@@ -110,6 +110,10 @@ update message model =
             ( updateGame posix model, Cmd.none )
 
 
+f =
+    1
+
+
 updateGame : Posix -> Model -> Model
 updateGame _ model =
     randomUpdateWalker model

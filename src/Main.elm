@@ -15,12 +15,15 @@ type alias Flags =
 
 
 type alias Model =
-    {}
+    { screen : Screen }
 
 
 init : Flags -> ( Model, Cmd Msg )
 init flags =
-    ( {}, Browser.Dom.getViewport |> Task.perform GotViewport )
+    ( { screen = Screen 600 400
+      }
+    , Browser.Dom.getViewport |> Task.perform GotViewport
+    )
 
 
 type Msg
@@ -39,8 +42,8 @@ update message model =
         NoOp ->
             ( model, Cmd.none )
 
-        GotViewport viewport ->
-            ( model, Cmd.none )
+        GotViewport { scene } ->
+            ( { model | screen = Screen scene.width scene.height }, Cmd.none )
 
 
 main =

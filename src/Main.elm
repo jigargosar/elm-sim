@@ -152,12 +152,13 @@ randomUpdateWalker =
     randomUpdateWalkerHelp 10
 
 
+randomUpdateWalkerHelp : Int -> Model -> Model
 randomUpdateWalkerHelp maxTries model =
     let
         ( walker, seed ) =
             Random.step (updateWalkerGenerator model.walker) model.seed
     in
-    if maxTries > 0 && Set.member walker model.bitMap then
+    if maxTries > 0 && Set.member walker model.walkerHistory then
         randomUpdateWalkerHelp (maxTries - 1) { model | seed = seed }
 
     else

@@ -148,7 +148,11 @@ randomUpdateWalker model =
         ( walker, seed ) =
             Random.step (updateWalkerGenerator model.walker) model.seed
     in
-    { model | walker = walker, seed = seed }
+    if Set.member ( walker.x, walker.y ) model.bitMap then
+        randomUpdateWalker { model | seed = seed }
+
+    else
+        { model | walker = walker, seed = seed }
 
 
 updateWalkerGenerator : Walker -> Generator Walker

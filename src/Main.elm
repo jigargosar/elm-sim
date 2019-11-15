@@ -126,10 +126,10 @@ update message model =
             ( { model | screen = screenFromWH (toFloat w) (toFloat h) }, Cmd.none )
 
         OnAnimationFrame posix ->
-            ( updateAnimation posix model, Cmd.none )
+            ( updateGame posix model, Cmd.none )
 
 
-updateAnimation posix model =
+updateGame posix model =
     let
         walker =
             updateWalker model.walker

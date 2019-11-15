@@ -11,6 +11,10 @@ import Svg.Attributes exposing (..)
 import Task
 
 
+
+-- Screen
+
+
 type alias Screen =
     { w : Float
     , h : Float
@@ -32,10 +36,30 @@ screenFromWH w h =
     }
 
 
+
+-- Transform
+
+
 type alias Transform =
     { x : Float
     , y : Float
     }
+
+
+noTransform : Transform
+noTransform =
+    { x = 0
+    , y = 0
+    }
+
+
+move : Float -> Float -> Transform -> Transform
+move dx dy ({ x, y } as t) =
+    { t | x = x + dx, y = y + dy }
+
+
+
+-- Model
 
 
 type alias Flags =
@@ -90,18 +114,6 @@ main =
         , update = update
         , view = view
         }
-
-
-noTransform : Transform
-noTransform =
-    { x = 0
-    , y = 0
-    }
-
-
-move : Float -> Float -> Transform -> Transform
-move dx dy ({ x, y } as t) =
-    { t | x = x + dx, y = y + dy }
 
 
 view : Model -> Html msg

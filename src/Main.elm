@@ -31,6 +31,12 @@ screenFromWH w h =
     }
 
 
+type alias Transform =
+    { x : Float
+    , y : Float
+    }
+
+
 type alias Flags =
     {}
 
@@ -80,8 +86,19 @@ main =
         }
 
 
+noTransform : Transform
+noTransform =
+    { x = 0
+    , y = 0
+    }
+
+
 view : Model -> Html msg
 view model =
+    let
+        circleT =
+            Transform 0 0
+    in
     render model.screen [ renderCircle 10 ]
 
 

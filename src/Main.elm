@@ -113,9 +113,12 @@ update message model =
 
 
 updateGame : Posix -> Model -> Model
-updateGame _ model =
-    randomUpdateWalker model
-        |> updateWalkerHistory
+updateGame _ =
+    walkOnce >> walkOnce >> walkOnce >> walkOnce >> walkOnce >> walkOnce
+
+
+walkOnce =
+    randomUpdateWalker >> updateWalkerHistory
 
 
 updateWalkerHistory : Model -> Model
@@ -186,12 +189,15 @@ view model =
     let
         screen =
             model.screen
+
+        list =
+            List.reverse model.walkerHistoryList
     in
     render screen
         [ renderKeyedGroup [] renderKeyedBit (List.reverse model.walkerHistoryList)
 
         {- ,
-           renderGroup [] renderBit (Set.toList model.walkerHistory)
+           renderGroup [] renderBit list
         -}
         ]
 

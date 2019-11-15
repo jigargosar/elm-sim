@@ -5,7 +5,7 @@ import Browser.Dom exposing (Viewport)
 import Browser.Events
 import Html exposing (Html, text)
 import Html.Attributes as H
-import Random exposing (Seed)
+import Random exposing (Generator, Seed)
 import Task
 import Time exposing (Posix)
 import TypedSvg exposing (..)
@@ -139,6 +139,20 @@ updateGame posix model =
 
 updateWalker walker =
     { walker | x = walker.x + 1.5 }
+
+
+updateWalkerGenerator : Walker -> Generator Walker
+updateWalkerGenerator walker =
+    Random.pair (Random.int 0 1) (Random.int 0 1)
+        |> Random.map
+            (Tuple.mapBoth toFloat toFloat
+                >> (\( dx, dy ) ->
+                        { walker
+                            | x = walker.x + dx
+                            , y = walker.y + dy
+                        }
+                   )
+            )
 
 
 main : Program Flags Model Msg

@@ -73,14 +73,14 @@ type alias Flags =
 
 
 type alias Walker =
-    { x : Float, y : Float }
+    { x : Int, y : Int }
 
 
 type alias Model =
     { screen : Screen
     , seed : Seed
     , walker : Walker
-    , bitMap : Set ( Float, Float )
+    , bitMap : Set ( Int, Int )
     }
 
 
@@ -155,13 +155,11 @@ updateWalkerGenerator : Walker -> Generator Walker
 updateWalkerGenerator walker =
     Random.pair (Random.int -1 1) (Random.int -1 1)
         |> Random.map
-            (Tuple.mapBoth toFloat toFloat
-                >> (\( dx, dy ) ->
-                        { walker
-                            | x = walker.x + dx
-                            , y = walker.y + dy
-                        }
-                   )
+            (\( dx, dy ) ->
+                { walker
+                    | x = walker.x + dx
+                    , y = walker.y + dy
+                }
             )
 
 
@@ -181,7 +179,7 @@ view model =
         screen =
             model.screen
     in
-    render screen (Set.toList model.bitMap |> List.map renderBit)
+    render screen (Set.toList model.bitMap |> List.map (Tuple.mapBoth toFloat toFloat >> renderBit))
 
 
 renderBit : ( Float, Float ) -> Svg msg

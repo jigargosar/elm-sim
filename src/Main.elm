@@ -93,11 +93,17 @@ noTransform =
     }
 
 
+move : Float -> Float -> Transform -> Transform
+move x y t =
+    { t | x = x, y = y }
+
+
 view : Model -> Html msg
 view model =
     let
         circleT =
-            Transform 0 0
+            noTransform
+                |> move 10 10
     in
     render model.screen [ renderCircle 10 ]
 
@@ -127,14 +133,29 @@ render screen =
         ]
 
 
-renderCircle : Float -> Svg msg
-renderCircle radius =
+renderCircle : Float -> Transform -> Svg msg
+renderCircle radius transform_ =
     -- renderCircle color radius x y angle s alpha =
     Svg.circle
         (r (String.fromFloat radius)
             --:: fill (renderColor color)
-            --:: transform (renderTransform x y angle s)
+            :: transform (renderTransform transform_)
             --:: renderAlpha alpha
             :: []
         )
         []
+
+
+renderTransform : Transform -> String
+renderTransform { x, y } =
+    let
+        a =
+            0
+
+        translate_ =
+            "translate(" ++ String.fromFloat x ++ "," ++ String.fromFloat -y ++ ")"
+
+        rotate_ =
+            "rotate(" ++ String.fromFloat -a ++ ")"
+    in
+    translate_ ++ " " ++ rotate_

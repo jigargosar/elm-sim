@@ -138,7 +138,7 @@ updateAnimation posix model =
 
 
 updateWalker walker =
-    { walker | x = walker.x + 1 }
+    { walker | x = walker.x + 1.5 }
 
 
 main : Program Flags Model Msg

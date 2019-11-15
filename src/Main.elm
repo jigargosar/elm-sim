@@ -82,7 +82,7 @@ type alias Model =
     { screen : Screen
     , seed : Seed
     , walker : Walker
-    , bitMap : Set Walker
+    , walkerHistory : Set Walker
     }
 
 
@@ -95,7 +95,7 @@ init flags =
     ( { screen = screenFromWH 600 400
       , seed = Random.initialSeed flags.now
       , walker = walker
-      , bitMap = Set.singleton walker
+      , walkerHistory = Set.singleton walker
       }
     , Browser.Dom.getViewport |> Task.perform GotViewport
     )
@@ -144,7 +144,7 @@ updateWalkPath model =
         ( x, y ) =
             model.walker
     in
-    { model | bitMap = Set.insert ( x, y ) model.bitMap }
+    { model | walkerHistory = Set.insert ( x, y ) model.walkerHistory }
 
 
 randomUpdateWalker : Model -> Model
@@ -189,7 +189,7 @@ view model =
         screen =
             model.screen
     in
-    render screen [ Svg.Keyed.node "g" [] (Set.toList model.bitMap |> List.map renderBit) ]
+    render screen [ Svg.Keyed.node "g" [] (Set.toList model.walkerHistory |> List.map renderBit) ]
 
 
 renderBit : Walker -> ( String, Svg msg )

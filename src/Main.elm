@@ -186,10 +186,11 @@ view model =
             model.screen
     in
     render screen
-        [ {- renderKeyedGroup [] renderKeyedBit (Set.toList model.walkerHistory)
-             ,
-          -}
-          renderGroup [] renderBit (Set.toList model.walkerHistory)
+        [ renderKeyedGroup [] renderKeyedBit (Set.toList model.walkerHistory)
+
+        {- ,
+           renderGroup [] renderBit (Set.toList model.walkerHistory)
+        -}
         ]
 
 

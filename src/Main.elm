@@ -200,7 +200,7 @@ renderBit ( x, y ) =
 renderBitAt : Int -> Int -> Svg msg
 renderBitAt x y =
     circle
-        [ r 1
+        [ r 0.5
         , transform [ Translate (toFloat x) (toFloat y) ]
         ]
         []

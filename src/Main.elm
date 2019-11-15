@@ -108,11 +108,11 @@ view model =
         screen =
             model.screen
     in
-    viewScreen screen [ renderCircle 10 circleT ]
+    render screen [ renderCircle 10 circleT ]
 
 
-viewScreen : Screen -> List (Svg msg) -> Html msg
-viewScreen screen =
+render : Screen -> List (Svg msg) -> Html msg
+render screen =
     let
         w =
             String.fromFloat screen.w

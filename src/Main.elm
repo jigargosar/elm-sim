@@ -6,9 +6,12 @@ import Browser.Events
 import Html exposing (Html, text)
 import Html.Attributes as H
 import Random exposing (Seed)
-import Svg exposing (..)
-import Svg.Attributes exposing (..)
 import Task
+import TypedSvg exposing (..)
+import TypedSvg.Attributes as A exposing (transform, viewBox)
+import TypedSvg.Attributes.InPx exposing (r)
+import TypedSvg.Core exposing (Svg)
+import TypedSvg.Types as T exposing (Transform(..), percent)
 
 
 
@@ -40,20 +43,20 @@ screenFromWH w h =
 -- Transform
 
 
-type alias Transform =
+type alias Transforms =
     { x : Float
     , y : Float
     }
 
 
-noTransform : Transform
+noTransform : Transforms
 noTransform =
     { x = 0
     , y = 0
     }
 
 
-move : Float -> Float -> Transform -> Transform
+move : Float -> Float -> Transforms -> Transforms
 move dx dy ({ x, y } as t) =
     { t | x = x + dx, y = y + dy }
 
@@ -133,50 +136,44 @@ render : Screen -> List (Svg msg) -> Html msg
 render screen =
     let
         w =
-            String.fromFloat screen.w
+            screen.w
 
         h =
-            String.fromFloat screen.h
+            screen.h
 
         x =
-            String.fromFloat screen.l
+            screen.l
 
         y =
-            String.fromFloat screen.b
+            screen.b
     in
     svg
-        [ viewBox (x ++ " " ++ y ++ " " ++ w ++ " " ++ h)
+        [ viewBox x y w h
         , H.style "position" "fixed"
         , H.style "top" "0"
         , H.style "left" "0"
-        , width "100%"
-        , height "100%"
+        , A.width (percent 100)
+        , A.height (percent 100)
         ]
 
 
-renderCircle : Float -> Transform -> Svg msg
-renderCircle radius transform_ =
+renderCircle : Float -> Transforms -> Svg msg
+renderCircle radius transforms_ =
     -- renderCircle color radius x y angle s alpha =
-    Svg.circle
-        (r (String.fromFloat radius)
+    circle
+        (r radius
             --:: fill (renderColor color)
-            :: transform (renderTransform transform_)
+            :: transform (renderTransforms transforms_)
             --:: renderAlpha alpha
             :: []
         )
         []
 
 
-renderTransform : Transform -> String
-renderTransform { x, y } =
+renderTransforms : Transforms -> List T.Transform
+renderTransforms { x, y } =
     let
         a =
             0
-
-        translate_ =
-            "translate(" ++ String.fromFloat x ++ "," ++ String.fromFloat -y ++ ")"
-
-        rotate_ =
-            "rotate(" ++ String.fromFloat -a ++ ")"
     in
-    translate_ ++ " " ++ rotate_
+    [ Translate x -y, Rotate -a 0 0 ]

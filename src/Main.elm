@@ -70,9 +70,14 @@ type alias Flags =
     }
 
 
+type alias Walker =
+    { x : Float, y : Float }
+
+
 type alias Model =
     { screen : Screen
     , seed : Seed
+    , walker : Walker
     }
 
 
@@ -80,6 +85,7 @@ init : Flags -> ( Model, Cmd Msg )
 init flags =
     ( { screen = screenFromWH 600 400
       , seed = Random.initialSeed flags.now
+      , walker = Walker 0 0
       }
     , Browser.Dom.getViewport |> Task.perform GotViewport
     )

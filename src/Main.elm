@@ -2,6 +2,7 @@ module Main exposing (main)
 
 import Browser
 import Browser.Dom exposing (Viewport)
+import Browser.Events
 import Html exposing (text)
 import Task
 
@@ -46,11 +47,12 @@ init flags =
 type Msg
     = NoOp
     | GotViewport Viewport
+    | OnBrowserResize Int Int
 
 
 subscriptions : Model -> Sub Msg
 subscriptions _ =
-    Sub.none
+    Browser.Events.onResize OnBrowserResize
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -61,6 +63,9 @@ update message model =
 
         GotViewport { scene } ->
             ( { model | screen = screenFromWH scene.width scene.height }, Cmd.none )
+
+        OnBrowserResize w h ->
+            ( { model | screen = screenFromWH (toFloat w) (toFloat h) }, Cmd.none )
 
 
 main =

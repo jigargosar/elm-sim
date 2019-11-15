@@ -60,7 +60,8 @@ type alias Model =
     { screen : Screen
     , seed : Seed
     , walker : Walker
-    , walkerHistory : Set Walker
+    , walkerHistorySet : Set Walker
+    , walkerHistoryList : List Walker
     }
 
 
@@ -73,7 +74,8 @@ init flags =
     ( { screen = screenFromWH 600 400
       , seed = Random.initialSeed flags.now
       , walker = walker
-      , walkerHistory = Set.singleton walker
+      , walkerHistorySet = Set.singleton walker
+      , walkerHistoryList = List.singleton walker
       }
     , Browser.Dom.getViewport |> Task.perform GotViewport
     )
@@ -118,11 +120,10 @@ updateGame _ model =
 
 updateWalkerHistory : Model -> Model
 updateWalkerHistory model =
-    let
-        ( x, y ) =
-            model.walker
-    in
-    { model | walkerHistory = Set.insert ( x, y ) model.walkerHistory }
+    { model
+        | walkerHistorySet = Set.insert model.walker model.walkerHistorySet
+        , walkerHistoryList = model.walker :: model.walkerHistoryList
+    }
 
 
 randomUpdateWalker : Model -> Model
@@ -136,7 +137,7 @@ randomUpdateWalkerHelp maxTries model =
         ( walker, seed ) =
             Random.step (updateWalkerGenerator model.walker) model.seed
     in
-    if maxTries > 0 && Set.member walker model.walkerHistory then
+    if maxTries > 0 && Set.member walker model.walkerHistorySet then
         randomUpdateWalkerHelp (maxTries - 1) { model | seed = seed }
 
     else
@@ -187,7 +188,7 @@ view model =
             model.screen
     in
     render screen
-        [ renderKeyedGroup [] renderKeyedBit (Set.toList model.walkerHistory)
+        [ renderKeyedGroup [] renderKeyedBit (Set.toList model.walkerHistorySet)
 
         {- ,
            renderGroup [] renderBit (Set.toList model.walkerHistory)

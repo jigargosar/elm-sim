@@ -15,7 +15,7 @@ import TypedSvg exposing (..)
 import TypedSvg.Attributes as A exposing (transform, viewBox)
 import TypedSvg.Attributes.InPx exposing (r)
 import TypedSvg.Core exposing (Svg)
-import TypedSvg.Types as T exposing (Transform(..), percent)
+import TypedSvg.Types exposing (Transform(..), percent)
 
 
 
@@ -41,28 +41,6 @@ screenFromWH w h =
     , l = w / 2 * -1
     , r = w / 2
     }
-
-
-
--- Transform
-
-
-type alias Transforms =
-    { x : Float
-    , y : Float
-    }
-
-
-noTransform : Transforms
-noTransform =
-    { x = 0
-    , y = 0
-    }
-
-
-move : Float -> Float -> Transforms -> Transforms
-move dx dy ({ x, y } as t) =
-    { t | x = x + dx, y = y + dy }
 
 
 
@@ -133,7 +111,7 @@ update message model =
 
 
 updateGame : Posix -> Model -> Model
-updateGame posix model =
+updateGame _ model =
     randomUpdateWalker model
         |> updateWalkerHistory
 
@@ -230,25 +208,3 @@ render screen =
         , A.width (percent 100)
         , A.height (percent 100)
         ]
-
-
-renderCircle : Float -> Transforms -> Svg msg
-renderCircle radius transforms_ =
-    -- renderCircle color radius x y angle s alpha =
-    circle
-        (r radius
-            --:: fill (renderColor color)
-            :: transform (renderTransforms transforms_)
-            --:: renderAlpha alpha
-            :: []
-        )
-        []
-
-
-renderTransforms : Transforms -> List T.Transform
-renderTransforms { x, y } =
-    let
-        a =
-            0
-    in
-    [ Translate x -y, Rotate -a 0 0 ]

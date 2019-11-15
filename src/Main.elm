@@ -130,20 +130,25 @@ update message model =
 
 
 updateGame posix model =
+    randomUpdateWalker model
+        |> updateWalkPath
+
+
+updateWalkPath model =
+    { model | walkPath = model.walker :: model.walkPath }
+
+
+randomUpdateWalker model =
     let
-        walker =
-            updateWalker model.walker
+        ( walker, seed ) =
+            Random.step (updateWalkerGenerator model.walker) model.seed
     in
-    { model | walker = walker, walkPath = walker :: model.walkPath }
-
-
-updateWalker walker =
-    { walker | x = walker.x + 1.5 }
+    { model | walker = walker, seed = seed }
 
 
 updateWalkerGenerator : Walker -> Generator Walker
 updateWalkerGenerator walker =
-    Random.pair (Random.int 0 1) (Random.int 0 1)
+    Random.pair (Random.int -1 1) (Random.int -1 1)
         |> Random.map
             (Tuple.mapBoth toFloat toFloat
                 >> (\( dx, dy ) ->

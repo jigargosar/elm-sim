@@ -140,7 +140,7 @@ updateWalkerHistory model =
 
 
 batchSize =
-    100
+    500
 
 
 updateWalkerHistoryBatch model =

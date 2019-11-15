@@ -146,13 +146,17 @@ updateWalkPath model =
 
 
 randomUpdateWalker : Model -> Model
-randomUpdateWalker model =
+randomUpdateWalker =
+    randomUpdateWalkerHelp 10
+
+
+randomUpdateWalkerHelp maxTries model =
     let
         ( walker, seed ) =
             Random.step (updateWalkerGenerator model.walker) model.seed
     in
-    if Set.member walker model.bitMap then
-        randomUpdateWalker { model | seed = seed }
+    if maxTries > 0 && Set.member walker model.bitMap then
+        randomUpdateWalkerHelp (maxTries - 1) { model | seed = seed }
 
     else
         { model | walker = walker, seed = seed }

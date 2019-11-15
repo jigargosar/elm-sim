@@ -7,6 +7,8 @@ import Html exposing (Html)
 import Html.Attributes as H
 import Random exposing (Generator, Seed)
 import Set exposing (Set)
+import Svg.Keyed
+import Svg.Lazy
 import Task
 import Time exposing (Posix)
 import TypedSvg exposing (..)
@@ -187,17 +189,21 @@ view model =
         screen =
             model.screen
     in
-    render screen (Set.toList model.bitMap |> List.map (Tuple.mapBoth toFloat toFloat >> renderBit))
+    render screen [ Svg.Keyed.node "g" [] (Set.toList model.bitMap |> List.map renderBit) ]
 
 
-renderBit : ( Float, Float ) -> Svg msg
+renderBit : Walker -> ( String, Svg msg )
 renderBit ( x, y ) =
-    let
-        t =
-            noTransform
-                |> move x y
-    in
-    renderCircle 1 t
+    ( String.fromInt x ++ "," ++ String.fromInt y, Svg.Lazy.lazy2 renderBitAt x y )
+
+
+renderBitAt : Int -> Int -> Svg msg
+renderBitAt x y =
+    circle
+        [ r 1
+        , transform [ Translate (toFloat x) (toFloat y) ]
+        ]
+        []
 
 
 render : Screen -> List (Svg msg) -> Html msg

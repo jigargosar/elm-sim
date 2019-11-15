@@ -3,7 +3,7 @@ module Main exposing (main)
 import Browser
 import Browser.Dom exposing (Viewport)
 import Browser.Events
-import Html exposing (Html, text)
+import Html exposing (Html)
 import Html.Attributes as H
 import Random exposing (Generator, Seed)
 import Set exposing (Set)
@@ -73,14 +73,14 @@ type alias Flags =
 
 
 type alias Walker =
-    { x : Int, y : Int }
+    ( Int, Int )
 
 
 type alias Model =
     { screen : Screen
     , seed : Seed
     , walker : Walker
-    , bitMap : Set ( Int, Int )
+    , bitMap : Set Walker
     }
 
 
@@ -88,12 +88,12 @@ init : Flags -> ( Model, Cmd Msg )
 init flags =
     let
         walker =
-            Walker 0 0
+            ( 0, 0 )
     in
     ( { screen = screenFromWH 600 400
       , seed = Random.initialSeed flags.now
       , walker = walker
-      , bitMap = Set.singleton ( walker.x, walker.y )
+      , bitMap = Set.singleton walker
       }
     , Browser.Dom.getViewport |> Task.perform GotViewport
     )
@@ -130,25 +130,28 @@ update message model =
             ( updateGame posix model, Cmd.none )
 
 
+updateGame : Posix -> Model -> Model
 updateGame posix model =
     randomUpdateWalker model
         |> updateWalkPath
 
 
+updateWalkPath : Model -> Model
 updateWalkPath model =
     let
-        { x, y } =
+        ( x, y ) =
             model.walker
     in
     { model | bitMap = Set.insert ( x, y ) model.bitMap }
 
 
+randomUpdateWalker : Model -> Model
 randomUpdateWalker model =
     let
         ( walker, seed ) =
             Random.step (updateWalkerGenerator model.walker) model.seed
     in
-    if Set.member ( walker.x, walker.y ) model.bitMap then
+    if Set.member walker model.bitMap then
         randomUpdateWalker { model | seed = seed }
 
     else
@@ -156,14 +159,11 @@ randomUpdateWalker model =
 
 
 updateWalkerGenerator : Walker -> Generator Walker
-updateWalkerGenerator walker =
+updateWalkerGenerator ( x, y ) =
     Random.pair (Random.int -1 1) (Random.int -1 1)
         |> Random.map
             (\( dx, dy ) ->
-                { walker
-                    | x = walker.x + dx
-                    , y = walker.y + dy
-                }
+                ( x + dx, y + dy )
             )
 
 

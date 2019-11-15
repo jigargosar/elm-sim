@@ -188,7 +188,7 @@ view model =
             model.screen
     in
     render screen
-        [ renderKeyedGroup [] renderKeyedBit (Set.toList model.walkerHistorySet)
+        [ renderKeyedGroup [] renderKeyedBit (List.reverse model.walkerHistoryList)
 
         {- ,
            renderGroup [] renderBit (Set.toList model.walkerHistory)

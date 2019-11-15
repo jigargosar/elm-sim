@@ -1,7 +1,9 @@
 module Main exposing (main)
 
 import Browser
+import Browser.Dom exposing (Viewport)
 import Html exposing (text)
+import Task
 
 
 type alias Screen =
@@ -16,24 +18,28 @@ type alias Model =
     {}
 
 
-init : Flags -> ( Model, Cmd msg )
+init : Flags -> ( Model, Cmd Msg )
 init flags =
-    ( {}, Cmd.none )
+    ( {}, Browser.Dom.getViewport |> Task.perform GotViewport )
 
 
 type Msg
     = NoOp
+    | GotViewport Viewport
 
 
-subscriptions : Model -> Sub msg
+subscriptions : Model -> Sub Msg
 subscriptions _ =
     Sub.none
 
 
-update : Msg -> Model -> ( Model, Cmd msg )
+update : Msg -> Model -> ( Model, Cmd Msg )
 update message model =
     case message of
         NoOp ->
+            ( model, Cmd.none )
+
+        GotViewport viewport ->
             ( model, Cmd.none )
 
 

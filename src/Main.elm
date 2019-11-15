@@ -62,6 +62,8 @@ type alias Model =
     , walker : Walker
     , walkerHistorySet : Set Walker
     , walkerHistoryList : List Walker
+    , walkerHistoryListLength : Int
+    , walkerHistoryBatch : List (List Walker)
     }
 
 
@@ -76,6 +78,8 @@ init flags =
       , walker = walker
       , walkerHistorySet = Set.singleton walker
       , walkerHistoryList = List.singleton walker
+      , walkerHistoryListLength = 1
+      , walkerHistoryBatch = []
       }
     , Browser.Dom.getViewport |> Task.perform GotViewport
     )
@@ -123,10 +127,32 @@ walkOnce =
 
 updateWalkerHistory : Model -> Model
 updateWalkerHistory model =
+    let
+        walker =
+            model.walker
+    in
     { model
-        | walkerHistorySet = Set.insert model.walker model.walkerHistorySet
-        , walkerHistoryList = model.walker :: model.walkerHistoryList
+        | walkerHistorySet = Set.insert walker model.walkerHistorySet
+        , walkerHistoryList = walker :: model.walkerHistoryList
+        , walkerHistoryListLength = model.walkerHistoryListLength + 1
     }
+        |> updateWalkerHistoryBatch
+
+
+updateWalkerHistoryBatch model =
+    if model.walkerHistoryListLength > 100 then
+        let
+            newWHL =
+                List.drop 100 model.walkerHistoryList
+        in
+        { model
+            | walkerHistoryList = newWHL
+            , walkerHistoryListLength = List.length newWHL
+            , walkerHistoryBatch = List.take 100 model.walkerHistoryList :: model.walkerHistoryBatch
+        }
+
+    else
+        model
 
 
 randomUpdateWalker : Model -> Model
@@ -194,7 +220,7 @@ view model =
             List.reverse model.walkerHistoryList
     in
     render screen
-        [ renderKeyedGroup [] renderKeyedBit (List.reverse model.walkerHistoryList)
+        [ renderKeyedGroup [] renderKeyedBit list
 
         {- ,
            renderGroup [] renderBit list

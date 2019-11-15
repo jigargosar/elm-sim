@@ -14,7 +14,7 @@ import Time exposing (Posix)
 import TypedSvg exposing (..)
 import TypedSvg.Attributes as A exposing (transform, viewBox)
 import TypedSvg.Attributes.InPx exposing (r)
-import TypedSvg.Core exposing (Svg)
+import TypedSvg.Core as Svg exposing (Svg)
 import TypedSvg.Types exposing (Transform(..), percent)
 
 
@@ -143,13 +143,30 @@ randomUpdateWalkerHelp maxTries model =
         { model | walker = walker, seed = seed }
 
 
+randomIntRange n =
+    Random.int -n n
+
+
+double : a -> ( a, a )
+double n =
+    ( n, n )
+
+
+uncurry : (a -> b -> c) -> ( a, b ) -> c
+uncurry func ( a, b ) =
+    func a b
+
+
+tupleLift : (a -> b -> c) -> ( a, a ) -> ( b, b ) -> ( c, c )
+tupleLift f ( a, b ) ( c, d ) =
+    ( f a c, f b d )
+
+
 updateWalkerGenerator : Walker -> Generator Walker
-updateWalkerGenerator ( x, y ) =
-    Random.pair (Random.int -1 1) (Random.int -1 1)
-        |> Random.map
-            (\( dx, dy ) ->
-                ( x + dx, y + dy )
-            )
+updateWalkerGenerator walker =
+    double (randomIntRange 1)
+        |> uncurry Random.pair
+        |> Random.map (tupleLift (+) walker)
 
 
 main : Program Flags Model Msg
@@ -168,18 +185,36 @@ view model =
         screen =
             model.screen
     in
-    render screen [ Svg.Keyed.node "g" [] (Set.toList model.walkerHistory |> List.map renderBit) ]
+    render screen
+        [ renderKeyedGroup [] renderKeyedBit (Set.toList model.walkerHistory)
+        , renderGroup [] renderBit (Set.toList model.walkerHistory)
+        ]
 
 
-renderBit : Walker -> ( String, Svg msg )
+renderKeyedGroup : List (Svg.Attribute msg) -> (a -> ( String, Svg msg )) -> List a -> Svg msg
+renderKeyedGroup attrs func list =
+    Svg.Keyed.node "g" attrs (List.map func list)
+
+
+renderGroup : List (Svg.Attribute msg) -> (a -> Svg msg) -> List a -> Svg msg
+renderGroup attrs func list =
+    g attrs (List.map func list)
+
+
+renderKeyedBit : Walker -> ( String, Svg msg )
+renderKeyedBit ( x, y ) =
+    ( String.fromInt x ++ "," ++ String.fromInt y, renderBit ( x, y ) )
+
+
+renderBit : ( Int, Int ) -> Svg msg
 renderBit ( x, y ) =
-    ( String.fromInt x ++ "," ++ String.fromInt y, Svg.Lazy.lazy2 renderBitAt x y )
+    Svg.Lazy.lazy2 renderBitAt x y
 
 
 renderBitAt : Int -> Int -> Svg msg
 renderBitAt x y =
     circle
-        [ r 2
+        [ r 0.5
         , transform [ Translate (toFloat x) (toFloat y) ]
         ]
         []

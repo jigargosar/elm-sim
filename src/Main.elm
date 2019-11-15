@@ -79,14 +79,20 @@ type alias Model =
     { screen : Screen
     , seed : Seed
     , walker : Walker
+    , walkPath : List Walker
     }
 
 
 init : Flags -> ( Model, Cmd Msg )
 init flags =
+    let
+        walker =
+            Walker 0 0
+    in
     ( { screen = screenFromWH 600 400
       , seed = Random.initialSeed flags.now
-      , walker = Walker 0 0
+      , walker = walker
+      , walkPath = [ walker ]
       }
     , Browser.Dom.getViewport |> Task.perform GotViewport
     )
@@ -124,7 +130,11 @@ update message model =
 
 
 updateAnimation posix model =
-    { model | walker = updateWalker model.walker }
+    let
+        walker =
+            updateWalker model.walker
+    in
+    { model | walker = walker, walkPath = walker :: model.walkPath }
 
 
 updateWalker walker =
@@ -144,17 +154,19 @@ main =
 view : Model -> Html msg
 view model =
     let
-        walker =
-            model.walker
-
-        walkerT =
-            noTransform
-                |> move walker.x walker.y
-
         screen =
             model.screen
     in
-    render screen [ renderCircle 1 walkerT ]
+    render screen (List.map renderWalker model.walkPath)
+
+
+renderWalker walker =
+    let
+        walkerT =
+            noTransform
+                |> move walker.x walker.y
+    in
+    renderCircle 1 walkerT
 
 
 render : Screen -> List (Svg msg) -> Html msg

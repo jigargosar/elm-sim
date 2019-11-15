@@ -94,8 +94,8 @@ noTransform =
 
 
 move : Float -> Float -> Transform -> Transform
-move x y t =
-    { t | x = x, y = y }
+move dx dy ({ x, y } as t) =
+    { t | x = x + dx, y = y + dy }
 
 
 view : Model -> Html msg
@@ -103,9 +103,12 @@ view model =
     let
         circleT =
             noTransform
-                |> move 10 10
+                |> move screen.l 0
+
+        screen =
+            model.screen
     in
-    render model.screen [ renderCircle 10 circleT ]
+    render screen [ renderCircle 10 circleT ]
 
 
 render : Screen -> List (Svg msg) -> Html msg

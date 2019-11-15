@@ -135,11 +135,11 @@ update message model =
 updateGame : Posix -> Model -> Model
 updateGame posix model =
     randomUpdateWalker model
-        |> updateWalkPath
+        |> updateWalkerHistory
 
 
-updateWalkPath : Model -> Model
-updateWalkPath model =
+updateWalkerHistory : Model -> Model
+updateWalkerHistory model =
     let
         ( x, y ) =
             model.walker

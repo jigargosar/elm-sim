@@ -3,7 +3,10 @@ module Main exposing (main)
 import Browser
 import Browser.Dom exposing (Viewport)
 import Browser.Events
-import Html exposing (text)
+import Html exposing (Html, text)
+import Html.Attributes as H
+import Svg exposing (..)
+import Svg.Attributes exposing (..)
 import Task
 
 
@@ -77,5 +80,44 @@ main =
         }
 
 
-view _ =
-    text "hi"
+view : Model -> Html msg
+view model =
+    render model.screen [ renderCircle 10 ]
+
+
+render : Screen -> List (Svg msg) -> Html msg
+render screen =
+    let
+        w =
+            String.fromFloat screen.w
+
+        h =
+            String.fromFloat screen.h
+
+        x =
+            String.fromFloat screen.l
+
+        y =
+            String.fromFloat screen.b
+    in
+    svg
+        [ viewBox (x ++ " " ++ y ++ " " ++ w ++ " " ++ h)
+        , H.style "position" "fixed"
+        , H.style "top" "0"
+        , H.style "left" "0"
+        , width "100%"
+        , height "100%"
+        ]
+
+
+renderCircle : Float -> Svg msg
+renderCircle radius =
+    -- renderCircle color radius x y angle s alpha =
+    Svg.circle
+        (r (String.fromFloat radius)
+            --:: fill (renderColor color)
+            --:: transform (renderTransform x y angle s)
+            --:: renderAlpha alpha
+            :: []
+        )
+        []

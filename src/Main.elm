@@ -143,6 +143,7 @@ randomUpdateWalkerHelp maxTries model =
         { model | walker = walker, seed = seed }
 
 
+randomIntRange : Int -> Generator Int
 randomIntRange n =
     Random.int -n n
 

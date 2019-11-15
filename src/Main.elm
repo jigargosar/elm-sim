@@ -105,7 +105,7 @@ view model =
             noTransform
                 |> move 10 10
     in
-    render model.screen [ renderCircle 10 ]
+    render model.screen [ renderCircle 10 circleT ]
 
 
 render : Screen -> List (Svg msg) -> Html msg

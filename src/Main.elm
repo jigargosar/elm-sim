@@ -7,7 +7,24 @@ import Task
 
 
 type alias Screen =
-    { w : Float, h : Float }
+    { w : Float
+    , h : Float
+    , t : Float
+    , b : Float
+    , l : Float
+    , r : Float
+    }
+
+
+screenFromWH : Float -> Float -> Screen
+screenFromWH w h =
+    { w = w
+    , h = h
+    , t = h / 2 * -1
+    , b = h / 2 * -1
+    , l = w / 2 * -1
+    , r = w / 2
+    }
 
 
 type alias Flags =
@@ -20,7 +37,7 @@ type alias Model =
 
 init : Flags -> ( Model, Cmd Msg )
 init flags =
-    ( { screen = Screen 600 400
+    ( { screen = screenFromWH 600 400
       }
     , Browser.Dom.getViewport |> Task.perform GotViewport
     )
@@ -43,7 +60,7 @@ update message model =
             ( model, Cmd.none )
 
         GotViewport { scene } ->
-            ( { model | screen = Screen scene.width scene.height }, Cmd.none )
+            ( { model | screen = screenFromWH scene.width scene.height }, Cmd.none )
 
 
 main =

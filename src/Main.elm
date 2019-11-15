@@ -7,6 +7,7 @@ import Html exposing (Html, text)
 import Html.Attributes as H
 import Random exposing (Seed)
 import Task
+import Time exposing (Posix)
 import TypedSvg exposing (..)
 import TypedSvg.Attributes as A exposing (transform, viewBox)
 import TypedSvg.Attributes.InPx exposing (r)
@@ -95,11 +96,15 @@ type Msg
     = NoOp
     | GotViewport Viewport
     | OnBrowserResize Int Int
+    | OnAnimationFrame Posix
 
 
 subscriptions : Model -> Sub Msg
 subscriptions _ =
-    Browser.Events.onResize OnBrowserResize
+    Sub.batch
+        [ Browser.Events.onResize OnBrowserResize
+        , Browser.Events.onAnimationFrame OnAnimationFrame
+        ]
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -113,6 +118,17 @@ update message model =
 
         OnBrowserResize w h ->
             ( { model | screen = screenFromWH (toFloat w) (toFloat h) }, Cmd.none )
+
+        OnAnimationFrame posix ->
+            ( updateAnimation posix model, Cmd.none )
+
+
+updateAnimation posix model =
+    { model | walker = updateWalker model.walker }
+
+
+updateWalker walker =
+    { walker | x = walker.x + 1 }
 
 
 main : Program Flags Model Msg
@@ -128,14 +144,17 @@ main =
 view : Model -> Html msg
 view model =
     let
-        circleT =
+        walker =
+            model.walker
+
+        walkerT =
             noTransform
-                |> move screen.l 0
+                |> move walker.x walker.y
 
         screen =
             model.screen
     in
-    render screen [ renderCircle 10 circleT ]
+    render screen [ renderCircle 10 walkerT ]
 
 
 render : Screen -> List (Svg msg) -> Html msg

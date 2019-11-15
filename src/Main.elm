@@ -139,16 +139,20 @@ updateWalkerHistory model =
         |> updateWalkerHistoryBatch
 
 
+batchSize =
+    100
+
+
 updateWalkerHistoryBatch model =
-    if model.walkerHistoryListLength > 100 then
+    if model.walkerHistoryListLength > batchSize then
         let
             newWHL =
-                List.drop 100 model.walkerHistoryList
+                List.drop batchSize model.walkerHistoryList
         in
         { model
             | walkerHistoryList = newWHL
             , walkerHistoryListLength = List.length newWHL
-            , walkerHistoryBatch = List.take 100 model.walkerHistoryList :: model.walkerHistoryBatch
+            , walkerHistoryBatch = List.take batchSize model.walkerHistoryList :: model.walkerHistoryBatch
         }
 
     else

@@ -6,6 +6,7 @@ import Browser.Events
 import Html exposing (Html, text)
 import Html.Attributes as H
 import Random exposing (Generator, Seed)
+import Set exposing (Set)
 import Task
 import Time exposing (Posix)
 import TypedSvg exposing (..)
@@ -79,7 +80,7 @@ type alias Model =
     { screen : Screen
     , seed : Seed
     , walker : Walker
-    , walkPath : List Walker
+    , bitMap : Set ( Float, Float )
     }
 
 
@@ -92,7 +93,7 @@ init flags =
     ( { screen = screenFromWH 600 400
       , seed = Random.initialSeed flags.now
       , walker = walker
-      , walkPath = [ walker ]
+      , bitMap = Set.singleton ( walker.x, walker.y )
       }
     , Browser.Dom.getViewport |> Task.perform GotViewport
     )
@@ -135,7 +136,11 @@ updateGame posix model =
 
 
 updateWalkPath model =
-    { model | walkPath = model.walker :: model.walkPath }
+    let
+        { x, y } =
+            model.walker
+    in
+    { model | bitMap = Set.insert ( x, y ) model.bitMap }
 
 
 randomUpdateWalker model =
@@ -176,16 +181,17 @@ view model =
         screen =
             model.screen
     in
-    render screen (List.map renderWalker model.walkPath)
+    render screen (Set.toList model.bitMap |> List.map renderBit)
 
 
-renderWalker walker =
+renderBit : ( Float, Float ) -> Svg msg
+renderBit ( x, y ) =
     let
-        walkerT =
+        t =
             noTransform
-                |> move walker.x walker.y
+                |> move x y
     in
-    renderCircle 1 walkerT
+    renderCircle 1 t
 
 
 render : Screen -> List (Svg msg) -> Html msg

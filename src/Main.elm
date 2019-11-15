@@ -154,7 +154,7 @@ view model =
         screen =
             model.screen
     in
-    render screen [ renderCircle 10 walkerT ]
+    render screen [ renderCircle 1 walkerT ]
 
 
 render : Screen -> List (Svg msg) -> Html msg

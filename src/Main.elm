@@ -5,6 +5,7 @@ import Browser.Dom exposing (Viewport)
 import Browser.Events
 import Html exposing (Html, text)
 import Html.Attributes as H
+import Random exposing (Seed)
 import Svg exposing (..)
 import Svg.Attributes exposing (..)
 import Task
@@ -38,16 +39,20 @@ type alias Transform =
 
 
 type alias Flags =
-    {}
+    { now : Int
+    }
 
 
 type alias Model =
-    { screen : Screen }
+    { screen : Screen
+    , seed : Seed
+    }
 
 
 init : Flags -> ( Model, Cmd Msg )
 init flags =
     ( { screen = screenFromWH 600 400
+      , seed = Random.initialSeed flags.now
       }
     , Browser.Dom.getViewport |> Task.perform GotViewport
     )
@@ -77,6 +82,7 @@ update message model =
             ( { model | screen = screenFromWH (toFloat w) (toFloat h) }, Cmd.none )
 
 
+main : Program Flags Model Msg
 main =
     Browser.element
         { init = init

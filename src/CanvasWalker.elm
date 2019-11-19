@@ -128,14 +128,15 @@ view model =
 
 
 type alias GridConfig =
-    { rowCount : Int, colCount : Int, cellSize : Float }
+    { rowCount : Int
+    , colCount : Int
+    }
 
 
 gridConfig : GridConfig
 gridConfig =
     { rowCount = 30
     , colCount = 30
-    , cellSize = 20
     }
 
 

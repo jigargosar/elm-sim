@@ -5,8 +5,9 @@ import Browser.Dom exposing (Viewport, getViewport)
 import Browser.Events exposing (onAnimationFrameDelta)
 import Class
 import Html exposing (..)
-import Html.Attributes exposing (class, classList, style)
+import Html.Attributes exposing (style)
 import Task
+import UI exposing (..)
 
 
 type alias Model =
@@ -45,28 +46,6 @@ main =
                         )
         , subscriptions = \_ -> onAnimationFrameDelta Tick
         }
-
-
-shouldDebugLayout =
-    False
-
-
-hStack lst =
-    Class.dFlex
-        :: Class.fdRow
-        :: Class.justifyCenter
-        :: classList [ ( "layout-debug", shouldDebugLayout ) ]
-        :: lst
-        |> div
-
-
-vStack lst =
-    Class.dFlex
-        :: Class.fdCol
-        :: Class.justifyCenter
-        :: classList [ ( "layout-debug", shouldDebugLayout ) ]
-        :: lst
-        |> div
 
 
 viewCell =

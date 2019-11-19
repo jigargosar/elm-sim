@@ -62,8 +62,7 @@ main =
 update message model =
     case message of
         Tick delta ->
-            ( updateCollectedDeltaBy delta model
-                |> step
+            ( mapElapsedBy delta model |> step
             , Cmd.none
             )
 
@@ -71,8 +70,8 @@ update message model =
             ( { model | grid = grid }, Cmd.none )
 
 
-updateCollectedDeltaBy : Float -> Model -> Model
-updateCollectedDeltaBy dd model =
+mapElapsedBy : Float -> Model -> Model
+mapElapsedBy dd model =
     { model | elapsed = model.elapsed + dd }
 
 
@@ -87,7 +86,7 @@ step model =
             1000 / updatesPerSecond
     in
     if model.elapsed > targetFrameInMilli then
-        updateOnFrame (updateCollectedDeltaBy -targetFrameInMilli model)
+        updateOnFrame (mapElapsedBy -targetFrameInMilli model)
             |> step
 
     else

@@ -77,18 +77,6 @@ nextStateOfCell aliveNeighbourCount cell =
                 Off
 
 
-nextStateOfCellAtRC : Int -> Int -> Grid -> Cell
-nextStateOfCellAtRC row col grid =
-    let
-        aliveNeighbourCount =
-            aliveNeighbourCountOfCellAtRC row col grid
-
-        cell =
-            cellAtRC row col grid
-    in
-    nextStateOfCell aliveNeighbourCount cell
-
-
 mapRows : (b -> b) -> { a | rows : b } -> { a | rows : b }
 mapRows func model =
     { model | rows = func model.rows }

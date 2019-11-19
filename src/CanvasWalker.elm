@@ -97,7 +97,7 @@ updateCollectedDeltaBy dd model =
 
 
 updatesPerSecond =
-    10
+    60
 
 
 step : Model -> Model

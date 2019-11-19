@@ -1,4 +1,4 @@
-module GridOfLife exposing (Cell(..), Grid, asList2d, cellAtRC, generator, initEmpty, nextState)
+module GridOfLife exposing (Cell(..), Grid, asList2d, generator, initEmpty, nextState)
 
 import Array exposing (Array)
 import Random exposing (Generator)

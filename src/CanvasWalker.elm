@@ -67,16 +67,17 @@ viewGrid c =
         borderSize =
             1
 
-        cellSize =
-            c.cellSize - borderSize
+        outlineSize =
+            0
 
         viewGridCell : Html msg
         viewGridCell =
             div
-                [ Style.widthPx cellSize
-                , Style.heightPx cellSize
+                [ Style.widthPx c.cellSize
+                , Style.heightPx c.cellSize
                 , Style.bgColor "yellow"
-                , Style.border [ Style.px borderSize, "solid", "rgba(0,0,0,0.5)" ]
+                , Style.border [ Style.px borderSize, "solid", "rgba(0,0,0,1)" ]
+                , Style.outline [ Style.px outlineSize, "solid", "rgba(0,0,0,1)" ]
                 , Style.noShrink
                 ]
                 []

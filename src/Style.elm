@@ -39,6 +39,11 @@ border =
     String.join " " >> A.style "border"
 
 
+outline : List String -> Attribute msg
+outline =
+    String.join " " >> A.style "outline"
+
+
 noShrink : Attribute msg
 noShrink =
     A.style "flex-shrink" "0"

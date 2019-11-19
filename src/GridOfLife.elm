@@ -99,8 +99,8 @@ nextGridState grid =
     let
         func =
             mapRCArrayIndexed
-                (\rowNum colNum cell ->
-                    nextStateOfCell (aliveNeighbourCountOfCellAtRC rowNum colNum grid) cell
+                (\rowNum colNum ->
+                    nextStateOfCell (aliveNeighbourCountOfCellAtRC rowNum colNum grid)
                 )
     in
     mapRows func grid

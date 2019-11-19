@@ -64,13 +64,19 @@ gridConfig =
 viewGrid : GridConfig -> Html msg
 viewGrid c =
     let
+        borderSize =
+            1
+
+        cellSize =
+            c.cellSize - borderSize
+
         viewGridCell : Html msg
         viewGridCell =
             div
-                [ Style.widthPx c.cellSize
-                , Style.heightPx c.cellSize
+                [ Style.widthPx cellSize
+                , Style.heightPx cellSize
                 , Style.bgColor "yellow"
-                , style "outline" "1px solid rgba(0,0,0,1)"
+                , style "border" (Style.toPx borderSize ++ "solid rgba(0,0,0,0.5)")
                 , style "flex-shrink" "0"
                 ]
                 []

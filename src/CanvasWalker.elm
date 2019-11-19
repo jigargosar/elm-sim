@@ -12,7 +12,7 @@ import UI exposing (..)
 
 
 type alias Model =
-    { delta : Float
+    { collectedDelta : Float
     , width : Float
     , height : Float
     }
@@ -29,7 +29,7 @@ main =
     Browser.element
         { init =
             \() ->
-                ( { delta = 0
+                ( { collectedDelta = 0
                   , width = 400
                   , height = 400
                   }
@@ -66,9 +66,9 @@ main =
         }
 
 
-addDelta : number -> { a | delta : number } -> { a | delta : number }
+addDelta : Float -> Model -> Model
 addDelta delta model =
-    { model | delta = model.delta + delta }
+    { model | collectedDelta = model.collectedDelta + delta }
 
 
 targetFrameInMilli =
@@ -77,8 +77,8 @@ targetFrameInMilli =
 
 step : Model -> Model
 step model =
-    if model.delta > targetFrameInMilli then
-        onFrame { model | delta = model.delta - targetFrameInMilli }
+    if model.collectedDelta > targetFrameInMilli then
+        onFrame { model | collectedDelta = model.collectedDelta - targetFrameInMilli }
             |> step
 
     else

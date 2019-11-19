@@ -206,7 +206,7 @@ updateCollectedDeltaBy dd model =
 
 
 targetFrameInMilli =
-    1000 / 60
+    1000 / 10
 
 
 step : Model -> Model

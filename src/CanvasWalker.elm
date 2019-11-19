@@ -90,11 +90,10 @@ viewGrid c =
         viewGridRow =
             hStack [] (List.repeat c.colCount viewGridCell)
     in
-    hStack []
+    hStack [ Style.transform [ "scale(2)" ] ]
         [ vStack
-            [ Style.transform [ "scale(2)" ]
-            , Style.borderTop borderArgs
-            , Style.borderBottom borderArgs
+            [ Style.borderBottom borderArgs
+            , Style.borderRight borderArgs
             ]
             (List.repeat c.rowCount viewGridRow)
         ]

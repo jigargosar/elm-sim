@@ -109,8 +109,8 @@ nextGridState grid =
     mapRows func grid
 
 
-mapArrayRC : (Int -> Int -> a -> b) -> Array (Array a) -> Array (Array b)
-mapArrayRC func =
+map2DArrayRC : (Int -> Int -> a -> b) -> Array (Array a) -> Array (Array b)
+map2DArrayRC func =
     Array.indexedMap (func >> Array.indexedMap)
 
 

@@ -46,7 +46,6 @@ randomizeGrid model =
 
 type Msg
     = Tick Float
-    | GotGrid GOL.Grid
 
 
 main : Program Flags Model Msg
@@ -66,9 +65,6 @@ update message model =
             ( mapElapsedBy delta model |> step
             , Cmd.none
             )
-
-        GotGrid grid ->
-            ( { model | grid = grid }, Cmd.none )
 
 
 mapElapsedBy : Float -> Model -> Model

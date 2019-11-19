@@ -11,6 +11,16 @@ import Style
 import UI exposing (..)
 
 
+main : Program Flags Model Msg
+main =
+    Browser.element
+        { init = init
+        , view = view
+        , update = update
+        , subscriptions = \_ -> onAnimationFrameDelta Tick
+        }
+
+
 type alias Flags =
     { now : Int }
 
@@ -46,16 +56,6 @@ randomizeGrid model =
 
 type Msg
     = Tick Float
-
-
-main : Program Flags Model Msg
-main =
-    Browser.element
-        { init = init
-        , view = view
-        , update = update
-        , subscriptions = \_ -> onAnimationFrameDelta Tick
-        }
 
 
 update : Msg -> Model -> ( Model, Cmd msg )
@@ -144,16 +144,11 @@ viewGrid config grid =
     let
         viewGridCell : Int -> Int -> Html msg
         viewGridCell rowNum colNum =
-            let
-                cell : GOL.Cell
-                cell =
-                    GOL.cellAtRC rowNum colNum grid
-            in
             div
                 [ Style.widthPx config.cellSize
                 , Style.heightPx config.cellSize
                 , Style.bgColor
-                    (case cell of
+                    (case GOL.cellAtRC rowNum colNum grid of
                         GOL.Off ->
                             "yellow"
 

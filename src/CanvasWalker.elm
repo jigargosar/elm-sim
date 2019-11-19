@@ -70,6 +70,34 @@ aliveNeighbourCountOfCellAtRC row col grid =
         |> List.length
 
 
+{-| <https://www.conwaylife.com/wiki/Conway's_Game_of_Life>
+-}
+nextStateOfCell : Int -> Cell -> Cell
+nextStateOfCell aliveNeighbourCount cell =
+    case cell of
+        On ->
+            {- Any live cell with fewer than two live neighbours dies
+                (referred to as underpopulation or exposure[1]).
+               Any live cell with more than three live neighbours dies
+                (referred to as overpopulation or overcrowding).
+            -}
+            if aliveNeighbourCount < 2 || aliveNeighbourCount > 3 then
+                Off
+
+            else
+                {- Any live cell with two or three live neighbours lives,
+                   unchanged, to the next generation.
+                -}
+                On
+
+        Off ->
+            if aliveNeighbourCount == 3 then
+                On
+
+            else
+                Off
+
+
 nextStateOfCellAtRC row col grid =
     let
         aliveNeighbourCount =

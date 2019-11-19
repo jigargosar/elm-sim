@@ -46,15 +46,15 @@ main =
         }
 
 
-vStack a =
+hStack lst =
     class "d-flex fd-row"
-        :: a
+        :: lst
         |> div
 
 
-hStack a =
+vStack lst =
     class "d-flex fd-column"
-        :: a
+        :: lst
         |> div
 
 
@@ -63,8 +63,8 @@ view { count, width, height } =
     vStack
         [ class "fullscreen-fixed"
         ]
-        [ div [ class "fd debug" ]
-            [ div [ class "" ] [ text "HW" ]
-            , div [ class "" ] [ text "HW" ]
+        [ vStack [ class "fd debug" ]
+            [ hStack [ class "" ] [ text "HW" ]
+            , hStack [ class "" ] [ text "HW" ]
             ]
         ]

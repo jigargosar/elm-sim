@@ -205,12 +205,16 @@ updateCollectedDeltaBy dd model =
     { model | collectedDelta = model.collectedDelta + dd }
 
 
-targetFrameInMilli =
-    1000 / 10
+updatesPerSecond =
+    10
 
 
 step : Model -> Model
 step model =
+    let
+        targetFrameInMilli =
+            1000 / updatesPerSecond
+    in
     if model.collectedDelta > targetFrameInMilli then
         updateOnFrame (updateCollectedDeltaBy -targetFrameInMilli model)
             |> step

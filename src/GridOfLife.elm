@@ -9,15 +9,24 @@ type Cell
     | Off
 
 
-type alias GridRow =
+type alias Row =
     Array Cell
+
+
+type alias Rows =
+    Array Row
 
 
 type alias Grid =
     { rowCount : Int
     , colCount : Int
-    , rows : Array GridRow
+    , rows : Rows
     }
+
+
+mapRows : (b -> b) -> { a | rows : b } -> { a | rows : b }
+mapRows func model =
+    { model | rows = func model.rows }
 
 
 cellAtRC : Int -> Int -> Grid -> Cell
@@ -85,11 +94,6 @@ nextStateOfCell aliveNeighbourCount cell =
 
             else
                 Off
-
-
-mapRows : (b -> b) -> { a | rows : b } -> { a | rows : b }
-mapRows func model =
-    { model | rows = func model.rows }
 
 
 nextState : Grid -> Grid

@@ -47,7 +47,7 @@ main =
         }
 
 
-layoutDebug =
+shouldDebugLayout =
     True
 
 
@@ -55,7 +55,7 @@ hStack lst =
     Class.dFlex
         :: Class.fdRow
         :: Class.justifyCenter
-        :: classList [ ( "layout-debug", layoutDebug ) ]
+        :: classList [ ( "layout-debug", shouldDebugLayout ) ]
         :: lst
         |> div
 
@@ -64,7 +64,7 @@ vStack lst =
     Class.dFlex
         :: Class.fdCol
         :: Class.justifyCenter
-        :: classList [ ( "layout-debug", layoutDebug ) ]
+        :: classList [ ( "layout-debug", shouldDebugLayout ) ]
         :: lst
         |> div
 
@@ -75,8 +75,8 @@ view { count, width, height } =
         [ Class.pFixed
         , Class.trblZero
         ]
-        [ vStack [ class "debug" ]
-            [ hStack [ class "" ] [ text "HW" ]
-            , hStack [ class "" ] [ text "HW" ]
+        [ vStack []
+            [ hStack [] [ text "HW" ]
+            , hStack [] [ text "HW" ]
             ]
         ]

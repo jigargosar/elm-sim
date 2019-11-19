@@ -102,7 +102,7 @@ updateOnFrame model =
 
 pushLastGridState : GOL.Grid -> Model -> Model
 pushLastGridState lastGrid model =
-    { model | lastGridStates = lastGrid :: model.lastGridStates |> List.take 2 }
+    { model | lastGridStates = lastGrid :: model.lastGridStates |> List.take 4 }
 
 
 randomizeGridIfReachedStableState : Model -> Model

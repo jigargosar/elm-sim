@@ -1,4 +1,4 @@
-module GridOfLife exposing (Cell(..), Grid, asList2d, initEmpty, nextState, randomize)
+module GridOfLife exposing (Cell(..), Grid, asList2d, initEmpty, nextState, randomize, toggleCellAtRC)
 
 import Array exposing (Array)
 import Random exposing (Generator)
@@ -43,8 +43,8 @@ cellAtRC rowNum_ colNum_ grid =
         |> Maybe.withDefault Off
 
 
-toggleAtRC : Int -> Int -> Grid -> Grid
-toggleAtRC rowNum colNum grid =
+toggleCellAtRC : Int -> Int -> Grid -> Grid
+toggleCellAtRC rowNum colNum grid =
     let
         toggleCell cell =
             case cell of

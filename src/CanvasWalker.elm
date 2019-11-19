@@ -6,6 +6,7 @@ import Class
 import GridOfLife as GOL
 import Html exposing (..)
 import Html.Attributes exposing (style)
+import Html.Events exposing (onClick)
 import Random exposing (Generator, Seed)
 import Style
 import UI exposing (..)
@@ -56,6 +57,7 @@ randomizeGrid model =
 
 type Msg
     = Tick Float
+    | CellClicked Int Int
 
 
 update : Msg -> Model -> ( Model, Cmd msg )
@@ -65,6 +67,16 @@ update message model =
             ( mapElapsedBy delta model |> step
             , Cmd.none
             )
+
+        CellClicked rIdx cIdx ->
+            ( mapGrid (GOL.toggleCellAtRC rIdx cIdx) model
+            , Cmd.none
+            )
+
+
+mapGrid : (GOL.Grid -> GOL.Grid) -> Model -> Model
+mapGrid func model =
+    { model | grid = func model.grid }
 
 
 mapElapsedBy : Float -> Model -> Model
@@ -140,10 +152,10 @@ gridConfig =
     }
 
 
-viewGrid : GOL.Grid -> Html msg
+viewGrid : GOL.Grid -> Html Msg
 viewGrid grid =
     let
-        viewGridRow : Int -> List GOL.Cell -> Html msg
+        viewGridRow : Int -> List GOL.Cell -> Html Msg
         viewGridRow rowIdx cellRow =
             hStack [] (List.indexedMap (viewCell rowIdx) cellRow)
     in
@@ -152,7 +164,7 @@ viewGrid grid =
         (GOL.asList2d grid |> List.indexedMap viewGridRow)
 
 
-viewCell : Int -> Int -> GOL.Cell -> Html msg
+viewCell : Int -> Int -> GOL.Cell -> Html Msg
 viewCell rowIdx colIdx cell =
     let
         cellSize =
@@ -172,5 +184,6 @@ viewCell rowIdx colIdx cell =
         , Style.noShrink
         , style "box-shadow"
             "inset 0 0 0px 0.5px rgb(0,0,0), 0 0 0px 0.5px rgb(0,0,0)"
+        , onClick (CellClicked rowIdx colIdx)
         ]
         []

@@ -59,6 +59,7 @@ main =
         }
 
 
+update : Msg -> Model -> ( Model, Cmd msg )
 update message model =
     case message of
         Tick delta ->

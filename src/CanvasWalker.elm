@@ -2,7 +2,7 @@ module CanvasWalker exposing (main)
 
 import Browser
 import Browser.Dom exposing (Viewport, getViewport)
-import Browser.Events exposing (onAnimationFrameDelta)
+import Browser.Events exposing (onAnimationFrameDelta, onResize)
 import Class
 import Html exposing (..)
 import Html.Attributes exposing (style)
@@ -21,6 +21,7 @@ type alias Model =
 type Msg
     = Tick Float
     | GotViewport Viewport
+    | BrowserResized Int Int
 
 
 main : Program () Model Msg
@@ -51,7 +52,17 @@ main =
                           }
                         , Cmd.none
                         )
-        , subscriptions = \_ -> onAnimationFrameDelta Tick
+
+                    BrowserResized w h ->
+                        ( { model | width = toFloat w, height = toFloat h }
+                        , Cmd.none
+                        )
+        , subscriptions =
+            \_ ->
+                Sub.batch
+                    [ onAnimationFrameDelta Tick
+                    , onResize BrowserResized
+                    ]
         }
 
 
@@ -76,6 +87,10 @@ step model =
 
 onFrame : Model -> Model
 onFrame model =
+    let
+        _ =
+            Debug.log "onFrame" model
+    in
     model
 
 

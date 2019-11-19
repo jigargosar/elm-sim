@@ -30,16 +30,16 @@ mapRows func grid =
 
 
 cellAtRC : Int -> Int -> Grid -> Cell
-cellAtRC row_ col_ grid =
+cellAtRC rowNum_ colNum_ grid =
     let
-        row =
-            modBy grid.rowCount row_
+        rowNum =
+            modBy grid.rowCount rowNum_
 
-        col =
-            modBy grid.colCount col_
+        colNum =
+            modBy grid.colCount colNum_
     in
-    Array.get row grid.rows
-        |> Maybe.andThen (Array.get col)
+    Array.get rowNum grid.rows
+        |> Maybe.andThen (Array.get colNum)
         |> Maybe.withDefault Off
 
 

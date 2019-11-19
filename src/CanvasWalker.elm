@@ -40,7 +40,7 @@ main =
             \message model ->
                 case message of
                     Tick delta ->
-                        ( addDelta delta model
+                        ( updateDeltaBy delta model
                             |> step
                         , Cmd.none
                         )
@@ -66,9 +66,9 @@ main =
         }
 
 
-addDelta : Float -> Model -> Model
-addDelta delta model =
-    { model | collectedDelta = model.collectedDelta + delta }
+updateDeltaBy : Float -> Model -> Model
+updateDeltaBy dd model =
+    { model | collectedDelta = model.collectedDelta + dd }
 
 
 targetFrameInMilli =
@@ -78,7 +78,7 @@ targetFrameInMilli =
 step : Model -> Model
 step model =
     if model.collectedDelta > targetFrameInMilli then
-        onFrame (addDelta -targetFrameInMilli model)
+        onFrame (updateDeltaBy -targetFrameInMilli model)
             |> step
 
     else

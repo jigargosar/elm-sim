@@ -142,11 +142,14 @@ gridConfig =
 viewGrid : GridConfig -> GOL.Grid -> Html msg
 viewGrid config grid =
     let
+        cellSize =
+            20
+
         viewGridCell : Int -> Int -> Html msg
         viewGridCell rowNum colNum =
             div
-                [ Style.widthPx config.cellSize
-                , Style.heightPx config.cellSize
+                [ Style.widthPx cellSize
+                , Style.heightPx cellSize
                 , Style.bgColor
                     (case GOL.cellAtRC rowNum colNum grid of
                         GOL.Off ->

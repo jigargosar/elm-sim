@@ -1,15 +1,13 @@
 module CanvasWalker exposing (main)
 
 import Browser
-import Browser.Dom exposing (Viewport, getViewport)
-import Browser.Events exposing (onAnimationFrameDelta, onResize)
+import Browser.Events exposing (onAnimationFrameDelta)
 import Class
 import GridOfLife as GOL
 import Html exposing (..)
 import Html.Attributes exposing (style)
 import Random exposing (Generator, Seed)
 import Style
-import Task
 import UI exposing (..)
 
 

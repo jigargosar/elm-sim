@@ -4,7 +4,7 @@ import Browser
 import Browser.Dom exposing (Viewport, getViewport)
 import Browser.Events exposing (onAnimationFrameDelta)
 import Html exposing (..)
-import Html.Attributes exposing (class)
+import Html.Attributes exposing (class, classList)
 import Task
 
 
@@ -46,8 +46,13 @@ main =
         }
 
 
+layoutDebug =
+    True
+
+
 hStack lst =
     class "d-flex fd-row"
+        :: classList [ ( "layout-debug", layoutDebug ) ]
         :: lst
         |> div
 
@@ -61,7 +66,7 @@ vStack lst =
 view : Model -> Html Msg
 view { count, width, height } =
     vStack
-        [ class "fullscreen-fixed"
+        [ class "p-fixed trbl-zero"
         ]
         [ vStack [ class "fd debug" ]
             [ hStack [ class "" ] [ text "HW" ]

@@ -78,7 +78,7 @@ targetFrameInMilli =
 step : Model -> Model
 step model =
     if model.collectedDelta > targetFrameInMilli then
-        onFrame { model | collectedDelta = model.collectedDelta - targetFrameInMilli }
+        onFrame (addDelta -targetFrameInMilli model)
             |> step
 
     else

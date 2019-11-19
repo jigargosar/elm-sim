@@ -46,6 +46,51 @@ cellAtRC row col grid =
         |> Maybe.withDefault Off
 
 
+neighbours : List ( Int, Int )
+neighbours =
+    [ ( -1, -1 ), ( -1, 0 ), ( -1, 1 ) ]
+        ++ [ ( 0, -1 ), {- ignore self (0,0) , -} ( 0, 1 ) ]
+        ++ [ ( 1, -1 ), ( 1, 0 ), ( 1, 1 ) ]
+
+
+neighboursOfRC : Int -> Int -> Grid -> List Cell
+neighboursOfRC row col grid =
+    neighbours
+        |> List.map (\( nr, nc ) -> cellAtRC (row + nr) (col + nc) grid)
+
+
+is =
+    (==)
+
+
+aliveNeighbourCountOfCellAtRC : Int -> Int -> Grid -> Int
+aliveNeighbourCountOfCellAtRC row col grid =
+    neighboursOfRC row col grid
+        |> List.filter (is On)
+        |> List.length
+
+
+nextStateOfCellAtRC row col grid =
+    let
+        aliveNeighbourCount =
+            aliveNeighbourCountOfCellAtRC row col grid
+    in
+    case cellAtRC row col grid of
+        On ->
+            if aliveNeighbourCount < 2 || aliveNeighbourCount > 3 then
+                Off
+
+            else
+                On
+
+        Off ->
+            if aliveNeighbourCount == 3 then
+                On
+
+            else
+                Off
+
+
 emptyGrid : Grid
 emptyGrid =
     Array.repeat gridConfig.colCount Off

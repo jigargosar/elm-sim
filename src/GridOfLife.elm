@@ -37,6 +37,7 @@ neighboursOfRC row col grid =
         |> List.map (\( nr, nc ) -> cellAtRC (row + nr) (col + nc) grid)
 
 
+is : a -> a -> Bool
 is =
     (==)
 
@@ -98,6 +99,7 @@ nextGridState grid =
     mapGridRC (\r c _ -> nextStateOfCellAtRC r c grid) grid
 
 
+emptyGrid : { a | colCount : Int, rowCount : Int } -> Array (Array Cell)
 emptyGrid gridConfig =
     Array.repeat gridConfig.colCount Off
         |> Array.repeat gridConfig.rowCount
@@ -108,6 +110,7 @@ randomArray count =
     Random.list count >> Random.map Array.fromList
 
 
+randomGrid : { a | colCount : Int, rowCount : Int } -> Generator Grid
 randomGrid gridConfig =
     let
         randomGridCell : Generator Cell

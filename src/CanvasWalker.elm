@@ -51,15 +51,18 @@ main =
 
 viewCell =
     div
-        [ Style.widthPx 10
-        , Style.heightPx 10
-        , style "background-color" "yellow"
+        [ Style.widthPx gridConfig.cellSize
+        , Style.heightPx gridConfig.cellSize
+        , Style.bgColor "yellow"
         ]
         []
 
 
 gridConfig =
-    { rowCount = 30, colCount = 30 }
+    { rowCount = 30
+    , colCount = 30
+    , cellSize = 10
+    }
 
 
 viewGridRow =

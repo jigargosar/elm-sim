@@ -27,3 +27,8 @@ heightPx f =
 toPx : Float -> String
 toPx f =
     String.fromFloat f ++ "px"
+
+
+bgColor : String -> Attribute msg
+bgColor =
+    A.style "background-color"

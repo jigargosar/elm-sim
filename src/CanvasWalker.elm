@@ -64,21 +64,12 @@ gridConfig =
 viewGrid : GridConfig -> Html msg
 viewGrid c =
     let
-        borderArgs =
-            [ Style.px 0, "solid", "rgba(0,0,0,1)" ]
-
-        outlineSize =
-            0
-
         viewGridCell : Html msg
         viewGridCell =
             div
                 [ Style.widthPx c.cellSize
                 , Style.heightPx c.cellSize
                 , Style.bgColor "yellow"
-                , Style.borderTop borderArgs
-                , Style.borderLeft borderArgs
-                , Style.outline [ Style.px outlineSize, "solid", "rgba(0,0,0,1)" ]
                 , Style.noShrink
                 , style "box-shadow"
                     "inset 0 0 0px 0.5px rgb(0,0,0), 0 0 0px 0.5px rgb(0,0,0)"
@@ -89,13 +80,9 @@ viewGrid c =
         viewGridRow =
             hStack [] (List.repeat c.colCount viewGridCell)
     in
-    hStack []
-        [ vStack
-            [ Style.borderBottom borderArgs
-            , Style.borderRight borderArgs
-            ]
-            (List.repeat c.rowCount viewGridRow)
-        ]
+    vStack
+        []
+        (List.repeat c.rowCount viewGridRow)
 
 
 view : Model -> Html Msg

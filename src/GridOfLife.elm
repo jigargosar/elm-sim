@@ -24,10 +24,10 @@ cellAtRC : Int -> Int -> Grid -> Cell
 cellAtRC row_ col_ grid =
     let
         row =
-            row_
+            modBy grid.rowCount row_
 
         col =
-            col_
+            modBy grid.colCount col_
     in
     Array.get row grid.rows
         |> Maybe.andThen (Array.get col)

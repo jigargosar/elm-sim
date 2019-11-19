@@ -24,7 +24,12 @@ type Msg
 
 main : Program () Model Msg
 main =
-    Browser.element { init = init, update = update, subscriptions = subscriptions, view = view }
+    Browser.element
+        { init = init
+        , update = update
+        , subscriptions = subscriptions
+        , view = view
+        }
 
 
 subscriptions : Model -> Sub Msg

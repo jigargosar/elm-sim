@@ -7,9 +7,14 @@ import Browser.Events exposing (onAnimationFrameDelta, onResize)
 import Class
 import Html exposing (..)
 import Html.Attributes exposing (style)
+import Random exposing (Seed)
 import Style
 import Task
 import UI exposing (..)
+
+
+type alias Flags =
+    { now : Int }
 
 
 type alias Model =
@@ -17,6 +22,7 @@ type alias Model =
     , grid : Grid
     , width : Float
     , height : Float
+    , seed : Seed
     }
 
 
@@ -36,15 +42,16 @@ type Msg
     | BrowserResized Int Int
 
 
-main : Program () Model Msg
+main : Program Flags Model Msg
 main =
     Browser.element
         { init =
-            \() ->
+            \flags ->
                 ( { collectedDelta = 0
                   , width = 400
                   , height = 400
                   , grid = emptyGrid
+                  , seed = Random.initialSeed flags.now
                   }
                 , Task.perform GotViewport getViewport
                 )

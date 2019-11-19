@@ -1,4 +1,4 @@
-module GridOfLife exposing (Cell(..), Grid, asList2d, initEmpty, nextState, random)
+module GridOfLife exposing (Cell(..), Grid, asList2d, initEmpty, nextState, randomize)
 
 import Array exposing (Array)
 import Random exposing (Generator)
@@ -129,6 +129,11 @@ random { rowCount, colCount } =
                 , rows = rows
                 }
             )
+
+
+randomize : Grid -> Generator Grid
+randomize =
+    random
 
 
 randomArray : Int -> Generator a -> Generator (Array a)

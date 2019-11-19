@@ -49,7 +49,7 @@ randomizeGrid : Model -> Model
 randomizeGrid model =
     let
         ( grid, seed ) =
-            Random.step (GOL.random gridConfig) model.seed
+            Random.step (GOL.randomize model.grid) model.seed
     in
     { model | grid = grid, previousGrids = [], seed = seed }
 

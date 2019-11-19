@@ -39,8 +39,10 @@ main =
             \msg model ->
                 case msg of
                     Tick delta ->
-                        addDelta delta model
+                        ( addDelta delta model
                             |> step
+                        , Cmd.none
+                        )
 
                     GotViewport { viewport } ->
                         ( { model
@@ -67,7 +69,7 @@ step model =
             |> step
 
     else
-        ( model, Cmd.none )
+        model
 
 
 onFrame model =

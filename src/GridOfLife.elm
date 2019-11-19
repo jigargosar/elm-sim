@@ -98,19 +98,16 @@ nextGridState : Grid -> Grid
 nextGridState grid =
     let
         func =
-            Array.indexedMap
-                (\rowNum ->
-                    Array.indexedMap
-                        (\colNum cell ->
-                            nextStateOfCell (aliveNeighbourCountOfCellAtRC rowNum colNum grid) cell
-                        )
+            mapRCArrayIndexed
+                (\rowNum colNum cell ->
+                    nextStateOfCell (aliveNeighbourCountOfCellAtRC rowNum colNum grid) cell
                 )
     in
     mapRows func grid
 
 
-map2DArrayRC : (Int -> Int -> a -> b) -> Array (Array a) -> Array (Array b)
-map2DArrayRC func =
+mapRCArrayIndexed : (Int -> Int -> a -> b) -> Array (Array a) -> Array (Array b)
+mapRCArrayIndexed func =
     Array.indexedMap (func >> Array.indexedMap)
 
 

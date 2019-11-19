@@ -7,7 +7,7 @@ import Browser.Events exposing (onAnimationFrameDelta, onResize)
 import Class
 import Html exposing (..)
 import Html.Attributes exposing (style)
-import Random exposing (Seed)
+import Random exposing (Generator, Seed)
 import Style
 import Task
 import UI exposing (..)
@@ -26,14 +26,46 @@ type alias Model =
     }
 
 
+type alias GridRow =
+    Array Cell
+
+
 type alias Grid =
-    Array (Array Cell)
+    Array GridRow
 
 
 emptyGrid : Grid
 emptyGrid =
     Array.repeat gridConfig.colCount Off
         |> Array.repeat gridConfig.rowCount
+
+
+randomArray : Int -> Generator a -> Generator (Array a)
+randomArray count =
+    Random.list count >> Random.map Array.fromList
+
+
+randomGrid : Generator Grid
+randomGrid =
+    let
+        randomGridCell : Generator Cell
+        randomGridCell =
+            Random.uniform Off [ On ]
+
+        randomGridRow : Generator (Array Cell)
+        randomGridRow =
+            randomArray gridConfig.colCount randomGridCell
+    in
+    randomArray gridConfig.rowCount randomGridRow
+
+
+randomizeGrid : Model -> Model
+randomizeGrid model =
+    let
+        ( grid, seed ) =
+            Random.step randomGrid model.seed
+    in
+    { model | grid = grid, seed = seed }
 
 
 type Msg
@@ -53,6 +85,7 @@ main =
                   , grid = emptyGrid
                   , seed = Random.initialSeed flags.now
                   }
+                    |> randomizeGrid
                 , Task.perform GotViewport getViewport
                 )
         , view = view

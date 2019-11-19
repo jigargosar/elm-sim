@@ -14,7 +14,6 @@ body {
   left: 0;
 }
 
-
 .d-flex {
   display: flex;
 }
@@ -25,6 +24,14 @@ body {
 
 .fd-col {
   flex-direction: column;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.justify-center {
+  justify-content: center;
 }
 
 .debug {

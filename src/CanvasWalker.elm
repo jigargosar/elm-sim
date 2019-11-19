@@ -54,6 +54,7 @@ layoutDebug =
 hStack lst =
     Class.dFlex
         :: Class.fdRow
+        :: Class.justifyCenter
         :: classList [ ( "layout-debug", layoutDebug ) ]
         :: lst
         |> div
@@ -62,6 +63,8 @@ hStack lst =
 vStack lst =
     Class.dFlex
         :: Class.fdCol
+        :: Class.justifyCenter
+        :: classList [ ( "layout-debug", layoutDebug ) ]
         :: lst
         |> div
 

@@ -21,3 +21,11 @@ pFixed =
 
 trblZero =
     class "trbl-zero"
+
+
+itemsCenter =
+    class "items-center"
+
+
+justifyCenter =
+    class "justify-center"

@@ -3,6 +3,7 @@ module CanvasWalker exposing (main)
 import Browser
 import Browser.Dom exposing (Viewport, getViewport)
 import Browser.Events exposing (onAnimationFrameDelta)
+import Class
 import Html exposing (..)
 import Html.Attributes exposing (class, classList)
 import Task
@@ -51,14 +52,16 @@ layoutDebug =
 
 
 hStack lst =
-    class "d-flex fd-row"
+    Class.dFlex
+        :: Class.fdRow
         :: classList [ ( "layout-debug", layoutDebug ) ]
         :: lst
         |> div
 
 
 vStack lst =
-    class "d-flex fd-column"
+    Class.dFlex
+        :: Class.fdCol
         :: lst
         |> div
 

@@ -9,9 +9,9 @@ body {
 
 .trbl-zero {
   top: 0;
-  left: 0;
   right: 0;
   bottom: 0;
+  left: 0;
 }
 
 
@@ -23,7 +23,7 @@ body {
   flex-direction: row;
 }
 
-.fd-column {
+.fd-col {
   flex-direction: column;
 }
 

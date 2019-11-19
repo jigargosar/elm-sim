@@ -94,14 +94,14 @@ mapArrayRC func =
     Array.indexedMap (\rowNum -> Array.indexedMap (\colNum -> func rowNum colNum))
 
 
-mapRows : a -> { b | rows : a } -> { b | rows : a }
-mapRows rows model =
-    { model | rows = rows }
+mapRows : (b -> b) -> { a | rows : b } -> { a | rows : b }
+mapRows func model =
+    { model | rows = func model.rows }
 
 
 nextGridState : Grid -> Grid
 nextGridState grid =
-    mapRows (mapArrayRC (\r c _ -> nextStateOfCellAtRC r c grid) grid.rows) grid
+    mapRows (mapArrayRC (\r c _ -> nextStateOfCellAtRC r c grid)) grid
 
 
 initEmpty : { a | colCount : Int, rowCount : Int } -> Grid

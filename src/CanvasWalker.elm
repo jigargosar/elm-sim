@@ -21,8 +21,6 @@ type alias Model =
     { collectedDelta : Float
     , grid : GOL.Grid
     , lastGridStates : List GOL.Grid
-    , width : Float
-    , height : Float
     , seed : Seed
     }
 
@@ -30,14 +28,12 @@ type alias Model =
 init : Flags -> ( Model, Cmd Msg )
 init flags =
     ( { collectedDelta = 0
-      , width = 400
-      , height = 400
       , grid = GOL.emptyGrid gridConfig
       , lastGridStates = []
       , seed = Random.initialSeed flags.now
       }
         |> randomizeGrid
-    , Task.perform GotViewport getViewport
+    , Cmd.none
     )
 
 
@@ -52,8 +48,6 @@ randomizeGrid model =
 
 type Msg
     = Tick Float
-    | GotViewport Viewport
-    | BrowserResized Int Int
 
 
 main : Program Flags Model Msg
@@ -69,24 +63,10 @@ main =
                             |> step
                         , Cmd.none
                         )
-
-                    GotViewport { viewport } ->
-                        ( { model
-                            | width = viewport.width
-                            , height = viewport.height
-                          }
-                        , Cmd.none
-                        )
-
-                    BrowserResized w h ->
-                        ( { model | width = toFloat w, height = toFloat h }
-                        , Cmd.none
-                        )
         , subscriptions =
             \_ ->
                 Sub.batch
                     [ onAnimationFrameDelta Tick
-                    , onResize BrowserResized
                     ]
         }
 

@@ -51,9 +51,9 @@ neighbours =
 
 
 neighboursOfCellAtRC : Int -> Int -> Grid -> List Cell
-neighboursOfCellAtRC row col grid =
+neighboursOfCellAtRC rowNum colNum grid =
     neighbours
-        |> List.map (\( nr, nc ) -> cellAtRC (row + nr) (col + nc) grid)
+        |> List.map (\( nr, nc ) -> cellAtRC (rowNum + nr) (colNum + nc) grid)
 
 
 is : a -> a -> Bool

@@ -24,6 +24,10 @@ div {
   flex-direction: column;
 }
 
+.fd-row {
+  flex-direction: row;
+}
+
 .center-all {
 }
 

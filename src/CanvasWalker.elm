@@ -51,4 +51,8 @@ view { count, width, height } =
     div
         [ class "fullscreen-fixed"
         ]
-        [ div [ class "debug" ] [ text "HW" ] ]
+        [ div [ class "fd debug" ]
+            [ div [ class "" ] [ text "HW" ]
+            , div [ class "" ] [ text "HW" ]
+            ]
+        ]

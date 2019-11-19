@@ -1,150 +1,99 @@
 module CanvasWalker exposing (main)
 
 import Browser
-import Browser.Events exposing (onAnimationFrame)
+import Browser.Dom exposing (Viewport, getViewport)
+import Browser.Events exposing (onAnimationFrameDelta)
 import Canvas exposing (..)
 import Canvas.Settings exposing (..)
 import Canvas.Settings.Advanced exposing (..)
 import Color exposing (Color)
-import Grid
-import Html exposing (Html)
-import Html.Attributes exposing (style)
-import Html.Events exposing (onClick)
-import Time exposing (Posix)
+import Html exposing (Html, div)
+import Html.Attributes exposing (class, style)
+import Task
 
 
 type alias Model =
-    ( Bool, Float )
+    { count : Float, width : Float, height : Float }
 
 
 type Msg
-    = AnimationFrame Posix
-    | ToggleRunning
+    = Frame Float
+    | GetViewport Viewport
 
 
 main : Program () Model Msg
 main =
     Browser.element
-        { init = init
-        , update = update
-        , subscriptions = subscriptions
+        { init = \() -> ( { count = 0, width = 400, height = 400 }, Task.perform GetViewport getViewport )
         , view = view
+        , update =
+            \msg model ->
+                case msg of
+                    Frame _ ->
+                        ( { model | count = model.count + 1 }, Cmd.none )
+
+                    GetViewport data ->
+                        ( { model
+                            | width = data.viewport.width
+                            , height = data.viewport.height
+                          }
+                        , Cmd.none
+                        )
+        , subscriptions = \model -> onAnimationFrameDelta Frame
         }
 
 
-subscriptions : Model -> Sub Msg
-subscriptions ( isRunning, time ) =
-    if isRunning then
-        onAnimationFrame AnimationFrame
-
-    else
-        Sub.none
+centerX width =
+    width / 2
 
 
-init : () -> ( Model, Cmd Msg )
-init () =
-    ( ( True, 0 )
-    , Cmd.none
-    )
-
-
-update : Msg -> Model -> ( Model, Cmd Msg )
-update msg ( isRunning, time ) =
-    case msg of
-        AnimationFrame t ->
-            ( ( isRunning, t |> Time.posixToMillis |> toFloat ), Cmd.none )
-
-        ToggleRunning ->
-            ( ( not isRunning, time ), Cmd.none )
-
-
-h : Float
-h =
-    500
-
-
-w : Float
-w =
-    500
-
-
-gridSize =
-    24
-
-
-gridSizef =
-    toFloat gridSize
-
-
-cellSize =
-    (w - padding * 2) / gridSizef
-
-
-padding =
-    w * 0.1
-
-
-length =
-    cellSize * 0.65
-
-
-thickness =
-    cellSize * 0.1
+centerY height =
+    height / 2
 
 
 view : Model -> Html Msg
-view ( isRunning, time ) =
-    toHtml ( round w, round h )
-        [ onClick ToggleRunning ]
-        (shapes [ fill Color.white ] [ rect ( 0, 0 ) w h ]
-            :: renderItems time
-        )
+view { count, width, height } =
+    div
+        [ style "display" "flex"
+        , style "justify-content" "center"
+        , style "align-items" "center"
+        , class "fullscreen-fixed"
+        ]
+        [ Canvas.toHtml
+            ( round width, round height )
+            []
+            [ clearScreen width height
+            , render count width height
+            ]
+        ]
 
 
-renderItems time =
-    Grid.fold2d { rows = gridSize, cols = gridSize }
-        (renderItem time)
-        []
+clearScreen width height =
+    shapes [ fill Color.white ] [ rect ( 0, 0 ) width height ]
 
 
-renderItem time ( col, row ) lines =
+render count width height =
     let
-        ( colf, rowf ) =
-            ( toFloat col, toFloat row )
+        size =
+            min width height / 3
 
-        ( x, y ) =
-            ( (rowf * cellSize) + padding + cellSize / 2
-            , (colf * cellSize) + padding + cellSize / 2
-            )
+        x =
+            -(size / 2)
 
-        ( u, v ) =
-            ( colf / (gridSizef - 1)
-            , rowf / (gridSizef - 1)
-            )
-
-        offset =
-            u * 0.4 + v * 0.2
-
-        t =
-            time / 1000
-
-        rotationModifier =
-            sin (t + offset) ^ 3
-
-        initialRotation =
-            degrees 90
+        y =
+            -(size / 2)
 
         rotation =
-            initialRotation + rotationModifier * pi
+            degrees (count * 3)
+
+        hue =
+            toFloat (count / 4 |> floor |> modBy 100) / 100
     in
     shapes
-        [ transform [ translate x y, rotate rotation, translate -x -y ]
-        , fill Color.black
+        [ transform
+            [ translate (centerX width) (centerY height)
+            , rotate rotation
+            ]
+        , fill (Color.hsl hue 0.3 0.7)
         ]
-        [ rect ( x - length / 2, y - thickness / 2 ) length thickness ]
-        :: lines
-
-
-lerp : Float -> Float -> Float -> Float
-lerp v0 v1 t =
-    v0 * (1 - t) + v1 * t
+        [ rect ( x, y ) size size ]

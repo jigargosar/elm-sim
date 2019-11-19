@@ -1,4 +1,4 @@
-module GridOfLife exposing (Cell(..), Grid, asList2d, cellAtRC, emptyGrid, generator, nextGridState)
+module GridOfLife exposing (Cell(..), Grid, asList2d, cellAtRC, generator, initEmpty, nextGridState)
 
 import Array exposing (Array)
 import Random exposing (Generator)
@@ -14,12 +14,12 @@ type alias GridRow =
 
 
 type alias Grid =
-    Array GridRow
+    { rows : Array GridRow }
 
 
 cellAtRC : Int -> Int -> Grid -> Cell
 cellAtRC row col grid =
-    Array.get row grid
+    Array.get row grid.rows
         |> Maybe.andThen (Array.get col)
         |> Maybe.withDefault Off
 
@@ -89,20 +89,27 @@ nextStateOfCellAtRC row col grid =
     nextStateOfCell aliveNeighbourCount cell
 
 
-mapGridRC : (Int -> Int -> a -> b) -> Array (Array a) -> Array (Array b)
-mapGridRC func =
+mapArrayRC : (Int -> Int -> a -> b) -> Array (Array a) -> Array (Array b)
+mapArrayRC func =
     Array.indexedMap (\rowNum -> Array.indexedMap (\colNum -> func rowNum colNum))
+
+
+mapRows : a -> { b | rows : a } -> { b | rows : a }
+mapRows rows model =
+    { model | rows = rows }
 
 
 nextGridState : Grid -> Grid
 nextGridState grid =
-    mapGridRC (\r c _ -> nextStateOfCellAtRC r c grid) grid
+    mapRows (mapArrayRC (\r c _ -> nextStateOfCellAtRC r c grid) grid.rows) grid
 
 
-emptyGrid : { a | colCount : Int, rowCount : Int } -> Array (Array Cell)
-emptyGrid gridConfig =
-    Array.repeat gridConfig.colCount Off
-        |> Array.repeat gridConfig.rowCount
+initEmpty : { a | colCount : Int, rowCount : Int } -> Grid
+initEmpty gridConfig =
+    { rows =
+        Array.repeat gridConfig.colCount Off
+            |> Array.repeat gridConfig.rowCount
+    }
 
 
 randomArray : Int -> Generator a -> Generator (Array a)
@@ -122,8 +129,9 @@ generator gridConfig =
             randomArray gridConfig.colCount randomGridCell
     in
     randomArray gridConfig.rowCount randomGridRow
+        |> Random.map (\rows -> { rows = rows })
 
 
 asList2d : Grid -> List (List Cell)
 asList2d =
-    Array.map Array.toList >> Array.toList
+    .rows >> Array.map Array.toList >> Array.toList

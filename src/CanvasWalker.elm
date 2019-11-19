@@ -36,7 +36,7 @@ type alias Model =
 init : Flags -> ( Model, Cmd Msg )
 init flags =
     ( { elapsed = 0
-      , grid = GOL.emptyGrid gridConfig
+      , grid = GOL.initEmpty gridConfig
       , previousGrids = []
       , seed = Random.initialSeed flags.now
       }

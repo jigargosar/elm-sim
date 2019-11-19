@@ -39,13 +39,14 @@ randomizeGrid : Model -> Model
 randomizeGrid model =
     let
         ( grid, seed ) =
-            Random.step (GOL.randomGrid gridConfig) model.seed
+            Random.step (GOL.generator gridConfig) model.seed
     in
     { model | grid = grid, seed = seed }
 
 
 type Msg
     = Tick Float
+    | GotGrid GOL.Grid
 
 
 main : Program Flags Model Msg
@@ -53,16 +54,21 @@ main =
     Browser.element
         { init = init
         , view = view
-        , update =
-            \message model ->
-                case message of
-                    Tick delta ->
-                        ( updateCollectedDeltaBy delta model
-                            |> step
-                        , Cmd.none
-                        )
+        , update = update
         , subscriptions = \_ -> onAnimationFrameDelta Tick
         }
+
+
+update message model =
+    case message of
+        Tick delta ->
+            ( updateCollectedDeltaBy delta model
+                |> step
+            , Cmd.none
+            )
+
+        GotGrid grid ->
+            ( { model | grid = grid }, Cmd.none )
 
 
 updateCollectedDeltaBy : Float -> Model -> Model

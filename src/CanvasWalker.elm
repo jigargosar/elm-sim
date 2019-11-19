@@ -123,6 +123,7 @@ randomizeGridIfReachedStableState model =
         model
 
 
+is : a -> a -> Bool
 is =
     (==)
 

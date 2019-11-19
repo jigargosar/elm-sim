@@ -44,24 +44,8 @@ cellAtRC rowNum_ colNum_ grid =
 
 
 toggleAtRC : Int -> Int -> Grid -> Grid
-toggleAtRC rowNum_ colNum_ grid =
+toggleAtRC rowNum colNum grid =
     let
-        rowNum =
-            modBy grid.rowCount rowNum_
-
-        colNum =
-            modBy grid.colCount colNum_
-
-        func =
-            Array.indexedMap
-                (\cIdx ->
-                    if cIdx == colNum then
-                        toggleCell
-
-                    else
-                        identity
-                )
-
         toggleCell cell =
             case cell of
                 On ->
@@ -70,7 +54,16 @@ toggleAtRC rowNum_ colNum_ grid =
                 Off ->
                     On
     in
-    mapRowAt rowNum_ func grid
+    mapCellAt rowNum colNum toggleCell grid
+
+
+mapCellAt : Int -> Int -> (Cell -> Cell) -> Grid -> Grid
+mapCellAt rowNum colNum_ func grid =
+    let
+        colNum =
+            modBy grid.colCount colNum_
+    in
+    mapRowAt rowNum (arrayMapAt colNum func) grid
 
 
 mapRowAt : Int -> (Row -> Row) -> Grid -> Grid

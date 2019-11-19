@@ -7,7 +7,6 @@ import Html exposing (Html)
 import Html.Attributes as H
 import Random exposing (Generator, Seed)
 import Set exposing (Set)
-import Svg.Attributes
 import Svg.Keyed
 import Svg.Lazy
 import Task
@@ -257,10 +256,6 @@ renderBatch walkerHistoryBatch =
 
 renderBatchItem : List ( Int, Int ) -> Svg msg
 renderBatchItem list =
-    let
-        _ =
-            Debug.log "rendering batch" ""
-    in
     renderGroup [] renderBit list
 
 

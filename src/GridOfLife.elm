@@ -1,4 +1,4 @@
-module GridOfLife exposing (Cell(..), Grid, asList2d, cellAtRC, generator, initEmpty, nextGridState)
+module GridOfLife exposing (Cell(..), Grid, asList2d, cellAtRC, generator, initEmpty, nextState)
 
 import Array exposing (Array)
 import Random exposing (Generator)
@@ -82,8 +82,8 @@ mapRows func model =
     { model | rows = func model.rows }
 
 
-nextGridState : Grid -> Grid
-nextGridState grid =
+nextState : Grid -> Grid
+nextState grid =
     let
         func =
             mapRCArrayIndexed

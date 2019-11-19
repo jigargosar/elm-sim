@@ -92,7 +92,7 @@ step model =
 
 updateOnFrame : Model -> Model
 updateOnFrame model =
-    { model | grid = GOL.nextGridState model.grid }
+    { model | grid = GOL.nextState model.grid }
         |> pushLastGridState model.grid
         |> randomizeGridIfReachedStableState
 

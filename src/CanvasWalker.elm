@@ -26,7 +26,8 @@ type alias Grid =
 
 emptyGrid : Grid
 emptyGrid =
-    Array.empty
+    Array.repeat gridConfig.colCount Off
+        |> Array.repeat gridConfig.rowCount
 
 
 type Msg

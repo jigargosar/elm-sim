@@ -49,6 +49,6 @@ main =
 view : Model -> Html Msg
 view { count, width, height } =
     div
-        [ class "fullscreen-fixed content-centered"
+        [ class "fullscreen-fixed"
         ]
         [ div [ class "debug" ] [ text "HW" ] ]

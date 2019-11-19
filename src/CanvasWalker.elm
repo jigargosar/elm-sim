@@ -108,10 +108,10 @@ onFrame model =
 
 
 view : Model -> Html Msg
-view _ =
+view model =
     vStack
         [ Class.pFixed, Class.trblZero ]
-        [ viewGrid gridConfig ]
+        [ viewGrid gridConfig model.grid ]
 
 
 type Cell
@@ -131,25 +131,44 @@ gridConfig =
     }
 
 
-viewGrid : GridConfig -> Html msg
-viewGrid c =
+cellAtRC : Int -> Int -> Grid -> Cell
+cellAtRC row col grid =
+    Array.get row grid
+        |> Maybe.andThen (Array.get col)
+        |> Maybe.withDefault Off
+
+
+viewGrid : GridConfig -> Grid -> Html msg
+viewGrid config grid =
     let
-        viewGridCell : Html msg
-        viewGridCell =
+        viewGridCell : Int -> Int -> Html msg
+        viewGridCell rowNum colNum =
+            let
+                cell : Cell
+                cell =
+                    cellAtRC rowNum colNum grid
+            in
             div
-                [ Style.widthPx c.cellSize
-                , Style.heightPx c.cellSize
-                , Style.bgColor "yellow"
+                [ Style.widthPx config.cellSize
+                , Style.heightPx config.cellSize
+                , Style.bgColor
+                    (case cell of
+                        Off ->
+                            "yellow"
+
+                        On ->
+                            "red"
+                    )
                 , Style.noShrink
                 , style "box-shadow"
                     "inset 0 0 0px 0.5px rgb(0,0,0), 0 0 0px 0.5px rgb(0,0,0)"
                 ]
                 []
 
-        viewGridRow : Html msg
-        viewGridRow =
-            hStack [] (List.repeat c.colCount viewGridCell)
+        viewGridRow : Int -> Html msg
+        viewGridRow rowNum =
+            hStack [] (List.range 0 config.colCount |> List.map (viewGridCell rowNum))
     in
     vStack
         []
-        (List.repeat c.rowCount viewGridRow)
+        (List.range 0 config.rowCount |> List.map viewGridRow)

@@ -26,12 +26,24 @@ type alias Model =
     }
 
 
+type Cell
+    = On
+    | Off
+
+
 type alias GridRow =
     Array Cell
 
 
 type alias Grid =
     Array GridRow
+
+
+cellAtRC : Int -> Int -> Grid -> Cell
+cellAtRC row col grid =
+    Array.get row grid
+        |> Maybe.andThen (Array.get col)
+        |> Maybe.withDefault Off
 
 
 emptyGrid : Grid
@@ -150,11 +162,6 @@ view model =
         [ viewGrid gridConfig model.grid ]
 
 
-type Cell
-    = On
-    | Off
-
-
 type alias GridConfig =
     { rowCount : Int, colCount : Int, cellSize : Float }
 
@@ -165,13 +172,6 @@ gridConfig =
     , colCount = 30
     , cellSize = 20
     }
-
-
-cellAtRC : Int -> Int -> Grid -> Cell
-cellAtRC row col grid =
-    Array.get row grid
-        |> Maybe.andThen (Array.get col)
-        |> Maybe.withDefault Off
 
 
 viewGrid : GridConfig -> Grid -> Html msg

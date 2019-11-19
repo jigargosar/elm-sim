@@ -14,7 +14,10 @@ type alias GridRow =
 
 
 type alias Grid =
-    { rows : Array GridRow }
+    { rowCount : Int
+    , colCount : Int
+    , rows : Array GridRow
+    }
 
 
 cellAtRC : Int -> Int -> Grid -> Cell
@@ -100,20 +103,15 @@ mapRCArrayIndexed func =
 
 
 initEmpty : { a | colCount : Int, rowCount : Int } -> Grid
-initEmpty gridConfig =
-    { rows =
-        Array.repeat gridConfig.colCount Off
-            |> Array.repeat gridConfig.rowCount
+initEmpty { rowCount, colCount } =
+    { rowCount = rowCount
+    , colCount = colCount
+    , rows = Array.repeat colCount Off |> Array.repeat rowCount
     }
 
 
-randomArray : Int -> Generator a -> Generator (Array a)
-randomArray count =
-    Random.list count >> Random.map Array.fromList
-
-
 generator : { a | colCount : Int, rowCount : Int } -> Generator Grid
-generator gridConfig =
+generator { rowCount, colCount } =
     let
         randomGridCell : Generator Cell
         randomGridCell =
@@ -121,10 +119,21 @@ generator gridConfig =
 
         randomGridRow : Generator (Array Cell)
         randomGridRow =
-            randomArray gridConfig.colCount randomGridCell
+            randomArray colCount randomGridCell
     in
-    randomArray gridConfig.rowCount randomGridRow
-        |> Random.map (\rows -> { rows = rows })
+    randomArray rowCount randomGridRow
+        |> Random.map
+            (\rows ->
+                { rowCount = rowCount
+                , colCount = colCount
+                , rows = rows
+                }
+            )
+
+
+randomArray : Int -> Generator a -> Generator (Array a)
+randomArray count =
+    Random.list count >> Random.map Array.fromList
 
 
 asList2d : Grid -> List (List Cell)

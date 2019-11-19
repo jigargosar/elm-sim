@@ -55,23 +55,26 @@ main =
         }
 
 
+addDelta : number -> { a | delta : number } -> { a | delta : number }
 addDelta delta model =
     { model | delta = model.delta + delta }
 
 
-frame =
+targetFrameInMilli =
     1000 / 60
 
 
+step : Model -> Model
 step model =
-    if model.delta > frame then
-        onFrame { model | delta = model.delta - frame }
+    if model.delta > targetFrameInMilli then
+        onFrame { model | delta = model.delta - targetFrameInMilli }
             |> step
 
     else
         model
 
 
+onFrame : Model -> Model
 onFrame model =
     model
 

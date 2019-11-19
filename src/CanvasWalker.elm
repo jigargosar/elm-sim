@@ -18,7 +18,7 @@ type alias Model =
 
 type Msg
     = Frame Float
-    | GetViewport Viewport
+    | GotViewport Viewport
 
 
 main : Program () Model Msg
@@ -30,7 +30,7 @@ main =
                   , width = 400
                   , height = 400
                   }
-                , Task.perform GetViewport getViewport
+                , Task.perform GotViewport getViewport
                 )
         , view = view
         , update =
@@ -39,10 +39,10 @@ main =
                     Frame _ ->
                         ( { model | count = model.count + 1 }, Cmd.none )
 
-                    GetViewport data ->
+                    GotViewport { viewport } ->
                         ( { model
-                            | width = data.viewport.width
-                            , height = data.viewport.height
+                            | width = viewport.width
+                            , height = viewport.height
                           }
                         , Cmd.none
                         )

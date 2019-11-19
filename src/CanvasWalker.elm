@@ -63,11 +63,7 @@ main =
                             |> step
                         , Cmd.none
                         )
-        , subscriptions =
-            \_ ->
-                Sub.batch
-                    [ onAnimationFrameDelta Tick
-                    ]
+        , subscriptions = \_ -> onAnimationFrameDelta Tick
         }
 
 

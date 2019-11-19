@@ -142,32 +142,34 @@ gridConfig =
 viewGrid : GridConfig -> GOL.Grid -> Html msg
 viewGrid config grid =
     let
-        cellSize =
-            20
-
-        viewGridCell : Int -> Int -> Html msg
-        viewGridCell rowNum colNum =
-            div
-                [ Style.widthPx cellSize
-                , Style.heightPx cellSize
-                , Style.bgColor
-                    (case GOL.cellAtRC rowNum colNum grid of
-                        GOL.Off ->
-                            "yellow"
-
-                        GOL.On ->
-                            "red"
-                    )
-                , Style.noShrink
-                , style "box-shadow"
-                    "inset 0 0 0px 0.5px rgb(0,0,0), 0 0 0px 0.5px rgb(0,0,0)"
-                ]
-                []
-
-        viewGridRow : Int -> Html msg
-        viewGridRow rowNum =
-            hStack [] (List.range 0 config.colCount |> List.map (viewGridCell rowNum))
+        viewGridRow : List GOL.Cell -> Html msg
+        viewGridRow cellRow =
+            hStack [] (List.map viewCell cellRow)
     in
     vStack
         []
-        (List.range 0 config.rowCount |> List.map viewGridRow)
+        (GOL.asList2d grid |> List.map viewGridRow)
+
+
+viewCell : GOL.Cell -> Html msg
+viewCell cell =
+    let
+        cellSize =
+            20
+    in
+    div
+        [ Style.widthPx cellSize
+        , Style.heightPx cellSize
+        , Style.bgColor
+            (case cell of
+                GOL.Off ->
+                    "yellow"
+
+                GOL.On ->
+                    "red"
+            )
+        , Style.noShrink
+        , style "box-shadow"
+            "inset 0 0 0px 0.5px rgb(0,0,0), 0 0 0px 0.5px rgb(0,0,0)"
+        ]
+        []

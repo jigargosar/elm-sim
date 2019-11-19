@@ -1,4 +1,4 @@
-module GridOfLife exposing (Cell(..), Grid, cellAtRC, emptyGrid, generator, nextGridState)
+module GridOfLife exposing (Cell(..), Grid, asList2d, cellAtRC, emptyGrid, generator, nextGridState)
 
 import Array exposing (Array)
 import Random exposing (Generator)
@@ -122,3 +122,8 @@ generator gridConfig =
             randomArray gridConfig.colCount randomGridCell
     in
     randomArray gridConfig.rowCount randomGridRow
+
+
+asList2d : Grid -> List (List Cell)
+asList2d =
+    Array.map Array.toList >> Array.toList

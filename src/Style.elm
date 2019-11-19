@@ -37,3 +37,8 @@ bgColor =
 border : List String -> Attribute msg
 border =
     String.join " " >> A.style "border"
+
+
+noShrink : Attribute msg
+noShrink =
+    A.style "flex-shrink" "0"

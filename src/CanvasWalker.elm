@@ -57,7 +57,7 @@ gridConfig : GridConfig
 gridConfig =
     { rowCount = 30
     , colCount = 30
-    , cellSize = 10
+    , cellSize = 20
     }
 
 
@@ -90,7 +90,7 @@ viewGrid c =
         viewGridRow =
             hStack [] (List.repeat c.colCount viewGridCell)
     in
-    hStack [ Style.transform [ "scale(2)" ] ]
+    hStack []
         [ vStack
             [ Style.borderBottom borderArgs
             , Style.borderRight borderArgs

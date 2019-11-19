@@ -43,6 +43,43 @@ cellAtRC rowNum_ colNum_ grid =
         |> Maybe.withDefault Off
 
 
+toggleAtRC : Int -> Int -> Grid -> Grid
+toggleAtRC rowNum_ colNum_ grid =
+    let
+        rowNum =
+            modBy grid.rowCount rowNum_
+
+        colNum =
+            modBy grid.colCount colNum_
+
+        func =
+            Array.indexedMap
+                (\rIdx ->
+                    if rIdx == rowNum then
+                        Array.indexedMap
+                            (\cIdx ->
+                                if cIdx == colNum then
+                                    toggleCell
+
+                                else
+                                    identity
+                            )
+
+                    else
+                        identity
+                )
+
+        toggleCell cell =
+            case cell of
+                On ->
+                    Off
+
+                Off ->
+                    On
+    in
+    mapRows func grid
+
+
 neighbours : List ( Int, Int )
 neighbours =
     [ ( -1, -1 ), ( -1, 0 ), ( -1, 1 ) ]

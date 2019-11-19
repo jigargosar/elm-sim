@@ -126,6 +126,7 @@ pushLastGridState lastGrid model =
     { model | lastGridStates = lastGrid :: model.lastGridStates |> List.take 2 }
 
 
+randomizeGridIfReachedStableState : Model -> Model
 randomizeGridIfReachedStableState model =
     if isGridStable model then
         randomizeGrid model

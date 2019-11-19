@@ -65,10 +65,10 @@ viewGrid : GridConfig -> Html msg
 viewGrid c =
     let
         borderArgs =
-            [ Style.px 1, "solid", "rgba(0,0,0,1)" ]
+            [ Style.px 0, "solid", "rgba(0,0,0,1)" ]
 
         outlineSize =
-            0
+            2
 
         viewGridCell : Html msg
         viewGridCell =

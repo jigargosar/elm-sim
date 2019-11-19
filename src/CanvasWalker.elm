@@ -20,10 +20,25 @@ type alias Flags =
 type alias Model =
     { collectedDelta : Float
     , grid : Grid
+    , lastGridStates : List Grid
     , width : Float
     , height : Float
     , seed : Seed
     }
+
+
+init : Flags -> ( Model, Cmd Msg )
+init flags =
+    ( { collectedDelta = 0
+      , width = 400
+      , height = 400
+      , grid = emptyGrid
+      , lastGridStates = []
+      , seed = Random.initialSeed flags.now
+      }
+        |> randomizeGrid
+    , Task.perform GotViewport getViewport
+    )
 
 
 type Cell
@@ -115,6 +130,11 @@ mapGridRC func =
     Array.indexedMap (\rowNum -> Array.indexedMap (\colNum -> func rowNum colNum))
 
 
+nextGridState : Grid -> Grid
+nextGridState grid =
+    mapGridRC (\r c _ -> nextStateOfCellAtRC r c grid) grid
+
+
 emptyGrid : Grid
 emptyGrid =
     Array.repeat gridConfig.colCount Off
@@ -158,17 +178,7 @@ type Msg
 main : Program Flags Model Msg
 main =
     Browser.element
-        { init =
-            \flags ->
-                ( { collectedDelta = 0
-                  , width = 400
-                  , height = 400
-                  , grid = emptyGrid
-                  , seed = Random.initialSeed flags.now
-                  }
-                    |> randomizeGrid
-                , Task.perform GotViewport getViewport
-                )
+        { init = init
         , view = view
         , update =
             \message model ->
@@ -225,7 +235,13 @@ step model =
 
 updateOnFrame : Model -> Model
 updateOnFrame model =
-    { model | grid = mapGridRC (\r c _ -> nextStateOfCellAtRC r c model.grid) model.grid }
+    { model | grid = nextGridState model.grid }
+        |> pushLastGridState model.grid
+
+
+pushLastGridState : Grid -> Model -> Model
+pushLastGridState lastGrid model =
+    { model | lastGridStates = lastGrid :: model.lastGridStates |> List.take 2 }
 
 
 view : Model -> Html Msg

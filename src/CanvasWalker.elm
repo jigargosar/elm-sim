@@ -28,7 +28,7 @@ type alias Flags =
 type alias Model =
     { elapsed : Float
     , grid : GOL.Grid
-    , lastGridStates : List GOL.Grid
+    , previousGrids : List GOL.Grid
     , seed : Seed
     }
 
@@ -37,7 +37,7 @@ init : Flags -> ( Model, Cmd Msg )
 init flags =
     ( { elapsed = 0
       , grid = GOL.emptyGrid gridConfig
-      , lastGridStates = []
+      , previousGrids = []
       , seed = Random.initialSeed flags.now
       }
         |> randomizeGrid
@@ -99,7 +99,7 @@ updateOnFrame model =
 
 pushLastGridState : GOL.Grid -> Model -> Model
 pushLastGridState lastGrid model =
-    { model | lastGridStates = lastGrid :: model.lastGridStates |> List.take 6 }
+    { model | previousGrids = lastGrid :: model.previousGrids |> List.take 6 }
 
 
 randomizeGridIfReachedStableState : Model -> Model
@@ -117,7 +117,7 @@ is =
 
 isGridStable : Model -> Bool
 isGridStable model =
-    List.any (is model.grid) model.lastGridStates
+    List.any (is model.grid) model.previousGrids
 
 
 view : Model -> Html Msg

@@ -100,10 +100,6 @@ step model =
 
 onFrame : Model -> Model
 onFrame model =
-    let
-        _ =
-            Debug.log "onFrame" model
-    in
     model
 
 

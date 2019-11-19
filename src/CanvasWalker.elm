@@ -68,7 +68,7 @@ viewGrid c =
             [ Style.px 0, "solid", "rgba(0,0,0,1)" ]
 
         outlineSize =
-            2
+            0
 
         viewGridCell : Html msg
         viewGridCell =
@@ -80,6 +80,8 @@ viewGrid c =
                 , Style.borderLeft borderArgs
                 , Style.outline [ Style.px outlineSize, "solid", "rgba(0,0,0,1)" ]
                 , Style.noShrink
+                , style "box-shadow"
+                    "inset 0 0 0px 0.5px rgb(0,0,0), 0 0 0px 0.5px rgb(0,0,0)"
                 ]
                 []
 

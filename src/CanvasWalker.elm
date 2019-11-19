@@ -118,11 +118,29 @@ updateOnFrame : Model -> Model
 updateOnFrame model =
     { model | grid = GOL.nextGridState model.grid }
         |> pushLastGridState model.grid
+        |> randomizeGridIfReachedStableState
 
 
 pushLastGridState : GOL.Grid -> Model -> Model
 pushLastGridState lastGrid model =
     { model | lastGridStates = lastGrid :: model.lastGridStates |> List.take 2 }
+
+
+randomizeGridIfReachedStableState model =
+    if isGridStable model then
+        randomizeGrid model
+
+    else
+        model
+
+
+is =
+    (==)
+
+
+isGridStable : Model -> Bool
+isGridStable model =
+    List.any (is model.grid) model.lastGridStates
 
 
 view : Model -> Html Msg

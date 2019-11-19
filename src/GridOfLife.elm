@@ -1,4 +1,4 @@
-module GridOfLife exposing (Cell(..), Grid, asList2d, generator, initEmpty, nextState)
+module GridOfLife exposing (Cell(..), Grid, asList2d, initEmpty, nextState, random)
 
 import Array exposing (Array)
 import Random exposing (Generator)
@@ -110,8 +110,8 @@ initEmpty { rowCount, colCount } =
     }
 
 
-generator : { a | colCount : Int, rowCount : Int } -> Generator Grid
-generator { rowCount, colCount } =
+random : { a | colCount : Int, rowCount : Int } -> Generator Grid
+random { rowCount, colCount } =
     let
         randomGridCell : Generator Cell
         randomGridCell =

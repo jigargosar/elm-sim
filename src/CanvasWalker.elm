@@ -49,15 +49,11 @@ main =
         }
 
 
-viewCell =
-    div
-        [ Style.widthPx gridConfig.cellSize
-        , Style.heightPx gridConfig.cellSize
-        , Style.bgColor "yellow"
-        ]
-        []
+type alias GridConfig =
+    { rowCount : Int, colCount : Int, cellSize : Float }
 
 
+gridConfig : GridConfig
 gridConfig =
     { rowCount = 30
     , colCount = 30
@@ -65,13 +61,24 @@ gridConfig =
     }
 
 
-viewGridRow =
-    hStack [] (List.repeat gridConfig.colCount viewCell)
+viewGrid : GridConfig -> Html msg
+viewGrid c =
+    let
+        viewGridCell : Html msg
+        viewGridCell =
+            div
+                [ Style.widthPx c.cellSize
+                , Style.heightPx c.cellSize
+                , Style.bgColor "yellow"
+                ]
+                []
 
-
-viewGrid =
+        viewGridRow : Html msg
+        viewGridRow =
+            hStack [] (List.repeat c.colCount viewGridCell)
+    in
     vStack []
-        (List.repeat gridConfig.rowCount viewGridRow)
+        (List.repeat c.rowCount viewGridRow)
 
 
 view : Model -> Html Msg
@@ -80,5 +87,5 @@ view { count, width, height } =
         [ Class.pFixed
         , Class.trblZero
         ]
-        [ viewGrid
+        [ viewGrid gridConfig
         ]

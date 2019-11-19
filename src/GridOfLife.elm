@@ -79,17 +79,14 @@ mapRowAt rowNum_ func grid =
         rowNum =
             modBy grid.rowCount rowNum_
     in
-    mapRows
-        (Array.indexedMap
-            (\rIdx ->
-                if rIdx == rowNum then
-                    func
+    mapRows (arrayMapAt rowNum func) grid
 
-                else
-                    identity
-            )
-        )
-        grid
+
+arrayMapAt : Int -> (a -> a) -> Array a -> Array a
+arrayMapAt idx func arr =
+    Array.get idx arr
+        |> Maybe.map (func >> (\v -> Array.set idx v arr))
+        |> Maybe.withDefault arr
 
 
 neighbours : List ( Int, Int )

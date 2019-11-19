@@ -12,7 +12,10 @@ import UI exposing (..)
 
 
 type alias Model =
-    { count : Float, width : Float, height : Float }
+    { delta : Float
+    , width : Float
+    , height : Float
+    }
 
 
 type Msg
@@ -25,7 +28,7 @@ main =
     Browser.element
         { init =
             \() ->
-                ( { count = 0
+                ( { delta = 0
                   , width = 400
                   , height = 400
                   }
@@ -35,8 +38,9 @@ main =
         , update =
             \msg model ->
                 case msg of
-                    Tick _ ->
-                        ( { model | count = model.count + 1 }, Cmd.none )
+                    Tick delta ->
+                        addDelta delta model
+                            |> step
 
                     GotViewport { viewport } ->
                         ( { model
@@ -47,6 +51,27 @@ main =
                         )
         , subscriptions = \_ -> onAnimationFrameDelta Tick
         }
+
+
+addDelta delta model =
+    { model | delta = model.delta + delta }
+
+
+frame =
+    1000 / 60
+
+
+step model =
+    if model.delta > frame then
+        onFrame { model | delta = model.delta - frame }
+            |> step
+
+    else
+        ( model, Cmd.none )
+
+
+onFrame model =
+    model
 
 
 type alias GridConfig =

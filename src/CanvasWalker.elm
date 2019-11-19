@@ -124,7 +124,7 @@ view : Model -> Html Msg
 view model =
     vStack
         [ Class.pFixed, Class.trblZero ]
-        [ viewGrid gridConfig model.grid ]
+        [ viewGrid model.grid ]
 
 
 type alias GridConfig =
@@ -139,8 +139,8 @@ gridConfig =
     }
 
 
-viewGrid : GridConfig -> GOL.Grid -> Html msg
-viewGrid config grid =
+viewGrid : GOL.Grid -> Html msg
+viewGrid grid =
     let
         viewGridRow : List GOL.Cell -> Html msg
         viewGridRow cellRow =

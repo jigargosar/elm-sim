@@ -1,4 +1,4 @@
-module GridOfLife exposing (..)
+module GridOfLife exposing (Cell(..), Grid, cellAtRC, emptyGrid, nextGridState, randomGrid)
 
 import Array exposing (Array)
 import Random exposing (Generator)

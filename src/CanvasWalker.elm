@@ -1,6 +1,5 @@
 module CanvasWalker exposing (main)
 
-import Array exposing (Array)
 import Browser
 import Browser.Dom exposing (Viewport, getViewport)
 import Browser.Events exposing (onAnimationFrameDelta, onResize)

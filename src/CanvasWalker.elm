@@ -6,6 +6,7 @@ import Browser.Events exposing (onAnimationFrameDelta)
 import Class
 import Html exposing (..)
 import Html.Attributes exposing (style)
+import Style
 import Task
 import UI exposing (..)
 
@@ -50,10 +51,9 @@ main =
 
 viewCell =
     div
-        [ style "width" "10px"
-        , style "height" "10px"
+        [ Style.widthPx 10
+        , Style.heightPx 10
         , style "background-color" "yellow"
-        , style "outline" "2px solid rgba(0,0,0,1)"
         ]
         []
 

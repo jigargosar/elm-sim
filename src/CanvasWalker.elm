@@ -1,5 +1,6 @@
 module CanvasWalker exposing (main)
 
+import Array exposing (Array)
 import Browser
 import Browser.Dom exposing (Viewport, getViewport)
 import Browser.Events exposing (onAnimationFrameDelta, onResize)
@@ -13,9 +14,19 @@ import UI exposing (..)
 
 type alias Model =
     { collectedDelta : Float
+    , grid : Grid
     , width : Float
     , height : Float
     }
+
+
+type alias Grid =
+    Array (Array Cell)
+
+
+emptyGrid : Grid
+emptyGrid =
+    Array.empty
 
 
 type Msg
@@ -32,6 +43,7 @@ main =
                 ( { collectedDelta = 0
                   , width = 400
                   , height = 400
+                  , grid = emptyGrid
                   }
                 , Task.perform GotViewport getViewport
                 )
@@ -99,6 +111,11 @@ view _ =
     vStack
         [ Class.pFixed, Class.trblZero ]
         [ viewGrid gridConfig ]
+
+
+type Cell
+    = On
+    | Off
 
 
 type alias GridConfig =

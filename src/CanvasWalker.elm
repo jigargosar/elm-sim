@@ -110,6 +110,11 @@ nextStateOfCellAtRC row col grid =
     nextStateOfCell aliveNeighbourCount cell
 
 
+mapGridRC : (Int -> Int -> a -> b) -> Array (Array a) -> Array (Array b)
+mapGridRC func =
+    Array.indexedMap (\rowNum -> Array.indexedMap (\colNum -> func rowNum colNum))
+
+
 emptyGrid : Grid
 emptyGrid =
     Array.repeat gridConfig.colCount Off
@@ -207,16 +212,16 @@ targetFrameInMilli =
 step : Model -> Model
 step model =
     if model.collectedDelta > targetFrameInMilli then
-        onFrame (updateCollectedDeltaBy -targetFrameInMilli model)
+        updateOnFrame (updateCollectedDeltaBy -targetFrameInMilli model)
             |> step
 
     else
         model
 
 
-onFrame : Model -> Model
-onFrame model =
-    model
+updateOnFrame : Model -> Model
+updateOnFrame model =
+    { model | grid = mapGridRC (\r c _ -> nextStateOfCellAtRC r c model.grid) model.grid }
 
 
 view : Model -> Html Msg

@@ -89,11 +89,6 @@ nextStateOfCellAtRC row col grid =
     nextStateOfCell aliveNeighbourCount cell
 
 
-mapArrayRC : (Int -> Int -> a -> b) -> Array (Array a) -> Array (Array b)
-mapArrayRC func =
-    Array.indexedMap (\rowNum -> Array.indexedMap (\colNum -> func rowNum colNum))
-
-
 mapRows : (b -> b) -> { a | rows : b } -> { a | rows : b }
 mapRows func model =
     { model | rows = func model.rows }
@@ -101,7 +96,22 @@ mapRows func model =
 
 nextGridState : Grid -> Grid
 nextGridState grid =
-    mapRows (mapArrayRC (\r c _ -> nextStateOfCellAtRC r c grid)) grid
+    let
+        func =
+            Array.indexedMap
+                (\rowNum ->
+                    Array.indexedMap
+                        (\colNum cell ->
+                            nextStateOfCell (aliveNeighbourCountOfCellAtRC rowNum colNum grid) cell
+                        )
+                )
+    in
+    mapRows func grid
+
+
+mapArrayRC : (Int -> Int -> a -> b) -> Array (Array a) -> Array (Array b)
+mapArrayRC func =
+    Array.indexedMap (func >> Array.indexedMap)
 
 
 initEmpty : { a | colCount : Int, rowCount : Int } -> Grid

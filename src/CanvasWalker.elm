@@ -82,10 +82,7 @@ viewGrid c =
 
 
 view : Model -> Html Msg
-view { count, width, height } =
+view _ =
     vStack
-        [ Class.pFixed
-        , Class.trblZero
-        ]
-        [ viewGrid gridConfig
-        ]
+        [ Class.pFixed, Class.trblZero ]
+        [ viewGrid gridConfig ]

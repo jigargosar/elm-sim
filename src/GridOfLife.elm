@@ -121,8 +121,8 @@ initEmpty { rowCount, colCount } =
     }
 
 
-random : { a | colCount : Int, rowCount : Int } -> Generator Grid
-random { rowCount, colCount } =
+randomize : Grid -> Generator Grid
+randomize { rowCount, colCount } =
     let
         randomGridCell : Generator Cell
         randomGridCell =
@@ -140,11 +140,6 @@ random { rowCount, colCount } =
                 , rows = rows
                 }
             )
-
-
-randomize : Grid -> Generator Grid
-randomize =
-    random
 
 
 randomArray : Int -> Generator a -> Generator (Array a)

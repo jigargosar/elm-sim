@@ -79,21 +79,17 @@ viewCell =
         []
 
 
-gridColumns =
-    30
-
-
-gridRows =
-    gridColumns
+grid =
+    { rowCount = 30, colCount = 30 }
 
 
 viewGridRow =
-    hStack [] (List.repeat gridColumns viewCell)
+    hStack [] (List.repeat grid.colCount viewCell)
 
 
 viewGrid =
     vStack []
-        (List.repeat gridRows viewGridRow)
+        (List.repeat grid.rowCount viewGridRow)
 
 
 view : Model -> Html Msg

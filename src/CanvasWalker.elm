@@ -98,25 +98,16 @@ nextStateOfCell aliveNeighbourCount cell =
                 Off
 
 
+nextStateOfCellAtRC : Int -> Int -> Grid -> Cell
 nextStateOfCellAtRC row col grid =
     let
         aliveNeighbourCount =
             aliveNeighbourCountOfCellAtRC row col grid
+
+        cell =
+            cellAtRC row col grid
     in
-    case cellAtRC row col grid of
-        On ->
-            if aliveNeighbourCount < 2 || aliveNeighbourCount > 3 then
-                Off
-
-            else
-                On
-
-        Off ->
-            if aliveNeighbourCount == 3 then
-                On
-
-            else
-                Off
+    nextStateOfCell aliveNeighbourCount cell
 
 
 emptyGrid : Grid

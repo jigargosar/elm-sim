@@ -24,7 +24,14 @@ type Msg
 main : Program () Model Msg
 main =
     Browser.element
-        { init = \() -> ( { count = 0, width = 400, height = 400 }, Task.perform GetViewport getViewport )
+        { init =
+            \() ->
+                ( { count = 0
+                  , width = 400
+                  , height = 400
+                  }
+                , Task.perform GetViewport getViewport
+                )
         , view = view
         , update =
             \msg model ->
@@ -39,7 +46,7 @@ main =
                           }
                         , Cmd.none
                         )
-        , subscriptions = \model -> onAnimationFrameDelta Frame
+        , subscriptions = \_ -> onAnimationFrameDelta Frame
         }
 
 

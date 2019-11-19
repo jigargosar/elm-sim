@@ -24,9 +24,9 @@ type alias Grid =
     }
 
 
-mapRows : (b -> b) -> { a | rows : b } -> { a | rows : b }
-mapRows func model =
-    { model | rows = func model.rows }
+mapRows : (Rows -> Rows) -> Grid -> Grid
+mapRows func grid =
+    { grid | rows = func grid.rows }
 
 
 cellAtRC : Int -> Int -> Grid -> Cell

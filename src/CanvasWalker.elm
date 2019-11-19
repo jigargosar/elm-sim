@@ -69,7 +69,8 @@ vStack lst =
 view : Model -> Html Msg
 view { count, width, height } =
     vStack
-        [ class "p-fixed trbl-zero"
+        [ Class.pFixed
+        , Class.trblZero
         ]
         [ vStack [ class "debug" ]
             [ hStack [ class "" ] [ text "HW" ]

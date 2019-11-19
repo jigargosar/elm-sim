@@ -13,3 +13,11 @@ fdRow =
 
 fdCol =
     class "fd-col"
+
+
+pFixed =
+    class "p-fixed"
+
+
+trblZero =
+    class "trbl-zero"

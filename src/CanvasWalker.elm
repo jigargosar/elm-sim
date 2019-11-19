@@ -46,9 +46,21 @@ main =
         }
 
 
+vStack a =
+    class "d-flex fd-row"
+        :: a
+        |> div
+
+
+hStack a =
+    class "d-flex fd-column"
+        :: a
+        |> div
+
+
 view : Model -> Html Msg
 view { count, width, height } =
-    div
+    vStack
         [ class "fullscreen-fixed"
         ]
         [ div [ class "fd debug" ]

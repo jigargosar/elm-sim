@@ -76,7 +76,7 @@ viewGrid c =
                 [ Style.widthPx cellSize
                 , Style.heightPx cellSize
                 , Style.bgColor "yellow"
-                , Style.border [ Style.toPx borderSize, "solid", "rgba(0,0,0,0.5)" ]
+                , Style.border [ Style.px borderSize, "solid", "rgba(0,0,0,0.5)" ]
                 , Style.noShrink
                 ]
                 []

@@ -16,16 +16,16 @@ height =
 
 widthPx : Float -> Attribute msg
 widthPx f =
-    width (toPx f)
+    width (px f)
 
 
 heightPx : Float -> Attribute msg
 heightPx f =
-    height (toPx f)
+    height (px f)
 
 
-toPx : Float -> String
-toPx f =
+px : Float -> String
+px f =
     String.fromFloat f ++ "px"
 
 

@@ -54,16 +54,9 @@ toggleAtRC rowNum_ colNum_ grid =
 
         func =
             Array.indexedMap
-                (\rIdx ->
-                    if rIdx == rowNum then
-                        Array.indexedMap
-                            (\cIdx ->
-                                if cIdx == colNum then
-                                    toggleCell
-
-                                else
-                                    identity
-                            )
+                (\cIdx ->
+                    if cIdx == colNum then
+                        toggleCell
 
                     else
                         identity
@@ -77,9 +70,10 @@ toggleAtRC rowNum_ colNum_ grid =
                 Off ->
                     On
     in
-    mapRows func grid
+    mapRowAt rowNum_ func grid
 
 
+mapRowAt : Int -> (Row -> Row) -> Grid -> Grid
 mapRowAt rowNum_ func grid =
     let
         rowNum =

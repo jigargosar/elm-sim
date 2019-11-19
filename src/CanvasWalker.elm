@@ -94,6 +94,13 @@ onFrame model =
     model
 
 
+view : Model -> Html Msg
+view _ =
+    vStack
+        [ Class.pFixed, Class.trblZero ]
+        [ viewGrid gridConfig ]
+
+
 type alias GridConfig =
     { rowCount : Int, colCount : Int, cellSize : Float }
 
@@ -128,10 +135,3 @@ viewGrid c =
     vStack
         []
         (List.repeat c.rowCount viewGridRow)
-
-
-view : Model -> Html Msg
-view _ =
-    vStack
-        [ Class.pFixed, Class.trblZero ]
-        [ viewGrid gridConfig ]

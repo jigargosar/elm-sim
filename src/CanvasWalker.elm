@@ -143,17 +143,17 @@ gridConfig =
 viewGrid : GOL.Grid -> Html msg
 viewGrid grid =
     let
-        viewGridRow : List GOL.Cell -> Html msg
-        viewGridRow cellRow =
-            hStack [] (List.map viewCell cellRow)
+        viewGridRow : Int -> List GOL.Cell -> Html msg
+        viewGridRow rowIdx cellRow =
+            hStack [] (List.indexedMap (viewCell rowIdx) cellRow)
     in
     vStack
         []
-        (GOL.asList2d grid |> List.map viewGridRow)
+        (GOL.asList2d grid |> List.indexedMap viewGridRow)
 
 
-viewCell : GOL.Cell -> Html msg
-viewCell cell =
+viewCell : Int -> Int -> GOL.Cell -> Html msg
+viewCell rowIdx colIdx cell =
     let
         cellSize =
             20

@@ -1,3 +1,4 @@
+require('elm-canvas')
 const Module = require('./CanvasWalker.elm')
 require('./styles.css')
 

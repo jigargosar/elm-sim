@@ -68,7 +68,7 @@ view { count, width, height } =
     vStack
         [ class "p-fixed trbl-zero"
         ]
-        [ vStack [ class "fd debug" ]
+        [ vStack [ class "debug" ]
             [ hStack [ class "" ] [ text "HW" ]
             , hStack [ class "" ] [ text "HW" ]
             ]

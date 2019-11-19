@@ -67,6 +67,9 @@ viewGrid c =
         borderSize =
             1
 
+        borderArgs =
+            [ Style.px borderSize, "solid", "rgba(0,0,0,1)" ]
+
         outlineSize =
             0
 
@@ -76,7 +79,8 @@ viewGrid c =
                 [ Style.widthPx c.cellSize
                 , Style.heightPx c.cellSize
                 , Style.bgColor "yellow"
-                , Style.border [ Style.px borderSize, "solid", "rgba(0,0,0,1)" ]
+                , Style.borderTop borderArgs
+                , Style.borderLeft borderArgs
                 , Style.outline [ Style.px outlineSize, "solid", "rgba(0,0,0,1)" ]
                 , Style.noShrink
                 ]
@@ -86,8 +90,14 @@ viewGrid c =
         viewGridRow =
             hStack [] (List.repeat c.colCount viewGridCell)
     in
-    vStack [ Style.transform [ "scale(2)" ] ]
-        (List.repeat c.rowCount viewGridRow)
+    hStack []
+        [ vStack
+            [ Style.transform [ "scale(2)" ]
+            , Style.borderTop borderArgs
+            , Style.borderBottom borderArgs
+            ]
+            (List.repeat c.rowCount viewGridRow)
+        ]
 
 
 view : Model -> Html Msg

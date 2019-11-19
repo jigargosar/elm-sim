@@ -39,6 +39,26 @@ border =
     String.join " " >> A.style "border"
 
 
+borderTop : List String -> Attribute msg
+borderTop =
+    String.join " " >> A.style "border-top"
+
+
+borderLeft : List String -> Attribute msg
+borderLeft =
+    String.join " " >> A.style "border-left"
+
+
+borderBottom : List String -> Attribute msg
+borderBottom =
+    String.join " " >> A.style "border-bottom"
+
+
+borderRight : List String -> Attribute msg
+borderRight =
+    String.join " " >> A.style "border-right"
+
+
 outline : List String -> Attribute msg
 outline =
     String.join " " >> A.style "outline"

@@ -53,7 +53,7 @@ neighbours =
 neighboursOfCellAtRC : Int -> Int -> Grid -> List Cell
 neighboursOfCellAtRC rowNum colNum grid =
     neighbours
-        |> List.map (\( nr, nc ) -> cellAtRC (rowNum + nr) (colNum + nc) grid)
+        |> List.map (\( dr, dc ) -> cellAtRC (rowNum + dr) (colNum + dc) grid)
 
 
 is : a -> a -> Bool

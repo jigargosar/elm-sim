@@ -37,8 +37,8 @@ main =
                 )
         , view = view
         , update =
-            \msg model ->
-                case msg of
+            \message model ->
+                case message of
                     Tick delta ->
                         ( addDelta delta model
                             |> step

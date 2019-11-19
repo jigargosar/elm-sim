@@ -1,9 +1,12 @@
-const Module = require('./Main.elm')
+const Module = require('./CanvasWalker.elm')
 require('./styles.css')
 
-Module.Elm.Main.init({
+Module.Elm.CanvasWalker.init({
   node: document.getElementById('root'),
   flags: {
     now: Date.now(),
   },
 })
+
+
+console.log(Module)

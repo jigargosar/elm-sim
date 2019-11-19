@@ -18,7 +18,7 @@ type alias Flags =
 
 
 type alias Model =
-    { collectedDelta : Float
+    { elapsed : Float
     , grid : GOL.Grid
     , lastGridStates : List GOL.Grid
     , seed : Seed
@@ -27,7 +27,7 @@ type alias Model =
 
 init : Flags -> ( Model, Cmd Msg )
 init flags =
-    ( { collectedDelta = 0
+    ( { elapsed = 0
       , grid = GOL.emptyGrid gridConfig
       , lastGridStates = []
       , seed = Random.initialSeed flags.now
@@ -69,7 +69,7 @@ main =
 
 updateCollectedDeltaBy : Float -> Model -> Model
 updateCollectedDeltaBy dd model =
-    { model | collectedDelta = model.collectedDelta + dd }
+    { model | elapsed = model.elapsed + dd }
 
 
 updatesPerSecond =
@@ -82,7 +82,7 @@ step model =
         targetFrameInMilli =
             1000 / updatesPerSecond
     in
-    if model.collectedDelta > targetFrameInMilli then
+    if model.elapsed > targetFrameInMilli then
         updateOnFrame (updateCollectedDeltaBy -targetFrameInMilli model)
             |> step
 

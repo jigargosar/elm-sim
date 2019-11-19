@@ -32,3 +32,8 @@ toPx f =
 bgColor : String -> Attribute msg
 bgColor =
     A.style "background-color"
+
+
+border : List String -> Attribute msg
+border =
+    String.join " " >> A.style "border"

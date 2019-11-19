@@ -21,7 +21,14 @@ type alias Grid =
 
 
 cellAtRC : Int -> Int -> Grid -> Cell
-cellAtRC row col grid =
+cellAtRC row_ col_ grid =
+    let
+        row =
+            row_
+
+        col =
+            col_
+    in
     Array.get row grid.rows
         |> Maybe.andThen (Array.get col)
         |> Maybe.withDefault Off

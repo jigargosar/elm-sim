@@ -85,7 +85,7 @@ viewGrid c =
         viewGridRow =
             hStack [] (List.repeat c.colCount viewGridCell)
     in
-    vStack [ style "transform" "scale(2)" ]
+    vStack [ Style.transform [ "scale(2)" ] ]
         (List.repeat c.rowCount viewGridRow)
 
 

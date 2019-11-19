@@ -42,3 +42,8 @@ border =
 noShrink : Attribute msg
 noShrink =
     A.style "flex-shrink" "0"
+
+
+transform : List String -> Attribute msg
+transform =
+    String.join " " >> A.style "transform"

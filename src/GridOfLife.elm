@@ -80,6 +80,24 @@ toggleAtRC rowNum_ colNum_ grid =
     mapRows func grid
 
 
+mapRowAt rowNum_ func grid =
+    let
+        rowNum =
+            modBy grid.rowCount rowNum_
+    in
+    mapRows
+        (Array.indexedMap
+            (\rIdx ->
+                if rIdx == rowNum then
+                    func
+
+                else
+                    identity
+            )
+        )
+        grid
+
+
 neighbours : List ( Int, Int )
 neighbours =
     [ ( -1, -1 ), ( -1, 0 ), ( -1, 1 ) ]

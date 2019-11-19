@@ -41,8 +41,8 @@ neighbours =
         ++ [ ( 1, -1 ), ( 1, 0 ), ( 1, 1 ) ]
 
 
-neighboursOfRC : Int -> Int -> Grid -> List Cell
-neighboursOfRC row col grid =
+neighboursOfCellAtRC : Int -> Int -> Grid -> List Cell
+neighboursOfCellAtRC row col grid =
     neighbours
         |> List.map (\( nr, nc ) -> cellAtRC (row + nr) (col + nc) grid)
 
@@ -54,7 +54,7 @@ is =
 
 aliveNeighbourCountOfCellAtRC : Int -> Int -> Grid -> Int
 aliveNeighbourCountOfCellAtRC row col grid =
-    neighboursOfRC row col grid
+    neighboursOfCellAtRC row col grid
         |> List.filter (is On)
         |> List.length
 

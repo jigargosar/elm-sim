@@ -51,7 +51,7 @@ randomizeGrid model =
         ( grid, seed ) =
             Random.step (GOL.generator gridConfig) model.seed
     in
-    { model | grid = grid, seed = seed }
+    { model | grid = grid, previousGrids = [], seed = seed }
 
 
 type Msg

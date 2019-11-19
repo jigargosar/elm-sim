@@ -50,7 +50,7 @@ randomGrid =
     let
         randomGridCell : Generator Cell
         randomGridCell =
-            Random.uniform Off [ On ]
+            Random.weighted ( 80, Off ) [ ( 20, On ) ]
 
         randomGridRow : Generator (Array Cell)
         randomGridRow =

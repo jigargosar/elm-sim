@@ -5,7 +5,7 @@ import Browser.Dom exposing (Viewport, getViewport)
 import Browser.Events exposing (onAnimationFrameDelta)
 import Class
 import Html exposing (..)
-import Html.Attributes exposing (class, classList)
+import Html.Attributes exposing (class, classList, style)
 import Task
 
 
@@ -48,7 +48,7 @@ main =
 
 
 shouldDebugLayout =
-    True
+    False
 
 
 hStack lst =
@@ -69,14 +69,38 @@ vStack lst =
         |> div
 
 
+viewCell =
+    div
+        [ style "width" "10px"
+        , style "height" "10px"
+        , style "background-color" "yellow"
+        , style "outline" "2px solid rgba(0,0,0,1)"
+        ]
+        []
+
+
+gridColumns =
+    30
+
+
+gridRows =
+    gridColumns
+
+
+viewGridRow =
+    hStack [] (List.repeat gridColumns viewCell)
+
+
+viewGrid =
+    vStack []
+        (List.repeat gridRows viewGridRow)
+
+
 view : Model -> Html Msg
 view { count, width, height } =
     vStack
         [ Class.pFixed
         , Class.trblZero
         ]
-        [ vStack []
-            [ hStack [] [ text "HW" ]
-            , hStack [] [ text "HW" ]
-            ]
+        [ viewGrid
         ]

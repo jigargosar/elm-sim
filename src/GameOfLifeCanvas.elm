@@ -210,8 +210,11 @@ view model =
 
 render model =
     let
+        cellSize =
+            50
+
         renderCellRC ri ci =
-            rect ( 0, 0 ) 50 50
+            rect ( ci * cellSize, ri * cellSize ) cellSize cellSize
     in
     [ shapes
         [ fill Color.blue

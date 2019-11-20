@@ -24,6 +24,7 @@
     "webpack-dev-server": "^3.9.0"
   },
   "dependencies": {
-    "elm-canvas": "^2.2.3"
+    "elm-canvas": "^2.2.3",
+    "ramda": "^0.26.1"
   }
 }

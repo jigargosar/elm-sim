@@ -1,13 +1,26 @@
+import { keys, pathOr } from 'ramda'
+
 require('elm-canvas')
 const Module = require('./GameOfLifeHtml.elm')
 require('./styles.css')
 
-Module.Elm.GameOfLifeHtml.init({
+initElmApp(Module, {
   node: document.getElementById('root'),
   flags: {
     now: Date.now(),
   },
 })
 
-
 console.log(Module)
+
+function initElmApp(elmModule, initArgs) {
+  const appNames = keys(pathOr({}, ['Elm'], elmModule))
+  invariant(appNames.length === 1)
+  return elmModule['Elm'][appNames[0]].init(initArgs)
+}
+
+function invariant(bool, msg = 'invariant failed') {
+  if (!bool) {
+    throw new Error(msg)
+  }
+}

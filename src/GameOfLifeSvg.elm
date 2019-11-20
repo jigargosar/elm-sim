@@ -5,13 +5,10 @@ import Browser.Events as B
 import Color
 import GridOfLife as GOL
 import Html exposing (..)
-import Html.Attributes as H exposing (style)
-import Html.Events as H
+import Html.Attributes as H
 import Html.Lazy exposing (lazy)
 import Json.Decode as JD
 import Random exposing (Generator, Seed)
-import Style
-import Svg.Keyed as SK
 import Svg.Lazy as S
 import TypedSvg as S exposing (svg)
 import TypedSvg.Attributes as S
@@ -210,7 +207,7 @@ view model =
 
 viewGridSvg : GOL.Grid -> Html Msg
 viewGridSvg grid =
-    hStack [ style "padding" "1rem" ]
+    hStack []
         [ let
             s =
                 600
@@ -281,40 +278,3 @@ gridConfig =
     { rowCount = 30
     , colCount = 30
     }
-
-
-viewGrid : GOL.Grid -> Html Msg
-viewGrid grid =
-    let
-        viewGridRow : Int -> List GOL.Cell -> Html Msg
-        viewGridRow rowIdx cellRow =
-            hStack [] (List.indexedMap (viewCell rowIdx) cellRow)
-    in
-    vStack [ Style.noSelection ]
-        (GOL.toListRC grid |> List.indexedMap viewGridRow)
-
-
-viewCell : Int -> Int -> GOL.Cell -> Html Msg
-viewCell rowIdx colIdx cell =
-    let
-        cellSize =
-            20
-    in
-    div
-        [ Style.widthPx cellSize
-        , Style.heightPx cellSize
-        , Style.bgColor
-            (case cell of
-                GOL.Off ->
-                    "yellow"
-
-                GOL.On ->
-                    "red"
-            )
-        , Style.noShrink
-        , style "box-shadow"
-            "inset 0 0 0px 0.5px rgb(0,0,0), 0 0 0px 0.5px rgb(0,0,0)"
-        , H.onMouseOver (MouseOverCell rowIdx colIdx)
-        , H.onMouseDown (MouseDownOnCell rowIdx colIdx)
-        ]
-        []

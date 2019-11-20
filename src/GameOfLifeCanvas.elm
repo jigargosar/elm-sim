@@ -2,7 +2,10 @@ module GameOfLifeCanvas exposing (main)
 
 import Browser
 import Browser.Events as B
+import Canvas exposing (rect, shapes)
+import Canvas.Settings exposing (fill)
 import Class
+import Color
 import GridOfLife as GOL
 import Html exposing (..)
 import Html.Attributes exposing (style)
@@ -194,7 +197,16 @@ view : Model -> Html Msg
 view model =
     vStack
         [ Class.pFixed, Class.trblZero ]
-        [ viewGrid model.grid ]
+        [ hStack []
+            [ Canvas.toHtml ( 100, 100 )
+                [ style "line-height" "0"
+                , Style.border [ "1px solid black" ]
+                ]
+                [ shapes [ fill Color.blue ] [ rect ( 0, 0 ) 5 5 ]
+                ]
+            ]
+        , viewGrid model.grid
+        ]
 
 
 type alias GridConfig =

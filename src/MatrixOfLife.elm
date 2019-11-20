@@ -5,7 +5,6 @@ module MatrixOfLife exposing
     , initEmpty
     , nextState
     , randomize
-    , toListRC
     , toggleCellAtRC
     )
 
@@ -34,11 +33,6 @@ type alias Grid =
     }
 
 
-mapRows : (Rows -> Rows) -> Grid -> Grid
-mapRows func grid =
-    { grid | rows = func grid.rows }
-
-
 cellAtRC : Int -> Int -> Grid -> Cell
 cellAtRC rowNum_ colNum_ grid =
     Matrix.getWarped rowNum_ colNum_ grid.rows
@@ -61,14 +55,7 @@ toggleCellAtRC rowNum colNum grid =
 
 mapCellAt : Int -> Int -> (Cell -> Cell) -> Grid -> Grid
 mapCellAt rowNum colNum func grid =
-    mapRowAt rowNum (arrayMapAt colNum func) grid
-
-
-arrayMapAt : Int -> (a -> a) -> Array a -> Array a
-arrayMapAt idx func arr =
-    Array.get idx arr
-        |> Maybe.map (func >> (\v -> Array.set idx v arr))
-        |> Maybe.withDefault arr
+    { grid | rows = Matrix.mapAt rowNum colNum func grid.rows }
 
 
 neighbours : List ( Int, Int )
@@ -128,12 +115,12 @@ nextState : Grid -> Grid
 nextState grid =
     let
         func =
-            mapRCArrayIndexed
+            Matrix.indexedMap
                 (\rowNum colNum ->
                     nextStateOfCell (aliveNeighbourCountOfCellAtRC rowNum colNum grid)
                 )
     in
-    mapRows func grid
+    { grid | rows = func grid.rows }
 
 
 mapRCArrayIndexed : (Int -> Int -> a -> b) -> Array (Array a) -> Array (Array b)
@@ -143,10 +130,7 @@ mapRCArrayIndexed func =
 
 initEmpty : { a | colCount : Int, rowCount : Int } -> Grid
 initEmpty { rowCount, colCount } =
-    { rowCount = rowCount
-    , colCount = colCount
-    , rows = Array.repeat colCount Off |> Array.repeat rowCount
-    }
+    Grid rowCount colCount (Matrix.repeat rowCount colCount Off)
 
 
 randomize : Grid -> Generator Grid
@@ -155,29 +139,14 @@ randomize { rowCount, colCount } =
         randomGridCell : Generator Cell
         randomGridCell =
             Random.weighted ( 80, Off ) [ ( 20, On ) ]
-
-        randomGridRow : Generator (Array Cell)
-        randomGridRow =
-            randomArray colCount randomGridCell
     in
-    randomArray rowCount randomGridRow
-        |> Random.map
-            (\rows ->
-                { rowCount = rowCount
-                , colCount = colCount
-                , rows = rows
-                }
-            )
+    Matrix.generator rowCount colCount randomGridCell
+        |> Random.map (Grid rowCount colCount)
 
 
 randomArray : Int -> Generator a -> Generator (Array a)
 randomArray count =
     Random.list count >> Random.map Array.fromList
-
-
-toListRC : Grid -> List (List Cell)
-toListRC =
-    .rows >> Array.map Array.toList >> Array.toList
 
 
 asGrid : Grid -> Grid
@@ -189,6 +158,5 @@ indexedMapToList : (Int -> Int -> Cell -> a) -> Grid -> List a
 indexedMapToList func =
     asGrid
         >> .rows
-        >> Array.indexedMap (\ri -> Array.indexedMap (func ri) >> Array.toList)
-        >> Array.toList
-        >> List.concat
+        >> Matrix.indexedMap func
+        >> Matrix.toList

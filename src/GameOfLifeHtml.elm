@@ -160,8 +160,7 @@ viewGrid grid =
         viewGridRow rowIdx cellRow =
             hStack [] (List.indexedMap (viewCell rowIdx) cellRow)
     in
-    vStack
-        []
+    vStack []
         (GOL.toListRC grid |> List.indexedMap viewGridRow)
 
 

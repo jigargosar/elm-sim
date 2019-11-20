@@ -200,7 +200,8 @@ view model =
     vStack
         [{- Class.pFixed, Class.trblZero -}]
         [ lazy viewGridSvg model.grid
-        , lazy viewGrid model.grid
+
+        --, lazy viewGrid model.grid
         ]
 
 
@@ -220,9 +221,7 @@ viewGridSvg grid =
             renderCellRC : Int -> Int -> GOL.Cell -> S.Svg msg
             renderCellRC ri ci cell =
                 S.rect
-                    [ S.stroke Color.black
-                    , S.strokeWidth (S.px 2)
-                    , (case cell of
+                    [ (case cell of
                         GOL.Off ->
                             Color.lightYellow
 
@@ -248,7 +247,13 @@ viewGridSvg grid =
                     |> List.indexedMap (\ri -> renderRow ri)
                     |> List.concat
           in
-          svg [ S.viewBox 0 0 s s, H.width s ] renderGrid
+          svg [ S.viewBox 0 0 s s, H.width s ]
+            [ S.g
+                [ S.stroke Color.black
+                , S.strokeWidth (S.px 2)
+                ]
+                renderGrid
+            ]
         ]
 
 

@@ -6,7 +6,7 @@ import Color
 import GridOfLife as GOL
 import Html exposing (..)
 import Html.Attributes as H exposing (style)
-import Html.Events as H exposing (onMouseOver)
+import Html.Events as H
 import Html.Lazy exposing (lazy)
 import Json.Decode as JD
 import Random exposing (Generator, Seed)
@@ -303,7 +303,7 @@ viewCell rowIdx colIdx cell =
         , Style.noShrink
         , style "box-shadow"
             "inset 0 0 0px 0.5px rgb(0,0,0), 0 0 0px 0.5px rgb(0,0,0)"
-        , onMouseOver (MouseOverCell rowIdx colIdx)
+        , H.onMouseOver (MouseOverCell rowIdx colIdx)
         , H.onMouseDown (MouseDownOnCell rowIdx colIdx)
         ]
         []

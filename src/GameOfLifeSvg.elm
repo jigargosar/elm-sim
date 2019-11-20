@@ -11,6 +11,8 @@ import Html.Lazy exposing (lazy)
 import Json.Decode as JD
 import Random exposing (Generator, Seed)
 import Style
+import Svg.Keyed as SK
+import Svg.Lazy as S
 import TypedSvg as S exposing (svg)
 import TypedSvg.Attributes as S
 import TypedSvg.Core as S
@@ -239,7 +241,7 @@ viewGridSvg grid =
 
             renderRow : Int -> List GOL.Cell -> List (S.Svg msg)
             renderRow ri =
-                List.indexedMap (\ci -> renderCellRC ri ci)
+                List.indexedMap (\ci -> S.lazy3 renderCellRC ri ci)
 
             renderGrid : List (S.Svg msg)
             renderGrid =
@@ -248,11 +250,11 @@ viewGridSvg grid =
                     |> List.concat
           in
           svg [ S.viewBox 0 0 s s, H.width s ]
-            [ S.g
+            [ SK.node "g"
                 [ S.stroke Color.black
                 , S.strokeWidth (S.px 2)
                 ]
-                renderGrid
+                (List.indexedMap (\i -> Tuple.pair (String.fromInt i)) renderGrid)
             ]
         ]
 

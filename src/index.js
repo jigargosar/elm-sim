@@ -11,8 +11,6 @@ initElmApp(Module, {
   },
 })
 
-
-
 function initElmApp(elmModule, initArgs) {
   const appNames = keys(pathOr({}, ['Elm'], elmModule))
   invariant(appNames.length === 1)

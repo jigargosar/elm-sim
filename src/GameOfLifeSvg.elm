@@ -198,7 +198,7 @@ isGridStable model =
 view : Model -> Html Msg
 view model =
     vStack
-        [{- Class.pFixed, Class.trblZero -}]
+        []
         [ lazy viewGridSvg model.grid
 
         --, lazy viewGrid model.grid

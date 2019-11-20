@@ -220,28 +220,9 @@ viewGridSvg grid =
             cellSize =
                 toFloat gridWidthInPx / toFloat grid.rowCount
 
-            renderCellRC : Int -> Int -> GOL.Cell -> S.Svg msg
-            renderCellRC ri ci cell =
-                S.rect
-                    [ (case cell of
-                        GOL.Off ->
-                            Color.lightYellow
-
-                        GOL.On ->
-                            Color.lightRed
-                      )
-                        |> S.Fill
-                        |> S.fill
-                    , S.x (S.px <| toFloat ci * cellSize + 1)
-                    , S.y (S.px <| toFloat ri * cellSize + 1)
-                    , S.width (S.px cellSize)
-                    , S.height (S.px cellSize)
-                    ]
-                    []
-
             renderRow : Int -> List GOL.Cell -> List (S.Svg msg)
             renderRow ri =
-                List.indexedMap (\ci -> S.lazy3 renderCellRC ri ci)
+                List.indexedMap (\ci -> S.lazy4 renderCellRC cellSize ri ci)
 
             renderGrid : List (S.Svg msg)
             renderGrid =
@@ -257,6 +238,31 @@ viewGridSvg grid =
                 (List.indexedMap (\i -> Tuple.pair (String.fromInt i)) renderGrid)
             ]
         ]
+
+
+renderCellRC : Float -> Int -> Int -> GOL.Cell -> S.Svg msg
+renderCellRC cellSize ri ci cell =
+    let
+        _ =
+            -- Debug.log "rc" ( ri, ci )
+            1
+    in
+    S.rect
+        [ (case cell of
+            GOL.Off ->
+                Color.lightYellow
+
+            GOL.On ->
+                Color.lightRed
+          )
+            |> S.Fill
+            |> S.fill
+        , S.x (S.px <| toFloat ci * cellSize + 1)
+        , S.y (S.px <| toFloat ri * cellSize + 1)
+        , S.width (S.px cellSize)
+        , S.height (S.px cellSize)
+        ]
+        []
 
 
 type alias GridConfig =

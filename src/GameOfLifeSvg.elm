@@ -239,14 +239,14 @@ viewKeyedGridCellsSvg : Float -> GOL.Grid -> List ( String, S.Svg Msg )
 viewKeyedGridCellsSvg cellSize grid =
     GOL.indexedMapToList
         (\ri ci ->
-            S.lazy4 renderCellRC cellSize ri ci
+            S.lazy4 viewCellRCSvg cellSize ri ci
                 >> Tuple.pair (String.fromInt ri ++ "," ++ String.fromInt ci)
         )
         grid
 
 
-renderCellRC : Float -> Int -> Int -> GOL.Cell -> S.Svg Msg
-renderCellRC cellSize ri ci cell =
+viewCellRCSvg : Float -> Int -> Int -> GOL.Cell -> S.Svg Msg
+viewCellRCSvg cellSize ri ci cell =
     let
         _ =
             -- Debug.log "rc" ( ri, ci )

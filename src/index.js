@@ -1,8 +1,8 @@
 require('elm-canvas')
-const Module = require('./CanvasWalker.elm')
+const Module = require('./GameOfLifeHtml.elm')
 require('./styles.css')
 
-Module.Elm.CanvasWalker.init({
+Module.Elm.GameOfLifeHtml.init({
   node: document.getElementById('root'),
   flags: {
     now: Date.now(),

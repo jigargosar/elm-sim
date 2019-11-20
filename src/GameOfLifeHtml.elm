@@ -1,4 +1,4 @@
-module CanvasWalker exposing (main)
+module GameOfLifeHtml exposing (main)
 
 import Browser
 import Browser.Events exposing (onAnimationFrameDelta)

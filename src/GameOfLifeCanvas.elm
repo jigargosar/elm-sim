@@ -9,10 +9,11 @@ import Class
 import Color
 import GridOfLife as GOL
 import Html exposing (..)
-import Html.Attributes exposing (style)
+import Html.Attributes exposing (style, tabindex)
 import Html.Events as H exposing (onMouseOver)
 import Html.Lazy exposing (lazy)
 import Json.Decode as JD
+import Json.Encode as JE
 import Random exposing (Generator, Seed)
 import Style
 import UI exposing (..)

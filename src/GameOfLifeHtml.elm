@@ -1,12 +1,12 @@
 module GameOfLifeHtml exposing (main)
 
 import Browser
-import Browser.Events exposing (onAnimationFrameDelta, onMouseDown, onMouseUp)
+import Browser.Events as B
 import Class
 import GridOfLife as GOL
 import Html exposing (..)
 import Html.Attributes exposing (style)
-import Html.Events exposing (onClick, onMouseOver)
+import Html.Events as H exposing (onMouseOver)
 import Json.Decode as JD
 import Random exposing (Generator, Seed)
 import Style
@@ -21,9 +21,8 @@ main =
         , update = update
         , subscriptions =
             \_ ->
-                onAnimationFrameDelta Tick
-                    :: onMouseDown (JD.succeed (MouseDown True))
-                    :: onMouseUp (JD.succeed (MouseDown False))
+                B.onAnimationFrameDelta Tick
+                    :: B.onMouseUp (JD.succeed (MouseDown False))
                     :: []
                     |> Sub.batch
         }
@@ -68,6 +67,7 @@ type Msg
     = Tick Float
     | MouseOverCell Int Int
     | MouseDown Bool
+    | MouseDownOnCell Int Int
 
 
 update : Msg -> Model -> ( Model, Cmd msg )
@@ -80,7 +80,7 @@ update message model =
 
         MouseOverCell ri ci ->
             ( if model.isMouseDown then
-                mapGrid (GOL.toggleCellAtRC ri ci) model
+                toggleCellRC ri ci model
 
               else
                 model
@@ -88,7 +88,24 @@ update message model =
             )
 
         MouseDown bool ->
-            ( { model | isMouseDown = bool }, Cmd.none )
+            ( setMouseDown bool model, Cmd.none )
+
+        MouseDownOnCell ri ci ->
+            ( model
+                |> setMouseDown True
+                |> toggleCellRC ri ci
+            , Cmd.none
+            )
+
+
+setMouseDown : a -> { b | isMouseDown : a } -> { b | isMouseDown : a }
+setMouseDown isMouseDown model =
+    { model | isMouseDown = isMouseDown }
+
+
+toggleCellRC : Int -> Int -> Model -> Model
+toggleCellRC ri ci =
+    mapGrid (GOL.toggleCellAtRC ri ci)
 
 
 mapGrid : (GOL.Grid -> GOL.Grid) -> Model -> Model
@@ -202,5 +219,6 @@ viewCell rowIdx colIdx cell =
         , style "box-shadow"
             "inset 0 0 0px 0.5px rgb(0,0,0), 0 0 0px 0.5px rgb(0,0,0)"
         , onMouseOver (MouseOverCell rowIdx colIdx)
+        , H.onMouseDown (MouseDownOnCell rowIdx colIdx)
         ]
         []

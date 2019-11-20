@@ -3,13 +3,15 @@ module GameOfLifeCanvas exposing (main)
 import Browser
 import Browser.Events as B
 import Canvas exposing (rect, shapes)
-import Canvas.Settings exposing (fill)
+import Canvas.Settings exposing (fill, stroke)
+import Canvas.Settings.Line exposing (lineWidth)
 import Class
 import Color
 import GridOfLife as GOL
 import Html exposing (..)
 import Html.Attributes exposing (style)
 import Html.Events as H exposing (onMouseOver)
+import Html.Lazy exposing (lazy)
 import Json.Decode as JD
 import Random exposing (Generator, Seed)
 import Style
@@ -141,7 +143,7 @@ mapElapsedBy dd model =
 
 
 updatesPerSecond =
-    2
+    10
 
 
 step : Model -> Model
@@ -197,47 +199,66 @@ view : Model -> Html Msg
 view model =
     vStack
         [{- Class.pFixed, Class.trblZero -}]
-        [ hStack []
-            [ let
-                canvasSize =
-                    ( 500, 500 )
-              in
-              Canvas.toHtml canvasSize
-                [ style "line-height" "0"
-                , Style.border [ "1px solid black" ]
-                ]
-                (render canvasSize model)
-            ]
-        , viewGrid model.grid
+        [ lazy viewGridCanvas model.grid
+        , lazy viewGrid model.grid
         ]
 
 
-render canvasSize model =
+viewGridCanvas : GOL.Grid -> Html msg
+viewGridCanvas grid =
+    hStack [ style "padding" "1rem" ]
+        [ let
+            canvasSize =
+                ( 600, 600 )
+          in
+          Canvas.toHtml canvasSize
+            [ style "line-height" "0"
+
+            --, Style.border [ "1px solid black" ]
+            ]
+            (render canvasSize grid)
+        ]
+
+
+render : ( Int, Int ) -> GOL.Grid -> List Canvas.Renderable
+render canvasSize grid =
     let
         ( cw, ch ) =
             canvasSize
 
-        cellSize =
-            (toFloat <| min cw ch) / toFloat gridConfig.rowCount
+        gridWidthInPx =
+            cw - 2
 
-        renderCellRC : Int -> Int -> GOL.Cell -> Canvas.Shape
+        cellSize =
+            toFloat gridWidthInPx / toFloat gridConfig.rowCount
+
+        renderCellRC : Int -> Int -> GOL.Cell -> Canvas.Renderable
         renderCellRC ri ci cell =
-            rect ( toFloat ci * cellSize, toFloat ri * cellSize ) cellSize cellSize
+            shapes
+                [ stroke Color.black
+                , lineWidth 2
+                , fill
+                    (case cell of
+                        GOL.Off ->
+                            Color.lightYellow
+
+                        GOL.On ->
+                            Color.lightRed
+                    )
+                ]
+                [ rect ( toFloat ci * cellSize + 1, toFloat ri * cellSize + 1 ) cellSize cellSize
+                ]
 
         renderRow ri =
             List.indexedMap (\ci -> renderCellRC ri ci)
 
+        renderGrid : List Canvas.Renderable
         renderGrid =
-            GOL.toListRC model.grid
+            GOL.toListRC grid
                 |> List.indexedMap (\ri -> renderRow ri)
                 |> List.concat
     in
-    [ shapes
-        [ fill Color.blue
-        , Canvas.Settings.stroke Color.yellow
-        ]
-        renderGrid
-    ]
+    renderGrid
 
 
 type alias GridConfig =

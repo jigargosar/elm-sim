@@ -15,7 +15,7 @@ import Svg.Keyed as SK
 import Svg.Lazy as S
 import TypedSvg as S exposing (svg)
 import TypedSvg.Attributes as S
-import TypedSvg.Core as S
+import TypedSvg.Core as S exposing (Svg)
 import TypedSvg.Events as S
 import TypedSvg.Types as S
 import UI exposing (..)
@@ -222,26 +222,24 @@ viewGridSvg grid =
                 toFloat gridWidthInPx / toFloat grid.rowCount
           in
           svg [ S.viewBox 0 0 s s, H.width s ]
-            [ viewKeyedGridSvg cellSize grid
+            [ viewUnKeyedGridSvg cellSize grid
             ]
         ]
 
 
-viewKeyedGridSvg cellSize grid =
-    SK.node "g"
+viewUnKeyedGridSvg : Float -> GOL.Grid -> Svg Msg
+viewUnKeyedGridSvg cellSize grid =
+    S.g
         [ S.stroke Color.black
         , S.strokeWidth (S.px 2)
         ]
-        (viewKeyedGridCellsSvg cellSize grid)
+        (viewGridCellsSvg cellSize grid)
 
 
-viewKeyedGridCellsSvg : Float -> GOL.Grid -> List ( String, S.Svg Msg )
-viewKeyedGridCellsSvg cellSize grid =
+viewGridCellsSvg : Float -> GOL.Grid -> List (Svg Msg)
+viewGridCellsSvg cellSize grid =
     GOL.indexedMapToList
-        (\ri ci ->
-            S.lazy4 viewCellRCSvg cellSize ri ci
-                >> Tuple.pair (String.fromInt ri ++ "," ++ String.fromInt ci)
-        )
+        (S.lazy4 viewCellRCSvg cellSize)
         grid
 
 

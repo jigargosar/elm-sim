@@ -4,13 +4,13 @@ module MatrixOfLife exposing
     , indexedMapToList
     , initEmpty
     , nextState
-    , nextStateOfCell
     , randomize
     , toListRC
     , toggleCellAtRC
     )
 
 import Array exposing (Array)
+import Matrix exposing (Matrix)
 import Random exposing (Generator)
 
 
@@ -24,7 +24,7 @@ type alias Row =
 
 
 type alias Rows =
-    Array Row
+    Matrix Cell
 
 
 type alias Grid =
@@ -41,15 +41,7 @@ mapRows func grid =
 
 cellAtRC : Int -> Int -> Grid -> Cell
 cellAtRC rowNum_ colNum_ grid =
-    let
-        rowNum =
-            modBy grid.rowCount rowNum_
-
-        colNum =
-            modBy grid.colCount colNum_
-    in
-    Array.get rowNum grid.rows
-        |> Maybe.andThen (Array.get colNum)
+    Matrix.getWarped rowNum_ colNum_ grid.rows
         |> Maybe.withDefault Off
 
 
@@ -68,21 +60,8 @@ toggleCellAtRC rowNum colNum grid =
 
 
 mapCellAt : Int -> Int -> (Cell -> Cell) -> Grid -> Grid
-mapCellAt rowNum colNum_ func grid =
-    let
-        colNum =
-            modBy grid.colCount colNum_
-    in
+mapCellAt rowNum colNum func grid =
     mapRowAt rowNum (arrayMapAt colNum func) grid
-
-
-mapRowAt : Int -> (Row -> Row) -> Grid -> Grid
-mapRowAt rowNum_ func grid =
-    let
-        rowNum =
-            modBy grid.rowCount rowNum_
-    in
-    mapRows (arrayMapAt rowNum func) grid
 
 
 arrayMapAt : Int -> (a -> a) -> Array a -> Array a

@@ -202,11 +202,25 @@ view model =
                 [ style "line-height" "0"
                 , Style.border [ "1px solid black" ]
                 ]
-                [ shapes [ fill Color.blue ] [ rect ( 0, 0 ) 5 5 ]
-                ]
+                (render model)
             ]
         , viewGrid model.grid
         ]
+
+
+render model =
+    let
+        renderCellRC ri ci =
+            rect ( 0, 0 ) 50 50
+    in
+    [ shapes
+        [ fill Color.blue
+        , Canvas.Settings.stroke Color.yellow
+        ]
+        [ renderCellRC 0 0
+        , renderCellRC 0 1
+        ]
+    ]
 
 
 type alias GridConfig =

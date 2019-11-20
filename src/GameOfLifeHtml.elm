@@ -66,7 +66,6 @@ randomizeGrid model =
 
 type Msg
     = Tick Float
-    | CellClicked Int Int
     | MouseOverCell Int Int
     | MouseDown Bool
 
@@ -76,11 +75,6 @@ update message model =
     case message of
         Tick delta ->
             ( mapElapsedBy delta model |> step
-            , Cmd.none
-            )
-
-        CellClicked rIdx cIdx ->
-            ( mapGrid (GOL.toggleCellAtRC rIdx cIdx) model
             , Cmd.none
             )
 
@@ -207,7 +201,6 @@ viewCell rowIdx colIdx cell =
         , Style.noShrink
         , style "box-shadow"
             "inset 0 0 0px 0.5px rgb(0,0,0), 0 0 0px 0.5px rgb(0,0,0)"
-        , onClick (CellClicked rowIdx colIdx)
         , onMouseOver (MouseOverCell rowIdx colIdx)
         ]
         []

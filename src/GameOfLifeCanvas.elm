@@ -5,15 +5,13 @@ import Browser.Events as B
 import Canvas exposing (rect, shapes)
 import Canvas.Settings exposing (fill, stroke)
 import Canvas.Settings.Line exposing (lineWidth)
-import Class
 import Color
 import GridOfLife as GOL
 import Html exposing (..)
-import Html.Attributes exposing (style, tabindex)
+import Html.Attributes exposing (style)
 import Html.Events as H exposing (onMouseOver)
 import Html.Lazy exposing (lazy)
 import Json.Decode as JD
-import Json.Encode as JE
 import Random exposing (Generator, Seed)
 import Style
 import UI exposing (..)

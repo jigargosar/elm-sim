@@ -222,13 +222,13 @@ viewGridSvg grid =
                 toFloat gridWidthInPx / toFloat grid.rowCount
           in
           svg [ S.viewBox 0 0 s s, H.width s ]
-            [ viewUnKeyedGridSvg cellSize grid
+            [ viewGridSvgGroup cellSize grid
             ]
         ]
 
 
-viewUnKeyedGridSvg : Float -> GOL.Grid -> Svg Msg
-viewUnKeyedGridSvg cellSize grid =
+viewGridSvgGroup : Float -> GOL.Grid -> Svg Msg
+viewGridSvgGroup cellSize grid =
     S.g
         [ S.stroke Color.black
         , S.strokeWidth (S.px 2)

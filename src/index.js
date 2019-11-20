@@ -11,7 +11,7 @@ initElmApp(Module, {
   },
 })
 
-console.log(Module)
+
 
 function initElmApp(elmModule, initArgs) {
   const appNames = keys(pathOr({}, ['Elm'], elmModule))

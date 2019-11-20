@@ -1,7 +1,7 @@
 import { keys, pathOr } from 'ramda'
 
 require('elm-canvas')
-const Module = require('./GameOfLifeCanvas.elm')
+const Module = require('./GameOfLifeSvg.elm')
 require('./styles.css')
 
 initElmApp(Module, {

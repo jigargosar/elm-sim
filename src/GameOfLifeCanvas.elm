@@ -196,33 +196,47 @@ isGridStable model =
 view : Model -> Html Msg
 view model =
     vStack
-        [ Class.pFixed, Class.trblZero ]
+        [{- Class.pFixed, Class.trblZero -}]
         [ hStack []
-            [ Canvas.toHtml ( 100, 100 )
+            [ let
+                canvasSize =
+                    ( 500, 500 )
+              in
+              Canvas.toHtml canvasSize
                 [ style "line-height" "0"
                 , Style.border [ "1px solid black" ]
                 ]
-                (render model)
+                (render canvasSize model)
             ]
         , viewGrid model.grid
         ]
 
 
-render model =
+render canvasSize model =
     let
-        cellSize =
-            50
+        ( cw, ch ) =
+            canvasSize
 
-        renderCellRC ri ci =
-            rect ( ci * cellSize, ri * cellSize ) cellSize cellSize
+        cellSize =
+            (toFloat <| min cw ch) / toFloat gridConfig.rowCount
+
+        renderCellRC : Int -> Int -> GOL.Cell -> Canvas.Shape
+        renderCellRC ri ci cell =
+            rect ( toFloat ci * cellSize, toFloat ri * cellSize ) cellSize cellSize
+
+        renderRow ri =
+            List.indexedMap (\ci -> renderCellRC ri ci)
+
+        renderGrid =
+            GOL.toListRC model.grid
+                |> List.indexedMap (\ri -> renderRow ri)
+                |> List.concat
     in
     [ shapes
         [ fill Color.blue
         , Canvas.Settings.stroke Color.yellow
         ]
-        [ renderCellRC 0 0
-        , renderCellRC 0 1
-        ]
+        renderGrid
     ]
 
 

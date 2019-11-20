@@ -23,6 +23,7 @@ main =
             \_ ->
                 B.onAnimationFrameDelta Tick
                     :: B.onMouseUp (JD.succeed (MouseDown False))
+                    :: B.onKeyDown (JD.field "key" JD.string |> JD.map KeyDown)
                     :: []
                     |> Sub.batch
         }
@@ -35,6 +36,7 @@ type alias Flags =
 type alias Model =
     { elapsed : Float
     , isMouseDown : Bool
+    , isPaused : Bool
     , grid : GOL.Grid
     , previousGrids : List GOL.Grid
     , seed : Seed
@@ -45,6 +47,7 @@ init : Flags -> ( Model, Cmd Msg )
 init flags =
     ( { elapsed = 0
       , isMouseDown = False
+      , isPaused = False
       , grid = GOL.initEmpty gridConfig
       , previousGrids = []
       , seed = Random.initialSeed flags.now
@@ -67,6 +70,7 @@ type Msg
     = Tick Float
     | MouseOverCell Int Int
     | MouseDown Bool
+    | KeyDown String
     | MouseDownOnCell Int Int
 
 
@@ -75,6 +79,16 @@ update message model =
     case message of
         Tick delta ->
             ( mapElapsedBy delta model |> step
+            , Cmd.none
+            )
+
+        KeyDown key ->
+            ( case key of
+                " " ->
+                    togglePaused model
+
+                _ ->
+                    model
             , Cmd.none
             )
 
@@ -106,6 +120,11 @@ setMouseDown isMouseDown model =
 toggleCellRC : Int -> Int -> Model -> Model
 toggleCellRC ri ci =
     mapGrid (GOL.toggleCellAtRC ri ci)
+
+
+togglePaused : { a | isPaused : Bool } -> { a | isPaused : Bool }
+togglePaused model =
+    { model | isPaused = not model.isPaused }
 
 
 mapGrid : (GOL.Grid -> GOL.Grid) -> Model -> Model

@@ -162,7 +162,7 @@ viewGrid grid =
     in
     vStack
         []
-        (GOL.asList2d grid |> List.indexedMap viewGridRow)
+        (GOL.toListRC grid |> List.indexedMap viewGridRow)
 
 
 viewCell : Int -> Int -> GOL.Cell -> Html Msg

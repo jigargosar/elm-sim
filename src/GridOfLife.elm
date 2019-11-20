@@ -189,3 +189,10 @@ randomArray count =
 toListRC : Grid -> List (List Cell)
 toListRC =
     .rows >> Array.map Array.toList >> Array.toList
+
+
+toIndexedList =
+    .rows
+        >> Array.map Array.toList
+        >> Array.toList
+        >> List.indexedMap (\ri -> List.indexedMap (\ci cell -> ( ri, ci, cell )))

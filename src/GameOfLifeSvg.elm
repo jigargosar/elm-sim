@@ -8,14 +8,16 @@ import Canvas.Settings.Line exposing (lineWidth)
 import Color
 import GridOfLife as GOL
 import Html exposing (..)
-import Html.Attributes exposing (style)
+import Html.Attributes as H exposing (style)
 import Html.Events as H exposing (onMouseOver)
 import Html.Lazy exposing (lazy)
 import Json.Decode as JD
 import Random exposing (Generator, Seed)
 import Style
-import TypedSvg exposing (svg)
+import TypedSvg as S exposing (svg)
 import TypedSvg.Attributes as S
+import TypedSvg.Core as S
+import TypedSvg.Types as S
 import UI exposing (..)
 
 
@@ -212,8 +214,45 @@ viewGridSvg grid =
         [ let
             s =
                 600
+
+            gridWidthInPx =
+                s - 2
+
+            cellSize =
+                toFloat gridWidthInPx / toFloat grid.rowCount
+
+            renderCellRC : Int -> Int -> GOL.Cell -> S.Svg msg
+            renderCellRC ri ci cell =
+                S.rect
+                    [ S.stroke Color.black
+                    , S.strokeWidth (S.px 2)
+                    , (case cell of
+                        GOL.Off ->
+                            Color.lightYellow
+
+                        GOL.On ->
+                            Color.lightRed
+                      )
+                        |> S.Fill
+                        |> S.fill
+                    , S.x (S.px <| toFloat ci * cellSize + 1)
+                    , S.y (S.px <| toFloat ri * cellSize + 1)
+                    , S.width (S.px cellSize)
+                    , S.height (S.px cellSize)
+                    ]
+                    []
+
+            renderRow : Int -> List GOL.Cell -> List (S.Svg msg)
+            renderRow ri =
+                List.indexedMap (\ci -> renderCellRC ri ci)
+
+            renderGrid : List (S.Svg msg)
+            renderGrid =
+                GOL.toListRC grid
+                    |> List.indexedMap (\ri -> renderRow ri)
+                    |> List.concat
           in
-          svg [ S.viewBox 0 0 s s ] []
+          svg [ S.viewBox 0 0 s s, H.width s ] renderGrid
         ]
 
 

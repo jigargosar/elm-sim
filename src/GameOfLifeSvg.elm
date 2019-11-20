@@ -2,9 +2,6 @@ module GameOfLifeSvg exposing (main)
 
 import Browser
 import Browser.Events as B
-import Canvas exposing (rect, shapes)
-import Canvas.Settings exposing (fill, stroke)
-import Canvas.Settings.Line exposing (lineWidth)
 import Color
 import GridOfLife as GOL
 import Html exposing (..)
@@ -203,7 +200,6 @@ view model =
     vStack
         [{- Class.pFixed, Class.trblZero -}]
         [ lazy viewGridSvg model.grid
-        , lazy viewGridCanvas model.grid
         , lazy viewGrid model.grid
         ]
 
@@ -254,63 +250,6 @@ viewGridSvg grid =
           in
           svg [ S.viewBox 0 0 s s, H.width s ] renderGrid
         ]
-
-
-viewGridCanvas : GOL.Grid -> Html msg
-viewGridCanvas grid =
-    hStack [ style "padding" "1rem" ]
-        [ let
-            canvasSize =
-                ( 600, 600 )
-          in
-          Canvas.toHtml canvasSize
-            [ style "line-height" "0"
-
-            --, Style.border [ "1px solid black" ]
-            ]
-            (render canvasSize grid)
-        ]
-
-
-render : ( Int, Int ) -> GOL.Grid -> List Canvas.Renderable
-render canvasSize grid =
-    let
-        ( cw, ch ) =
-            canvasSize
-
-        gridWidthInPx =
-            cw - 2
-
-        cellSize =
-            toFloat gridWidthInPx / toFloat gridConfig.rowCount
-
-        renderCellRC : Int -> Int -> GOL.Cell -> Canvas.Renderable
-        renderCellRC ri ci cell =
-            shapes
-                [ stroke Color.black
-                , lineWidth 2
-                , fill
-                    (case cell of
-                        GOL.Off ->
-                            Color.lightYellow
-
-                        GOL.On ->
-                            Color.lightRed
-                    )
-                ]
-                [ rect ( toFloat ci * cellSize + 1, toFloat ri * cellSize + 1 ) cellSize cellSize
-                ]
-
-        renderRow ri =
-            List.indexedMap (\ci -> renderCellRC ri ci)
-
-        renderGrid : List Canvas.Renderable
-        renderGrid =
-            GOL.toListRC grid
-                |> List.indexedMap (\ri -> renderRow ri)
-                |> List.concat
-    in
-    renderGrid
 
 
 type alias GridConfig =

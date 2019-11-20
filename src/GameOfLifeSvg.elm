@@ -145,7 +145,7 @@ mapElapsedBy dd model =
 
 
 updatesPerSecond =
-    10
+    100
 
 
 step : Model -> Model

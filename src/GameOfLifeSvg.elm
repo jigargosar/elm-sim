@@ -221,15 +221,21 @@ viewGridSvg grid =
             cellSize =
                 toFloat gridWidthInPx / toFloat grid.rowCount
 
+            renderGrid : List ( String, S.Svg Msg )
             renderGrid =
-                GOL.indexedMapToList (S.lazy4 renderCellRC cellSize) grid
+                GOL.indexedMapToList
+                    (\ri ci ->
+                        S.lazy4 renderCellRC cellSize ri ci
+                            >> Tuple.pair (String.fromInt ri ++ "," ++ String.fromInt ci)
+                    )
+                    grid
           in
           svg [ S.viewBox 0 0 s s, H.width s ]
             [ SK.node "g"
                 [ S.stroke Color.black
                 , S.strokeWidth (S.px 2)
                 ]
-                (List.indexedMap (\i -> Tuple.pair (String.fromInt i)) renderGrid)
+                renderGrid
             ]
         ]
 

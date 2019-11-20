@@ -1,12 +1,13 @@
 module GameOfLifeHtml exposing (main)
 
 import Browser
-import Browser.Events exposing (onAnimationFrameDelta)
+import Browser.Events exposing (onAnimationFrameDelta, onMouseDown, onMouseUp)
 import Class
 import GridOfLife as GOL
 import Html exposing (..)
 import Html.Attributes exposing (style)
-import Html.Events exposing (onClick)
+import Html.Events exposing (onClick, onMouseOver)
+import Json.Decode as JD
 import Random exposing (Generator, Seed)
 import Style
 import UI exposing (..)
@@ -18,7 +19,13 @@ main =
         { init = init
         , view = view
         , update = update
-        , subscriptions = \_ -> onAnimationFrameDelta Tick
+        , subscriptions =
+            \_ ->
+                onAnimationFrameDelta Tick
+                    :: onMouseDown (JD.succeed (MouseDown True))
+                    :: onMouseUp (JD.succeed (MouseDown False))
+                    :: []
+                    |> Sub.batch
         }
 
 
@@ -28,6 +35,7 @@ type alias Flags =
 
 type alias Model =
     { elapsed : Float
+    , isMouseDown : Bool
     , grid : GOL.Grid
     , previousGrids : List GOL.Grid
     , seed : Seed
@@ -37,6 +45,7 @@ type alias Model =
 init : Flags -> ( Model, Cmd Msg )
 init flags =
     ( { elapsed = 0
+      , isMouseDown = False
       , grid = GOL.initEmpty gridConfig
       , previousGrids = []
       , seed = Random.initialSeed flags.now
@@ -58,6 +67,8 @@ randomizeGrid model =
 type Msg
     = Tick Float
     | CellClicked Int Int
+    | MouseOverCell Int Int
+    | MouseDown Bool
 
 
 update : Msg -> Model -> ( Model, Cmd msg )
@@ -73,6 +84,18 @@ update message model =
             , Cmd.none
             )
 
+        MouseOverCell ri ci ->
+            ( if model.isMouseDown then
+                mapGrid (GOL.toggleCellAtRC ri ci) model
+
+              else
+                model
+            , Cmd.none
+            )
+
+        MouseDown bool ->
+            ( { model | isMouseDown = bool }, Cmd.none )
+
 
 mapGrid : (GOL.Grid -> GOL.Grid) -> Model -> Model
 mapGrid func model =
@@ -85,7 +108,7 @@ mapElapsedBy dd model =
 
 
 updatesPerSecond =
-    100
+    2
 
 
 step : Model -> Model
@@ -185,5 +208,6 @@ viewCell rowIdx colIdx cell =
         , style "box-shadow"
             "inset 0 0 0px 0.5px rgb(0,0,0), 0 0 0px 0.5px rgb(0,0,0)"
         , onClick (CellClicked rowIdx colIdx)
+        , onMouseOver (MouseOverCell rowIdx colIdx)
         ]
         []

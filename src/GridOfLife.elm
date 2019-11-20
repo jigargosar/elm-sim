@@ -191,8 +191,15 @@ toListRC =
     .rows >> Array.map Array.toList >> Array.toList
 
 
-toIndexedList =
-    .rows
-        >> Array.map Array.toList
+asGrid : Grid -> Grid
+asGrid =
+    identity
+
+
+mapIndexedList : (Int -> Int -> Cell -> a) -> Grid -> List a
+mapIndexedList func =
+    asGrid
+        >> .rows
+        >> Array.indexedMap (\ri -> Array.indexedMap (func ri) >> Array.toList)
         >> Array.toList
-        >> List.indexedMap (\ri -> List.indexedMap (\ci cell -> ( ri, ci, cell )))
+        >> List.concat

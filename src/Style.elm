@@ -4,6 +4,11 @@ import Html exposing (Attribute)
 import Html.Attributes as A
 
 
+noSelection : Attribute msg
+noSelection =
+    A.style "user-select" "none"
+
+
 width : String -> Attribute msg
 width =
     A.style "width"

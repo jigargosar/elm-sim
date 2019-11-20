@@ -222,21 +222,21 @@ viewGridSvg grid =
                 toFloat gridWidthInPx / toFloat grid.rowCount
           in
           svg [ S.viewBox 0 0 s s, H.width s ]
-            [ viewKeyedGrid cellSize grid
+            [ viewKeyedGridSvg cellSize grid
             ]
         ]
 
 
-viewKeyedGrid cellSize grid =
+viewKeyedGridSvg cellSize grid =
     SK.node "g"
         [ S.stroke Color.black
         , S.strokeWidth (S.px 2)
         ]
-        (viewKeyedGridCells cellSize grid)
+        (viewKeyedGridCellsSvg cellSize grid)
 
 
-viewKeyedGridCells : Float -> GOL.Grid -> List ( String, S.Svg Msg )
-viewKeyedGridCells cellSize grid =
+viewKeyedGridCellsSvg : Float -> GOL.Grid -> List ( String, S.Svg Msg )
+viewKeyedGridCellsSvg cellSize grid =
     GOL.indexedMapToList
         (\ri ci ->
             S.lazy4 renderCellRC cellSize ri ci

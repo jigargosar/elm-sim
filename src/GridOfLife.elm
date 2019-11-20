@@ -1,4 +1,14 @@
-module GridOfLife exposing (Cell(..), Grid, indexedMapToList, initEmpty, nextState, randomize, toListRC, toggleCellAtRC)
+module GridOfLife exposing
+    ( Cell(..)
+    , Grid
+    , indexedMapToList
+    , initEmpty
+    , nextState
+    , nextStateOfCell
+    , randomize
+    , toListRC
+    , toggleCellAtRC
+    )
 
 import Array exposing (Array)
 import Random exposing (Generator)

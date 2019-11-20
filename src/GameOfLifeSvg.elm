@@ -16,6 +16,7 @@ import Svg.Lazy as S
 import TypedSvg as S exposing (svg)
 import TypedSvg.Attributes as S
 import TypedSvg.Core as S
+import TypedSvg.Events as S
 import TypedSvg.Types as S
 import UI exposing (..)
 
@@ -207,7 +208,7 @@ view model =
         ]
 
 
-viewGridSvg : GOL.Grid -> Html msg
+viewGridSvg : GOL.Grid -> Html Msg
 viewGridSvg grid =
     hStack [ style "padding" "1rem" ]
         [ let
@@ -220,15 +221,8 @@ viewGridSvg grid =
             cellSize =
                 toFloat gridWidthInPx / toFloat grid.rowCount
 
-            renderRow : Int -> List GOL.Cell -> List (S.Svg msg)
-            renderRow ri =
-                List.indexedMap (\ci -> S.lazy4 renderCellRC cellSize ri ci)
-
-            renderGrid : List (S.Svg msg)
             renderGrid =
-                GOL.toListRC grid
-                    |> List.indexedMap (\ri -> renderRow ri)
-                    |> List.concat
+                GOL.indexedMapToList (S.lazy4 renderCellRC cellSize) grid
           in
           svg [ S.viewBox 0 0 s s, H.width s ]
             [ SK.node "g"
@@ -240,7 +234,7 @@ viewGridSvg grid =
         ]
 
 
-renderCellRC : Float -> Int -> Int -> GOL.Cell -> S.Svg msg
+renderCellRC : Float -> Int -> Int -> GOL.Cell -> S.Svg Msg
 renderCellRC cellSize ri ci cell =
     let
         _ =
@@ -261,6 +255,8 @@ renderCellRC cellSize ri ci cell =
         , S.y (S.px <| toFloat ri * cellSize + 1)
         , S.width (S.px cellSize)
         , S.height (S.px cellSize)
+        , S.onMouseOver (MouseOverCell ri ci)
+        , S.onMouseDown (MouseDownOnCell ri ci)
         ]
         []
 

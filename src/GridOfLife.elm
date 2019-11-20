@@ -1,4 +1,4 @@
-module GridOfLife exposing (Cell(..), Grid, initEmpty, nextState, randomize, toListRC, toggleCellAtRC)
+module GridOfLife exposing (Cell(..), Grid, indexedMapToList, initEmpty, nextState, randomize, toListRC, toggleCellAtRC)
 
 import Array exposing (Array)
 import Random exposing (Generator)
@@ -196,8 +196,8 @@ asGrid =
     identity
 
 
-mapIndexedList : (Int -> Int -> Cell -> a) -> Grid -> List a
-mapIndexedList func =
+indexedMapToList : (Int -> Int -> Cell -> a) -> Grid -> List a
+indexedMapToList func =
     asGrid
         >> .rows
         >> Array.indexedMap (\ri -> Array.indexedMap (func ri) >> Array.toList)

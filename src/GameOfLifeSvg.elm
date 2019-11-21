@@ -146,18 +146,20 @@ updatesPerSecond =
     100
 
 
+targetFrameInMilli =
+    1000 / updatesPerSecond
+
+
 step : Model -> Model
 step model =
-    let
-        targetFrameInMilli =
-            1000 / updatesPerSecond
-    in
-    if model.elapsed > targetFrameInMilli then
-        updateOnFrame (mapElapsedBy -targetFrameInMilli model)
-            |> step
+    if model.elapsed <= targetFrameInMilli then
+        model
 
     else
         model
+            |> mapElapsedBy -targetFrameInMilli
+            |> updateOnFrame
+            |> step
 
 
 updateOnFrame : Model -> Model

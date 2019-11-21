@@ -1,3 +1,5 @@
+import { identity, isNil, mathMod } from 'ramda'
+
 const canvasEl = document.getElementById('canvas-el')
 
 const ctx = canvasEl.getContext('2d')
@@ -43,8 +45,48 @@ function toggleCell(cell) {
   return cell === 0 ? 1 : 0
 }
 
+const neighbourIndices = Array.of(
+  [
+    [-1, -1],
+    [-1, 0],
+    [-1, 1],
+  ],
+  [
+    [0, -1],
+    /*ignore self (0,0)*/
+    [0, 1],
+  ],
+  [
+    [1, -1],
+    [1, 0],
+    [1, 1],
+  ],
+).flat(1)
+
+console.log(neighbourIndices)
+
+function aliveNeighboursCountOf(x, y, grid) {
+  return neighbourIndices.reduce((ct, [x,y]) => {
+    return getCellAt(x, y, grid) === 1 ? ct + 1 : ct
+  }, 0)
+}
+
+function getCellAt(x_, y_, grid) {
+  const [x, y] = [
+    mathMod(x_, gridConfig.colCount),
+    mathMod(y_, gridConfig.rowCount),
+  ]
+
+  const cell = grid[y * gridConfig.rowCount + x]
+  return isNil(cell) ? 0 : cell
+}
+
 function nextCell(x, y, cell, grid) {
-  return Math.random() < 0.01 ? toggleCell(cell) : cell
+  const aliveCt = aliveNeighboursCountOf(x, y, grid)
+  if (cell === 1) return aliveCt > 2 || aliveCt < 4 ? 0 : 1
+  else {
+    return 1
+  }
 }
 
 function nextGrid(grid) {

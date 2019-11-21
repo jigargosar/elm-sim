@@ -34,8 +34,8 @@ type alias Grid =
 
 
 cellAtRC : Int -> Int -> Grid -> Cell
-cellAtRC rowNum_ colNum_ grid =
-    Matrix.getWarped rowNum_ colNum_ grid.rows
+cellAtRC ri ci grid =
+    Matrix.getWarped ri ci grid.rows
         |> Maybe.withDefault Off
 
 

@@ -32,6 +32,5 @@ grid.forEach((cell, i) => {
     Math.round(i % gridConfig.colCount),
     Math.floor(i / gridConfig.rowCount),
   ]
-  console.log(x, y)
   drawCell(x, y, cell)
 })

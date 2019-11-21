@@ -1,1 +1,2 @@
-require('./elm-index')
+// require('./elm-index')
+require('./js-index')

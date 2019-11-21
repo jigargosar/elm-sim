@@ -24,7 +24,7 @@ function drawCell(x, y, cell) {
 }
 
 function randomCell() {
-  return Math.random() < 0.1 ? 1 : 0
+  return Math.random() < 0.4 ? 1 : 0
 }
 
 function renderGrid(grid) {
@@ -65,9 +65,9 @@ const neighbourIndices = Array.of(
 
 console.log(neighbourIndices)
 
-function aliveNeighboursCountOf(x, y, grid) {
+function aliveNeighboursCountOf(cx, cy, grid) {
   return neighbourIndices.reduce((ct, [x, y]) => {
-    return getCellAt(x, y, grid) === 1 ? ct + 1 : ct
+    return getCellAt(cx + x, cy + y, grid) === 1 ? ct + 1 : ct
   }, 0)
 }
 
@@ -92,6 +92,7 @@ function nextCell(x, y, cell, grid) {
 function nextGrid(grid) {
   return grid.map((cell, i) => {
     const [x, y] = arrayIndexToXY(i)
+
     return nextCell(x, y, cell, grid)
   })
 }

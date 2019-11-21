@@ -1,5 +1,3 @@
-import { modulo } from 'ramda'
-
 const canvasEl = document.getElementById('canvas-el')
 
 const ctx = canvasEl.getContext('2d')

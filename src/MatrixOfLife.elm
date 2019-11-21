@@ -18,25 +18,13 @@ type Cell
     | Off
 
 
-type alias Row =
-    Array Cell
-
-
-type alias Rows =
+type alias Grid =
     Matrix Cell
 
 
-type alias Grid =
-    { rowCount : Int
-    , colCount : Int
-    , rows : Rows
-    }
-
-
 cellAtRC : Int -> Int -> Grid -> Cell
-cellAtRC ri ci grid =
-    Matrix.getWarped ri ci grid.rows
-        |> Maybe.withDefault Off
+cellAtRC ri ci =
+    Matrix.getWarped ri ci >> Maybe.withDefault Off
 
 
 toggleCellAtRC : Int -> Int -> Grid -> Grid
@@ -121,11 +109,6 @@ nextState grid =
                 )
     in
     { grid | rows = func grid.rows }
-
-
-mapRCArrayIndexed : (Int -> Int -> a -> b) -> Array (Array a) -> Array (Array b)
-mapRCArrayIndexed func =
-    Array.indexedMap (func >> Array.indexedMap)
 
 
 initEmpty : { a | colCount : Int, rowCount : Int } -> Grid

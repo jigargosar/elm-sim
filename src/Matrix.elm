@@ -27,7 +27,7 @@ indexedMap func { rc, cc, arr } =
     Matrix rc cc (Array.indexedMap (\i -> func (i // rc) (remainderBy cc i)) arr)
 
 
-mapAt : number -> number -> (a -> a) -> Matrix a -> Matrix a
+mapAt : Int -> Int -> (a -> a) -> Matrix a -> Matrix a
 mapAt ri ci func mat =
     let
         idx =

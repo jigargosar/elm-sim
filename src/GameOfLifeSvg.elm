@@ -3,11 +3,11 @@ module GameOfLifeSvg exposing (main)
 import Browser
 import Browser.Events as B
 import Color
-import GridOfLife as GOL
 import Html exposing (..)
 import Html.Attributes as H
 import Html.Lazy exposing (lazy)
 import Json.Decode as JD
+import MatrixOfLife as MOL
 import Random exposing (Generator, Seed)
 import Svg.Lazy as S
 import TypedSvg as S exposing (svg)
@@ -42,8 +42,8 @@ type alias Model =
     { elapsed : Float
     , isMouseDown : Bool
     , isPaused : Bool
-    , grid : GOL.Grid
-    , previousGrids : List GOL.Grid
+    , grid : MOL.Grid
+    , previousGrids : List MOL.Grid
     , seed : Seed
     }
 
@@ -53,7 +53,7 @@ init flags =
     ( { elapsed = 0
       , isMouseDown = False
       , isPaused = False
-      , grid = GOL.initEmpty gridConfig
+      , grid = MOL.initEmpty gridConfig
       , previousGrids = []
       , seed = Random.initialSeed flags.now
       }
@@ -66,7 +66,7 @@ randomizeGrid : Model -> Model
 randomizeGrid model =
     let
         ( grid, seed ) =
-            Random.step (GOL.randomize model.grid) model.seed
+            Random.step (MOL.randomize model.grid) model.seed
     in
     { model | grid = grid, previousGrids = [], seed = seed }
 
@@ -124,7 +124,7 @@ setMouseDown isMouseDown model =
 
 toggleCellRC : Int -> Int -> Model -> Model
 toggleCellRC ri ci =
-    mapGrid (GOL.toggleCellAtRC ri ci)
+    mapGrid (MOL.toggleCellAtRC ri ci)
 
 
 togglePaused : { a | isPaused : Bool } -> { a | isPaused : Bool }
@@ -132,7 +132,7 @@ togglePaused model =
     { model | isPaused = not model.isPaused }
 
 
-mapGrid : (GOL.Grid -> GOL.Grid) -> Model -> Model
+mapGrid : (MOL.Grid -> MOL.Grid) -> Model -> Model
 mapGrid func model =
     { model | grid = func model.grid }
 
@@ -166,12 +166,12 @@ updateOnFrame model =
         model
 
     else
-        { model | grid = GOL.nextState model.grid }
+        { model | grid = MOL.nextState model.grid }
             |> pushLastGridState model.grid
             |> randomizeGridIfReachedStableState
 
 
-pushLastGridState : GOL.Grid -> Model -> Model
+pushLastGridState : MOL.Grid -> Model -> Model
 pushLastGridState lastGrid model =
     { model | previousGrids = lastGrid :: model.previousGrids |> List.take 6 }
 
@@ -200,12 +200,10 @@ view model =
     vStack
         []
         [ lazy viewGridSvg model.grid
-
-        --, lazy viewGrid model.grid
         ]
 
 
-viewGridSvg : GOL.Grid -> Html Msg
+viewGridSvg : MOL.Grid -> Html Msg
 viewGridSvg grid =
     hStack []
         [ let
@@ -224,7 +222,7 @@ viewGridSvg grid =
         ]
 
 
-viewGridSvgGroup : Float -> GOL.Grid -> Svg Msg
+viewGridSvgGroup : Float -> MOL.Grid -> Svg Msg
 viewGridSvgGroup cellSize grid =
     S.g
         [ S.stroke Color.black
@@ -233,14 +231,14 @@ viewGridSvgGroup cellSize grid =
         (viewGridCellsSvg cellSize grid)
 
 
-viewGridCellsSvg : Float -> GOL.Grid -> List (Svg Msg)
+viewGridCellsSvg : Float -> MOL.Grid -> List (Svg Msg)
 viewGridCellsSvg cellSize grid =
-    GOL.indexedMapToList
+    MOL.indexedMapToList
         (S.lazy4 viewCellRCSvg cellSize)
         grid
 
 
-viewCellRCSvg : Float -> Int -> Int -> GOL.Cell -> S.Svg Msg
+viewCellRCSvg : Float -> Int -> Int -> MOL.Cell -> S.Svg Msg
 viewCellRCSvg cellSize ri ci cell =
     let
         _ =
@@ -249,10 +247,10 @@ viewCellRCSvg cellSize ri ci cell =
     in
     S.rect
         [ (case cell of
-            GOL.Off ->
+            MOL.Off ->
                 Color.lightYellow
 
-            GOL.On ->
+            MOL.On ->
                 Color.lightRed
           )
             |> S.Fill

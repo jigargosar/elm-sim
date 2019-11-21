@@ -28,22 +28,17 @@ cellAtRC ri ci =
 
 
 toggleCellAtRC : Int -> Int -> Grid -> Grid
-toggleCellAtRC rowNum colNum grid =
-    let
-        toggleCell cell =
-            case cell of
-                On ->
-                    Off
-
-                Off ->
-                    On
-    in
-    mapCellAt rowNum colNum toggleCell grid
+toggleCellAtRC rowNum colNum =
+    Matrix.mapAt rowNum colNum toggleCell
 
 
-mapCellAt : Int -> Int -> (Cell -> Cell) -> Grid -> Grid
-mapCellAt rowNum colNum func grid =
-    { grid | rows = Matrix.mapAt rowNum colNum func grid.rows }
+toggleCell cell =
+    case cell of
+        On ->
+            Off
+
+        Off ->
+            On
 
 
 neighbours : List ( Int, Int )
@@ -101,45 +96,31 @@ nextStateOfCell aliveNeighbourCount cell =
 
 nextState : Grid -> Grid
 nextState grid =
-    let
-        func =
-            Matrix.indexedMap
-                (\rowNum colNum ->
-                    nextStateOfCell (aliveNeighbourCountOfCellAtRC rowNum colNum grid)
-                )
-    in
-    { grid | rows = func grid.rows }
+    Matrix.indexedMap
+        (\rowNum colNum ->
+            nextStateOfCell (aliveNeighbourCountOfCellAtRC rowNum colNum grid)
+        )
+        grid
 
 
 initEmpty : { a | colCount : Int, rowCount : Int } -> Grid
 initEmpty { rowCount, colCount } =
-    Grid rowCount colCount (Matrix.repeat rowCount colCount Off)
+    Matrix.repeat rowCount colCount Off
 
 
 randomize : Grid -> Generator Grid
-randomize { rowCount, colCount } =
+randomize grid =
     let
         randomGridCell : Generator Cell
         randomGridCell =
             Random.weighted ( 80, Off ) [ ( 20, On ) ]
+
+        ( rowCount, colCount ) =
+            Matrix.size grid
     in
     Matrix.generator rowCount colCount randomGridCell
-        |> Random.map (Grid rowCount colCount)
-
-
-randomArray : Int -> Generator a -> Generator (Array a)
-randomArray count =
-    Random.list count >> Random.map Array.fromList
-
-
-asGrid : Grid -> Grid
-asGrid =
-    identity
 
 
 indexedMapToList : (Int -> Int -> Cell -> a) -> Grid -> List a
 indexedMapToList func =
-    asGrid
-        >> .rows
-        >> Matrix.indexedMap func
-        >> Matrix.toList
+    Matrix.indexedMap func >> Matrix.toList

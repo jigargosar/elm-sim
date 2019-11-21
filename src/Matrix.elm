@@ -1,4 +1,4 @@
-module Matrix exposing (Matrix, generator, getWarped, indexedMap, mapAt, repeat, toList)
+module Matrix exposing (Matrix, generator, getWarped, indexedMap, mapAt, repeat, size, toList)
 
 import Array exposing (Array)
 import Random exposing (Generator)
@@ -9,6 +9,11 @@ type alias Matrix a =
     , cc : Int
     , arr : Array a
     }
+
+
+size : Matrix a -> ( Int, Int )
+size { rc, cc } =
+    ( rc, cc )
 
 
 repeat : Int -> Int -> a -> Matrix a

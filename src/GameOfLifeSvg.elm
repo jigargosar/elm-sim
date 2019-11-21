@@ -214,7 +214,7 @@ viewGridSvg grid =
                 s - 2
 
             cellSize =
-                toFloat gridWidthInPx / toFloat grid.rowCount
+                toFloat gridWidthInPx / toFloat gridConfig.rowCount
           in
           svg [ S.viewBox 0 0 s s, H.width s ]
             [ viewGridSvgGroup cellSize grid

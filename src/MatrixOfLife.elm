@@ -8,7 +8,6 @@ module MatrixOfLife exposing
     , toggleCellAtRC
     )
 
-import Array exposing (Array)
 import Matrix exposing (Matrix)
 import Random exposing (Generator)
 
@@ -48,22 +47,19 @@ neighbours =
         ++ [ ( 1, -1 ), ( 1, 0 ), ( 1, 1 ) ]
 
 
-neighboursOfCellAtRC : Int -> Int -> Grid -> List Cell
-neighboursOfCellAtRC rowNum colNum grid =
-    neighbours
-        |> List.map (\( dr, dc ) -> cellAtRC (rowNum + dr) (colNum + dc) grid)
-
-
-is : a -> a -> Bool
-is =
-    (==)
-
-
 aliveNeighbourCountOfCellAtRC : Int -> Int -> Grid -> Int
-aliveNeighbourCountOfCellAtRC row col grid =
-    neighboursOfCellAtRC row col grid
-        |> List.filter (is On)
-        |> List.length
+aliveNeighbourCountOfCellAtRC rowNum colNum grid =
+    neighbours
+        |> List.foldl
+            (\( dr, dc ) ct ->
+                case Matrix.getWarped (rowNum + dr) (colNum + dc) grid of
+                    Just On ->
+                        ct + 1
+
+                    _ ->
+                        ct
+            )
+            0
 
 
 {-| <https://www.conwaylife.com/wiki/Conway's_Game_of_Life>

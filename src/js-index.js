@@ -21,7 +21,11 @@ function drawCell(x, y, cell) {
   ctx.stroke()
 }
 
-const grid = new Array(cellCount).fill(0)
+function randomCell() {
+  return Math.floor(Math.random() * 2)
+}
+
+const grid = new Array(cellCount).fill(0).map(randomCell)
 
 grid.forEach((cell, i) => {
   const [x, y] = [

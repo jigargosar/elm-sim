@@ -7,9 +7,13 @@ const canvasSize = { width: ctx.canvas.width, height: ctx.canvas.height }
 const cellSize = (canvasSize.width - 2) / gridConfig.colCount
 const cellCount = gridConfig.rowCount * gridConfig.colCount
 
-function drawCell(x, y) {
+function drawCell(x, y, cell) {
   ctx.beginPath()
-  ctx.fillStyle = 'yellow'
+  if (cell === 0) {
+    ctx.fillStyle = 'yellow'
+  } else {
+    ctx.fillStyle = 'red'
+  }
   ctx.strokeStyle = 'black'
   ctx.lineWidth = 1.5
   ctx.rect(x * cellSize + 1, y * cellSize + 1, cellSize, cellSize)
@@ -25,5 +29,5 @@ grid.forEach((cell, i) => {
     Math.floor(i / gridConfig.rowCount),
   ]
   console.log(x, y)
-  drawCell(x, y)
+  drawCell(x, y, cell)
 })

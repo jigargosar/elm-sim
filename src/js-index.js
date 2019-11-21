@@ -25,12 +25,14 @@ function randomCell() {
   return Math.random() < 0.2 ? 1 : 0
 }
 
-const grid = new Array(cellCount).fill(0).map(randomCell)
 
-grid.forEach((cell, i) => {
-  const [x, y] = arrayIndexToXY(i)
-  drawCell(x, y, cell)
-})
+
+function renderGrid(grid) {
+  grid.forEach((cell, i) => {
+    const [x, y] = arrayIndexToXY(i)
+    drawCell(x, y, cell)
+  })
+}
 
 function arrayIndexToXY(i) {
   return [
@@ -38,3 +40,25 @@ function arrayIndexToXY(i) {
     Math.floor(i / gridConfig.rowCount),
   ]
 }
+
+function nextCell(x, y, cell, grid) {
+  return cell
+}
+
+function nextGrid(grid) {
+  return grid.map((cell, i) =>{
+    const [x,y] = arrayIndexToXY(i)
+    return nextCell(x,y,cell, grid)
+  })
+}
+
+function renderLoop(grid){
+  requestAnimationFrame(()=>{
+    renderGrid(grid)
+    requestAnimationFrame(()=>renderLoop(nextGrid(grid)))
+  })
+}
+
+const grid =  new Array(cellCount).fill(0).map(randomCell)
+
+renderLoop(grid)

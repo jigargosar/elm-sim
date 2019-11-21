@@ -143,7 +143,7 @@ mapElapsedBy dd model =
 
 
 updatesPerSecond =
-    60
+    30
 
 
 targetFrameInMilli =
@@ -278,6 +278,6 @@ type alias GridConfig =
 
 gridConfig : GridConfig
 gridConfig =
-    { rowCount = 30
-    , colCount = 30
+    { rowCount = 60
+    , colCount = 60
     }

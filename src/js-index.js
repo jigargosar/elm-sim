@@ -4,7 +4,7 @@ const canvasEl = document.getElementById('canvas-el')
 
 const ctx = canvasEl.getContext('2d')
 
-const gridConfig = { rowCount: 30, colCount: 30 }
+const gridConfig = { rowCount: 60, colCount: 60 }
 const canvasSize = { width: ctx.canvas.width, height: ctx.canvas.height }
 const cellSize = (canvasSize.width - 2) / gridConfig.colCount
 const cellCount = gridConfig.rowCount * gridConfig.colCount

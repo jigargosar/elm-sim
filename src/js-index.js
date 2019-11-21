@@ -1,4 +1,4 @@
-import { identity, isNil, mathMod } from 'ramda'
+import { isNil, mathMod } from 'ramda'
 
 const canvasEl = document.getElementById('canvas-el')
 

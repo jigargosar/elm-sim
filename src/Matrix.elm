@@ -70,23 +70,3 @@ getWarped rowNum_ colNum_ { rc, cc, arr } =
             modBy rc colNum_
     in
     Array.get (rowNum * rc + colNum) arr
-
-
-getWarped_ : Int -> Int -> Matrix c -> Maybe c
-getWarped_ rowNum_ colNum_ { rc, cc, arr } =
-    let
-        rowNum =
-            if rowNum_ < 0 || rowNum_ >= rc then
-                modBy rc rowNum_
-
-            else
-                rowNum_
-
-        colNum =
-            if colNum_ < 0 || colNum_ >= cc then
-                modBy rc colNum_
-
-            else
-                colNum_
-    in
-    Array.get (rowNum * rc + colNum) arr

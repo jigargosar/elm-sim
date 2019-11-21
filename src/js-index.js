@@ -66,7 +66,7 @@ const neighbourIndices = Array.of(
 console.log(neighbourIndices)
 
 function aliveNeighboursCountOf(x, y, grid) {
-  return neighbourIndices.reduce((ct, [x,y]) => {
+  return neighbourIndices.reduce((ct, [x, y]) => {
     return getCellAt(x, y, grid) === 1 ? ct + 1 : ct
   }, 0)
 }
@@ -83,9 +83,9 @@ function getCellAt(x_, y_, grid) {
 
 function nextCell(x, y, cell, grid) {
   const aliveCt = aliveNeighboursCountOf(x, y, grid)
-  if (cell === 1) return aliveCt > 2 || aliveCt < 4 ? 0 : 1
+  if (cell === 1) return aliveCt < 2 || aliveCt > 3 ? 0 : 1
   else {
-    return 1
+    return aliveCt === 3 ? 1 : 0
   }
 }
 

@@ -4,7 +4,8 @@ const ctx = canvasEl.getContext('2d')
 
 const gridConfig = { rowCount: 30, colCount: 30 }
 const canvasSize = { width: ctx.canvas.width, height: ctx.canvas.height }
-const cellSize = (canvasSize.width -2) / gridConfig.colCount
+const cellSize = (canvasSize.width - 2) / gridConfig.colCount
+const cellCount = gridConfig.rowCount * gridConfig.colCount
 
 function drawCell(x, y) {
   ctx.beginPath()
@@ -15,8 +16,6 @@ function drawCell(x, y) {
   ctx.fill()
   ctx.stroke()
 }
-
-const cellCount = gridConfig.rowCount * gridConfig.colCount
 
 const grid = new Array(cellCount).fill(0)
 

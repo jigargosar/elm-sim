@@ -1,4 +1,13 @@
-module Matrix exposing (Matrix, generator, getWarped, indexedMap, mapAt, repeat, size, toList)
+module Matrix exposing
+    ( Matrix
+    , generator
+    , getWarped
+    , indexedMap
+    , mapAt
+    , repeat
+    , size
+    , toList
+    )
 
 import Array exposing (Array)
 import Random exposing (Generator)

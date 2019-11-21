@@ -143,7 +143,7 @@ mapElapsedBy dd model =
 
 
 updatesPerSecond =
-    350
+    60
 
 
 targetFrameInMilli =

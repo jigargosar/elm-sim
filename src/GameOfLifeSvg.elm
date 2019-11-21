@@ -156,10 +156,13 @@ step model =
         model
 
     else
-        model
-            |> mapElapsedBy -targetFrameInMilli
-            |> updateOnFrame
-            |> step
+        let
+            newModel =
+                model
+                    |> mapElapsedBy -targetFrameInMilli
+                    |> updateOnFrame
+        in
+        step newModel
 
 
 updateOnFrame : Model -> Model

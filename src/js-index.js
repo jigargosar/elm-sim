@@ -22,7 +22,7 @@ function drawCell(x, y, cell) {
 }
 
 function randomCell() {
-  return Math.floor(Math.random() * 2)
+  return Math.random() < 0.2 ? 1 : 0
 }
 
 const grid = new Array(cellCount).fill(0).map(randomCell)

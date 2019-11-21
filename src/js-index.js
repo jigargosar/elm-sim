@@ -28,9 +28,13 @@ function randomCell() {
 const grid = new Array(cellCount).fill(0).map(randomCell)
 
 grid.forEach((cell, i) => {
-  const [x, y] = [
+  const [x, y] = arrayIndexToXY(i)
+  drawCell(x, y, cell)
+})
+
+function arrayIndexToXY(i) {
+  return [
     Math.round(i % gridConfig.colCount),
     Math.floor(i / gridConfig.rowCount),
   ]
-  drawCell(x, y, cell)
-})
+}

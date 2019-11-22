@@ -287,69 +287,11 @@ randomizeGridIfFoundInHistory model =
 
 view : Model -> Html Msg
 view model =
-    let
-        w =
-            600
-
-        h =
-            w
-
-        gridWidthInPx =
-            w - 2
-
-        grid =
-            model.grid
-
-        cellWidthInPx =
-            toFloat gridWidthInPx / toFloat grid.width
-
-        viewCell ( gridX, gridY ) cell =
-            let
-                x =
-                    toFloat gridX * cellWidthInPx + 1
-
-                y =
-                    toFloat gridY * cellWidthInPx + 1
-            in
-            S.rect
-                [ (if cell == Dead then
-                    Color.lightYellow
-
-                   else
-                    Color.lightRed
-                  )
-                    |> ST.Fill
-                    |> SA.fill
-                , SA.x (ST.px x)
-                , SA.y (ST.px y)
-                , SA.width (ST.px cellWidthInPx)
-                , SA.height (ST.px cellWidthInPx)
-                ]
-                []
-    in
-    S.svg [ SA.viewBox 0 0 w h, HA.width w, HA.height h ]
-        [ S.g
-            [ SA.stroke Color.black
-            , SA.strokeWidth (ST.px 2)
-            ]
-            (grid.data
-                |> Array.indexedMap (\i -> viewCell (gridIndexToXY i grid))
-                |> Array.toList
-            )
-        ]
+    viewGrid model.grid
 
 
-
---- VIEW 2
-
-
-view2 : Model -> Html Msg
-view2 model =
-    viewGrid2 model.grid
-
-
-viewGrid2 : Grid -> Html Msg
-viewGrid2 grid =
+viewGrid : Grid -> Html Msg
+viewGrid grid =
     let
         w =
             600
@@ -421,5 +363,5 @@ main =
         { init = init
         , subscriptions = \_ -> Browser.Events.onAnimationFrame Tick
         , update = update
-        , view = view2
+        , view = view
         }

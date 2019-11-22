@@ -101,6 +101,12 @@ initialGrid =
         |> Grid width height
 
 
+gridGenerator : Int -> Int -> Generator Grid
+gridGenerator width height =
+    Random.list (width * height) (Random.weighted ( 20, Alive ) [ ( 80, Dead ) ])
+        |> Random.map (Array.fromList >> Grid width height)
+
+
 gridIndexToXY : Int -> Grid -> ( Int, Int )
 gridIndexToXY i grid =
     let
@@ -143,12 +149,6 @@ init { now } =
     ( model |> randomizeGrid
     , Cmd.none
     )
-
-
-gridGenerator : Int -> Int -> Generator Grid
-gridGenerator width height =
-    Random.list (width * height) (Random.weighted ( 20, Alive ) [ ( 80, Dead ) ])
-        |> Random.map (Array.fromList >> Grid width height)
 
 
 setGridFromTuple : ( Grid, Model ) -> Model

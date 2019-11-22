@@ -182,6 +182,11 @@ gridGenerator width height =
         |> Random.map updateGridFromCellArray
 
 
+randomGridGeneratorFromGrid : Grid -> Generator Grid
+randomGridGeneratorFromGrid grid =
+    gridGenerator grid.width grid.height
+
+
 computeNextGrid : Grid -> Grid
 computeNextGrid grid =
     let
@@ -213,29 +218,113 @@ computeNextGrid grid =
     { grid | cellState = newCellArray, aliveNeighboursLookup = newANL }
 
 
-main =
+
+-- MAIN
+
+
+type alias Flags =
+    { now : Int }
+
+
+type alias Model =
+    { grid : Grid
+    , gridHistory : List Grid
+    , seed : Seed
+    }
+
+
+init : Flags -> ( Model, Cmd Msg )
+init { now } =
     let
-        ( grid, _ ) =
-            Random.step (gridGenerator 10 10) (Random.initialSeed 10)
+        gridLen =
+            60
 
-        nextGrid =
-            computeNextGrid grid
-
-        nextGrid2 =
-            computeNextGrid nextGrid
+        model : Model
+        model =
+            { grid = initDeadGrid gridLen gridLen
+            , gridHistory = []
+            , seed = Random.initialSeed 0
+            }
     in
-    div []
-        [ viewGrid grid
-        , viewGrid nextGrid
-        , viewGrid nextGrid2
-        ]
+    ( randomizeGrid model
+    , Cmd.none
+    )
+
+
+setGridFromTuple : ( Grid, Model ) -> Model
+setGridFromTuple ( grid, model ) =
+    { model | grid = grid }
+
+
+mapGrid : (Grid -> Grid) -> Model -> Model
+mapGrid func model =
+    { model | grid = func model.grid }
+
+
+randomStep : Generator a -> Model -> ( a, Model )
+randomStep generator model =
+    Random.step generator model.seed
+        |> Tuple.mapSecond (\seed -> { model | seed = seed })
+
+
+type Msg
+    = Tick Posix
+
+
+update : Msg -> Model -> ( Model, Cmd Msg )
+update message model =
+    case message of
+        Tick _ ->
+            ( updateGridState model
+            , Cmd.none
+            )
+
+
+randomizeGrid : Model -> Model
+randomizeGrid model =
+    model
+        |> randomStep (randomGridGeneratorFromGrid model.grid)
+        |> setGridFromTuple
+
+
+updateGridState : Model -> Model
+updateGridState model =
+    mapGrid computeNextGrid model
+        |> pushGridHistory model.grid
+        |> randomizeGridIfFoundInHistory
+
+
+pushGridHistory grid model =
+    { model | gridHistory = grid :: model.gridHistory |> List.take 6 }
+
+
+clearGridHistory model =
+    { model | gridHistory = [] }
+
+
+randomizeGridIfFoundInHistory model =
+    if List.member model.grid model.gridHistory then
+        randomizeGrid model
+            |> clearGridHistory
+
+    else
+        model
+
+
+main =
+    Browser.element
+        { init = init
+        , subscriptions = \_ -> Browser.Events.onAnimationFrame Tick
+        , update = update
+        , view = .grid >> viewGrid
+        }
 
 
 viewGrid : Grid -> Html msg
 viewGrid grid =
     let
         w =
-            202
+            602
 
         h =
             w
@@ -295,11 +384,13 @@ viewCell cellWidthInPx gridX gridY cell anc =
             , SA.height (ST.px cellWidthInPx)
             ]
             []
-        , S.text_
-            [ SA.x (ST.px x)
-            , SA.y (ST.px <| y + 15)
-            , SA.width (ST.px cellWidthInPx)
-            , SA.height (ST.px cellWidthInPx)
-            ]
-            [ SC.text anc ]
+
+        {- , S.text_
+           [ SA.x (ST.px x)
+           , SA.y (ST.px <| y + 15)
+           , SA.width (ST.px cellWidthInPx)
+           , SA.height (ST.px cellWidthInPx)
+           ]
+           [ SC.text anc ]
+        -}
         ]

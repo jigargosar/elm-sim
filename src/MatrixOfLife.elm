@@ -21,11 +21,6 @@ type alias Grid =
     Matrix Cell
 
 
-cellAtRC : Int -> Int -> Grid -> Cell
-cellAtRC ri ci =
-    Matrix.getWarped ri ci >> Maybe.withDefault Off
-
-
 toggleCellAtRC : Int -> Int -> Grid -> Grid
 toggleCellAtRC rowNum colNum =
     Matrix.mapAt rowNum colNum toggleCell

@@ -159,6 +159,7 @@ type alias Flags =
 
 type alias Model =
     { grid : Grid
+    , gridHistory : List Grid
     , seed : Seed
     }
 
@@ -166,8 +167,10 @@ type alias Model =
 init : Flags -> ( Model, Cmd Msg )
 init { now } =
     let
+        model : Model
         model =
             { grid = initialGrid 30 30
+            , gridHistory = []
             , seed = Random.initialSeed now
             }
     in
@@ -179,6 +182,11 @@ init { now } =
 setGridFromTuple : ( Grid, Model ) -> Model
 setGridFromTuple ( grid, model ) =
     { model | grid = grid }
+
+
+mapGrid : (Grid -> Grid) -> Model -> Model
+mapGrid func model =
+    { model | grid = func model.grid }
 
 
 randomStep : Generator a -> Model -> ( a, Model )
@@ -213,7 +221,26 @@ randomizeGrid model =
 
 updateGridState : Model -> Model
 updateGridState model =
-    { model | grid = nextGridState model.grid }
+    mapGrid nextGridState model
+        |> pushGridHistory model.grid
+        |> randomizeGridIfFoundInHistory
+
+
+pushGridHistory grid model =
+    { model | gridHistory = grid :: model.gridHistory |> List.take 6 }
+
+
+clearGridHistory model =
+    { model | gridHistory = [] }
+
+
+randomizeGridIfFoundInHistory model =
+    if List.member model.grid model.gridHistory then
+        randomizeGrid model
+            |> clearGridHistory
+
+    else
+        model
 
 
 

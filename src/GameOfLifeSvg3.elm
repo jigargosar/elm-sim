@@ -53,15 +53,30 @@ initDeadGrid width height =
 
 cellDataGenerator : Int -> Generator (Array Cell)
 cellDataGenerator length =
-    Random.list length (Random.weighted ( 20, Alive ) [ ( 80, Dead ) ])
-        |> Random.map Array.fromList
+    {- Random.list length (Random.weighted ( 20, Alive ) [ ( 80, Dead ) ])
+       |> Random.map Array.fromList
+    -}
+    [ Dead, Dead, Dead, Dead, Alive, Dead, Dead, Dead, Dead, Dead, Dead, Dead ]
+        |> Array.fromList
+        |> Random.constant
 
 
 neighbourOffsets : List ( Int, Int )
 neighbourOffsets =
-    [ ( -1, -1 ), ( -1, 0 ), ( -1, 1 ) ]
-        ++ [ ( 0, -1 ), {- ignore self (0,0) , -} ( 0, 1 ) ]
-        ++ [ ( 1, -1 ), ( 1, 0 ), ( 1, 1 ) ]
+    [ ( -1, -1 ), ( 0, -1 ), ( 1, -1 ) ]
+        ++ [ ( -1, 0 ), {- ignore self (0,0) , -} ( 1, 0 ) ]
+        ++ [ ( -1, 1 ), ( 0, 1 ), ( 1, 1 ) ]
+
+
+
+{-
+   neighbourOffsets : List ( Int, Int )
+   neighbourOffsets =
+       [ ( -1, -1 ), ( -1, 0 ), ( -1, 1 ) ]
+           ++ [ ( 0, -1 ), {- ignore self (0,0) , -} ( 0, 1 ) ]
+           ++ [ ( 1, -1 ), ( 1, 0 ), ( 1, 1 ) ]
+
+-}
 
 
 gridGenerator : Int -> Int -> Generator Grid
@@ -114,6 +129,6 @@ gridGenerator width height =
 main =
     let
         grid =
-            Random.step (gridGenerator 3 3) (Random.initialSeed 4)
+            Random.step (gridGenerator 3 4) (Random.initialSeed 4)
     in
     text (Debug.toString grid)

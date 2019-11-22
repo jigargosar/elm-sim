@@ -199,7 +199,7 @@ update : Msg -> Model -> ( Model, Cmd msg )
 update message model =
     case message of
         Tick _ ->
-            ( { model | grid = nextGridState model.grid }
+            ( updateGridState model
             , Cmd.none
             )
 
@@ -209,6 +209,11 @@ randomizeGrid model =
     model
         |> randomStep (randomGridGeneratorFromGrid model.grid)
         |> setGridFromTuple
+
+
+updateGridState : Model -> Model
+updateGridState model =
+    { model | grid = nextGridState model.grid }
 
 
 

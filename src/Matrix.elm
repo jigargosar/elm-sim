@@ -68,26 +68,10 @@ toList (Matrix { data }) =
 
 
 getWarped : Int -> Int -> Matrix c -> Maybe c
-getWarped rowNum_ colNum_ (Matrix { rowCount, columnCount, data }) =
-    let
-        rowNum =
-            modBy rowCount rowNum_
-
-        colNum =
-            modBy rowCount colNum_
-    in
-    Array.get (rowNum * rowCount + colNum) data
+getWarped rowIndex columnIndex ((Matrix { rowCount, columnCount }) as matrix) =
+    getUnsafe (modBy rowCount rowIndex) (modBy rowCount columnIndex) matrix
 
 
-get : Int -> Int -> Matrix a -> Maybe a
-get rowIndex columnIndex (Matrix { rowCount, columnCount, data }) =
-    if isIndexOutOfBounds rowIndex rowCount || isIndexOutOfBounds columnIndex columnCount then
-        Nothing
-
-    else
-        Array.get (rowIndex * rowCount + columnIndex) data
-
-
-isIndexOutOfBounds : Int -> Int -> Bool
-isIndexOutOfBounds index length =
-    index < 0 || index >= length
+getUnsafe : Int -> Int -> Matrix a -> Maybe a
+getUnsafe rowIndex columnIndex (Matrix { rowCount, data }) =
+    Array.get (rowIndex * rowCount + columnIndex) data

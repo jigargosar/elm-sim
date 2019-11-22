@@ -124,6 +124,15 @@ xyToGridIndex x y grid =
     modBy grid.width x + modBy grid.height y * grid.height
 
 
+getGridCellAt : Int -> Int -> Grid -> Maybe Cell
+getGridCellAt x y grid =
+    let
+        i =
+            xyToGridIndex x y grid
+    in
+    Array.get i grid.data
+
+
 
 -- Model
 
@@ -173,6 +182,10 @@ randomStep generator model =
         |> Tuple.mapSecond (\seed -> { model | seed = seed })
 
 
+
+-- UPDATE
+
+
 type Msg
     = Tick Float
 
@@ -182,15 +195,6 @@ update message model =
     case message of
         Tick delta ->
             ( updateGridOnTick model, Cmd.none )
-
-
-getGridCellAt : Int -> Int -> Grid -> Maybe Cell
-getGridCellAt x y grid =
-    let
-        i =
-            xyToGridIndex x y grid
-    in
-    Array.get i grid.data
 
 
 updateGridOnTick : Model -> Model

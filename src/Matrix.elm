@@ -13,7 +13,11 @@ import Array exposing (Array)
 import Random exposing (Generator)
 
 
-type alias Matrix a =
+type Matrix a
+    = Matrix (Inner a)
+
+
+type alias Inner a =
     { rc : Int
     , cc : Int
     , arr : Array a
@@ -21,47 +25,49 @@ type alias Matrix a =
 
 
 size : Matrix a -> ( Int, Int )
-size { rc, cc } =
+size (Matrix { rc, cc }) =
     ( rc, cc )
 
 
 repeat : Int -> Int -> a -> Matrix a
 repeat rc cc a =
-    Matrix rc cc (Array.repeat (rc * cc) a)
+    Inner rc cc (Array.repeat (rc * cc) a)
+        |> Matrix
 
 
 generator : Int -> Int -> Generator a -> Generator (Matrix a)
 generator rc cc =
     Random.list (rc * cc)
-        >> Random.map (Array.fromList >> Matrix rc cc)
+        >> Random.map (Array.fromList >> Inner rc cc >> Matrix)
 
 
 indexedMap : (Int -> Int -> a -> b) -> Matrix a -> Matrix b
-indexedMap func { rc, cc, arr } =
-    Matrix rc cc (Array.indexedMap (\i -> func (i // rc) (remainderBy cc i)) arr)
+indexedMap func (Matrix { rc, cc, arr }) =
+    Inner rc cc (Array.indexedMap (\i -> func (i // rc) (remainderBy cc i)) arr)
+        |> Matrix
 
 
 mapAt : Int -> Int -> (a -> a) -> Matrix a -> Matrix a
-mapAt ri ci func mat =
+mapAt ri ci func (Matrix inner) =
     let
         idx =
-            ri * mat.rc + ci
+            ri * inner.rc + ci
     in
-    case Array.get idx mat.arr of
+    case Array.get idx inner.arr of
         Nothing ->
-            mat
+            Matrix inner
 
         Just a ->
-            { mat | arr = Array.set idx (func a) mat.arr }
+            Matrix { inner | arr = Array.set idx (func a) inner.arr }
 
 
 toList : Matrix b -> List b
-toList =
-    .arr >> Array.toList
+toList (Matrix { rc, cc, arr }) =
+    Array.toList arr
 
 
 getWarped : Int -> Int -> Matrix c -> Maybe c
-getWarped rowNum_ colNum_ { rc, cc, arr } =
+getWarped rowNum_ colNum_ (Matrix { rc, cc, arr }) =
     let
         rowNum =
             modBy rc rowNum_

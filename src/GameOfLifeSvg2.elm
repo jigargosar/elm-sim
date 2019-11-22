@@ -185,7 +185,7 @@ init { now } =
             , updateEndedAt = now
             , grid = initialGrid gridLen gridLen
             , gridHistory = []
-            , seed = Random.initialSeed now
+            , seed = Random.initialSeed 0
             }
     in
     ( randomizeGrid model

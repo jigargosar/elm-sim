@@ -226,7 +226,8 @@ update message model =
                     now - model.updateStartedAt
 
                 _ =
-                    Debug.log "time elapsed since last update ended" elapsed
+                    --Debug.log "time elapsed since last update ended" elapsed
+                    1
             in
             ( updateGridState model |> setUpdateStartedAt now
             , Time.now |> Task.perform AfterUpdate
@@ -334,6 +335,10 @@ view model =
         ]
 
 
+
+--- VIEW 2
+
+
 view2 : Model -> Html Msg
 view2 model =
     viewGrid2 model.grid
@@ -401,5 +406,5 @@ main =
         { init = init
         , subscriptions = \_ -> Browser.Events.onAnimationFrame Tick
         , update = update
-        , view = view
+        , view = view2
         }

@@ -246,8 +246,7 @@ update message model =
                 )
 
             else
-                ( updateGridState model
-                    |> setStartMilli now
+                ( updateGridState model |> setStartMilli now
                 , Time.now |> Task.perform AfterUpdate
                 )
 

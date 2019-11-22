@@ -257,7 +257,7 @@ update message model =
                     now - model.startMilli
 
                 _ =
-                    if delta > 1000 // 60 then
+                    if delta > 8 then
                         Debug.log "update time taken" delta
 
                     else

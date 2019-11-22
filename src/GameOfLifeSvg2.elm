@@ -180,3 +180,59 @@ main =
         , update = update
         , view = view
         }
+
+
+nextCellState : Int -> Int -> (Int -> Int -> Maybe Cell) -> Cell -> Cell
+nextCellState i j cellAt =
+    getAliveNeighbourCount i j cellAt
+        |> nextStateWithAliveNeighbourCount
+
+
+neighbours : List ( Int, Int )
+neighbours =
+    [ ( -1, -1 ), ( -1, 0 ), ( -1, 1 ) ]
+        ++ [ ( 0, -1 ), {- ignore self (0,0) , -} ( 0, 1 ) ]
+        ++ [ ( 1, -1 ), ( 1, 0 ), ( 1, 1 ) ]
+
+
+getAliveNeighbourCount : Int -> Int -> (Int -> Int -> Maybe Cell) -> Int
+getAliveNeighbourCount i j cellAt =
+    neighbours
+        |> List.foldl
+            (\( di, dj ) ct ->
+                case cellAt (i + di) (j + dj) of
+                    Just Alive ->
+                        ct + 1
+
+                    _ ->
+                        ct
+            )
+            0
+
+
+{-| <https://www.conwaylife.com/wiki/Conway's_Game_of_Life>
+-}
+nextStateWithAliveNeighbourCount : Int -> Cell -> Cell
+nextStateWithAliveNeighbourCount aliveNeighbourCount cell =
+    case cell of
+        Alive ->
+            {- Any live cell with fewer than two live neighbours dies
+                (referred to as underpopulation or exposure[1]).
+               Any live cell with more than three live neighbours dies
+                (referred to as overpopulation or overcrowding).
+            -}
+            if aliveNeighbourCount < 2 || aliveNeighbourCount > 3 then
+                Dead
+
+            else
+                {- Any live cell with two or three live neighbours lives,
+                   unchanged, to the next generation.
+                -}
+                Alive
+
+        Dead ->
+            if aliveNeighbourCount == 3 then
+                Alive
+
+            else
+                Dead

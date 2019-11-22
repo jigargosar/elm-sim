@@ -169,7 +169,7 @@ init { now } =
     let
         model : Model
         model =
-            { grid = initialGrid 30 30
+            { grid = initialGrid 60 60
             , gridHistory = []
             , seed = Random.initialSeed now
             }

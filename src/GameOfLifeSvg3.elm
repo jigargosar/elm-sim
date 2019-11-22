@@ -93,6 +93,32 @@ gridIndexToXY i grid =
     ( x, y )
 
 
+incrementANC : Int -> Grid -> Dict Int Int -> Dict Int Int
+incrementANC i grid lookup =
+    let
+        ( x, y ) =
+            gridIndexToXY i grid
+
+        { width, height } =
+            grid
+    in
+    neighbourOffsets
+        |> List.foldl
+            (\( dx, dy ) ->
+                Dict.update
+                    ((y + dy |> modBy height) * height + (x + dx |> modBy width))
+                    (\aliveCt ->
+                        case aliveCt of
+                            Nothing ->
+                                Just 1
+
+                            Just ct ->
+                                Just (ct + 1)
+                    )
+            )
+            lookup
+
+
 gridGenerator : Int -> Int -> Generator Grid
 gridGenerator width height =
     let
@@ -104,26 +130,8 @@ gridGenerator width height =
                 reducer cell ( i, lookup ) =
                     case cell of
                         Alive ->
-                            let
-                                ( x, y ) =
-                                    gridIndexToXY i grid
-                            in
                             ( i + 1
-                            , neighbourOffsets
-                                |> List.foldl
-                                    (\( dx, dy ) ->
-                                        Dict.update
-                                            ((y + dy |> modBy height) * height + (x + dx |> modBy width))
-                                            (\aliveCt ->
-                                                case aliveCt of
-                                                    Nothing ->
-                                                        Just 1
-
-                                                    Just ct ->
-                                                        Just (ct + 1)
-                                            )
-                                    )
-                                    lookup
+                            , incrementANC i grid lookup
                             )
 
                         Dead ->

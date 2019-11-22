@@ -216,14 +216,18 @@ computeNextGrid grid =
 main =
     let
         ( grid, _ ) =
-            Random.step (gridGenerator 10 10) (Random.initialSeed 5)
+            Random.step (gridGenerator 10 10) (Random.initialSeed 10)
 
         nextGrid =
             computeNextGrid grid
+
+        nextGrid2 =
+            computeNextGrid nextGrid
     in
     div []
         [ viewGrid grid
         , viewGrid nextGrid
+        , viewGrid nextGrid2
         ]
 
 
@@ -231,7 +235,7 @@ viewGrid : Grid -> Html msg
 viewGrid grid =
     let
         w =
-            602
+            202
 
         h =
             w

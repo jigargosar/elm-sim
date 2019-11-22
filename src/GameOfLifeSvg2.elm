@@ -426,19 +426,16 @@ viewCell2 cellWidthInPx gridX gridY cell =
         y =
             toFloat gridY * cellWidthInPx + 1
     in
-    S.rect
+    S.use
         [ (if cell == Dead then
-            Color.lightYellow
+            "#dead-cell"
 
            else
-            Color.lightRed
+            "#alive-cell"
           )
-            |> ST.Fill
-            |> SA.fill
+            |> SA.xlinkHref
         , SA.x (ST.px x)
         , SA.y (ST.px y)
-        , SA.width (ST.px cellWidthInPx)
-        , SA.height (ST.px cellWidthInPx)
         ]
         []
 

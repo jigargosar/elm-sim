@@ -167,9 +167,12 @@ type alias Model =
 init : Flags -> ( Model, Cmd Msg )
 init { now } =
     let
+        gridLen =
+            30
+
         model : Model
         model =
-            { grid = initialGrid 60 60
+            { grid = initialGrid gridLen gridLen
             , gridHistory = []
             , seed = Random.initialSeed now
             }
@@ -206,10 +209,22 @@ type Msg
 update : Msg -> Model -> ( Model, Cmd msg )
 update message model =
     case message of
-        Tick _ ->
-            ( updateGridState model
-            , Cmd.none
-            )
+        Tick delta ->
+            let
+                fps =
+                    1000 / delta
+            in
+            if fps < 40 then
+                let
+                    _ =
+                        Debug.log "skipping frame " ( fps, delta )
+                in
+                ( model, Cmd.none )
+
+            else
+                ( updateGridState model
+                , Cmd.none
+                )
 
 
 randomizeGrid : Model -> Model

@@ -185,12 +185,32 @@ gridGenerator width height =
 computeNextGrid : Grid -> Grid
 computeNextGrid grid =
     let
-        nextCellState : Int -> Cell -> Cell
-        nextCellState i =
+        getNextCellState : Int -> Cell -> Cell
+        getNextCellState i =
             nextCellStateWithAliveNeighbourCount
                 (Dict.get i grid.aliveNeighboursLookup |> Maybe.withDefault 0)
+
+        newCellArray =
+            Array.indexedMap getNextCellState grid.cellState
+
+        reducer prevCell ( i, lookup ) =
+            case ( prevCell, Array.get i newCellArray ) of
+                ( _, Nothing ) ->
+                    Debug.todo "This should never happen"
+
+                ( Alive, Just Dead ) ->
+                    ( i + 1, decrementANC i grid lookup )
+
+                ( Dead, Just Alive ) ->
+                    ( i + 1, incrementANC i grid lookup )
+
+                _ ->
+                    ( i + 1, lookup )
+
+        ( _, newANL ) =
+            Array.foldl reducer ( 0, grid.aliveNeighboursLookup ) grid.cellState
     in
-    { grid | cellState = Array.indexedMap nextCellState grid.cellState }
+    { grid | cellState = newCellArray, aliveNeighboursLookup = newANL }
 
 
 main =

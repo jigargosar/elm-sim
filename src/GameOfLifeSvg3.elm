@@ -1,11 +1,11 @@
-module GameOfLifeSvg2 exposing (main)
+module GameOfLifeSvg3 exposing (..)
 
 import Array exposing (Array)
 import Browser
 import Browser.Events
 import Color
 import Dict exposing (Dict)
-import Html exposing (Html)
+import Html exposing (Html, text)
 import Html.Attributes as HA
 import Random exposing (Generator, Seed)
 import Svg.Lazy as SL
@@ -57,6 +57,13 @@ cellDataGenerator length =
         |> Random.map Array.fromList
 
 
+neighbourOffsets : List ( Int, Int )
+neighbourOffsets =
+    [ ( -1, -1 ), ( -1, 0 ), ( -1, 1 ) ]
+        ++ [ ( 0, -1 ), {- ignore self (0,0) , -} ( 0, 1 ) ]
+        ++ [ ( 1, -1 ), ( 1, 0 ), ( 1, 1 ) ]
+
+
 gridGenerator : Int -> Int -> Generator Grid
 gridGenerator width height =
     let
@@ -65,18 +72,48 @@ gridGenerator width height =
 
         updateGridFromCellArray cellArray =
             let
-                reducer cell lookup =
+                reducer cell ( i, lookup ) =
                     case cell of
                         Alive ->
-                            lookup
+                            let
+                                x =
+                                    remainderBy grid.width i
+
+                                y =
+                                    i // grid.height
+                            in
+                            ( i + 1
+                            , neighbourOffsets
+                                |> List.foldl
+                                    (\( dx, dy ) ->
+                                        Dict.update ((y + dy) * height + (x + dx))
+                                            (\aliveCt ->
+                                                case aliveCt of
+                                                    Nothing ->
+                                                        Just 0
+
+                                                    Just ct ->
+                                                        Just (ct + 1)
+                                            )
+                                    )
+                                    lookup
+                            )
 
                         Dead ->
-                            lookup
+                            ( i + 1, lookup )
 
-                aliveNeighboursLookup =
-                    Array.foldl reducer grid.aliveNeighboursLookup cellArray
+                ( _, aliveNeighboursLookup ) =
+                    Array.foldl reducer ( 0, Dict.empty ) cellArray
             in
             { grid | cellState = cellArray, aliveNeighboursLookup = aliveNeighboursLookup }
     in
     cellDataGenerator grid.length
         |> Random.map updateGridFromCellArray
+
+
+main =
+    let
+        grid =
+            Random.step (gridGenerator 3 3) (Random.initialSeed 0)
+    in
+    text (Debug.toString grid)

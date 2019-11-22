@@ -211,19 +211,14 @@ type Msg
 update : Msg -> Model -> ( Model, Cmd msg )
 update message model =
     case message of
-        Tick delta ->
-            ( updateGridOnTick model, Cmd.none )
+        Tick _ ->
+            ( { model | grid = nextGridState model.grid }
+            , Cmd.none
+            )
 
 
-updateGridOnTick : Model -> Model
-updateGridOnTick model =
-    let
-        grid =
-            model.grid
-    in
-    { model
-        | grid = nextGridState grid
-    }
+
+-- VIEW
 
 
 view : Model -> Html Msg
@@ -278,6 +273,10 @@ view model =
                 |> Array.toList
             )
         ]
+
+
+
+-- MAIN
 
 
 main =

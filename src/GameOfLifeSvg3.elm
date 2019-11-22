@@ -119,6 +119,35 @@ incrementANC i grid lookup =
             lookup
 
 
+decrementANC : Int -> Grid -> Dict Int Int -> Dict Int Int
+decrementANC i grid lookup =
+    let
+        ( x, y ) =
+            gridIndexToXY i grid
+
+        { width, height } =
+            grid
+    in
+    neighbourOffsets
+        |> List.foldl
+            (\( dx, dy ) ->
+                Dict.update
+                    ((y + dy |> modBy height) * height + (x + dx |> modBy width))
+                    (\aliveCt ->
+                        case aliveCt of
+                            Nothing ->
+                                Debug.todo "This should never happen"
+
+                            Just 1 ->
+                                Nothing
+
+                            Just ct ->
+                                Just (ct + 1)
+                    )
+            )
+            lookup
+
+
 gridGenerator : Int -> Int -> Generator Grid
 gridGenerator width height =
     let

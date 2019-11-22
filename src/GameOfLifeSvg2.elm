@@ -7,6 +7,9 @@ import Color
 import Html exposing (Html)
 import Html.Attributes as HA
 import Random exposing (Generator, Seed)
+import Svg
+import Svg.Attributes as SVA
+import Svg.Keyed as SK
 import Svg.Lazy as SL
 import Task
 import Time exposing (Posix)
@@ -361,19 +364,19 @@ viewGrid2 grid =
             toFloat gridWidthInPx / toFloat grid.width
     in
     S.svg [ SA.viewBox 0 0 w h, HA.width w, HA.height h ]
-        [ S.g
+        [ SK.node "g"
             [ SA.stroke Color.black
-            , SA.strokeWidth (ST.px 2)
+            , SA.strokeWidth (ST.px 1)
             ]
             (grid.data
                 |> Array.indexedMap
-                    (\i ->
+                    (\i cell ->
                         let
                             ( x, y ) =
                                 gridIndexToXY i grid
                         in
                         --SL.lazy4 viewCell2 cellWidthInPx x y
-                        SL.lazy4 viewCell2 cellWidthInPx x y
+                        ( String.fromInt i, SL.lazy4 viewCell2 cellWidthInPx x y cell )
                     )
                 |> Array.toList
             )

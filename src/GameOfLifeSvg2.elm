@@ -385,6 +385,7 @@ defs2 : Float -> Svg Msg
 defs2 cellWidthInPx =
     S.defs []
         [ deadCellDef cellWidthInPx
+        , aliveCellDef cellWidthInPx
         ]
 
 
@@ -392,6 +393,18 @@ deadCellDef cellWidthInPx =
     S.rect
         [ HA.id "dead-cell"
         , Color.lightYellow
+            |> ST.Fill
+            |> SA.fill
+        , SA.width (ST.px cellWidthInPx)
+        , SA.height (ST.px cellWidthInPx)
+        ]
+        []
+
+
+aliveCellDef cellWidthInPx =
+    S.rect
+        [ HA.id "alive-cell"
+        , Color.red
             |> ST.Fill
             |> SA.fill
         , SA.width (ST.px cellWidthInPx)

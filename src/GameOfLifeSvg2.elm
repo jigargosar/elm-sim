@@ -7,6 +7,7 @@ import Color
 import Html exposing (Html)
 import Html.Attributes as HA
 import Random exposing (Generator, Seed)
+import Svg.Lazy as SL
 import Task
 import Time exposing (Posix)
 import TypedSvg as S
@@ -229,7 +230,7 @@ update message model =
                     --Debug.log "time elapsed since last update ended" elapsed
                     1
             in
-            ( updateGridState model |> setUpdateStartedAt now
+            ( {- updateGridState -} model |> setUpdateStartedAt now
             , Time.now |> Task.perform AfterUpdate
             )
 
@@ -365,15 +366,27 @@ viewGrid2 grid =
             , SA.strokeWidth (ST.px 2)
             ]
             (grid.data
-                |> Array.indexedMap (\i -> viewCell2 cellWidthInPx (gridIndexToXY i grid))
+                |> Array.indexedMap
+                    (\i ->
+                        let
+                            ( x, y ) =
+                                gridIndexToXY i grid
+                        in
+                        --SL.lazy4 viewCell2 cellWidthInPx x y
+                        SL.lazy4 viewCell2 cellWidthInPx x y
+                    )
                 |> Array.toList
             )
         ]
 
 
-viewCell2 : Float -> ( Int, Int ) -> Cell -> Svg Msg
-viewCell2 cellWidthInPx ( gridX, gridY ) cell =
+viewCell2 : Float -> Int -> Int -> Cell -> Svg Msg
+viewCell2 cellWidthInPx gridX gridY cell =
     let
+        _ =
+            1
+
+        --|> Debug.log "viewCell2 called"
         x =
             toFloat gridX * cellWidthInPx + 1
 

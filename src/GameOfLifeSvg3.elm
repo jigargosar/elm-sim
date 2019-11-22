@@ -149,7 +149,7 @@ decrementANC i grid lookup =
                                 Nothing
 
                             Just ct ->
-                                Just (ct + 1)
+                                Just (ct - 1)
                     )
             )
             lookup

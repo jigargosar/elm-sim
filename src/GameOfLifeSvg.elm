@@ -143,7 +143,7 @@ mapElapsedBy dd model =
 
 
 updatesPerSecond =
-    30
+    20
 
 
 targetFrameInMilli =
@@ -213,7 +213,7 @@ viewGridSvg grid =
     hStack []
         [ let
             s =
-                600
+                800
 
             gridWidthInPx =
                 s - 2

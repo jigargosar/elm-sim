@@ -86,5 +86,6 @@ getUnsafe rowIndex columnIndex (Matrix { rowCount, data }) =
     Array.get (rowIndex * rowCount + columnIndex) data
 
 
+areIndicesOutOfBounds : Int -> Int -> Matrix a -> Bool
 areIndicesOutOfBounds rowIndex columnIndex (Matrix { rowCount, columnCount }) =
     rowIndex < 0 || columnIndex < 0 || rowIndex >= rowCount || columnIndex >= columnCount

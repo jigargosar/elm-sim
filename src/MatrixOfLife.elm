@@ -8,13 +8,9 @@ module MatrixOfLife exposing
     , toggleCellAtRC
     )
 
+import GameOfLifeCell exposing (Cell)
 import Matrix exposing (Matrix)
 import Random exposing (Generator)
-
-
-type Cell
-    = On
-    | Off
 
 
 type alias Grid =
@@ -23,17 +19,7 @@ type alias Grid =
 
 toggleCellAtRC : Int -> Int -> Grid -> Grid
 toggleCellAtRC rowNum colNum =
-    Matrix.mapAt rowNum colNum toggleCell
-
-
-toggleCell : Cell -> Cell
-toggleCell cell =
-    case cell of
-        On ->
-            Off
-
-        Off ->
-            On
+    Matrix.mapAt rowNum colNum GameOfLifeCell.toggle
 
 
 neighbours : List ( Int, Int )

@@ -94,10 +94,15 @@ initialGrid width height =
         |> Grid width height
 
 
-gridGenerator : Int -> Int -> Generator Grid
-gridGenerator width height =
+randomGridGenerator : Int -> Int -> Generator Grid
+randomGridGenerator width height =
     Random.list (width * height) (Random.weighted ( 20, Alive ) [ ( 80, Dead ) ])
         |> Random.map (Array.fromList >> Grid width height)
+
+
+randomGridGeneratorFromGrid : Grid -> Generator Grid
+randomGridGeneratorFromGrid grid =
+    randomGridGenerator grid.width grid.height
 
 
 gridIndexToXY : Int -> Grid -> ( Int, Int )
@@ -178,12 +183,8 @@ setGridFromTuple ( grid, model ) =
 
 randomizeGrid : Model -> Model
 randomizeGrid model =
-    let
-        { width, height } =
-            model.grid
-    in
     model
-        |> randomStep (gridGenerator width height)
+        |> randomStep (randomGridGeneratorFromGrid model.grid)
         |> setGridFromTuple
 
 

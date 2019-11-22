@@ -1,6 +1,5 @@
 module MatrixOfLife exposing
-    ( Cell(..)
-    , Grid
+    ( Grid
     , indexedMapToList
     , initEmpty
     , nextState
@@ -22,68 +21,23 @@ toggleCellAtRC rowNum colNum =
     Matrix.mapAt rowNum colNum GameOfLifeCell.toggle
 
 
-neighbours : List ( Int, Int )
-neighbours =
-    [ ( -1, -1 ), ( -1, 0 ), ( -1, 1 ) ]
-        ++ [ ( 0, -1 ), {- ignore self (0,0) , -} ( 0, 1 ) ]
-        ++ [ ( 1, -1 ), ( 1, 0 ), ( 1, 1 ) ]
-
-
-aliveNeighbourCountOfCellAtRC : Int -> Int -> Grid -> Int
-aliveNeighbourCountOfCellAtRC rowNum colNum grid =
-    neighbours
-        |> List.foldl
-            (\( dr, dc ) ct ->
-                case Matrix.getWarped (rowNum + dr) (colNum + dc) grid of
-                    Just On ->
-                        ct + 1
-
-                    _ ->
-                        ct
-            )
-            0
-
-
-{-| <https://www.conwaylife.com/wiki/Conway's_Game_of_Life>
--}
-nextStateOfCell : Int -> Cell -> Cell
-nextStateOfCell aliveNeighbourCount cell =
-    case cell of
-        On ->
-            {- Any live cell with fewer than two live neighbours dies
-                (referred to as underpopulation or exposure[1]).
-               Any live cell with more than three live neighbours dies
-                (referred to as overpopulation or overcrowding).
-            -}
-            if aliveNeighbourCount < 2 || aliveNeighbourCount > 3 then
-                Off
-
-            else
-                {- Any live cell with two or three live neighbours lives,
-                   unchanged, to the next generation.
-                -}
-                On
-
-        Off ->
-            if aliveNeighbourCount == 3 then
-                On
-
-            else
-                Off
-
-
 nextState : Grid -> Grid
 nextState grid =
+    let
+        cellAt : Int -> Int -> Maybe Cell
+        cellAt ri ci =
+            Matrix.getWarped ri ci grid
+    in
     Matrix.indexedMap
         (\rowNum colNum ->
-            nextStateOfCell (aliveNeighbourCountOfCellAtRC rowNum colNum grid)
+            GameOfLifeCell.nextState rowNum colNum cellAt
         )
         grid
 
 
 initEmpty : { a | colCount : Int, rowCount : Int } -> Grid
 initEmpty { rowCount, colCount } =
-    Matrix.repeat rowCount colCount Off
+    Matrix.repeat rowCount colCount GameOfLifeCell.off
 
 
 randomize : Grid -> Generator Grid
@@ -91,7 +45,7 @@ randomize grid =
     let
         randomGridCell : Generator Cell
         randomGridCell =
-            Random.weighted ( 80, Off ) [ ( 20, On ) ]
+            Random.weighted ( 80, GameOfLifeCell.off ) [ ( 20, GameOfLifeCell.on ) ]
 
         ( rowCount, colCount ) =
             Matrix.size grid

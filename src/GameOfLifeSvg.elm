@@ -3,6 +3,7 @@ module GameOfLifeSvg exposing (main)
 import Browser
 import Browser.Events as B
 import Color
+import GameOfLifeCell exposing (Cell)
 import Html exposing (..)
 import Html.Attributes as H
 import Html.Lazy exposing (lazy)
@@ -243,7 +244,7 @@ viewGridCellsSvg cellSize grid =
         grid
 
 
-viewCellRCSvg : Float -> Int -> Int -> MOL.Cell -> S.Svg Msg
+viewCellRCSvg : Float -> Int -> Int -> Cell -> S.Svg Msg
 viewCellRCSvg cellSize ri ci cell =
     let
         _ =
@@ -251,12 +252,11 @@ viewCellRCSvg cellSize ri ci cell =
             1
     in
     S.rect
-        [ (case cell of
-            MOL.Off ->
-                Color.lightYellow
+        [ (if cell == GameOfLifeCell.off then
+            Color.lightYellow
 
-            MOL.On ->
-                Color.lightRed
+           else
+            Color.lightRed
           )
             |> S.Fill
             |> S.fill

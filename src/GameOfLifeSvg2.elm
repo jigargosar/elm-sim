@@ -364,8 +364,6 @@ viewGrid2 grid =
         [ S.g
             [ SA.stroke Color.black
             , SA.strokeWidth (ST.px 2)
-            , SA.width (ST.px cellWidthInPx)
-            , SA.height (ST.px cellWidthInPx)
             ]
             (grid.data
                 |> Array.indexedMap

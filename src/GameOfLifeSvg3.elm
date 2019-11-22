@@ -25,8 +25,38 @@ type Cell
     | Dead
 
 
-type alias CellData =
-    ( Cell, Int )
+cellGenerator : Int -> Generator (Array Cell)
+cellGenerator length =
+    Random.list length (Random.weighted ( 20, Alive ) [ ( 80, Dead ) ])
+        |> Random.map Array.fromList
+
+
+{-| <https://www.conwaylife.com/wiki/Conway's_Game_of_Life>
+-}
+nextCellStateWithAliveNeighbourCount : Int -> Cell -> Cell
+nextCellStateWithAliveNeighbourCount aliveNeighbourCount cell =
+    case cell of
+        Alive ->
+            {- Any live cell with fewer than two live neighbours dies
+                (referred to as underpopulation or exposure[1]).
+               Any live cell with more than three live neighbours dies
+                (referred to as overpopulation or overcrowding).
+            -}
+            if aliveNeighbourCount < 2 || aliveNeighbourCount > 3 then
+                Dead
+
+            else
+                {- Any live cell with two or three live neighbours lives,
+                   unchanged, to the next generation.
+                -}
+                Alive
+
+        Dead ->
+            if aliveNeighbourCount == 3 then
+                Alive
+
+            else
+                Dead
 
 
 
@@ -49,12 +79,6 @@ initDeadGrid width height =
             width * height
     in
     Grid width height length (Array.repeat length Dead) Dict.empty
-
-
-cellGenerator : Int -> Generator (Array Cell)
-cellGenerator length =
-    Random.list length (Random.weighted ( 20, Alive ) [ ( 80, Dead ) ])
-        |> Random.map Array.fromList
 
 
 neighbourOffsets : List ( Int, Int )
@@ -158,21 +182,28 @@ gridGenerator width height =
         |> Random.map updateGridFromCellArray
 
 
+computeNextGrid : Grid -> Grid
 computeNextGrid grid =
-    grid
+    let
+        nextCellState : Int -> Cell -> Cell
+        nextCellState i =
+            nextCellStateWithAliveNeighbourCount
+                (Dict.get i grid.aliveNeighboursLookup |> Maybe.withDefault 0)
+    in
+    { grid | cellState = Array.indexedMap nextCellState grid.cellState }
 
 
 main =
     let
         ( grid, _ ) =
-            Random.step (gridGenerator 4 4) (Random.initialSeed 4)
+            Random.step (gridGenerator 10 10) (Random.initialSeed 5)
 
         nextGrid =
             computeNextGrid grid
     in
     div []
-        [ text (Debug.toString grid)
-        , viewGrid grid
+        [ viewGrid grid
+        , viewGrid nextGrid
         ]
 
 

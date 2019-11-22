@@ -51,8 +51,8 @@ initDeadGrid width height =
     Grid width height length (Array.repeat length Dead) Dict.empty
 
 
-cellDataGenerator : Int -> Generator (Array Cell)
-cellDataGenerator length =
+cellGenerator : Int -> Generator (Array Cell)
+cellGenerator length =
     Random.list length (Random.weighted ( 20, Alive ) [ ( 80, Dead ) ])
         |> Random.map Array.fromList
 
@@ -154,7 +154,7 @@ gridGenerator width height =
             in
             { grid | cellState = cellArray, aliveNeighboursLookup = aliveNeighboursLookup }
     in
-    cellDataGenerator grid.length
+    cellGenerator grid.length
         |> Random.map updateGridFromCellArray
 
 

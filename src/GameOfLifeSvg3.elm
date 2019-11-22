@@ -139,6 +139,7 @@ gridGenerator width height =
 
 
 computeNextGrid grid =
+    grid
 
 
 main =
@@ -146,7 +147,8 @@ main =
         ( grid, _ ) =
             Random.step (gridGenerator 4 4) (Random.initialSeed 4)
 
-        nextGrid = computeNextGrid grid
+        nextGrid =
+            computeNextGrid grid
     in
     div []
         [ text (Debug.toString grid)

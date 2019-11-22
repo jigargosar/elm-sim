@@ -120,11 +120,8 @@ view model =
         cellWidthInPx =
             toFloat gridWidthInPx / toFloat grid.width
 
-        viewCell i cell =
+        viewCell ( gridX, gridY ) cell =
             let
-                ( gridX, gridY ) =
-                    gridIndexToXY i grid
-
                 x =
                     toFloat gridX * cellWidthInPx + 1
 
@@ -152,7 +149,10 @@ view model =
             [ SA.stroke Color.black
             , SA.strokeWidth (ST.px 2)
             ]
-            (Array.indexedMap viewCell grid.data |> Array.toList)
+            (grid.data
+                |> Array.indexedMap (\i -> viewCell (gridIndexToXY i grid))
+                |> Array.toList
+            )
         ]
 
 

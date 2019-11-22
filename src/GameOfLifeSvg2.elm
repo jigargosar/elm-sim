@@ -228,8 +228,7 @@ update message model =
                     _ =
                         Debug.log "skipping frame " ( fps, delta )
                 in
-                ( model
-                    |> setStartMilli now
+                ( model |> setStartMilli now
                 , Cmd.none
                 )
 

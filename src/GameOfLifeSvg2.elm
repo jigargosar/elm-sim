@@ -7,11 +7,7 @@ import Color
 import Html exposing (Html)
 import Html.Attributes as HA
 import Random exposing (Generator, Seed)
-import Svg
-import Svg.Attributes as SVA
-import Svg.Keyed as SK
 import Svg.Lazy as SL
-import Task
 import Time exposing (Posix)
 import TypedSvg as S
 import TypedSvg.Attributes as SA
@@ -165,9 +161,7 @@ type alias Flags =
 
 
 type alias Model =
-    { updateStartedAt : Int
-    , updateEndedAt : Int
-    , grid : Grid
+    { grid : Grid
     , gridHistory : List Grid
     , seed : Seed
     }
@@ -181,9 +175,7 @@ init { now } =
 
         model : Model
         model =
-            { updateStartedAt = now
-            , updateEndedAt = now
-            , grid = initialGrid gridLen gridLen
+            { grid = initialGrid gridLen gridLen
             , gridHistory = []
             , seed = Random.initialSeed 0
             }
@@ -215,39 +207,15 @@ randomStep generator model =
 
 type Msg
     = Tick Posix
-    | AfterUpdate Posix
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update message model =
     case message of
-        Tick posix ->
-            let
-                now =
-                    Time.posixToMillis posix
-
-                elapsed =
-                    now - model.updateStartedAt
-
-                _ =
-                    --Debug.log "time elapsed since last update ended" elapsed
-                    1
-            in
-            ( updateGridState model |> setUpdateStartedAt now
-            , Time.now |> Task.perform AfterUpdate
+        Tick _ ->
+            ( updateGridState model
+            , Cmd.none
             )
-
-        AfterUpdate posix ->
-            let
-                now =
-                    Time.posixToMillis posix
-            in
-            ( { model | updateEndedAt = now }, Cmd.none )
-
-
-setUpdateStartedAt : Int -> Model -> Model
-setUpdateStartedAt milli model =
-    { model | updateStartedAt = milli }
 
 
 randomizeGrid : Model -> Model

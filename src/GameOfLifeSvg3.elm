@@ -12,7 +12,7 @@ import Svg.Lazy as SL
 import Time exposing (Posix)
 import TypedSvg as S
 import TypedSvg.Attributes as SA
-import TypedSvg.Core exposing (Svg)
+import TypedSvg.Core as SC exposing (Svg)
 import TypedSvg.Types as ST
 
 
@@ -257,16 +257,21 @@ viewGrid grid =
                         let
                             ( x, y ) =
                                 gridIndexToXY i grid
+
+                            anc =
+                                Dict.get i grid.aliveNeighboursLookup
+                                    |> Maybe.withDefault 0
+                                    |> String.fromInt
                         in
-                        SL.lazy4 viewCell cellWidthInPx x y cell
+                        SL.lazy5 viewCell cellWidthInPx x y cell anc
                     )
                 |> Array.toList
             )
         ]
 
 
-viewCell : Float -> Int -> Int -> Cell -> Svg msg
-viewCell cellWidthInPx gridX gridY cell =
+viewCell : Float -> Int -> Int -> Cell -> String -> Svg msg
+viewCell cellWidthInPx gridX gridY cell anc =
     let
         x =
             toFloat gridX * cellWidthInPx + 1
@@ -274,18 +279,27 @@ viewCell cellWidthInPx gridX gridY cell =
         y =
             toFloat gridY * cellWidthInPx + 1
     in
-    S.rect
-        [ (if cell == Dead then
-            Color.lightYellow
+    S.g []
+        [ S.rect
+            [ (if cell == Dead then
+                Color.lightYellow
 
-           else
-            Color.lightRed
-          )
-            |> ST.Fill
-            |> SA.fill
-        , SA.x (ST.px x)
-        , SA.y (ST.px y)
-        , SA.width (ST.px cellWidthInPx)
-        , SA.height (ST.px cellWidthInPx)
+               else
+                Color.lightRed
+              )
+                |> ST.Fill
+                |> SA.fill
+            , SA.x (ST.px x)
+            , SA.y (ST.px y)
+            , SA.width (ST.px cellWidthInPx)
+            , SA.height (ST.px cellWidthInPx)
+            ]
+            []
+        , S.text_
+            [ SA.x (ST.px x)
+            , SA.y (ST.px <| y + 15)
+            , SA.width (ST.px cellWidthInPx)
+            , SA.height (ST.px cellWidthInPx)
+            ]
+            [ SC.text anc ]
         ]
-        []

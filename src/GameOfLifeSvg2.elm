@@ -122,11 +122,14 @@ view model =
 
         viewCell i cell =
             let
+                ( gridX, gridY ) =
+                    gridIndexToXY i grid
+
                 x =
-                    toFloat (remainderBy grid.width i) * cellWidthInPx + 1
+                    toFloat gridX * cellWidthInPx + 1
 
                 y =
-                    toFloat (i // grid.height) * cellWidthInPx + 1
+                    toFloat gridY * cellWidthInPx + 1
             in
             S.rect
                 [ (if cell == Dead then
@@ -151,6 +154,18 @@ view model =
             ]
             (Array.indexedMap viewCell grid.data |> Array.toList)
         ]
+
+
+gridIndexToXY : Int -> Grid -> ( Int, Int )
+gridIndexToXY i grid =
+    let
+        x =
+            remainderBy grid.width i
+
+        y =
+            i // grid.height
+    in
+    ( x, y )
 
 
 main =

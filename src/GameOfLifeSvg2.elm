@@ -160,8 +160,8 @@ type alias Flags =
 
 
 type alias Model =
-    { startMilli : Int
-    , lastUpdateMilli : Int
+    { updateStartedAt : Int
+    , updateEndedAt : Int
     , grid : Grid
     , gridHistory : List Grid
     , seed : Seed
@@ -176,8 +176,8 @@ init { now } =
 
         model : Model
         model =
-            { startMilli = now
-            , lastUpdateMilli = 0
+            { updateStartedAt = now
+            , updateEndedAt = now
             , grid = initialGrid gridLen gridLen
             , gridHistory = []
             , seed = Random.initialSeed now
@@ -221,59 +221,27 @@ update message model =
                 now =
                     Time.posixToMillis posix
 
-                delta =
-                    now - model.startMilli
+                elapsed =
+                    now - model.updateStartedAt
 
-                fps =
-                    1000 // delta
+                _ =
+                    Debug.log "time elapsed since last update ended" elapsed
             in
-            {- if fps < 40 then
-                   let
-                       _ =
-                           Debug.log "skipping frame " ( fps, delta )
-                   in
-                   ( model |> setStartMilli now
-                   , Cmd.none
-                   )
-
-               else
-            -}
-            if model.lastUpdateMilli >= 3 then
-                ( model
-                    |> setStartMilli now
-                    |> setLastUpdateMilli (model.lastUpdateMilli - 3)
-                , Cmd.none
-                )
-
-            else
-                ( updateGridState model |> setStartMilli now
-                , Time.now |> Task.perform AfterUpdate
-                )
+            ( updateGridState model |> setUpdateStartedAt now
+            , Time.now |> Task.perform AfterUpdate
+            )
 
         AfterUpdate posix ->
             let
                 now =
                     Time.posixToMillis posix
-
-                delta =
-                    now - model.startMilli
-
-                _ =
-                    if delta > 8 then
-                        Debug.log "update time taken" delta
-
-                    else
-                        delta
             in
-            ( setLastUpdateMilli delta model, Cmd.none )
+            ( { model | updateEndedAt = now }, Cmd.none )
 
 
-setLastUpdateMilli milli model =
-    { model | lastUpdateMilli = milli }
-
-
-setStartMilli milli model =
-    { model | startMilli = milli }
+setUpdateStartedAt : Int -> Model -> Model
+setUpdateStartedAt milli model =
+    { model | updateStartedAt = milli }
 
 
 randomizeGrid : Model -> Model

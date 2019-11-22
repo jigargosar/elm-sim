@@ -1,4 +1,4 @@
-module GameOfLifeSvg3 exposing (..)
+module GameOfLifeSvg3 exposing (main)
 
 import Array exposing (Array)
 import Browser

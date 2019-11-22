@@ -26,6 +26,7 @@ toggleCellAtRC rowNum colNum =
     Matrix.mapAt rowNum colNum toggleCell
 
 
+toggleCell : Cell -> Cell
 toggleCell cell =
     case cell of
         On ->

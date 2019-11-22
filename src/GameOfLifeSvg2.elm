@@ -177,7 +177,7 @@ init { now } =
         model =
             { grid = initialGrid gridLen gridLen
             , gridHistory = []
-            , seed = Random.initialSeed 0
+            , seed = Random.initialSeed now
             }
     in
     ( randomizeGrid model

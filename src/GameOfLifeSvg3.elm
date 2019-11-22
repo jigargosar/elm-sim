@@ -57,12 +57,6 @@ cellDataGenerator length =
         |> Random.map Array.fromList
 
 
-
---    [ Dead, Dead, Dead, Dead, Alive, Dead, Dead, Dead, Dead, Dead, Dead, Dead ]
---        |> Array.fromList
---        |> Random.constant
-
-
 neighbourOffsets : List ( Int, Int )
 neighbourOffsets =
     [ ( -1, -1 ), ( 0, -1 ), ( 1, -1 ) ]

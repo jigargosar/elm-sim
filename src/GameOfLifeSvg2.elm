@@ -225,19 +225,20 @@ update message model =
                 fps =
                     1000 // delta
             in
-            if fps < 40 then
-                let
-                    _ =
-                        Debug.log "skipping frame " ( fps, delta )
-                in
-                ( model |> setStartMilli now
-                , Cmd.none
-                )
+            {- if fps < 40 then
+                   let
+                       _ =
+                           Debug.log "skipping frame " ( fps, delta )
+                   in
+                   ( model |> setStartMilli now
+                   , Cmd.none
+                   )
 
-            else
-                ( updateGridState model |> setStartMilli now
-                , Time.now |> Task.perform AfterUpdate
-                )
+               else
+            -}
+            ( updateGridState model |> setStartMilli now
+            , Time.now |> Task.perform AfterUpdate
+            )
 
         AfterUpdate posix ->
             let
@@ -247,11 +248,12 @@ update message model =
                 delta =
                     now - model.startMilli
 
-                fps =
-                    1000 // delta
-
                 _ =
-                    Debug.log "update time taken ms: " delta
+                    if delta > 1000 // 60 then
+                        Debug.log "update time taken" delta
+
+                    else
+                        delta
             in
             ( model, Cmd.none )
 

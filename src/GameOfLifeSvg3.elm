@@ -138,10 +138,15 @@ gridGenerator width height =
         |> Random.map updateGridFromCellArray
 
 
+computeNextGrid grid =
+
+
 main =
     let
         ( grid, _ ) =
             Random.step (gridGenerator 4 4) (Random.initialSeed 4)
+
+        nextGrid = computeNextGrid grid
     in
     div []
         [ text (Debug.toString grid)

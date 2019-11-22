@@ -54,12 +54,15 @@ indexedMap func (Matrix { rowCount, columnCount, data }) =
 
 
 mapAt : Int -> Int -> (a -> a) -> Matrix a -> Matrix a
-mapAt rowIndex columnIndex func ((Matrix inner) as matrix) =
+mapAt rowIndex columnIndex func matrix =
     if areIndicesOutOfBounds rowIndex columnIndex matrix then
         matrix
 
     else
         let
+            (Matrix inner) =
+                matrix
+
             idx =
                 rowIndex * inner.rowCount + columnIndex
         in

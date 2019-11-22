@@ -78,7 +78,10 @@ toList (Matrix { data }) =
 
 getWarped : Int -> Int -> Matrix c -> Maybe c
 getWarped rowIndex columnIndex ((Matrix { rowCount, columnCount }) as matrix) =
-    getUnsafe (modBy rowCount rowIndex) (modBy columnCount columnIndex) matrix
+    getUnsafe
+        (modBy rowCount rowIndex)
+        (modBy columnCount columnIndex)
+        matrix
 
 
 getUnsafe : Int -> Int -> Matrix a -> Maybe a

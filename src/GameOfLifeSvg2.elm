@@ -81,16 +81,6 @@ nextCellStateWithAliveNeighbourCount aliveNeighbourCount cell =
 -- GRID
 
 
-type alias Flags =
-    { now : Int }
-
-
-type alias Model =
-    { grid : Grid
-    , seed : Seed
-    }
-
-
 type alias Grid =
     { width : Int
     , height : Int
@@ -109,6 +99,37 @@ initialGrid =
     in
     Array.repeat (width * height) Dead
         |> Grid width height
+
+
+gridIndexToXY : Int -> Grid -> ( Int, Int )
+gridIndexToXY i grid =
+    let
+        x =
+            remainderBy grid.width i
+
+        y =
+            i // grid.height
+    in
+    ( x, y )
+
+
+xyToGridIndex : Int -> Int -> Grid -> Int
+xyToGridIndex x y grid =
+    modBy grid.width x + modBy grid.height y * grid.height
+
+
+
+-- Model
+
+
+type alias Flags =
+    { now : Int }
+
+
+type alias Model =
+    { grid : Grid
+    , seed : Seed
+    }
 
 
 init : Flags -> ( Model, Cmd Msg )
@@ -248,23 +269,6 @@ view model =
                 |> Array.toList
             )
         ]
-
-
-gridIndexToXY : Int -> Grid -> ( Int, Int )
-gridIndexToXY i grid =
-    let
-        x =
-            remainderBy grid.width i
-
-        y =
-            i // grid.height
-    in
-    ( x, y )
-
-
-xyToGridIndex : Int -> Int -> Grid -> Int
-xyToGridIndex x y grid =
-    modBy grid.width x + modBy grid.height y * grid.height
 
 
 main =

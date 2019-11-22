@@ -90,7 +90,7 @@ gridGenerator width height =
                                             (\aliveCt ->
                                                 case aliveCt of
                                                     Nothing ->
-                                                        Just 0
+                                                        Just 1
 
                                                     Just ct ->
                                                         Just (ct + 1)
@@ -114,6 +114,6 @@ gridGenerator width height =
 main =
     let
         grid =
-            Random.step (gridGenerator 1 1) (Random.initialSeed 0)
+            Random.step (gridGenerator 3 3) (Random.initialSeed 4)
     in
     text (Debug.toString grid)

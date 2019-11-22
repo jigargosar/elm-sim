@@ -119,8 +119,8 @@ gridIndexToXY i grid =
     ( x, y )
 
 
-xyToGridIndex : Int -> Int -> Grid -> Int
-xyToGridIndex x y grid =
+gridIndexFromXY : Int -> Int -> Grid -> Int
+gridIndexFromXY x y grid =
     modBy grid.width x + modBy grid.height y * grid.height
 
 
@@ -128,7 +128,7 @@ getGridCellAt : Int -> Int -> Grid -> Maybe Cell
 getGridCellAt x y grid =
     let
         i =
-            xyToGridIndex x y grid
+            gridIndexFromXY x y grid
     in
     Array.get i grid.data
 

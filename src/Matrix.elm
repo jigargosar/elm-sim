@@ -31,14 +31,19 @@ size (Matrix { rowCount, columnCount }) =
 
 repeat : Int -> Int -> a -> Matrix a
 repeat rowCount columnCount cellData =
-    Inner rowCount columnCount (Array.repeat (rowCount * columnCount) cellData)
+    Array.repeat (rowCount * columnCount) cellData
+        |> Inner rowCount columnCount
         |> Matrix
 
 
 generator : Int -> Int -> Generator a -> Generator (Matrix a)
 generator rowCount columnCount =
     Random.list (rowCount * columnCount)
-        >> Random.map (Array.fromList >> Inner rowCount columnCount >> Matrix)
+        >> Random.map
+            (Array.fromList
+                >> Inner rowCount columnCount
+                >> Matrix
+            )
 
 
 indexedMap : (Int -> Int -> a -> b) -> Matrix a -> Matrix b

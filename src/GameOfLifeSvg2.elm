@@ -230,7 +230,7 @@ update message model =
                     --Debug.log "time elapsed since last update ended" elapsed
                     1
             in
-            ( {- updateGridState -} model |> setUpdateStartedAt now
+            ( updateGridState model |> setUpdateStartedAt now
             , Time.now |> Task.perform AfterUpdate
             )
 

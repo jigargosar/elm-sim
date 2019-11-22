@@ -1,8 +1,8 @@
 module UI exposing (..)
 
-import Class
 import Html exposing (..)
 import Html.Attributes exposing (classList)
+import UI.Class as Class
 
 
 shouldDebugLayout =

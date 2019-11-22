@@ -364,7 +364,7 @@ viewGrid2 grid =
             toFloat gridWidthInPx / toFloat grid.width
     in
     S.svg [ SA.viewBox 0 0 w h, HA.width w, HA.height h ]
-        [ SK.node "g"
+        [ S.g
             [ SA.stroke Color.black
             , SA.strokeWidth (ST.px 1)
             ]
@@ -375,8 +375,8 @@ viewGrid2 grid =
                             ( x, y ) =
                                 gridIndexToXY i grid
                         in
-                        --SL.lazy4 viewCell2 cellWidthInPx x y
-                        ( String.fromInt i, SL.lazy4 viewCell2 cellWidthInPx x y cell )
+                        SL.lazy4 viewCell2 cellWidthInPx x y cell
+                     --( String.fromInt i, SL.lazy4 viewCell2 cellWidthInPx x y cell )
                     )
                 |> Array.toList
             )

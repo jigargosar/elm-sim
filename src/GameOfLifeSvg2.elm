@@ -361,10 +361,11 @@ viewGrid2 grid =
             toFloat gridWidthInPx / toFloat grid.width
     in
     S.svg [ SA.viewBox 0 0 w h, HA.width w, HA.height h ]
-        [ SL.lazy defs2 cellWidthInPx
-        , S.g
+        [ S.g
             [ SA.stroke Color.black
             , SA.strokeWidth (ST.px 2)
+            , SA.width (ST.px cellWidthInPx)
+            , SA.height (ST.px cellWidthInPx)
             ]
             (grid.data
                 |> Array.indexedMap
@@ -381,38 +382,6 @@ viewGrid2 grid =
         ]
 
 
-defs2 : Float -> Svg Msg
-defs2 cellWidthInPx =
-    S.defs []
-        [ deadCellDef cellWidthInPx
-        , aliveCellDef cellWidthInPx
-        ]
-
-
-deadCellDef cellWidthInPx =
-    S.rect
-        [ HA.id "dead-cell"
-        , Color.lightYellow
-            |> ST.Fill
-            |> SA.fill
-        , SA.width (ST.px cellWidthInPx)
-        , SA.height (ST.px cellWidthInPx)
-        ]
-        []
-
-
-aliveCellDef cellWidthInPx =
-    S.rect
-        [ HA.id "alive-cell"
-        , Color.red
-            |> ST.Fill
-            |> SA.fill
-        , SA.width (ST.px cellWidthInPx)
-        , SA.height (ST.px cellWidthInPx)
-        ]
-        []
-
-
 viewCell2 : Float -> Int -> Int -> Cell -> Svg Msg
 viewCell2 cellWidthInPx gridX gridY cell =
     let
@@ -426,16 +395,19 @@ viewCell2 cellWidthInPx gridX gridY cell =
         y =
             toFloat gridY * cellWidthInPx + 1
     in
-    S.use
+    S.rect
         [ (if cell == Dead then
-            "#dead-cell"
+            Color.lightYellow
 
            else
-            "#alive-cell"
+            Color.lightRed
           )
-            |> SA.xlinkHref
+            |> ST.Fill
+            |> SA.fill
         , SA.x (ST.px x)
         , SA.y (ST.px y)
+        , SA.width (ST.px cellWidthInPx)
+        , SA.height (ST.px cellWidthInPx)
         ]
         []
 

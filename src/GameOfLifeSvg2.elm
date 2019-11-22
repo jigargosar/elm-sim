@@ -181,13 +181,6 @@ setGridFromTuple ( grid, model ) =
     { model | grid = grid }
 
 
-randomizeGrid : Model -> Model
-randomizeGrid model =
-    model
-        |> randomStep (randomGridGeneratorFromGrid model.grid)
-        |> setGridFromTuple
-
-
 randomStep : Generator a -> Model -> ( a, Model )
 randomStep generator model =
     Random.step generator model.seed
@@ -209,6 +202,13 @@ update message model =
             ( { model | grid = nextGridState model.grid }
             , Cmd.none
             )
+
+
+randomizeGrid : Model -> Model
+randomizeGrid model =
+    model
+        |> randomStep (randomGridGeneratorFromGrid model.grid)
+        |> setGridFromTuple
 
 
 

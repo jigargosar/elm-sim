@@ -88,15 +88,8 @@ type alias Grid =
     }
 
 
-initialGrid : Grid
-initialGrid =
-    let
-        width =
-            30
-
-        height =
-            width
-    in
+initialGrid : Int -> Int -> Grid
+initialGrid width height =
     Array.repeat (width * height) Dead
         |> Grid width height
 
@@ -169,7 +162,7 @@ init : Flags -> ( Model, Cmd Msg )
 init { now } =
     let
         model =
-            { grid = initialGrid
+            { grid = initialGrid 30 30
             , seed = Random.initialSeed now
             }
     in

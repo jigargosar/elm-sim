@@ -18,15 +18,15 @@ type Matrix a
 
 
 type alias Inner a =
-    { rc : Int
-    , cc : Int
-    , arr : Array a
+    { rowCount : Int
+    , columnCount : Int
+    , data : Array a
     }
 
 
 size : Matrix a -> ( Int, Int )
-size (Matrix { rc, cc }) =
-    ( rc, cc )
+size (Matrix { rowCount, columnCount }) =
+    ( rowCount, columnCount )
 
 
 repeat : Int -> Int -> a -> Matrix a
@@ -42,8 +42,8 @@ generator rc cc =
 
 
 indexedMap : (Int -> Int -> a -> b) -> Matrix a -> Matrix b
-indexedMap func (Matrix { rc, cc, arr }) =
-    Inner rc cc (Array.indexedMap (\i -> func (i // rc) (remainderBy cc i)) arr)
+indexedMap func (Matrix { rowCount, columnCount, data }) =
+    Inner rowCount columnCount (Array.indexedMap (\i -> func (i // rowCount) (remainderBy columnCount i)) data)
         |> Matrix
 
 
@@ -51,28 +51,28 @@ mapAt : Int -> Int -> (a -> a) -> Matrix a -> Matrix a
 mapAt ri ci func (Matrix inner) =
     let
         idx =
-            ri * inner.rc + ci
+            ri * inner.rowCount + ci
     in
-    case Array.get idx inner.arr of
+    case Array.get idx inner.data of
         Nothing ->
             Matrix inner
 
         Just a ->
-            Matrix { inner | arr = Array.set idx (func a) inner.arr }
+            Matrix { inner | data = Array.set idx (func a) inner.data }
 
 
 toList : Matrix b -> List b
-toList (Matrix { rc, cc, arr }) =
-    Array.toList arr
+toList (Matrix { rowCount, columnCount, data }) =
+    Array.toList data
 
 
 getWarped : Int -> Int -> Matrix c -> Maybe c
-getWarped rowNum_ colNum_ (Matrix { rc, cc, arr }) =
+getWarped rowNum_ colNum_ (Matrix { rowCount, columnCount, data }) =
     let
         rowNum =
-            modBy rc rowNum_
+            modBy rowCount rowNum_
 
         colNum =
-            modBy rc colNum_
+            modBy rowCount colNum_
     in
-    Array.get (rowNum * rc + colNum) arr
+    Array.get (rowNum * rowCount + colNum) data

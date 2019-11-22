@@ -1,11 +1,12 @@
 module GameOfLifeSvg2 exposing (..)
 
 import Array exposing (Array)
-import Random exposing (Generator)
+import Random exposing (Generator, Seed)
 
 
 type alias Model =
     { grid : Grid
+    , seed : Seed
     }
 
 
@@ -16,8 +17,8 @@ type alias Grid =
     }
 
 
-randomGrid : Int -> Int -> Generator Grid
-randomGrid width height =
+gridGenerator : Int -> Int -> Generator Grid
+gridGenerator width height =
     Random.list (width * height) (Random.weighted ( 20, Alive ) [ ( 80, Dead ) ])
         |> Random.map (Array.fromList >> Grid width height)
 

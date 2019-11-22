@@ -144,7 +144,7 @@ view model =
                 ]
                 []
     in
-    S.svg [ SA.viewBox 0 0 w h, HA.width w ]
+    S.svg [ SA.viewBox 0 0 w h, HA.width w, HA.height h ]
         [ S.g
             [ SA.stroke Color.black
             , SA.strokeWidth (ST.px 2)

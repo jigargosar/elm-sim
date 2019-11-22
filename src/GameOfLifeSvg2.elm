@@ -238,15 +238,18 @@ update message model =
 
                else
             -}
-            ( (if model.lastUpdateMilli < 8 then
-                updateGridState model
+            if model.lastUpdateMilli >= 3 then
+                ( model
+                    |> setStartMilli now
+                    |> setLastUpdateMilli (model.lastUpdateMilli - 3)
+                , Cmd.none
+                )
 
-               else
-                model
-              )
-                |> setStartMilli now
-            , Time.now |> Task.perform AfterUpdate
-            )
+            else
+                ( updateGridState model
+                    |> setStartMilli now
+                , Time.now |> Task.perform AfterUpdate
+                )
 
         AfterUpdate posix ->
             let
@@ -263,7 +266,11 @@ update message model =
                     else
                         delta
             in
-            ( { model | lastUpdateMilli = delta }, Cmd.none )
+            ( setLastUpdateMilli delta model, Cmd.none )
+
+
+setLastUpdateMilli milli model =
+    { model | lastUpdateMilli = milli }
 
 
 setStartMilli milli model =

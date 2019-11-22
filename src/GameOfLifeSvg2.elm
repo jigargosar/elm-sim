@@ -4,6 +4,7 @@ import Array exposing (Array)
 import Browser
 import Browser.Events
 import Color
+import Html exposing (Html)
 import Html.Attributes as HA
 import Random exposing (Generator, Seed)
 import TypedSvg as S
@@ -131,6 +132,7 @@ updateGridOnTick model =
     }
 
 
+view : Model -> Html Msg
 view model =
     let
         w =

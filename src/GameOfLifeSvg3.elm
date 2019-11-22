@@ -143,7 +143,8 @@ decrementANC i grid lookup =
                     (\aliveCt ->
                         case aliveCt of
                             Nothing ->
-                                Debug.todo "This should never happen"
+                                -- Debug.todo "This should never happen"
+                                Nothing
 
                             Just 1 ->
                                 Nothing
@@ -200,9 +201,9 @@ computeNextGrid grid =
 
         reducer prevCell ( i, lookup ) =
             case ( prevCell, Array.get i newCellArray ) of
-                ( _, Nothing ) ->
-                    Debug.todo "This should never happen"
-
+                {- ( _, Nothing ) ->
+                   Debug.todo "This should never happen"
+                -}
                 ( Alive, Just Dead ) ->
                     ( i + 1, decrementANC i grid lookup )
 

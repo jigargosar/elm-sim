@@ -6,6 +6,7 @@
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/../elm-sim\tests" isTestSource="true" />
       <excludeFolder url="file://$MODULE_DIR$/.cache" />
+      <excludeFolder url="file://$MODULE_DIR$/dist" />
       <excludeFolder url="file://$MODULE_DIR$/elm-stuff" />
       <excludePattern pattern="elm-stuff" />
     </content>

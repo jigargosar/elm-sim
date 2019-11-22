@@ -3,7 +3,7 @@ module GameOfLifeSvg exposing (main)
 import Browser
 import Browser.Events as B
 import Color
-import GameOfLifeCell exposing (Cell)
+import GameOfLife.Cell as Cell exposing (Cell)
 import Html exposing (..)
 import Html.Attributes as H
 import Html.Lazy exposing (lazy)
@@ -252,7 +252,7 @@ viewCellRCSvg cellSize ri ci cell =
             1
     in
     S.rect
-        [ (if cell == GameOfLifeCell.off then
+        [ (if cell == Cell.off then
             Color.lightYellow
 
            else

@@ -7,7 +7,7 @@ module MatrixOfLife exposing
     , toggleCellAtRC
     )
 
-import GameOfLifeCell exposing (Cell)
+import GameOfLife.Cell as Cell exposing (Cell)
 import Matrix exposing (Matrix)
 import Random exposing (Generator)
 
@@ -18,7 +18,7 @@ type alias Grid =
 
 toggleCellAtRC : Int -> Int -> Grid -> Grid
 toggleCellAtRC rowNum colNum =
-    Matrix.mapAt rowNum colNum GameOfLifeCell.toggle
+    Matrix.mapAt rowNum colNum Cell.toggle
 
 
 nextState : Grid -> Grid
@@ -30,14 +30,14 @@ nextState grid =
     in
     Matrix.indexedMap
         (\rowNum colNum ->
-            GameOfLifeCell.nextState rowNum colNum cellAt
+            Cell.nextState rowNum colNum cellAt
         )
         grid
 
 
 initEmpty : { a | colCount : Int, rowCount : Int } -> Grid
 initEmpty { rowCount, colCount } =
-    Matrix.repeat rowCount colCount GameOfLifeCell.off
+    Matrix.repeat rowCount colCount Cell.off
 
 
 randomize : Grid -> Generator Grid
@@ -45,7 +45,7 @@ randomize grid =
     let
         randomGridCell : Generator Cell
         randomGridCell =
-            Random.weighted ( 80, GameOfLifeCell.off ) [ ( 20, GameOfLifeCell.on ) ]
+            Random.weighted ( 80, Cell.off ) [ ( 20, Cell.on ) ]
 
         ( rowCount, colCount ) =
             Matrix.size grid

@@ -1,4 +1,4 @@
-module GameOfLifeCell exposing (Cell, nextState, off, on, toggle)
+module GameOfLife.Cell exposing (Cell, nextState, off, on, toggle)
 
 
 type Cell

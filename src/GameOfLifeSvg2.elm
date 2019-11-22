@@ -48,7 +48,15 @@ initialGrid =
 
 init : Flags -> ( Model, Cmd Msg )
 init { now } =
-    ( { grid = initialGrid, seed = Random.initialSeed now }, Cmd.none )
+    let
+        model =
+            { grid = initialGrid
+            , seed = Random.initialSeed now
+            }
+    in
+    ( model |> randomizeGrid
+    , Cmd.none
+    )
 
 
 gridGenerator : Int -> Int -> Generator Grid

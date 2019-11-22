@@ -49,17 +49,21 @@ indexedMap func (Matrix { rowCount, columnCount, data }) =
 
 
 mapAt : Int -> Int -> (a -> a) -> Matrix a -> Matrix a
-mapAt rowIndex columnIndex func (Matrix inner) =
-    let
-        idx =
-            rowIndex * inner.rowCount + columnIndex
-    in
-    case Array.get idx inner.data of
-        Nothing ->
-            Matrix inner
+mapAt rowIndex columnIndex func ((Matrix inner) as matrix) =
+    if areIndicesOutOfBounds rowIndex columnIndex matrix then
+        matrix
 
-        Just a ->
-            Matrix { inner | data = Array.set idx (func a) inner.data }
+    else
+        let
+            idx =
+                rowIndex * inner.rowCount + columnIndex
+        in
+        case Array.get idx inner.data of
+            Nothing ->
+                Matrix inner
+
+            Just a ->
+                Matrix { inner | data = Array.set idx (func a) inner.data }
 
 
 toList : Matrix b -> List b
@@ -75,3 +79,7 @@ getWarped rowIndex columnIndex ((Matrix { rowCount, columnCount }) as matrix) =
 getUnsafe : Int -> Int -> Matrix a -> Maybe a
 getUnsafe rowIndex columnIndex (Matrix { rowCount, data }) =
     Array.get (rowIndex * rowCount + columnIndex) data
+
+
+areIndicesOutOfBounds rowIndex columnIndex (Matrix { rowCount, columnCount }) =
+    rowIndex < 0 || columnIndex < 0 || rowIndex >= rowCount || columnIndex >= columnCount

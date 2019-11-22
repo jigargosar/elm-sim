@@ -234,8 +234,7 @@ update message model =
                 )
 
             else
-                ( updateGridState model
-                    |> setStartMilli now
+                ( updateGridState model |> setStartMilli now
                 , Cmd.none
                 )
 

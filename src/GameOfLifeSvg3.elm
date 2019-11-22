@@ -86,7 +86,7 @@ gridGenerator width height =
                             , neighbourOffsets
                                 |> List.foldl
                                     (\( dx, dy ) ->
-                                        Dict.update ((y + dy) * height + (x + dx))
+                                        Dict.update ((y + dy |> modBy height) * height + (x + dx |> modBy width))
                                             (\aliveCt ->
                                                 case aliveCt of
                                                     Nothing ->
@@ -114,6 +114,6 @@ gridGenerator width height =
 main =
     let
         grid =
-            Random.step (gridGenerator 3 3) (Random.initialSeed 0)
+            Random.step (gridGenerator 1 1) (Random.initialSeed 0)
     in
     text (Debug.toString grid)

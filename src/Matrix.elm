@@ -30,28 +30,29 @@ size (Matrix { rowCount, columnCount }) =
 
 
 repeat : Int -> Int -> a -> Matrix a
-repeat rc cc a =
-    Inner rc cc (Array.repeat (rc * cc) a)
+repeat rowCount columnCount cellData =
+    Inner rowCount columnCount (Array.repeat (rowCount * columnCount) cellData)
         |> Matrix
 
 
 generator : Int -> Int -> Generator a -> Generator (Matrix a)
-generator rc cc =
-    Random.list (rc * cc)
-        >> Random.map (Array.fromList >> Inner rc cc >> Matrix)
+generator rowCount columnCount =
+    Random.list (rowCount * columnCount)
+        >> Random.map (Array.fromList >> Inner rowCount columnCount >> Matrix)
 
 
 indexedMap : (Int -> Int -> a -> b) -> Matrix a -> Matrix b
 indexedMap func (Matrix { rowCount, columnCount, data }) =
-    Inner rowCount columnCount (Array.indexedMap (\i -> func (i // rowCount) (remainderBy columnCount i)) data)
+    Array.indexedMap (\i -> func (i // rowCount) (remainderBy columnCount i)) data
+        |> Inner rowCount columnCount
         |> Matrix
 
 
 mapAt : Int -> Int -> (a -> a) -> Matrix a -> Matrix a
-mapAt ri ci func (Matrix inner) =
+mapAt rowIndex columnIndex func (Matrix inner) =
     let
         idx =
-            ri * inner.rowCount + ci
+            rowIndex * inner.rowCount + columnIndex
     in
     case Array.get idx inner.data of
         Nothing ->
@@ -62,7 +63,7 @@ mapAt ri ci func (Matrix inner) =
 
 
 toList : Matrix b -> List b
-toList (Matrix { rowCount, columnCount, data }) =
+toList (Matrix { data }) =
     Array.toList data
 
 
@@ -76,3 +77,17 @@ getWarped rowNum_ colNum_ (Matrix { rowCount, columnCount, data }) =
             modBy rowCount colNum_
     in
     Array.get (rowNum * rowCount + colNum) data
+
+
+get : Int -> Int -> Matrix a -> Maybe a
+get rowIndex columnIndex (Matrix { rowCount, columnCount, data }) =
+    if isIndexOutOfBounds rowIndex rowCount || isIndexOutOfBounds columnIndex columnCount then
+        Nothing
+
+    else
+        Array.get (rowIndex * rowCount + columnIndex) data
+
+
+isIndexOutOfBounds : Int -> Int -> Bool
+isIndexOutOfBounds index length =
+    index < 0 || index >= length

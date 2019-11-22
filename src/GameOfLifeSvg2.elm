@@ -376,7 +376,6 @@ viewGrid2 grid =
                                 gridIndexToXY i grid
                         in
                         SL.lazy4 viewCell2 cellWidthInPx x y cell
-                     --( String.fromInt i, SL.lazy4 viewCell2 cellWidthInPx x y cell )
                     )
                 |> Array.toList
             )

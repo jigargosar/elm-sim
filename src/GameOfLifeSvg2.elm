@@ -166,7 +166,7 @@ init { now } =
             , seed = Random.initialSeed now
             }
     in
-    ( model |> randomizeGrid
+    ( randomizeGrid model
     , Cmd.none
     )
 

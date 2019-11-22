@@ -295,10 +295,6 @@ viewGrid grid =
 viewCell : Float -> Int -> Int -> Cell -> Svg Msg
 viewCell cellWidthInPx gridX gridY cell =
     let
-        _ =
-            1
-
-        --|> Debug.log "viewCell2 called"
         x =
             toFloat gridX * cellWidthInPx + 1
 

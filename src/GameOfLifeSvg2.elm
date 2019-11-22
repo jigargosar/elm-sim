@@ -262,7 +262,7 @@ viewGrid : Grid -> Html Msg
 viewGrid grid =
     let
         w =
-            600
+            602
 
         h =
             w

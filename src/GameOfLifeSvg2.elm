@@ -11,6 +11,7 @@ import Task
 import Time exposing (Posix)
 import TypedSvg as S
 import TypedSvg.Attributes as SA
+import TypedSvg.Core exposing (Svg)
 import TypedSvg.Types as ST
 
 
@@ -331,6 +332,64 @@ view model =
                 |> Array.toList
             )
         ]
+
+
+view2 : Model -> Html Msg
+view2 model =
+    viewGrid2 model.grid
+
+
+viewGrid2 : Grid -> Html Msg
+viewGrid2 grid =
+    let
+        w =
+            600
+
+        h =
+            w
+
+        gridWidthInPx =
+            w - 2
+
+        cellWidthInPx =
+            toFloat gridWidthInPx / toFloat grid.width
+    in
+    S.svg [ SA.viewBox 0 0 w h, HA.width w, HA.height h ]
+        [ S.g
+            [ SA.stroke Color.black
+            , SA.strokeWidth (ST.px 2)
+            ]
+            (grid.data
+                |> Array.indexedMap (\i -> viewCell2 cellWidthInPx (gridIndexToXY i grid))
+                |> Array.toList
+            )
+        ]
+
+
+viewCell2 : Float -> ( Int, Int ) -> Cell -> Svg Msg
+viewCell2 cellWidthInPx ( gridX, gridY ) cell =
+    let
+        x =
+            toFloat gridX * cellWidthInPx + 1
+
+        y =
+            toFloat gridY * cellWidthInPx + 1
+    in
+    S.rect
+        [ (if cell == Dead then
+            Color.lightYellow
+
+           else
+            Color.lightRed
+          )
+            |> ST.Fill
+            |> SA.fill
+        , SA.x (ST.px x)
+        , SA.y (ST.px y)
+        , SA.width (ST.px cellWidthInPx)
+        , SA.height (ST.px cellWidthInPx)
+        ]
+        []
 
 
 

@@ -361,7 +361,8 @@ viewGrid2 grid =
             toFloat gridWidthInPx / toFloat grid.width
     in
     S.svg [ SA.viewBox 0 0 w h, HA.width w, HA.height h ]
-        [ S.g
+        [ SL.lazy defs2 cellWidthInPx
+        , S.g
             [ SA.stroke Color.black
             , SA.strokeWidth (ST.px 2)
             ]
@@ -378,6 +379,25 @@ viewGrid2 grid =
                 |> Array.toList
             )
         ]
+
+
+defs2 : Float -> Svg Msg
+defs2 cellWidthInPx =
+    S.defs []
+        [ deadCellDef cellWidthInPx
+        ]
+
+
+deadCellDef cellWidthInPx =
+    S.rect
+        [ HA.id "dead-cell"
+        , Color.lightYellow
+            |> ST.Fill
+            |> SA.fill
+        , SA.width (ST.px cellWidthInPx)
+        , SA.height (ST.px cellWidthInPx)
+        ]
+        []
 
 
 viewCell2 : Float -> Int -> Int -> Cell -> Svg Msg

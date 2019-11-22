@@ -317,15 +317,15 @@ viewGrid grid =
                             ( x, y ) =
                                 gridIndexToXY i grid
                         in
-                        SL.lazy4 viewCell2 cellWidthInPx x y cell
+                        SL.lazy4 viewCell cellWidthInPx x y cell
                     )
                 |> Array.toList
             )
         ]
 
 
-viewCell2 : Float -> Int -> Int -> Cell -> Svg Msg
-viewCell2 cellWidthInPx gridX gridY cell =
+viewCell : Float -> Int -> Int -> Cell -> Svg Msg
+viewCell cellWidthInPx gridX gridY cell =
     let
         _ =
             1

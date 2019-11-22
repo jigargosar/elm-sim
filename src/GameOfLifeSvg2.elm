@@ -168,6 +168,11 @@ gridIndexToXY i grid =
     ( x, y )
 
 
+xyToGridIndex : Int -> Int -> Grid -> Int
+xyToGridIndex x y grid =
+    modBy grid.width x + modBy grid.height y * grid.height
+
+
 main =
     Browser.element
         { init = init

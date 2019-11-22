@@ -7,6 +7,7 @@ import Color
 import Html exposing (Html)
 import Html.Attributes as HA
 import Random exposing (Generator, Seed)
+import Time exposing (Posix)
 import TypedSvg as S
 import TypedSvg.Attributes as SA
 import TypedSvg.Types as ST
@@ -158,7 +159,8 @@ type alias Flags =
 
 
 type alias Model =
-    { grid : Grid
+    { startMilli : Int
+    , grid : Grid
     , gridHistory : List Grid
     , seed : Seed
     }
@@ -172,7 +174,8 @@ init { now } =
 
         model : Model
         model =
-            { grid = initialGrid gridLen gridLen
+            { startMilli = now
+            , grid = initialGrid gridLen gridLen
             , gridHistory = []
             , seed = Random.initialSeed now
             }
@@ -203,28 +206,42 @@ randomStep generator model =
 
 
 type Msg
-    = Tick Float
+    = Tick Posix
 
 
 update : Msg -> Model -> ( Model, Cmd msg )
 update message model =
     case message of
-        Tick delta ->
+        Tick posix ->
             let
+                now =
+                    Time.posixToMillis posix
+
+                delta =
+                    now - model.startMilli
+
                 fps =
-                    1000 / delta
+                    1000 // delta
             in
             if fps < 40 then
                 let
                     _ =
                         Debug.log "skipping frame " ( fps, delta )
                 in
-                ( model, Cmd.none )
+                ( model
+                    |> setStartMilli now
+                , Cmd.none
+                )
 
             else
                 ( updateGridState model
+                    |> setStartMilli now
                 , Cmd.none
                 )
+
+
+setStartMilli milli model =
+    { model | startMilli = milli }
 
 
 randomizeGrid : Model -> Model
@@ -323,7 +340,7 @@ view model =
 main =
     Browser.element
         { init = init
-        , subscriptions = \_ -> Browser.Events.onAnimationFrameDelta Tick
+        , subscriptions = \_ -> Browser.Events.onAnimationFrame Tick
         , update = update
         , view = view
         }

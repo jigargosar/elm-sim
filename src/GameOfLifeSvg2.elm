@@ -98,9 +98,37 @@ update message model =
             ( updateGridOnTick model, Cmd.none )
 
 
+getGridCellAt : Int -> Int -> Grid -> Maybe Cell
+getGridCellAt x y grid =
+    let
+        i =
+            xyToGridIndex x y grid
+    in
+    Array.get i grid.data
+
+
 updateGridOnTick : Model -> Model
 updateGridOnTick model =
-    model
+    let
+        grid =
+            model.grid
+
+        cellAt x y =
+            getGridCellAt x y grid
+    in
+    { model
+        | grid =
+            Array.indexedMap
+                (\i ->
+                    let
+                        ( x, y ) =
+                            gridIndexToXY i grid
+                    in
+                    nextCellState x y cellAt
+                )
+                grid.data
+                |> Grid grid.width grid.height
+    }
 
 
 view model =

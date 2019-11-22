@@ -7,6 +7,7 @@ import Color
 import Html exposing (Html)
 import Html.Attributes as HA
 import Random exposing (Generator, Seed)
+import Task
 import Time exposing (Posix)
 import TypedSvg as S
 import TypedSvg.Attributes as SA
@@ -207,9 +208,10 @@ randomStep generator model =
 
 type Msg
     = Tick Posix
+    | AfterUpdate Posix
 
 
-update : Msg -> Model -> ( Model, Cmd msg )
+update : Msg -> Model -> ( Model, Cmd Msg )
 update message model =
     case message of
         Tick posix ->
@@ -234,8 +236,24 @@ update message model =
 
             else
                 ( updateGridState model |> setStartMilli now
-                , Cmd.none
+                , Time.now |> Task.perform AfterUpdate
                 )
+
+        AfterUpdate posix ->
+            let
+                now =
+                    Time.posixToMillis posix
+
+                delta =
+                    now - model.startMilli
+
+                fps =
+                    1000 // delta
+
+                _ =
+                    Debug.log "update time taken ms: " delta
+            in
+            ( model, Cmd.none )
 
 
 setStartMilli milli model =

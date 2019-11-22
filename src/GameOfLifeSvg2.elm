@@ -161,6 +161,7 @@ type alias Flags =
 
 type alias Model =
     { startMilli : Int
+    , lastUpdateMilli : Int
     , grid : Grid
     , gridHistory : List Grid
     , seed : Seed
@@ -176,6 +177,7 @@ init { now } =
         model : Model
         model =
             { startMilli = now
+            , lastUpdateMilli = 0
             , grid = initialGrid gridLen gridLen
             , gridHistory = []
             , seed = Random.initialSeed now
@@ -236,7 +238,13 @@ update message model =
 
                else
             -}
-            ( updateGridState model |> setStartMilli now
+            ( (if model.lastUpdateMilli < 8 then
+                updateGridState model
+
+               else
+                model
+              )
+                |> setStartMilli now
             , Time.now |> Task.perform AfterUpdate
             )
 
@@ -255,7 +263,7 @@ update message model =
                     else
                         delta
             in
-            ( model, Cmd.none )
+            ( { model | lastUpdateMilli = delta }, Cmd.none )
 
 
 setStartMilli milli model =

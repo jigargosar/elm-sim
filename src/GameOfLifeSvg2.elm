@@ -1,6 +1,8 @@
 module GameOfLifeSvg2 exposing (..)
 
 import Array exposing (Array)
+import Browser
+import Browser.Events
 import Color
 import Html.Attributes as HA
 import Random exposing (Generator, Seed)
@@ -81,10 +83,11 @@ type Msg
     = Tick Float
 
 
+update : Msg -> Model -> ( Model, Cmd msg )
 update message model =
     case message of
         Tick delta ->
-            updateGridOnTick model
+            ( updateGridOnTick model, Cmd.none )
 
 
 updateGridOnTick : Model -> Model
@@ -140,3 +143,12 @@ view model =
             ]
             (Array.indexedMap viewCell grid.data |> Array.toList)
         ]
+
+
+main =
+    Browser.element
+        { init = init
+        , subscriptions = \_ -> Browser.Events.onAnimationFrameDelta Tick
+        , update = update
+        , view = view
+        }

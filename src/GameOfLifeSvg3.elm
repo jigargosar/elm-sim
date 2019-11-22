@@ -135,3 +135,29 @@ main =
             Random.step (gridGenerator 4 4) (Random.initialSeed 4)
     in
     text (Debug.toString grid)
+
+
+viewCell : Float -> Int -> Int -> Cell -> Svg msg
+viewCell cellWidthInPx gridX gridY cell =
+    let
+        x =
+            toFloat gridX * cellWidthInPx + 1
+
+        y =
+            toFloat gridY * cellWidthInPx + 1
+    in
+    S.rect
+        [ (if cell == Dead then
+            Color.lightYellow
+
+           else
+            Color.lightRed
+          )
+            |> ST.Fill
+            |> SA.fill
+        , SA.x (ST.px x)
+        , SA.y (ST.px y)
+        , SA.width (ST.px cellWidthInPx)
+        , SA.height (ST.px cellWidthInPx)
+        ]
+        []

@@ -70,17 +70,6 @@ neighbourOffsets =
         ++ [ ( -1, 1 ), ( 0, 1 ), ( 1, 1 ) ]
 
 
-
-{-
-   neighbourOffsets : List ( Int, Int )
-   neighbourOffsets =
-       [ ( -1, -1 ), ( -1, 0 ), ( -1, 1 ) ]
-           ++ [ ( 0, -1 ), {- ignore self (0,0) , -} ( 0, 1 ) ]
-           ++ [ ( 1, -1 ), ( 1, 0 ), ( 1, 1 ) ]
-
--}
-
-
 gridIndexToXY : Int -> Grid -> ( Int, Int )
 gridIndexToXY i grid =
     let

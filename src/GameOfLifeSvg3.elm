@@ -5,7 +5,7 @@ import Browser
 import Browser.Events
 import Color
 import Dict exposing (Dict)
-import Html exposing (Html, text)
+import Html exposing (Html, div, text)
 import Html.Attributes as HA
 import Random exposing (Generator, Seed)
 import Svg.Lazy as SL
@@ -81,6 +81,18 @@ neighbourOffsets =
 -}
 
 
+gridIndexToXY : Int -> Grid -> ( Int, Int )
+gridIndexToXY i grid =
+    let
+        x =
+            remainderBy grid.width i
+
+        y =
+            i // grid.height
+    in
+    ( x, y )
+
+
 gridGenerator : Int -> Int -> Generator Grid
 gridGenerator width height =
     let
@@ -93,11 +105,8 @@ gridGenerator width height =
                     case cell of
                         Alive ->
                             let
-                                x =
-                                    remainderBy grid.width i
-
-                                y =
-                                    i // grid.height
+                                ( x, y ) =
+                                    gridIndexToXY i grid
                             in
                             ( i + 1
                             , neighbourOffsets
@@ -131,10 +140,47 @@ gridGenerator width height =
 
 main =
     let
-        grid =
+        ( grid, _ ) =
             Random.step (gridGenerator 4 4) (Random.initialSeed 4)
     in
-    text (Debug.toString grid)
+    div []
+        [ text (Debug.toString grid)
+        , viewGrid grid
+        ]
+
+
+viewGrid : Grid -> Html msg
+viewGrid grid =
+    let
+        w =
+            602
+
+        h =
+            w
+
+        gridWidthInPx =
+            w - 2
+
+        cellWidthInPx =
+            toFloat gridWidthInPx / toFloat grid.width
+    in
+    S.svg [ SA.viewBox 0 0 w h, HA.width w, HA.height h ]
+        [ S.g
+            [ SA.stroke Color.black
+            , SA.strokeWidth (ST.px 1)
+            ]
+            (grid.cellState
+                |> Array.indexedMap
+                    (\i cell ->
+                        let
+                            ( x, y ) =
+                                gridIndexToXY i grid
+                        in
+                        SL.lazy4 viewCell cellWidthInPx x y cell
+                    )
+                |> Array.toList
+            )
+        ]
 
 
 viewCell : Float -> Int -> Int -> Cell -> Svg msg

@@ -153,26 +153,26 @@ incAnc gc pos data =
             data
 
 
+decAncHelp nPos d =
+    case Dict.get nPos d of
+        Nothing ->
+            d
+
+        Just ( Dead, 1 ) ->
+            Dict.remove nPos d
+
+        Just ( c, ct ) ->
+            if ct <= 0 then
+                d
+
+            else
+                Dict.insert nPos ( c, ct - 1 ) d
+
+
 decAnc : HasWH xx -> Pos -> Data -> Data
 decAnc gc pos data =
     getValidNeighbourCords gc pos
-        |> List.foldl
-            (\nPos d ->
-                case Dict.get nPos d of
-                    Nothing ->
-                        d
-
-                    Just ( Dead, 1 ) ->
-                        Dict.remove nPos d
-
-                    Just ( c, ct ) ->
-                        if ct <= 0 then
-                            d
-
-                        else
-                            Dict.insert nPos ( c, ct - 1 ) d
-            )
-            data
+        |> List.foldl decAncHelp data
 
 
 getNextCellData : CellData -> CellData

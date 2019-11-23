@@ -100,11 +100,11 @@ initialGrid width height =
 randomGridGeneratorFromGrid : Grid -> Generator Grid
 randomGridGeneratorFromGrid grid =
     let
-        randomCellGenerator : Generator Cell
+        randomCellGenerator : Generator (Maybe Cell)
         randomCellGenerator =
-            Random.weighted ( 20, Alive ) [ ( 80, Dead ) ]
+            Random.weighted ( 20, Just Alive ) [ ( 80, Nothing ) ]
 
-        randomCellListGenerator : Generator (List Cell)
+        randomCellListGenerator : Generator (List (Maybe Cell))
         randomCellListGenerator =
             Random.list grid.length randomCellGenerator
 
@@ -113,7 +113,8 @@ randomGridGeneratorFromGrid grid =
             randomCellListGenerator
                 |> Random.map
                     (\cellList ->
-                        List.map2 Tuple.pair grid.cords cellList
+                        List.map2 (\cord -> Maybe.map (Tuple.pair cord)) grid.cords cellList
+                            |> List.filterMap identity
                             |> Dict.fromList
                     )
     in

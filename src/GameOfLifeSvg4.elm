@@ -120,33 +120,6 @@ randomGridGeneratorFromGrid grid =
     dataGenerator |> Random.map (\data -> { grid | data = data })
 
 
-gridIndexToXY : Int -> Grid -> ( Int, Int )
-gridIndexToXY i grid =
-    let
-        x =
-            remainderBy grid.width i
-
-        y =
-            i // grid.height
-    in
-    ( x, y )
-
-
-gridIndexFromXY : Int -> Int -> Grid -> Int
-gridIndexFromXY x y grid =
-    modBy grid.width x + modBy grid.height y * grid.height
-
-
-
---getGridCellAt : Int -> Int -> Grid -> Maybe Cell
---getGridCellAt x y grid =
---    let
---        i =
---            gridIndexFromXY x y grid
---    in
---    Array.get i grid.data
-
-
 nextGridState : Grid -> Grid
 nextGridState grid =
     let

@@ -74,3 +74,8 @@ incNeighboursANC width height ( x, y ) model =
         )
         model
         neighbourOffsets
+
+
+nextState : Int -> Int -> Model -> Model
+nextState width height model =
+    Debug.todo "impl"

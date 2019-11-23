@@ -1,4 +1,4 @@
-module GOLGrid exposing (Grid, initDead, randomize)
+module GOLGrid exposing (Grid, initDead, nextState, randomize)
 
 import Dict exposing (Dict)
 import Random exposing (Generator)

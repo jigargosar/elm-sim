@@ -46,4 +46,18 @@ initDead w h =
 
 randomize : Grid -> Generator Grid
 randomize grid =
-    Random.constant grid
+    randomDataGenerator grid |> Random.map (\data -> { grid | data = data })
+
+
+randomDataGenerator : HasWH xx -> Generator Data
+randomDataGenerator { w, h } =
+    let
+        maybePosCellGen : Pos -> Generator (Maybe ( Pos, Cell ))
+        maybePosCellGen pos =
+            Random.weighted ( 20, Just Alive ) [ ( 80, Nothing ) ]
+                |> Random.map (Maybe.map (Tuple.pair pos))
+
+        _ =
+            Random.list (w * h)
+    in
+    Random.constant Dict.empty

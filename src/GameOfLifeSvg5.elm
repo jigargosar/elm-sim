@@ -42,7 +42,7 @@ init : Flags -> ( Model, Cmd Msg )
 init { now } =
     let
         gridLen =
-            10
+            60
 
         model : Model
         model =
@@ -104,7 +104,7 @@ updateGridState delta model =
             model.delta + delta
 
         interval =
-            1000 / 0.1
+            1000 / 60
     in
     if accDelta > interval then
         model
@@ -171,18 +171,23 @@ viewGrid grid =
             (grid.cords
                 |> List.map
                     (\( x, y ) ->
-                        SL.lazy4 viewCell
+                        let
+                            ( cell, anc ) =
+                                Dict.get ( x, y ) grid.data |> Maybe.withDefault ( GOLGrid.Dead, 0 )
+                        in
+                        SL.lazy5 viewCell
                             cellWidthInPx
                             x
                             y
-                            (Dict.get ( x, y ) grid.data |> Maybe.withDefault ( GOLGrid.Dead, 0 ))
+                            cell
+                            anc
                     )
             )
         ]
 
 
-viewCell : Float -> Int -> Int -> GOLGrid.CellData -> Svg Msg
-viewCell cellWidthInPx gridX gridY ( cell, anc ) =
+viewCell : Float -> Int -> Int -> GOLGrid.Cell -> Int -> Svg Msg
+viewCell cellWidthInPx gridX gridY cell anc =
     let
         x =
             toFloat gridX * cellWidthInPx + 1
@@ -206,11 +211,6 @@ viewCell cellWidthInPx gridX gridY ( cell, anc ) =
             , SA.height (ST.px cellWidthInPx)
             ]
             []
-        , S.text_
-            [ SA.x (ST.px x)
-            , SA.y (ST.px <| y + 15)
-            ]
-            [ SC.text <| String.fromInt anc ]
         ]
 
 

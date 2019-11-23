@@ -225,13 +225,20 @@ nextState grid =
                             let
                                 nextCellData =
                                     getNextCellData prevCellData
+
+                                nextCell =
+                                    Tuple.first nextCellData
                             in
                             if prevCellData == nextCellData then
                                 identity
 
                             else
-                                Dict.insert pos nextCellData
-                                    >> (case Tuple.first nextCellData of
+                                Dict.update pos
+                                    (Maybe.map (Tuple.mapFirst (always nextCell))
+                                        >> Maybe.withDefault ( nextCell, 0 )
+                                        >> Just
+                                    )
+                                    >> (case nextCell of
                                             Alive ->
                                                 incAnc grid pos
 

@@ -1,4 +1,4 @@
-module GOLGrid exposing (Cell(..), Model, initDead, nextState, randomize, width)
+module GOLGrid exposing (Cell(..), CellData, Model, initDead, nextState, randomize, width)
 
 import Dict exposing (Dict)
 import Random exposing (Generator)

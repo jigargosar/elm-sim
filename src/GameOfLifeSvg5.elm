@@ -12,7 +12,7 @@ import Svg.Lazy as SL
 import Time exposing (Posix)
 import TypedSvg as S
 import TypedSvg.Attributes as SA
-import TypedSvg.Core exposing (Svg)
+import TypedSvg.Core as SC exposing (Svg)
 import TypedSvg.Types as ST
 
 
@@ -155,14 +155,14 @@ viewGrid grid =
                             cellWidthInPx
                             x
                             y
-                            (Dict.get ( x, y ) grid.data |> Maybe.map Tuple.first)
+                            (Dict.get ( x, y ) grid.data |> Maybe.withDefault ( GOLGrid.Dead, 0 ))
                     )
             )
         ]
 
 
-viewCell : Float -> Int -> Int -> Maybe GOLGrid.Cell -> Svg Msg
-viewCell cellWidthInPx gridX gridY cell =
+viewCell : Float -> Int -> Int -> GOLGrid.CellData -> Svg Msg
+viewCell cellWidthInPx gridX gridY ( cell, anc ) =
     let
         x =
             toFloat gridX * cellWidthInPx + 1
@@ -170,21 +170,28 @@ viewCell cellWidthInPx gridX gridY cell =
         y =
             toFloat gridY * cellWidthInPx + 1
     in
-    S.rect
-        [ (if cell == Just GOLGrid.Alive then
-            Color.lightRed
+    S.g []
+        [ S.rect
+            [ (if cell == GOLGrid.Alive then
+                Color.lightRed
 
-           else
-            Color.lightYellow
-          )
-            |> ST.Fill
-            |> SA.fill
-        , SA.x (ST.px x)
-        , SA.y (ST.px y)
-        , SA.width (ST.px cellWidthInPx)
-        , SA.height (ST.px cellWidthInPx)
+               else
+                Color.lightYellow
+              )
+                |> ST.Fill
+                |> SA.fill
+            , SA.x (ST.px x)
+            , SA.y (ST.px y)
+            , SA.width (ST.px cellWidthInPx)
+            , SA.height (ST.px cellWidthInPx)
+            ]
+            []
+        , S.text_
+            [ SA.x (ST.px x)
+            , SA.y (ST.px <| y + 5)
+            ]
+            [ SC.text "1" ]
         ]
-        []
 
 
 

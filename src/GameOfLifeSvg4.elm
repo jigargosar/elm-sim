@@ -140,7 +140,10 @@ nextGridState grid =
                     neighbourOffsets
                         |> List.foldl
                             (\( dx, dy ) ct ->
-                                case getPrevCellAt ( x + dx, y + dy ) of
+                                case
+                                    getPrevCellAt
+                                        ( x + dx |> modBy grid.width, y + dy |> modBy grid.height )
+                                of
                                     Just Alive ->
                                         ct + 1
 

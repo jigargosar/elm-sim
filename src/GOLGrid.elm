@@ -158,16 +158,16 @@ decAnc gc pos data =
                     (\maybeCellData ->
                         case maybeCellData of
                             Nothing ->
-                                -- Debug.todo "invalid state"
+                                Debug.todo "invalid state"
+
+                            -- Nothing
+                            Just ( Dead, 1 ) ->
                                 Nothing
 
-                            {- Just ( Dead, 1 ) ->
-                               Nothing
-                            -}
                             Just ( c, ct ) ->
                                 if ct <= 0 then
-                                    -- Debug.todo "invalid state"
-                                    Just ( c, 0 )
+                                    Debug.todo "invalid state"
+                                    -- Just ( c, 0 )
 
                                 else
                                     Just ( c, ct - 1 )

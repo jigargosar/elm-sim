@@ -149,7 +149,16 @@ nextGridState grid =
                 nextCell =
                     nextCellStateWithAliveNeighbourCount anc prevCell
             in
-            Dict.insert ( x, y ) nextCell
+            if prevCell /= nextCell then
+                case nextCell of
+                    Alive ->
+                        Dict.insert ( x, y ) nextCell
+
+                    Dead ->
+                        Dict.remove ( x, y )
+
+            else
+                identity
 
         nextData =
             List.foldl reducer grid.data grid.cords

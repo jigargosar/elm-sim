@@ -153,14 +153,16 @@ decAnc gc pos data =
                     (\maybeCellData ->
                         case maybeCellData of
                             Nothing ->
-                                Debug.todo "invalid state"
+                                -- Debug.todo "invalid state"
+                                Nothing
 
                             Just ( Dead, 1 ) ->
                                 Nothing
 
                             Just ( c, ct ) ->
                                 if ct <= 0 then
-                                    Debug.todo "invalid state"
+                                    -- Debug.todo "invalid state"
+                                    Just ( c, 0 )
 
                                 else
                                     Just ( c, ct - 1 )
@@ -191,13 +193,17 @@ getNextCellData cellData =
                 cellData
 
 
+
+{-
+   nextState : Model -> Model
+   nextState grid =
+       grid
+
+-}
+
+
 nextState : Model -> Model
 nextState grid =
-    grid
-
-
-nextState_ : Model -> Model
-nextState_ grid =
     let
         getPrevCellData : Pos -> Maybe CellData
         getPrevCellData pos =

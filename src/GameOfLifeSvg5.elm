@@ -171,11 +171,11 @@ viewCell cellWidthInPx gridX gridY cell =
             toFloat gridY * cellWidthInPx + 1
     in
     S.rect
-        [ (if cell == Nothing then
-            Color.lightYellow
+        [ (if cell == Just GOLGrid.Alive then
+            Color.lightRed
 
            else
-            Color.lightRed
+            Color.lightYellow
           )
             |> ST.Fill
             |> SA.fill

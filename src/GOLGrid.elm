@@ -1,4 +1,4 @@
-module GOLGrid exposing (Cell, Model, initDead, nextState, randomize, width)
+module GOLGrid exposing (Cell(..), Model, initDead, nextState, randomize, width)
 
 import Dict exposing (Dict)
 import Random exposing (Generator)
@@ -89,7 +89,7 @@ randomDataGenerator gc =
 
         maybeAlivePosGen : Pos -> Generator (Maybe Pos)
         maybeAlivePosGen pos =
-            Random.weighted ( 20, Just Alive ) [ ( 80, Nothing ) ]
+            Random.weighted ( 10, Just Alive ) [ ( 90, Nothing ) ]
                 |> Random.map (Maybe.map (always pos))
 
         posCellListGenerator : Generator (List Pos)
@@ -193,6 +193,11 @@ getNextCellData cellData =
 
 nextState : Model -> Model
 nextState grid =
+    grid
+
+
+nextState_ : Model -> Model
+nextState_ grid =
     let
         getPrevCellData : Pos -> Maybe CellData
         getPrevCellData pos =

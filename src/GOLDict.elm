@@ -20,22 +20,26 @@ type alias Model =
     Dict ( Int, Int ) CellData
 
 
-fromAlivePositions : List ( Int, Int ) -> Model
-fromAlivePositions =
-    List.foldl setAliveAtAndIncrementNeighbours Dict.empty
+fromAlivePositions : Int -> Int -> List Pos -> Model
+fromAlivePositions width height =
+    List.foldl (setAliveAtAndIncrementNeighbours width height) Dict.empty
 
 
-setAliveAtAndIncrementNeighbours : Pos -> Model -> Model
-setAliveAtAndIncrementNeighbours pos =
+setAliveAtAndIncrementNeighbours : Int -> Int -> Pos -> Model -> Model
+setAliveAtAndIncrementNeighbours width height pos_ =
     let
         setAliveHelp : Maybe CellData -> CellData
         setAliveHelp =
             Maybe.map
                 (\( _, anc ) -> ( Alive, anc ))
                 >> Maybe.withDefault ( Alive, 0 )
+
+        pos : Pos
+        pos =
+            modPos width height pos_
     in
     Dict.update pos (setAliveHelp >> Just)
-        >> incNeighboursANC pos
+        >> incNeighboursANC width height pos
 
 
 neighbourOffsets : List ( Int, Int )
@@ -45,26 +49,25 @@ neighbourOffsets =
         ++ [ ( 1, -1 ), ( 1, 0 ), ( 1, 1 ) ]
 
 
-addPos ( x, y ) ( x2, y2 ) =
-    ( x + x2, y + y2 )
+modPos : Int -> Int -> Pos -> Pos
+modPos width height ( x, y ) =
+    ( modBy width x, modBy height y )
 
 
-modPos =
-    identity
-
-
-incNeighboursANC : Pos -> Model -> Model
-incNeighboursANC pos model =
+incNeighboursANC : Int -> Int -> Pos -> Model -> Model
+incNeighboursANC width height ( x, y ) model =
     let
         incHelp : Maybe CellData -> CellData
         incHelp =
             Maybe.map
                 (\( cell, anc ) -> ( cell, anc + 1 ))
                 >> Maybe.withDefault ( Dead, 1 )
+
+        translateOffset ( dx, dy ) =
+            modPos width height ( x + dx, y + dy )
     in
     List.foldl
-        (addPos pos
-            >> modPos
+        (translateOffset
             >> (\nPos ->
                     Dict.update nPos (incHelp >> Just)
                )

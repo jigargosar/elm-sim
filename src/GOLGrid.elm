@@ -123,7 +123,7 @@ dataGeneratorFromAlivePosList gc =
                         Just ( _, ct ) ->
                             Just ( Alive, ct )
                 )
-                >> incAnc pos
+                >> incAnc gc pos
     in
     List.foldl setCellAlive Dict.empty
 

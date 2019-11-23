@@ -21,7 +21,10 @@ import TypedSvg.Types as ST
 
 type Cell
     = Alive
-    | Dead
+
+
+aliveState =
+    Just Alive
 
 
 neighbourOffsets : List ( Int, Int )
@@ -33,30 +36,30 @@ neighbourOffsets =
 
 {-| <https://www.conwaylife.com/wiki/Conway's_Game_of_Life>
 -}
-nextCellStateWithAliveNeighbourCount : Int -> Cell -> Cell
+nextCellStateWithAliveNeighbourCount : Int -> Maybe Cell -> Maybe Cell
 nextCellStateWithAliveNeighbourCount aliveNeighbourCount cell =
     case cell of
-        Alive ->
+        Just Alive ->
             {- Any live cell with fewer than two live neighbours dies
                 (referred to as underpopulation or exposure[1]).
                Any live cell with more than three live neighbours dies
                 (referred to as overpopulation or overcrowding).
             -}
             if aliveNeighbourCount < 2 || aliveNeighbourCount > 3 then
-                Dead
+                Nothing
 
             else
                 {- Any live cell with two or three live neighbours lives,
                    unchanged, to the next generation.
                 -}
-                Alive
+                aliveState
 
-        Dead ->
+        Nothing ->
             if aliveNeighbourCount == 3 then
-                Alive
+                aliveState
 
             else
-                Dead
+                Nothing
 
 
 
@@ -102,7 +105,7 @@ randomGridGeneratorFromGrid grid =
     let
         randomCellGenerator : Generator (Maybe Cell)
         randomCellGenerator =
-            Random.weighted ( 10, Just Alive ) [ ( 90, Nothing ) ]
+            Random.weighted ( 10, aliveState ) [ ( 90, Nothing ) ]
 
         randomCellListGenerator : Generator (List (Maybe Cell))
         randomCellListGenerator =
@@ -131,7 +134,7 @@ nextGridState grid =
         reducer ( x, y ) =
             let
                 prevCell =
-                    getPrevCellAt ( x, y ) |> Maybe.withDefault Dead
+                    getPrevCellAt ( x, y )
 
                 anc =
                     neighbourOffsets
@@ -151,10 +154,10 @@ nextGridState grid =
             in
             if prevCell /= nextCell then
                 case nextCell of
-                    Alive ->
-                        Dict.insert ( x, y ) nextCell
+                    Just Alive ->
+                        Dict.insert ( x, y ) Alive
 
-                    Dead ->
+                    Nothing ->
                         Dict.remove ( x, y )
 
             else
@@ -299,13 +302,13 @@ viewGrid grid =
                             cellWidthInPx
                             x
                             y
-                            (Dict.get ( x, y ) grid.data |> Maybe.withDefault Dead)
+                            (Dict.get ( x, y ) grid.data)
                     )
             )
         ]
 
 
-viewCell : Float -> Int -> Int -> Cell -> Svg Msg
+viewCell : Float -> Int -> Int -> Maybe Cell -> Svg Msg
 viewCell cellWidthInPx gridX gridY cell =
     let
         x =
@@ -315,7 +318,7 @@ viewCell cellWidthInPx gridX gridY cell =
             toFloat gridY * cellWidthInPx + 1
     in
     S.rect
-        [ (if cell == Dead then
+        [ (if cell == Nothing then
             Color.lightYellow
 
            else

@@ -24,32 +24,11 @@ type Cell
     | Dead
 
 
-nextCellState : Int -> Int -> (Int -> Int -> Maybe Cell) -> Cell -> Cell
-nextCellState i j cellAt =
-    getAliveNeighbourCount i j cellAt
-        |> nextCellStateWithAliveNeighbourCount
-
-
 neighbourOffsets : List ( Int, Int )
 neighbourOffsets =
     [ ( -1, -1 ), ( -1, 0 ), ( -1, 1 ) ]
         ++ [ ( 0, -1 ), {- ignore self (0,0) , -} ( 0, 1 ) ]
         ++ [ ( 1, -1 ), ( 1, 0 ), ( 1, 1 ) ]
-
-
-getAliveNeighbourCount : Int -> Int -> (Int -> Int -> Maybe Cell) -> Int
-getAliveNeighbourCount i j cellAt =
-    neighbourOffsets
-        |> List.foldl
-            (\( di, dj ) ct ->
-                case cellAt (i + di) (j + dj) of
-                    Just Alive ->
-                        ct + 1
-
-                    _ ->
-                        ct
-            )
-            0
 
 
 {-| <https://www.conwaylife.com/wiki/Conway's_Game_of_Life>

@@ -34,6 +34,7 @@ type alias Model =
     { grid : Grid
     , gridHistory : List Grid
     , seed : Seed
+    , delta : Float
     }
 
 
@@ -48,6 +49,7 @@ init { now } =
             { grid = GOLGrid.initDead gridLen gridLen
             , gridHistory = []
             , seed = Random.initialSeed now
+            , delta = 0
             }
     in
     ( randomizeGrid model
@@ -76,14 +78,14 @@ randomStep generator model =
 
 
 type Msg
-    = Tick Posix
+    = Tick Float
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update message model =
     case message of
-        Tick _ ->
-            ( updateGridState model
+        Tick delta ->
+            ( updateGridState delta model
             , Cmd.none
             )
 
@@ -95,11 +97,29 @@ randomizeGrid model =
         |> setGridFromTuple
 
 
-updateGridState : Model -> Model
-updateGridState model =
-    mapGrid GOLGrid.nextState model
-        |> pushGridHistory model.grid
-        |> randomizeGridIfFoundInHistory
+updateGridState : Float -> Model -> Model
+updateGridState delta model =
+    let
+        accDelta =
+            model.delta + delta
+
+        interval =
+            1000 / 0.1
+    in
+    if accDelta > interval then
+        model
+            |> setDelta (accDelta - interval)
+            |> mapGrid GOLGrid.nextState
+            |> pushGridHistory model.grid
+            |> randomizeGridIfFoundInHistory
+
+    else
+        model
+            |> setDelta accDelta
+
+
+setDelta delta model =
+    { model | delta = delta }
 
 
 pushGridHistory grid model =
@@ -201,7 +221,7 @@ viewCell cellWidthInPx gridX gridY ( cell, anc ) =
 main =
     Browser.element
         { init = init
-        , subscriptions = \_ -> Browser.Events.onAnimationFrame Tick
+        , subscriptions = \_ -> Browser.Events.onAnimationFrameDelta Tick
         , update = update
         , view = view
         }

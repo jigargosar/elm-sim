@@ -91,13 +91,13 @@ randomDataGenerator gc =
         { l, cords } =
             gc
 
-        maybeAlivePosGen : Generator (Maybe Cell)
-        maybeAlivePosGen =
+        maybeCellGen : Generator (Maybe Cell)
+        maybeCellGen =
             Random.weighted ( 10, Just Alive ) [ ( 90, Nothing ) ]
 
         posCellListGenerator : Generator (List Pos)
         posCellListGenerator =
-            Random.list l maybeAlivePosGen
+            Random.list l maybeCellGen
                 |> Random.map
                     (List.map2 (\pos -> Maybe.map (always pos)) cords
                         >> List.filterMap identity

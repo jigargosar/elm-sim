@@ -172,22 +172,21 @@ viewGrid grid =
                 |> List.map
                     (\( x, y ) ->
                         let
-                            ( cell, anc ) =
-                                Dict.get ( x, y ) grid.data |> Maybe.withDefault ( GOLGrid.Dead, 0 )
+                            cell =
+                                Dict.get ( x, y ) grid.data |> Maybe.map Tuple.first
                         in
-                        SL.lazy5 viewCell
+                        SL.lazy4 viewCell
                             cellWidthInPx
                             x
                             y
                             cell
-                            anc
                     )
             )
         ]
 
 
-viewCell : Float -> Int -> Int -> GOLGrid.Cell -> Int -> Svg Msg
-viewCell cellWidthInPx gridX gridY cell anc =
+viewCell : Float -> Int -> Int -> Maybe GOLGrid.Cell -> Svg Msg
+viewCell cellWidthInPx gridX gridY cell =
     let
         x =
             toFloat gridX * cellWidthInPx + 1
@@ -197,7 +196,7 @@ viewCell cellWidthInPx gridX gridY cell anc =
     in
     S.g []
         [ S.rect
-            [ (if cell == GOLGrid.Alive then
+            [ (if cell == Just GOLGrid.Alive then
                 Color.lightRed
 
                else

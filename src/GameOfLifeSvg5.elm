@@ -41,7 +41,7 @@ init : Flags -> ( Model, Cmd Msg )
 init { now } =
     let
         gridLen =
-            60
+            10
 
         model : Model
         model =
@@ -188,9 +188,9 @@ viewCell cellWidthInPx gridX gridY ( cell, anc ) =
             []
         , S.text_
             [ SA.x (ST.px x)
-            , SA.y (ST.px <| y + 5)
+            , SA.y (ST.px <| y + 15)
             ]
-            [ SC.text "1" ]
+            [ SC.text <| String.fromInt anc ]
         ]
 
 

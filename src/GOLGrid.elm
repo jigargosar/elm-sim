@@ -153,6 +153,7 @@ incAnc gc pos data =
             data
 
 
+decAncHelp : Pos -> Data -> Data
 decAncHelp nPos d =
     case Dict.get nPos d of
         Nothing ->

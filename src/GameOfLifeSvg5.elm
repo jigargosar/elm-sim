@@ -92,23 +92,28 @@ randomizeGrid model =
 
 updateGridState : Float -> Model -> Model
 updateGridState delta model =
-    let
-        accDelta =
-            model.delta + delta
+    {-
+       let
+           accDelta =
+               model.delta + delta
 
-        interval =
-            1000 / 60
-    in
-    if accDelta > interval then
-        model
-            |> setDelta (accDelta - interval)
-            |> mapGrid GOLGrid.nextState
-            |> pushGridHistory model.grid
-            |> randomizeGridIfFoundInHistory
+           interval =
+               1000 / 60
+       in
+       if accDelta > interval then
+    -}
+    model
+        --|> setDelta (accDelta - interval)
+        |> mapGrid GOLGrid.nextState
+        |> pushGridHistory model.grid
+        |> randomizeGridIfFoundInHistory
 
-    else
-        model
-            |> setDelta accDelta
+
+
+{- else
+   model
+       |> setDelta accDelta
+-}
 
 
 setDelta delta model =

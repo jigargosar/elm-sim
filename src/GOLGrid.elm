@@ -39,6 +39,7 @@ type alias Data =
 type alias Grid =
     { w : Int
     , h : Int
+    , l : Int
     , data : Data
     , cords : List Pos
     }
@@ -48,6 +49,7 @@ initDead : Int -> Int -> Grid
 initDead w h =
     { w = w
     , h = h
+    , l = w * h
     , data = Dict.empty
     , cords = toCords w h
     }
@@ -80,21 +82,57 @@ randomDataGenerator gc =
         { l, cords } =
             gc
 
-        maybePosCellGen : Pos -> Generator (Maybe ( Pos, Cell ))
-        maybePosCellGen pos =
+        maybeAlivePosGen : Pos -> Generator (Maybe Pos)
+        maybeAlivePosGen pos =
             Random.weighted ( 20, Just Alive ) [ ( 80, Nothing ) ]
-                |> Random.map (Maybe.map (Tuple.pair pos))
+                |> Random.map (Maybe.map (always pos))
 
-        posCellListGenerator : Generator (List ( Pos, Cell ))
+        posCellListGenerator : Generator (List Pos)
         posCellListGenerator =
             cords
-                |> List.map maybePosCellGen
+                |> List.map maybeAlivePosGen
                 |> Random.Extra.combine
                 |> Random.map (List.filterMap identity)
     in
-    posCellListGenerator |> Random.map (dataGeneratorFromPosCellList gc)
+    posCellListGenerator |> Random.map (dataGeneratorFromAlivePosList gc)
 
 
-dataGeneratorFromPosCellList : HasGridConfig xx -> List ( Pos, Cell ) -> Data
-dataGeneratorFromPosCellList gc =
-    always Dict.empty
+neighbourOffsets : List ( Int, Int )
+neighbourOffsets =
+    [ ( -1, -1 ), ( -1, 0 ), ( -1, 1 ) ]
+        ++ [ ( 0, -1 ), {- ignore self (0,0) , -} ( 0, 1 ) ]
+        ++ [ ( 1, -1 ), ( 1, 0 ), ( 1, 1 ) ]
+
+
+getValidNeighbourCords : HasWH xx -> Pos -> List Pos
+getValidNeighbourCords hasWH pos =
+    neighbourOffsets |> List.map (addPos pos >> modPos hasWH)
+
+
+dataGeneratorFromAlivePosList : HasGridConfig xx -> List Pos -> Data
+dataGeneratorFromAlivePosList gc =
+    let
+        incAnc : Pos -> Data -> Data
+        incAnc pos data =
+            getValidNeighbourCords gc pos
+                |> List.foldl
+                    (\nPos ->
+                        Dict.update nPos
+                            (Maybe.withDefault ( Dead, 0 ) >> Tuple.mapSecond ((+) 1) >> Just)
+                    )
+                    data
+
+        setCellAlive : Pos -> Data -> Data
+        setCellAlive pos =
+            Dict.update pos
+                (\maybeCellData ->
+                    case maybeCellData of
+                        Nothing ->
+                            Just ( Alive, 0 )
+
+                        Just ( _, ct ) ->
+                            Just ( Alive, ct )
+                )
+                >> incAnc pos
+    in
+    List.foldl setCellAlive Dict.empty

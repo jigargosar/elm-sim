@@ -21,8 +21,8 @@ type alias Model =
 
 
 fromAlivePositions : List ( Int, Int ) -> Model
-fromAlivePositions alivePositions =
-    Debug.todo "impl"
+fromAlivePositions =
+    List.foldl setAliveAtAndIncrementNeighbours Dict.empty
 
 
 setAliveAtAndIncrementNeighbours : Pos -> Model -> Model
@@ -35,7 +35,7 @@ setAliveAtAndIncrementNeighbours pos =
                 >> Maybe.withDefault ( Alive, 0 )
     in
     Dict.update pos (setAliveHelp >> Just)
-        >> incANC pos
+        >> incNeighboursANC pos
 
 
 neighbourOffsets : List ( Int, Int )

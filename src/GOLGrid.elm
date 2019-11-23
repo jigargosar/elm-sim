@@ -142,9 +142,13 @@ incAnc : HasWH xx -> Pos -> Data -> Data
 incAnc gc pos data =
     getValidNeighbourCords gc pos
         |> List.foldl
-            (\nPos ->
-                Dict.update nPos
-                    (Maybe.withDefault ( Dead, 0 ) >> Tuple.mapSecond ((+) 1) >> Just)
+            (\nPos d ->
+                case Dict.get nPos d of
+                    Nothing ->
+                        Dict.insert nPos ( Dead, 1 ) d
+
+                    Just ( c, ct ) ->
+                        Dict.insert nPos ( c, ct + 1 ) d
             )
             data
 

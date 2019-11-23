@@ -214,19 +214,28 @@ nextState grid =
 
                         Just prevCellData ->
                             let
+                                ( prevCell, _ ) =
+                                    prevCellData
+
                                 nextCellData =
                                     getNextCellData prevCellData
 
-                                nextCell =
-                                    Tuple.first nextCellData
+                                ( nextCell, _ ) =
+                                    nextCellData
                             in
-                            if prevCellData == nextCellData then
+                            if prevCell == nextCell then
                                 identity
 
                             else
                                 Dict.update pos
-                                    (Maybe.map (Tuple.mapFirst (always nextCell))
-                                        >> Maybe.withDefault ( nextCell, 0 )
+                                    ((\maybe ->
+                                        case maybe of
+                                            Nothing ->
+                                                ( nextCell, 0 )
+
+                                            Just ( _, ct ) ->
+                                                ( nextCell, ct )
+                                     )
                                         >> Just
                                     )
                                     >> (case nextCell of

@@ -74,7 +74,12 @@ toCords w h =
         heightRange =
             List.range 0 (h - 1)
     in
-    List.concatMap (\y -> List.map (\x -> ( x, y )) widthRange) heightRange
+    heightRange
+        |> List.concatMap
+            (\y ->
+                widthRange |> List.map (\x -> ( x, y ))
+            )
+        |> Debug.log "cords"
 
 
 type alias HasGridConfig xx =
@@ -156,9 +161,9 @@ decAnc gc pos data =
                                 -- Debug.todo "invalid state"
                                 Nothing
 
-                            Just ( Dead, 1 ) ->
-                                Nothing
-
+                            {- Just ( Dead, 1 ) ->
+                               Nothing
+                            -}
                             Just ( c, ct ) ->
                                 if ct <= 0 then
                                     -- Debug.todo "invalid state"

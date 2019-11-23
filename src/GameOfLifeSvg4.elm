@@ -295,8 +295,9 @@ viewGrid grid =
     in
     S.svg [ SA.viewBox 0 0 w h, HA.width w, HA.height h ]
         [ S.g
-            [ SA.stroke Color.black
-            , SA.strokeWidth (ST.px 1)
+            [{- SA.stroke Color.black
+                , SA.strokeWidth (ST.px 1)
+             -}
             ]
             (grid.cords
                 |> List.map

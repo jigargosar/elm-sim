@@ -79,7 +79,6 @@ toCords w h =
             (\y ->
                 widthRange |> List.map (\x -> ( x, y ))
             )
-        |> Debug.log "cords"
 
 
 type alias HasGridConfig xx =

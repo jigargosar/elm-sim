@@ -345,7 +345,11 @@ viewCell cellWidthInPx gridX gridY cell =
 main =
     Browser.element
         { init = init
-        , subscriptions = \_ -> Browser.Events.onAnimationFrame Tick
+        , subscriptions = subscriptions
         , update = update
         , view = view
         }
+
+
+subscriptions _ =
+    Browser.Events.onAnimationFrame Tick

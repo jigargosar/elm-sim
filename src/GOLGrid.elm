@@ -137,3 +137,88 @@ incAnc gc pos data =
                     (Maybe.withDefault ( Dead, 0 ) >> Tuple.mapSecond ((+) 1) >> Just)
             )
             data
+
+
+decAnc : HasWH xx -> Pos -> Data -> Data
+decAnc gc pos data =
+    getValidNeighbourCords gc pos
+        |> List.foldl
+            (\nPos ->
+                Dict.update nPos
+                    (\maybeCellData ->
+                        case maybeCellData of
+                            Nothing ->
+                                Debug.todo "invalid state"
+
+                            Just ( Dead, 1 ) ->
+                                Nothing
+
+                            Just ( c, ct ) ->
+                                if ct <= 0 then
+                                    Debug.todo "invalid state"
+
+                                else
+                                    Just ( c, ct - 1 )
+                    )
+            )
+            data
+
+
+getNextCellData : CellData -> CellData
+getNextCellData cellData =
+    let
+        ( cell, anc ) =
+            cellData
+    in
+    case cell of
+        Alive ->
+            if anc < 2 || anc > 3 then
+                ( Dead, anc )
+
+            else
+                cellData
+
+        Dead ->
+            if anc === 3 then
+                ( Alive, anc )
+
+            else
+                cellData
+
+
+nextState : Grid -> Grid
+nextState grid =
+    let
+        getPrevCellData : Pos -> Maybe CellData
+        getPrevCellData pos =
+            Dict.get pos grid.data
+
+        nextData =
+            List.foldl
+                (\pos ->
+                    case getPrevCellData pos of
+                        Nothing ->
+                            identity
+
+                        Just prevCellData ->
+                            let
+                                nextCellData =
+                                    getNextCellData prevCellData
+                            in
+                            if prevCellData == nextCellData then
+                                identity
+
+                            else
+                                Dict.insert pos nextCellData
+                                    >> (case Tuple.first nextCellData of
+                                            Alive ->
+                                                incAnc grid pos
+
+                                            Dead ->
+                                                decAnc grid pos
+                                       )
+                )
+                grid.data
+                grid.cords
+    in
+    { grid | data = nextData }

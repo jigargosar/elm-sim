@@ -99,16 +99,7 @@ randomDataGenerator gc =
         posCellListGenerator =
             Random.list l maybeAlivePosGen
                 |> Random.map
-                    (List.map2
-                        (\pos maybeCell ->
-                            case maybeCell of
-                                Nothing ->
-                                    Nothing
-
-                                Just _ ->
-                                    Just pos
-                        )
-                        cords
+                    (List.map2 (\pos -> Maybe.map (always pos)) cords
                         >> List.filterMap identity
                     )
     in

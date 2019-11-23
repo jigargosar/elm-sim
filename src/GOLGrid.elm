@@ -198,15 +198,6 @@ getNextCellData cellData =
                 cellData
 
 
-
-{-
-   nextState : Model -> Model
-   nextState grid =
-       grid
-
--}
-
-
 nextState : Model -> Model
 nextState grid =
     let

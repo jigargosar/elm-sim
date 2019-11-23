@@ -1,4 +1,4 @@
-module GOLGrid exposing (Grid, initDead, nextState, randomize)
+module GOLGrid exposing (Cell, Model, initDead, nextState, randomize, width)
 
 import Dict exposing (Dict)
 import Random exposing (Generator)
@@ -36,7 +36,7 @@ type alias Data =
     Dict Pos CellData
 
 
-type alias Grid =
+type alias Model =
     { w : Int
     , h : Int
     , l : Int
@@ -45,7 +45,12 @@ type alias Grid =
     }
 
 
-initDead : Int -> Int -> Grid
+width : Model -> Int
+width =
+    .w
+
+
+initDead : Int -> Int -> Model
 initDead w h =
     { w = w
     , h = h
@@ -55,7 +60,7 @@ initDead w h =
     }
 
 
-randomize : Grid -> Generator Grid
+randomize : Model -> Generator Model
 randomize grid =
     randomDataGenerator grid |> Random.map (\data -> { grid | data = data })
 
@@ -179,14 +184,14 @@ getNextCellData cellData =
                 cellData
 
         Dead ->
-            if anc === 3 then
+            if anc == 3 then
                 ( Alive, anc )
 
             else
                 cellData
 
 
-nextState : Grid -> Grid
+nextState : Model -> Model
 nextState grid =
     let
         getPrevCellData : Pos -> Maybe CellData

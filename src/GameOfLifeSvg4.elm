@@ -1,9 +1,9 @@
 module GameOfLifeSvg4 exposing (main)
 
-import Array exposing (Array)
 import Browser
 import Browser.Events
 import Color
+import Dict exposing (Dict)
 import Html exposing (Html)
 import Html.Attributes as HA
 import Random exposing (Generator, Seed)
@@ -84,28 +84,61 @@ nextCellStateWithAliveNeighbourCount aliveNeighbourCount cell =
 -- GRID
 
 
+type alias Pos =
+    ( Int, Int )
+
+
 type alias Grid =
     { width : Int
     , height : Int
-    , data : Array Cell
+    , length : Int
+    , cords : List Pos
+    , data : Dict Pos Cell
     }
+
+
+toCords : Int -> Int -> List Pos
+toCords w h =
+    let
+        widthRange =
+            List.range 0 (w - 1)
+
+        heightRange =
+            List.range 0 (h - 1)
+    in
+    List.concatMap (\y -> List.map (\x -> ( x, y )) widthRange) heightRange
 
 
 initialGrid : Int -> Int -> Grid
 initialGrid width height =
-    Array.repeat (width * height) Dead
-        |> Grid width height
-
-
-randomGridGenerator : Int -> Int -> Generator Grid
-randomGridGenerator width height =
-    Random.list (width * height) (Random.weighted ( 20, Alive ) [ ( 80, Dead ) ])
-        |> Random.map (Array.fromList >> Grid width height)
+    let
+        length =
+            width * height
+    in
+    Grid width height length (toCords width height) Dict.empty
 
 
 randomGridGeneratorFromGrid : Grid -> Generator Grid
 randomGridGeneratorFromGrid grid =
-    randomGridGenerator grid.width grid.height
+    let
+        randomCellGenerator : Generator Cell
+        randomCellGenerator =
+            Random.weighted ( 20, Alive ) [ ( 80, Dead ) ]
+
+        randomCellListGenerator : Generator (List Cell)
+        randomCellListGenerator =
+            Random.list grid.length randomCellGenerator
+
+        dataGenerator : Generator (Dict Pos Cell)
+        dataGenerator =
+            randomCellListGenerator
+                |> Random.map
+                    (\cellList ->
+                        List.map2 Tuple.pair grid.cords cellList
+                            |> Dict.fromList
+                    )
+    in
+    dataGenerator |> Random.map (\data -> { grid | data = data })
 
 
 gridIndexToXY : Int -> Grid -> ( Int, Int )
@@ -125,31 +158,50 @@ gridIndexFromXY x y grid =
     modBy grid.width x + modBy grid.height y * grid.height
 
 
-getGridCellAt : Int -> Int -> Grid -> Maybe Cell
-getGridCellAt x y grid =
-    let
-        i =
-            gridIndexFromXY x y grid
-    in
-    Array.get i grid.data
+
+--getGridCellAt : Int -> Int -> Grid -> Maybe Cell
+--getGridCellAt x y grid =
+--    let
+--        i =
+--            gridIndexFromXY x y grid
+--    in
+--    Array.get i grid.data
 
 
 nextGridState : Grid -> Grid
 nextGridState grid =
     let
-        cellAt x y =
-            getGridCellAt x y grid
-    in
-    Array.indexedMap
-        (\i ->
+        getPrevCellAt pos =
+            Dict.get pos grid.data
+
+        reducer : Pos -> Dict Pos Cell -> Dict Pos Cell
+        reducer ( x, y ) =
             let
-                ( x, y ) =
-                    gridIndexToXY i grid
+                prevCell =
+                    getPrevCellAt ( x, y ) |> Maybe.withDefault Dead
+
+                anc =
+                    neighbourOffsets
+                        |> List.foldl
+                            (\( dx, dy ) ct ->
+                                case getPrevCellAt ( x + dx, y + dy ) of
+                                    Just Alive ->
+                                        ct + 1
+
+                                    _ ->
+                                        ct
+                            )
+                            0
+
+                nextCell =
+                    nextCellStateWithAliveNeighbourCount anc prevCell
             in
-            nextCellState x y cellAt
-        )
-        grid.data
-        |> Grid grid.width grid.height
+            Dict.insert ( x, y ) nextCell
+
+        nextData =
+            List.foldl reducer grid.data grid.cords
+    in
+    { grid | data = nextData }
 
 
 
@@ -279,15 +331,11 @@ viewGrid grid =
             , SA.strokeWidth (ST.px 1)
             ]
             (grid.data
-                |> Array.indexedMap
-                    (\i cell ->
-                        let
-                            ( x, y ) =
-                                gridIndexToXY i grid
-                        in
+                |> Dict.toList
+                |> List.map
+                    (\( ( x, y ), cell ) ->
                         SL.lazy4 viewCell cellWidthInPx x y cell
                     )
-                |> Array.toList
             )
         ]
 

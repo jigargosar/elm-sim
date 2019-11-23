@@ -222,37 +222,40 @@ nextState grid =
                             identity
 
                         Just prevCellData ->
-                            let
-                                ( prevCell, _ ) =
-                                    prevCellData
-
-                                nextCellData =
-                                    getNextCellData prevCellData
-
-                                ( nextCell, _ ) =
-                                    nextCellData
-                            in
-                            if prevCell == nextCell then
-                                identity
-
-                            else
-                                (\d ->
-                                    case Dict.get pos d of
-                                        Nothing ->
-                                            Dict.insert pos ( nextCell, 0 ) d
-
-                                        Just ( _, ct ) ->
-                                            Dict.insert pos ( nextCell, ct ) d
-                                )
-                                    >> (case nextCell of
-                                            Alive ->
-                                                incAnc grid pos
-
-                                            Dead ->
-                                                decAnc grid pos
-                                       )
+                            updateCell grid pos prevCellData
                 )
                 grid.data
                 grid.cords
     in
     { grid | data = nextData }
+
+
+updateCell grid pos prevCellData data =
+    let
+        ( prevCell, _ ) =
+            prevCellData
+
+        nextCellData =
+            getNextCellData prevCellData
+
+        ( nextCell, _ ) =
+            nextCellData
+    in
+    if prevCell == nextCell then
+        data
+
+    else
+        (case Dict.get pos data of
+            Nothing ->
+                Dict.insert pos ( nextCell, 0 ) data
+
+            Just ( _, ct ) ->
+                Dict.insert pos ( nextCell, ct ) data
+        )
+            |> (case nextCell of
+                    Alive ->
+                        incAnc grid pos
+
+                    Dead ->
+                        decAnc grid pos
+               )

@@ -100,10 +100,20 @@ randomDataGenerator gc =
         posCellListGenerator =
             cords
                 |> List.map maybeAlivePosGen
-                |> Random.Extra.combine
+                |> combine
                 |> Random.map (List.filterMap identity)
     in
     posCellListGenerator |> Random.map (dataGeneratorFromAlivePosList gc)
+
+
+combine : List (Generator a) -> Generator (List a)
+combine =
+    List.foldl
+        (\gen ->
+            Random.andThen
+                (\list -> Random.map (\item -> item :: list) gen)
+        )
+        (Random.constant [])
 
 
 neighbourOffsets : List ( Int, Int )

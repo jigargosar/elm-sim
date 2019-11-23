@@ -9,17 +9,10 @@ import Html exposing (Html)
 import Html.Attributes as HA
 import Random exposing (Generator, Seed)
 import Svg.Lazy as SL
-import Time exposing (Posix)
 import TypedSvg as S
 import TypedSvg.Attributes as SA
-import TypedSvg.Core as SC exposing (Svg)
+import TypedSvg.Core exposing (Svg)
 import TypedSvg.Types as ST
-
-
-
--- CELL
--- GRID
--- Model
 
 
 type alias Flags =

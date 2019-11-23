@@ -191,7 +191,7 @@ init : Flags -> ( Model, Cmd Msg )
 init { now } =
     let
         gridLen =
-            60
+            120
 
         model : Model
         model =

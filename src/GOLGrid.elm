@@ -236,17 +236,14 @@ nextState grid =
                                 identity
 
                             else
-                                Dict.update pos
-                                    ((\maybe ->
-                                        case maybe of
-                                            Nothing ->
-                                                ( nextCell, 0 )
+                                (\d ->
+                                    case Dict.get pos d of
+                                        Nothing ->
+                                            Dict.insert pos ( nextCell, 0 ) d
 
-                                            Just ( _, ct ) ->
-                                                ( nextCell, ct )
-                                     )
-                                        >> Just
-                                    )
+                                        Just ( _, ct ) ->
+                                            Dict.insert pos ( nextCell, ct ) d
+                                )
                                     >> (case nextCell of
                                             Alive ->
                                                 incAnc grid pos

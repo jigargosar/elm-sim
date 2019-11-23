@@ -112,16 +112,6 @@ getValidNeighbourCords hasWH pos =
 dataGeneratorFromAlivePosList : HasGridConfig xx -> List Pos -> Data
 dataGeneratorFromAlivePosList gc =
     let
-        incAnc : Pos -> Data -> Data
-        incAnc pos data =
-            getValidNeighbourCords gc pos
-                |> List.foldl
-                    (\nPos ->
-                        Dict.update nPos
-                            (Maybe.withDefault ( Dead, 0 ) >> Tuple.mapSecond ((+) 1) >> Just)
-                    )
-                    data
-
         setCellAlive : Pos -> Data -> Data
         setCellAlive pos =
             Dict.update pos
@@ -136,3 +126,14 @@ dataGeneratorFromAlivePosList gc =
                 >> incAnc pos
     in
     List.foldl setCellAlive Dict.empty
+
+
+incAnc : HasWH xx -> Pos -> Data -> Data
+incAnc gc pos data =
+    getValidNeighbourCords gc pos
+        |> List.foldl
+            (\nPos ->
+                Dict.update nPos
+                    (Maybe.withDefault ( Dead, 0 ) >> Tuple.mapSecond ((+) 1) >> Just)
+            )
+            data

@@ -102,7 +102,7 @@ randomGridGeneratorFromGrid grid =
     let
         randomCellGenerator : Generator (Maybe Cell)
         randomCellGenerator =
-            Random.weighted ( 20, Just Alive ) [ ( 80, Nothing ) ]
+            Random.weighted ( 10, Just Alive ) [ ( 90, Nothing ) ]
 
         randomCellListGenerator : Generator (List (Maybe Cell))
         randomCellListGenerator =
@@ -292,11 +292,14 @@ viewGrid grid =
             [ SA.stroke Color.black
             , SA.strokeWidth (ST.px 1)
             ]
-            (grid.data
-                |> Dict.toList
+            (grid.cords
                 |> List.map
-                    (\( ( x, y ), cell ) ->
-                        SL.lazy4 viewCell cellWidthInPx x y cell
+                    (\( x, y ) ->
+                        SL.lazy4 viewCell
+                            cellWidthInPx
+                            x
+                            y
+                            (Dict.get ( x, y ) grid.data |> Maybe.withDefault Dead)
                     )
             )
         ]

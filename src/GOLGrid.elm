@@ -157,25 +157,20 @@ decAnc : HasWH xx -> Pos -> Data -> Data
 decAnc gc pos data =
     getValidNeighbourCords gc pos
         |> List.foldl
-            (\nPos ->
-                Dict.update nPos
-                    (\maybeCellData ->
-                        case maybeCellData of
-                            Nothing ->
-                                Debug.todo "invalid state"
+            (\nPos d ->
+                case Dict.get nPos d of
+                    Nothing ->
+                        d
 
-                            -- Nothing
-                            Just ( Dead, 1 ) ->
-                                Nothing
+                    Just ( Dead, 1 ) ->
+                        Dict.remove nPos d
 
-                            Just ( c, ct ) ->
-                                if ct <= 0 then
-                                    Debug.todo "invalid state"
-                                    -- Just ( c, 0 )
+                    Just ( c, ct ) ->
+                        if ct <= 0 then
+                            d
 
-                                else
-                                    Just ( c, ct - 1 )
-                    )
+                        else
+                            Dict.insert nPos ( c, ct - 1 ) d
             )
             data
 

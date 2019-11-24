@@ -14,16 +14,11 @@ import TypedSvg.Attributes as SA
 import View
 
 
-
--- CELL
-
-
-neighbourOffsets : Set ( Int, Int )
+neighbourOffsets : List ( Int, Int )
 neighbourOffsets =
     [ ( -1, -1 ), ( -1, 0 ), ( -1, 1 ) ]
         ++ [ ( 0, -1 ), {- ignore self (0,0) , -} ( 0, 1 ) ]
         ++ [ ( 1, -1 ), ( 1, 0 ), ( 1, 1 ) ]
-        |> Set.fromList
 
 
 nextCellStateWithANC : Int -> Bool -> Bool
@@ -48,7 +43,7 @@ type alias Grid =
     , height : Int
     , length : Int
     , cords : List Pos
-    , neighboursCordsLookup : Dict Pos (Set Pos)
+    , neighboursCordsLookup : Dict Pos (List Pos)
     , data : Set Pos
     }
 
@@ -65,12 +60,12 @@ toCords w h =
     List.concatMap (\y -> List.map (\x -> ( x, y )) widthRange) heightRange
 
 
-cordsToNeighboursPosLookup : Int -> Int -> List Pos -> Dict Pos (Set Pos)
+cordsToNeighboursPosLookup : Int -> Int -> List Pos -> Dict Pos (List Pos)
 cordsToNeighboursPosLookup w h =
     let
         toNCord ( x, y ) =
             neighbourOffsets
-                |> Set.map (\( dx, dy ) -> ( x + dx |> modBy w, y + dy |> modBy h ))
+                |> List.map (\( dx, dy ) -> ( x + dx |> modBy w, y + dy |> modBy h ))
     in
     List.map (\pos -> ( pos, toNCord pos ))
         >> Dict.fromList
@@ -128,8 +123,16 @@ ancOfPos p grid =
             0
 
         Just neighbourPosList ->
-            Set.intersect neighbourPosList grid.data
-                |> Set.size
+            neighbourPosList
+                |> List.foldl
+                    (\np ct ->
+                        if Set.member np grid.data then
+                            ct + 1
+
+                        else
+                            ct
+                    )
+                    0
 
 
 nextGridState : Grid -> Grid

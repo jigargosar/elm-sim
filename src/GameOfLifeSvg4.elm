@@ -2,7 +2,6 @@ module GameOfLifeSvg4 exposing (main)
 
 import Browser
 import Browser.Events
-import Color
 import Dict exposing (Dict)
 import Html exposing (Html)
 import Html.Attributes as HA
@@ -12,7 +11,7 @@ import Time exposing (Posix)
 import TypedSvg as S
 import TypedSvg.Attributes as SA
 import TypedSvg.Core exposing (Svg)
-import TypedSvg.Types as ST
+import View
 
 
 
@@ -21,6 +20,11 @@ import TypedSvg.Types as ST
 
 type Cell
     = Alive
+
+
+isAlive : Maybe Cell -> Bool
+isAlive =
+    (/=) Nothing
 
 
 aliveState =
@@ -314,28 +318,7 @@ viewGrid grid =
 
 viewCell : Float -> Int -> Int -> Maybe Cell -> Svg Msg
 viewCell cellWidthInPx gridX gridY cell =
-    let
-        x =
-            toFloat gridX * cellWidthInPx + 1
-
-        y =
-            toFloat gridY * cellWidthInPx + 1
-    in
-    S.rect
-        [ (if cell == Nothing then
-            Color.lightYellow
-
-           else
-            Color.lightRed
-          )
-            |> ST.Fill
-            |> SA.fill
-        , SA.x (ST.px x)
-        , SA.y (ST.px y)
-        , SA.width (ST.px cellWidthInPx)
-        , SA.height (ST.px cellWidthInPx)
-        ]
-        []
+    View.cell cellWidthInPx gridX gridY (isAlive cell)
 
 
 

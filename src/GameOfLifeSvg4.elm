@@ -180,16 +180,16 @@ nextGridDataHelp grid p =
         nextCell =
             nextCellStateWithANC anc prevCell
     in
-    if prevCell /= nextCell then
+    if prevCell == nextCell then
+        identity
+
+    else
         case nextCell of
             Just Alive ->
                 Dict.insert p Alive
 
             Nothing ->
                 Dict.remove p
-
-    else
-        identity
 
 
 

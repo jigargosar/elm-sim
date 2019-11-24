@@ -143,8 +143,8 @@ randomGridGeneratorFromGrid grid =
     dataGenerator |> Random.map (\data -> { grid | data = data })
 
 
-getAnc : Pos -> Grid -> Int
-getAnc p grid =
+ancOfPos : Pos -> Grid -> Int
+ancOfPos p grid =
     case Dict.get p grid.nPosLookup of
         Nothing ->
             0
@@ -179,7 +179,7 @@ nextGridState grid =
                     getPrevCellAt p
 
                 anc =
-                    getAnc p grid
+                    ancOfPos p grid
 
                 nextCell =
                     nextCellStateWithANC anc prevCell

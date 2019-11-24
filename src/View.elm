@@ -5,7 +5,7 @@ import Svg exposing (Svg)
 import TypedSvg exposing (rect)
 import TypedSvg.Attributes exposing (fill)
 import TypedSvg.Attributes.InPx exposing (height, width, x, y)
-import TypedSvg.Types exposing (Fill, px)
+import TypedSvg.Types exposing (Fill)
 
 
 cell : Float -> Int -> Int -> Bool -> Svg msg

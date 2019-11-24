@@ -79,7 +79,7 @@ type alias Grid =
     , height : Int
     , length : Int
     , cords : List Pos
-    , nCords : Dict Pos (List Pos)
+    , nPosLookup : Dict Pos (List Pos)
     , data : Dict Pos Cell
     }
 
@@ -143,22 +143,24 @@ randomGridGeneratorFromGrid grid =
     dataGenerator |> Random.map (\data -> { grid | data = data })
 
 
-getAnc x y grid =
-    neighbourOffsets
-        |> List.foldl
-            (\( dx, dy ) ct ->
-                case
-                    Dict.get
-                        ( x + dx |> modBy grid.width, y + dy |> modBy grid.height )
-                        grid.data
-                of
-                    Just Alive ->
-                        ct + 1
-
-                    _ ->
-                        ct
-            )
+getAnc : Pos -> Grid -> Int
+getAnc p grid =
+    case Dict.get p grid.nPosLookup of
+        Nothing ->
             0
+
+        Just neighbourPosList ->
+            neighbourPosList
+                |> List.foldl
+                    (\np ct ->
+                        case Dict.get np grid.data of
+                            Just Alive ->
+                                ct + 1
+
+                            _ ->
+                                ct
+                    )
+                    0
 
 
 nextGridState : Grid -> Grid
@@ -168,13 +170,16 @@ nextGridState grid =
             Dict.get pos grid.data
 
         reducer : Pos -> Dict Pos Cell -> Dict Pos Cell
-        reducer ( x, y ) =
+        reducer p =
             let
+                ( x, y ) =
+                    p
+
                 prevCell =
-                    getPrevCellAt ( x, y )
+                    getPrevCellAt p
 
                 anc =
-                    getAnc x y grid
+                    getAnc p grid
 
                 nextCell =
                     nextCellStateWithANC anc prevCell

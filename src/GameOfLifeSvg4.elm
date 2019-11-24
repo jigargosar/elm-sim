@@ -165,11 +165,11 @@ ancOfPos p grid =
 
 nextGridState : Grid -> Grid
 nextGridState grid =
-    { grid | data = List.foldl (nextGridStateHelp grid) grid.data grid.cords }
+    { grid | data = List.foldl (nextGridDataHelp grid) grid.data grid.cords }
 
 
-nextGridStateHelp : Grid -> Pos -> Dict Pos Cell -> Dict Pos Cell
-nextGridStateHelp grid p =
+nextGridDataHelp : Grid -> Pos -> Dict Pos Cell -> Dict Pos Cell
+nextGridDataHelp grid p =
     let
         prevCell =
             Dict.get p grid.data

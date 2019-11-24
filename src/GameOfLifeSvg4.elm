@@ -40,8 +40,8 @@ neighbourOffsets =
 
 {-| <https://www.conwaylife.com/wiki/Conway's_Game_of_Life>
 -}
-nextCellStateWithAliveNeighbourCount : Int -> Maybe Cell -> Maybe Cell
-nextCellStateWithAliveNeighbourCount aliveNeighbourCount cell =
+nextCellStateWithANC : Int -> Maybe Cell -> Maybe Cell
+nextCellStateWithANC aliveNeighbourCount cell =
     case cell of
         Just Alive ->
             {- Any live cell with fewer than two live neighbours dies
@@ -128,6 +128,24 @@ randomGridGeneratorFromGrid grid =
     dataGenerator |> Random.map (\data -> { grid | data = data })
 
 
+getAnc x y grid =
+    neighbourOffsets
+        |> List.foldl
+            (\( dx, dy ) ct ->
+                case
+                    Dict.get
+                        ( x + dx |> modBy grid.width, y + dy |> modBy grid.height )
+                        grid.data
+                of
+                    Just Alive ->
+                        ct + 1
+
+                    _ ->
+                        ct
+            )
+            0
+
+
 nextGridState : Grid -> Grid
 nextGridState grid =
     let
@@ -141,23 +159,10 @@ nextGridState grid =
                     getPrevCellAt ( x, y )
 
                 anc =
-                    neighbourOffsets
-                        |> List.foldl
-                            (\( dx, dy ) ct ->
-                                case
-                                    getPrevCellAt
-                                        ( x + dx |> modBy grid.width, y + dy |> modBy grid.height )
-                                of
-                                    Just Alive ->
-                                        ct + 1
-
-                                    _ ->
-                                        ct
-                            )
-                            0
+                    getAnc x y grid
 
                 nextCell =
-                    nextCellStateWithAliveNeighbourCount anc prevCell
+                    nextCellStateWithANC anc prevCell
             in
             if prevCell /= nextCell then
                 case nextCell of

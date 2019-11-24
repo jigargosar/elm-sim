@@ -15,6 +15,14 @@ import TypedSvg.Core exposing (Svg)
 import TypedSvg.Types as ST
 
 
+
+{-
+   Uses GOLGrid Implementation which stores and
+   updates AliveNeighbourCount of neighbours
+   of a cell being toggled.
+-}
+
+
 type alias Flags =
     { now : Int }
 

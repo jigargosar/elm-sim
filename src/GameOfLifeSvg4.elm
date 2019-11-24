@@ -79,7 +79,7 @@ type alias Grid =
     , height : Int
     , length : Int
     , cords : List Pos
-    , nPosLookup : Dict Pos (List Pos)
+    , neighboursCordsLookup : Dict Pos (List Pos)
     , data : Dict Pos Cell
     }
 
@@ -145,7 +145,7 @@ randomGridGeneratorFromGrid grid =
 
 ancOfPos : Pos -> Grid -> Int
 ancOfPos p grid =
-    case Dict.get p grid.nPosLookup of
+    case Dict.get p grid.neighboursCordsLookup of
         Nothing ->
             0
 

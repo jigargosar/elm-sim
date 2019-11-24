@@ -165,40 +165,31 @@ ancOfPos p grid =
 
 nextGridState : Grid -> Grid
 nextGridState grid =
+    { grid | data = List.foldl (nextGridStateHelp grid) grid.data grid.cords }
+
+
+nextGridStateHelp : Grid -> Pos -> Dict Pos Cell -> Dict Pos Cell
+nextGridStateHelp grid p =
     let
-        getPrevCellAt pos =
-            Dict.get pos grid.data
+        prevCell =
+            Dict.get p grid.data
 
-        reducer : Pos -> Dict Pos Cell -> Dict Pos Cell
-        reducer p =
-            let
-                ( x, y ) =
-                    p
+        anc =
+            ancOfPos p grid
 
-                prevCell =
-                    getPrevCellAt p
-
-                anc =
-                    ancOfPos p grid
-
-                nextCell =
-                    nextCellStateWithANC anc prevCell
-            in
-            if prevCell /= nextCell then
-                case nextCell of
-                    Just Alive ->
-                        Dict.insert ( x, y ) Alive
-
-                    Nothing ->
-                        Dict.remove ( x, y )
-
-            else
-                identity
-
-        nextData =
-            List.foldl reducer grid.data grid.cords
+        nextCell =
+            nextCellStateWithANC anc prevCell
     in
-    { grid | data = nextData }
+    if prevCell /= nextCell then
+        case nextCell of
+            Just Alive ->
+                Dict.insert p Alive
+
+            Nothing ->
+                Dict.remove p
+
+    else
+        identity
 
 
 

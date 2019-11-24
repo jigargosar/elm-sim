@@ -96,8 +96,8 @@ toCords w h =
     List.concatMap (\y -> List.map (\x -> ( x, y )) widthRange) heightRange
 
 
-toNCords : Int -> Int -> List Pos -> Dict Pos (List Pos)
-toNCords w h =
+cordsToNeighboursPosLookup : Int -> Int -> List Pos -> Dict Pos (List Pos)
+cordsToNeighboursPosLookup w h =
     let
         toNCord ( x, y ) =
             neighbourOffsets
@@ -116,7 +116,7 @@ initialGrid width height =
         cords =
             toCords width height
     in
-    Grid width height length cords (toNCords width height cords) Dict.empty
+    Grid width height length cords (cordsToNeighboursPosLookup width height cords) Dict.empty
 
 
 randomGridGeneratorFromGrid : Grid -> Generator Grid

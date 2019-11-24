@@ -4,7 +4,7 @@ import Browser
 import Browser.Events
 import Color
 import Dict exposing (Dict)
-import GOLGrid
+import GameOfLifeSvg5Grid as Grid
 import Html exposing (Html)
 import Html.Attributes as HA
 import Random exposing (Generator, Seed)
@@ -17,7 +17,7 @@ import TypedSvg.Types as ST
 
 
 {-
-   Uses GOLGrid Implementation which stores and
+   Uses GameOfLifeSvg5Grid Implementation which stores and
    updates AliveNeighbourCount of neighbours
    of a cell being toggled.
 -}
@@ -28,7 +28,7 @@ type alias Flags =
 
 
 type alias Grid =
-    GOLGrid.Model
+    Grid.Model
 
 
 type alias Model =
@@ -47,7 +47,7 @@ init { now } =
 
         model : Model
         model =
-            { grid = GOLGrid.initDead gridLen gridLen
+            { grid = Grid.initDead gridLen gridLen
             , gridHistory = []
             , seed = Random.initialSeed now
             , delta = 0
@@ -94,7 +94,7 @@ update message model =
 randomizeGrid : Model -> Model
 randomizeGrid model =
     model
-        |> randomStep (GOLGrid.randomize model.grid)
+        |> randomStep (Grid.randomize model.grid)
         |> setGridFromTuple
 
 
@@ -112,7 +112,7 @@ updateGridState delta model =
     -}
     model
         --|> setDelta (accDelta - interval)
-        |> mapGrid GOLGrid.nextState
+        |> mapGrid Grid.nextState
         |> pushGridHistory model.grid
         |> randomizeGridIfFoundInHistory
 
@@ -167,7 +167,7 @@ viewGrid grid =
             w - 2
 
         cellWidthInPx =
-            toFloat gridWidthInPx / toFloat (GOLGrid.width grid)
+            toFloat gridWidthInPx / toFloat (Grid.width grid)
     in
     S.svg [ SA.viewBox 0 0 w h, HA.width w, HA.height h ]
         [ S.g
@@ -192,7 +192,7 @@ viewGrid grid =
         ]
 
 
-viewCell : Float -> Int -> Int -> Maybe GOLGrid.Cell -> Svg Msg
+viewCell : Float -> Int -> Int -> Maybe Grid.Cell -> Svg Msg
 viewCell cellWidthInPx gridX gridY cell =
     let
         x =
@@ -203,7 +203,7 @@ viewCell cellWidthInPx gridX gridY cell =
     in
     S.g []
         [ S.rect
-            [ (if cell == Just GOLGrid.Alive then
+            [ (if cell == Just Grid.Alive then
                 Color.lightRed
 
                else

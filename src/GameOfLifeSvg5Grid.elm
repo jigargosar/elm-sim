@@ -1,4 +1,4 @@
-module GOLGrid exposing (Cell(..), CellData, Model, initDead, nextState, randomize, width)
+module GameOfLifeSvg5Grid exposing (Cell(..), CellData, Model, initDead, nextState, randomize, width)
 
 import Dict exposing (Dict)
 import Random exposing (Generator)

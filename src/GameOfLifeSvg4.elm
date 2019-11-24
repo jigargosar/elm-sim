@@ -79,6 +79,7 @@ type alias Grid =
     , height : Int
     , length : Int
     , cords : List Pos
+    , nCords : Dict Pos (List Pos)
     , data : Dict Pos Cell
     }
 
@@ -95,13 +96,27 @@ toCords w h =
     List.concatMap (\y -> List.map (\x -> ( x, y )) widthRange) heightRange
 
 
+toNCords : Int -> Int -> List Pos -> Dict Pos (List Pos)
+toNCords w h =
+    let
+        toNCord ( x, y ) =
+            neighbourOffsets
+                |> List.map (\( dx, dy ) -> ( x + dx |> modBy w, y + dy |> modBy h ))
+    in
+    List.map (\pos -> ( pos, toNCord pos ))
+        >> Dict.fromList
+
+
 initialGrid : Int -> Int -> Grid
 initialGrid width height =
     let
         length =
             width * height
+
+        cords =
+            toCords width height
     in
-    Grid width height length (toCords width height) Dict.empty
+    Grid width height length cords (toNCords width height cords) Dict.empty
 
 
 randomGridGeneratorFromGrid : Grid -> Generator Grid

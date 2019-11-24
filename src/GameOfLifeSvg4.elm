@@ -6,11 +6,11 @@ import Dict exposing (Dict)
 import Html exposing (Html)
 import Html.Attributes as HA
 import Random exposing (Generator, Seed)
+import Set exposing (Set)
 import Svg.Lazy as SL
 import Time exposing (Posix)
 import TypedSvg as S
 import TypedSvg.Attributes as SA
-import TypedSvg.Core exposing (Svg)
 import View
 
 
@@ -18,52 +18,21 @@ import View
 -- CELL
 
 
-type Cell
-    = Alive
-
-
-isAlive : Maybe Cell -> Bool
-isAlive =
-    (/=) Nothing
-
-
-aliveState =
-    Just Alive
-
-
-neighbourOffsets : List ( Int, Int )
+neighbourOffsets : Set ( Int, Int )
 neighbourOffsets =
     [ ( -1, -1 ), ( -1, 0 ), ( -1, 1 ) ]
         ++ [ ( 0, -1 ), {- ignore self (0,0) , -} ( 0, 1 ) ]
         ++ [ ( 1, -1 ), ( 1, 0 ), ( 1, 1 ) ]
+        |> Set.fromList
 
 
-{-| <https://www.conwaylife.com/wiki/Conway's_Game_of_Life>
--}
-nextCellStateWithANC : Int -> Maybe Cell -> Maybe Cell
-nextCellStateWithANC aliveNeighbourCount cell =
-    case cell of
-        Just Alive ->
-            {- Any live cell with fewer than two live neighbours dies
-                (referred to as underpopulation or exposure[1]).
-               Any live cell with more than three live neighbours dies
-                (referred to as overpopulation or overcrowding).
-            -}
-            if aliveNeighbourCount < 2 || aliveNeighbourCount > 3 then
-                Nothing
+nextCellStateWithANC : Int -> Bool -> Bool
+nextCellStateWithANC anc cell =
+    if cell then
+        not (anc < 2 || anc > 3)
 
-            else
-                {- Any live cell with two or three live neighbours lives,
-                   unchanged, to the next generation.
-                -}
-                aliveState
-
-        Nothing ->
-            if aliveNeighbourCount == 3 then
-                aliveState
-
-            else
-                Nothing
+    else
+        anc == 3
 
 
 
@@ -79,8 +48,8 @@ type alias Grid =
     , height : Int
     , length : Int
     , cords : List Pos
-    , neighboursCordsLookup : Dict Pos (List Pos)
-    , data : Dict Pos Cell
+    , neighboursCordsLookup : Dict Pos (Set Pos)
+    , data : Set Pos
     }
 
 
@@ -96,12 +65,12 @@ toCords w h =
     List.concatMap (\y -> List.map (\x -> ( x, y )) widthRange) heightRange
 
 
-cordsToNeighboursPosLookup : Int -> Int -> List Pos -> Dict Pos (List Pos)
+cordsToNeighboursPosLookup : Int -> Int -> List Pos -> Dict Pos (Set Pos)
 cordsToNeighboursPosLookup w h =
     let
         toNCord ( x, y ) =
             neighbourOffsets
-                |> List.map (\( dx, dy ) -> ( x + dx |> modBy w, y + dy |> modBy h ))
+                |> Set.map (\( dx, dy ) -> ( x + dx |> modBy w, y + dy |> modBy h ))
     in
     List.map (\pos -> ( pos, toNCord pos ))
         >> Dict.fromList
@@ -116,28 +85,37 @@ initialGrid width height =
         cords =
             toCords width height
     in
-    Grid width height length cords (cordsToNeighboursPosLookup width height cords) Dict.empty
+    Grid width height length cords (cordsToNeighboursPosLookup width height cords) Set.empty
 
 
 randomGridGeneratorFromGrid : Grid -> Generator Grid
 randomGridGeneratorFromGrid grid =
     let
-        cellGen : Generator (Maybe Cell)
+        cellGen : Generator Bool
         cellGen =
-            Random.weighted ( 10, aliveState ) [ ( 90, Nothing ) ]
+            Random.weighted ( 10, True ) [ ( 90, False ) ]
 
-        cellListGen : Generator (List (Maybe Cell))
+        cellListGen : Generator (List Bool)
         cellListGen =
             Random.list grid.length cellGen
 
-        dataGenerator : Generator (Dict Pos Cell)
+        dataGenerator : Generator (Set Pos)
         dataGenerator =
             cellListGen
                 |> Random.map
                     (\cellList ->
-                        List.map2 (\cord -> Maybe.map (Tuple.pair cord)) grid.cords cellList
+                        List.map2
+                            (\cord aliveBool ->
+                                if aliveBool then
+                                    Just cord
+
+                                else
+                                    Nothing
+                            )
+                            grid.cords
+                            cellList
                             |> List.filterMap identity
-                            |> Dict.fromList
+                            |> Set.fromList
                     )
     in
     dataGenerator |> Random.map (\data -> { grid | data = data })
@@ -150,17 +128,8 @@ ancOfPos p grid =
             0
 
         Just neighbourPosList ->
-            neighbourPosList
-                |> List.foldl
-                    (\np ct ->
-                        case Dict.get np grid.data of
-                            Just Alive ->
-                                ct + 1
-
-                            _ ->
-                                ct
-                    )
-                    0
+            Set.intersect neighbourPosList grid.data
+                |> Set.size
 
 
 nextGridState : Grid -> Grid
@@ -168,28 +137,28 @@ nextGridState grid =
     { grid | data = List.foldl (nextGridDataHelp grid) grid.data grid.cords }
 
 
-nextGridDataHelp : Grid -> Pos -> Dict Pos Cell -> Dict Pos Cell
+nextGridDataHelp : Grid -> Pos -> Set Pos -> Set Pos
 nextGridDataHelp grid p =
     let
+        prevCell : Bool
         prevCell =
-            Dict.get p grid.data
+            Set.member p grid.data
 
         anc =
             ancOfPos p grid
 
+        nextCell : Bool
         nextCell =
             nextCellStateWithANC anc prevCell
     in
     if prevCell == nextCell then
         identity
 
-    else
-        case nextCell of
-            Just Alive ->
-                Dict.insert p Alive
+    else if nextCell then
+        Set.insert p
 
-            Nothing ->
-                Dict.remove p
+    else
+        Set.remove p
 
 
 
@@ -322,19 +291,14 @@ viewGrid grid =
             (grid.cords
                 |> List.map
                     (\( x, y ) ->
-                        SL.lazy4 viewCell
+                        SL.lazy4 View.cell
                             cellWidthInPx
                             x
                             y
-                            (Dict.get ( x, y ) grid.data)
+                            (Set.member ( x, y ) grid.data)
                     )
             )
         ]
-
-
-viewCell : Float -> Int -> Int -> Maybe Cell -> Svg Msg
-viewCell cellWidthInPx gridX gridY cell =
-    View.cell cellWidthInPx gridX gridY (isAlive cell)
 
 
 

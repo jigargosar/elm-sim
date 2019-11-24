@@ -128,7 +128,7 @@ ancOfPos ( x, y ) grid =
 
 nextGridState : Grid -> Grid
 nextGridState grid =
-    { grid | data = List.foldl (nextGridDataHelp grid) grid.data grid.cords }
+    { grid | data = List.foldl (\data -> nextGridDataHelp grid data) grid.data grid.cords }
 
 
 nextGridDataHelp : Grid -> Pos -> Set Pos -> Set Pos
@@ -277,20 +277,16 @@ viewGrid grid =
             toFloat gridWidthInPx / toFloat grid.width
     in
     S.svg [ SA.viewBox 0 0 w h, HA.width w, HA.height h ]
-        [ S.g
-            [{- SA.stroke Color.black
-                , SA.strokeWidth (ST.px 1)
-             -}
-            ]
-            (grid.cords
-                |> List.map
-                    (\(( x, y ) as p) ->
-                        SL.lazy4 View.cell
-                            cellWidthInPx
-                            x
-                            y
-                            (Set.member p grid.data)
-                    )
+        [ S.g [{- SA.stroke Color.black , SA.strokeWidth (ST.px 1) -}]
+            (List.map
+                (\(( x, y ) as p) ->
+                    SL.lazy4 View.cell
+                        cellWidthInPx
+                        x
+                        y
+                        (Set.member p grid.data)
+                )
+                grid.cords
             )
         ]
 

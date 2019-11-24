@@ -49,9 +49,11 @@ type alias Grid =
 toCords : Int -> Int -> List Pos
 toCords w h =
     let
+        widthRange : List Int
         widthRange =
             List.range 0 (w - 1)
 
+        heightRange : List Int
         heightRange =
             List.range 0 (h - 1)
     in
@@ -130,7 +132,7 @@ nextGridState grid =
 
 
 nextGridDataHelp : Grid -> Pos -> Set Pos -> Set Pos
-nextGridDataHelp grid p =
+nextGridDataHelp grid p data =
     let
         prevCell : Bool
         prevCell =
@@ -144,13 +146,13 @@ nextGridDataHelp grid p =
             nextCellStateWithANC anc prevCell
     in
     if prevCell == nextCell then
-        identity
+        data
 
     else if nextCell then
-        Set.insert p
+        Set.insert p data
 
     else
-        Set.remove p
+        Set.remove p data
 
 
 
@@ -282,12 +284,12 @@ viewGrid grid =
             ]
             (grid.cords
                 |> List.map
-                    (\( x, y ) ->
+                    (\(( x, y ) as p) ->
                         SL.lazy4 View.cell
                             cellWidthInPx
                             x
                             y
-                            (Set.member ( x, y ) grid.data)
+                            (Set.member p grid.data)
                     )
             )
         ]

@@ -135,6 +135,27 @@ ancOfPos p grid =
                     0
 
 
+ancOfPos2 : Pos -> Grid -> Int
+ancOfPos2 ( x, y ) grid =
+    let
+        w =
+            grid.width
+
+        h =
+            grid.height
+    in
+    List.foldl
+        (\( dx, dy ) ct ->
+            if Set.member ( x + dx |> modBy w, y + dy |> modBy h ) grid.data then
+                ct + 1
+
+            else
+                ct
+        )
+        0
+        neighbourOffsets
+
+
 nextGridState : Grid -> Grid
 nextGridState grid =
     { grid | data = List.foldl (nextGridDataHelp grid) grid.data grid.cords }

@@ -315,7 +315,7 @@ viewCell cellWidthInPx gridX gridY cell =
         , SA.width (ST.px cellWidthInPx)
         , SA.height (ST.px cellWidthInPx)
         ]
-        []
+        []`
 
 
 

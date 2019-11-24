@@ -2,7 +2,6 @@ module GameOfLifeSvg4 exposing (main)
 
 import Browser
 import Browser.Events
-import Dict exposing (Dict)
 import Html exposing (Html)
 import Html.Attributes as HA
 import Random exposing (Generator, Seed)
@@ -43,7 +42,6 @@ type alias Grid =
     , height : Int
     , length : Int
     , cords : List Pos
-    , neighboursCordsLookup : Dict Pos (List Pos)
     , data : Set Pos
     }
 
@@ -60,17 +58,6 @@ toCords w h =
     List.concatMap (\y -> List.map (\x -> ( x, y )) widthRange) heightRange
 
 
-cordsToNeighboursPosLookup : Int -> Int -> List Pos -> Dict Pos (List Pos)
-cordsToNeighboursPosLookup w h =
-    let
-        toNCord ( x, y ) =
-            neighbourOffsets
-                |> List.map (\( dx, dy ) -> ( x + dx |> modBy w, y + dy |> modBy h ))
-    in
-    List.map (\pos -> ( pos, toNCord pos ))
-        >> Dict.fromList
-
-
 initialGrid : Int -> Int -> Grid
 initialGrid width height =
     let
@@ -80,7 +67,7 @@ initialGrid width height =
         cords =
             toCords width height
     in
-    Grid width height length cords (cordsToNeighboursPosLookup width height cords) Set.empty
+    Grid width height length cords Set.empty
 
 
 randomGridGeneratorFromGrid : Grid -> Generator Grid
@@ -117,26 +104,7 @@ randomGridGeneratorFromGrid grid =
 
 
 ancOfPos : Pos -> Grid -> Int
-ancOfPos p grid =
-    case Dict.get p grid.neighboursCordsLookup of
-        Nothing ->
-            0
-
-        Just neighbourPosList ->
-            neighbourPosList
-                |> List.foldl
-                    (\np ct ->
-                        if Set.member np grid.data then
-                            ct + 1
-
-                        else
-                            ct
-                    )
-                    0
-
-
-ancOfPos2 : Pos -> Grid -> Int
-ancOfPos2 ( x, y ) grid =
+ancOfPos ( x, y ) grid =
     let
         w =
             grid.width

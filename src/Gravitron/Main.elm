@@ -80,7 +80,7 @@ fillColor =
 
 
 view : Model -> Html Msg
-view _ =
+view model =
     let
         sw =
             600
@@ -93,14 +93,11 @@ view _ =
 
         scy =
             sh / 2
-
-        planet =
-            initPlanet
     in
     svg [ viewBox 0 0 sw sh, width sw, height sh ]
         [ renderRect 0 0 sw sh [ fillColor Color.black ]
         , g [ transform [ Translate scx scy ] ]
-            [ renderPlanet planet
+            [ renderPlanet model.planet
             , renderSun
             ]
         ]

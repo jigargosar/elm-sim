@@ -49,6 +49,7 @@ initPlanet =
 type alias Model =
     { seed : Seed
     , planet : Planet
+    , ct : Int
     }
 
 
@@ -56,6 +57,7 @@ init : Flags -> ( Model, Cmd Msg )
 init flags =
     ( { seed = Random.initialSeed flags.now
       , planet = initPlanet
+      , ct = 0
       }
     , Cmd.none
     )
@@ -78,7 +80,10 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update message model =
     case message of
         Tick _ ->
-            ( updatePlanet model, Cmd.none )
+            ( { model | ct = model.ct + 1 }
+                |> updatePlanet
+            , Cmd.none
+            )
 
 
 updatePlanet : Model -> Model

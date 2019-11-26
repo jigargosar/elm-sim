@@ -10,10 +10,10 @@ import Json.Decode as JD
 import Random exposing (Seed)
 import Task
 import TypedSvg exposing (circle, g, rect, svg)
-import TypedSvg.Attributes exposing (fill, transform, viewBox)
-import TypedSvg.Attributes.InPx exposing (cx, cy, height, r, width, x, y)
+import TypedSvg.Attributes as TSA exposing (fill, stroke, transform, viewBox)
+import TypedSvg.Attributes.InPx exposing (cx, cy, height, r, strokeWidth, width, x, y)
 import TypedSvg.Core as TSC
-import TypedSvg.Types exposing (Fill(..), Transform(..))
+import TypedSvg.Types exposing (Fill(..), StrokeLinecap(..), StrokeLinejoin(..), Transform(..))
 
 
 
@@ -305,11 +305,31 @@ view model =
         [ renderRect s.l s.t s.w s.h [ fillColor Color.black ]
         , renderPlanet model.planet
         , renderSun model.mouse
+        , renderTurret
         ]
 
 
 renderSun { x, y } =
     renderCircle x y 50 [ fillColor Color.yellow ]
+
+
+renderTurret =
+    g []
+        [ renderCircle -100 -100 20 [ fillColor Color.green ]
+        , renderCircle -100
+            -100
+            20
+            [ fillNone
+            , stroke Color.white
+            , strokeWidth 10
+            , TSA.strokeLinecap StrokeLinecapRound
+            , TSA.strokeLinejoin StrokeLinejoinRound
+            ]
+        ]
+
+
+fillNone =
+    fill FillNone
 
 
 renderPlanet { x, y, radius } =

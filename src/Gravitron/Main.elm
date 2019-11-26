@@ -86,7 +86,7 @@ view _ =
         planet =
             initPlanet
     in
-    svg [ viewBox 0 0 sw sh, width 600 ]
+    svg [ viewBox 0 0 sw sh, width sw, height sh ]
         [ renderRect 0 0 sw sh [ fillColor Color.black ]
         , g [ transform [ Translate scx scy ] ]
             [ renderPlanet planet

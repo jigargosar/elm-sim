@@ -137,39 +137,12 @@ gravityVectorTo p2 p1 =
     fromPolar ( gRadius, gTheta )
 
 
-gravitateTo p2 ({ x, y, vx, vy } as p) =
+gravitateTo p2 p1 =
     let
-        p2x =
-            p2.x
-
-        p2y =
-            p2.y
-
-        p2Mass =
-            p2.mass
-
-        dx =
-            p2x - x
-
-        dy =
-            p2y - y
-
-        angleToP2 =
-            atan2 dy dx
-
-        distanceSquareToP2 =
-            dx ^ 2 + dy ^ 2
-
-        gRadius =
-            p2Mass / distanceSquareToP2
-
-        gTheta =
-            angleToP2
-
         ( gvx, gvy ) =
-            fromPolar ( gRadius, gTheta )
+            gravityVectorTo p2 p1
     in
-    { p | vx = vx + gvx, vy = vy + gvy }
+    accelerate gvx gvy p1
 
 
 stepVel ({ x, y, vx, vy } as p) =

@@ -89,6 +89,7 @@ view _ =
         ]
 
 
+renderRect : Float -> Float -> Float -> Float -> List (TSC.Attribute msg) -> TSC.Svg msg
 renderRect xv yv wv hv rest =
     rect ([ x xv, y yv, width wv, height hv ] ++ rest) []
 

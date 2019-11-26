@@ -8,6 +8,14 @@ body {
   box-sizing: border-box;
 }
 
+.fixed-full-screen {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+
 .p-fixed {
   position: fixed;
 }
@@ -44,7 +52,6 @@ body {
     0 0 1px 1px rgba(255, 0, 255, 1);
 }
 
-
-.yellow{
+.yellow {
   color: rgb(255, 255, 0);
 }

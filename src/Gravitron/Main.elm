@@ -1,11 +1,14 @@
 module Gravitron.Main exposing (main)
 
 import Browser
+import Browser.Dom
 import Browser.Events
 import Color
-import Html exposing (Html)
+import Html exposing (Html, div)
+import Html.Attributes exposing (class)
 import Json.Decode as JD
 import Random exposing (Seed)
+import Task
 import TypedSvg exposing (circle, g, rect, svg)
 import TypedSvg.Attributes exposing (fill, transform, viewBox)
 import TypedSvg.Attributes.InPx exposing (cx, cy, height, r, width, x, y)
@@ -52,6 +55,35 @@ type alias Model =
     , planet : Planet
     , ct : Int
     , mouse : Mouse
+    , screen : Screen
+    }
+
+
+type alias Screen =
+    { w : Float
+    , h : Float
+    , l : Float
+    , r : Float
+    , t : Float
+    , b : Float
+    }
+
+
+toScreen : Float -> Float -> Screen
+toScreen sw sh =
+    let
+        scx =
+            sw / 2
+
+        scy =
+            sh / 2
+    in
+    { w = sw
+    , h = sh
+    , l = -scx
+    , r = scx
+    , t = -scy
+    , b = scy
     }
 
 
@@ -67,8 +99,10 @@ init flags =
       , planet = initPlanet
       , ct = 0
       , mouse = Mouse 0 0
+      , screen = toScreen 600 600
       }
-    , Cmd.none
+    , Browser.Dom.getViewport
+        |> Task.perform OnViewport
     )
 
 
@@ -79,6 +113,7 @@ init flags =
 type Msg
     = Tick Float
     | MouseMoved Float Float
+    | OnViewport Browser.Dom.Viewport
 
 
 subscriptions : Model -> Sub Msg
@@ -107,6 +142,11 @@ update message model =
                     model.mouse
             in
             ( { model | mouse = { mouse | x = mx, y = my } }
+            , Cmd.none
+            )
+
+        OnViewport { scene } ->
+            ( { model | screen = toScreen scene.width scene.height }
             , Cmd.none
             )
 
@@ -186,39 +226,18 @@ fillColor =
     Fill >> fill
 
 
-screen =
-    let
-        sw =
-            600
-
-        sh =
-            600
-
-        scx =
-            sw / 2
-
-        scy =
-            sh / 2
-    in
-    { w = sw
-    , h = sh
-    , l = -scx
-    , r = scx
-    , t = -scy
-    , b = scy
-    }
-
-
 view : Model -> Html Msg
 view model =
     let
         s =
-            screen
+            model.screen
     in
-    svg [ viewBox s.l s.t s.w s.h, width s.w, height s.h ]
-        [ renderRect s.l s.t s.w s.h [ fillColor Color.black ]
-        , renderPlanet model.planet
-        , renderSun model.mouse
+    div [ class "fixed-full-screen" ]
+        [ svg [ viewBox s.l s.t s.w s.h, width s.w, height s.h ]
+            [ renderRect s.l s.t s.w s.h [ fillColor Color.black ]
+            , renderPlanet model.planet
+            , renderSun model.mouse
+            ]
         ]
 
 

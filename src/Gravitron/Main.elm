@@ -95,6 +95,48 @@ updatePlanet model =
     { model | planet = stepVel model.planet |> gravitateTo sun }
 
 
+accelerate ax ay ({ vx, vy } as p) =
+    { p | vx = vx + ax, vy = vy + ay }
+
+
+gravityVectorTo p2 p1 =
+    let
+        p2x =
+            p2.x
+
+        p2y =
+            p2.y
+
+        p1x =
+            p1.x
+
+        p1y =
+            p1.y
+
+        p2Mass =
+            p2.mass
+
+        dx =
+            p2x - p1x
+
+        dy =
+            p2y - p1y
+
+        angleToP2 =
+            atan2 dy dx
+
+        distanceSquareToP2 =
+            dx ^ 2 + dy ^ 2
+
+        gRadius =
+            p2Mass / distanceSquareToP2
+
+        gTheta =
+            angleToP2
+    in
+    fromPolar ( gRadius, gTheta )
+
+
 gravitateTo p2 ({ x, y, vx, vy } as p) =
     let
         p2x =

@@ -78,13 +78,15 @@ init flags =
 
 type Msg
     = Tick Float
-    | MouseMoved
+    | MouseMoved Float Float
 
 
 subscriptions : Model -> Sub Msg
 subscriptions _ =
     [ Browser.Events.onAnimationFrameDelta Tick
-    , JD.succeed MouseMoved
+    , JD.map2 MouseMoved
+        (JD.field "pageX" JD.float)
+        (JD.field "pageY" JD.float)
         |> Browser.Events.onMouseMove
     ]
         |> Sub.batch
@@ -99,12 +101,12 @@ update message model =
             , Cmd.none
             )
 
-        MouseMoved ->
+        MouseMoved mx my ->
             let
                 mouse =
                     model.mouse
             in
-            ( { model | mouse = { mouse | x = 0, y = 0 } }
+            ( { model | mouse = { mouse | x = mx, y = my } }
                 |> updatePlanet
             , Cmd.none
             )

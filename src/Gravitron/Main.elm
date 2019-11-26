@@ -88,17 +88,11 @@ update message model =
 
 updatePlanet : Model -> Model
 updatePlanet model =
-    { model | planet = stepVel model.planet |> gravitateToCenter }
+    { model | planet = stepVel model.planet |> gravitateTo 0 0 }
 
 
-gravitateToCenter ({ x, y, vx, vy } as p) =
+gravitateTo p2x p2y ({ x, y, vx, vy } as p) =
     let
-        p2x =
-            0
-
-        p2y =
-            0
-
         dx =
             p2x - x
 

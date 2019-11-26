@@ -103,10 +103,6 @@ renderPlanet { x, y, radius } =
     renderCircle x y radius [ fillColor Color.blue ]
 
 
-add =
-    (+)
-
-
 renderCircle : Float -> Float -> Float -> List (TSC.Attribute msg) -> TSC.Svg msg
 renderCircle cxv cyv rv rest =
     circle ([ cx cxv, cy cyv, r rv ] ++ rest) []

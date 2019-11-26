@@ -34,7 +34,7 @@ initPlanet =
     { x = 150
     , y = 0
     , vx = 0
-    , vy = -15
+    , vy = -350
     , radius = 20
     }
 
@@ -104,7 +104,7 @@ gravitateToCenter dt ({ x, y, vx, vy } as p) =
             dx ^ 2 + dy ^ 2
 
         p2Mass =
-            20 * 1000
+            20 * 1000 * 1000
 
         gRadius =
             p2Mass / distanceSquareToP2
@@ -115,8 +115,17 @@ gravitateToCenter dt ({ x, y, vx, vy } as p) =
         ( gvx, gvy ) =
             -- (0, 0)
             fromPolar ( gRadius, gTheta )
+
+        ( nvx, nvy ) =
+            ( gvx, gvy )
+                |> Tuple.mapBoth ((*) dt) ((*) dt)
+                |> Tuple.mapBoth ((+) vx) ((*) vy)
     in
     { p | vx = vx + gvx * dt, vy = vy + gvy * dt }
+
+
+
+-- { p | vx = nvx, vy = nvy }
 
 
 stepVel dt ({ x, y, vx, vy } as p) =

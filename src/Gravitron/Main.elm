@@ -5,7 +5,7 @@ import Browser.Dom
 import Browser.Events
 import Color
 import Html exposing (Html, div)
-import Html.Attributes exposing (class)
+import Html.Attributes exposing (style)
 import Json.Decode as JD
 import Random exposing (Seed)
 import Task
@@ -232,12 +232,10 @@ view model =
         s =
             model.screen
     in
-    div [ class "fixed-full-screen" ]
-        [ svg [ viewBox s.l s.t s.w s.h, width s.w, height s.h ]
-            [ renderRect s.l s.t s.w s.h [ fillColor Color.black ]
-            , renderPlanet model.planet
-            , renderSun model.mouse
-            ]
+    svg [ style "position" "fixed", viewBox s.l s.t s.w s.h, width s.w, height s.h ]
+        [ renderRect s.l s.t s.w s.h [ fillColor Color.black ]
+        , renderPlanet model.planet
+        , renderSun model.mouse
         ]
 
 

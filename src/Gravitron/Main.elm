@@ -8,6 +8,7 @@ import Random exposing (Seed)
 import TypedSvg exposing (circle, rect, svg)
 import TypedSvg.Attributes exposing (fill, viewBox)
 import TypedSvg.Attributes.InPx exposing (cx, cy, height, r, rx, ry, width, x, y)
+import TypedSvg.Core as TSC
 import TypedSvg.Types exposing (Fill(..))
 
 
@@ -60,6 +61,11 @@ update message model =
 
 
 -- View
+
+
+fillColor : Color.Color -> TSC.Attribute msg
+fillColor =
+    Fill >> fill
 
 
 view : Model -> Html Msg

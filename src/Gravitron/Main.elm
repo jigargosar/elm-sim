@@ -314,14 +314,31 @@ renderSun { x, y } =
 
 
 renderTurret =
-    g []
-        [ renderCircle -100 -100 20 [ fillColor Color.green ]
-        , renderCircle -100
-            -100
+    let
+        maxRadius =
             20
+
+        outerStrokeWidth =
+            1.5
+
+        gap =
+            outerStrokeWidth * 2
+
+        innerRadius =
+            maxRadius - gap
+
+        outerRadius =
+            maxRadius
+    in
+    g []
+        [ renderCircle -100 -100 innerRadius [ fillColor Color.green ]
+        , renderCircle
+            -100
+            -100
+            outerRadius
             [ fillNone
-            , stroke Color.white
-            , strokeWidth 10
+            , stroke <| Color.rgba 1 1 1 0.8
+            , strokeWidth outerStrokeWidth
             , TSA.strokeLinecap StrokeLinecapRound
             , TSA.strokeLinejoin StrokeLinejoinRound
             ]

@@ -83,6 +83,23 @@ updatePlanet dt model =
     { model | planet = stepVel dt model.planet }
 
 
+gravitateToCenter dt ({ x, y, vx, vy } as p) =
+    let
+        angle =
+            1
+
+        length =
+            1
+
+        gvx =
+            0
+
+        gvy =
+            0
+    in
+    { p | vx = vx + gvx * dt, vy = vy + gvy * dt }
+
+
 stepVel dt ({ x, y, vx, vy } as p) =
     { p | x = x + vx * dt, y = y + vy * dt }
 

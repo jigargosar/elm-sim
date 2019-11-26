@@ -20,6 +20,14 @@ type alias Flags =
     { now : Int }
 
 
+type alias Planet =
+    { x : Float
+    , y : Float
+    , radius : Float
+    }
+
+
+initPlanet : Planet
 initPlanet =
     { x = 150
     , y = 0
@@ -29,12 +37,15 @@ initPlanet =
 
 type alias Model =
     { seed : Seed
+    , planet : Planet
     }
 
 
 init : Flags -> ( Model, Cmd Msg )
 init flags =
-    ( { seed = Random.initialSeed flags.now }
+    ( { seed = Random.initialSeed flags.now
+      , planet = initPlanet
+      }
     , Cmd.none
     )
 

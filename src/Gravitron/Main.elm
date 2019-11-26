@@ -186,8 +186,7 @@ fillColor =
     Fill >> fill
 
 
-view : Model -> Html Msg
-view model =
+screen =
     let
         sw =
             600
@@ -201,11 +200,24 @@ view model =
         scy =
             sh / 2
     in
-    svg [ viewBox 0 0 sw sh, width sw, height sh ]
-        [ renderRect 0 0 sw sh [ fillColor Color.black ]
-        , g [ transform [ Translate scx scy ] ]
-            [ renderPlanet model.planet
-            ]
+    { w = sw
+    , h = sh
+    , l = -scx
+    , r = scx
+    , t = -scy
+    , b = scy
+    }
+
+
+view : Model -> Html Msg
+view model =
+    let
+        s =
+            screen
+    in
+    svg [ viewBox s.l s.t s.w s.h, width s.w, height s.h ]
+        [ renderRect s.l s.t s.w s.h [ fillColor Color.black ]
+        , renderPlanet model.planet
         , renderSun model.mouse
         ]
 

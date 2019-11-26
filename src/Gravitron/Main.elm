@@ -93,8 +93,8 @@ view _ =
         ]
 
 
-renderPlanet scx scy { x, y } =
-    renderCircle (scx + x) (scy + y) 20 [ fillColor Color.blue ]
+renderPlanet scx scy { x, y, radius } =
+    renderCircle (scx + x) (scy + y) radius [ fillColor Color.blue ]
 
 
 add =

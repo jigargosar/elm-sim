@@ -115,8 +115,11 @@ update message model =
 updatePlanet : Model -> Model
 updatePlanet model =
     let
+        mouse =
+            model.mouse
+
         sun =
-            { x = 0, y = 0, mass = 20 * 1000 }
+            { x = mouse.x, y = mouse.y, mass = 20 * 1000 }
     in
     { model | planet = stepVel model.planet |> gravitateTo sun }
 

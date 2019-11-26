@@ -31,7 +31,7 @@ type alias Planet =
 
 initPlanet : Planet
 initPlanet =
-    { x = 150
+    { x = -200
     , y = 0
     , vx = 0
     , vy = 10

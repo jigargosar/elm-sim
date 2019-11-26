@@ -31,10 +31,28 @@ type alias Planet =
 
 initPlanet : Planet
 initPlanet =
-    { x = 200
-    , y = 0
-    , vx = 0
-    , vy = -10
+    let
+        _ =
+            ( 0, 10 )
+                |> toPolar
+                |> Debug.log "(0,-10) |> toPolar"
+                |> Tuple.second
+                |> toDegrees
+                |> Debug.log "theta to deg"
+
+        _ =
+            degrees
+
+        toDegrees theta =
+            180 / (theta * pi)
+
+        ( vx, vy ) =
+            fromPolar ( -10, 0 )
+    in
+    { x = 0
+    , y = -200
+    , vx = vx
+    , vy = vy
     , radius = 20
     }
 

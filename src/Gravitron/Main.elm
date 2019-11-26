@@ -34,7 +34,7 @@ initPlanet =
     { x = 150
     , y = 0
     , vx = 0
-    , vy = -1
+    , vy = -15
     , radius = 20
     }
 

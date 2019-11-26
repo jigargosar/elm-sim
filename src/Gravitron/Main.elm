@@ -100,7 +100,11 @@ update message model =
             )
 
         MouseMoved ->
-            ( { model | ct = model.ct + 1 }
+            let
+                mouse =
+                    model.mouse
+            in
+            ( { model | mouse = { mouse | x = 0, y = 0 } }
                 |> updatePlanet
             , Cmd.none
             )

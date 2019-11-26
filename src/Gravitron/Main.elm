@@ -85,8 +85,13 @@ view _ =
     in
     svg [ viewBox 0 0 sw sh, width 600 ]
         [ renderRect 0 0 sw sh [ fillColor Color.black ]
-        , circle [ cx scx, cy scy, r 50, fillColor Color.yellow ] []
+        , renderCircle scx scy 50 [ fillColor Color.yellow ]
         ]
+
+
+renderCircle : Float -> Float -> Float -> List (TSC.Attribute msg) -> TSC.Svg msg
+renderCircle cxv cyv rv rest =
+    circle ([ cx cxv, cy cyv, r rv ] ++ rest) []
 
 
 renderRect : Float -> Float -> Float -> Float -> List (TSC.Attribute msg) -> TSC.Svg msg

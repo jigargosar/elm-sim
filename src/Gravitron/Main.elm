@@ -6,8 +6,8 @@ import Color
 import Html exposing (Html, text)
 import Random exposing (Seed)
 import TypedSvg exposing (circle, rect, svg)
-import TypedSvg.Attributes exposing (fill)
-import TypedSvg.Attributes.InPx exposing (r)
+import TypedSvg.Attributes exposing (fill, viewBox)
+import TypedSvg.Attributes.InPx exposing (cx, cy, height, r, rx, ry, width, x, y)
 import TypedSvg.Types exposing (Fill(..))
 
 
@@ -64,8 +64,16 @@ update message model =
 
 view : Model -> Html Msg
 view _ =
-    svg []
-        [ circle [ r 50, fill (Fill Color.yellow) ] []
+    let
+        sw =
+            600
+
+        sh =
+            600
+    in
+    svg [ viewBox 0 0 sw sh, width 600 ]
+        [ rect [ x 0, y 0, width sw, height sh, fill (Fill Color.black) ] []
+        , circle [ cx 50, cy 50, r 50, fill (Fill Color.yellow) ] []
         ]
 
 

@@ -2,8 +2,13 @@ module Gravitron.Main exposing (main)
 
 import Browser
 import Browser.Events
+import Color
 import Html exposing (Html, text)
 import Random exposing (Seed)
+import TypedSvg exposing (circle, rect, svg)
+import TypedSvg.Attributes exposing (fill)
+import TypedSvg.Attributes.InPx exposing (r)
+import TypedSvg.Types exposing (Fill(..))
 
 
 
@@ -12,6 +17,13 @@ import Random exposing (Seed)
 
 type alias Flags =
     { now : Int }
+
+
+sun =
+    { x = 0
+    , y = 0
+    , radius = 20
+    }
 
 
 type alias Model =
@@ -52,7 +64,9 @@ update message model =
 
 view : Model -> Html Msg
 view _ =
-    text "hi"
+    svg []
+        [ circle [ r 50, fill (Fill Color.yellow) ] []
+        ]
 
 
 main =

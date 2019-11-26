@@ -164,9 +164,23 @@ updatePlanet model =
             model.screen
 
         sun =
-            { x = mouse.x, y = mouse.y, mass = 20 * 1000 }
+            { x = mouse.x, y = mouse.y, mass = 10 * 1000 }
     in
-    { model | planet = stepVel model.planet |> gravitateTo sun |> bounceOffScreen screen }
+    { model
+        | planet =
+            stepVel model.planet
+                |> gravitateTo sun
+                |> clampVelocity 30
+                |> bounceOffScreen screen
+    }
+
+
+clampVelocity n p =
+    let
+        clampPart =
+            clamp -n n
+    in
+    { p | vx = clampPart p.vx, vy = clampPart p.vy }
 
 
 bounceOffScreen s =

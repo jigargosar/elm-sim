@@ -46,6 +46,17 @@ initPlanet =
     }
 
 
+type alias Turret =
+    { elapsed : Float
+    }
+
+
+initTurret : Turret
+initTurret =
+    { elapsed = 0
+    }
+
+
 
 -- Model
 
@@ -57,6 +68,7 @@ type alias Flags =
 type alias Model =
     { seed : Seed
     , planet : Planet
+    , turret : Turret
     , ct : Int
     , mouse : Mouse
     , screen : Screen
@@ -101,6 +113,7 @@ init : Flags -> ( Model, Cmd Msg )
 init flags =
     ( { seed = Random.initialSeed flags.now
       , planet = initPlanet
+      , turret = initTurret
       , ct = 0
       , mouse = Mouse 0 0
       , screen = toScreen 600 600

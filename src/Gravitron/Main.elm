@@ -107,7 +107,6 @@ update message model =
                     model.mouse
             in
             ( { model | mouse = { mouse | x = mx, y = my } }
-                |> updatePlanet
             , Cmd.none
             )
 
@@ -206,13 +205,13 @@ view model =
         [ renderRect 0 0 sw sh [ fillColor Color.black ]
         , g [ transform [ Translate scx scy ] ]
             [ renderPlanet model.planet
-            , renderSun
             ]
+        , renderSun model.mouse
         ]
 
 
-renderSun =
-    renderCircle 0 0 50 [ fillColor Color.yellow ]
+renderSun { x, y } =
+    renderCircle x y 50 [ fillColor Color.yellow ]
 
 
 renderPlanet { x, y, radius } =

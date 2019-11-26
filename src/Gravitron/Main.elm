@@ -84,9 +84,13 @@ view _ =
             sh / 2
     in
     svg [ viewBox 0 0 sw sh, width 600 ]
-        [ rect [ x 0, y 0, width sw, height sh, fillColor Color.black ] []
+        [ renderRect 0 0 sw sh [ fillColor Color.black ]
         , circle [ cx scx, cy scy, r 50, fillColor Color.yellow ] []
         ]
+
+
+renderRect xv yv wv hv rest =
+    rect ([ x xv, y yv, width wv, height hv ] ++ rest) []
 
 
 main =

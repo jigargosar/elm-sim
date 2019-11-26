@@ -17,11 +17,7 @@ import TypedSvg.Types exposing (Fill(..), Transform(..))
 
 
 
--- Model
-
-
-type alias Flags =
-    { now : Int }
+-- DATA
 
 
 type alias Planet =
@@ -48,6 +44,14 @@ initPlanet =
     , vy = vy
     , radius = 20
     }
+
+
+
+-- Model
+
+
+type alias Flags =
+    { now : Int }
 
 
 type alias Model =

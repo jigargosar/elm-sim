@@ -1,4 +1,4 @@
-module Gravitron.Main exposing (..)
+module Gravitron.Main exposing (main)
 
 import Browser
 import Browser.Events

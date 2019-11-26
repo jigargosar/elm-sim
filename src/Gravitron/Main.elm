@@ -70,10 +70,16 @@ view _ =
 
         sh =
             600
+
+        scx =
+            sw / 2
+
+        scy =
+            sh / 2
     in
     svg [ viewBox 0 0 sw sh, width 600 ]
         [ rect [ x 0, y 0, width sw, height sh, fill (Fill Color.black) ] []
-        , circle [ cx 50, cy 50, r 50, fill (Fill Color.yellow) ] []
+        , circle [ cx scx, cy scy, r 50, fill (Fill Color.yellow) ] []
         ]
 
 

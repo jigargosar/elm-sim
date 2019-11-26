@@ -23,6 +23,8 @@ type alias Flags =
 type alias Planet =
     { x : Float
     , y : Float
+    , vx : Float
+    , vy : Float
     , radius : Float
     }
 
@@ -31,6 +33,8 @@ initPlanet : Planet
 initPlanet =
     { x = 150
     , y = 0
+    , vx = 0
+    , vy = 0
     , radius = 20
     }
 

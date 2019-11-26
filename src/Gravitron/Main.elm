@@ -34,9 +34,12 @@ initPlanet =
     let
         ( vx, vy ) =
             fromPolar ( 10, degrees -90 )
+
+        ( x, y ) =
+            fromPolar ( 200, degrees 0 )
     in
-    { x = 200
-    , y = 0
+    { x = x
+    , y = y
     , vx = vx
     , vy = vy
     , radius = 20

@@ -86,7 +86,16 @@ view _ =
     svg [ viewBox 0 0 sw sh, width 600 ]
         [ renderRect 0 0 sw sh [ fillColor Color.black ]
         , renderCircle scx scy 50 [ fillColor Color.yellow ]
+        , renderPlanet scx scy
         ]
+
+
+renderPlanet scx scy =
+    renderCircle (scx |> add 150) scy 20 [ fillColor Color.blue ]
+
+
+add =
+    (+)
 
 
 renderCircle : Float -> Float -> Float -> List (TSC.Attribute msg) -> TSC.Svg msg

@@ -88,9 +88,15 @@ view _ =
     in
     svg [ viewBox 0 0 sw sh, width 600 ]
         [ renderRect 0 0 sw sh [ fillColor Color.black ]
-        , renderCircle scx scy 50 [ fillColor Color.yellow ]
-        , g [ transform [ Translate scx scy ] ] [ renderPlanet planet ]
+        , g [ transform [ Translate scx scy ] ]
+            [ renderPlanet planet
+            , renderSun
+            ]
         ]
+
+
+renderSun =
+    renderCircle 0 0 50 [ fillColor Color.yellow ]
 
 
 renderPlanet { x, y, radius } =

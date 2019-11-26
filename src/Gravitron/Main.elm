@@ -5,11 +5,11 @@ import Browser.Events
 import Color
 import Html exposing (Html, text)
 import Random exposing (Seed)
-import TypedSvg exposing (circle, rect, svg)
-import TypedSvg.Attributes exposing (fill, viewBox)
+import TypedSvg exposing (circle, g, rect, svg)
+import TypedSvg.Attributes exposing (fill, transform, viewBox)
 import TypedSvg.Attributes.InPx exposing (cx, cy, height, r, rx, ry, width, x, y)
 import TypedSvg.Core as TSC
-import TypedSvg.Types exposing (Fill(..))
+import TypedSvg.Types exposing (Fill(..), Transform(..))
 
 
 
@@ -89,12 +89,12 @@ view _ =
     svg [ viewBox 0 0 sw sh, width 600 ]
         [ renderRect 0 0 sw sh [ fillColor Color.black ]
         , renderCircle scx scy 50 [ fillColor Color.yellow ]
-        , renderPlanet scx scy planet
+        , g [ transform [ Translate scx scy ] ] [ renderPlanet planet ]
         ]
 
 
-renderPlanet scx scy { x, y, radius } =
-    renderCircle (scx + x) (scy + y) radius [ fillColor Color.blue ]
+renderPlanet { x, y, radius } =
+    renderCircle x y radius [ fillColor Color.blue ]
 
 
 add =

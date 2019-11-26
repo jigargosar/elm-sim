@@ -3,11 +3,12 @@ module Gravitron.Main exposing (main)
 import Browser
 import Browser.Events
 import Color
-import Html exposing (Html, text)
+import Html exposing (Html)
+import Json.Decode as JD
 import Random exposing (Seed)
 import TypedSvg exposing (circle, g, rect, svg)
 import TypedSvg.Attributes exposing (fill, transform, viewBox)
-import TypedSvg.Attributes.InPx exposing (cx, cy, height, r, rx, ry, width, x, y)
+import TypedSvg.Attributes.InPx exposing (cx, cy, height, r, width, x, y)
 import TypedSvg.Core as TSC
 import TypedSvg.Types exposing (Fill(..), Transform(..))
 
@@ -50,6 +51,13 @@ type alias Model =
     { seed : Seed
     , planet : Planet
     , ct : Int
+    , mouse : Mouse
+    }
+
+
+type alias Mouse =
+    { x : Float
+    , y : Float
     }
 
 
@@ -58,6 +66,7 @@ init flags =
     ( { seed = Random.initialSeed flags.now
       , planet = initPlanet
       , ct = 0
+      , mouse = Mouse 0 0
       }
     , Cmd.none
     )
@@ -69,17 +78,28 @@ init flags =
 
 type Msg
     = Tick Float
+    | MouseMoved
 
 
 subscriptions : Model -> Sub Msg
 subscriptions _ =
-    Browser.Events.onAnimationFrameDelta Tick
+    [ Browser.Events.onAnimationFrameDelta Tick
+    , JD.succeed MouseMoved
+        |> Browser.Events.onMouseMove
+    ]
+        |> Sub.batch
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update message model =
     case message of
         Tick _ ->
+            ( { model | ct = model.ct + 1 }
+                |> updatePlanet
+            , Cmd.none
+            )
+
+        MouseMoved ->
             ( { model | ct = model.ct + 1 }
                 |> updatePlanet
             , Cmd.none

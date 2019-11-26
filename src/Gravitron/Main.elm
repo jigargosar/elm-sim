@@ -20,8 +20,8 @@ type alias Flags =
     { now : Int }
 
 
-sun =
-    { x = 0
+initPlanet =
+    { x = 150
     , y = 0
     , radius = 20
     }
@@ -82,16 +82,19 @@ view _ =
 
         scy =
             sh / 2
+
+        planet =
+            initPlanet
     in
     svg [ viewBox 0 0 sw sh, width 600 ]
         [ renderRect 0 0 sw sh [ fillColor Color.black ]
         , renderCircle scx scy 50 [ fillColor Color.yellow ]
-        , renderPlanet scx scy
+        , renderPlanet scx scy planet
         ]
 
 
-renderPlanet scx scy =
-    renderCircle (scx |> add 150) scy 20 [ fillColor Color.blue ]
+renderPlanet scx scy { x, y } =
+    renderCircle (scx + x) (scy + y) 20 [ fillColor Color.blue ]
 
 
 add =

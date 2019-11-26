@@ -160,10 +160,38 @@ updatePlanet model =
         mouse =
             model.mouse
 
+        screen =
+            model.screen
+
         sun =
             { x = mouse.x, y = mouse.y, mass = 20 * 1000 }
     in
-    { model | planet = stepVel model.planet |> gravitateTo sun }
+    { model | planet = stepVel model.planet |> gravitateTo sun |> bounceOffScreen screen }
+
+
+bounceOffScreen s =
+    let
+        bounceX p =
+            if p.x < s.l then
+                { p | x = s.l, vx = p.vx * -0.8 }
+
+            else if p.x > s.r then
+                { p | x = s.r, vx = p.vx * -0.8 }
+
+            else
+                p
+
+        bounceY p =
+            if p.y < s.t then
+                { p | y = s.t, vy = p.vy * -0.8 }
+
+            else if p.y > s.b then
+                { p | y = s.b, vy = p.vy * -0.8 }
+
+            else
+                p
+    in
+    bounceX >> bounceY
 
 
 gravitateTo p2 p1 =

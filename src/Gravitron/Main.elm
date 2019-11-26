@@ -71,7 +71,16 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update message model =
     case message of
         Tick _ ->
-            ( model, Cmd.none )
+            ( updatePlanet model, Cmd.none )
+
+
+updatePlanet : Model -> Model
+updatePlanet model =
+    { model | planet = stepVel model.planet }
+
+
+stepVel ({ x, y, vx, vy } as p) =
+    { p | x = x + vx, y = y + vy }
 
 
 

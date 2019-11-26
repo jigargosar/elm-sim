@@ -140,8 +140,11 @@ update message model =
             let
                 mouse =
                     model.mouse
+
+                screen =
+                    model.screen
             in
-            ( { model | mouse = { mouse | x = mx, y = my } }
+            ( { model | mouse = { mouse | x = mx + screen.l, y = my + screen.t } }
             , Cmd.none
             )
 

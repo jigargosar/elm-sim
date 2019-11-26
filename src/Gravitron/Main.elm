@@ -88,11 +88,24 @@ update message model =
 
 updatePlanet : Model -> Model
 updatePlanet model =
-    { model | planet = stepVel model.planet |> gravitateTo 0 0 }
-
-
-gravitateTo p2x p2y ({ x, y, vx, vy } as p) =
     let
+        sun =
+            { x = 0, y = 0, mass = 20 * 1000 }
+    in
+    { model | planet = stepVel model.planet |> gravitateTo sun }
+
+
+gravitateTo p2 ({ x, y, vx, vy } as p) =
+    let
+        p2x =
+            p2.x
+
+        p2y =
+            p2.y
+
+        p2Mass =
+            p2.mass
+
         dx =
             p2x - x
 
@@ -104,9 +117,6 @@ gravitateTo p2x p2y ({ x, y, vx, vy } as p) =
 
         distanceSquareToP2 =
             dx ^ 2 + dy ^ 2
-
-        p2Mass =
-            20 * 1000
 
         gRadius =
             p2Mass / distanceSquareToP2

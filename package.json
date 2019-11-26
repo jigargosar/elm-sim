@@ -6,8 +6,8 @@
   "scripts": {
     "start_": "parcel src/index.html",
     "start": "webpack-dev-server",
-    "build_": "webpack -p",
-    "build": "parcel build src/index.html"
+    "build": "webpack -p",
+    "parcel-build": "parcel build src/index-parcel.html --no-source-maps -o index.html"
   },
   "keywords": [],
   "author": "Jigar Gosar <jigar.gosar@gmail.com>",

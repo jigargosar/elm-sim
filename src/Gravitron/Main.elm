@@ -70,7 +70,11 @@ subscriptions _ =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update message model =
     case message of
-        Tick dt ->
+        Tick deltaMilli ->
+            let
+                dt =
+                    deltaMilli / 1000
+            in
             ( updatePlanet dt model, Cmd.none )
 
 
@@ -80,7 +84,7 @@ updatePlanet dt model =
 
 
 stepVel dt ({ x, y, vx, vy } as p) =
-    { p | x = x + vx, y = y + vy }
+    { p | x = x + vx * dt, y = y + vy * dt }
 
 
 

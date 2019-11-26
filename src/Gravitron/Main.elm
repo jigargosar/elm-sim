@@ -80,22 +80,41 @@ update message model =
 
 updatePlanet : Float -> Model -> Model
 updatePlanet dt model =
-    { model | planet = stepVel dt model.planet }
+    { model | planet = stepVel dt model.planet |> gravitateToCenter dt }
 
 
 gravitateToCenter dt ({ x, y, vx, vy } as p) =
     let
-        angle =
-            1
-
-        length =
-            1
-
-        gvx =
+        p2x =
             0
 
-        gvy =
+        p2y =
             0
+
+        dx =
+            p2x - x
+
+        dy =
+            p2y - y
+
+        angleToP2 =
+            atan2 dy dx
+
+        distanceSquareToP2 =
+            dx ^ 2 + dy ^ 2
+
+        p2Mass =
+            20 * 1000
+
+        gRadius =
+            p2Mass / distanceSquareToP2
+
+        gTheta =
+            angleToP2
+
+        ( gvx, gvy ) =
+            -- (0, 0)
+            fromPolar ( gRadius, gTheta )
     in
     { p | vx = vx + gvx * dt, vy = vy + gvy * dt }
 

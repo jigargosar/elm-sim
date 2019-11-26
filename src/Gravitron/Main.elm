@@ -34,7 +34,7 @@ initPlanet =
     { x = 150
     , y = 0
     , vx = 0
-    , vy = -350
+    , vy = 10
     , radius = 20
     }
 
@@ -70,20 +70,16 @@ subscriptions _ =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update message model =
     case message of
-        Tick deltaMilli ->
-            let
-                dt =
-                    deltaMilli / 1000
-            in
-            ( updatePlanet dt model, Cmd.none )
+        Tick _ ->
+            ( updatePlanet model, Cmd.none )
 
 
-updatePlanet : Float -> Model -> Model
-updatePlanet dt model =
-    { model | planet = stepVel dt model.planet |> gravitateToCenter dt }
+updatePlanet : Model -> Model
+updatePlanet model =
+    { model | planet = stepVel model.planet |> gravitateToCenter }
 
 
-gravitateToCenter dt ({ x, y, vx, vy } as p) =
+gravitateToCenter ({ x, y, vx, vy } as p) =
     let
         p2x =
             0
@@ -104,7 +100,7 @@ gravitateToCenter dt ({ x, y, vx, vy } as p) =
             dx ^ 2 + dy ^ 2
 
         p2Mass =
-            20 * 1000 * 1000
+            20 * 1000
 
         gRadius =
             p2Mass / distanceSquareToP2
@@ -113,23 +109,13 @@ gravitateToCenter dt ({ x, y, vx, vy } as p) =
             angleToP2
 
         ( gvx, gvy ) =
-            -- (0, 0)
             fromPolar ( gRadius, gTheta )
-
-        ( nvx, nvy ) =
-            ( gvx, gvy )
-                |> Tuple.mapBoth ((*) dt) ((*) dt)
-                |> Tuple.mapBoth ((+) vx) ((*) vy)
     in
-    { p | vx = vx + gvx * dt, vy = vy + gvy * dt }
+    { p | vx = vx + gvx, vy = vy + gvy }
 
 
-
--- { p | vx = nvx, vy = nvy }
-
-
-stepVel dt ({ x, y, vx, vy } as p) =
-    { p | x = x + vx * dt, y = y + vy * dt }
+stepVel ({ x, y, vx, vy } as p) =
+    { p | x = x + vx, y = y + vy }
 
 
 

@@ -113,6 +113,7 @@ init flags =
 type Msg
     = Tick Float
     | MouseMoved Float Float
+    | OnResize Int Int
     | OnViewport Browser.Dom.Viewport
 
 
@@ -123,6 +124,7 @@ subscriptions _ =
         (JD.field "pageX" JD.float)
         (JD.field "pageY" JD.float)
         |> Browser.Events.onMouseMove
+    , Browser.Events.onResize OnResize
     ]
         |> Sub.batch
 
@@ -150,6 +152,11 @@ update message model =
 
         OnViewport { scene } ->
             ( { model | screen = toScreen scene.width scene.height }
+            , Cmd.none
+            )
+
+        OnResize width height ->
+            ( { model | screen = toScreen (toFloat width) (toFloat height) }
             , Cmd.none
             )
 

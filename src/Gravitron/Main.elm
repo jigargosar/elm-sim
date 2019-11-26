@@ -70,16 +70,16 @@ subscriptions _ =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update message model =
     case message of
-        Tick _ ->
-            ( updatePlanet model, Cmd.none )
+        Tick dt ->
+            ( updatePlanet dt model, Cmd.none )
 
 
-updatePlanet : Model -> Model
-updatePlanet model =
-    { model | planet = stepVel model.planet }
+updatePlanet : Float -> Model -> Model
+updatePlanet dt model =
+    { model | planet = stepVel dt model.planet }
 
 
-stepVel ({ x, y, vx, vy } as p) =
+stepVel dt ({ x, y, vx, vy } as p) =
     { p | x = x + vx, y = y + vy }
 
 

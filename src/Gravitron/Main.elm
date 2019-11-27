@@ -55,7 +55,7 @@ type alias Turret =
 initTurret : Turret
 initTurret =
     { elapsed = 0
-    , rate = 120
+    , rate = 120 * 2
     }
 
 

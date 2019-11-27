@@ -103,6 +103,7 @@ type alias Turret =
     , elapsed : Float
     , rate : Float
     , bullets : List Bullet
+    , angle : Float
     , seed : Seed
     }
 
@@ -125,6 +126,7 @@ initTurret seed =
     , elapsed = 0
     , rate = bulletInitialFireRate
     , bullets = []
+    , angle = 0
     , seed = seed
     }
 
@@ -336,7 +338,7 @@ updateTurret model =
         | turret =
             model.turret
                 |> updateTurretElapsed
-                |> turretFireBulletIfReadyTowardsRandomAngle
+                |> turretFireBulletWhenReady
                 |> updateTurretBullets model
     }
 
@@ -346,26 +348,29 @@ updateTurretElapsed turret =
     { turret | elapsed = turret.elapsed + 1 }
 
 
-turretFireBulletIfReadyTowardsRandomAngle =
-    stepRandom randomAngle >> apply2 turretFireBulletIfReadyTowards
-
-
-turretFireBulletIfReadyTowards angle turret =
+turretFireBulletWhenReady turret =
     if turret.elapsed >= turret.rate then
-        let
-            x =
-                turret.x
-
-            y =
-                turret.y
-        in
-        { turret
-            | elapsed = 0
-            , bullets = initBullet x y bulletInitialSpeed angle :: turret.bullets
-        }
+        turretFireBullet turret
 
     else
         turret
+
+
+turretFireBullet turret =
+    let
+        x =
+            turret.x
+
+        y =
+            turret.y
+
+        angle =
+            turret.angle
+    in
+    { turret
+        | elapsed = 0
+        , bullets = initBullet x y bulletInitialSpeed angle :: turret.bullets
+    }
 
 
 updateTurretBullets : Model -> Turret -> Turret

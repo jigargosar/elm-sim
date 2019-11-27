@@ -401,8 +401,7 @@ view model =
         [ renderRect s.l s.t s.w s.h [ fillColor Color.black ]
         , renderPlanet model.planet
         , renderSun model.mouse
-        , renderTurret
-        , renderTurret2 model.turret
+        , renderTurret model.turret
         ]
 
 
@@ -410,7 +409,7 @@ renderSun { x, y } =
     renderCircle x y 50 [ fillColor Color.yellow ]
 
 
-renderTurret2 { x, y, radius, color, rate, elapsed } =
+renderTurret { x, y, radius, color, rate, elapsed, bullets } =
     let
         innerR =
             radius / rate * elapsed
@@ -424,48 +423,6 @@ renderTurret2 { x, y, radius, color, rate, elapsed } =
 whiteA : Float -> Color.Color
 whiteA =
     Color.rgba 1 1 1
-
-
-renderTurret =
-    let
-        maxRadius =
-            20
-
-        outerStrokeWidth =
-            1.5
-
-        gap =
-            outerStrokeWidth * 2
-
-        innerRadius =
-            maxRadius - gap
-
-        outerRadius =
-            maxRadius
-    in
-    g [ transform [ Translate -100 -100 ] ]
-        [ renderCircle 0 0 innerRadius [ fillColor Color.green ]
-        , renderCircle 0
-            0
-            outerRadius
-            [ fillNone
-            , stroke <| Color.rgba 1 1 1 0.8
-
-            {- , strokeWidth outerStrokeWidth
-               , TSA.strokeLinecap StrokeLinecapRound
-               , TSA.strokeLinejoin StrokeLinejoinRound
-            -}
-            ]
-        , renderCircle 0
-            0
-            outerRadius
-            [ fillNone
-            , stroke <| Color.orange
-            , strokeWidth outerStrokeWidth
-            , TSA.strokeLinecap StrokeLinecapRound
-            , TSA.strokeLinejoin StrokeLinejoinRound
-            ]
-        ]
 
 
 fillNone =

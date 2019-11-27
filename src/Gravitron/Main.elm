@@ -49,6 +49,15 @@ initPlanet =
 type alias Turret =
     { elapsed : Float
     , rate : Float
+    , bullets : List Bullet
+    }
+
+
+type alias Bullet =
+    { x : Float
+    , y : Float
+    , vx : Float
+    , vy : Float
     }
 
 
@@ -56,6 +65,7 @@ initTurret : Turret
 initTurret =
     { elapsed = 0
     , rate = 120 * 2
+    , bullets = []
     }
 
 

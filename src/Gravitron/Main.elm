@@ -25,7 +25,7 @@ turretAimSpeed =
 
 
 bulletInitialFireRate =
-    200
+    100
 
 
 bulletInitialSpeed =
@@ -360,50 +360,30 @@ updateTurret model =
 updateTurretAim : Turret -> Turret
 updateTurretAim turret =
     let
-        diff =
-            turret.aimTargetAngle - turret.aimAngle
-
-        nanToZero n =
-            if isNaN n then
-                0
-
-            else
-                n
-
-        diffSign =
-            diff
-                / abs diff
-                |> nanToZero
-
         s =
             turret.aimAngle
 
         e =
             turret.aimTargetAngle
 
-        sign =
-            compare s e
-                |> (\o ->
-                        case o of
-                            LT ->
-                                if abs diff < pi then
-                                    1
+        speed =
+            turretAimSpeed
 
-                                else
-                                    -1
+        final =
+            if s < e then
+                if e - s < pi then
+                    s + speed
 
-                            EQ ->
-                                0
+                else
+                    s - speed
 
-                            GT ->
-                                if abs diff < pi then
-                                    -1
+            else if s - e < pi then
+                s - speed
 
-                                else
-                                    1
-                   )
+            else
+                s + speed
     in
-    { turret | aimAngle = turret.aimAngle + turretAimSpeed * sign }
+    { turret | aimAngle = final }
 
 
 updateTurretElapsed : Turret -> Turret

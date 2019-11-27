@@ -21,7 +21,7 @@ import TypedSvg.Types exposing (Fill(..), StrokeLinecap(..), StrokeLinejoin(..),
 
 
 turretAimSpeed =
-    degrees 1
+    degrees 5
 
 
 bulletInitialFireRate =
@@ -357,6 +357,10 @@ updateTurret model =
     }
 
 
+fModBy fixedPt roller =
+    roller + (toFloat <| ceiling (-roller / fixedPt)) * fixedPt
+
+
 updateTurretAim : Turret -> Turret
 updateTurretAim turret =
     let
@@ -366,17 +370,16 @@ updateTurretAim turret =
         e =
             turret.aimTargetAngle
 
-        _ =
-            if s > degrees 360 then
-                Debug.log "wtf" ( s, e )
-                    |> Debug.todo "wtf"
-
-            else
-                1
-
+        --        _ =
+        --            if s > degrees 360 then
+        --                Debug.log "start > 360" ( s, e )
+        --                    |> Debug.todo "wtf"
+        --
+        --            else
+        --                1
         _ =
             if e > degrees 360 then
-                Debug.log "wtf" ( s, e )
+                Debug.log "end > 360" ( s, e )
                     |> Debug.todo "wtf"
 
             else

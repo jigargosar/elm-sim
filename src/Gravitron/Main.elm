@@ -132,7 +132,8 @@ initTurret seed =
 
 
 turretGenerator =
-    Random.independentSeed |> Random.map initTurret
+    Random.independentSeed
+        |> Random.map (initTurret >> turretAimTowardsRandomAngle)
 
 
 initBullet : Float -> Float -> Float -> Float -> Bullet

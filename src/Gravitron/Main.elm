@@ -20,19 +20,23 @@ import TypedSvg.Types exposing (Fill(..), StrokeLinecap(..), StrokeLinejoin(..),
 -- Constants
 
 
-initialBulletSpeed =
+bulletInitialSpeed =
     7
+
+
+bulletMaxSpeed =
+    10
 
 
 initialSunMass =
     2000
 
 
-wallBounceFriction =
+bulletWallDrag =
     0.9
 
 
-bulletDrag =
+bulletUpdateDrag =
     0.999
 
 
@@ -327,7 +331,7 @@ turretFireBulletIfReadyTowards p2 turret =
             angle =
                 angleTo { x = turret.x, y = turret.y } p2
         in
-        { turret | elapsed = 0, bullets = initBullet x y initialBulletSpeed angle :: turret.bullets }
+        { turret | elapsed = 0, bullets = initBullet x y bulletInitialSpeed angle :: turret.bullets }
 
     else
         turret
@@ -346,7 +350,7 @@ updateTurretBullets model turret =
             bullet
                 |> stepVel
                 |> gravitateTo sun
-                |> applyDrag bulletDrag
+                |> applyDrag bulletUpdateDrag
                 --|> clampVelocity 10
                 |> bounceOffScreen screen
     in
@@ -413,20 +417,20 @@ bounceOffScreen s =
     let
         bounceX p =
             if p.x < s.l then
-                { p | x = s.l, vx = p.vx * -1 * wallBounceFriction }
+                { p | x = s.l, vx = p.vx * -1 * bulletWallDrag }
 
             else if p.x > s.r then
-                { p | x = s.r, vx = p.vx * -1 * wallBounceFriction }
+                { p | x = s.r, vx = p.vx * -1 * bulletWallDrag }
 
             else
                 p
 
         bounceY p =
             if p.y < s.t then
-                { p | y = s.t, vy = p.vy * -1 * wallBounceFriction }
+                { p | y = s.t, vy = p.vy * -1 * bulletWallDrag }
 
             else if p.y > s.b then
-                { p | y = s.b, vy = p.vy * -1 * wallBounceFriction }
+                { p | y = s.b, vy = p.vy * -1 * bulletWallDrag }
 
             else
                 p

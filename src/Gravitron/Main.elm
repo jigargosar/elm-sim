@@ -4,13 +4,13 @@ import Browser
 import Browser.Dom
 import Browser.Events
 import Color
-import Html exposing (Html, div)
+import Html exposing (Html)
 import Html.Attributes exposing (style)
 import Json.Decode as JD
 import Random exposing (Seed)
 import Task
-import TypedSvg as Svg exposing (circle, g, path, rect, svg)
-import TypedSvg.Attributes as TSA exposing (d, fill, stroke, transform, viewBox)
+import TypedSvg exposing (circle, g, rect, svg)
+import TypedSvg.Attributes as TSA exposing (fill, stroke, transform, viewBox)
 import TypedSvg.Attributes.InPx exposing (cx, cy, height, r, strokeWidth, width, x, y)
 import TypedSvg.Core as TSC
 import TypedSvg.Types exposing (Fill(..), StrokeLinecap(..), StrokeLinejoin(..), Transform(..))
@@ -49,6 +49,8 @@ initPlanet =
 type alias Turret =
     { x : Float
     , y : Float
+    , radius : Float
+    , color : Color.Color
     , elapsed : Float
     , rate : Float
     , bullets : List Bullet
@@ -67,6 +69,8 @@ initTurret : Turret
 initTurret =
     { x = -100
     , y = 100
+    , radius = 20
+    , color = Color.lightGreen
     , elapsed = 0
     , rate = 120 * 2
     , bullets = []
@@ -353,16 +357,13 @@ renderSun { x, y } =
     renderCircle x y 50 [ fillColor Color.yellow ]
 
 
-renderTurret2 ({ x, y } as turret) =
+renderTurret2 ({ x, y, radius, color } as turret) =
     let
-        r =
-            20
-
         innerR =
-            r / turret.rate * turret.elapsed
+            radius / turret.rate * turret.elapsed
     in
     g [ transform [ Translate x y ] ]
-        [ renderCircle 0 0 r [ fillColor Color.green ]
+        [ renderCircle 0 0 radius [ fillColor color ]
         , renderCircle 0 0 innerR [ fillColor <| whiteA 0.5 ]
         ]
 

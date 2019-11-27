@@ -285,7 +285,7 @@ updateTurret model =
         | turret =
             model.turret
                 |> updateTurretElapsed
-                |> turretFireBulletIfReady
+                |> turretFireBulletIfReadyTowards model.sun
                 |> updateTurretBullets model
     }
 
@@ -295,8 +295,7 @@ updateTurretElapsed turret =
     { turret | elapsed = turret.elapsed + 1 }
 
 
-turretFireBulletIfReady : Turret -> Turret
-turretFireBulletIfReady turret =
+turretFireBulletIfReadyTowards p2 turret =
     if turret.elapsed >= turret.rate then
         let
             x =
@@ -309,7 +308,7 @@ turretFireBulletIfReady turret =
                 10
 
             angle =
-                degrees 180
+                angleTo { x = turret.x, y = turret.y } p2
         in
         { turret | elapsed = 0, bullets = initBullet x y speed angle :: turret.bullets }
 
@@ -415,13 +414,14 @@ bounceOffScreen s =
 
 dxyTo : { a | x : number, y : number } -> { b | x : number, y : number } -> ( number, number )
 dxyTo p2 p1 =
-    ( p2.x - p1.x, p2.y - p1.y )
+    ( p2.x - p1.x, p1.y - p2.y )
 
 
 angleTo : { a | x : Float, y : Float } -> { b | x : Float, y : Float } -> Float
 angleTo p2 p1 =
     dxyTo p2 p1
         |> apply2 atan2
+        |> (+) (pi / 2)
 
 
 apply2 : (a -> b -> c) -> ( a, b ) -> c

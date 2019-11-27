@@ -414,10 +414,17 @@ renderTurret { x, y, radius, color, rate, elapsed, bullets } =
         innerR =
             radius / rate * elapsed
     in
-    g [ transform [ Translate x y ] ]
-        [ renderCircle 0 0 radius [ fillColor color ]
-        , renderCircle 0 0 innerR [ fillColor <| whiteA 0.5 ]
+    g []
+        [ g [ transform [ Translate x y ] ]
+            [ renderCircle 0 0 radius [ fillColor color ]
+            , renderCircle 0 0 innerR [ fillColor <| whiteA 0.5 ]
+            ]
+        , g [] (List.map renderTurretBullet bullets)
         ]
+
+
+renderTurretBullet { x, y, radius } =
+    renderCircle x y radius [ fillColor <| whiteA 0.9 ]
 
 
 whiteA : Float -> Color.Color

@@ -314,14 +314,21 @@ stepRandom generator model =
 
 
 updateTurret : Model -> Model
-updateTurret model =
-    { model
-        | turret =
-            model.turret
-                |> updateTurretElapsed
-                |> turretFireBulletIfReadyTowards model.sun
-                |> updateTurretBullets model
-    }
+updateTurret =
+    let
+        randomAngle =
+            Random.float 0 (2 * pi)
+    in
+    stepRandom randomAngle
+        >> (\( angle, model ) ->
+                { model
+                    | turret =
+                        model.turret
+                            |> updateTurretElapsed
+                            |> turretFireBulletIfReadyTowards angle
+                            |> updateTurretBullets model
+                }
+           )
 
 
 updateTurretElapsed : Turret -> Turret
@@ -329,7 +336,7 @@ updateTurretElapsed turret =
     { turret | elapsed = turret.elapsed + 1 }
 
 
-turretFireBulletIfReadyTowards p2 turret =
+turretFireBulletIfReadyTowards angle turret =
     if turret.elapsed >= turret.rate then
         let
             x =
@@ -337,9 +344,6 @@ turretFireBulletIfReadyTowards p2 turret =
 
             y =
                 turret.y
-
-            angle =
-                angleTo { x = turret.x, y = turret.y } p2
         in
         { turret
             | elapsed = 0

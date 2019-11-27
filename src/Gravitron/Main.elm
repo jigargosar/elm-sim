@@ -331,7 +331,10 @@ turretFireBulletIfReadyTowards p2 turret =
             angle =
                 angleTo { x = turret.x, y = turret.y } p2
         in
-        { turret | elapsed = 0, bullets = initBullet x y bulletInitialSpeed angle :: turret.bullets }
+        { turret
+            | elapsed = 0
+            , bullets = initBullet x y bulletInitialSpeed angle :: turret.bullets
+        }
 
     else
         turret

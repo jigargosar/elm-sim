@@ -412,14 +412,13 @@ bounceOffScreen s =
     bounceX >> bounceY
 
 
-dxyTo : { a | x : number, y : number } -> { b | x : number, y : number } -> ( number, number )
-dxyTo p2 p1 =
-    ( p2.x - p1.x, p1.y - p2.y )
-
-
 angleTo : { a | x : Float, y : Float } -> { b | x : Float, y : Float } -> Float
 angleTo p2 p1 =
-    dxyTo p2 p1
+    let
+        dxy =
+            ( p2.x - p1.x, p1.y - p2.y )
+    in
+    dxy
         |> apply2 atan2
         |> (+) (pi / 2)
 

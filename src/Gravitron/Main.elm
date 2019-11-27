@@ -220,17 +220,32 @@ updateTurret model =
         | turret =
             model.turret
                 |> updateTurretElapsed
-                |> updateTurretBullet
+                |> updateTurretBullets
     }
 
 
+updateTurretElapsed : Turret -> Turret
 updateTurretElapsed turret =
     { turret | elapsed = turret.elapsed + 1 }
 
 
-updateTurretBullet turret =
+updateTurretBullets : Turret -> Turret
+updateTurretBullets turret =
     if turret.elapsed >= turret.rate then
-        { turret | elapsed = 0 }
+        let
+            x =
+                turret.x
+
+            y =
+                turret.y
+
+            speed =
+                10
+
+            angle =
+                degrees 90
+        in
+        { turret | elapsed = 0, bullets = initBullet x y speed angle :: turret.bullets }
 
     else
         turret

@@ -413,7 +413,7 @@ view model =
     in
     svg [ style "position" "fixed", viewBox s.l s.t s.w s.h, width s.w, height s.h ]
         [ renderRect s.l s.t s.w s.h [ fillColor Color.black ]
-        , renderSun model.mouse
+        , renderSun model.sun
         , renderTurret model.turret
         , renderPlanet model.planet
         ]

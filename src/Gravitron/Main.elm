@@ -303,6 +303,11 @@ updateCollisions model =
            )
 
 
+type alias HasSeed a =
+    { a | seed : Seed }
+
+
+stepRandom : Random.Generator a -> HasSeed b -> ( a, HasSeed b )
 stepRandom generator model =
     Random.step generator model.seed
         |> Tuple.mapSecond (\seed -> { model | seed = seed })

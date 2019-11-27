@@ -599,7 +599,7 @@ renderSun { x, y, radius } =
 
 
 renderTurret : Turret -> TSC.Svg msg
-renderTurret { x, y, radius, color, rate, aimAngle, elapsed, bullets } =
+renderTurret { x, y, radius, color, rate, aimAngle, aimTargetAngle, elapsed, bullets } =
     let
         innerR =
             radius / rate * elapsed
@@ -612,7 +612,12 @@ renderTurret { x, y, radius, color, rate, aimAngle, elapsed, bullets } =
                 ( p2x, p2y ) =
                     fromPolar ( radius, aimAngle )
               in
-              line [ x1 0, y1 0, x2 p2x, y2 p2y, stroke Color.red ] []
+              line [ x1 0, y1 0, x2 p2x, y2 p2y, stroke Color.red, strokeWidth 4 ] []
+            , let
+                ( p2x, p2y ) =
+                    fromPolar ( radius, aimTargetAngle )
+              in
+              line [ x1 0, y1 0, x2 p2x, y2 p2y, stroke Color.orange, strokeWidth 3 ] []
             ]
         , g [] (List.map renderTurretBullet bullets)
         ]

@@ -21,7 +21,7 @@ import TypedSvg.Types exposing (Fill(..), StrokeLinecap(..), StrokeLinejoin(..),
 
 
 turretAimSpeed =
-    degrees 0.1
+    degrees 1
 
 
 bulletInitialFireRate =
@@ -363,8 +363,17 @@ updateTurretAim turret =
         diff =
             turret.aimTargetAngle - turret.aimAngle
 
+        nanToZero n =
+            if isNaN n then
+                0
+
+            else
+                n
+
         diffSign =
-            diff / abs diff
+            diff
+                / abs diff
+                |> nanToZero
     in
     { turret | aimAngle = turret.aimAngle + turretAimSpeed * diffSign }
 

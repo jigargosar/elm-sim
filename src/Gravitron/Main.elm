@@ -47,7 +47,9 @@ initPlanet =
 
 
 type alias Turret =
-    { elapsed : Float
+    { x : Float
+    , y : Float
+    , elapsed : Float
     , rate : Float
     , bullets : List Bullet
     }
@@ -63,7 +65,9 @@ type alias Bullet =
 
 initTurret : Turret
 initTurret =
-    { elapsed = 0
+    { x = -100
+    , y = 100
+    , elapsed = 0
     , rate = 120 * 2
     , bullets = []
     }
@@ -349,11 +353,8 @@ renderSun { x, y } =
     renderCircle x y 50 [ fillColor Color.yellow ]
 
 
-renderTurret2 turret =
+renderTurret2 ({ x, y } as turret) =
     let
-        ( x, y ) =
-            ( -100, 100 )
-
         r =
             20
 

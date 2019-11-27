@@ -365,6 +365,20 @@ updateTurretAim turret =
 
         e =
             turret.aimTargetAngle
+
+        _ =
+            if s > degrees 360 then
+                Debug.todo "wtf"
+
+            else
+                1
+
+        _ =
+            if e > degrees 360 then
+                Debug.todo "wtf"
+
+            else
+                1
     in
     {- if s == e then
            turret

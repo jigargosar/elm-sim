@@ -94,7 +94,7 @@ initTurret =
     , radius = 20
     , color = Color.lightGreen
     , elapsed = 0
-    , rate = 120 * 2
+    , rate = 120
     , bullets = []
     }
 

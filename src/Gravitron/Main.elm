@@ -341,7 +341,7 @@ stepRandom generator model =
 
 
 randomAngle =
-    Random.float 0 (2 * pi)
+    Random.float 0 (degrees 359)
 
 
 updateTurret : Model -> Model
@@ -374,8 +374,36 @@ updateTurretAim turret =
             diff
                 / abs diff
                 |> nanToZero
+
+        s =
+            turret.aimAngle
+
+        e =
+            turret.aimTargetAngle
+
+        sign =
+            compare s e
+                |> (\o ->
+                        case o of
+                            LT ->
+                                if abs diff < pi then
+                                    1
+
+                                else
+                                    -1
+
+                            EQ ->
+                                0
+
+                            GT ->
+                                if abs diff < pi then
+                                    -1
+
+                                else
+                                    1
+                   )
     in
-    { turret | aimAngle = turret.aimAngle + turretAimSpeed * diffSign }
+    { turret | aimAngle = turret.aimAngle + turretAimSpeed * sign }
 
 
 updateTurretElapsed : Turret -> Turret

@@ -47,14 +47,14 @@ initPlanet =
 
 
 type alias Turret =
-    { start : Float
+    { elapsed : Float
     , rate : Float
     }
 
 
 initTurret : Turret
 initTurret =
-    { start = 0
+    { elapsed = 0
     , rate = 20
     }
 
@@ -183,21 +183,32 @@ update message model =
 
 updateTurret : Model -> Model
 updateTurret model =
-    let
-        turret =
+    { model
+        | turret =
             model.turret
+                |> updateTurretElapsed
+                |> turretFireBullet
+    }
 
-        elapsed =
-            model.ct - turret.start
 
-        newTurret =
-            if elapsed > turret.rate then
-                { turret | start = 0 }
+turretFireBullet turret =
+    if turret.elapsed > turret.rate then
+        { turret | elapsed = 0 }
 
-            else
-                turret
-    in
-    { model | turret = newTurret }
+    else
+        turret
+
+
+updateTurretElapsed turret =
+    { turret | elapsed = turret.elapsed + 1 }
+
+
+turretElapsed ct turret =
+    ct - turret.start
+
+
+turretPct ct turret =
+    ct
 
 
 updatePlanet : Model -> Model

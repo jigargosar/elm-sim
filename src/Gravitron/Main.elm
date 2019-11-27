@@ -380,10 +380,12 @@ updateTurretAim turret =
                         da =
                             e - s
                     in
-                    if da <= speed then
-                        e
+                    {- if da <= speed then
+                           e
 
-                    else if da < pi then
+                       else
+                    -}
+                    if da < pi then
                         s + speed
 
                     else
@@ -394,10 +396,12 @@ updateTurretAim turret =
                         da =
                             s - e
                     in
-                    if da <= speed then
-                        e
+                    {- if da <= speed then
+                           e
 
-                    else if da < pi then
+                       else
+                    -}
+                    if da < pi then
                         s - speed
 
                     else

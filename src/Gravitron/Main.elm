@@ -32,6 +32,10 @@ wallBounceFriction =
     0.9
 
 
+bulletDrag =
+    0.9
+
+
 
 -- DATA
 

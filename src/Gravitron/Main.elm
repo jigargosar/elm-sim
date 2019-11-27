@@ -351,10 +351,6 @@ renderTurret2 turret =
             100
                 / turret.rate
                 * turret.elapsed
-                |> Debug.log "pctCompleted"
-
-        _ =
-            Debug.log "turret" ( turret.rate, turret.elapsed )
 
         innerR =
             r / 100 * pctCompleted

@@ -370,13 +370,14 @@ updateTurretAim turret =
         e =
             turret.aimTargetAngle
 
-        --        _ =
-        --            if s > degrees 360 then
-        --                Debug.log "start > 360" ( s, e )
-        --                    |> Debug.todo "wtf"
-        --
-        --            else
-        --                1
+        _ =
+            if s > degrees 360 then
+                Debug.log "start > 360" ( s, e )
+                    |> Debug.todo "wtf"
+
+            else
+                1
+
         _ =
             if e > degrees 360 then
                 Debug.log "end > 360" ( s, e )
@@ -427,7 +428,7 @@ updateTurretAim turret =
                 else
                     s + speed
     in
-    { turret | aimAngle = final }
+    { turret | aimAngle = final |> fModBy (degrees 360) }
 
 
 updateTurretElapsed : Turret -> Turret

@@ -20,6 +20,15 @@ import TypedSvg.Types exposing (Fill(..), StrokeLinecap(..), StrokeLinejoin(..),
 -- DATA
 
 
+type alias Sun =
+    { x : Float
+    , y : Float
+    , vx : Float
+    , vy : Float
+    , radius : Float
+    }
+
+
 type alias Planet =
     { x : Float
     , y : Float

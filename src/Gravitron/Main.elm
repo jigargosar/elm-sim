@@ -26,16 +26,18 @@ type alias Sun =
     , vx : Float
     , vy : Float
     , radius : Float
+    , mass : Float
     }
 
 
-initSun : Planet
+initSun : Sun
 initSun =
     { x = 0
     , y = 0
     , vx = 0
     , vy = 0
     , radius = 20
+    , mass = 10 * 1000
     }
 
 
@@ -276,14 +278,11 @@ fireTurretBulletIfReady turret =
 updateTurretBullets : Model -> Turret -> Turret
 updateTurretBullets model turret =
     let
-        mouse =
-            model.mouse
-
         screen =
             model.screen
 
         sun =
-            { x = mouse.x, y = mouse.y, mass = 10 * 1000 }
+            model.sun
 
         updateBullet bullet =
             bullet
@@ -303,14 +302,11 @@ updatePlanet model =
 
         screen =
             model.screen
-
-        sun =
-            { x = mouse.x, y = mouse.y, mass = 10 * 1000 }
     in
     { model
         | planet =
             stepVel model.planet
-                |> gravitateTo sun
+                |> gravitateTo model.sun
                 |> clampVelocity 30
                 |> bounceOffScreen screen
     }

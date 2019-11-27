@@ -350,10 +350,16 @@ updateTurretElapsed turret =
 
 turretFireBulletWhenReady turret =
     if turret.elapsed >= turret.rate then
-        turretFireBullet turret
+        turret
+            |> turretResetElapsed
+            |> turretFireBullet
 
     else
         turret
+
+
+turretResetElapsed turret =
+    { turret | elapsed = 0 }
 
 
 turretFireBullet turret =
@@ -368,8 +374,7 @@ turretFireBullet turret =
             turret.angle
     in
     { turret
-        | elapsed = 0
-        , bullets = initBullet x y bulletInitialSpeed angle :: turret.bullets
+        | bullets = initBullet x y bulletInitialSpeed angle :: turret.bullets
     }
 
 

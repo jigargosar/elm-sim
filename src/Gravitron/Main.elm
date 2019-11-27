@@ -348,9 +348,7 @@ renderTurret2 turret =
             20
 
         pctCompleted =
-            100
-                / turret.rate
-                * turret.elapsed
+            100 / turret.rate * turret.elapsed
 
         innerR =
             r / 100 * pctCompleted

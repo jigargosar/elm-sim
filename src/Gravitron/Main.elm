@@ -326,27 +326,28 @@ stepRandom generator model =
         |> Tuple.mapSecond (\seed -> { model | seed = seed })
 
 
+randomAngle =
+    Random.float 0 (2 * pi)
+
+
 updateTurret : Model -> Model
-updateTurret =
-    let
-        randomAngle =
-            Random.float 0 (2 * pi)
-    in
-    stepRandom randomAngle
-        >> (\( angle, model ) ->
-                { model
-                    | turret =
-                        model.turret
-                            |> updateTurretElapsed
-                            |> turretFireBulletIfReadyTowards angle
-                            |> updateTurretBullets model
-                }
-           )
+updateTurret model =
+    { model
+        | turret =
+            model.turret
+                |> updateTurretElapsed
+                |> turretFireBulletIfReadyTowardsRandomAngle
+                |> updateTurretBullets model
+    }
 
 
 updateTurretElapsed : Turret -> Turret
 updateTurretElapsed turret =
     { turret | elapsed = turret.elapsed + 1 }
+
+
+turretFireBulletIfReadyTowardsRandomAngle =
+    stepRandom randomAngle >> apply2 turretFireBulletIfReadyTowards
 
 
 turretFireBulletIfReadyTowards angle turret =

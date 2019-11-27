@@ -131,6 +131,7 @@ initTurret seed =
     }
 
 
+turretGenerator : Random.Generator Turret
 turretGenerator =
     Random.independentSeed
         |> Random.map (initTurret >> turretAimTowardsRandomAngle)
@@ -360,18 +361,22 @@ turretWhenBulletReadyUpdateWith func turret =
         turret
 
 
+turretAimTowardsRandomAngle : Turret -> Turret
 turretAimTowardsRandomAngle =
     stepRandom randomAngle >> apply2 turretAimToWards
 
 
+turretAimToWards : Float -> Turret -> Turret
 turretAimToWards angle turret =
     { turret | angle = angle }
 
 
+turretResetElapsed : Turret -> Turret
 turretResetElapsed turret =
     { turret | elapsed = 0 }
 
 
+turretFireBullet : Turret -> Turret
 turretFireBullet turret =
     let
         x =

@@ -9,8 +9,8 @@ import Html.Attributes exposing (style)
 import Json.Decode as JD
 import Random exposing (Seed)
 import Task
-import TypedSvg exposing (circle, g, rect, svg)
-import TypedSvg.Attributes as TSA exposing (fill, stroke, transform, viewBox)
+import TypedSvg as Svg exposing (circle, g, path, rect, svg)
+import TypedSvg.Attributes as TSA exposing (d, fill, stroke, transform, viewBox)
 import TypedSvg.Attributes.InPx exposing (cx, cy, height, r, strokeWidth, width, x, y)
 import TypedSvg.Core as TSC
 import TypedSvg.Types exposing (Fill(..), StrokeLinecap(..), StrokeLinejoin(..), Transform(..))
@@ -330,14 +330,24 @@ renderTurret =
         outerRadius =
             maxRadius
     in
-    g []
-        [ renderCircle -100 -100 innerRadius [ fillColor Color.green ]
-        , renderCircle
-            -100
-            -100
+    g [ transform [ Translate -100 -100 ] ]
+        [ renderCircle 0 0 innerRadius [ fillColor Color.green ]
+        , renderCircle 0
+            0
             outerRadius
             [ fillNone
             , stroke <| Color.rgba 1 1 1 0.8
+
+            {- , strokeWidth outerStrokeWidth
+               , TSA.strokeLinecap StrokeLinecapRound
+               , TSA.strokeLinejoin StrokeLinejoinRound
+            -}
+            ]
+        , renderCircle 0
+            0
+            outerRadius
+            [ fillNone
+            , stroke <| Color.orange
             , strokeWidth outerStrokeWidth
             , TSA.strokeLinecap StrokeLinecapRound
             , TSA.strokeLinejoin StrokeLinejoinRound

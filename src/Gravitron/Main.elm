@@ -328,7 +328,7 @@ updateTurretBullets model turret =
             bullet
                 |> stepVel
                 |> gravitateTo sun
-                |> clampVelocity 10
+                --|> clampVelocity 10
                 |> bounceOffScreen screen
     in
     { turret | bullets = List.map updateBullet turret.bullets }

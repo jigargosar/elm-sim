@@ -285,7 +285,7 @@ updateTurret model =
         | turret =
             model.turret
                 |> updateTurretElapsed
-                |> fireTurretBulletIfReady
+                |> turretFireBulletIfReady
                 |> updateTurretBullets model
     }
 
@@ -295,8 +295,8 @@ updateTurretElapsed turret =
     { turret | elapsed = turret.elapsed + 1 }
 
 
-fireTurretBulletIfReady : Turret -> Turret
-fireTurretBulletIfReady turret =
+turretFireBulletIfReady : Turret -> Turret
+turretFireBulletIfReady turret =
     if turret.elapsed >= turret.rate then
         let
             x =
@@ -411,6 +411,22 @@ bounceOffScreen s =
                 p
     in
     bounceX >> bounceY
+
+
+dxyTo : { a | x : number, y : number } -> { b | x : number, y : number } -> ( number, number )
+dxyTo p2 p1 =
+    ( p2.x - p1.x, p2.y - p1.y )
+
+
+angleTo : { a | x : Float, y : Float } -> { b | x : Float, y : Float } -> Float
+angleTo p2 p1 =
+    dxyTo p2 p1
+        |> apply2 atan2
+
+
+apply2 : (a -> b -> c) -> ( a, b ) -> c
+apply2 func ( a, b ) =
+    func a b
 
 
 gravitateTo p2 p1 =

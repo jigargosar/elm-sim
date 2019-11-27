@@ -29,6 +29,16 @@ type alias Sun =
     }
 
 
+initSun : Planet
+initSun =
+    { x = 0
+    , y = 0
+    , vx = 0
+    , vy = 0
+    , radius = 20
+    }
+
+
 type alias Planet =
     { x : Float
     , y : Float
@@ -113,6 +123,7 @@ type alias Model =
     { seed : Seed
     , planet : Planet
     , turret : Turret
+    , sun : Sun
     , ct : Float
     , mouse : Mouse
     , screen : Screen
@@ -156,6 +167,7 @@ type alias Mouse =
 init : Flags -> ( Model, Cmd Msg )
 init flags =
     ( { seed = Random.initialSeed flags.now
+      , sun = initSun
       , planet = initPlanet
       , turret = initTurret
       , ct = 0

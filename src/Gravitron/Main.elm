@@ -212,6 +212,7 @@ update message model =
                 |> updatePlanet
                 |> updateTurret
                 |> updateSun
+                |> updateCollisions
             , Cmd.none
             )
 
@@ -236,6 +237,18 @@ update message model =
             ( { model | screen = toScreen (toFloat width) (toFloat height) }
             , Cmd.none
             )
+
+
+updateCollisions : Model -> Model
+updateCollisions model =
+    let
+        bullets =
+            model.turret.bullets
+
+        sun =
+            model.sun
+    in
+    model
 
 
 updateTurret : Model -> Model

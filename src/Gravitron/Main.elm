@@ -353,9 +353,18 @@ turretFireBulletWhenReady turret =
         turret
             |> turretResetElapsed
             |> turretFireBullet
+            |> turretAimToRandomAngle
 
     else
         turret
+
+
+turretAimToRandomAngle =
+    stepRandom randomAngle >> apply2 turretAimToWards
+
+
+turretAimToWards angle turret =
+    { turret | angle = angle }
 
 
 turretResetElapsed turret =

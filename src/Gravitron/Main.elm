@@ -62,6 +62,7 @@ type alias Bullet =
     , y : Float
     , vx : Float
     , vy : Float
+    , radius : Float
     }
 
 
@@ -74,6 +75,20 @@ initTurret =
     , elapsed = 0
     , rate = 120 * 2
     , bullets = []
+    }
+
+
+initBullet : Float -> Float -> Float -> Float -> Bullet
+initBullet x y speed angle =
+    let
+        ( vx, vy ) =
+            fromPolar ( speed, angle )
+    in
+    { x = x
+    , y = y
+    , vx = vx
+    , vy = vy
+    , radius = 20
     }
 
 

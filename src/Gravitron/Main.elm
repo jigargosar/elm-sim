@@ -103,7 +103,7 @@ type alias Turret =
     , elapsed : Float
     , rate : Float
     , bullets : List Bullet
-    , angle : Float
+    , aimAngle : Float
     , seed : Seed
     }
 
@@ -126,7 +126,7 @@ initTurret seed =
     , elapsed = 0
     , rate = bulletInitialFireRate
     , bullets = []
-    , angle = 0
+    , aimAngle = 0
     , seed = seed
     }
 
@@ -368,7 +368,7 @@ turretAimTowardsRandomAngle =
 
 turretAimToWards : Float -> Turret -> Turret
 turretAimToWards angle turret =
-    { turret | angle = angle }
+    { turret | aimAngle = angle }
 
 
 turretResetElapsed : Turret -> Turret
@@ -386,7 +386,7 @@ turretFireBullet turret =
             turret.y
 
         angle =
-            turret.angle
+            turret.aimAngle
     in
     { turret
         | bullets = initBullet x y bulletInitialSpeed angle :: turret.bullets
@@ -592,7 +592,8 @@ renderSun { x, y, radius } =
     renderCircle x y radius [ fillColor Color.yellow ]
 
 
-renderTurret { x, y, radius, color, rate, angle, elapsed, bullets } =
+renderTurret : Turret -> TSC.Svg msg
+renderTurret { x, y, radius, color, rate, aimAngle, elapsed, bullets } =
     let
         innerR =
             radius / rate * elapsed
@@ -603,7 +604,7 @@ renderTurret { x, y, radius, color, rate, angle, elapsed, bullets } =
             , renderCircle 0 0 innerR [ fillColor <| whiteA 0.5 ]
             , let
                 ( p2x, p2y ) =
-                    fromPolar ( radius, angle )
+                    fromPolar ( radius, aimAngle )
               in
               line [ x1 0, y1 0, x2 p2x, y2 p2y, stroke Color.red ] []
             ]

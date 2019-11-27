@@ -29,15 +29,15 @@ bulletInitialSpeed =
 
 
 bulletMaxSpeed =
-    7
+    11
 
 
 initialSunMass =
-    3000
+    1500
 
 
 bulletWallDrag =
-    0.9
+    0.8
 
 
 bulletUpdateDrag =

@@ -453,10 +453,6 @@ whiteA =
     Color.rgba 1 1 1
 
 
-fillNone =
-    fill FillNone
-
-
 renderPlanet { x, y, radius } =
     renderCircle x y radius [ fillColor Color.blue ]
 

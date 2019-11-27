@@ -260,7 +260,7 @@ updateCollisions model =
 
         folder bullet ( sun, bullets ) =
             if areColliding sun bullet then
-                ( sun, bullet :: bullets )
+                ( sun, bullets )
 
             else
                 ( sun, bullet :: bullets )
@@ -328,7 +328,7 @@ updateTurretBullets model turret =
             bullet
                 |> stepVel
                 |> gravitateTo sun
-                |> clampVelocity 30
+                |> clampVelocity 10
                 |> bounceOffScreen screen
     in
     { turret | bullets = List.map updateBullet turret.bullets }
@@ -485,8 +485,8 @@ view model =
         ]
 
 
-renderSun { x, y } =
-    renderCircle x y 50 [ fillColor Color.yellow ]
+renderSun { x, y, radius } =
+    renderCircle x y radius [ fillColor Color.yellow ]
 
 
 renderTurret { x, y, radius, color, rate, elapsed, bullets } =

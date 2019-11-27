@@ -41,7 +41,7 @@ bulletWallDrag =
 
 
 bulletUpdateDrag =
-    1
+    0.999
 
 
 

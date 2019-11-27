@@ -357,10 +357,12 @@ renderSun { x, y } =
     renderCircle x y 50 [ fillColor Color.yellow ]
 
 
-renderTurret2 ({ x, y, radius, color } as turret) =
+renderTurret2 ({ x, y, radius, color, rate, elapsed } as turret) =
     let
         innerR =
-            radius / turret.rate * turret.elapsed
+            radius
+                / rate
+                * elapsed
     in
     g [ transform [ Translate x y ] ]
         [ renderCircle 0 0 radius [ fillColor color ]

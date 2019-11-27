@@ -123,7 +123,8 @@ type alias Flags =
 
 type alias Model =
     { seed : Seed
-    , planet : Planet
+
+    --, planet : Planet
     , turret : Turret
     , sun : Sun
     , ct : Float
@@ -170,7 +171,8 @@ init : Flags -> ( Model, Cmd Msg )
 init flags =
     ( { seed = Random.initialSeed flags.now
       , sun = initSun
-      , planet = initPlanet
+
+      --, planet = initPlanet
       , turret = initTurret
       , ct = 0
       , mouse = Mouse 0 0
@@ -209,7 +211,7 @@ update message model =
     case message of
         Tick _ ->
             ( { model | ct = model.ct + 1 }
-                |> updatePlanet
+                --|> updatePlanet
                 |> updateTurret
                 |> updateSun
                 |> updateCollisions
@@ -360,19 +362,22 @@ followXY { x, y } sun =
     { sun | vx = nvx, vy = nvy }
 
 
-updatePlanet : Model -> Model
-updatePlanet model =
-    let
-        screen =
-            model.screen
-    in
-    { model
-        | planet =
-            stepVel model.planet
-                |> gravitateTo model.sun
-                |> clampVelocity 30
-                |> bounceOffScreen screen
-    }
+
+{-
+   updatePlanet : Model -> Model
+   updatePlanet model =
+       let
+           screen =
+               model.screen
+       in
+       { model
+           | planet =
+               stepVel model.planet
+                   |> gravitateTo model.sun
+                   |> clampVelocity 30
+                   |> bounceOffScreen screen
+       }
+-}
 
 
 clampVelocity n p =
@@ -481,7 +486,8 @@ view model =
         [ renderRect s.l s.t s.w s.h [ fillColor Color.black ]
         , renderSun model.sun
         , renderTurret model.turret
-        , renderPlanet model.planet
+
+        --, renderPlanet model.planet
         ]
 
 

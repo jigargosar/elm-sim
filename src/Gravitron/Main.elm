@@ -9,9 +9,9 @@ import Html.Attributes exposing (style)
 import Json.Decode as JD
 import Random exposing (Seed)
 import Task
-import TypedSvg exposing (circle, g, rect, svg)
+import TypedSvg exposing (circle, g, line, rect, svg)
 import TypedSvg.Attributes as TSA exposing (fill, stroke, transform, viewBox)
-import TypedSvg.Attributes.InPx exposing (cx, cy, height, r, strokeWidth, width, x, y)
+import TypedSvg.Attributes.InPx exposing (cx, cy, height, r, strokeWidth, width, x, x1, x2, y, y1, y2)
 import TypedSvg.Core as TSC
 import TypedSvg.Types exposing (Fill(..), StrokeLinecap(..), StrokeLinejoin(..), Transform(..))
 
@@ -601,6 +601,11 @@ renderTurret { x, y, radius, color, rate, angle, elapsed, bullets } =
         [ g [ transform [ Translate x y ] ]
             [ renderCircle 0 0 radius [ fillColor color ]
             , renderCircle 0 0 innerR [ fillColor <| whiteA 0.5 ]
+            , let
+                ( p2x, p2y ) =
+                    fromPolar ( radius, angle )
+              in
+              line [ x1 0, y1 0, x2 p2x, y2 p2y, stroke Color.red ] []
             ]
         , g [] (List.map renderTurretBullet bullets)
         ]

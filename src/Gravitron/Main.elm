@@ -88,7 +88,7 @@ initBullet x y speed angle =
     , y = y
     , vx = vx
     , vy = vy
-    , radius = 20
+    , radius = 5
     }
 
 
@@ -244,7 +244,7 @@ fireTurretBulletIfReady turret =
                 10
 
             angle =
-                degrees 90
+                degrees 180
         in
         { turret | elapsed = 0, bullets = initBullet x y speed angle :: turret.bullets }
 
@@ -399,9 +399,9 @@ view model =
     in
     svg [ style "position" "fixed", viewBox s.l s.t s.w s.h, width s.w, height s.h ]
         [ renderRect s.l s.t s.w s.h [ fillColor Color.black ]
-        , renderPlanet model.planet
         , renderSun model.mouse
         , renderTurret model.turret
+        , renderPlanet model.planet
         ]
 
 

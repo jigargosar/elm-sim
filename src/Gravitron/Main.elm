@@ -371,17 +371,32 @@ updateTurretAim turret =
 
         final =
             if s < e then
-                if e - s < pi then
+                let
+                    da =
+                        e - s
+                in
+                if da <= speed then
+                    e
+
+                else if da < pi then
                     s + speed
 
                 else
                     s - speed
 
-            else if s - e < pi then
-                s - speed
-
             else
-                s + speed
+                let
+                    da =
+                        s - e
+                in
+                if da <= speed then
+                    e
+
+                else if da < pi then
+                    s - speed
+
+                else
+                    s + speed
     in
     { turret | aimAngle = final }
 

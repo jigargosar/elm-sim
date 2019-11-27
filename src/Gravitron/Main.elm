@@ -297,9 +297,6 @@ updateTurretBullets model turret =
 updatePlanet : Model -> Model
 updatePlanet model =
     let
-        mouse =
-            model.mouse
-
         screen =
             model.screen
     in

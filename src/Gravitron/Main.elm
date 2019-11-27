@@ -21,19 +21,19 @@ import TypedSvg.Types exposing (Fill(..), StrokeLinecap(..), StrokeLinejoin(..),
 
 
 bulletInitialSpeed =
-    7
+    5
 
 
 bulletMaxSpeed =
-    10
+    8
 
 
 initialSunMass =
-    2000
+    3000
 
 
 bulletWallDrag =
-    0.9
+    1.2
 
 
 bulletUpdateDrag =

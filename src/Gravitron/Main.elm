@@ -338,7 +338,8 @@ updateTurret model =
         | turret =
             model.turret
                 |> updateTurretElapsed
-                |> turretFireBulletWhenReady
+                |> turretWhenBulletReadyUpdateWith
+                    (turretFireBullet >> turretAimTowardsRandomAngle)
                 |> updateTurretBullets model
     }
 
@@ -348,18 +349,17 @@ updateTurretElapsed turret =
     { turret | elapsed = turret.elapsed + 1 }
 
 
-turretFireBulletWhenReady turret =
+turretWhenBulletReadyUpdateWith func turret =
     if turret.elapsed >= turret.rate then
         turret
             |> turretResetElapsed
-            |> turretFireBullet
-            |> turretAimToRandomAngle
+            |> func
 
     else
         turret
 
 
-turretAimToRandomAngle =
+turretAimTowardsRandomAngle =
     stepRandom randomAngle >> apply2 turretAimToWards
 
 

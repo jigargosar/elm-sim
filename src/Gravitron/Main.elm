@@ -303,6 +303,11 @@ updateCollisions model =
            )
 
 
+stepRandom generator model =
+    Random.step generator model.seed
+        |> Tuple.mapSecond (\seed -> { model | seed = seed })
+
+
 updateTurret : Model -> Model
 updateTurret model =
     { model

@@ -216,8 +216,7 @@ init flags =
       , mouse = Mouse 0 0
       , screen = toScreen 600 600
       }
-    , Browser.Dom.getViewport
-        |> Task.perform OnViewport
+    , Browser.Dom.getViewport |> Task.perform OnViewport
     )
 
 

@@ -136,7 +136,11 @@ initTurret seed =
 turretGenerator : Random.Generator Turret
 turretGenerator =
     Random.independentSeed
-        |> Random.map (initTurret >> turretAimTowardsRandomAngle)
+        |> Random.map
+            (initTurret
+                >> turretAimTowardsRandomAngle
+                >> (\turret -> { turret | aimAngle = turret.aimTargetAngle })
+            )
 
 
 initBullet : Float -> Float -> Float -> Float -> Bullet

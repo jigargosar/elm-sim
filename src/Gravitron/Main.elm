@@ -306,6 +306,7 @@ view model =
         , renderPlanet model.planet
         , renderSun model.mouse
         , renderTurret
+        , renderTurret2
         ]
 
 
@@ -320,9 +321,22 @@ renderTurret2 =
 
         r =
             20
+
+        pctCompleted =
+            35
+
+        innerR =
+            r / 100 * pctCompleted
     in
     g [ transform [ Translate x y ] ]
-        [ renderCircle 0 0 r [ fillColor Color.green ] ]
+        [ renderCircle 0 0 r [ fillColor Color.green ]
+        , renderCircle 0 0 innerR [ fillColor <| whiteA 0.5 ]
+        ]
+
+
+whiteA : Float -> Color.Color
+whiteA =
+    Color.rgba 1 1 1
 
 
 renderTurret =

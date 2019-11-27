@@ -55,7 +55,7 @@ type alias Turret =
 initTurret : Turret
 initTurret =
     { elapsed = 0
-    , rate = 20
+    , rate = 120
     }
 
 
@@ -187,28 +187,20 @@ updateTurret model =
         | turret =
             model.turret
                 |> updateTurretElapsed
-                |> turretFireBullet
+                |> updateTurretBullet
     }
-
-
-turretFireBullet turret =
-    if turret.elapsed > turret.rate then
-        { turret | elapsed = 0 }
-
-    else
-        turret
 
 
 updateTurretElapsed turret =
     { turret | elapsed = turret.elapsed + 1 }
 
 
-turretElapsed ct turret =
-    ct - turret.start
+updateTurretBullet turret =
+    if turret.elapsed > turret.rate then
+        { turret | elapsed = 0 }
 
-
-turretPct ct turret =
-    ct
+    else
+        turret
 
 
 updatePlanet : Model -> Model
@@ -339,7 +331,7 @@ view model =
         , renderPlanet model.planet
         , renderSun model.mouse
         , renderTurret
-        , renderTurret2
+        , renderTurret2 model.turret
         ]
 
 
@@ -347,7 +339,7 @@ renderSun { x, y } =
     renderCircle x y 50 [ fillColor Color.yellow ]
 
 
-renderTurret2 =
+renderTurret2 turret =
     let
         ( x, y ) =
             ( -100, 100 )
@@ -356,7 +348,10 @@ renderTurret2 =
             20
 
         pctCompleted =
-            35
+            turret.rate
+                / 100
+                * turret.elapsed
+                |> Debug.log "pctCompleted"
 
         innerR =
             r / 100 * pctCompleted

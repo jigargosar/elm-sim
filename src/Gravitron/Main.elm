@@ -20,6 +20,10 @@ import TypedSvg.Types exposing (Fill(..), StrokeLinecap(..), StrokeLinejoin(..),
 -- Constants
 
 
+turretAimSpeed =
+    degrees 0.1
+
+
 bulletInitialFireRate =
     200
 
@@ -346,10 +350,23 @@ updateTurret model =
         | turret =
             model.turret
                 |> updateTurretElapsed
+                |> updateTurretAim
                 |> turretWhenBulletReadyUpdateWith
                     (turretFireBullet >> turretAimTowardsRandomAngle)
                 |> updateTurretBullets model
     }
+
+
+updateTurretAim : Turret -> Turret
+updateTurretAim turret =
+    let
+        diff =
+            turret.aimTargetAngle - turret.aimAngle
+
+        diffSign =
+            diff / abs diff
+    in
+    { turret | aimAngle = turret.aimAngle + turretAimSpeed * diffSign }
 
 
 updateTurretElapsed : Turret -> Turret

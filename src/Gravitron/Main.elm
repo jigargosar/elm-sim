@@ -242,13 +242,16 @@ update message model =
 updateCollisions : Model -> Model
 updateCollisions model =
     let
-        bullets =
-            model.turret.bullets
+        folder bullet ( sun, bulletsAcc ) =
+            ( sun, bullets )
 
-        sun =
-            model.sun
+        turret =
+            model.turret
+
+        ( sun, bullets ) =
+            List.foldl folder ( model.sun, [] ) model.turret.bullets
     in
-    model
+    { model | turret = { turret | bullets = bullets }, sun = sun }
 
 
 updateTurret : Model -> Model

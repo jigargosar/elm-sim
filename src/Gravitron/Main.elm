@@ -211,6 +211,7 @@ update message model =
             ( { model | ct = model.ct + 1 }
                 |> updatePlanet
                 |> updateTurret
+                |> updateSun
             , Cmd.none
             )
 
@@ -292,6 +293,32 @@ updateTurretBullets model turret =
                 |> bounceOffScreen screen
     in
     { turret | bullets = List.map updateBullet turret.bullets }
+
+
+updateSun model =
+    { model
+        | sun =
+            model.sun
+                |> stepVel
+                |> followXY model.mouse
+    }
+
+
+followXY { x, y } sun =
+    let
+        dx =
+            x - sun.x
+
+        dy =
+            y - sun.y
+
+        ( rad, theta ) =
+            toPolar ( dx, dy )
+
+        ( nvx, nvy ) =
+            fromPolar ( rad / 15, theta )
+    in
+    { sun | vx = nvx, vy = nvy }
 
 
 updatePlanet : Model -> Model

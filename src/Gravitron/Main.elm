@@ -25,7 +25,7 @@ initialBulletSpeed =
 
 
 initialSunMass =
-    5000
+    1000
 
 
 wallBounceFriction =

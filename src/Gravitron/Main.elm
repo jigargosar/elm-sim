@@ -17,6 +17,14 @@ import TypedSvg.Types exposing (Fill(..), StrokeLinecap(..), StrokeLinejoin(..),
 
 
 
+-- Constants
+
+
+initialBulletSpeed =
+    7
+
+
+
 -- DATA
 
 
@@ -304,13 +312,10 @@ turretFireBulletIfReadyTowards p2 turret =
             y =
                 turret.y
 
-            speed =
-                5
-
             angle =
                 angleTo { x = turret.x, y = turret.y } p2
         in
-        { turret | elapsed = 0, bullets = initBullet x y speed angle :: turret.bullets }
+        { turret | elapsed = 0, bullets = initBullet x y initialBulletSpeed angle :: turret.bullets }
 
     else
         turret
@@ -389,22 +394,25 @@ clampVelocity n p =
 
 bounceOffScreen s =
     let
+        bounceFriction =
+            1
+
         bounceX p =
             if p.x < s.l then
-                { p | x = s.l, vx = p.vx * -0.8 }
+                { p | x = s.l, vx = p.vx * -1 * bounceFriction }
 
             else if p.x > s.r then
-                { p | x = s.r, vx = p.vx * -0.8 }
+                { p | x = s.r, vx = p.vx * -1 * bounceFriction }
 
             else
                 p
 
         bounceY p =
             if p.y < s.t then
-                { p | y = s.t, vy = p.vy * -0.8 }
+                { p | y = s.t, vy = p.vy * -1 * bounceFriction }
 
             else if p.y > s.b then
-                { p | y = s.b, vy = p.vy * -0.8 }
+                { p | y = s.b, vy = p.vy * -1 * bounceFriction }
 
             else
                 p

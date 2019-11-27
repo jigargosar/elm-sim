@@ -25,7 +25,11 @@ initialBulletSpeed =
 
 
 initialSunMass =
-    2000
+    5000
+
+
+wallBounceFriction =
+    0.9
 
 
 
@@ -398,25 +402,22 @@ clampVelocity n p =
 
 bounceOffScreen s =
     let
-        bounceFriction =
-            1
-
         bounceX p =
             if p.x < s.l then
-                { p | x = s.l, vx = p.vx * -1 * bounceFriction }
+                { p | x = s.l, vx = p.vx * -1 * wallBounceFriction }
 
             else if p.x > s.r then
-                { p | x = s.r, vx = p.vx * -1 * bounceFriction }
+                { p | x = s.r, vx = p.vx * -1 * wallBounceFriction }
 
             else
                 p
 
         bounceY p =
             if p.y < s.t then
-                { p | y = s.t, vy = p.vy * -1 * bounceFriction }
+                { p | y = s.t, vy = p.vy * -1 * wallBounceFriction }
 
             else if p.y > s.b then
-                { p | y = s.b, vy = p.vy * -1 * bounceFriction }
+                { p | y = s.b, vy = p.vy * -1 * wallBounceFriction }
 
             else
                 p

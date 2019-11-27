@@ -365,40 +365,45 @@ updateTurretAim turret =
 
         e =
             turret.aimTargetAngle
-
-        speed =
-            turretAimSpeed
-
-        final =
-            if s < e then
-                let
-                    da =
-                        e - s
-                in
-                if da <= speed then
-                    e
-
-                else if da < pi then
-                    s + speed
-
-                else
-                    s - speed
-
-            else
-                let
-                    da =
-                        s - e
-                in
-                if da <= speed then
-                    e
-
-                else if da < pi then
-                    s - speed
-
-                else
-                    s + speed
     in
-    { turret | aimAngle = final }
+    if s == e then
+        turret
+
+    else
+        let
+            speed =
+                turretAimSpeed
+
+            final =
+                if s < e then
+                    let
+                        da =
+                            e - s
+                    in
+                    if da <= speed then
+                        e
+
+                    else if da < pi then
+                        s + speed
+
+                    else
+                        s - speed
+
+                else
+                    let
+                        da =
+                            s - e
+                    in
+                    if da <= speed then
+                        e
+
+                    else if da < pi then
+                        s - speed
+
+                    else
+                        s + speed
+        in
+        { turret | aimAngle = final }
 
 
 updateTurretElapsed : Turret -> Turret

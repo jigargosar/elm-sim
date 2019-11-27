@@ -305,7 +305,7 @@ turretFireBulletIfReadyTowards p2 turret =
                 turret.y
 
             speed =
-                10
+                5
 
             angle =
                 angleTo { x = turret.x, y = turret.y } p2

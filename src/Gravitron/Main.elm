@@ -47,13 +47,15 @@ initPlanet =
 
 
 type alias Turret =
-    { elapsed : Float
+    { start : Float
+    , rate : Float
     }
 
 
 initTurret : Turret
 initTurret =
-    { elapsed = 0
+    { start = 0
+    , rate = 20
     }
 
 
@@ -69,7 +71,7 @@ type alias Model =
     { seed : Seed
     , planet : Planet
     , turret : Turret
-    , ct : Int
+    , ct : Float
     , mouse : Mouse
     , screen : Screen
     }
@@ -152,6 +154,7 @@ update message model =
         Tick _ ->
             ( { model | ct = model.ct + 1 }
                 |> updatePlanet
+                |> updateTurret
             , Cmd.none
             )
 
@@ -176,6 +179,25 @@ update message model =
             ( { model | screen = toScreen (toFloat width) (toFloat height) }
             , Cmd.none
             )
+
+
+updateTurret : Model -> Model
+updateTurret model =
+    let
+        turret =
+            model.turret
+
+        elapsed =
+            model.ct - turret.start
+
+        newTurret =
+            if elapsed > turret.rate then
+                { turret | start = 0 }
+
+            else
+                turret
+    in
+    { model | turret = newTurret }
 
 
 updatePlanet : Model -> Model

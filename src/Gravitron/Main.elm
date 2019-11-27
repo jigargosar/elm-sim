@@ -347,11 +347,8 @@ renderTurret2 turret =
         r =
             20
 
-        pctCompleted =
-            100 / turret.rate * turret.elapsed
-
         innerR =
-            r / 100 * pctCompleted
+            r / turret.rate * turret.elapsed
     in
     g [ transform [ Translate x y ] ]
         [ renderCircle 0 0 r [ fillColor Color.green ]

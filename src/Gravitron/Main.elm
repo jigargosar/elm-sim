@@ -104,6 +104,7 @@ type alias Turret =
     , rate : Float
     , bullets : List Bullet
     , aimAngle : Float
+    , aimTargetAngle : Float
     , seed : Seed
     }
 
@@ -127,6 +128,7 @@ initTurret seed =
     , rate = bulletInitialFireRate
     , bullets = []
     , aimAngle = 0
+    , aimTargetAngle = 0
     , seed = seed
     }
 
@@ -368,7 +370,7 @@ turretAimTowardsRandomAngle =
 
 turretAimToWards : Float -> Turret -> Turret
 turretAimToWards angle turret =
-    { turret | aimAngle = angle }
+    { turret | aimTargetAngle = angle }
 
 
 turretResetElapsed : Turret -> Turret

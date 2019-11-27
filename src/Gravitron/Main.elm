@@ -368,14 +368,16 @@ updateTurretAim turret =
 
         _ =
             if s > degrees 360 then
-                Debug.todo "wtf"
+                Debug.log "wtf" ( s, e )
+                    |> Debug.todo "wtf"
 
             else
                 1
 
         _ =
             if e > degrees 360 then
-                Debug.todo "wtf"
+                Debug.log "wtf" ( s, e )
+                    |> Debug.todo "wtf"
 
             else
                 1

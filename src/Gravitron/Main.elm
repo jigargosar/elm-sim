@@ -24,6 +24,10 @@ initialBulletSpeed =
     7
 
 
+initialSunMass =
+    2000
+
+
 
 -- DATA
 
@@ -45,7 +49,7 @@ initSun =
     , vx = 0
     , vy = 0
     , radius = 20
-    , mass = 2000
+    , mass = initialSunMass
     }
 
 

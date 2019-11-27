@@ -196,7 +196,7 @@ updateTurretElapsed turret =
 
 
 updateTurretBullet turret =
-    if turret.elapsed > turret.rate then
+    if turret.elapsed >= turret.rate then
         { turret | elapsed = 0 }
 
     else
@@ -348,10 +348,13 @@ renderTurret2 turret =
             20
 
         pctCompleted =
-            turret.rate
-                / 100
+            100
+                / turret.rate
                 * turret.elapsed
                 |> Debug.log "pctCompleted"
+
+        _ =
+            Debug.log "turret" ( turret.rate, turret.elapsed )
 
         innerR =
             r / 100 * pctCompleted

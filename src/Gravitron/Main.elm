@@ -313,6 +313,18 @@ renderSun { x, y } =
     renderCircle x y 50 [ fillColor Color.yellow ]
 
 
+renderTurret2 =
+    let
+        ( x, y ) =
+            ( -100, 100 )
+
+        r =
+            20
+    in
+    g [ transform [ Translate x y ] ]
+        [ renderCircle 0 0 r [ fillColor Color.green ] ]
+
+
 renderTurret =
     let
         maxRadius =

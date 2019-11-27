@@ -103,6 +103,7 @@ type alias Turret =
     , elapsed : Float
     , rate : Float
     , bullets : List Bullet
+    , seed : Seed
     }
 
 
@@ -115,8 +116,8 @@ type alias Bullet =
     }
 
 
-initTurret : Turret
-initTurret =
+initTurret : Seed -> Turret
+initTurret seed =
     { x = -100
     , y = 100
     , radius = 20
@@ -124,7 +125,12 @@ initTurret =
     , elapsed = 0
     , rate = bulletInitialFireRate
     , bullets = []
+    , seed = seed
     }
+
+
+turretGenerator =
+    Random.independentSeed |> Random.map initTurret
 
 
 initBullet : Float -> Float -> Float -> Float -> Bullet
@@ -197,11 +203,15 @@ type alias Mouse =
 
 init : Flags -> ( Model, Cmd Msg )
 init flags =
-    ( { seed = Random.initialSeed flags.now
+    let
+        ( turret, seed ) =
+            Random.step turretGenerator (Random.initialSeed flags.now)
+    in
+    ( { seed = seed
       , sun = initSun
 
       --, planet = initPlanet
-      , turret = initTurret
+      , turret = turret
       , ct = 0
       , mouse = Mouse 0 0
       , screen = toScreen 600 600

@@ -242,8 +242,28 @@ update message model =
 updateCollisions : Model -> Model
 updateCollisions model =
     let
+        areColliding c1 c2 =
+            let
+                dx =
+                    c2.x - c1.x
+
+                dy =
+                    c2.y - c1.y
+
+                distanceSquared =
+                    dx ^ 2 + dy ^ 2
+
+                radiiSquared =
+                    (c1.radius + c2.radius) ^ 2
+            in
+            distanceSquared <= radiiSquared
+
         folder bullet ( sun, bullets ) =
-            ( sun, bullets )
+            if areColliding sun bullet then
+                ( sun, bullet :: bullets )
+
+            else
+                ( sun, bullet :: bullets )
 
         turret =
             model.turret

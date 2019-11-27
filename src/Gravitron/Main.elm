@@ -220,7 +220,8 @@ updateTurret model =
         | turret =
             model.turret
                 |> updateTurretElapsed
-                |> updateTurretBullets
+                |> fireTurretBulletIfReady
+                |> updateTurretBullets model
     }
 
 
@@ -229,8 +230,8 @@ updateTurretElapsed turret =
     { turret | elapsed = turret.elapsed + 1 }
 
 
-updateTurretBullets : Turret -> Turret
-updateTurretBullets turret =
+fireTurretBulletIfReady : Turret -> Turret
+fireTurretBulletIfReady turret =
     if turret.elapsed >= turret.rate then
         let
             x =
@@ -249,6 +250,28 @@ updateTurretBullets turret =
 
     else
         turret
+
+
+updateTurretBullets : Model -> Turret -> Turret
+updateTurretBullets model turret =
+    let
+        mouse =
+            model.mouse
+
+        screen =
+            model.screen
+
+        sun =
+            { x = mouse.x, y = mouse.y, mass = 10 * 1000 }
+
+        updateBullet bullet =
+            bullet
+                |> stepVel
+                |> gravitateTo sun
+                |> clampVelocity 30
+                |> bounceOffScreen screen
+    in
+    { turret | bullets = List.map updateBullet turret.bullets }
 
 
 updatePlanet : Model -> Model

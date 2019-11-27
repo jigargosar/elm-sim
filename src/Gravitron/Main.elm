@@ -25,7 +25,7 @@ initialBulletSpeed =
 
 
 initialSunMass =
-    1000
+    2000
 
 
 wallBounceFriction =
@@ -33,7 +33,7 @@ wallBounceFriction =
 
 
 bulletDrag =
-    0.9
+    0.999
 
 
 
@@ -346,10 +346,15 @@ updateTurretBullets model turret =
             bullet
                 |> stepVel
                 |> gravitateTo sun
+                |> applyDrag bulletDrag
                 --|> clampVelocity 10
                 |> bounceOffScreen screen
     in
     { turret | bullets = List.map updateBullet turret.bullets }
+
+
+applyDrag drag p =
+    { p | vx = p.vx * drag, vy = p.vy * drag }
 
 
 updateSun model =

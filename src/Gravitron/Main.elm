@@ -20,12 +20,16 @@ import TypedSvg.Types exposing (Fill(..), StrokeLinecap(..), StrokeLinejoin(..),
 -- Constants
 
 
+bulletInitialFireRate =
+    20
+
+
 bulletInitialSpeed =
-    5
+    7
 
 
 bulletMaxSpeed =
-    8
+    7
 
 
 initialSunMass =
@@ -33,11 +37,11 @@ initialSunMass =
 
 
 bulletWallDrag =
-    1.2
+    1.1
 
 
 bulletUpdateDrag =
-    0.999
+    1
 
 
 
@@ -118,7 +122,7 @@ initTurret =
     , radius = 20
     , color = Color.lightGreen
     , elapsed = 0
-    , rate = 120
+    , rate = bulletInitialFireRate
     , bullets = []
     }
 

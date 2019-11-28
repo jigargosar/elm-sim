@@ -86,16 +86,22 @@ initTurretAt x y =
     }
 
 
-type alias Bullet =
+type BulletState
+    = BulletTraveling
+    | BulletExploding
+
+
+type alias BulletContext =
     { x : Float
     , y : Float
     , vx : Float
     , vy : Float
     , radius : Float
+    , state : BulletState
     }
 
 
-initBullet : Float -> Float -> Float -> Float -> Bullet
+initBullet : Float -> Float -> Float -> Float -> BulletContext
 initBullet x y speed angle =
     let
         ( vx, vy ) =
@@ -106,6 +112,7 @@ initBullet x y speed angle =
     , vx = vx
     , vy = vy
     , radius = 5
+    , state = BulletTraveling
     }
 
 
@@ -122,7 +129,7 @@ type alias Model =
     , turret : Turret
     , ticksSinceLastFire : Float
     , fireRateInTicks : Float
-    , bullets : List Bullet
+    , bullets : List BulletContext
     , sun : Sun
     , mouse : Mouse
     , screen : Screen
@@ -247,11 +254,6 @@ phase1UpdatePositions ({ sun, bullets } as model) =
     }
 
 
-type BulletState
-    = BulletMoving
-    | BulletExploded
-
-
 phase2UpdateCollisions ({ screen, mouse, sun, bullets } as model) =
     let
         newBullets =
@@ -319,41 +321,42 @@ phase3UpdatePositionDependenciesForNextTick ({ screen, mouse, sun, bullets } as 
     }
 
 
-updateOnTick : Model -> Model
-updateOnTick ({ screen, mouse, sun, bullets } as model) =
-    let
-        newSun =
-            sun
-                |> stepVel
-                |> followXY mouse
 
-        ( shouldFireBullet, newTicksSinceFire ) =
-            updateTicksSinceLastFire model
-
-        appendNewBulletIfFired =
-            shouldFireBullet
-                |> Maybe.map (\_ -> (::) (initBullet 0 0 bulletInitialSpeed (degrees 180)))
-                |> Maybe.withDefault identity
-
-        newBullets =
-            let
-                updateBullet bullet =
-                    bullet
-                        |> stepVel
-                        |> gravitateTo sun
-                        |> applyDrag bulletUpdateDrag
-                        |> clampVelocity bulletMaxSpeed
-                        |> bounceOffScreen screen
-            in
-            bullets
-                |> appendNewBulletIfFired
-                |> List.map updateBullet
-    in
-    { model
-        | sun = newSun
-        , ticksSinceLastFire = newTicksSinceFire
-        , bullets = newBullets
-    }
+--updateOnTick : Model -> Model
+--updateOnTick ({ screen, mouse, sun, bullets } as model) =
+--    let
+--        newSun =
+--            sun
+--                |> stepVel
+--                |> followXY mouse
+--
+--        ( shouldFireBullet, newTicksSinceFire ) =
+--            updateTicksSinceLastFire model
+--
+--        appendNewBulletIfFired =
+--            shouldFireBullet
+--                |> Maybe.map (\_ -> (::) (initBullet 0 0 bulletInitialSpeed (degrees 180)))
+--                |> Maybe.withDefault identity
+--
+--        newBullets =
+--            let
+--                updateBullet bullet =
+--                    bullet
+--                        |> stepVel
+--                        |> gravitateTo sun
+--                        |> applyDrag bulletUpdateDrag
+--                        |> clampVelocity bulletMaxSpeed
+--                        |> bounceOffScreen screen
+--            in
+--            bullets
+--                |> appendNewBulletIfFired
+--                |> List.map updateBullet
+--    in
+--    { model
+--        | sun = newSun
+--        , ticksSinceLastFire = newTicksSinceFire
+--        , bullets = newBullets
+--    }
 
 
 type FireBullet

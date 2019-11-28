@@ -207,11 +207,7 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update message model =
     case message of
         Tick _ ->
-            ( { model | ct = model.ct + 1 }
-                --|> updatePlanet
-                |> updateTurret
-                |> updateSun
-                |> updateCollisions
+            ( updateOnTick model
             , Cmd.none
             )
 
@@ -236,6 +232,14 @@ update message model =
             ( { model | screen = toScreen (toFloat width) (toFloat height) }
             , Cmd.none
             )
+
+
+updateOnTick : Model -> Model
+updateOnTick model =
+    { model | ct = model.ct + 1 }
+        |> updateTurret
+        |> updateSun
+        |> updateCollisions
 
 
 updateCollisions : Model -> Model

@@ -289,7 +289,7 @@ areCirclesOverlapping c1 c2 =
     distance < c1.radius + c2.radius
 
 
-phase3UpdatePositionDependenciesForNextTick ({ screen, mouse, sun, bullets } as model) =
+phase3UpdatePositionDependenciesForNextTick ({ screen, mouse, sun, turret, bullets } as model) =
     let
         newSun =
             followXY mouse sun
@@ -297,9 +297,12 @@ phase3UpdatePositionDependenciesForNextTick ({ screen, mouse, sun, bullets } as 
         ( shouldFireBullet, newTicksSinceFire ) =
             updateTicksSinceLastFire model
 
+        newBullet _ =
+            initBullet 0 0 bulletInitialSpeed (degrees 180)
+
         appendNewBulletIfFired =
             shouldFireBullet
-                |> Maybe.map (\_ -> (::) (initBullet 0 0 bulletInitialSpeed (degrees 180)))
+                |> Maybe.map (newBullet >> (::))
                 |> Maybe.withDefault identity
 
         newBullets =

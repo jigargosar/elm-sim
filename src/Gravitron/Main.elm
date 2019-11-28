@@ -241,7 +241,7 @@ updateOnTick ({ screen, sun, bullets } as model) =
                 |> followXY model.mouse
 
         ( shouldFireBullet, newTicksSinceFire ) =
-            turretStepTriggerAndFireBulletIfReady model
+            updateTicksSinceLastFire model
 
         appendNewBulletIfFired =
             shouldFireBullet
@@ -273,10 +273,10 @@ type FireBullet
     = FireBullet
 
 
-turretStepTriggerAndFireBulletIfReady :
+updateTicksSinceLastFire :
     { a | ticksSinceLastFire : Float, fireRateInTicks : Float }
     -> ( Maybe FireBullet, Float )
-turretStepTriggerAndFireBulletIfReady { ticksSinceLastFire, fireRateInTicks } =
+updateTicksSinceLastFire { ticksSinceLastFire, fireRateInTicks } =
     let
         newTicksSinceLastFire =
             ticksSinceLastFire + 1

@@ -234,13 +234,16 @@ update message model =
 
 phasedUpdateOnTick : Model -> Model
 phasedUpdateOnTick model =
-    phase1UpdatePositions
+    phase1UpdatePositions model
         |> phase2UpdateCollisions
         |> phase3UpdatePositionDependenciesForNextTick
 
 
-phase1UpdatePositions =
-    Debug.todo "impl"
+phase1UpdatePositions ({ sun, bullets } as model) =
+    { model
+        | sun = stepVel sun
+        , bullets = List.map stepVel bullets
+    }
 
 
 phase2UpdateCollisions =

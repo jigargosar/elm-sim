@@ -174,7 +174,7 @@ init : Flags -> ( Model, Cmd Msg )
 init flags =
     ( { seed = Random.initialSeed flags.now
       , sun = initSun
-      , turret = initTurretAt 100 -100
+      , turret = initTurretAt -100 -100
       , ticksSinceLastFire = 0
       , fireRateInTicks = turretFireRateInTicks
       , bullets = []

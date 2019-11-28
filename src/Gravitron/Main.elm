@@ -233,7 +233,7 @@ update message model =
 
 
 updateOnTick : Model -> Model
-updateOnTick model =
+updateOnTick ({ screen, sun, bullets } as model) =
     let
         newSun =
             model.sun
@@ -249,11 +249,11 @@ updateOnTick model =
                 |> Maybe.withDefault identity
 
         newBullets =
-            model.bullets
+            bullets
                 |> appendNewBulletIfFired
-                |> List.map (updateBullet model.screen model.sun)
+                |> List.map updateBullet
 
-        updateBullet screen sun bullet =
+        updateBullet bullet =
             bullet
                 |> stepVel
                 |> gravitateTo sun

@@ -73,32 +73,6 @@ initSun =
     }
 
 
-type alias Planet =
-    { x : Float
-    , y : Float
-    , vx : Float
-    , vy : Float
-    , radius : Float
-    }
-
-
-initPlanet : Planet
-initPlanet =
-    let
-        ( vx, vy ) =
-            fromPolar ( 10, degrees -90 )
-
-        ( x, y ) =
-            fromPolar ( 200, degrees 0 )
-    in
-    { x = x
-    , y = y
-    , vx = vx
-    , vy = vy
-    , radius = 20
-    }
-
-
 type alias Turret =
     { x : Float
     , y : Float
@@ -571,15 +545,16 @@ bounceOffScreen s =
     bounceX >> bounceY
 
 
-angleTo : { a | x : Float, y : Float } -> { b | x : Float, y : Float } -> Float
-angleTo p2 p1 =
-    let
-        dxy =
-            ( p2.x - p1.x, p1.y - p2.y )
-    in
-    dxy
-        |> apply2 atan2
-        |> (+) (pi / 2)
+
+--angleTo : { a | x : Float, y : Float } -> { b | x : Float, y : Float } -> Float
+--angleTo p2 p1 =
+--    let
+--        dxy =
+--            ( p2.x - p1.x, p1.y - p2.y )
+--    in
+--    dxy
+--        |> apply2 atan2
+--        |> (+) (pi / 2)
 
 
 apply2 : (a -> b -> c) -> ( a, b ) -> c

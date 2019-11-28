@@ -284,9 +284,12 @@ distanceSquared p1 p2 =
     (p1.x - p2.x) ^ 2 + (p1.y - p2.y) ^ 2
 
 
-distance : { a | x : Float, y : Float } -> { b | x : Float, y : Float } -> Float
-distance p1 p2 =
-    distanceSquared p1 p2 |> sqrt
+
+{-
+   distance : { a | x : Float, y : Float } -> { b | x : Float, y : Float } -> Float
+   distance p1 p2 =
+       distanceSquared p1 p2 |> sqrt
+-}
 
 
 phase3UpdatePositionDependenciesForNextTick ({ screen, mouse, sun, turret, bullets } as model) =

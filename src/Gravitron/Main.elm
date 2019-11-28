@@ -29,7 +29,7 @@ bulletInitialFireRate =
 
 
 bulletInitialSpeed =
-    1
+    5
 
 
 bulletMaxSpeed =

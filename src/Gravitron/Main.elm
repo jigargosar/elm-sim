@@ -205,7 +205,8 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update message model =
     case message of
         Tick _ ->
-            ( updateOnTick model
+            ( -- updateOnTick model
+              phasedUpdateOnTick model
             , Cmd.none
             )
 
@@ -258,6 +259,7 @@ phase2UpdateCollisions ({ screen, mouse, sun, bullets } as model) =
                         Just bullet
             in
             List.filterMap updateBullet bullets
+                |> List.map (bounceOffScreen screen)
     in
     { model | bullets = newBullets }
 
@@ -280,8 +282,36 @@ areCirclesOverlapping c1 c2 =
     distance < c1.radius + c2.radius
 
 
-phase3UpdatePositionDependenciesForNextTick =
-    Debug.todo "impl"
+phase3UpdatePositionDependenciesForNextTick ({ screen, mouse, sun, bullets } as model) =
+    let
+        newSun =
+            followXY mouse sun
+
+        ( shouldFireBullet, newTicksSinceFire ) =
+            updateTicksSinceLastFire model
+
+        appendNewBulletIfFired =
+            shouldFireBullet
+                |> Maybe.map (\_ -> (::) (initBullet 0 0 bulletInitialSpeed (degrees 180)))
+                |> Maybe.withDefault identity
+
+        newBullets =
+            let
+                updateBullet bullet =
+                    bullet
+                        |> gravitateTo sun
+                        |> applyDrag bulletUpdateDrag
+                        |> clampVelocity bulletMaxSpeed
+            in
+            bullets
+                |> List.map updateBullet
+                |> appendNewBulletIfFired
+    in
+    { model
+        | sun = newSun
+        , ticksSinceLastFire = newTicksSinceFire
+        , bullets = newBullets
+    }
 
 
 updateOnTick : Model -> Model

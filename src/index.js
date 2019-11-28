@@ -1,7 +1,7 @@
 const Module = require('./Main.elm')
 require('./styles.css')
 
-console.log(Module)
+// console.log(Module)
 
 Module.Elm.Main.init({
   node: document.getElementById('root'),

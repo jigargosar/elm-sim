@@ -262,6 +262,10 @@ phase2UpdateCollisions ({ screen, mouse, sun, bullets } as model) =
     { model | bullets = newBullets }
 
 
+isCircleOverlap :
+    { a | x : Float, y : Float, radius : Float }
+    -> { b | x : Float, y : Float, radius : Float }
+    -> Bool
 isCircleOverlap c1 c2 =
     let
         dx =

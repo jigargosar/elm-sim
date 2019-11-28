@@ -391,24 +391,6 @@ followXY { x, y } sun =
     { sun | vx = nvx, vy = nvy }
 
 
-
-{-
-   updatePlanet : Model -> Model
-   updatePlanet model =
-       let
-           screen =
-               model.screen
-       in
-       { model
-           | planet =
-               stepVel model.planet
-                   |> gravitateTo model.sun
-                   |> clampVelocity 30
-                   |> bounceOffScreen screen
-       }
--}
-
-
 clampVelocity n p =
     let
         clampPart =

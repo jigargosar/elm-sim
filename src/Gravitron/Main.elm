@@ -74,8 +74,8 @@ type alias Turret =
     , y : Float
     , radius : Float
     , color : Color.Color
-    , triggerTicks : Float
-    , firenWhenTicksExceed : Float
+    , ticksSinceLastFire : Float
+    , fireWhenTicksExceed : Float
     , bullets : List Bullet
     }
 
@@ -86,8 +86,8 @@ initTurretAt x y =
     , y = y
     , radius = 20
     , color = Color.lightGreen
-    , triggerTicks = 0
-    , firenWhenTicksExceed = bulletInitialFireRate
+    , ticksSinceLastFire = 0
+    , fireWhenTicksExceed = bulletInitialFireRate
     , bullets = []
     }
 
@@ -249,19 +249,19 @@ updateOnTick model =
 turretStepTriggerAndFireBulletIfReady : Turret -> Turret
 turretStepTriggerAndFireBulletIfReady turret =
     let
-        elapsed =
-            turret.triggerTicks + 1
+        ticksSinceLastFire =
+            turret.ticksSinceLastFire + 1
     in
-    if elapsed >= turret.firenWhenTicksExceed then
+    if ticksSinceLastFire >= turret.fireWhenTicksExceed then
         { turret
-            | triggerTicks = 0
+            | ticksSinceLastFire = 0
             , bullets =
                 initBullet turret.x turret.y bulletInitialSpeed (degrees 180)
                     :: turret.bullets
         }
 
     else
-        { turret | triggerTicks = elapsed }
+        { turret | ticksSinceLastFire = ticksSinceLastFire }
 
 
 turretBulletsUpdate : Model -> Turret -> Turret
@@ -439,10 +439,10 @@ renderSun { x, y, radius } =
 
 
 renderTurret : Turret -> TSC.Svg msg
-renderTurret { x, y, radius, color, firenWhenTicksExceed, triggerTicks, bullets } =
+renderTurret { x, y, radius, color, fireWhenTicksExceed, ticksSinceLastFire, bullets } =
     let
         innerR =
-            radius / firenWhenTicksExceed * triggerTicks
+            radius / fireWhenTicksExceed * ticksSinceLastFire
     in
     g []
         [ g [ transform [ Translate x y ] ]

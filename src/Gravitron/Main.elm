@@ -304,10 +304,6 @@ updateTurret model =
     }
 
 
-fModBy fixedPt roller =
-    roller + (toFloat <| ceiling (-roller / fixedPt)) * fixedPt
-
-
 turretStepTriggerAndFireBulletIfReady : Turret -> Turret
 turretStepTriggerAndFireBulletIfReady turret =
     let
@@ -324,11 +320,6 @@ turretStepTriggerAndFireBulletIfReady turret =
 
     else
         { turret | elapsed = elapsed }
-
-
-turretResetElapsed : Turret -> Turret
-turretResetElapsed turret =
-    { turret | elapsed = 0 }
 
 
 turretBulletsUpdate : Model -> Turret -> Turret

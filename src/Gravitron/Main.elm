@@ -243,21 +243,21 @@ updateOnTick model =
         ( shouldFireBullet, newTicksSinceFire ) =
             turretStepTriggerAndFireBulletIfReady model
 
-        newBullets =
-            case shouldFireBullet of
-                Just _ ->
-                    initBullet 0 0 bulletInitialSpeed (degrees 180)
-                        :: model.bullets
+        appendNewBulletIfFired =
+            shouldFireBullet
+                |> Maybe.map (\_ -> (::) (initBullet 0 0 bulletInitialSpeed (degrees 180)))
+                |> Maybe.withDefault identity
 
-                Nothing ->
-                    model.bullets
+        newBullets =
+            model.bullets
+                |> appendNewBulletIfFired
+                |> bulletsUpdate model
     in
     { model
         | sun = newSun
         , ticksSinceLastFire = newTicksSinceFire
         , bullets = newBullets
     }
-        |> bulletsUpdate
 
 
 type FireBullet
@@ -277,7 +277,7 @@ turretStepTriggerAndFireBulletIfReady model =
         ( Nothing, ticksSinceLastFire )
 
 
-bulletsUpdate : Model -> Model
+bulletsUpdate : { a | screen : Screen, sun : Sun } -> List Bullet -> List Bullet
 bulletsUpdate model =
     let
         screen =
@@ -294,7 +294,7 @@ bulletsUpdate model =
                 |> clampVelocity bulletMaxSpeed
                 |> bounceOffScreen screen
     in
-    { model | bullets = List.map updateBullet model.bullets }
+    List.map updateBullet
 
 
 applyDrag drag p =

@@ -20,7 +20,7 @@ import TypedSvg.Types exposing (Fill(..), StrokeLinecap(..), StrokeLinejoin(..),
 -- Constants
 
 
-fireWhenTicksExceed =
+fireRateInTicks =
     60
 
 
@@ -87,7 +87,7 @@ initTurretAt x y =
     , radius = 20
     , color = Color.lightGreen
     , ticksSinceLastFire = 0
-    , fireWhenTicksExceed = fireWhenTicksExceed
+    , fireWhenTicksExceed = fireRateInTicks
     , bullets = []
     }
 

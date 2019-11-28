@@ -9,19 +9,15 @@ import Html.Attributes exposing (style)
 import Json.Decode as JD
 import Random exposing (Seed)
 import Task
-import TypedSvg exposing (circle, g, line, rect, svg)
-import TypedSvg.Attributes exposing (fill, stroke, transform, viewBox)
-import TypedSvg.Attributes.InPx exposing (cx, cy, height, r, strokeWidth, width, x, x1, x2, y, y1, y2)
+import TypedSvg exposing (circle, g, rect, svg)
+import TypedSvg.Attributes exposing (fill, transform, viewBox)
+import TypedSvg.Attributes.InPx exposing (cx, cy, height, r, width, x, y)
 import TypedSvg.Core as TSC
 import TypedSvg.Types exposing (Fill(..), StrokeLinecap(..), StrokeLinejoin(..), Transform(..))
 
 
 
 -- Constants
-
-
-turretAimSpeed =
-    degrees 2
 
 
 bulletInitialFireRate =
@@ -284,16 +280,6 @@ type alias HasSeed a =
     { a | seed : Seed }
 
 
-stepRandom : Random.Generator a -> HasSeed b -> ( a, HasSeed b )
-stepRandom generator model =
-    Random.step generator model.seed
-        |> Tuple.mapSecond (\seed -> { model | seed = seed })
-
-
-randomAngle =
-    Random.float 0 (degrees 359)
-
-
 updateTurret : Model -> Model
 updateTurret model =
     { model
@@ -421,23 +407,6 @@ bounceOffScreen s =
                 p
     in
     bounceX >> bounceY
-
-
-
---angleTo : { a | x : Float, y : Float } -> { b | x : Float, y : Float } -> Float
---angleTo p2 p1 =
---    let
---        dxy =
---            ( p2.x - p1.x, p1.y - p2.y )
---    in
---    dxy
---        |> apply2 atan2
---        |> (+) (pi / 2)
-
-
-apply2 : (a -> b -> c) -> ( a, b ) -> c
-apply2 func ( a, b ) =
-    func a b
 
 
 gravitateTo p2 p1 =

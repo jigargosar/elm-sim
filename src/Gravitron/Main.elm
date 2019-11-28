@@ -87,15 +87,6 @@ type alias Turret =
     }
 
 
-type alias Bullet =
-    { x : Float
-    , y : Float
-    , vx : Float
-    , vy : Float
-    , radius : Float
-    }
-
-
 turretGenerator : Random.Generator Turret
 turretGenerator =
     let
@@ -119,6 +110,15 @@ turretGenerator =
                 >> turretAimTowardsRandomAngle
                 >> (\turret -> { turret | aimAngle = turret.aimTargetAngle })
             )
+
+
+type alias Bullet =
+    { x : Float
+    , y : Float
+    , vx : Float
+    , vy : Float
+    , radius : Float
+    }
 
 
 initBullet : Float -> Float -> Float -> Float -> Bullet
@@ -323,8 +323,8 @@ updateTurret model =
     { model
         | turret =
             model.turret
-                |> updateTurretElapsed
-                |> updateTurretAim
+                |> turretUpdateElapsed
+                |> turretUpdateAim
                 |> turretWhenBulletReadyUpdateWith
                     (turretFireBullet >> turretAimTowardsRandomAngle)
                 |> updateTurretBullets model
@@ -335,8 +335,8 @@ fModBy fixedPt roller =
     roller + (toFloat <| ceiling (-roller / fixedPt)) * fixedPt
 
 
-updateTurretAim : Turret -> Turret
-updateTurretAim turret =
+turretUpdateAim : Turret -> Turret
+turretUpdateAim turret =
     let
         s =
             turret.aimAngle
@@ -397,8 +397,8 @@ updateTurretAim turret =
     { turret | aimAngle = final |> fModBy (degrees 360) }
 
 
-updateTurretElapsed : Turret -> Turret
-updateTurretElapsed turret =
+turretUpdateElapsed : Turret -> Turret
+turretUpdateElapsed turret =
     { turret | elapsed = turret.elapsed + 1 }
 
 

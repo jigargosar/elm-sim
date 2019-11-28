@@ -81,35 +81,19 @@ type alias Turret =
     , elapsed : Float
     , rate : Float
     , bullets : List Bullet
-    , aimAngle : Float
-    , aimTargetAngle : Float
-    , seed : Seed
     }
 
 
-turretGenerator : Random.Generator Turret
-turretGenerator =
-    let
-        initTurret : Seed -> Turret
-        initTurret seed =
-            { x = -100
-            , y = 100
-            , radius = 20
-            , color = Color.lightGreen
-            , elapsed = 0
-            , rate = bulletInitialFireRate
-            , bullets = []
-            , aimAngle = 0
-            , aimTargetAngle = 0
-            , seed = seed
-            }
-    in
-    Random.independentSeed
-        |> Random.map
-            (initTurret
-                >> turretAimTowardsRandomAngle
-                >> (\turret -> { turret | aimAngle = turret.aimTargetAngle })
-            )
+initTurretAt : Float -> Float -> Turret
+initTurretAt x y =
+    { x = x
+    , y = y
+    , radius = 20
+    , color = Color.lightGreen
+    , elapsed = 0
+    , rate = bulletInitialFireRate
+    , bullets = []
+    }
 
 
 type alias Bullet =
@@ -145,8 +129,6 @@ type alias Flags =
 
 type alias Model =
     { seed : Seed
-
-    --, planet : Planet
     , turret : Turret
     , sun : Sun
     , ct : Float
@@ -191,15 +173,9 @@ type alias Mouse =
 
 init : Flags -> ( Model, Cmd Msg )
 init flags =
-    let
-        ( turret, seed ) =
-            Random.step turretGenerator (Random.initialSeed flags.now)
-    in
-    ( { seed = seed
+    ( { seed = Random.initialSeed flags.now
       , sun = initSun
-
-      --, planet = initPlanet
-      , turret = turret
+      , turret = initTurretAt 100 -100
       , ct = 0
       , mouse = Mouse 0 0
       , screen = toScreen 600 600
@@ -323,10 +299,7 @@ updateTurret model =
     { model
         | turret =
             model.turret
-                |> turretUpdateElapsed
-                |> turretUpdateAim
-                |> turretWhenBulletReadyUpdateWith
-                    (turretFireBullet >> turretAimTowardsRandomAngle)
+                |> turretStepTriggerAndFireBulletIfReady
                 |> turretBulletsUpdate model
     }
 
@@ -335,113 +308,27 @@ fModBy fixedPt roller =
     roller + (toFloat <| ceiling (-roller / fixedPt)) * fixedPt
 
 
-turretUpdateAim : Turret -> Turret
-turretUpdateAim turret =
+turretStepTriggerAndFireBulletIfReady : Turret -> Turret
+turretStepTriggerAndFireBulletIfReady turret =
     let
-        s =
-            turret.aimAngle
-
-        e =
-            turret.aimTargetAngle
-
-        _ =
-            if s < 0 || s > degrees 360 || e < 0 || e > degrees 360 then
-                Debug.log "end > 360" ( s, e )
-                    |> Debug.todo "wtf"
-
-            else
-                1
+        elapsed =
+            turret.elapsed + 1
     in
-    {- if s == e then
-           turret
-
-       else
-    -}
-    let
-        speed =
-            turretAimSpeed
-
-        final =
-            if s < e then
-                let
-                    da =
-                        e - s
-                in
-                {- if da <= speed then
-                       e
-
-                   else
-                -}
-                if da < pi then
-                    s + speed
-
-                else
-                    s - speed
-
-            else
-                let
-                    da =
-                        s - e
-                in
-                {- if da <= speed then
-                       e
-
-                   else
-                -}
-                if da < pi then
-                    s - speed
-
-                else
-                    s + speed
-    in
-    { turret | aimAngle = final |> fModBy (degrees 360) }
-
-
-turretUpdateElapsed : Turret -> Turret
-turretUpdateElapsed turret =
-    { turret | elapsed = turret.elapsed + 1 }
-
-
-turretWhenBulletReadyUpdateWith func turret =
-    if turret.elapsed >= turret.rate then
-        turret
-            |> turretResetElapsed
-            |> func
+    if elapsed >= turret.rate then
+        { turret
+            | elapsed = 0
+            , bullets =
+                initBullet turret.x turret.y bulletInitialSpeed (degrees 180)
+                    :: turret.bullets
+        }
 
     else
-        turret
-
-
-turretAimTowardsRandomAngle : Turret -> Turret
-turretAimTowardsRandomAngle =
-    stepRandom randomAngle >> apply2 turretAimToWards
-
-
-turretAimToWards : Float -> Turret -> Turret
-turretAimToWards angle turret =
-    { turret | aimTargetAngle = angle }
+        { turret | elapsed = elapsed }
 
 
 turretResetElapsed : Turret -> Turret
 turretResetElapsed turret =
     { turret | elapsed = 0 }
-
-
-turretFireBullet : Turret -> Turret
-turretFireBullet turret =
-    let
-        x =
-            turret.x
-
-        y =
-            turret.y
-
-        angle =
-            turret.aimAngle
-    in
-    { turret
-        | bullets = initBullet x y bulletInitialSpeed angle :: turret.bullets
-    }
 
 
 turretBulletsUpdate : Model -> Turret -> Turret
@@ -645,7 +532,7 @@ renderSun { x, y, radius } =
 
 
 renderTurret : Turret -> TSC.Svg msg
-renderTurret { x, y, radius, color, rate, aimAngle, aimTargetAngle, elapsed, bullets } =
+renderTurret { x, y, radius, color, rate, elapsed, bullets } =
     let
         innerR =
             radius / rate * elapsed
@@ -654,16 +541,6 @@ renderTurret { x, y, radius, color, rate, aimAngle, aimTargetAngle, elapsed, bul
         [ g [ transform [ Translate x y ] ]
             [ renderCircle 0 0 radius [ fillColor color ]
             , renderCircle 0 0 innerR [ fillColor <| whiteA 0.5 ]
-            , let
-                ( p2x, p2y ) =
-                    fromPolar ( radius, aimAngle )
-              in
-              line [ x1 0, y1 0, x2 p2x, y2 p2y, stroke Color.red, strokeWidth 4 ] []
-            , let
-                ( p2x, p2y ) =
-                    fromPolar ( radius, aimTargetAngle )
-              in
-              line [ x1 0, y1 0, x2 p2x, y2 p2y, stroke Color.orange, strokeWidth 3 ] []
             ]
         , g [] (List.map renderTurretBullet bullets)
         ]

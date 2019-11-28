@@ -247,6 +247,11 @@ phase1UpdatePositions ({ sun, bullets } as model) =
     }
 
 
+type BulletState
+    = BulletMoving
+    | BulletExploded
+
+
 phase2UpdateCollisions ({ screen, mouse, sun, bullets } as model) =
     let
         newBullets =

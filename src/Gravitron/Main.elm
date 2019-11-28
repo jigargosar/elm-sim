@@ -234,20 +234,15 @@ update message model =
 
 updateOnTick : Model -> Model
 updateOnTick model =
-    model
-        |> updateTurret
-        |> updateSun
-        |> updateCollisions
-
-
-updateTurret : Model -> Model
-updateTurret model =
-    { model
-        | turret =
+    let
+        turret =
             model.turret
                 |> turretStepTriggerAndFireBulletIfReady
                 |> turretBulletsUpdate model
-    }
+    in
+    { model | turret = turret }
+        |> updateSun
+        |> updateCollisions
 
 
 updateCollisions : Model -> Model

@@ -251,7 +251,7 @@ updateOnTick model =
         newBullets =
             model.bullets
                 |> appendNewBulletIfFired
-                |> bulletsUpdate model
+                |> List.map (updateBullet model.screen model.sun)
     in
     { model
         | sun = newSun
@@ -277,24 +277,13 @@ turretStepTriggerAndFireBulletIfReady model =
         ( Nothing, ticksSinceLastFire )
 
 
-bulletsUpdate : { a | screen : Screen, sun : Sun } -> List Bullet -> List Bullet
-bulletsUpdate model =
-    let
-        screen =
-            model.screen
-
-        sun =
-            model.sun
-
-        updateBullet bullet =
-            bullet
-                |> stepVel
-                |> gravitateTo sun
-                |> applyDrag bulletUpdateDrag
-                |> clampVelocity bulletMaxSpeed
-                |> bounceOffScreen screen
-    in
-    List.map updateBullet
+updateBullet screen sun bullet =
+    bullet
+        |> stepVel
+        |> gravitateTo sun
+        |> applyDrag bulletUpdateDrag
+        |> clampVelocity bulletMaxSpeed
+        |> bounceOffScreen screen
 
 
 applyDrag drag p =

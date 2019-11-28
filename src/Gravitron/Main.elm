@@ -244,45 +244,6 @@ updateOnTick model =
                 |> stepVel
                 |> followXY model.mouse
     }
-        |> updateCollisions
-
-
-updateCollisions : Model -> Model
-updateCollisions model =
-    let
-        areColliding c1 c2 =
-            let
-                dx =
-                    c2.x - c1.x
-
-                dy =
-                    c2.y - c1.y
-
-                distanceSquared =
-                    dx ^ 2 + dy ^ 2
-
-                radiiSquared =
-                    (c1.radius + c2.radius) ^ 2
-            in
-            distanceSquared <= radiiSquared
-
-        folder bullet ( sun, bullets ) =
-            if areColliding sun bullet then
-                ( sun, bullets )
-
-            else
-                ( sun, bullet :: bullets )
-
-        turret =
-            model.turret
-    in
-    List.foldl folder ( model.sun, [] ) turret.bullets
-        |> (\( sun, bullets ) ->
-                { model
-                    | turret = { turret | bullets = bullets }
-                    , sun = sun
-                }
-           )
 
 
 turretStepTriggerAndFireBulletIfReady : Turret -> Turret

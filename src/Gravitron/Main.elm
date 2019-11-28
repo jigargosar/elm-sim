@@ -276,17 +276,17 @@ areCirclesOverlapping :
     -> { b | x : Float, y : Float, radius : Float }
     -> Bool
 areCirclesOverlapping c1 c2 =
-    let
-        dx =
-            c1.x - c2.x
+    distanceSquared c1 c2 < (c1.radius + c2.radius) ^ 2
 
-        dy =
-            c1.y - c2.y
 
-        distance =
-            sqrt ((dx * dx) + (dy * dy))
-    in
-    distance < c1.radius + c2.radius
+distanceSquared : { a | x : number, y : number } -> { b | x : number, y : number } -> number
+distanceSquared p1 p2 =
+    (p1.x - p2.x) ^ 2 + (p1.y - p2.y) ^ 2
+
+
+distance : { a | x : Float, y : Float } -> { b | x : Float, y : Float } -> Float
+distance p1 p2 =
+    distanceSquared p1 p2 |> sqrt
 
 
 phase3UpdatePositionDependenciesForNextTick ({ screen, mouse, sun, turret, bullets } as model) =

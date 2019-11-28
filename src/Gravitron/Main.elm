@@ -10,7 +10,7 @@ import Json.Decode as JD
 import Random exposing (Seed)
 import Task
 import TypedSvg exposing (circle, g, line, rect, svg)
-import TypedSvg.Attributes as TSA exposing (fill, stroke, transform, viewBox)
+import TypedSvg.Attributes exposing (fill, stroke, transform, viewBox)
 import TypedSvg.Attributes.InPx exposing (cx, cy, height, r, strokeWidth, width, x, x1, x2, y, y1, y2)
 import TypedSvg.Core as TSC
 import TypedSvg.Types exposing (Fill(..), StrokeLinecap(..), StrokeLinejoin(..), Transform(..))
@@ -676,10 +676,6 @@ renderTurretBullet { x, y, radius } =
 whiteA : Float -> Color.Color
 whiteA =
     Color.rgba 1 1 1
-
-
-renderPlanet { x, y, radius } =
-    renderCircle x y radius [ fillColor Color.blue ]
 
 
 renderCircle : Float -> Float -> Float -> List (TSC.Attribute msg) -> TSC.Svg msg

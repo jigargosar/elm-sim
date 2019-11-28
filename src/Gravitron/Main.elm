@@ -21,11 +21,11 @@ import TypedSvg.Types exposing (Fill(..), StrokeLinecap(..), StrokeLinejoin(..),
 
 
 turretAimSpeed =
-    degrees 5
+    degrees 2
 
 
 bulletInitialFireRate =
-    100
+    60
 
 
 bulletInitialSpeed =

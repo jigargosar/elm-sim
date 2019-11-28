@@ -251,7 +251,7 @@ phase2UpdateCollisions ({ screen, mouse, sun, bullets } as model) =
         newBullets =
             let
                 updateBullet bullet =
-                    if isCircleOverlap sun bullet then
+                    if areCirclesColliding sun bullet then
                         Nothing
 
                     else
@@ -262,11 +262,11 @@ phase2UpdateCollisions ({ screen, mouse, sun, bullets } as model) =
     { model | bullets = newBullets }
 
 
-isCircleOverlap :
+areCirclesColliding :
     { a | x : Float, y : Float, radius : Float }
     -> { b | x : Float, y : Float, radius : Float }
     -> Bool
-isCircleOverlap c1 c2 =
+areCirclesColliding c1 c2 =
     let
         dx =
             c1.x - c2.x

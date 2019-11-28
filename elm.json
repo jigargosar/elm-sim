@@ -17,6 +17,8 @@
             "elm/time": "1.0.0",
             "elm-community/random-extra": "3.1.0",
             "elm-community/typed-svg": "5.1.0",
+            "ianmackenzie/elm-geometry": "3.0.0",
+            "ianmackenzie/elm-units": "2.2.0",
             "joakin/elm-canvas": "4.0.1",
             "joakin/elm-grid": "1.0.1"
         },
@@ -25,6 +27,11 @@
             "Skinney/murmur3": "2.0.8",
             "elm/url": "1.0.0",
             "elm/virtual-dom": "1.0.2",
+            "ianmackenzie/elm-1d-parameter": "1.0.1",
+            "ianmackenzie/elm-float-extra": "1.1.0",
+            "ianmackenzie/elm-interval": "2.0.0",
+            "ianmackenzie/elm-triangular-mesh": "1.0.2",
+            "ianmackenzie/elm-units-interval": "1.0.0",
             "owanturist/elm-union-find": "1.0.0",
             "rtfeldman/elm-css": "16.0.1",
             "rtfeldman/elm-hex": "1.0.0"

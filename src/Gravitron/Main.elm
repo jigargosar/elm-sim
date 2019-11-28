@@ -1,12 +1,16 @@
 module Gravitron.Main exposing (main)
 
+import Angle
 import Browser
 import Browser.Dom
 import Browser.Events
 import Color
+import Direction2d exposing (Direction2d)
 import Html exposing (Html)
 import Html.Attributes exposing (style)
 import Json.Decode as JD
+import Pixels exposing (Pixels)
+import Point2d
 import Random exposing (Seed)
 import Task
 import TypedSvg exposing (circle, g, rect, svg)
@@ -292,6 +296,11 @@ distanceSquared p1 p2 =
 -}
 
 
+pt : { a | x : Float, y : Float } -> Point2d.Point2d Pixels coordinates
+pt { x, y } =
+    Point2d.fromPixels { x = x, y = y }
+
+
 phase3UpdatePositionDependenciesForNextTick ({ screen, mouse, sun, turret, bullets } as model) =
     let
         newSun =
@@ -304,8 +313,22 @@ phase3UpdatePositionDependenciesForNextTick ({ screen, mouse, sun, turret, bulle
             let
                 { x, y } =
                     turret
+
+                dir =
+                    Direction2d.from (pt turret) (pt sun)
+                        |> Maybe.withDefault Direction2d.x
+
+                bPos =
+                    Point2d.translateIn
+                        dir
+                        (Pixels.pixels turret.radius)
+                        (pt turret)
+                        |> Point2d.toPixels
+
+                bAngle =
+                    Direction2d.toAngle dir |> Angle.inRadians
             in
-            initBullet x y bulletInitialSpeed (degrees 180)
+            initBullet bPos.x bPos.y bulletInitialSpeed bAngle
 
         appendNewBulletIfFired =
             shouldFireBullet

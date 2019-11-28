@@ -233,12 +233,12 @@ update message model =
 
 
 updateOnTick : Model -> Model
-updateOnTick ({ screen, sun, bullets } as model) =
+updateOnTick ({ screen, mouse, sun, bullets } as model) =
     let
         newSun =
-            model.sun
+            sun
                 |> stepVel
-                |> followXY model.mouse
+                |> followXY mouse
 
         ( shouldFireBullet, newTicksSinceFire ) =
             updateTicksSinceLastFire model

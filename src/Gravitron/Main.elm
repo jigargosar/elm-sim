@@ -96,23 +96,23 @@ type alias Bullet =
     }
 
 
-initTurret : Seed -> Turret
-initTurret seed =
-    { x = -100
-    , y = 100
-    , radius = 20
-    , color = Color.lightGreen
-    , elapsed = 0
-    , rate = bulletInitialFireRate
-    , bullets = []
-    , aimAngle = 0
-    , aimTargetAngle = 0
-    , seed = seed
-    }
-
-
 turretGenerator : Random.Generator Turret
 turretGenerator =
+    let
+        initTurret : Seed -> Turret
+        initTurret seed =
+            { x = -100
+            , y = 100
+            , radius = 20
+            , color = Color.lightGreen
+            , elapsed = 0
+            , rate = bulletInitialFireRate
+            , bullets = []
+            , aimAngle = 0
+            , aimTargetAngle = 0
+            , seed = seed
+            }
+    in
     Random.independentSeed
         |> Random.map
             (initTurret

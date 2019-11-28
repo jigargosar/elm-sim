@@ -74,9 +74,6 @@ type alias Turret =
     , y : Float
     , radius : Float
     , color : Color.Color
-    , ticksSinceLastFire : Float
-    , fireRateInTicks : Float
-    , bullets : List Bullet
     }
 
 
@@ -86,9 +83,6 @@ initTurretAt x y =
     , y = y
     , radius = 20
     , color = Color.lightGreen
-    , ticksSinceLastFire = 0
-    , fireRateInTicks = turretFireRateInTicks
-    , bullets = []
     }
 
 
@@ -126,6 +120,9 @@ type alias Flags =
 type alias Model =
     { seed : Seed
     , turret : Turret
+    , ticksSinceLastFire : Float
+    , fireRateInTicks : Float
+    , bullets : List Bullet
     , sun : Sun
     , mouse : Mouse
     , screen : Screen
@@ -171,6 +168,9 @@ init flags =
     ( { seed = Random.initialSeed flags.now
       , sun = initSun
       , turret = initTurretAt 100 -100
+      , ticksSinceLastFire = 0
+      , fireRateInTicks = turretFireRateInTicks
+      , bullets = []
       , mouse = Mouse 0 0
       , screen = toScreen 600 600
       }
@@ -235,37 +235,35 @@ update message model =
 updateOnTick : Model -> Model
 updateOnTick model =
     { model
-        | turret =
-            model.turret
-                |> turretStepTriggerAndFireBulletIfReady
-                |> turretBulletsUpdate model
-        , sun =
+        | sun =
             model.sun
                 |> stepVel
                 |> followXY model.mouse
     }
+        |> turretStepTriggerAndFireBulletIfReady
+        |> bulletsUpdate
 
 
-turretStepTriggerAndFireBulletIfReady : Turret -> Turret
-turretStepTriggerAndFireBulletIfReady turret =
+turretStepTriggerAndFireBulletIfReady : Model -> Model
+turretStepTriggerAndFireBulletIfReady model =
     let
         ticksSinceLastFire =
-            turret.ticksSinceLastFire + 1
+            model.ticksSinceLastFire + 1
     in
-    if ticksSinceLastFire >= turret.fireRateInTicks then
-        { turret
+    if ticksSinceLastFire >= model.fireRateInTicks then
+        { model
             | ticksSinceLastFire = 0
             , bullets =
-                initBullet turret.x turret.y bulletInitialSpeed (degrees 180)
-                    :: turret.bullets
+                initBullet 0 0 bulletInitialSpeed (degrees 180)
+                    :: model.bullets
         }
 
     else
-        { turret | ticksSinceLastFire = ticksSinceLastFire }
+        { model | ticksSinceLastFire = ticksSinceLastFire }
 
 
-turretBulletsUpdate : Model -> Turret -> Turret
-turretBulletsUpdate model turret =
+bulletsUpdate : Model -> Model
+bulletsUpdate model =
     let
         screen =
             model.screen
@@ -281,7 +279,7 @@ turretBulletsUpdate model turret =
                 |> clampVelocity bulletMaxSpeed
                 |> bounceOffScreen screen
     in
-    { turret | bullets = List.map updateBullet turret.bullets }
+    { model | bullets = List.map updateBullet model.bullets }
 
 
 applyDrag drag p =
@@ -428,7 +426,12 @@ view model =
     svg [ style "position" "fixed", viewBox s.l s.t s.w s.h, width s.w, height s.h ]
         [ renderRect s.l s.t s.w s.h [ fillColor Color.black ]
         , renderSun model.sun
-        , renderTurret model.turret
+        , let
+            factor =
+                1 / model.fireRateInTicks * model.ticksSinceLastFire
+          in
+          renderTurret factor model.turret
+        , g [] (List.map renderTurretBullet model.bullets)
 
         --, renderPlanet model.planet
         ]
@@ -438,18 +441,17 @@ renderSun { x, y, radius } =
     renderCircle x y radius [ fillColor Color.yellow ]
 
 
-renderTurret : Turret -> TSC.Svg msg
-renderTurret { x, y, radius, color, fireRateInTicks, ticksSinceLastFire, bullets } =
+renderTurret : Float -> Turret -> TSC.Svg msg
+renderTurret fireNextBulletProgress { x, y, radius, color } =
     let
         innerR =
-            radius * (1 / fireRateInTicks * ticksSinceLastFire)
+            radius * fireNextBulletProgress
     in
     g []
         [ g [ transform [ Translate x y ] ]
             [ renderCircle 0 0 radius [ fillColor color ]
             , renderCircle 0 0 innerR [ fillColor <| whiteA 0.5 ]
             ]
-        , g [] (List.map renderTurretBullet bullets)
         ]
 
 

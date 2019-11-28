@@ -276,16 +276,16 @@ type FireBullet
 turretStepTriggerAndFireBulletIfReady :
     { a | ticksSinceLastFire : Float, fireRateInTicks : Float }
     -> ( Maybe FireBullet, Float )
-turretStepTriggerAndFireBulletIfReady model =
+turretStepTriggerAndFireBulletIfReady { ticksSinceLastFire, fireRateInTicks } =
     let
-        ticksSinceLastFire =
-            model.ticksSinceLastFire + 1
+        newTicksSinceLastFire =
+            ticksSinceLastFire + 1
     in
-    if ticksSinceLastFire >= model.fireRateInTicks then
+    if newTicksSinceLastFire >= fireRateInTicks then
         ( Just FireBullet, 0 )
 
     else
-        ( Nothing, ticksSinceLastFire )
+        ( Nothing, newTicksSinceLastFire )
 
 
 applyDrag drag p =

@@ -127,7 +127,6 @@ type alias Model =
     { seed : Seed
     , turret : Turret
     , sun : Sun
-    , ct : Float
     , mouse : Mouse
     , screen : Screen
     }
@@ -172,7 +171,6 @@ init flags =
     ( { seed = Random.initialSeed flags.now
       , sun = initSun
       , turret = initTurretAt 100 -100
-      , ct = 0
       , mouse = Mouse 0 0
       , screen = toScreen 600 600
       }
@@ -236,10 +234,20 @@ update message model =
 
 updateOnTick : Model -> Model
 updateOnTick model =
-    { model | ct = model.ct + 1 }
+    model
         |> updateTurret
         |> updateSun
         |> updateCollisions
+
+
+updateTurret : Model -> Model
+updateTurret model =
+    { model
+        | turret =
+            model.turret
+                |> turretStepTriggerAndFireBulletIfReady
+                |> turretBulletsUpdate model
+    }
 
 
 updateCollisions : Model -> Model
@@ -278,20 +286,6 @@ updateCollisions model =
                     , sun = sun
                 }
            )
-
-
-type alias HasSeed a =
-    { a | seed : Seed }
-
-
-updateTurret : Model -> Model
-updateTurret model =
-    { model
-        | turret =
-            model.turret
-                |> turretStepTriggerAndFireBulletIfReady
-                |> turretBulletsUpdate model
-    }
 
 
 turretStepTriggerAndFireBulletIfReady : Turret -> Turret

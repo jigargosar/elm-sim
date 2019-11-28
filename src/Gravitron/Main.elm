@@ -249,17 +249,18 @@ updateOnTick ({ screen, sun, bullets } as model) =
                 |> Maybe.withDefault identity
 
         newBullets =
+            let
+                updateBullet bullet =
+                    bullet
+                        |> stepVel
+                        |> gravitateTo sun
+                        |> applyDrag bulletUpdateDrag
+                        |> clampVelocity bulletMaxSpeed
+                        |> bounceOffScreen screen
+            in
             bullets
                 |> appendNewBulletIfFired
                 |> List.map updateBullet
-
-        updateBullet bullet =
-            bullet
-                |> stepVel
-                |> gravitateTo sun
-                |> applyDrag bulletUpdateDrag
-                |> clampVelocity bulletMaxSpeed
-                |> bounceOffScreen screen
     in
     { model
         | sun = newSun

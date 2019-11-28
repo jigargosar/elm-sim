@@ -232,6 +232,25 @@ update message model =
             )
 
 
+phasedUpdateOnTick : Model -> Model
+phasedUpdateOnTick model =
+    phase1UpdatePositions
+        |> phase2UpdateCollisions
+        |> phase3UpdatePositionDependenciesForNextTick
+
+
+phase1UpdatePositions =
+    Debug.todo "impl"
+
+
+phase2UpdateCollisions =
+    Debug.todo "impl"
+
+
+phase3UpdatePositionDependenciesForNextTick =
+    Debug.todo "impl"
+
+
 updateOnTick : Model -> Model
 updateOnTick ({ screen, mouse, sun, bullets } as model) =
     let

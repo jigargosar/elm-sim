@@ -246,8 +246,34 @@ phase1UpdatePositions ({ sun, bullets } as model) =
     }
 
 
-phase2UpdateCollisions =
-    Debug.todo "impl"
+phase2UpdateCollisions ({ screen, mouse, sun, bullets } as model) =
+    let
+        newBullets =
+            let
+                updateBullet bullet =
+                    if isCircleOverlap sun bullet then
+                        Nothing
+
+                    else
+                        Just bullet
+            in
+            List.filterMap updateBullet bullets
+    in
+    { model | bullets = newBullets }
+
+
+isCircleOverlap c1 c2 =
+    let
+        dx =
+            c1.x - c2.x
+
+        dy =
+            c1.y - c2.y
+
+        distance =
+            sqrt ((dx * dx) + (dy * dy))
+    in
+    distance < c1.radius + c2.radius
 
 
 phase3UpdatePositionDependenciesForNextTick =

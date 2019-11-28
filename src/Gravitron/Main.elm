@@ -273,7 +273,9 @@ type FireBullet
     = FireBullet
 
 
-turretStepTriggerAndFireBulletIfReady : Model -> ( Maybe FireBullet, Float )
+turretStepTriggerAndFireBulletIfReady :
+    { a | ticksSinceLastFire : Float, fireRateInTicks : Float }
+    -> ( Maybe FireBullet, Float )
 turretStepTriggerAndFireBulletIfReady model =
     let
         ticksSinceLastFire =

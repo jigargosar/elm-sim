@@ -298,7 +298,11 @@ phase3UpdatePositionDependenciesForNextTick ({ screen, mouse, sun, turret, bulle
             updateTicksSinceLastFire model
 
         newBullet _ =
-            initBullet 0 0 bulletInitialSpeed (degrees 180)
+            let
+                { x, y } =
+                    turret
+            in
+            initBullet x y bulletInitialSpeed (degrees 180)
 
         appendNewBulletIfFired =
             shouldFireBullet

@@ -234,14 +234,16 @@ update message model =
 
 updateOnTick : Model -> Model
 updateOnTick model =
-    let
-        turret =
+    { model
+        | turret =
             model.turret
                 |> turretStepTriggerAndFireBulletIfReady
                 |> turretBulletsUpdate model
-    in
-    { model | turret = turret }
-        |> updateSun
+        , sun =
+            model.sun
+                |> stepVel
+                |> followXY model.mouse
+    }
         |> updateCollisions
 
 
@@ -323,15 +325,6 @@ turretBulletsUpdate model turret =
 
 applyDrag drag p =
     { p | vx = p.vx * drag, vy = p.vy * drag }
-
-
-updateSun model =
-    { model
-        | sun =
-            model.sun
-                |> stepVel
-                |> followXY model.mouse
-    }
 
 
 followXY { x, y } sun =

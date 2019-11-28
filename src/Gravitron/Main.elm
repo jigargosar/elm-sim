@@ -234,32 +234,47 @@ update message model =
 
 updateOnTick : Model -> Model
 updateOnTick model =
-    { model
-        | sun =
+    let
+        newSun =
             model.sun
                 |> stepVel
                 |> followXY model.mouse
+
+        ( shouldFireBullet, newTicksSinceFire ) =
+            turretStepTriggerAndFireBulletIfReady model
+
+        newBullets =
+            case shouldFireBullet of
+                Just _ ->
+                    initBullet 0 0 bulletInitialSpeed (degrees 180)
+                        :: model.bullets
+
+                Nothing ->
+                    model.bullets
+    in
+    { model
+        | sun = newSun
+        , ticksSinceLastFire = newTicksSinceFire
+        , bullets = newBullets
     }
-        |> turretStepTriggerAndFireBulletIfReady
         |> bulletsUpdate
 
 
-turretStepTriggerAndFireBulletIfReady : Model -> Model
+type FireBullet
+    = FireBullet
+
+
+turretStepTriggerAndFireBulletIfReady : Model -> ( Maybe FireBullet, Float )
 turretStepTriggerAndFireBulletIfReady model =
     let
         ticksSinceLastFire =
             model.ticksSinceLastFire + 1
     in
     if ticksSinceLastFire >= model.fireRateInTicks then
-        { model
-            | ticksSinceLastFire = 0
-            , bullets =
-                initBullet 0 0 bulletInitialSpeed (degrees 180)
-                    :: model.bullets
-        }
+        ( Just FireBullet, 0 )
 
     else
-        { model | ticksSinceLastFire = ticksSinceLastFire }
+        ( Nothing, ticksSinceLastFire )
 
 
 bulletsUpdate : Model -> Model

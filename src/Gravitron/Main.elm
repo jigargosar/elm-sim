@@ -442,7 +442,7 @@ renderTurret : Turret -> TSC.Svg msg
 renderTurret { x, y, radius, color, fireRateInTicks, ticksSinceLastFire, bullets } =
     let
         innerR =
-            radius / fireRateInTicks * ticksSinceLastFire
+            radius * (1 / fireRateInTicks * ticksSinceLastFire)
     in
     g []
         [ g [ transform [ Translate x y ] ]

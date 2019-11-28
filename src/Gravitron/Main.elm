@@ -327,7 +327,7 @@ updateTurret model =
                 |> turretUpdateAim
                 |> turretWhenBulletReadyUpdateWith
                     (turretFireBullet >> turretAimTowardsRandomAngle)
-                |> updateTurretBullets model
+                |> turretBulletsUpdate model
     }
 
 
@@ -444,8 +444,8 @@ turretFireBullet turret =
     }
 
 
-updateTurretBullets : Model -> Turret -> Turret
-updateTurretBullets model turret =
+turretBulletsUpdate : Model -> Turret -> Turret
+turretBulletsUpdate model turret =
     let
         screen =
             model.screen

@@ -20,7 +20,7 @@ import TypedSvg.Types exposing (Fill(..), StrokeLinecap(..), StrokeLinejoin(..),
 -- Constants
 
 
-fireRateInTicks =
+turretFireRateInTicks =
     60
 
 
@@ -75,7 +75,7 @@ type alias Turret =
     , radius : Float
     , color : Color.Color
     , ticksSinceLastFire : Float
-    , fireWhenTicksExceed : Float
+    , fireRateInTicks : Float
     , bullets : List Bullet
     }
 
@@ -87,7 +87,7 @@ initTurretAt x y =
     , radius = 20
     , color = Color.lightGreen
     , ticksSinceLastFire = 0
-    , fireWhenTicksExceed = fireRateInTicks
+    , fireRateInTicks = turretFireRateInTicks
     , bullets = []
     }
 
@@ -252,7 +252,7 @@ turretStepTriggerAndFireBulletIfReady turret =
         ticksSinceLastFire =
             turret.ticksSinceLastFire + 1
     in
-    if ticksSinceLastFire >= turret.fireWhenTicksExceed then
+    if ticksSinceLastFire >= turret.fireRateInTicks then
         { turret
             | ticksSinceLastFire = 0
             , bullets =
@@ -439,10 +439,10 @@ renderSun { x, y, radius } =
 
 
 renderTurret : Turret -> TSC.Svg msg
-renderTurret { x, y, radius, color, fireWhenTicksExceed, ticksSinceLastFire, bullets } =
+renderTurret { x, y, radius, color, fireRateInTicks, ticksSinceLastFire, bullets } =
     let
         innerR =
-            radius / fireWhenTicksExceed * ticksSinceLastFire
+            radius / fireRateInTicks * ticksSinceLastFire
     in
     g []
         [ g [ transform [ Translate x y ] ]

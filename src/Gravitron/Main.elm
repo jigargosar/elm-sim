@@ -178,7 +178,7 @@ init flags =
       , ticksSinceLastFire = 0
       , fireRateInTicks = turretFireRateInTicks
       , bullets = []
-      , mouse = Mouse 0 0
+      , mouse = Mouse 100 100
       , screen = toScreen 600 600
       }
     , Browser.Dom.getViewport |> Task.perform OnViewport

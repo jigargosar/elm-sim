@@ -78,6 +78,11 @@ type alias Radius =
     Quantity Float Pixels
 
 
+radiusFromPixels : Float -> Radius
+radiusFromPixels =
+    Pixels.pixels
+
+
 type alias HasPosition a =
     { a | position : Point }
 
@@ -162,14 +167,9 @@ type alias Turret =
 initTurretAtXY : Float -> Float -> Turret
 initTurretAtXY x y =
     { position = pointAt x y
-    , radius = initPx 20
+    , radius = radiusFromPixels 20
     , color = Color.lightGreen
     }
-
-
-initPx : number -> Quantity number Pixels
-initPx =
-    Pixels.pixels
 
 
 type BulletState

@@ -557,33 +557,6 @@ accelerate v2 =
 
 gravityVectorTo p2 p1 =
     let
-        p2Pos =
-            p2.position |> Point2d.toPixels
-
-        p2x =
-            p2Pos.x
-
-        p2y =
-            p2Pos.y
-
-        p1Pos =
-            p1.position |> Point2d.toPixels
-
-        p1x =
-            p1Pos.x
-
-        p1y =
-            p1Pos.y
-
-        p2Mass =
-            p2.mass
-
-        dx =
-            p2x - p1x
-
-        dy =
-            p2y - p1y
-
         vectorToP2 =
             Vector2d.from p1.position p2.position
 
@@ -591,16 +564,16 @@ gravityVectorTo p2 p1 =
             Vector2d.direction vectorToP2
                 |> Maybe.withDefault Direction2d.x
 
-        distanceSquareToP2 =
+        distanceSquareToP2InPixels =
             Vector2d.length vectorToP2
                 --|> Quantity.squared
                 |> Pixels.inPixels
                 |> (^) 2
-                |> (/) 1
-                |> Pixels.pixels
 
         gMagnitude =
-            Quantity.multiplyBy p2Mass distanceSquareToP2
+            p2.mass
+                / distanceSquareToP2InPixels
+                |> Pixels.pixels
 
         gDirection =
             directionToP2

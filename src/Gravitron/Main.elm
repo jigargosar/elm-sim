@@ -496,7 +496,8 @@ phase3UpdatePositionDependenciesForNextTick ({ screen, mouse, sun, turret, bulle
                     bullet
                         |> gravitateTo sun
                         |> applyDrag bulletUpdateDrag
-                        |> clampVelocityMagnitude bulletMaxSpeed
+
+                --|> clampVelocityMagnitude bulletMaxSpeed
             in
             bullets
                 |> List.map updateBullet
@@ -586,12 +587,7 @@ gravitateTo p2 p1 =
         gravityVector =
             gravityVectorTo p2 p1
     in
-    accelerate gravityVector p1
-
-
-accelerate : Vector2d Pixels () -> HasVelocity a -> HasVelocity a
-accelerate v2 =
-    mapVelocity (Vector2d.plus v2)
+    mapVelocity (Vector2d.plus gravityVector) p1
 
 
 gravityVectorTo : Sun -> HasPosition a -> Vector2d Pixels ()

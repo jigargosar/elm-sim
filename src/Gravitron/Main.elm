@@ -72,11 +72,6 @@ type alias Point =
     Point2d Pixels ()
 
 
-pointXY : Float -> Float -> Point
-pointXY x y =
-    Point2d.xy (pixels x) (pixels y)
-
-
 
 -- Position
 

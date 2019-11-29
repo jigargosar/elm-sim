@@ -70,7 +70,7 @@ translatePositionByVelocity =
     with (.velocity >> Point2d.translateBy) mapPosition
 
 
-type alias QPixel =
+type alias QPixels =
     Quantity Float Pixels.Pixels
 
 
@@ -318,7 +318,7 @@ areCirclesOverlapping c1 c2 =
         |> Quantity.lessThanOrEqualTo (Quantity.plus c1.radius c2.radius)
 
 
-distanceFrom : Point -> Point -> QPixel
+distanceFrom : Point -> Point -> QPixels
 distanceFrom =
     Point2d.distanceFrom
 

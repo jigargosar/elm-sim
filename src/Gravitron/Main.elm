@@ -612,7 +612,7 @@ view model =
                 1 / model.fireRateInTicks * model.ticksSinceLastFire
           in
           renderTurret factor model.turret
-        , g [] (List.map renderTurretBullet model.bullets)
+        , g [] (List.map renderBullet model.bullets)
         ]
 
 
@@ -646,8 +646,8 @@ renderTurret fireNextBulletProgress { position, radius, color } =
         ]
 
 
-renderTurretBullet : Bullet -> Svg Msg
-renderTurretBullet { position, radius } =
+renderBullet : Bullet -> Svg Msg
+renderBullet { position, radius } =
     Draw.circle2d [ fillColor <| whiteA 0.9 ] (Circle2d.atPoint position (radiusToQPixels radius))
 
 

@@ -61,10 +61,6 @@ positionFromXY { x, y } =
     Point2d.fromPixels { x = x, y = y }
 
 
-translatePositionByVelocity =
-    with (.velocity >> Point2d.translateBy) mapPosition
-
-
 type alias QPixels =
     Quantity Float Pixels.Pixels
 
@@ -86,11 +82,6 @@ type alias Radius =
     Quantity Float Pixels
 
 
-addRadii : HasRadius a -> HasRadius b -> Radius
-addRadii c1 c2 =
-    Quantity.plus c1.radius c2.radius
-
-
 type alias HasPosition a =
     { a | position : Point }
 
@@ -105,8 +96,22 @@ distanceBetweenPositions c1 c2 =
     Point2d.distanceFrom c1.position c2.position
 
 
+type alias HasPositionVelocity a =
+    HasPosition { a | velocity : Velocity }
+
+
+translatePositionByVelocity : HasPositionVelocity a -> HasPositionVelocity a
+translatePositionByVelocity =
+    with (.velocity >> Point2d.translateBy) mapPosition
+
+
 type alias HasRadius a =
     { a | radius : Radius }
+
+
+addRadii : HasRadius a -> HasRadius b -> Radius
+addRadii c1 c2 =
+    Quantity.plus c1.radius c2.radius
 
 
 type alias HasPositionRadius a =

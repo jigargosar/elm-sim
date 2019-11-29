@@ -86,9 +86,14 @@ positionXY =
     Position
 
 
-distanceSquaredBetweenPositions : Position -> Position -> Float
-distanceSquaredBetweenPositions (Position x1 y1) (Position x2 y2) =
+positionDistanceSquaredFrom : Position -> Position -> Float
+positionDistanceSquaredFrom (Position x1 y1) (Position x2 y2) =
     (x2 - x1) ^ 2 + (y2 - y1) ^ 2
+
+
+positionDistanceFrom : Position -> Position -> Float
+positionDistanceFrom p1 p2 =
+    positionDistanceSquaredFrom p1 p2 |> sqrt
 
 
 angleBetweenPositions : Position -> Position -> Float
@@ -138,6 +143,11 @@ radiusToQPixels (Radius r) =
     pixels r
 
 
+radiusToFloat : Radius -> Float
+radiusToFloat (Radius r) =
+    r
+
+
 radiusScaleBy : Float -> Radius -> Radius
 radiusScaleBy scale (Radius r) =
     r * abs scale |> Radius
@@ -174,9 +184,9 @@ mapPositionAsPoint func =
     mapPosition (positionToPoint >> func >> positionFromPoint)
 
 
-distanceBetweenPositions : HasPosition a -> HasPosition b -> QPixels
+distanceBetweenPositions : HasPosition a -> HasPosition b -> Float
 distanceBetweenPositions c1 c2 =
-    Point2d.distanceFrom (positionToPoint c1.position) (positionToPoint c2.position)
+    positionDistanceFrom c1.position c2.position
 
 
 
@@ -255,8 +265,7 @@ type alias HasPositionRadius a =
 
 areCirclesOverlapping : HasPositionRadius a -> HasPositionRadius b -> Bool
 areCirclesOverlapping c1 c2 =
-    distanceBetweenPositions c1 c2
-        |> Quantity.lessThanOrEqualTo (addRadii c1 c2 |> radiusToQPixels)
+    distanceBetweenPositions c1 c2 <= (addRadii c1 c2 |> radiusToFloat)
 
 
 
@@ -608,7 +617,7 @@ gravityVectorTo p2 p1 =
 
         magnitude =
             p2.mass
-                / distanceSquaredBetweenPositions p1.position p2.position
+                / positionDistanceSquaredFrom p1.position p2.position
     in
     Vector2d.rTheta (pixels magnitude) (Angle.radians angle)
 

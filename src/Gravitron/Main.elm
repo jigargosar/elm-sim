@@ -596,7 +596,7 @@ distanceSquaredBetweenPositions (Position x1 y1) (Position x2 y2) =
 
 
 angleBetweenPositions (Position x1 y1) (Position x2 y2) =
-    atan2 ((y2 - y1) ^ 2) ((x2 - x1) ^ 2)
+    atan2 (y2 - y1) (x2 - x1)
 
 
 gravityVectorTo : Sun -> HasPosition a -> Vector2d Pixels ()
@@ -607,12 +607,11 @@ gravityVectorTo p2 p1 =
 
         ang1 =
             angleBetweenPositions p1.position p2.position
+                |> Angle.radians
+                |> Direction2d.fromAngle
 
         ang2 =
             directionToP2 |> Direction2d.toAngle |> Angle.inRadians
-
-        _ =
-            Debug.log "ang1,ang2" ( ang1, ang2 )
 
         directionToP2 =
             Vector2d.direction vectorToP2
@@ -624,7 +623,7 @@ gravityVectorTo p2 p1 =
                 |> Pixels.pixels
 
         gDirection =
-            directionToP2
+            ang1
     in
     Vector2d.withLength gMagnitude gDirection
 

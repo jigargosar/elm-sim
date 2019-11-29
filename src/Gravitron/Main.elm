@@ -82,22 +82,22 @@ pixels =
 
 
 type Radius
-    = Radius QPixels
+    = Radius Float
 
 
 initRadius : Float -> Radius
 initRadius =
-    Pixels.pixels >> Radius
+    abs >> Radius
 
 
 radiusAdd2 : Radius -> Radius -> Radius
 radiusAdd2 (Radius r1) (Radius r2) =
-    Quantity.plus r1 r2 |> Radius
+    r1 + r2 |> initRadius
 
 
 radiusToQPixels : Radius -> QPixels
 radiusToQPixels (Radius r) =
-    r
+    pixels r
 
 
 

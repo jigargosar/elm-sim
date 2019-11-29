@@ -356,6 +356,20 @@ changeVelocityAngleTowardsPoint point model =
     mapVelocityInVXY (always newVelocity) model
 
 
+when : (a -> Bool) -> (a -> a) -> a -> a
+when p t v =
+    if p v then
+        t v
+
+    else
+        v
+
+
+unless : (a -> Bool) -> (a -> a) -> a -> a
+unless p =
+    when (p >> not)
+
+
 phase3UpdatePositionDependenciesForNextTick : Model -> Model
 phase3UpdatePositionDependenciesForNextTick ({ screen, mouse, sun, turret, bullets } as model) =
     let

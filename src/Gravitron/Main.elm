@@ -482,23 +482,6 @@ applyDrag drag =
     mapVelocity (Vector2d.scaleBy drag)
 
 
-clampVelocityRadius : Radius -> { a | velocity : Velocity } -> { a | velocity : Velocity }
-clampVelocityRadius n =
-    mapVelocityRadius (Quantity.clamp (Quantity.negate n) n)
-
-
-mapR func v =
-    let
-        length =
-            Vector2d.length v
-
-        direction =
-            Vector2d.direction v
-                |> Maybe.withDefault (Direction2d.degrees 0)
-    in
-    Vector2d.withLength (func length) direction
-
-
 bounceOffScreen s =
     let
         bounceX p =
@@ -554,9 +537,39 @@ gravitateTo p2 p1 =
     accelerate gravityVector p1
 
 
-mapVelocity : (Velocity -> Velocity) -> { b | velocity : Velocity } -> { b | velocity : Velocity }
+type alias HasVelocity a =
+    { a | velocity : Velocity }
+
+
+clampVelocityRadius : Radius -> HasVelocity a -> HasVelocity a
+clampVelocityRadius n =
+    mapVelocityRadius (Quantity.clamp (Quantity.negate n) n)
+
+
+mapVelocity : (Velocity -> Velocity) -> HasVelocity a -> HasVelocity a
 mapVelocity func model =
     { model | velocity = func model.velocity }
+
+
+velocityRadius : Velocity -> Radius
+velocityRadius =
+    Vector2d.length
+
+
+mapVelocityRadiusHelp func velocity =
+    let
+        v =
+            velocity
+
+        radius : Radius
+        radius =
+            velocityRadius v |> func
+
+        direction =
+            Vector2d.direction v
+                |> Maybe.withDefault (Direction2d.degrees 0)
+    in
+    Vector2d.withLength radius direction
 
 
 mapVelocityRadius func model =
@@ -566,8 +579,7 @@ mapVelocityRadius func model =
 
         radius : Radius
         radius =
-            Vector2d.length v
-                |> func
+            velocityRadius v |> func
 
         direction =
             Vector2d.direction v

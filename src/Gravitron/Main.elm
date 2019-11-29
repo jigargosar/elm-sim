@@ -316,19 +316,16 @@ phase2UpdateCollisions ({ screen, mouse, sun, bullets } as model) =
 areCirclesOverlapping c1 c2 =
     Vector2d.from c1.position c2.position
         |> Vector2d.length
-        |> Quantity.lessThanOrEqualTo (mapEach .radius ( c1, c2 ) |> uncurry Quantity.plus)
-
-
-mapEach func ( a, b ) =
-    ( func a, func b )
-
-
-distanceSquared : { a | x : number, y : number } -> { b | x : number, y : number } -> number
-distanceSquared p1 p2 =
-    (p1.x - p2.x) ^ 2 + (p1.y - p2.y) ^ 2
+        |> Quantity.lessThanOrEqualTo (Quantity.plus c1.radius c2.radius)
 
 
 
+{-
+   distanceSquared : { a | x : number, y : number } -> { b | x : number, y : number } -> number
+   distanceSquared p1 p2 =
+       (p1.x - p2.x) ^ 2 + (p1.y - p2.y) ^ 2
+
+-}
 {-
    distance : { a | x : Float, y : Float } -> { b | x : Float, y : Float } -> Float
    distance p1 p2 =

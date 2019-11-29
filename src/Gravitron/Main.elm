@@ -96,9 +96,14 @@ positionDistanceFrom p1 p2 =
     positionDistanceSquaredFrom p1 p2 |> sqrt
 
 
-angleBetweenPositions : Position -> Position -> Float
-angleBetweenPositions (Position x1 y1) (Position x2 y2) =
+positionAngleBetween : Position -> Position -> Float
+positionAngleBetween (Position x1 y1) (Position x2 y2) =
     atan2 (y2 - y1) (x2 - x1)
+
+
+angleBetweenPositions : HasPosition a -> HasPosition a -> Float
+angleBetweenPositions p1 p2 =
+    positionAngleBetween p1.position p2.position
 
 
 positionToTuple : Position -> ( Float, Float )
@@ -193,32 +198,29 @@ distanceBetweenPositions c1 c2 =
 -- Velocity
 
 
-type alias Velocity =
+type alias Vector =
     Vector2d Pixels ()
 
 
-velocityFromSpeedDirection : QPixels -> Direction -> Velocity
-velocityFromSpeedDirection =
-    Vector2d.withLength
+type Velocity
+    = Velocity ( Float, Float )
 
 
-velocityMagnitude : Velocity -> QPixels
-velocityMagnitude =
-    Vector2d.length
+velocityFromPolar : ( Float, Float ) -> Velocity
+velocityFromPolar =
+    fromPolar >> Velocity
 
 
-velocityMapMagnitude : (QPixels -> QPixels) -> Velocity -> Velocity
+velocityToPolar : Velocity -> ( Float, Float )
+velocityToPolar (Velocity cart) =
+    toPolar cart
+
+
+velocityMapMagnitude : (Float -> Float) -> Velocity -> Velocity
 velocityMapMagnitude func model =
-    let
-        magnitude : QPixels
-        magnitude =
-            velocityMagnitude model |> func
-
-        direction =
-            Vector2d.direction model
-                |> Maybe.withDefault (Direction2d.degrees 0)
-    in
-    Vector2d.withLength magnitude direction
+    velocityToPolar model
+        |> Tuple.mapFirst func
+        |> velocityFromPolar
 
 
 
@@ -235,15 +237,12 @@ mapVelocity func model =
 
 
 clampVelocityMagnitude : Float -> HasVelocity a -> HasVelocity a
-clampVelocityMagnitude n =
+clampVelocityMagnitude maxMagnitude =
     let
-        maxRadius =
-            pixels n
-
-        clampRadiusFunc =
-            Quantity.min maxRadius
+        clampMagnitude =
+            min maxMagnitude
     in
-    mapVelocity (velocityMapMagnitude clampRadiusFunc)
+    mapVelocity (velocityMapMagnitude clampMagnitude)
 
 
 
@@ -254,9 +253,14 @@ type alias HasPositionVelocity a =
     HasPosition { a | velocity : Velocity }
 
 
+positionTranslateByVelocity : Velocity -> Position -> Position
+positionTranslateByVelocity (Velocity ( vx, vy )) (Position x y) =
+    Position (x + vx) (y + vy)
+
+
 translatePositionByVelocity : HasPositionVelocity a -> HasPositionVelocity a
 translatePositionByVelocity =
-    with (.velocity >> Point2d.translateBy) mapPositionAsPoint
+    with (.velocity >> positionTranslateByVelocity) mapPosition
 
 
 type alias HasPositionRadius a =
@@ -276,10 +280,15 @@ type alias Sun =
     HasPosition (HasVelocity (HasRadius { mass : Float }))
 
 
+velocityZero : Velocity
+velocityZero =
+    Velocity ( 0, 0 )
+
+
 initSun : Sun
 initSun =
     { position = positionXY 0 0
-    , velocity = Vector2d.pixels 0 0
+    , velocity = velocityZero
     , radius = newRadius 20
     , mass = initialSunMass
     }
@@ -305,10 +314,10 @@ type alias Bullet =
     HasPosition (HasVelocity (HasRadius { state : BulletState }))
 
 
-initBullet : Position -> Float -> Direction -> Bullet
-initBullet position speed direction =
+initBullet : Position -> ( Float, Float ) -> Bullet
+initBullet position velocityPolar =
     { position = position
-    , velocity = velocityFromSpeedDirection (pixels speed) direction
+    , velocity = velocityFromPolar velocityPolar
     , radius = newRadius 5
     , state = BulletTraveling
     }
@@ -473,9 +482,18 @@ sunUpdateVelocityTowards : Position -> Sun -> Sun
 sunUpdateVelocityTowards position2 model =
     { model
         | velocity =
-            Vector2d.from (positionToPoint model.position) (positionToPoint position2)
-                |> Vector2d.scaleBy 0.1
+            velocityFromPositions model.position position2
+                |> velocityScaleBy 0.1
     }
+
+
+velocityScaleBy n (Velocity ( vx, vy )) =
+    Velocity ( vx * n, vy * n )
+
+
+velocityFromPositions : Position -> Position -> Velocity
+velocityFromPositions p1 p2 =
+    velocityFromPolar ( positionDistanceFrom p1 p2, positionAngleBetween p1 p2 )
 
 
 phase3UpdatePositionDependenciesForNextTick : Model -> Model
@@ -614,7 +632,7 @@ gravityVectorTo : Sun -> HasPosition a -> Vector2d Pixels ()
 gravityVectorTo p2 p1 =
     let
         angle =
-            angleBetweenPositions p1.position p2.position
+            positionAngleBetween p1.position p2.position
 
         magnitude =
             p2.mass

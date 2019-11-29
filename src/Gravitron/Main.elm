@@ -74,9 +74,13 @@ type alias Velocity =
     Vector2d Pixels ()
 
 
-velocityFromRTheta : Radius -> Angle -> Velocity
-velocityFromRTheta =
-    Vector2d.rTheta
+type alias Direction =
+    Direction2d ()
+
+
+velocityWithRadiusDirection : Radius -> Direction -> Velocity
+velocityWithRadiusDirection =
+    Vector2d.withLength
 
 
 type alias Radius =
@@ -193,10 +197,10 @@ bulletToPositionRadius b =
     { position = positionFromXY b, radius = Pixels.pixels b.radius }
 
 
-initBullet : Point -> Float -> Angle -> Bullet
-initBullet position speed angle =
+initBullet : Point -> Float -> Direction -> Bullet
+initBullet position speed direction =
     { position = position
-    , velocity = velocityFromRTheta (initRadius speed) angle
+    , velocity = velocityWithRadiusDirection (initRadius speed) direction
     , radius = initRadius 5
     , state = BulletTraveling
     }
@@ -391,11 +395,8 @@ phase3UpdatePositionDependenciesForNextTick ({ screen, mouse, sun, turret, bulle
                         dir
                         turret.radius
                         turret.position
-
-                bAngle =
-                    Direction2d.toAngle dir
             in
-            initBullet bPos bulletInitialSpeed bAngle
+            initBullet bPos bulletInitialSpeed dir
 
         appendNewBulletIfFired =
             shouldFireBullet
@@ -642,7 +643,7 @@ gravityVectorTo p2 p1 =
         gTheta =
             angleToP2
     in
-    velocityFromRTheta (initRadius gRadius) (Angle.radians gTheta)
+    velocityWithRadiusDirection (initRadius gRadius) (Direction2d.radians gTheta)
 
 
 

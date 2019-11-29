@@ -612,8 +612,13 @@ view model =
                 1 / model.fireRateInTicks * model.ticksSinceLastFire
           in
           renderTurret factor model.turret
-        , g [] (List.map renderBullet model.bullets)
+        , renderBullets model.bullets
         ]
+
+
+renderBullets : List Bullet -> Svg Msg
+renderBullets bullets =
+    g [] (List.map renderBullet bullets)
 
 
 canvas : Screen -> List (Svg Msg) -> Svg Msg

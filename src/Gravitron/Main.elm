@@ -1,17 +1,14 @@
 module Gravitron.Main exposing (main)
 
 import Angle
-import Basics.Extra exposing (uncurry)
 import Browser
 import Browser.Dom
 import Browser.Events
-import Circle2d
 import Color
 import Direction2d exposing (Direction2d)
 import Html exposing (Html)
 import Html.Attributes exposing (style)
 import Json.Decode as JD
-import LineSegment2d
 import Pixels exposing (Pixels)
 import Point2d exposing (Point2d)
 import Quantity
@@ -338,11 +335,33 @@ pt { x, y } =
     Point2d.fromPixels { x = x, y = y }
 
 
+mapVelocityInVXY func model =
+    let
+        { x, y } =
+            velocityVectorFromVXY model
+                |> func
+                |> Vector2d.toPixels
+    in
+    { model | vx = x, vy = y }
+
+
+changeVelocityAngleTowardsPoint point model =
+    let
+        velocity =
+            Vector2d.from model.position point
+                |> Vector2d.scaleBy 0.9
+    in
+    mapVelocityInVXY (\_ -> velocity) model
+
+
 phase3UpdatePositionDependenciesForNextTick : Model -> Model
 phase3UpdatePositionDependenciesForNextTick ({ screen, mouse, sun, turret, bullets } as model) =
     let
+        mousePosition =
+            Point2d.fromPixels mouse
+
         newSun =
-            followXY mouse sun
+            changeVelocityAngleTowardsPoint mousePosition sun
 
         ( shouldFireBullet, newTicksSinceFire ) =
             updateTicksSinceLastFire model
@@ -353,7 +372,7 @@ phase3UpdatePositionDependenciesForNextTick ({ screen, mouse, sun, turret, bulle
                     turret
 
                 dir =
-                    Direction2d.from (pt turret) (pt sun)
+                    Direction2d.from (pt turret) sun.position
                         |> Maybe.withDefault Direction2d.x
                         |> always (Direction2d.degrees 190)
 
@@ -455,23 +474,6 @@ applyDrag drag p =
     { p | vx = p.vx * drag, vy = p.vy * drag }
 
 
-followXY { x, y } sun =
-    let
-        dx =
-            x - sun.x
-
-        dy =
-            y - sun.y
-
-        ( rad, theta ) =
-            toPolar ( dx, dy )
-
-        ( nvx, nvy ) =
-            fromPolar ( rad / 15, theta )
-    in
-    { sun | vx = nvx, vy = nvy }
-
-
 clampVelocity n p =
     let
         clampPart =
@@ -523,11 +525,14 @@ accelerate ax ay ({ vx, vy } as p) =
 
 gravityVectorTo p2 p1 =
     let
+        p2Pos =
+            p2.position |> Point2d.toPixels
+
         p2x =
-            p2.x
+            p2Pos.x
 
         p2y =
-            p2.y
+            p2Pos.y
 
         p1x =
             p1.x
@@ -588,7 +593,11 @@ view model =
         ]
 
 
-renderSun { x, y, radius } =
+renderSun { position, radius } =
+    let
+        { x, y } =
+            Point2d.toPixels position
+    in
     renderCircle x y radius [ fillColor Color.yellow ]
 
 

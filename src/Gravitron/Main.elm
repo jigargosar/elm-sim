@@ -469,10 +469,11 @@ phase2HandleCollisions ({ screen, mouse, sun, bullets } as model) =
     { model | bullets = newBullets }
 
 
-sunUpdateVelocityTowards point model =
+sunUpdateVelocityTowards : Position -> Sun -> Sun
+sunUpdateVelocityTowards position2 model =
     { model
         | velocity =
-            Vector2d.from (positionToPoint model.position) point
+            Vector2d.from (positionToPoint model.position) (positionToPoint position2)
                 |> Vector2d.scaleBy 0.1
     }
 
@@ -481,7 +482,7 @@ phase3UpdatePositionDependenciesForNextTick : Model -> Model
 phase3UpdatePositionDependenciesForNextTick ({ screen, mouse, sun, turret, bullets } as model) =
     let
         mousePosition =
-            Point2d.fromPixels mouse
+            positionXY mouse.x mouse.y
 
         newSun =
             sunUpdateVelocityTowards mousePosition sun

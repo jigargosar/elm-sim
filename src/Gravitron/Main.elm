@@ -592,8 +592,11 @@ renderSun { position, radius } =
     let
         { x, y } =
             Point2d.toPixels position
+
+        r =
+            Pixels.inPixels radius
     in
-    renderCircle x y radius [ fillColor Color.yellow ]
+    renderCircle x y r [ fillColor Color.yellow ]
 
 
 renderTurret : Float -> Turret -> TSC.Svg msg

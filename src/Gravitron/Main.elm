@@ -345,7 +345,7 @@ mapVelocityInVXY func model =
     { model | vx = x, vy = y }
 
 
-changeVelocityAngleTowardsPoint point model =
+sunUpdateVelocityTowards point model =
     let
         vectorToPoint =
             Vector2d.from model.position point
@@ -363,7 +363,7 @@ phase3UpdatePositionDependenciesForNextTick ({ screen, mouse, sun, turret, bulle
             Point2d.fromPixels mouse
 
         newSun =
-            changeVelocityAngleTowardsPoint mousePosition sun
+            sunUpdateVelocityTowards mousePosition sun
 
         ( shouldFireBullet, newTicksSinceFire ) =
             updateTicksSinceLastFire model

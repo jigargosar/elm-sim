@@ -1,6 +1,5 @@
 module Gravitron.Main exposing (main)
 
-import Angle
 import Browser
 import Browser.Dom
 import Browser.Events
@@ -77,13 +76,28 @@ pointAtXY x y =
 -- Radius
 
 
-type alias Radius =
-    Quantity Float Pixels
+pixels : Float -> QPixels
+pixels =
+    Pixels.pixels
+
+
+type Radius
+    = Radius QPixels
 
 
 initRadius : Float -> Radius
 initRadius =
-    Pixels.pixels
+    Pixels.pixels >> Radius
+
+
+radiusAdd2 : Radius -> Radius -> Radius
+radiusAdd2 (Radius r1) (Radius r2) =
+    Quantity.plus r1 r2 |> Radius
+
+
+radiusToQPixels : Radius -> QPixels
+radiusToQPixels (Radius r) =
+    r
 
 
 
@@ -96,7 +110,7 @@ type alias HasRadius a =
 
 addRadii : HasRadius a -> HasRadius b -> Radius
 addRadii c1 c2 =
-    Quantity.plus c1.radius c2.radius
+    radiusAdd2 c1.radius c2.radius
 
 
 
@@ -126,28 +140,27 @@ type alias Velocity =
 
 
 velocityFromMagnitudeDirection : Radius -> Direction -> Velocity
-velocityFromMagnitudeDirection =
-    Vector2d.withLength
+velocityFromMagnitudeDirection r =
+    Vector2d.withLength (radiusToQPixels r)
 
 
-velocityRadius : Velocity -> Radius
-velocityRadius =
+velocityMagnitude : Velocity -> QPixels
+velocityMagnitude =
     Vector2d.length
 
 
-velocityMapMagnitude : (Radius -> Radius) -> Velocity -> Velocity
+velocityMapMagnitude : (QPixels -> QPixels) -> Velocity -> Velocity
 velocityMapMagnitude func model =
     let
-        radius : Radius
-        radius =
-            velocityRadius model
-                |> func
+        magnitude : QPixels
+        magnitude =
+            velocityMagnitude model |> func
 
         direction =
             Vector2d.direction model
                 |> Maybe.withDefault (Direction2d.degrees 0)
     in
-    Vector2d.withLength radius direction
+    Vector2d.withLength magnitude direction
 
 
 
@@ -167,7 +180,7 @@ clampVelocityMagnitude : Float -> HasVelocity a -> HasVelocity a
 clampVelocityMagnitude n =
     let
         maxRadius =
-            initRadius n
+            pixels n
 
         clampRadiusFunc =
             Quantity.min maxRadius
@@ -198,7 +211,7 @@ type alias HasPositionRadius a =
 areCirclesOverlapping : HasPositionRadius a -> HasPositionRadius b -> Bool
 areCirclesOverlapping c1 c2 =
     distanceBetweenPositions c1 c2
-        |> Quantity.lessThanOrEqualTo (addRadii c1 c2)
+        |> Quantity.lessThanOrEqualTo (addRadii c1 c2 |> radiusToQPixels)
 
 
 
@@ -217,7 +230,7 @@ initSun : Sun
 initSun =
     { position = Point2d.pixels 0 0
     , velocity = Vector2d.pixels 0 0
-    , radius = Pixels.pixels 20
+    , radius = initRadius 20
     , mass = initialSunMass
     }
 
@@ -443,7 +456,7 @@ phase3UpdatePositionDependenciesForNextTick ({ screen, mouse, sun, turret, bulle
                 bPos =
                     Point2d.translateIn
                         dir
-                        turret.radius
+                        (turret.radius |> radiusToQPixels)
                         turret.position
             in
             initBullet bPos bulletInitialSpeed dir
@@ -613,17 +626,20 @@ view model =
 renderSun { position, radius } =
     Draw.circle2d
         [ fillColor Color.yellow ]
-        (Circle2d.atPoint position radius)
+        (Circle2d.atPoint position (radiusToQPixels radius))
 
 
 renderTurret : Float -> Turret -> TSC.Svg msg
 renderTurret fireNextBulletProgress { position, radius, color } =
     let
+        radiusQPixels =
+            radiusToQPixels radius
+
         innerR =
-            radius |> Quantity.multiplyBy fireNextBulletProgress
+            radiusQPixels |> Quantity.multiplyBy fireNextBulletProgress
     in
     g []
-        [ Draw.circle2d [ fillColor color ] (Circle2d.atPoint position radius)
+        [ Draw.circle2d [ fillColor color ] (Circle2d.atPoint position radiusQPixels)
         , Draw.circle2d [ fillColor <| whiteA 0.5 ] (Circle2d.atPoint position innerR)
         ]
 
@@ -633,7 +649,7 @@ type alias Circle =
 
 
 renderTurretBullet { position, radius } =
-    Draw.circle2d [ fillColor <| whiteA 0.9 ] (Circle2d.atPoint position radius)
+    Draw.circle2d [ fillColor <| whiteA 0.9 ] (Circle2d.atPoint position (radiusToQPixels radius))
 
 
 whiteA : Float -> Color.Color

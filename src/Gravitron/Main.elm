@@ -225,10 +225,7 @@ translatePositionByVelocity =
 
 
 type alias HasPositionRadius a =
-    { a
-        | position : Point
-        , radius : Radius
-    }
+    HasPosition (HasRadius a)
 
 
 areCirclesOverlapping : HasPositionRadius a -> HasPositionRadius b -> Bool
@@ -242,11 +239,13 @@ areCirclesOverlapping c1 c2 =
 
 
 type alias Sun =
-    { position : Point
-    , velocity : Velocity
-    , radius : Radius
-    , mass : Float
-    }
+    HasPosition
+        (HasVelocity
+            (HasRadius
+                { mass : Float
+                }
+            )
+        )
 
 
 initSun : Sun
@@ -259,10 +258,11 @@ initSun =
 
 
 type alias Turret =
-    { position : Point
-    , radius : Radius
-    , color : Color.Color
-    }
+    HasPosition
+        (HasRadius
+            { color : Color.Color
+            }
+        )
 
 
 initTurretAtXY : Float -> Float -> Turret

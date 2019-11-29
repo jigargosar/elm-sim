@@ -601,11 +601,11 @@ gravityVectorTo p2 p1 =
 view : Model -> Html Msg
 view model =
     let
-        s =
+        screen =
             model.screen
     in
-    svg [ style "position" "fixed", viewBox s.l s.t s.w s.h, width s.w, height s.h ]
-        [ renderBackground s
+    canvas screen
+        [ renderBackground screen
         , renderSun model.sun
         , let
             factor =

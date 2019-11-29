@@ -583,9 +583,17 @@ gravityVectorTo p2 p1 =
         dy =
             p2y - p1y
 
-        angleToP2 =
+        directionToP2 =
             Direction2d.radians (atan2 dy dx)
 
+        d2 =
+            Direction2d.from p1.position p2.position
+                |> Maybe.withDefault (Direction2d.radians 0)
+
+        _ =
+            1
+
+        --Debug.log "directionToP2 , d2" ( directionToP2, d2 )
         distanceSquareToP2 =
             dx ^ 2 + dy ^ 2
 
@@ -593,7 +601,7 @@ gravityVectorTo p2 p1 =
             initRadius (p2Mass / distanceSquareToP2)
 
         gDirection =
-            angleToP2
+            directionToP2
     in
     velocityFromMagnitudeDirection gMagnitude gDirection
 

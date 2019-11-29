@@ -103,14 +103,14 @@ type Radius
     = Radius Float
 
 
-initRadius : Float -> Radius
-initRadius =
+newRadius : Float -> Radius
+newRadius =
     abs >> Radius
 
 
 radiusAdd2 : Radius -> Radius -> Radius
 radiusAdd2 (Radius r1) (Radius r2) =
-    r1 + r2 |> initRadius
+    r1 + r2 |> newRadius
 
 
 radiusToQPixels : Radius -> QPixels
@@ -248,7 +248,7 @@ initSun : Sun
 initSun =
     { position = Point2d.pixels 0 0
     , velocity = Vector2d.pixels 0 0
-    , radius = initRadius 20
+    , radius = newRadius 20
     , mass = initialSunMass
     }
 
@@ -263,7 +263,7 @@ type alias Turret =
 initTurretAtXY : Float -> Float -> Turret
 initTurretAtXY x y =
     { position = pointXY x y
-    , radius = initRadius 20
+    , radius = newRadius 20
     , color = Color.lightGreen
     }
 
@@ -284,7 +284,7 @@ initBullet : Point -> Float -> Direction -> Bullet
 initBullet position speed direction =
     { position = position
     , velocity = velocityFromSpeedDirection (pixels speed) direction
-    , radius = initRadius 5
+    , radius = newRadius 5
     , state = BulletTraveling
     }
 

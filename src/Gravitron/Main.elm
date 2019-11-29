@@ -483,13 +483,8 @@ applyDrag drag =
 
 
 clampVelocityRadius : Radius -> { a | velocity : Velocity } -> { a | velocity : Velocity }
-clampVelocityRadius =
-    let
-        mapper : Radius -> Radius -> Radius
-        mapper n =
-            Quantity.clamp (Quantity.negate n) n
-    in
-    mapVelocity << mapR << mapper
+clampVelocityRadius n =
+    mapVelocityRadius (Quantity.clamp (Quantity.negate n) n)
 
 
 mapR func v =

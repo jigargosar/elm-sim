@@ -211,12 +211,11 @@ initBullet position speed direction =
 
 
 type alias Flags =
-    { now : Int }
+    ()
 
 
 type alias Model =
-    { seed : Seed
-    , turret : Turret
+    { turret : Turret
     , ticksSinceLastFire : Float
     , fireRateInTicks : Float
     , bullets : List Bullet
@@ -261,9 +260,8 @@ type alias Mouse =
 
 
 init : Flags -> ( Model, Cmd Msg )
-init flags =
-    ( { seed = Random.initialSeed flags.now
-      , sun = initSun
+init _ =
+    ( { sun = initSun
       , turret = initTurretAtXY -100 -100
       , ticksSinceLastFire = 0
       , fireRateInTicks = turretFireRateInTicks
@@ -564,21 +562,6 @@ gravitateTo p2 p1 =
 mapVelocity : (Velocity -> Velocity) -> { b | velocity : Velocity } -> { b | velocity : Velocity }
 mapVelocity func model =
     { model | velocity = func model.velocity }
-
-
-
-{-
-   let
-           length =
-               Vector2d.length v
-
-           direction =
-               Vector2d.direction v
-                   |> Maybe.withDefault (Direction2d.degrees 0)
-       in
-       Vector2d.withLength (func length) direction
-
--}
 
 
 mapVelocityRadius func model =

@@ -556,6 +556,7 @@ velocityRadius =
     Vector2d.length
 
 
+mapVelocityRadiusHelp : (Radius -> Radius) -> Velocity -> Velocity
 mapVelocityRadiusHelp func velocity =
     let
         v =

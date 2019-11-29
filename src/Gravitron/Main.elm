@@ -624,9 +624,13 @@ view model =
 
 
 renderSun { position, radius } =
-    Draw.circle2d
-        [ fillColor Color.yellow ]
-        (Circle2d.atPoint position (radiusToQPixels radius))
+    renderCircle [ fillColor Color.yellow ]
+        position
+        radius
+
+
+renderCircle attrs position radius =
+    Draw.circle2d attrs (Circle2d.atPoint position (radiusToQPixels radius))
 
 
 renderTurret : Float -> Turret -> TSC.Svg msg

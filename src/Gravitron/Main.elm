@@ -581,14 +581,6 @@ gravityVectorTo p2 p1 =
     Vector2d.withLength gMagnitude gDirection
 
 
-a =
-    "1"
-
-
-b =
-    1
-
-
 
 -- View
 

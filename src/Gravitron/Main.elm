@@ -347,11 +347,13 @@ mapVelocityInVXY func model =
 
 changeVelocityAngleTowardsPoint point model =
     let
-        velocity =
+        vectorToPoint =
             Vector2d.from model.position point
-                |> Vector2d.scaleBy 0.9
+
+        newVelocity =
+            Vector2d.scaleBy 0.1 vectorToPoint
     in
-    mapVelocityInVXY (\_ -> velocity) model
+    mapVelocityInVXY (always newVelocity) model
 
 
 phase3UpdatePositionDependenciesForNextTick : Model -> Model

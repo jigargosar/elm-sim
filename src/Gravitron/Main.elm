@@ -268,11 +268,7 @@ type BulletState
 
 
 type alias Bullet =
-    { position : Point
-    , velocity : Velocity
-    , radius : Radius
-    , state : BulletState
-    }
+    HasPosition (HasVelocity (HasRadius { state : BulletState }))
 
 
 initBullet : Point -> Float -> Direction -> Bullet

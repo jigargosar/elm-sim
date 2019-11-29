@@ -54,12 +54,7 @@ bulletUpdateDrag =
 
 
 
--- DATA
-
-
-mapPosition : (a -> a) -> { b | position : a } -> { b | position : a }
-mapPosition func model =
-    { model | position = func model.position }
+-- GEOMETRY
 
 
 positionFromXY { x, y } =
@@ -78,12 +73,57 @@ type alias Point =
     Point2d Pixels ()
 
 
+pointAt : Float -> Float -> Point
+pointAt x y =
+    Point2d.xy (Pixels.pixels x) (Pixels.pixels y)
+
+
 type alias Velocity =
     Vector2d Pixels ()
 
 
 type alias Radius =
     Quantity Float Pixels
+
+
+addRadii : HasRadius a -> HasRadius b -> Radius
+addRadii c1 c2 =
+    Quantity.plus c1.radius c2.radius
+
+
+type alias HasPosition a =
+    { a | position : Point }
+
+
+mapPosition : (Point -> Point) -> HasPosition a -> HasPosition a
+mapPosition func model =
+    { model | position = func model.position }
+
+
+distanceBetweenPositions : HasPosition a -> HasPosition b -> QPixels
+distanceBetweenPositions c1 c2 =
+    Point2d.distanceFrom c1.position c2.position
+
+
+type alias HasRadius a =
+    { a | radius : Radius }
+
+
+type alias HasPositionRadius a =
+    { a
+        | position : Point
+        , radius : Radius
+    }
+
+
+areCirclesOverlapping : HasPositionRadius a -> HasPositionRadius b -> Bool
+areCirclesOverlapping c1 c2 =
+    distanceBetweenPositions c1 c2
+        |> Quantity.lessThanOrEqualTo (addRadii c1 c2)
+
+
+
+-- DATA
 
 
 type alias Sun =
@@ -112,7 +152,7 @@ type alias Turret =
 
 initTurretAtXY : Float -> Float -> Turret
 initTurretAtXY x y =
-    { position = pointFromXY x y
+    { position = pointAt x y
     , radius = initPx 20
     , color = Color.lightGreen
     }
@@ -283,7 +323,7 @@ update message model =
 onTick : Model -> Model
 onTick model =
     phase1TranslatePositions model
-        |> phase2UpdateCollisions
+        |> phase2HandleCollisions
         |> phase3UpdatePositionDependenciesForNextTick
 
 
@@ -295,8 +335,8 @@ phase1TranslatePositions ({ sun, bullets } as model) =
     }
 
 
-phase2UpdateCollisions : Model -> Model
-phase2UpdateCollisions ({ screen, mouse, sun, bullets } as model) =
+phase2HandleCollisions : Model -> Model
+phase2HandleCollisions ({ screen, mouse, sun, bullets } as model) =
     let
         newBullets =
             let
@@ -311,42 +351,6 @@ phase2UpdateCollisions ({ screen, mouse, sun, bullets } as model) =
                 |> List.map (bounceOffScreen screen)
     in
     { model | bullets = newBullets }
-
-
-areCirclesOverlapping : HasPositionRadius a -> HasPositionRadius b -> Bool
-areCirclesOverlapping c1 c2 =
-    distanceFrom c1 c2
-        |> Quantity.lessThanOrEqualTo (addRadii c1 c2)
-
-
-addRadii : HasRadius a -> HasRadius b -> Radius
-addRadii c1 c2 =
-    Quantity.plus c1.radius c2.radius
-
-
-distanceFrom : HasPosition a -> HasPosition b -> QPixels
-distanceFrom c1 c2 =
-    Point2d.distanceFrom c1.position c2.position
-
-
-type alias HasPosition a =
-    { a | position : Point }
-
-
-type alias HasRadius a =
-    { a | radius : Radius }
-
-
-type alias HasPositionRadius a =
-    { a
-        | position : Point
-        , radius : Radius
-    }
-
-
-pointFromXY : Float -> Float -> Point
-pointFromXY x y =
-    Point2d.xy (Pixels.pixels x) (Pixels.pixels y)
 
 
 sunUpdateVelocityTowards point model =

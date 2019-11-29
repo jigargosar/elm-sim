@@ -616,6 +616,11 @@ view model =
         ]
 
 
+canvas : Screen -> List (Svg Msg) -> Svg Msg
+canvas { l, t, w, h } =
+    svg [ style "position" "fixed", viewBox l t w h, width w, height h ]
+
+
 renderBackground : Screen -> Svg Msg
 renderBackground { l, t, w, h } =
     Svg.rect [ x l, y t, width w, height h, fillColor Color.black ] []

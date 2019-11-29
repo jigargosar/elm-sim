@@ -52,11 +52,16 @@ bulletUpdateDrag =
 
 
 
--- GEOMETRY
+-- ELM GEOMETRY
 
 
 type alias QPixels =
     Quantity Float Pixels.Pixels
+
+
+pixels : Float -> QPixels
+pixels =
+    Pixels.pixels
 
 
 type alias Direction =
@@ -67,8 +72,8 @@ type alias Point =
     Point2d Pixels ()
 
 
-pointAtXY : Float -> Float -> Point
-pointAtXY x y =
+pointXY : Float -> Float -> Point
+pointXY x y =
     Point2d.xy (pixels x) (pixels y)
 
 
@@ -87,16 +92,11 @@ positionXY =
 
 positionToPoint : Position -> Point
 positionToPoint (Position x y) =
-    Point2d.xy (pixels x) (pixels y)
+    pointXY x y
 
 
 
 -- Radius
-
-
-pixels : Float -> QPixels
-pixels =
-    Pixels.pixels
 
 
 type Radius
@@ -262,7 +262,7 @@ type alias Turret =
 
 initTurretAtXY : Float -> Float -> Turret
 initTurretAtXY x y =
-    { position = pointAtXY x y
+    { position = pointXY x y
     , radius = initRadius 20
     , color = Color.lightGreen
     }
@@ -560,7 +560,7 @@ bounceOffScreen s =
             { x = x, y = y, vx = vx, vy = vy }
 
         fromParts { x, y, vx, vy } =
-            { position = pointAtXY x y, velocity = Vector2d.pixels vx vy }
+            { position = pointXY x y, velocity = Vector2d.pixels vx vy }
 
         mapPositionVelocityAsParts func model =
             let

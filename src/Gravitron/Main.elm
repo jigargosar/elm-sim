@@ -134,8 +134,8 @@ velocityRadius =
     Vector2d.length
 
 
-velocityMapRadius : (Radius -> Radius) -> Velocity -> Velocity
-velocityMapRadius func model =
+velocityMapMagnitude : (Radius -> Radius) -> Velocity -> Velocity
+velocityMapMagnitude func model =
     let
         radius : Radius
         radius =
@@ -162,8 +162,8 @@ mapVelocity func model =
     { model | velocity = func model.velocity }
 
 
-clampVelocityLength : Float -> HasVelocity a -> HasVelocity a
-clampVelocityLength n =
+clampVelocityMagnitude : Float -> HasVelocity a -> HasVelocity a
+clampVelocityMagnitude n =
     let
         maxRadius =
             initRadius n
@@ -171,7 +171,7 @@ clampVelocityLength n =
         clampRadiusFunc =
             Quantity.min maxRadius
     in
-    mapVelocity (velocityMapRadius clampRadiusFunc)
+    mapVelocity (velocityMapMagnitude clampRadiusFunc)
 
 
 
@@ -459,7 +459,7 @@ phase3UpdatePositionDependenciesForNextTick ({ screen, mouse, sun, turret, bulle
                     bullet
                         |> gravitateTo sun
                         |> applyDrag bulletUpdateDrag
-                        |> clampVelocityLength bulletMaxSpeed
+                        |> clampVelocityMagnitude bulletMaxSpeed
             in
             bullets
                 |> List.map updateBullet

@@ -165,11 +165,11 @@ mapVelocity func model =
 clampVelocityLength : Float -> HasVelocity a -> HasVelocity a
 clampVelocityLength n =
     let
-        radius =
+        maxRadius =
             initRadius n
 
         clampRadiusFunc =
-            Quantity.clamp (Quantity.negate radius) radius
+            Quantity.min maxRadius
     in
     mapVelocity (velocityMapRadius clampRadiusFunc)
 

@@ -565,6 +565,38 @@ mapVelocity func model =
     { model | velocity = func model.velocity }
 
 
+
+{-
+   let
+           length =
+               Vector2d.length v
+
+           direction =
+               Vector2d.direction v
+                   |> Maybe.withDefault (Direction2d.degrees 0)
+       in
+       Vector2d.withLength (func length) direction
+
+-}
+
+
+mapVelocityRadius func model =
+    let
+        v =
+            model.velocity
+
+        radius : Radius
+        radius =
+            Vector2d.length v
+                |> func
+
+        direction =
+            Vector2d.direction v
+                |> Maybe.withDefault (Direction2d.degrees 0)
+    in
+    { model | velocity = Vector2d.withLength radius direction }
+
+
 accelerate v2 =
     mapVelocity (Vector2d.plus v2)
 

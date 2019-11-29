@@ -57,10 +57,6 @@ bulletUpdateDrag =
 -- GEOMETRY
 
 
-positionFromXY { x, y } =
-    Point2d.fromPixels { x = x, y = y }
-
-
 type alias QPixels =
     Quantity Float Pixels.Pixels
 
@@ -125,6 +121,14 @@ areCirclesOverlapping : HasPositionRadius a -> HasPositionRadius b -> Bool
 areCirclesOverlapping c1 c2 =
     distanceBetweenPositions c1 c2
         |> Quantity.lessThanOrEqualTo (addRadii c1 c2)
+
+
+
+-- TRANSITION HELPERS
+
+
+positionFromXY { x, y } =
+    Point2d.fromPixels { x = x, y = y }
 
 
 

@@ -620,7 +620,7 @@ view model =
 
 renderSun : Sun -> Svg Msg
 renderSun { position, radius } =
-    renderCircle [ fillColor Color.yellow ] position radius
+    drawCircle [ fillColor Color.yellow ] position radius
 
 
 renderTurret : Float -> Turret -> Svg msg
@@ -661,8 +661,8 @@ fillColor =
     Fill >> fill
 
 
-renderCircle : List (Svg.Attribute msg) -> Point2d Pixels coordinates -> Radius -> Svg msg
-renderCircle attrs position radius =
+drawCircle : List (Svg.Attribute msg) -> Point2d Pixels coordinates -> Radius -> Svg msg
+drawCircle attrs position radius =
     Draw.circle2d attrs (Circle2d.atPoint position (radiusToQPixels radius))
 
 

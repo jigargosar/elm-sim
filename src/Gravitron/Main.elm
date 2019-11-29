@@ -211,6 +211,15 @@ velocityFromPolar =
     fromPolar >> Velocity
 
 
+velocityFromXY x y =
+    Velocity ( x, y )
+
+
+velocityToTuple : Velocity -> ( Float, Float )
+velocityToTuple (Velocity cart) =
+    cart
+
+
 velocityToPolar : Velocity -> ( Float, Float )
 velocityToPolar (Velocity cart) =
     toPolar cart
@@ -221,6 +230,10 @@ velocityMapMagnitude func model =
     velocityToPolar model
         |> Tuple.mapFirst func
         |> velocityFromPolar
+
+
+velocityAdd2 (Velocity ( x, y )) (Velocity ( x2, y2 )) =
+    Velocity ( x + x2, y + y2 )
 
 
 
@@ -573,7 +586,7 @@ updateTicksSinceLastFire { ticksSinceLastFire, fireRateInTicks } =
 
 
 applyDrag drag =
-    mapVelocity (Vector2d.scaleBy drag)
+    mapVelocity (velocityScaleBy drag)
 
 
 bounceOffScreen : Screen -> HasPositionVelocity a -> HasPositionVelocity a
@@ -605,12 +618,12 @@ bounceOffScreen s =
                     positionToTuple position
 
                 ( vx, vy ) =
-                    Vector2d.toTuple Pixels.inPixels velocity
+                    velocityToTuple velocity
             in
             { x = x, y = y, vx = vx, vy = vy }
 
         fromParts { x, y, vx, vy } =
-            { position = positionXY x y, velocity = Vector2d.pixels vx vy }
+            { position = positionXY x y, velocity = velocityFromXY vx vy }
 
         mapPositionVelocityAsParts func model =
             let
@@ -630,10 +643,9 @@ gravitateTo p2 p1 =
         gravityVector =
             gravityVectorTo p2 p1
     in
-    mapVelocity (Vector2d.plus gravityVector) p1
+    mapVelocity (velocityAdd2 gravityVector) p1
 
 
-gravityVectorTo : Sun -> HasPosition a -> Vector2d Pixels ()
 gravityVectorTo p2 p1 =
     let
         angle =
@@ -643,7 +655,7 @@ gravityVectorTo p2 p1 =
             p2.mass
                 / positionDistanceSquaredFrom p1.position p2.position
     in
-    Vector2d.rTheta (pixels magnitude) (Angle.radians angle)
+    velocityFromPolar ( magnitude, angle )
 
 
 

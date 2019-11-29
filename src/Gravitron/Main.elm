@@ -95,6 +95,7 @@ positionToTuple (Position x y) =
     ( x, y )
 
 
+positionFromPoint : Point -> Position
 positionFromPoint point =
     let
         { x, y } =

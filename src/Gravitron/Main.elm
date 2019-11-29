@@ -124,8 +124,8 @@ type alias Velocity =
     Vector2d Pixels ()
 
 
-velocityWithRadiusDirection : Radius -> Direction -> Velocity
-velocityWithRadiusDirection =
+velocityFromMagnitudeDirection : Radius -> Direction -> Velocity
+velocityFromMagnitudeDirection =
     Vector2d.withLength
 
 
@@ -251,7 +251,7 @@ type alias Bullet =
 initBullet : Point -> Float -> Direction -> Bullet
 initBullet position speed direction =
     { position = position
-    , velocity = velocityWithRadiusDirection (initRadius speed) direction
+    , velocity = velocityFromMagnitudeDirection (initRadius speed) direction
     , radius = initRadius 5
     , state = BulletTraveling
     }
@@ -592,10 +592,10 @@ gravityVectorTo p2 p1 =
         gRadius =
             p2Mass / distanceSquareToP2
 
-        gTheta =
+        gDirection =
             angleToP2
     in
-    velocityWithRadiusDirection (initRadius gRadius) (Direction2d.radians gTheta)
+    velocityFromMagnitudeDirection (initRadius gRadius) (Direction2d.radians gDirection)
 
 
 

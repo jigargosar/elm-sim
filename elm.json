@@ -15,6 +15,7 @@
             "elm/random": "1.0.0",
             "elm/svg": "1.0.1",
             "elm/time": "1.0.0",
+            "elm-community/basics-extra": "4.0.0",
             "elm-community/random-extra": "3.1.0",
             "elm-community/typed-svg": "5.1.0",
             "ianmackenzie/elm-geometry": "3.0.0",

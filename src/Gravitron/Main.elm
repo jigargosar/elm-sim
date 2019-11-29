@@ -1,16 +1,20 @@
 module Gravitron.Main exposing (main)
 
 import Angle
+import Basics.Extra exposing (uncurry)
 import Browser
 import Browser.Dom
 import Browser.Events
+import Circle2d
 import Color
 import Direction2d exposing (Direction2d)
 import Html exposing (Html)
 import Html.Attributes exposing (style)
 import Json.Decode as JD
+import LineSegment2d
 import Pixels exposing (Pixels)
 import Point2d exposing (Point2d)
+import Quantity
 import Random exposing (Seed)
 import Task
 import TypedSvg exposing (circle, g, rect, svg)
@@ -18,6 +22,7 @@ import TypedSvg.Attributes exposing (fill, transform, viewBox)
 import TypedSvg.Attributes.InPx exposing (cx, cy, height, r, width, x, y)
 import TypedSvg.Core as TSC
 import TypedSvg.Types exposing (Fill(..), StrokeLinecap(..), StrokeLinejoin(..), Transform(..))
+import Vector2d
 
 
 
@@ -52,17 +57,38 @@ bulletUpdateDrag =
 -- DATA
 
 
-type alias PixelPoint =
+type alias Point =
     Point2d Pixels ()
 
 
 type alias Sun =
-    { position : PixelPoint
+    { position : Point
     , vx : Float
     , vy : Float
     , radius : Float
     , mass : Float
     }
+
+
+mapPosition : (a -> a) -> { b | position : a } -> { b | position : a }
+mapPosition func model =
+    { model | position = func model.position }
+
+
+velocityVectorFromVXY { vx, vy } =
+    Vector2d.fromPixels { x = vx, y = vy }
+
+
+positionFromXY { x, y } =
+    Point2d.fromPixels { x = x, y = y }
+
+
+translatePositionByVelocity =
+    with (velocityVectorFromVXY >> Point2d.translateBy) mapPosition
+
+
+with func1 func2 model =
+    func2 (func1 model) model
 
 
 initSun : Sun
@@ -97,7 +123,7 @@ type BulletState
     | BulletExploding
 
 
-type alias BulletContext =
+type alias Bullet =
     { x : Float
     , y : Float
     , vx : Float
@@ -107,7 +133,15 @@ type alias BulletContext =
     }
 
 
-initBullet : Float -> Float -> Float -> Float -> BulletContext
+bulletToPositionRadius b =
+    { position = positionFromXY b, radius = Pixels.pixels b.radius }
+
+
+sunToPositionRadius s =
+    { position = s.position, radius = Pixels.pixels s.radius }
+
+
+initBullet : Float -> Float -> Float -> Float -> Bullet
 initBullet x y speed angle =
     let
         ( vx, vy ) =
@@ -135,7 +169,7 @@ type alias Model =
     , turret : Turret
     , ticksSinceLastFire : Float
     , fireRateInTicks : Float
-    , bullets : List BulletContext
+    , bullets : List Bullet
     , sun : Sun
     , mouse : Mouse
     , screen : Screen
@@ -256,7 +290,7 @@ phasedUpdateOnTick model =
 phase1UpdatePositions : Model -> Model
 phase1UpdatePositions ({ sun, bullets } as model) =
     { model
-        | sun = stepVel sun
+        | sun = translatePositionByVelocity sun
         , bullets = List.map stepVel bullets
     }
 
@@ -267,7 +301,7 @@ phase2UpdateCollisions ({ screen, mouse, sun, bullets } as model) =
         newBullets =
             let
                 updateBullet bullet =
-                    if areCirclesOverlapping sun bullet then
+                    if areCirclesOverlapping (sunToPositionRadius sun) (bulletToPositionRadius bullet) then
                         Nothing
 
                     else
@@ -279,12 +313,14 @@ phase2UpdateCollisions ({ screen, mouse, sun, bullets } as model) =
     { model | bullets = newBullets }
 
 
-areCirclesOverlapping :
-    { a | x : Float, y : Float, radius : Float }
-    -> { b | x : Float, y : Float, radius : Float }
-    -> Bool
 areCirclesOverlapping c1 c2 =
-    distanceSquared c1 c2 < (c1.radius + c2.radius) ^ 2
+    Vector2d.from c1.position c2.position
+        |> Vector2d.length
+        |> Quantity.lessThanOrEqualTo (mapEach .radius ( c1, c2 ) |> uncurry Quantity.plus)
+
+
+mapEach func ( a, b ) =
+    ( func a, func b )
 
 
 distanceSquared : { a | x : number, y : number } -> { b | x : number, y : number } -> number

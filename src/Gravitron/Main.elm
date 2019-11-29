@@ -1,6 +1,6 @@
 module Gravitron.Main exposing (main)
 
-import Angle
+import Angle exposing (Angle)
 import Browser
 import Browser.Dom
 import Browser.Events
@@ -65,8 +65,8 @@ type alias Point =
     Point2d Pixels ()
 
 
-pointAt : Float -> Float -> Point
-pointAt x y =
+pointAtXY : Float -> Float -> Point
+pointAtXY x y =
     Point2d.xy (Pixels.pixels x) (Pixels.pixels y)
 
 
@@ -74,12 +74,17 @@ type alias Velocity =
     Vector2d Pixels ()
 
 
+velocityFromRTheta : Radius -> Angle -> Velocity
+velocityFromRTheta =
+    Vector2d.rTheta
+
+
 type alias Radius =
     Quantity Float Pixels
 
 
-radiusFromPixels : Float -> Radius
-radiusFromPixels =
+initRadius : Float -> Radius
+initRadius =
     Pixels.pixels
 
 
@@ -166,8 +171,8 @@ type alias Turret =
 
 initTurretAtXY : Float -> Float -> Turret
 initTurretAtXY x y =
-    { position = pointAt x y
-    , radius = radiusFromPixels 20
+    { position = pointAtXY x y
+    , radius = initRadius 20
     , color = Color.lightGreen
     }
 
@@ -177,11 +182,9 @@ type BulletState
 
 
 type alias Bullet =
-    { x : Float
-    , y : Float
-    , vx : Float
-    , vy : Float
-    , radius : Float
+    { position : Point
+    , velocity : Velocity
+    , radius : Radius
     , state : BulletState
     }
 
@@ -190,17 +193,11 @@ bulletToPositionRadius b =
     { position = positionFromXY b, radius = Pixels.pixels b.radius }
 
 
-initBullet : Float -> Float -> Float -> Float -> Bullet
-initBullet x y speed angle =
-    let
-        ( vx, vy ) =
-            fromPolar ( speed, angle )
-    in
-    { x = x
-    , y = y
-    , vx = vx
-    , vy = vy
-    , radius = 5
+initBullet : Point -> Float -> Angle -> Bullet
+initBullet position speed angle =
+    { position = position
+    , velocity = velocityFromRTheta (initRadius speed) angle
+    , radius = initRadius 5
     , state = BulletTraveling
     }
 
@@ -394,13 +391,11 @@ phase3UpdatePositionDependenciesForNextTick ({ screen, mouse, sun, turret, bulle
                         dir
                         turret.radius
                         turret.position
-                        |> Point2d.toPixels
 
                 bAngle =
                     Direction2d.toAngle dir
-                        |> Angle.inRadians
             in
-            initBullet bPos.x bPos.y bulletInitialSpeed bAngle
+            initBullet bPos bulletInitialSpeed bAngle
 
         appendNewBulletIfFired =
             shouldFireBullet

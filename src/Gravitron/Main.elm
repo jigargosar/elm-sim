@@ -97,7 +97,7 @@ type alias Sun =
 initSun : Sun
 initSun =
     { position = Point2d.pixels 0 0
-    , velocity = Vector2d.fromTuple Pixels.pixels ( 0, 0 )
+    , velocity = Vector2d.pixels 0 0
     , radius = Pixels.pixels 20
     , mass = initialSunMass
     }
@@ -314,7 +314,7 @@ phase2UpdateCollisions ({ screen, mouse, sun, bullets } as model) =
 
 
 areCirclesOverlapping c1 c2 =
-    Point2d.distanceFrom c1.position c2.position
+    distanceFrom c1.position c2.position
         |> Quantity.lessThanOrEqualTo (Quantity.plus c1.radius c2.radius)
 
 

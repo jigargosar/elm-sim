@@ -68,19 +68,6 @@ pointAtXY x y =
     Point2d.xy (Pixels.pixels x) (Pixels.pixels y)
 
 
-type alias Velocity =
-    Vector2d Pixels ()
-
-
-type alias Direction =
-    Direction2d ()
-
-
-velocityWithRadiusDirection : Radius -> Direction -> Velocity
-velocityWithRadiusDirection =
-    Vector2d.withLength
-
-
 type alias Radius =
     Quantity Float Pixels
 
@@ -104,13 +91,17 @@ distanceBetweenPositions c1 c2 =
     Point2d.distanceFrom c1.position c2.position
 
 
-type alias HasVelocity a =
-    { a | velocity : Velocity }
+type alias Velocity =
+    Vector2d Pixels ()
 
 
-mapVelocity : (Velocity -> Velocity) -> HasVelocity a -> HasVelocity a
-mapVelocity func model =
-    { model | velocity = func model.velocity }
+type alias Direction =
+    Direction2d ()
+
+
+velocityWithRadiusDirection : Radius -> Direction -> Velocity
+velocityWithRadiusDirection =
+    Vector2d.withLength
 
 
 velocityRadius : Velocity -> Radius
@@ -118,17 +109,8 @@ velocityRadius =
     Vector2d.length
 
 
-clampVelocityRadius : Radius -> HasVelocity a -> HasVelocity a
-clampVelocityRadius n =
-    let
-        clampRadiusFunc =
-            Quantity.clamp (Quantity.negate n) n
-    in
-    mapVelocity (mapVelocityRadiusHelp clampRadiusFunc)
-
-
-mapVelocityRadiusHelp : (Radius -> Radius) -> Velocity -> Velocity
-mapVelocityRadiusHelp func model =
+velocityMapRadius : (Radius -> Radius) -> Velocity -> Velocity
+velocityMapRadius func model =
     let
         radius : Radius
         radius =
@@ -139,6 +121,24 @@ mapVelocityRadiusHelp func model =
                 |> Maybe.withDefault (Direction2d.degrees 0)
     in
     Vector2d.withLength radius direction
+
+
+type alias HasVelocity a =
+    { a | velocity : Velocity }
+
+
+mapVelocity : (Velocity -> Velocity) -> HasVelocity a -> HasVelocity a
+mapVelocity func model =
+    { model | velocity = func model.velocity }
+
+
+clampVelocityRadius : Radius -> HasVelocity a -> HasVelocity a
+clampVelocityRadius n =
+    let
+        clampRadiusFunc =
+            Quantity.clamp (Quantity.negate n) n
+    in
+    mapVelocity (velocityMapRadius clampRadiusFunc)
 
 
 type alias HasPositionVelocity a =

@@ -613,8 +613,6 @@ view model =
           in
           renderTurret factor model.turret
         , g [] (List.map renderTurretBullet model.bullets)
-
-        --, renderPlanet model.planet
         ]
 
 

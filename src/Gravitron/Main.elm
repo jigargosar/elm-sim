@@ -82,10 +82,6 @@ mapPosition func model =
     { model | position = func model.position }
 
 
-velocityVectorFromVXY { vx, vy } =
-    Vector2d.fromPixels { x = vx, y = vy }
-
-
 positionFromXY { x, y } =
     Point2d.fromPixels { x = x, y = y }
 
@@ -122,7 +118,6 @@ initTurretAt x y =
 
 type BulletState
     = BulletTraveling
-    | BulletExploding
 
 
 type alias Bullet =
@@ -137,10 +132,6 @@ type alias Bullet =
 
 bulletToPositionRadius b =
     { position = positionFromXY b, radius = Pixels.pixels b.radius }
-
-
-sunToPositionRadius s =
-    { position = s.position, radius = Pixels.pixels s.radius }
 
 
 initBullet : Float -> Float -> Float -> Float -> Bullet

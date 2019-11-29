@@ -162,11 +162,14 @@ mapVelocity func model =
     { model | velocity = func model.velocity }
 
 
-clampVelocityRadius : Radius -> HasVelocity a -> HasVelocity a
-clampVelocityRadius n =
+clampVelocityLength : Float -> HasVelocity a -> HasVelocity a
+clampVelocityLength n =
     let
+        radius =
+            initRadius n
+
         clampRadiusFunc =
-            Quantity.clamp (Quantity.negate n) n
+            Quantity.clamp (Quantity.negate radius) radius
     in
     mapVelocity (velocityMapRadius clampRadiusFunc)
 
@@ -456,7 +459,7 @@ phase3UpdatePositionDependenciesForNextTick ({ screen, mouse, sun, turret, bulle
                     bullet
                         |> gravitateTo sun
                         |> applyDrag bulletUpdateDrag
-                        |> clampVelocityRadius (initRadius bulletMaxSpeed)
+                        |> clampVelocityLength bulletMaxSpeed
             in
             bullets
                 |> List.map updateBullet

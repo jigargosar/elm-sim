@@ -589,6 +589,10 @@ gravitateTo p2 p1 =
     mapVelocity (Vector2d.plus gravityVector) p1
 
 
+distanceSquaredBetweenPositions (Position x1 y1) (Position x2 y2) =
+    (x2 - x1) ^ 2 + (y2 - y1) ^ 2
+
+
 gravityVectorTo : Sun -> HasPosition a -> Vector2d Pixels ()
 gravityVectorTo p2 p1 =
     let
@@ -599,15 +603,9 @@ gravityVectorTo p2 p1 =
             Vector2d.direction vectorToP2
                 |> Maybe.withDefault Direction2d.x
 
-        distanceSquareToP2InPixels =
-            (Vector2d.length vectorToP2
-                --|> Quantity.squared
-                |> Pixels.inPixels
-            )
-                ^ 2
-
         gMagnitude =
-            (p2.mass / distanceSquareToP2InPixels)
+            p2.mass
+                / distanceSquaredBetweenPositions p1.position p2.position
                 |> Pixels.pixels
 
         gDirection =

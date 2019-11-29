@@ -580,6 +580,7 @@ bounceOffScreen s =
     mapPositionVelocityAsParts (bounceX >> bounceY)
 
 
+gravitateTo : Sun -> HasPositionVelocity a -> HasPositionVelocity a
 gravitateTo p2 p1 =
     let
         gravityVector =
@@ -588,10 +589,12 @@ gravitateTo p2 p1 =
     accelerate gravityVector p1
 
 
+accelerate : Vector2d Pixels () -> HasVelocity a -> HasVelocity a
 accelerate v2 =
     mapVelocity (Vector2d.plus v2)
 
 
+gravityVectorTo : Sun -> HasPosition a -> Vector2d Pixels ()
 gravityVectorTo p2 p1 =
     let
         vectorToP2 =

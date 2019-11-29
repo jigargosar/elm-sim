@@ -543,7 +543,11 @@ type alias HasVelocity a =
 
 clampVelocityRadius : Radius -> HasVelocity a -> HasVelocity a
 clampVelocityRadius n =
-    mapVelocityRadius (Quantity.clamp (Quantity.negate n) n)
+    let
+        clampRadiusFunc =
+            Quantity.clamp (Quantity.negate n) n
+    in
+    mapVelocity (mapVelocityRadiusHelp clampRadiusFunc)
 
 
 mapVelocity : (Velocity -> Velocity) -> HasVelocity a -> HasVelocity a

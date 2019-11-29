@@ -469,44 +469,6 @@ phase3UpdatePositionDependenciesForNextTick ({ screen, mouse, sun, turret, bulle
     }
 
 
-
---updateOnTick : Model -> Model
---updateOnTick ({ screen, mouse, sun, bullets } as model) =
---    let
---        newSun =
---            sun
---                |> stepVel
---                |> followXY mouse
---
---        ( shouldFireBullet, newTicksSinceFire ) =
---            updateTicksSinceLastFire model
---
---        appendNewBulletIfFired =
---            shouldFireBullet
---                |> Maybe.map (\_ -> (::) (initBullet 0 0 bulletInitialSpeed (degrees 180)))
---                |> Maybe.withDefault identity
---
---        newBullets =
---            let
---                updateBullet bullet =
---                    bullet
---                        |> stepVel
---                        |> gravitateTo sun
---                        |> applyDrag bulletUpdateDrag
---                        |> clampVelocity bulletMaxSpeed
---                        |> bounceOffScreen screen
---            in
---            bullets
---                |> appendNewBulletIfFired
---                |> List.map updateBullet
---    in
---    { model
---        | sun = newSun
---        , ticksSinceLastFire = newTicksSinceFire
---        , bullets = newBullets
---    }
-
-
 type FireBullet
     = FireBullet
 

@@ -10,7 +10,7 @@ import Html exposing (Html)
 import Html.Attributes exposing (style)
 import Json.Decode as JD
 import Pixels exposing (Pixels)
-import Point2d
+import Point2d exposing (Point2d)
 import Random exposing (Seed)
 import Task
 import TypedSvg exposing (circle, g, rect, svg)
@@ -52,9 +52,12 @@ bulletUpdateDrag =
 -- DATA
 
 
+type alias PixelPoint =
+    Point2d Pixels ()
+
+
 type alias Sun =
-    { x : Float
-    , y : Float
+    { position : PixelPoint
     , vx : Float
     , vy : Float
     , radius : Float
@@ -64,8 +67,7 @@ type alias Sun =
 
 initSun : Sun
 initSun =
-    { x = 0
-    , y = 0
+    { position = Point2d.pixels 0 0
     , vx = 0
     , vy = 0
     , radius = 20
@@ -251,6 +253,7 @@ phasedUpdateOnTick model =
         |> phase3UpdatePositionDependenciesForNextTick
 
 
+phase1UpdatePositions : Model -> Model
 phase1UpdatePositions ({ sun, bullets } as model) =
     { model
         | sun = stepVel sun
@@ -258,6 +261,7 @@ phase1UpdatePositions ({ sun, bullets } as model) =
     }
 
 
+phase2UpdateCollisions : Model -> Model
 phase2UpdateCollisions ({ screen, mouse, sun, bullets } as model) =
     let
         newBullets =
@@ -301,6 +305,7 @@ pt { x, y } =
     Point2d.fromPixels { x = x, y = y }
 
 
+phase3UpdatePositionDependenciesForNextTick : Model -> Model
 phase3UpdatePositionDependenciesForNextTick ({ screen, mouse, sun, turret, bullets } as model) =
     let
         newSun =

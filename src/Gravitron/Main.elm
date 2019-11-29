@@ -4,8 +4,10 @@ import Angle
 import Browser
 import Browser.Dom
 import Browser.Events
+import Circle2d
 import Color
 import Direction2d exposing (Direction2d)
+import Geometry.Svg
 import Html exposing (Html)
 import Html.Attributes exposing (style)
 import Json.Decode as JD
@@ -589,14 +591,9 @@ view model =
 
 
 renderSun { position, radius } =
-    let
-        { x, y } =
-            Point2d.toPixels position
-
-        r =
-            Pixels.inPixels radius
-    in
-    renderCircle x y r [ fillColor Color.yellow ]
+    Geometry.Svg.circle2d
+        [ fillColor Color.yellow ]
+        (Circle2d.atPoint position radius)
 
 
 renderTurret : Float -> Turret -> TSC.Svg msg

@@ -598,11 +598,6 @@ gravityVectorTo p2 p1 =
 -- View
 
 
-fillColor : Color.Color -> Svg.Attribute msg
-fillColor =
-    Fill >> fill
-
-
 view : Model -> Html Msg
 view model =
     let
@@ -625,9 +620,7 @@ view model =
 
 renderSun : HasPositionRadius a -> Svg Msg
 renderSun { position, radius } =
-    renderCircle [ fillColor Color.yellow ]
-        position
-        radius
+    renderCircle [ fillColor Color.yellow ] position radius
 
 
 renderTurret : Float -> Turret -> Svg msg
@@ -649,11 +642,6 @@ type alias Circle =
     Circle2d.Circle2d Pixels ()
 
 
-renderCircle : List (Svg.Attribute msg) -> Point2d Pixels coordinates -> Radius -> Svg msg
-renderCircle attrs position radius =
-    Draw.circle2d attrs (Circle2d.atPoint position (radiusToQPixels radius))
-
-
 renderTurretBullet { position, radius } =
     Draw.circle2d [ fillColor <| whiteA 0.9 ] (Circle2d.atPoint position (radiusToQPixels radius))
 
@@ -663,9 +651,27 @@ whiteA =
     Color.rgba 1 1 1
 
 
-renderRect : Float -> Float -> Float -> Float -> List (TSC.Attribute msg) -> TSC.Svg msg
+renderRect : Float -> Float -> Float -> Float -> List (Svg.Attribute msg) -> Svg msg
 renderRect xv yv wv hv rest =
     rect ([ x xv, y yv, width wv, height hv ] ++ rest) []
+
+
+
+-- Drawing Helpers
+
+
+fillColor : Color.Color -> Svg.Attribute msg
+fillColor =
+    Fill >> fill
+
+
+renderCircle : List (Svg.Attribute msg) -> Point2d Pixels coordinates -> Radius -> Svg msg
+renderCircle attrs position radius =
+    Draw.circle2d attrs (Circle2d.atPoint position (radiusToQPixels radius))
+
+
+
+-- Program
 
 
 main =

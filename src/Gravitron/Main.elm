@@ -521,7 +521,12 @@ phase3UpdatePositionDependenciesForNextTick ({ screen, mouse, sun, turret, bulle
                         (turret.radius |> radiusToQPixels)
                         (positionToPoint turret.position)
             in
-            initBullet (positionFromPoint bPos) bulletInitialSpeed dir
+            initBullet (positionFromPoint bPos)
+                ( bulletInitialSpeed
+                , dir
+                    |> Direction2d.toAngle
+                    |> Angle.inRadians
+                )
 
         appendNewBulletIfFired =
             shouldFireBullet

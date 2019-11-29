@@ -11,7 +11,7 @@ import Html.Attributes exposing (style)
 import Json.Decode as JD
 import Pixels exposing (Pixels)
 import Point2d exposing (Point2d)
-import Quantity
+import Quantity exposing (Quantity)
 import Random exposing (Seed)
 import Task
 import TypedSvg exposing (circle, g, rect, svg)
@@ -19,7 +19,7 @@ import TypedSvg.Attributes exposing (fill, transform, viewBox)
 import TypedSvg.Attributes.InPx exposing (cx, cy, height, r, width, x, y)
 import TypedSvg.Core as TSC
 import TypedSvg.Types exposing (Fill(..), StrokeLinecap(..), StrokeLinejoin(..), Transform(..))
-import Vector2d
+import Vector2d exposing (Vector2d)
 
 
 
@@ -58,11 +58,18 @@ type alias Point =
     Point2d Pixels ()
 
 
+type alias Velocity =
+    Vector2d Pixels ()
+
+
+type alias Radius =
+    Quantity Float Pixels
+
+
 type alias Sun =
     { position : Point
-    , vx : Float
-    , vy : Float
-    , radius : Float
+    , velocity : Velocity
+    , radius : Radius
     , mass : Float
     }
 
@@ -81,7 +88,7 @@ positionFromXY { x, y } =
 
 
 translatePositionByVelocity =
-    with (velocityVectorFromVXY >> Point2d.translateBy) mapPosition
+    with (.velocity >> Point2d.translateBy) mapPosition
 
 
 with func1 func2 model =
@@ -91,9 +98,8 @@ with func1 func2 model =
 initSun : Sun
 initSun =
     { position = Point2d.pixels 0 0
-    , vx = 0
-    , vy = 0
-    , radius = 20
+    , velocity = Vector2d.fromTuple Pixels.pixels ( 0, 0 )
+    , radius = Pixels.pixels 20
     , mass = initialSunMass
     }
 
@@ -298,7 +304,7 @@ phase2UpdateCollisions ({ screen, mouse, sun, bullets } as model) =
         newBullets =
             let
                 updateBullet bullet =
-                    if areCirclesOverlapping (sunToPositionRadius sun) (bulletToPositionRadius bullet) then
+                    if areCirclesOverlapping sun (bulletToPositionRadius bullet) then
                         Nothing
 
                     else
@@ -335,25 +341,12 @@ pt { x, y } =
     Point2d.fromPixels { x = x, y = y }
 
 
-mapVelocityInVXY func model =
-    let
-        { x, y } =
-            velocityVectorFromVXY model
-                |> func
-                |> Vector2d.toPixels
-    in
-    { model | vx = x, vy = y }
-
-
 sunUpdateVelocityTowards point model =
-    let
-        vectorToPoint =
+    { model
+        | velocity =
             Vector2d.from model.position point
-
-        newVelocity =
-            Vector2d.scaleBy 0.1 vectorToPoint
-    in
-    mapVelocityInVXY (always newVelocity) model
+                |> Vector2d.scaleBy 0.1
+    }
 
 
 phase3UpdatePositionDependenciesForNextTick : Model -> Model

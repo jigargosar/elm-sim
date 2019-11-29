@@ -70,6 +70,10 @@ translatePositionByVelocity =
     with (.velocity >> Point2d.translateBy) mapPosition
 
 
+type alias QPixel =
+    Quantity Float Pixels.Pixels
+
+
 type alias Point =
     Point2d Pixels ()
 
@@ -312,6 +316,15 @@ phase2UpdateCollisions ({ screen, mouse, sun, bullets } as model) =
 areCirclesOverlapping c1 c2 =
     Point2d.distanceFrom c1.position c2.position
         |> Quantity.lessThanOrEqualTo (Quantity.plus c1.radius c2.radius)
+
+
+distanceFrom : Point -> Point -> QPixel
+distanceFrom =
+    Point2d.distanceFrom
+
+
+type alias PositionRadius a =
+    { a | position : Point, radius : Radius }
 
 
 pointFromXY : Float -> Float -> Point

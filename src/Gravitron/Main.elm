@@ -1,5 +1,6 @@
 module Gravitron.Main exposing (main)
 
+import Angle
 import Browser
 import Browser.Dom
 import Browser.Events
@@ -586,14 +587,24 @@ gravityVectorTo p2 p1 =
         directionToP2 =
             Direction2d.radians (atan2 dy dx)
 
+        d1 =
+            Direction2d.toAngle directionToP2
+
         d2 =
             Direction2d.from p1.position p2.position
                 |> Maybe.withDefault (Direction2d.radians 0)
+                |> Direction2d.toAngle
+
+        bool =
+            Quantity.equalWithin (Angle.degrees 0.0000000000001) d1 d2
 
         _ =
-            1
+            if bool then
+                1
 
-        --Debug.log "directionToP2 , d2" ( directionToP2, d2 )
+            else
+                Debug.log "False" 1
+
         distanceSquareToP2 =
             dx ^ 2 + dy ^ 2
 
@@ -604,6 +615,14 @@ gravityVectorTo p2 p1 =
             directionToP2
     in
     velocityFromMagnitudeDirection gMagnitude gDirection
+
+
+a =
+    "1"
+
+
+b =
+    1
 
 
 

@@ -409,7 +409,7 @@ phase3UpdatePositionDependenciesForNextTick ({ screen, mouse, sun, turret, bulle
                     bullet
                         |> gravitateTo sun
                         |> applyDrag bulletUpdateDrag
-                        |> clampVelocity (Pixels.pixels bulletMaxSpeed)
+                        |> clampVelocityRadius (initRadius bulletMaxSpeed)
             in
             bullets
                 |> List.map updateBullet
@@ -483,9 +483,10 @@ applyDrag drag =
     mapVelocity (Vector2d.scaleBy drag)
 
 
-clampVelocity =
+clampVelocityRadius : Radius -> { a | velocity : Velocity } -> { a | velocity : Velocity }
+clampVelocityRadius =
     let
-        mapper : QPixels -> QPixels -> QPixels
+        mapper : Radius -> Radius -> Radius
         mapper n =
             Quantity.clamp (Quantity.negate n) n
     in

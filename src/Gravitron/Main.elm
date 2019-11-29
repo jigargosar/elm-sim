@@ -16,7 +16,7 @@ import PointFree exposing (with)
 import Quantity exposing (Quantity)
 import Svg exposing (Svg)
 import Task
-import TypedSvg exposing (g, rect, svg)
+import TypedSvg exposing (g, svg)
 import TypedSvg.Attributes exposing (fill, viewBox)
 import TypedSvg.Attributes.InPx exposing (height, width, x, y)
 import TypedSvg.Types exposing (Fill(..), StrokeLinecap(..), StrokeLinejoin(..), Transform(..))
@@ -95,6 +95,19 @@ positionToPoint (Position x y) =
     pointXY x y
 
 
+positionToTuple : Position -> ( Float, Float )
+positionToTuple (Position x y) =
+    ( x, y )
+
+
+positionFromPoint point =
+    let
+        { x, y } =
+            Point2d.toPixels point
+    in
+    positionXY x y
+
+
 
 -- Radius
 
@@ -141,17 +154,22 @@ addRadii c1 c2 =
 
 
 type alias HasPosition a =
-    { a | position : Point }
+    { a | position : Position }
 
 
-mapPosition : (Point -> Point) -> HasPosition a -> HasPosition a
+mapPosition : (Position -> Position) -> HasPosition a -> HasPosition a
 mapPosition func model =
     { model | position = func model.position }
 
 
+mapPositionAsPoint : (Point -> Point) -> HasPosition a -> HasPosition a
+mapPositionAsPoint func =
+    mapPosition (positionToPoint >> func >> positionFromPoint)
+
+
 distanceBetweenPositions : HasPosition a -> HasPosition b -> QPixels
 distanceBetweenPositions c1 c2 =
-    Point2d.distanceFrom c1.position c2.position
+    Point2d.distanceFrom (positionToPoint c1.position) (positionToPoint c2.position)
 
 
 
@@ -221,7 +239,7 @@ type alias HasPositionVelocity a =
 
 translatePositionByVelocity : HasPositionVelocity a -> HasPositionVelocity a
 translatePositionByVelocity =
-    with (.velocity >> Point2d.translateBy) mapPosition
+    with (.velocity >> Point2d.translateBy) mapPositionAsPoint
 
 
 type alias HasPositionRadius a =
@@ -244,7 +262,7 @@ type alias Sun =
 
 initSun : Sun
 initSun =
-    { position = Point2d.pixels 0 0
+    { position = positionXY 0 0
     , velocity = Vector2d.pixels 0 0
     , radius = newRadius 20
     , mass = initialSunMass
@@ -257,7 +275,7 @@ type alias Turret =
 
 initTurretAtXY : Float -> Float -> Turret
 initTurretAtXY x y =
-    { position = pointXY x y
+    { position = positionXY x y
     , radius = newRadius 20
     , color = Color.lightGreen
     }
@@ -271,7 +289,7 @@ type alias Bullet =
     HasPosition (HasVelocity (HasRadius { state : BulletState }))
 
 
-initBullet : Point -> Float -> Direction -> Bullet
+initBullet : Position -> Float -> Direction -> Bullet
 initBullet position speed direction =
     { position = position
     , velocity = velocityFromSpeedDirection (pixels speed) direction
@@ -438,7 +456,7 @@ phase2HandleCollisions ({ screen, mouse, sun, bullets } as model) =
 sunUpdateVelocityTowards point model =
     { model
         | velocity =
-            Vector2d.from model.position point
+            Vector2d.from (positionToPoint model.position) point
                 |> Vector2d.scaleBy 0.1
     }
 
@@ -458,7 +476,7 @@ phase3UpdatePositionDependenciesForNextTick ({ screen, mouse, sun, turret, bulle
         newBullet _ =
             let
                 dir =
-                    Direction2d.from turret.position sun.position
+                    Direction2d.from (positionToPoint turret.position) (positionToPoint sun.position)
                         |> Maybe.withDefault Direction2d.x
                         |> always (Direction2d.degrees 190)
 
@@ -466,9 +484,9 @@ phase3UpdatePositionDependenciesForNextTick ({ screen, mouse, sun, turret, bulle
                     Point2d.translateIn
                         dir
                         (turret.radius |> radiusToQPixels)
-                        turret.position
+                        (positionToPoint turret.position)
             in
-            initBullet bPos bulletInitialSpeed dir
+            initBullet (positionFromPoint bPos) bulletInitialSpeed dir
 
         appendNewBulletIfFired =
             shouldFireBullet
@@ -518,6 +536,7 @@ applyDrag drag =
     mapVelocity (Vector2d.scaleBy drag)
 
 
+bounceOffScreen : Screen -> HasPositionVelocity a -> HasPositionVelocity a
 bounceOffScreen s =
     let
         bounceX p =
@@ -542,8 +561,8 @@ bounceOffScreen s =
 
         toParts { position, velocity } =
             let
-                { x, y } =
-                    Point2d.toPixels position
+                ( x, y ) =
+                    positionToTuple position
 
                 ( vx, vy ) =
                     Vector2d.toTuple Pixels.inPixels velocity
@@ -551,7 +570,7 @@ bounceOffScreen s =
             { x = x, y = y, vx = vx, vy = vy }
 
         fromParts { x, y, vx, vy } =
-            { position = pointXY x y, velocity = Vector2d.pixels vx vy }
+            { position = positionXY x y, velocity = Vector2d.pixels vx vy }
 
         mapPositionVelocityAsParts func model =
             let
@@ -580,7 +599,7 @@ accelerate v2 =
 gravityVectorTo p2 p1 =
     let
         vectorToP2 =
-            Vector2d.from p1.position p2.position
+            Vector2d.from (positionToPoint p1.position) (positionToPoint p2.position)
 
         directionToP2 =
             Vector2d.direction vectorToP2
@@ -676,9 +695,9 @@ fillColor =
     Fill >> fill
 
 
-drawCircle : List (Svg.Attribute msg) -> Point2d Pixels coordinates -> Radius -> Svg msg
+drawCircle : List (Svg.Attribute msg) -> Position -> Radius -> Svg msg
 drawCircle attrs position radius =
-    Geometry.Svg.circle2d attrs (Circle2d.atPoint position (radiusToQPixels radius))
+    Geometry.Svg.circle2d attrs (Circle2d.atPoint (positionToPoint position) (radiusToQPixels radius))
 
 
 

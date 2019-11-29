@@ -496,8 +496,7 @@ phase3UpdatePositionDependenciesForNextTick ({ screen, mouse, sun, turret, bulle
                     bullet
                         |> gravitateTo sun
                         |> applyDrag bulletUpdateDrag
-
-                --|> clampVelocityMagnitude bulletMaxSpeed
+                        |> clampVelocityMagnitude bulletMaxSpeed
             in
             bullets
                 |> List.map updateBullet
@@ -601,14 +600,14 @@ gravityVectorTo p2 p1 =
                 |> Maybe.withDefault Direction2d.x
 
         distanceSquareToP2InPixels =
-            Vector2d.length vectorToP2
+            (Vector2d.length vectorToP2
                 --|> Quantity.squared
                 |> Pixels.inPixels
-                |> (^) 2
+            )
+                ^ 2
 
         gMagnitude =
-            p2.mass
-                / distanceSquareToP2InPixels
+            (p2.mass / distanceSquareToP2InPixels)
                 |> Pixels.pixels
 
         gDirection =

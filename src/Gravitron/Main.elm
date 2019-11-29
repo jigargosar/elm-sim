@@ -7,7 +7,7 @@ import Browser.Events
 import Circle2d
 import Color
 import Direction2d exposing (Direction2d)
-import Geometry.Svg
+import Geometry.Svg as Draw
 import Html exposing (Html)
 import Html.Attributes exposing (style)
 import Json.Decode as JD
@@ -18,7 +18,7 @@ import Quantity exposing (Quantity)
 import Random exposing (Seed)
 import Task
 import TypedSvg exposing (circle, g, rect, svg)
-import TypedSvg.Attributes exposing (fill, transform, viewBox)
+import TypedSvg.Attributes exposing (fill, viewBox)
 import TypedSvg.Attributes.InPx exposing (cx, cy, height, r, width, x, y)
 import TypedSvg.Core as TSC
 import TypedSvg.Types exposing (Fill(..), StrokeLinecap(..), StrokeLinejoin(..), Transform(..))
@@ -100,20 +100,23 @@ initSun =
 
 
 type alias Turret =
-    { x : Float
-    , y : Float
-    , radius : Float
+    { position : Point
+    , radius : Radius
     , color : Color.Color
     }
 
 
-initTurretAt : Float -> Float -> Turret
-initTurretAt x y =
-    { x = x
-    , y = y
-    , radius = 20
+initTurretAtXY : Float -> Float -> Turret
+initTurretAtXY x y =
+    { position = pointFromXY x y
+    , radius = initPx 20
     , color = Color.lightGreen
     }
+
+
+initPx : number -> Quantity number Pixels
+initPx =
+    Pixels.pixels
 
 
 type BulletState
@@ -207,7 +210,7 @@ init : Flags -> ( Model, Cmd Msg )
 init flags =
     ( { seed = Random.initialSeed flags.now
       , sun = initSun
-      , turret = initTurretAt -100 -100
+      , turret = initTurretAtXY -100 -100
       , ticksSinceLastFire = 0
       , fireRateInTicks = turretFireRateInTicks
       , bullets = []
@@ -307,28 +310,13 @@ phase2UpdateCollisions ({ screen, mouse, sun, bullets } as model) =
 
 
 areCirclesOverlapping c1 c2 =
-    Vector2d.from c1.position c2.position
-        |> Vector2d.length
+    Point2d.distanceFrom c1.position c2.position
         |> Quantity.lessThanOrEqualTo (Quantity.plus c1.radius c2.radius)
 
 
-
-{-
-   distanceSquared : { a | x : number, y : number } -> { b | x : number, y : number } -> number
-   distanceSquared p1 p2 =
-       (p1.x - p2.x) ^ 2 + (p1.y - p2.y) ^ 2
-
--}
-{-
-   distance : { a | x : Float, y : Float } -> { b | x : Float, y : Float } -> Float
-   distance p1 p2 =
-       distanceSquared p1 p2 |> sqrt
--}
-
-
-pt : { a | x : Float, y : Float } -> Point2d.Point2d Pixels coordinates
-pt { x, y } =
-    Point2d.fromPixels { x = x, y = y }
+pointFromXY : Float -> Float -> Point
+pointFromXY x y =
+    Point2d.xy (Pixels.pixels x) (Pixels.pixels y)
 
 
 sunUpdateVelocityTowards point model =
@@ -353,19 +341,16 @@ phase3UpdatePositionDependenciesForNextTick ({ screen, mouse, sun, turret, bulle
 
         newBullet _ =
             let
-                { x, y } =
-                    turret
-
                 dir =
-                    Direction2d.from (pt turret) sun.position
+                    Direction2d.from turret.position sun.position
                         |> Maybe.withDefault Direction2d.x
                         |> always (Direction2d.degrees 190)
 
                 bPos =
                     Point2d.translateIn
                         dir
-                        (Pixels.pixels turret.radius)
-                        (pt turret)
+                        turret.radius
+                        turret.position
                         |> Point2d.toPixels
 
                 bAngle =
@@ -579,23 +564,25 @@ view model =
 
 
 renderSun { position, radius } =
-    Geometry.Svg.circle2d
+    Draw.circle2d
         [ fillColor Color.yellow ]
         (Circle2d.atPoint position radius)
 
 
 renderTurret : Float -> Turret -> TSC.Svg msg
-renderTurret fireNextBulletProgress { x, y, radius, color } =
+renderTurret fireNextBulletProgress { position, radius, color } =
     let
         innerR =
-            radius * fireNextBulletProgress
+            radius |> Quantity.multiplyBy fireNextBulletProgress
     in
     g []
-        [ g [ transform [ Translate x y ] ]
-            [ renderCircle 0 0 radius [ fillColor color ]
-            , renderCircle 0 0 innerR [ fillColor <| whiteA 0.5 ]
-            ]
+        [ Draw.circle2d [ fillColor color ] (Circle2d.atPoint position radius)
+        , Draw.circle2d [ fillColor <| whiteA 0.5 ] (Circle2d.atPoint position innerR)
         ]
+
+
+type alias Circle =
+    Circle2d.Circle2d Pixels ()
 
 
 renderTurretBullet { x, y, radius } =

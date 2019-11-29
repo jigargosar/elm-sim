@@ -337,7 +337,7 @@ phase1TranslatePositions : Model -> Model
 phase1TranslatePositions ({ sun, bullets } as model) =
     { model
         | sun = translatePositionByVelocity sun
-        , bullets = List.map stepVel bullets
+        , bullets = List.map translatePositionByVelocity bullets
     }
 
 
@@ -347,7 +347,7 @@ phase2HandleCollisions ({ screen, mouse, sun, bullets } as model) =
         newBullets =
             let
                 updateBullet bullet =
-                    if areCirclesOverlapping sun (bulletToPositionRadius bullet) then
+                    if areCirclesOverlapping sun bullet then
                         Nothing
 
                     else
@@ -404,11 +404,12 @@ phase3UpdatePositionDependenciesForNextTick ({ screen, mouse, sun, turret, bulle
 
         newBullets =
             let
+                updateBullet : Bullet -> Bullet
                 updateBullet bullet =
                     bullet
                         |> gravitateTo sun
                         |> applyDrag bulletUpdateDrag
-                        |> clampVelocity bulletMaxSpeed
+                        |> clampVelocity (Pixels.pixels bulletMaxSpeed)
             in
             bullets
                 |> List.map updateBullet
@@ -478,16 +479,29 @@ updateTicksSinceLastFire { ticksSinceLastFire, fireRateInTicks } =
         ( Nothing, newTicksSinceLastFire )
 
 
-applyDrag drag p =
-    { p | vx = p.vx * drag, vy = p.vy * drag }
+applyDrag drag =
+    mapVelocity (Vector2d.scaleBy drag)
 
 
-clampVelocity n p =
+clampVelocity =
     let
-        clampPart =
-            clamp -n n
+        mapper : QPixels -> QPixels -> QPixels
+        mapper n =
+            Quantity.clamp (Quantity.negate n) n
     in
-    { p | vx = clampPart p.vx, vy = clampPart p.vy }
+    mapVelocity << mapR << mapper
+
+
+mapR func v =
+    let
+        length =
+            Vector2d.length v
+
+        direction =
+            Vector2d.direction v
+                |> Maybe.withDefault (Direction2d.degrees 0)
+    in
+    Vector2d.withLength (func length) direction
 
 
 bounceOffScreen s =
@@ -511,24 +525,47 @@ bounceOffScreen s =
 
             else
                 p
+
+        toParts { position, velocity } =
+            let
+                { x, y } =
+                    Point2d.toPixels position
+
+                ( vx, vy ) =
+                    Vector2d.toTuple Pixels.inPixels velocity
+            in
+            { x = x, y = y, vx = vx, vy = vy }
+
+        fromParts { x, y, vx, vy } =
+            { position = pointAtXY x y, velocity = Vector2d.pixels vx vy }
+
+        mapPositionVelocityAsParts func model =
+            let
+                { position, velocity } =
+                    toParts model
+                        |> func
+                        |> fromParts
+            in
+            { model | position = position, velocity = velocity }
     in
-    bounceX >> bounceY
+    mapPositionVelocityAsParts (bounceX >> bounceY)
 
 
 gravitateTo p2 p1 =
     let
-        ( gvx, gvy ) =
+        gravityVector =
             gravityVectorTo p2 p1
     in
-    accelerate gvx gvy p1
+    accelerate gravityVector p1
 
 
-stepVel ({ x, y, vx, vy } as p) =
-    { p | x = x + vx, y = y + vy }
+mapVelocity : (Velocity -> Velocity) -> { b | velocity : Velocity } -> { b | velocity : Velocity }
+mapVelocity func model =
+    { model | velocity = func model.velocity }
 
 
-accelerate ax ay ({ vx, vy } as p) =
-    { p | vx = vx + ax, vy = vy + ay }
+accelerate v2 =
+    mapVelocity (Vector2d.plus v2)
 
 
 gravityVectorTo p2 p1 =
@@ -542,11 +579,14 @@ gravityVectorTo p2 p1 =
         p2y =
             p2Pos.y
 
+        p1Pos =
+            p1.position |> Point2d.toPixels
+
         p1x =
-            p1.x
+            p1Pos.x
 
         p1y =
-            p1.y
+            p1Pos.y
 
         p2Mass =
             p2.mass
@@ -569,7 +609,7 @@ gravityVectorTo p2 p1 =
         gTheta =
             angleToP2
     in
-    fromPolar ( gRadius, gTheta )
+    velocityFromRTheta (initRadius gRadius) (Angle.radians gTheta)
 
 
 
@@ -623,8 +663,8 @@ type alias Circle =
     Circle2d.Circle2d Pixels ()
 
 
-renderTurretBullet { x, y, radius } =
-    renderCircle x y radius [ fillColor <| whiteA 0.9 ]
+renderTurretBullet { position, radius } =
+    Draw.circle2d [ fillColor <| whiteA 0.9 ] (Circle2d.atPoint position radius)
 
 
 whiteA : Float -> Color.Color

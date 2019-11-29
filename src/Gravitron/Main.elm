@@ -86,9 +86,14 @@ positionXY =
     Position
 
 
-positionToPoint : Position -> Point
-positionToPoint (Position x y) =
-    Point2d.pixels x y
+distanceSquaredBetweenPositions : Position -> Position -> Float
+distanceSquaredBetweenPositions (Position x1 y1) (Position x2 y2) =
+    (x2 - x1) ^ 2 + (y2 - y1) ^ 2
+
+
+angleBetweenPositions : Position -> Position -> Float
+angleBetweenPositions (Position x1 y1) (Position x2 y2) =
+    atan2 (y2 - y1) (x2 - x1)
 
 
 positionToTuple : Position -> ( Float, Float )
@@ -103,6 +108,11 @@ positionFromPoint point =
             Point2d.toPixels point
     in
     positionXY x y
+
+
+positionToPoint : Position -> Point
+positionToPoint (Position x y) =
+    Point2d.pixels x y
 
 
 
@@ -588,15 +598,6 @@ gravitateTo p2 p1 =
             gravityVectorTo p2 p1
     in
     mapVelocity (Vector2d.plus gravityVector) p1
-
-
-distanceSquaredBetweenPositions : Position -> Position -> Float
-distanceSquaredBetweenPositions (Position x1 y1) (Position x2 y2) =
-    (x2 - x1) ^ 2 + (y2 - y1) ^ 2
-
-
-angleBetweenPositions (Position x1 y1) (Position x2 y2) =
-    atan2 (y2 - y1) (x2 - x1)
 
 
 gravityVectorTo : Sun -> HasPosition a -> Vector2d Pixels ()

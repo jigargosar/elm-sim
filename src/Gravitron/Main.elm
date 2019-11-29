@@ -1,6 +1,5 @@
 module Gravitron.Main exposing (main)
 
-import Angle exposing (Angle)
 import Browser
 import Browser.Dom
 import Browser.Events
@@ -15,11 +14,10 @@ import Pixels exposing (Pixels)
 import Point2d exposing (Point2d)
 import PointFree exposing (with)
 import Quantity exposing (Quantity)
-import Random exposing (Seed)
 import Task
-import TypedSvg exposing (circle, g, rect, svg)
+import TypedSvg exposing (g, rect, svg)
 import TypedSvg.Attributes exposing (fill, viewBox)
-import TypedSvg.Attributes.InPx exposing (cx, cy, height, r, width, x, y)
+import TypedSvg.Attributes.InPx exposing (height, width, x, y)
 import TypedSvg.Core as TSC
 import TypedSvg.Types exposing (Fill(..), StrokeLinecap(..), StrokeLinejoin(..), Transform(..))
 import Vector2d exposing (Vector2d)
@@ -191,10 +189,6 @@ type alias Bullet =
     , radius : Radius
     , state : BulletState
     }
-
-
-bulletToPositionRadius b =
-    { position = positionFromXY b, radius = Pixels.pixels b.radius }
 
 
 initBullet : Point -> Float -> Direction -> Bullet
@@ -574,10 +568,6 @@ mapVelocityRadiusHelp func model =
     Vector2d.withLength radius direction
 
 
-mapVelocityRadius func =
-    mapVelocity (mapVelocityRadiusHelp func)
-
-
 accelerate v2 =
     mapVelocity (Vector2d.plus v2)
 
@@ -684,11 +674,6 @@ renderTurretBullet { position, radius } =
 whiteA : Float -> Color.Color
 whiteA =
     Color.rgba 1 1 1
-
-
-renderCircle : Float -> Float -> Float -> List (TSC.Attribute msg) -> TSC.Svg msg
-renderCircle cxv cyv rv rest =
-    circle ([ cx cxv, cy cyv, r rv ] ++ rest) []
 
 
 renderRect : Float -> Float -> Float -> Float -> List (TSC.Attribute msg) -> TSC.Svg msg

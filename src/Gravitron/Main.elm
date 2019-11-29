@@ -18,7 +18,7 @@ import Task
 import TypedSvg exposing (g, rect, svg)
 import TypedSvg.Attributes exposing (fill, viewBox)
 import TypedSvg.Attributes.InPx exposing (height, width, x, y)
-import TypedSvg.Core as TSC
+import TypedSvg.Core as TSC exposing (Svg)
 import TypedSvg.Types exposing (Fill(..), StrokeLinecap(..), StrokeLinejoin(..), Transform(..))
 import Vector2d exposing (Vector2d)
 
@@ -623,6 +623,7 @@ view model =
         ]
 
 
+renderSun : HasPositionRadius a -> Svg Msg
 renderSun { position, radius } =
     renderCircle [ fillColor Color.yellow ]
         position

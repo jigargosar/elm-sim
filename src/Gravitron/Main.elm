@@ -639,14 +639,14 @@ view model =
         ]
 
 
-renderBullets : List Bullet -> Svg Msg
-renderBullets bullets =
-    g [] (List.map renderBullet bullets)
-
-
 canvas : Screen -> List (Svg Msg) -> Svg Msg
 canvas { l, t, w, h } =
     svg [ style "position" "fixed", viewBox l t w h, width w, height h ]
+
+
+renderBullets : List Bullet -> Svg Msg
+renderBullets bullets =
+    g [] (List.map renderBullet bullets)
 
 
 renderBackground : Screen -> Svg Msg

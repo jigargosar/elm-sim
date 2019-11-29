@@ -25,7 +25,7 @@ import TypedSvg.Types exposing (Fill(..), StrokeLinecap(..), StrokeLinejoin(..),
 
 
 turretFireRateInTicks =
-    60
+    10
 
 
 bulletInitialSpeed =
@@ -33,7 +33,7 @@ bulletInitialSpeed =
 
 
 bulletMaxSpeed =
-    11
+    100000
 
 
 initialSunMass =
@@ -41,11 +41,11 @@ initialSunMass =
 
 
 bulletWallDrag =
-    0.8
+    1
 
 
 bulletUpdateDrag =
-    0.999
+    1
 
 
 
@@ -317,6 +317,7 @@ phase3UpdatePositionDependenciesForNextTick ({ screen, mouse, sun, turret, bulle
                 dir =
                     Direction2d.from (pt turret) (pt sun)
                         |> Maybe.withDefault Direction2d.x
+                        |> always (Direction2d.degrees 190)
 
                 bPos =
                     Point2d.translateIn
@@ -326,7 +327,8 @@ phase3UpdatePositionDependenciesForNextTick ({ screen, mouse, sun, turret, bulle
                         |> Point2d.toPixels
 
                 bAngle =
-                    Direction2d.toAngle dir |> Angle.inRadians
+                    Direction2d.toAngle dir
+                        |> Angle.inRadians
             in
             initBullet bPos.x bPos.y bulletInitialSpeed bAngle
 

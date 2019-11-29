@@ -72,6 +72,10 @@ pointAtXY x y =
     Point2d.xy (Pixels.pixels x) (Pixels.pixels y)
 
 
+
+-- Radius
+
+
 type alias Radius =
     Quantity Float Pixels
 
@@ -81,6 +85,10 @@ initRadius =
     Pixels.pixels
 
 
+
+-- HasRadius
+
+
 type alias HasRadius a =
     { a | radius : Radius }
 
@@ -88,6 +96,10 @@ type alias HasRadius a =
 addRadii : HasRadius a -> HasRadius b -> Radius
 addRadii c1 c2 =
     Quantity.plus c1.radius c2.radius
+
+
+
+-- HasPosition
 
 
 type alias HasPosition a =
@@ -102,6 +114,10 @@ mapPosition func model =
 distanceBetweenPositions : HasPosition a -> HasPosition b -> QPixels
 distanceBetweenPositions c1 c2 =
     Point2d.distanceFrom c1.position c2.position
+
+
+
+-- Velocity
 
 
 type alias Velocity =

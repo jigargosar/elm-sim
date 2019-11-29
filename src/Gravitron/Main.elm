@@ -605,7 +605,7 @@ view model =
             model.screen
     in
     svg [ style "position" "fixed", viewBox s.l s.t s.w s.h, width s.w, height s.h ]
-        [ renderRect s.l s.t s.w s.h [ fillColor Color.black ]
+        [ renderBackground s
         , renderSun model.sun
         , let
             factor =
@@ -616,6 +616,11 @@ view model =
 
         --, renderPlanet model.planet
         ]
+
+
+renderBackground : Screen -> Svg Msg
+renderBackground { l, t, w, h } =
+    Svg.rect [ x l, y t, width w, height h, fillColor Color.black ] []
 
 
 renderSun : Sun -> Svg Msg

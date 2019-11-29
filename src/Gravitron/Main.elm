@@ -602,20 +602,10 @@ angleBetweenPositions (Position x1 y1) (Position x2 y2) =
 gravityVectorTo : Sun -> HasPosition a -> Vector2d Pixels ()
 gravityVectorTo p2 p1 =
     let
-        vectorToP2 =
-            Vector2d.from (positionToPoint p1.position) (positionToPoint p2.position)
-
         ang1 =
             angleBetweenPositions p1.position p2.position
                 |> Angle.radians
                 |> Direction2d.fromAngle
-
-        ang2 =
-            directionToP2 |> Direction2d.toAngle |> Angle.inRadians
-
-        directionToP2 =
-            Vector2d.direction vectorToP2
-                |> Maybe.withDefault Direction2d.x
 
         gMagnitude =
             p2.mass

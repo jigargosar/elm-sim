@@ -584,18 +584,18 @@ gravityVectorTo p2 p1 =
             p2y - p1y
 
         angleToP2 =
-            atan2 dy dx
+            Direction2d.radians (atan2 dy dx)
 
         distanceSquareToP2 =
             dx ^ 2 + dy ^ 2
 
-        gRadius =
-            p2Mass / distanceSquareToP2
+        gMagnitude =
+            initRadius (p2Mass / distanceSquareToP2)
 
         gDirection =
             angleToP2
     in
-    velocityFromMagnitudeDirection (initRadius gRadius) (Direction2d.radians gDirection)
+    velocityFromMagnitudeDirection gMagnitude gDirection
 
 
 

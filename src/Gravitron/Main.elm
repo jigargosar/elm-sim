@@ -92,7 +92,7 @@ positionXY =
 
 positionToPoint : Position -> Point
 positionToPoint (Position x y) =
-    pointXY x y
+    Point2d.pixels x y
 
 
 positionToTuple : Position -> ( Float, Float )

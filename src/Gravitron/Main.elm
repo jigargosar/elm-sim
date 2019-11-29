@@ -282,13 +282,13 @@ update message model =
 
 phasedUpdateOnTick : Model -> Model
 phasedUpdateOnTick model =
-    phase1UpdatePositions model
+    phase1TranslatePositions model
         |> phase2UpdateCollisions
         |> phase3UpdatePositionDependenciesForNextTick
 
 
-phase1UpdatePositions : Model -> Model
-phase1UpdatePositions ({ sun, bullets } as model) =
+phase1TranslatePositions : Model -> Model
+phase1TranslatePositions ({ sun, bullets } as model) =
     { model
         | sun = translatePositionByVelocity sun
         , bullets = List.map stepVel bullets

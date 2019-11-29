@@ -618,7 +618,7 @@ view model =
         ]
 
 
-renderSun : HasPositionRadius a -> Svg Msg
+renderSun : Sun -> Svg Msg
 renderSun { position, radius } =
     renderCircle [ fillColor Color.yellow ] position radius
 

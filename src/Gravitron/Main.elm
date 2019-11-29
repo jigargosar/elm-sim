@@ -313,9 +313,15 @@ phase2UpdateCollisions ({ screen, mouse, sun, bullets } as model) =
     { model | bullets = newBullets }
 
 
+areCirclesOverlapping : HasPositionRadius a -> HasPositionRadius b -> Bool
 areCirclesOverlapping c1 c2 =
     distanceFrom c1.position c2.position
         |> Quantity.lessThanOrEqualTo (Quantity.plus c1.radius c2.radius)
+
+
+addRadii : HasRadius a -> HasRadius b -> Radius
+addRadii c1 c2 =
+    Quantity.plus c1.radius c2.radius
 
 
 distanceFrom : Point -> Point -> QPixels
@@ -323,8 +329,19 @@ distanceFrom =
     Point2d.distanceFrom
 
 
-type alias PositionRadius a =
-    { a | position : Point, radius : Radius }
+type alias HasPosition a =
+    { a | position : Point }
+
+
+type alias HasRadius a =
+    { a | radius : Radius }
+
+
+type alias HasPositionRadius a =
+    { a
+        | position : Point
+        , radius : Radius
+    }
 
 
 pointFromXY : Float -> Float -> Point

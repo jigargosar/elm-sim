@@ -584,37 +584,28 @@ gravityVectorTo p2 p1 =
         dy =
             p2y - p1y
 
+        vectorToP2 =
+            Vector2d.from p1.position p2.position
+
         directionToP2 =
-            Direction2d.radians (atan2 dy dx)
-
-        d1 =
-            Direction2d.toAngle directionToP2
-
-        d2 =
-            Direction2d.from p1.position p2.position
-                |> Maybe.withDefault (Direction2d.radians 0)
-                |> Direction2d.toAngle
-
-        bool =
-            Quantity.equalWithin (Angle.degrees 0.0000000000001) d1 d2
-
-        _ =
-            if bool then
-                1
-
-            else
-                Debug.log "False" 1
+            Vector2d.direction vectorToP2
+                |> Maybe.withDefault Direction2d.x
 
         distanceSquareToP2 =
-            dx ^ 2 + dy ^ 2
+            Vector2d.length vectorToP2
+                --|> Quantity.squared
+                |> Pixels.inPixels
+                |> (^) 2
+                |> (/) 1
+                |> Pixels.pixels
 
         gMagnitude =
-            initRadius (p2Mass / distanceSquareToP2)
+            Quantity.multiplyBy p2Mass distanceSquareToP2
 
         gDirection =
             directionToP2
     in
-    velocityFromMagnitudeDirection gMagnitude gDirection
+    Vector2d.withLength gMagnitude gDirection
 
 
 a =

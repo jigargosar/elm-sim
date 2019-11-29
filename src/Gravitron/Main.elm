@@ -114,7 +114,8 @@ velocityMapRadius func model =
     let
         radius : Radius
         radius =
-            velocityRadius model |> func
+            velocityRadius model
+                |> func
 
         direction =
             Vector2d.direction model

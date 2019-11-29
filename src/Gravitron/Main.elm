@@ -59,6 +59,10 @@ type alias QPixels =
     Quantity Float Pixels.Pixels
 
 
+type alias Direction =
+    Direction2d ()
+
+
 type alias Point =
     Point2d Pixels ()
 
@@ -104,10 +108,6 @@ type alias Velocity =
     Vector2d Pixels ()
 
 
-type alias Direction =
-    Direction2d ()
-
-
 velocityWithRadiusDirection : Radius -> Direction -> Velocity
 velocityWithRadiusDirection =
     Vector2d.withLength
@@ -133,6 +133,10 @@ velocityMapRadius func model =
     Vector2d.withLength radius direction
 
 
+
+-- HasVelocity
+
+
 type alias HasVelocity a =
     { a | velocity : Velocity }
 
@@ -149,6 +153,10 @@ clampVelocityRadius n =
             Quantity.clamp (Quantity.negate n) n
     in
     mapVelocity (velocityMapRadius clampRadiusFunc)
+
+
+
+-- HasPositionVelocity
 
 
 type alias HasPositionVelocity a =
@@ -171,14 +179,6 @@ areCirclesOverlapping : HasPositionRadius a -> HasPositionRadius b -> Bool
 areCirclesOverlapping c1 c2 =
     distanceBetweenPositions c1 c2
         |> Quantity.lessThanOrEqualTo (addRadii c1 c2)
-
-
-
--- TRANSITION HELPERS
-
-
-positionFromXY { x, y } =
-    Point2d.fromPixels { x = x, y = y }
 
 
 

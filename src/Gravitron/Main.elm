@@ -6,7 +6,7 @@ import Browser.Events
 import Circle2d
 import Color
 import Direction2d exposing (Direction2d)
-import Geometry.Svg as Draw
+import Geometry.Svg
 import Html exposing (Html)
 import Html.Attributes exposing (style)
 import Json.Decode as JD
@@ -116,6 +116,11 @@ radiusAdd2 (Radius r1) (Radius r2) =
 radiusToQPixels : Radius -> QPixels
 radiusToQPixels (Radius r) =
     pixels r
+
+
+radiusScaleBy : Float -> Radius -> Radius
+radiusScaleBy scale (Radius r) =
+    r * abs scale |> Radius
 
 
 
@@ -657,21 +662,18 @@ renderSun { position, radius } =
 renderTurret : Float -> Turret -> Svg msg
 renderTurret fireNextBulletProgress { position, radius, color } =
     let
-        radiusQPixels =
-            radiusToQPixels radius
-
         innerR =
-            radiusQPixels |> Quantity.multiplyBy fireNextBulletProgress
+            radiusScaleBy fireNextBulletProgress radius
     in
     g []
-        [ Draw.circle2d [ fillColor color ] (Circle2d.atPoint position radiusQPixels)
-        , Draw.circle2d [ fillColor <| whiteA 0.5 ] (Circle2d.atPoint position innerR)
+        [ drawCircle [ fillColor color ] position radius
+        , drawCircle [ fillColor <| whiteA 0.5 ] position innerR
         ]
 
 
 renderBullet : Bullet -> Svg Msg
 renderBullet { position, radius } =
-    Draw.circle2d [ fillColor <| whiteA 0.9 ] (Circle2d.atPoint position (radiusToQPixels radius))
+    drawCircle [ fillColor <| whiteA 0.9 ] position radius
 
 
 
@@ -690,7 +692,7 @@ fillColor =
 
 drawCircle : List (Svg.Attribute msg) -> Point2d Pixels coordinates -> Radius -> Svg msg
 drawCircle attrs position radius =
-    Draw.circle2d attrs (Circle2d.atPoint position (radiusToQPixels radius))
+    Geometry.Svg.circle2d attrs (Circle2d.atPoint position (radiusToQPixels radius))
 
 
 

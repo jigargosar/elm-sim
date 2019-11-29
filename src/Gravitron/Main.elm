@@ -13,6 +13,7 @@ import Html.Attributes exposing (style)
 import Json.Decode as JD
 import Pixels exposing (Pixels)
 import Point2d exposing (Point2d)
+import PointFree exposing (with)
 import Quantity exposing (Quantity)
 import Random exposing (Seed)
 import Task
@@ -91,10 +92,6 @@ positionFromXY { x, y } =
 
 translatePositionByVelocity =
     with (.velocity >> Point2d.translateBy) mapPosition
-
-
-with func1 func2 model =
-    func2 (func1 model) model
 
 
 initSun : Sun

@@ -1,4 +1,9 @@
-module Ramda exposing (..)
+module PointFree exposing (..)
+
+
+with : (a -> b) -> (b -> a -> c) -> a -> c
+with func1 func2 model =
+    func2 (func1 model) model
 
 
 when : (a -> Bool) -> (a -> a) -> a -> a

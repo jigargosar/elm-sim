@@ -77,6 +77,15 @@ initRadius =
     Pixels.pixels
 
 
+type alias HasRadius a =
+    { a | radius : Radius }
+
+
+addRadii : HasRadius a -> HasRadius b -> Radius
+addRadii c1 c2 =
+    Quantity.plus c1.radius c2.radius
+
+
 type alias HasPosition a =
     { a | position : Point }
 
@@ -149,15 +158,6 @@ type alias HasPositionVelocity a =
 translatePositionByVelocity : HasPositionVelocity a -> HasPositionVelocity a
 translatePositionByVelocity =
     with (.velocity >> Point2d.translateBy) mapPosition
-
-
-type alias HasRadius a =
-    { a | radius : Radius }
-
-
-addRadii : HasRadius a -> HasRadius b -> Radius
-addRadii c1 c2 =
-    Quantity.plus c1.radius c2.radius
 
 
 type alias HasPositionRadius a =

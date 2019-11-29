@@ -239,13 +239,7 @@ areCirclesOverlapping c1 c2 =
 
 
 type alias Sun =
-    HasPosition
-        (HasVelocity
-            (HasRadius
-                { mass : Float
-                }
-            )
-        )
+    HasPosition (HasVelocity (HasRadius { mass : Float }))
 
 
 initSun : Sun
@@ -258,11 +252,7 @@ initSun =
 
 
 type alias Turret =
-    HasPosition
-        (HasRadius
-            { color : Color.Color
-            }
-        )
+    HasPosition (HasRadius { color : Color.Color })
 
 
 initTurretAtXY : Float -> Float -> Turret

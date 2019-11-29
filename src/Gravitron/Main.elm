@@ -638,17 +638,8 @@ renderTurret fireNextBulletProgress { position, radius, color } =
         ]
 
 
-type alias Circle =
-    Circle2d.Circle2d Pixels ()
-
-
 renderTurretBullet { position, radius } =
     Draw.circle2d [ fillColor <| whiteA 0.9 ] (Circle2d.atPoint position (radiusToQPixels radius))
-
-
-whiteA : Float -> Color.Color
-whiteA =
-    Color.rgba 1 1 1
 
 
 renderRect : Float -> Float -> Float -> Float -> List (Svg.Attribute msg) -> Svg msg
@@ -658,6 +649,11 @@ renderRect xv yv wv hv rest =
 
 
 -- Drawing Helpers
+
+
+whiteA : Float -> Color.Color
+whiteA =
+    Color.rgba 1 1 1
 
 
 fillColor : Color.Color -> Svg.Attribute msg

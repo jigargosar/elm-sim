@@ -607,12 +607,12 @@ gravityVectorTo p2 p1 =
             angleBetweenPositions p1.position p2.position
                 |> Angle.radians
 
-        gMag =
+        gr =
             p2.mass
                 / distanceSquaredBetweenPositions p1.position p2.position
                 |> Pixels.pixels
     in
-    Vector2d.rTheta gMag gTheta
+    Vector2d.rTheta gr gTheta
 
 
 

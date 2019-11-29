@@ -57,6 +57,19 @@ bulletUpdateDrag =
 -- DATA
 
 
+mapPosition : (a -> a) -> { b | position : a } -> { b | position : a }
+mapPosition func model =
+    { model | position = func model.position }
+
+
+positionFromXY { x, y } =
+    Point2d.fromPixels { x = x, y = y }
+
+
+translatePositionByVelocity =
+    with (.velocity >> Point2d.translateBy) mapPosition
+
+
 type alias Point =
     Point2d Pixels ()
 
@@ -75,19 +88,6 @@ type alias Sun =
     , radius : Radius
     , mass : Float
     }
-
-
-mapPosition : (a -> a) -> { b | position : a } -> { b | position : a }
-mapPosition func model =
-    { model | position = func model.position }
-
-
-positionFromXY { x, y } =
-    Point2d.fromPixels { x = x, y = y }
-
-
-translatePositionByVelocity =
-    with (.velocity >> Point2d.translateBy) mapPosition
 
 
 initSun : Sun

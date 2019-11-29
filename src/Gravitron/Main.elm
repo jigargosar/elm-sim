@@ -557,36 +557,21 @@ velocityRadius =
 
 
 mapVelocityRadiusHelp : (Radius -> Radius) -> Velocity -> Velocity
-mapVelocityRadiusHelp func velocity =
+mapVelocityRadiusHelp func model =
     let
-        v =
-            velocity
-
         radius : Radius
         radius =
-            velocityRadius v |> func
+            velocityRadius model |> func
 
         direction =
-            Vector2d.direction v
+            Vector2d.direction model
                 |> Maybe.withDefault (Direction2d.degrees 0)
     in
     Vector2d.withLength radius direction
 
 
-mapVelocityRadius func model =
-    let
-        v =
-            model.velocity
-
-        radius : Radius
-        radius =
-            velocityRadius v |> func
-
-        direction =
-            Vector2d.direction v
-                |> Maybe.withDefault (Direction2d.degrees 0)
-    in
-    { model | velocity = Vector2d.withLength radius direction }
+mapVelocityRadius func =
+    mapVelocity (mapVelocityRadiusHelp func)
 
 
 accelerate v2 =

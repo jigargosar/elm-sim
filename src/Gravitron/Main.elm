@@ -1,5 +1,6 @@
 module Gravitron.Main exposing (main)
 
+import Angle
 import Browser
 import Browser.Dom
 import Browser.Events
@@ -589,8 +590,13 @@ gravitateTo p2 p1 =
     mapVelocity (Vector2d.plus gravityVector) p1
 
 
+distanceSquaredBetweenPositions : Position -> Position -> Float
 distanceSquaredBetweenPositions (Position x1 y1) (Position x2 y2) =
     (x2 - x1) ^ 2 + (y2 - y1) ^ 2
+
+
+angleBetweenPositions (Position x1 y1) (Position x2 y2) =
+    atan2 ((y2 - y1) ^ 2) ((x2 - x1) ^ 2)
 
 
 gravityVectorTo : Sun -> HasPosition a -> Vector2d Pixels ()
@@ -598,6 +604,15 @@ gravityVectorTo p2 p1 =
     let
         vectorToP2 =
             Vector2d.from (positionToPoint p1.position) (positionToPoint p2.position)
+
+        ang1 =
+            angleBetweenPositions p1.position p2.position
+
+        ang2 =
+            directionToP2 |> Direction2d.toAngle |> Angle.inRadians
+
+        _ =
+            Debug.log "ang1,ang2" ( ang1, ang2 )
 
         directionToP2 =
             Vector2d.direction vectorToP2

@@ -157,9 +157,9 @@ type alias Velocity =
     Vector2d Pixels ()
 
 
-velocityFromMagnitudeDirection : Radius -> Direction -> Velocity
-velocityFromMagnitudeDirection r =
-    Vector2d.withLength (radiusToQPixels r)
+velocityFromMagnitudeDirection : QPixels -> Direction -> Velocity
+velocityFromMagnitudeDirection =
+    Vector2d.withLength
 
 
 velocityMagnitude : Velocity -> QPixels
@@ -283,7 +283,7 @@ type alias Bullet =
 initBullet : Point -> Float -> Direction -> Bullet
 initBullet position speed direction =
     { position = position
-    , velocity = velocityFromMagnitudeDirection (initRadius speed) direction
+    , velocity = velocityFromMagnitudeDirection (pixels speed) direction
     , radius = initRadius 5
     , state = BulletTraveling
     }

@@ -104,6 +104,43 @@ distanceBetweenPositions c1 c2 =
     Point2d.distanceFrom c1.position c2.position
 
 
+type alias HasVelocity a =
+    { a | velocity : Velocity }
+
+
+mapVelocity : (Velocity -> Velocity) -> HasVelocity a -> HasVelocity a
+mapVelocity func model =
+    { model | velocity = func model.velocity }
+
+
+velocityRadius : Velocity -> Radius
+velocityRadius =
+    Vector2d.length
+
+
+clampVelocityRadius : Radius -> HasVelocity a -> HasVelocity a
+clampVelocityRadius n =
+    let
+        clampRadiusFunc =
+            Quantity.clamp (Quantity.negate n) n
+    in
+    mapVelocity (mapVelocityRadiusHelp clampRadiusFunc)
+
+
+mapVelocityRadiusHelp : (Radius -> Radius) -> Velocity -> Velocity
+mapVelocityRadiusHelp func model =
+    let
+        radius : Radius
+        radius =
+            velocityRadius model |> func
+
+        direction =
+            Vector2d.direction model
+                |> Maybe.withDefault (Direction2d.degrees 0)
+    in
+    Vector2d.withLength radius direction
+
+
 type alias HasPositionVelocity a =
     HasPosition { a | velocity : Velocity }
 
@@ -529,43 +566,6 @@ gravitateTo p2 p1 =
             gravityVectorTo p2 p1
     in
     accelerate gravityVector p1
-
-
-type alias HasVelocity a =
-    { a | velocity : Velocity }
-
-
-clampVelocityRadius : Radius -> HasVelocity a -> HasVelocity a
-clampVelocityRadius n =
-    let
-        clampRadiusFunc =
-            Quantity.clamp (Quantity.negate n) n
-    in
-    mapVelocity (mapVelocityRadiusHelp clampRadiusFunc)
-
-
-mapVelocity : (Velocity -> Velocity) -> HasVelocity a -> HasVelocity a
-mapVelocity func model =
-    { model | velocity = func model.velocity }
-
-
-velocityRadius : Velocity -> Radius
-velocityRadius =
-    Vector2d.length
-
-
-mapVelocityRadiusHelp : (Radius -> Radius) -> Velocity -> Velocity
-mapVelocityRadiusHelp func model =
-    let
-        radius : Radius
-        radius =
-            velocityRadius model |> func
-
-        direction =
-            Vector2d.direction model
-                |> Maybe.withDefault (Direction2d.degrees 0)
-    in
-    Vector2d.withLength radius direction
 
 
 accelerate v2 =

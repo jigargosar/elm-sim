@@ -315,8 +315,8 @@ phase2UpdateCollisions ({ screen, mouse, sun, bullets } as model) =
 
 areCirclesOverlapping : HasPositionRadius a -> HasPositionRadius b -> Bool
 areCirclesOverlapping c1 c2 =
-    distanceFrom c1.position c2.position
-        |> Quantity.lessThanOrEqualTo (Quantity.plus c1.radius c2.radius)
+    distanceFrom c1 c2
+        |> Quantity.lessThanOrEqualTo (addRadii c1 c2)
 
 
 addRadii : HasRadius a -> HasRadius b -> Radius
@@ -324,9 +324,9 @@ addRadii c1 c2 =
     Quantity.plus c1.radius c2.radius
 
 
-distanceFrom : Point -> Point -> QPixels
-distanceFrom =
-    Point2d.distanceFrom
+distanceFrom : HasPosition a -> HasPosition b -> QPixels
+distanceFrom c1 c2 =
+    Point2d.distanceFrom c1.position c2.position
 
 
 type alias HasPosition a =

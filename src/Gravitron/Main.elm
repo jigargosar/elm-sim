@@ -646,13 +646,9 @@ renderTurret fireNextBulletProgress { position, radius, color } =
         ]
 
 
+renderTurretBullet : Bullet -> Svg Msg
 renderTurretBullet { position, radius } =
     Draw.circle2d [ fillColor <| whiteA 0.9 ] (Circle2d.atPoint position (radiusToQPixels radius))
-
-
-renderRect : Float -> Float -> Float -> Float -> List (Svg.Attribute msg) -> Svg msg
-renderRect xv yv wv hv rest =
-    rect ([ x xv, y yv, width wv, height hv ] ++ rest) []
 
 
 

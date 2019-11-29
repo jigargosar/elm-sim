@@ -253,7 +253,7 @@ update message model =
     case message of
         Tick _ ->
             ( -- updateOnTick model
-              phasedUpdateOnTick model
+              onTick model
             , Cmd.none
             )
 
@@ -280,8 +280,8 @@ update message model =
             )
 
 
-phasedUpdateOnTick : Model -> Model
-phasedUpdateOnTick model =
+onTick : Model -> Model
+onTick model =
     phase1TranslatePositions model
         |> phase2UpdateCollisions
         |> phase3UpdatePositionDependenciesForNextTick

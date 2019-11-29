@@ -603,16 +603,14 @@ gravitateTo p2 p1 =
 gravityVectorTo : Sun -> HasPosition a -> Vector2d Pixels ()
 gravityVectorTo p2 p1 =
     let
-        gTheta =
+        angle =
             angleBetweenPositions p1.position p2.position
-                |> Angle.radians
 
-        gr =
+        magnitude =
             p2.mass
                 / distanceSquaredBetweenPositions p1.position p2.position
-                |> Pixels.pixels
     in
-    Vector2d.rTheta gr gTheta
+    Vector2d.rTheta (pixels magnitude) (Angle.radians angle)
 
 
 

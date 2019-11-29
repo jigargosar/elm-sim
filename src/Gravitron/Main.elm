@@ -541,7 +541,7 @@ clampVelocityRadius n =
         clampRadiusFunc =
             Quantity.clamp (Quantity.negate n) n
     in
-    mapVelocity (mapVelocityRadiusHelp clampRadiusFunc)
+    mapVelocity (mapVelocityRadius clampRadiusFunc)
 
 
 mapVelocity : (Velocity -> Velocity) -> HasVelocity a -> HasVelocity a
@@ -554,8 +554,8 @@ velocityRadius =
     Vector2d.length
 
 
-mapVelocityRadiusHelp : (Radius -> Radius) -> Velocity -> Velocity
-mapVelocityRadiusHelp func model =
+mapVelocityRadius : (Radius -> Radius) -> Velocity -> Velocity
+mapVelocityRadius func model =
     let
         radius : Radius
         radius =

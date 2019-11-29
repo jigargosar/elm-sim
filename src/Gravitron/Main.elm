@@ -14,11 +14,11 @@ import Pixels exposing (Pixels)
 import Point2d exposing (Point2d)
 import PointFree exposing (with)
 import Quantity exposing (Quantity)
+import Svg exposing (Svg)
 import Task
 import TypedSvg exposing (g, rect, svg)
 import TypedSvg.Attributes exposing (fill, viewBox)
 import TypedSvg.Attributes.InPx exposing (height, width, x, y)
-import TypedSvg.Core as TSC exposing (Svg)
 import TypedSvg.Types exposing (Fill(..), StrokeLinecap(..), StrokeLinejoin(..), Transform(..))
 import Vector2d exposing (Vector2d)
 
@@ -598,7 +598,7 @@ gravityVectorTo p2 p1 =
 -- View
 
 
-fillColor : Color.Color -> TSC.Attribute msg
+fillColor : Color.Color -> Svg.Attribute msg
 fillColor =
     Fill >> fill
 
@@ -630,11 +630,7 @@ renderSun { position, radius } =
         radius
 
 
-renderCircle attrs position radius =
-    Draw.circle2d attrs (Circle2d.atPoint position (radiusToQPixels radius))
-
-
-renderTurret : Float -> Turret -> TSC.Svg msg
+renderTurret : Float -> Turret -> Svg msg
 renderTurret fireNextBulletProgress { position, radius, color } =
     let
         radiusQPixels =
@@ -651,6 +647,11 @@ renderTurret fireNextBulletProgress { position, radius, color } =
 
 type alias Circle =
     Circle2d.Circle2d Pixels ()
+
+
+renderCircle : List (Svg.Attribute msg) -> Point2d Pixels coordinates -> Radius -> Svg msg
+renderCircle attrs position radius =
+    Draw.circle2d attrs (Circle2d.atPoint position (radiusToQPixels radius))
 
 
 renderTurretBullet { position, radius } =

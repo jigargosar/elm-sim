@@ -73,6 +73,24 @@ pointAtXY x y =
 
 
 
+-- Position
+
+
+type Position
+    = Position Float Float
+
+
+positionXY : Float -> Float -> Position
+positionXY =
+    Position
+
+
+positionToPoint : Position -> Point
+positionToPoint (Position x y) =
+    Point2d.xy (pixels x) (pixels y)
+
+
+
 -- Radius
 
 

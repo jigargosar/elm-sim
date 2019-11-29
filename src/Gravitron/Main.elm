@@ -69,7 +69,7 @@ type alias Point =
 
 pointAtXY : Float -> Float -> Point
 pointAtXY x y =
-    Point2d.xy (Pixels.pixels x) (Pixels.pixels y)
+    Point2d.xy (pixels x) (pixels y)
 
 
 

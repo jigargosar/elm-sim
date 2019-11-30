@@ -1,7 +1,7 @@
 module Main exposing (main)
 
-import Gravitron.Main
+import GravitronV2.Main
 
 
 main =
-    Gravitron.Main.main
+    GravitronV2.Main.main

@@ -6,13 +6,10 @@ import Browser.Events
 import Color
 import GravitronV2.Draw as Draw
 import Html exposing (Html)
-import Html.Attributes exposing (style)
 import Json.Decode as JD
 import Svg exposing (Svg)
 import Task
-import TypedSvg
-import TypedSvg.Attributes exposing (fill, viewBox)
-import TypedSvg.Attributes.InPx exposing (height, width, x, y)
+import TypedSvg.Attributes exposing (fill)
 import TypedSvg.Types exposing (Fill(..), StrokeLinecap(..), StrokeLinejoin(..), Transform(..))
 
 
@@ -73,8 +70,7 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update message model =
     case message of
         Tick _ ->
-            ( -- updateOnTick model
-              onTick model
+            ( onTick model
             , Cmd.none
             )
 
@@ -91,12 +87,12 @@ update message model =
             )
 
         OnViewport { scene } ->
-            ( { model | screen = toScreen scene.width scene.height }
+            ( { model | screen = Draw.screenFromWidthHeight scene.width scene.height }
             , Cmd.none
             )
 
         OnResize width height ->
-            ( { model | screen = toScreen (toFloat width) (toFloat height) }
+            ( { model | screen = Draw.screenFromWidthHeight (toFloat width) (toFloat height) }
             , Cmd.none
             )
 

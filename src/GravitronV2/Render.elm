@@ -1,4 +1,4 @@
-module GravitronV2.Render exposing (Color, Screen, black, canvas, fillRectLeftTop, fullScreenCanvas, toScreen)
+module GravitronV2.Render exposing (Color, Screen, black, canvas, fillRectLeftTop, fullScreenCanvas, screenFromWidthHeight)
 
 import Color
 import Html exposing (Html)
@@ -20,8 +20,8 @@ type alias Screen =
     }
 
 
-toScreen : Float -> Float -> Screen
-toScreen width height =
+screenFromWidthHeight : Float -> Float -> Screen
+screenFromWidthHeight width height =
     let
         halfWidth =
             width / 2

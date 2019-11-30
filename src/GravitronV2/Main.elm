@@ -40,7 +40,7 @@ type alias Mouse =
 init : Flags -> ( Model, Cmd Msg )
 init _ =
     ( { mouse = Mouse 100 100
-      , screen = toScreen 600 600
+      , screen = Render.screenFromWidthHeight 600 600
       }
     , Browser.Dom.getViewport |> Task.perform OnViewport
     )

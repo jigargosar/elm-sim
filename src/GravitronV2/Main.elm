@@ -52,11 +52,8 @@ applyVelocity model =
 update : Computer -> Memory -> Memory
 update c m =
     let
-        mousePoint =
-            fromRec c.mouse
-
         springPoint =
-            mousePoint
+            fromRec c.mouse
 
         k =
             0.1

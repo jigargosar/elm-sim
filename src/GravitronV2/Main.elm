@@ -25,18 +25,23 @@ type alias Particle =
     }
 
 
-springTo : Vec -> Float -> Particle -> Particle
-springTo springPoint k model =
-    { model
-        | velocity =
-            springForceFrom model.position springPoint k
-                |> integrate model.velocity
-    }
-
-
 applyFriction : Particle -> Particle
 applyFriction model =
     { model | position = multiply model.friction model.velocity }
+
+
+applySpringForceTowardsPoint : Vec -> Float -> Particle -> Particle
+applySpringForceTowardsPoint toPoint k model =
+    let
+        force =
+            springForceFrom model.position toPoint k
+    in
+    applyForce force model
+
+
+applyForce : Vec -> Particle -> Particle
+applyForce force model =
+    { model | velocity = integrate force model.velocity }
 
 
 applyVelocity : Particle -> Particle
@@ -56,7 +61,7 @@ update c m =
         k =
             0.1
     in
-    m |> springTo springPoint k |> applyFriction |> applyVelocity
+    m |> applySpringForceTowardsPoint springPoint k |> applyFriction |> applyVelocity
 
 
 view : Computer -> Memory -> List Shape

@@ -4,7 +4,7 @@ import Browser
 import Browser.Dom
 import Browser.Events
 import Color
-import GravitronV2.Render
+import GravitronV2.Render as Render
 import Html exposing (Html)
 import Html.Attributes exposing (style)
 import Json.Decode as JD
@@ -162,7 +162,7 @@ view model =
         , width w
         , height h
         ]
-        [ GravitronV2.Render.fillRectTopLeft x y w h GravitronV2.Render.black
+        [ Render.fillRectTopLeft x y w h Render.black
         ]
 
 

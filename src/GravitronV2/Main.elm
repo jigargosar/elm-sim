@@ -2,7 +2,7 @@ module GravitronV2.Main exposing (main)
 
 import GravitronV2.Draw exposing (..)
 import GravitronV2.Particle as P exposing (Particle)
-import GravitronV2.Vector2 as V exposing (..)
+import GravitronV2.Vector2 exposing (..)
 
 
 type alias Memory =

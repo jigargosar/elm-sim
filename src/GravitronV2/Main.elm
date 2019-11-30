@@ -12,6 +12,11 @@ v =
     Tuple.pair
 
 
+vFromRec : { a | x : Float, y : Float } -> V
+vFromRec { x, y } =
+    v x y
+
+
 xin : V -> Float
 xin =
     Tuple.first
@@ -20,6 +25,11 @@ xin =
 mapX : (Float -> Float) -> V -> V
 mapX =
     Tuple.mapFirst
+
+
+setX : Float -> V -> V
+setX =
+    mapX << always
 
 
 inc =
@@ -42,9 +52,14 @@ mapPos func model =
     { model | pos = func model.pos }
 
 
+setPos : a -> { b | pos : a } -> { b | pos : a }
+setPos =
+    mapPos << always
+
+
 update : Computer -> Memory -> Memory
 update c m =
-    mapPos (mapX inc) m
+    setPos (vFromRec c.mouse) m
 
 
 view : Computer -> Memory -> List Shape

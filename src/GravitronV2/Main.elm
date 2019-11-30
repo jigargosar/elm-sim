@@ -161,6 +161,7 @@ view model =
         w
         h
         Render.black
+        []
 
 
 

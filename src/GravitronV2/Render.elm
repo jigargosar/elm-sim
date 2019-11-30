@@ -19,15 +19,15 @@ black =
     Color Color.black
 
 
-fullScreenCanvas : Float -> Float -> Float -> Float -> Color -> Html msg
-fullScreenCanvas x y width height (Color fillColor) =
+fullScreenCanvas : Float -> Float -> Float -> Float -> Color -> List (Svg msg) -> Html msg
+fullScreenCanvas x y width height (Color fillColor) children =
     TypedSvg.svg
         [ Html.Attributes.style "position" "fixed"
         , TypedSvg.Attributes.viewBox x y width height
         , InPx.width width
         , InPx.height height
         ]
-        [ TypedSvg.rect
+        (TypedSvg.rect
             [ InPx.x x
             , InPx.y y
             , InPx.width width
@@ -35,4 +35,5 @@ fullScreenCanvas x y width height (Color fillColor) =
             , TypedSvg.Attributes.fill (TypedSvg.Types.Fill fillColor)
             ]
             []
-        ]
+            :: children
+        )

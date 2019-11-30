@@ -1,4 +1,4 @@
-module GravitronV2.Render exposing (Color, black, canvas, fillRectLeftTop, fullScreenCanvas)
+module GravitronV2.Render exposing (Color, Screen, black, canvas, fillRectLeftTop, fullScreenCanvas, toScreen)
 
 import Color
 import Html exposing (Html)
@@ -8,6 +8,34 @@ import TypedSvg
 import TypedSvg.Attributes
 import TypedSvg.Attributes.InPx as InPx
 import TypedSvg.Types
+
+
+type alias Screen =
+    { left : Float
+    , right : Float
+    , top : Float
+    , bottom : Float
+    , width : Float
+    , height : Float
+    }
+
+
+toScreen : Float -> Float -> Screen
+toScreen width height =
+    let
+        halfWidth =
+            width / 2
+
+        halfHeight =
+            height / 2
+    in
+    { left = -halfWidth
+    , right = halfWidth
+    , top = -halfHeight
+    , bottom = halfHeight
+    , width = width
+    , height = height
+    }
 
 
 type Color

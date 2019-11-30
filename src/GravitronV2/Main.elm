@@ -27,35 +27,7 @@ type alias Flags =
 
 type alias Model =
     { mouse : Mouse
-    , screen : Screen
-    }
-
-
-type alias Screen =
-    { width : Float
-    , height : Float
-    , left : Float
-    , r : Float
-    , top : Float
-    , b : Float
-    }
-
-
-toScreen : Float -> Float -> Screen
-toScreen sw sh =
-    let
-        scx =
-            sw / 2
-
-        scy =
-            sh / 2
-    in
-    { width = sw
-    , height = sh
-    , left = -scx
-    , r = scx
-    , top = -scy
-    , b = scy
+    , screen : Render.Screen
     }
 
 

@@ -27,22 +27,36 @@ setPos =
     mapPos << always
 
 
-springVec : Vec -> Vec -> Vec
-springVec a b =
-    minus a b |> scale 0.0001
-
-
 update : Computer -> Memory -> Memory
 update c m =
     let
-        mousePos =
+        mousePoint =
             fromRec c.mouse
 
+        weightPoint =
+            m.pos
+
+        springPoint =
+            mousePoint
+
+        distanceToSpringPoint =
+            minus weightPoint springPoint
+
+        k =
+            0.3
+
+        springForce =
+            scale k distanceToSpringPoint
+
+        friction =
+            0.9
+
         vel =
-            plus m.vel (springVec m.pos mousePos)
+            plus m.vel springForce
+                |> scale friction
 
         pos =
-            plus vel m.pos
+            plus vel weightPoint
     in
     { m | pos = pos, vel = vel }
 

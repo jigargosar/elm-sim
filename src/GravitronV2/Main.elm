@@ -1,7 +1,8 @@
 module GravitronV2.Main exposing (main)
 
-import GravitronV2.Draw as Draw
+import GravitronV2.Draw exposing (..)
 
 
+main : Picture
 main =
-    Draw.main
+    picture [ circle 0 0 10 red ]

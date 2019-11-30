@@ -1,4 +1,4 @@
-module GravitronV2.Draw exposing (main)
+module GravitronV2.Draw exposing (Picture, circle, picture, red)
 
 import Browser
 import Browser.Dom
@@ -107,8 +107,17 @@ onTick model =
 -- View
 
 
-view : Model -> Html Msg
-view model =
+type Shape
+    = Circle Float Float Float Color
+
+
+circle : Float -> Float -> Float -> Color -> Shape
+circle =
+    Circle
+
+
+view : List Shape -> Model -> Html Msg
+view shapes model =
     let
         screen =
             model.screen
@@ -130,21 +139,15 @@ view model =
         w
         h
         black
-        []
+        (List.map renderShape shapes)
+
+
+renderShape shape =
+    Svg.g [] []
 
 
 
 -- Program
-
-
-main : Program Flags Model Msg
-main =
-    Browser.element
-        { init = init
-        , subscriptions = subscriptions
-        , update = update
-        , view = view
-        }
 
 
 type alias Screen =
@@ -184,6 +187,11 @@ black =
     Color Color.black
 
 
+red : Color
+red =
+    Color Color.red
+
+
 fullScreenCanvas : Float -> Float -> Float -> Float -> Color -> List (Svg msg) -> Html msg
 fullScreenCanvas x y width height (Color fillColor) children =
     TypedSvg.svg
@@ -202,3 +210,17 @@ fullScreenCanvas x y width height (Color fillColor) children =
             []
             :: children
         )
+
+
+type alias Picture =
+    Program Flags Model Msg
+
+
+picture : List Shape -> Picture
+picture shapes =
+    Browser.element
+        { init = init
+        , subscriptions = subscriptions
+        , update = update
+        , view = view shapes
+        }

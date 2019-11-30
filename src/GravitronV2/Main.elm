@@ -13,7 +13,7 @@ type alias Memory =
 initialMemory : Memory
 initialMemory =
     { pos = vec -150 0
-    , vel = vec0
+    , vel = vec1
     }
 
 

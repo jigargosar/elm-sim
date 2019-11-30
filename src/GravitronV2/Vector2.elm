@@ -1,13 +1,20 @@
 module GravitronV2.Vector2 exposing
     ( RecXY
     , Vec
+    , dirOppX
+    , dirOppY
+    , dirX
+    , dirY
     , fromRec
     , mapX
+    , opp
     , plus
+    , scale
     , setX
     , toRec
     , vec
     , vec0
+    , vec1
     )
 
 
@@ -23,6 +30,41 @@ vec =
 vec0 : Vec
 vec0 =
     vec 0 0
+
+
+vec1 : Vec
+vec1 =
+    vec 1 1
+
+
+dirX : Vec
+dirX =
+    vec 1 0
+
+
+dirY : Vec
+dirY =
+    vec 0 1
+
+
+dirOppX : Vec
+dirOppX =
+    vec -1 0
+
+
+dirOppY : Vec
+dirOppY =
+    vec 0 -1
+
+
+opp : Vec -> Vec
+opp =
+    scale -1
+
+
+scale : Float -> Vec -> Vec
+scale s (Vec x y) =
+    vec (x * s) (y * s)
 
 
 fromRec : { a | x : Float, y : Float } -> Vec
@@ -50,5 +92,5 @@ setX =
 
 
 plus : Vec -> Vec -> Vec
-plus v1 v2 =
-    v1
+plus (Vec x1 y1) (Vec x2 y2) =
+    vec (x1 + x2) (y1 + y2)

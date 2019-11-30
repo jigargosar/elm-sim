@@ -6,14 +6,18 @@ module GravitronV2.Vector2 exposing
     , dirX
     , dirY
     , fromRec
+    , getX
+    , getY
     , len
     , len2
     , mapX
+    , minus
     , opp
     , plus
     , scale
     , setX
     , toRec
+    , toTuple
     , vec
     , vec0
     , vec1
@@ -22,6 +26,21 @@ module GravitronV2.Vector2 exposing
 
 type Vec
     = Vec Float Float
+
+
+getX : Vec -> Float
+getX (Vec x _) =
+    x
+
+
+getY : Vec -> Float
+getY (Vec _ y) =
+    y
+
+
+toTuple : Vec -> ( Float, Float )
+toTuple =
+    apply2 Tuple.pair
 
 
 vec : Float -> Float -> Vec
@@ -98,6 +117,7 @@ plus (Vec x1 y1) (Vec x2 y2) =
     vec (x1 + x2) (y1 + y2)
 
 
+minus : Vec -> Vec -> Vec
 minus (Vec xa ya) (Vec xb yb) =
     vec (xb - xa) (yb - ya)
 

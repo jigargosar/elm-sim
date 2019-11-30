@@ -1,4 +1,4 @@
-module GravitronV2.Render exposing (Color, black, canvas, fillRectTopLeft)
+module GravitronV2.Render exposing (Color, black, canvas, fillRectLeftTop, fullScreenCanvas)
 
 import Color
 import Html exposing (Html)
@@ -19,23 +19,20 @@ black =
     Color Color.black
 
 
-fillRectTopLeft : Float -> Float -> Float -> Float -> Color -> Svg msg
-fillRectTopLeft x y width height (Color fillColor) =
-    TypedSvg.rect
-        [ InPx.x x
-        , InPx.y y
-        , InPx.width width
-        , InPx.height height
-        , TypedSvg.Attributes.fill (TypedSvg.Types.Fill fillColor)
-        ]
-        []
-
-
-canvas : Float -> Float -> Float -> Float -> List (Svg msg) -> Html msg
-canvas x y width height =
+fullScreenCanvas : Float -> Float -> Float -> Float -> Color -> Html msg
+fullScreenCanvas x y width height (Color fillColor) =
     TypedSvg.svg
         [ Html.Attributes.style "position" "fixed"
         , TypedSvg.Attributes.viewBox x y width height
         , InPx.width width
         , InPx.height height
+        ]
+        [ TypedSvg.rect
+            [ InPx.x x
+            , InPx.y y
+            , InPx.width width
+            , InPx.height height
+            , TypedSvg.Attributes.fill (TypedSvg.Types.Fill fillColor)
+            ]
+            []
         ]

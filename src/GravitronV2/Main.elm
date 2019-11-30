@@ -156,12 +156,11 @@ view model =
         h =
             screen.height
     in
-    Render.canvas x
+    Render.fullScreenCanvas x
         y
         w
         h
-        [ Render.fillRectTopLeft x y w h Render.black
-        ]
+        Render.black
 
 
 

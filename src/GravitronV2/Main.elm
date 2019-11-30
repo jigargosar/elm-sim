@@ -10,10 +10,10 @@ type alias Memory =
 
 initialMemory : Memory
 initialMemory =
-    initParticle (vec -150 0) vec1 0.9
+    initParticle (vec -150 0) vec1
 
 
-initParticle : Vec -> Vec -> Float -> Particle
+initParticle : Vec -> Vec -> Particle
 initParticle =
     Particle
 
@@ -21,13 +21,12 @@ initParticle =
 type alias Particle =
     { position : Vec
     , velocity : Vec
-    , friction : Float
     }
 
 
-applyFriction : Particle -> Particle
-applyFriction model =
-    { model | position = multiply model.friction model.velocity }
+applyFriction : Float -> Particle -> Particle
+applyFriction friction model =
+    { model | position = multiply friction model.velocity }
 
 
 applySpringForceTowardsPoint : Vec -> Float -> Particle -> Particle
@@ -55,10 +54,16 @@ update c m =
         springPoint =
             fromRec c.mouse
 
-        k =
+        springConstant =
             0.1
+
+        friction =
+            0.9
     in
-    m |> applySpringForceTowardsPoint springPoint k |> applyFriction |> applyVelocity
+    m
+        |> applySpringForceTowardsPoint springPoint springConstant
+        |> applyFriction friction
+        |> applyVelocity
 
 
 view : Computer -> Memory -> List Shape

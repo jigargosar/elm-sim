@@ -3,13 +3,13 @@ module GravitronV2.Main exposing (main)
 import GravitronV2.Draw exposing (..)
 
 
-type alias V =
-    ( Float, Float )
+type V
+    = V Float Float
 
 
 v : Float -> Float -> V
 v =
-    Tuple.pair
+    V
 
 
 fromRec : { a | x : Float, y : Float } -> V
@@ -17,14 +17,13 @@ fromRec { x, y } =
     v x y
 
 
-toRec : V -> { x : Float, y : Float }
-toRec ( x, y ) =
+type alias XY =
+    { x : Float, y : Float }
+
+
+toRec : V -> XY
+toRec (V x y) =
     { x = x, y = y }
-
-
-xin : V -> Float
-xin =
-    Tuple.first
 
 
 type alias Memory =

@@ -39,10 +39,10 @@ update c m =
             fromRec c.mouse
 
         vel =
-            plus (springVec m.pos mousePos) m.vel
+            plus m.vel (springVec m.pos mousePos)
 
         pos =
-            plus m.pos vel
+            plus vel m.pos
     in
     { m | pos = pos, vel = vel }
 

@@ -12,28 +12,19 @@ v =
     Tuple.pair
 
 
-vFromRec : { a | x : Float, y : Float } -> V
-vFromRec { x, y } =
+fromRec : { a | x : Float, y : Float } -> V
+fromRec { x, y } =
     v x y
+
+
+toRec : V -> { x : Float, y : Float }
+toRec ( x, y ) =
+    { x = x, y = y }
 
 
 xin : V -> Float
 xin =
     Tuple.first
-
-
-mapX : (Float -> Float) -> V -> V
-mapX =
-    Tuple.mapFirst
-
-
-setX : Float -> V -> V
-setX =
-    mapX << always
-
-
-inc =
-    (+) 1
 
 
 type alias Memory =
@@ -59,12 +50,16 @@ setPos =
 
 update : Computer -> Memory -> Memory
 update c m =
-    setPos (vFromRec c.mouse) m
+    setPos (fromRec c.mouse) m
 
 
 view : Computer -> Memory -> List Shape
 view c m =
-    [ circle (xin m.pos) 0 10 red ]
+    let
+        xy =
+            toRec m.pos
+    in
+    [ circle xy.x xy.y 10 red ]
 
 
 main : Game Memory

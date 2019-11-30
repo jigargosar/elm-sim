@@ -94,3 +94,29 @@ setX =
 plus : Vec -> Vec -> Vec
 plus (Vec x1 y1) (Vec x2 y2) =
     vec (x1 + x2) (y1 + y2)
+
+
+minus (Vec xa ya) (Vec xb yb) =
+    vec (xb - xa) (yb - ya)
+
+
+len2 : Vec -> Vec -> Float
+len2 a b =
+    minus a b
+        |> mapEach ((^) 2)
+        |> apply2 (+)
+
+
+len : Vec -> Vec -> Float
+len a b =
+    len2 a b |> sqrt
+
+
+mapEach : (Float -> Float) -> Vec -> Vec
+mapEach func (Vec x y) =
+    vec (func x) (func y)
+
+
+apply2 : (Float -> Float -> a) -> Vec -> a
+apply2 func (Vec x y) =
+    func x y

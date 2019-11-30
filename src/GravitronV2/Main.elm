@@ -28,8 +28,8 @@ setPos =
 
 
 springTo : Vec -> Vec -> Vec
-springTo v2 v1 =
-    v1
+springTo a b =
+    len a b
 
 
 update : Computer -> Memory -> Memory

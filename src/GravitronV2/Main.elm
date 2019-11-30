@@ -3,18 +3,13 @@ module GravitronV2.Main exposing (main)
 import Browser
 import Browser.Dom
 import Browser.Events
-import Color
 import GravitronV2.Draw as Draw
 import Html exposing (Html)
 import Json.Decode as JD
-import Svg exposing (Svg)
 import Task
-import TypedSvg.Attributes exposing (fill)
-import TypedSvg.Types exposing (Fill(..), StrokeLinecap(..), StrokeLinejoin(..), Transform(..))
 
 
 
--- Constants
 -- Model
 
 
@@ -130,20 +125,6 @@ view model =
         h
         Draw.black
         []
-
-
-
--- Drawing Helpers
-
-
-whiteA : Float -> Color.Color
-whiteA =
-    Color.rgba 1 1 1
-
-
-fillColor : Color.Color -> Svg.Attribute msg
-fillColor =
-    Fill >> fill
 
 
 

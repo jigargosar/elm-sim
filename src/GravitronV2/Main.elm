@@ -5,26 +5,43 @@ import GravitronV2.Vector2 as V exposing (..)
 
 
 type alias Memory =
-    { pos : Vec
-    , vel : Vec
-    }
+    Particle
 
 
 initialMemory : Memory
 initialMemory =
-    { pos = vec -150 0
-    , vel = vec1
+    initParticle (vec -150 0) vec1 0.9
+
+
+initParticle : Vec -> Vec -> Float -> Particle
+initParticle =
+    Particle
+
+
+type alias Particle =
+    { pos : Vec
+    , vel : Vec
+    , friction : Float
     }
 
 
-mapPos : (a -> a) -> { b | pos : a } -> { b | pos : a }
-mapPos func model =
-    { model | pos = func model.pos }
+springTo : Vec -> Float -> Particle -> Particle
+springTo springPoint k model =
+    { model
+        | vel =
+            springForceFrom model.pos springPoint k
+                |> integrate model.vel
+    }
 
 
-setPos : a -> { b | pos : a } -> { b | pos : a }
-setPos =
-    mapPos << always
+applyFriction : Particle -> Particle
+applyFriction model =
+    { model | pos = multiply model.friction model.vel }
+
+
+applyVelocity : Particle -> Particle
+applyVelocity model =
+    { model | pos = integrate model.pos model.vel }
 
 
 update : Computer -> Memory -> Memory
@@ -33,32 +50,13 @@ update c m =
         mousePoint =
             fromRec c.mouse
 
-        weightPoint =
-            m.pos
-
         springPoint =
             mousePoint
 
-        distanceToSpringPoint =
-            minus weightPoint springPoint
-
         k =
-            0.3
-
-        springForce =
-            scale k distanceToSpringPoint
-
-        friction =
-            0.9
-
-        vel =
-            plus m.vel springForce
-                |> scale friction
-
-        pos =
-            plus vel weightPoint
+            0.1
     in
-    { m | pos = pos, vel = vel }
+    m |> springTo springPoint k |> applyFriction |> applyVelocity
 
 
 view : Computer -> Memory -> List Shape

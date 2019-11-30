@@ -1,6 +1,7 @@
 module GravitronV2.Vector2 exposing
     ( RecXY
     , Vec
+    , add
     , dirOppX
     , dirOppY
     , dirX
@@ -8,19 +9,21 @@ module GravitronV2.Vector2 exposing
     , fromRec
     , getX
     , getY
-    , len
-    , len2
+    , integrate
     , mapX
     , minus
+    , multiply
     , opp
     , plus
-    , scale
     , setX
+    , springForceFrom
+    , subtract
     , toRec
     , toTuple
     , vec
     , vec0
     , vec1
+    , vecFrom
     )
 
 
@@ -80,11 +83,11 @@ dirOppY =
 
 opp : Vec -> Vec
 opp =
-    scale -1
+    multiply -1
 
 
-scale : Float -> Vec -> Vec
-scale s (Vec x y) =
+multiply : Float -> Vec -> Vec
+multiply s (Vec x y) =
     vec (x * s) (y * s)
 
 
@@ -112,31 +115,60 @@ setX =
     mapX << always
 
 
-plus : Vec -> Vec -> Vec
-plus (Vec x1 y1) (Vec x2 y2) =
+integrate : Vec -> Vec -> Vec
+integrate (Vec x1 y1) (Vec x2 y2) =
     vec (x1 + x2) (y1 + y2)
 
 
-minus : Vec -> Vec -> Vec
-minus (Vec xa ya) (Vec xb yb) =
+add : Vec -> Vec -> Vec
+add =
+    integrate
+
+
+plus : Vec -> Vec -> Vec
+plus =
+    integrate
+
+
+subtract : Vec -> Vec -> Vec
+subtract (Vec xa ya) (Vec xb yb) =
     vec (xb - xa) (yb - ya)
 
 
-len2 : Vec -> Vec -> Float
-len2 a b =
-    minus a b
-        |> mapEach ((^) 2)
-        |> apply2 (+)
+vecFrom : Vec -> Vec -> Vec
+vecFrom =
+    subtract
 
 
-len : Vec -> Vec -> Float
-len a b =
-    len2 a b |> sqrt
+minus : Vec -> Vec -> Vec
+minus =
+    subtract
 
 
-mapEach : (Float -> Float) -> Vec -> Vec
-mapEach func (Vec x y) =
-    vec (func x) (func y)
+springForceFrom : Vec -> Vec -> Float -> Vec
+springForceFrom a b k =
+    vecFrom a b |> multiply k
+
+
+
+{-
+   len2 : Vec -> Vec -> Float
+   len2 a b =
+       subtract a b
+           |> mapEach ((^) 2)
+           |> apply2 (+)
+
+
+   len : Vec -> Vec -> Float
+   len a b =
+       len2 a b |> sqrt
+-}
+{-
+   mapEach : (Float -> Float) -> Vec -> Vec
+   mapEach func (Vec x y) =
+       vec (func x) (func y)
+
+-}
 
 
 apply2 : (Float -> Float -> a) -> Vec -> a

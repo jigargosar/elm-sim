@@ -3,6 +3,15 @@ module GravitronV2.Main exposing (main)
 import GravitronV2.Draw exposing (..)
 
 
-main : Picture
+type alias Memory =
+    { x : Float
+    }
+
+
+initialMemory =
+    { x = -100 }
+
+
+main : Game Memory
 main =
-    picture [ circle -110 0 10 red ]
+    game initialMemory [ circle -110 0 10 red ]

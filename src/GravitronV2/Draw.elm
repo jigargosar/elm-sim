@@ -1,4 +1,4 @@
-module GravitronV2.Draw exposing (Picture, circle, picture, red)
+module GravitronV2.Draw exposing (Game, circle, game, red)
 
 import Browser
 import Browser.Dom
@@ -23,10 +23,14 @@ type alias Flags =
     ()
 
 
-type alias Model =
+type alias Computer =
     { mouse : Mouse
     , screen : Screen
     }
+
+
+type Model memory
+    = Model Computer memory
 
 
 type alias Mouse =
@@ -35,11 +39,13 @@ type alias Mouse =
     }
 
 
-init : Flags -> ( Model, Cmd Msg )
-init _ =
-    ( { mouse = Mouse 100 100
-      , screen = screenFromWidthHeight 600 600
-      }
+init : memory -> Flags -> ( Model memory, Cmd Msg )
+init initialMemory _ =
+    ( Model
+        { mouse = Mouse 100 100
+        , screen = screenFromWidthHeight 600 600
+        }
+        initialMemory
     , Browser.Dom.getViewport |> Task.perform OnViewport
     )
 
@@ -55,7 +61,7 @@ type Msg
     | OnViewport Browser.Dom.Viewport
 
 
-subscriptions : Model -> Sub Msg
+subscriptions : Model memory -> Sub Msg
 subscriptions _ =
     [ Browser.Events.onAnimationFrameDelta Tick
     , JD.map2 MouseMoved
@@ -67,38 +73,41 @@ subscriptions _ =
         |> Sub.batch
 
 
-update : Msg -> Model -> ( Model, Cmd Msg )
-update message model =
+update : Msg -> Model memory -> ( Model memory, Cmd Msg )
+update message (Model computer memory) =
     case message of
         Tick _ ->
-            ( onTick model
+            ( Model computer memory
             , Cmd.none
             )
 
         MouseMoved mx my ->
             let
                 mouse =
-                    model.mouse
+                    computer.mouse
 
                 screen =
-                    model.screen
+                    computer.screen
             in
-            ( { model | mouse = { mouse | x = mx + screen.left, y = my + screen.top } }
+            ( Model { computer | mouse = { mouse | x = mx + screen.left, y = my + screen.top } }
+                memory
             , Cmd.none
             )
 
         OnViewport { scene } ->
-            ( { model | screen = screenFromWidthHeight scene.width scene.height }
+            ( Model { computer | screen = screenFromWidthHeight scene.width scene.height }
+                memory
             , Cmd.none
             )
 
         OnResize width height ->
-            ( { model | screen = screenFromWidthHeight (toFloat width) (toFloat height) }
+            ( Model { computer | screen = screenFromWidthHeight (toFloat width) (toFloat height) }
+                memory
             , Cmd.none
             )
 
 
-onTick : Model -> Model
+onTick : Model memory -> Model memory
 onTick model =
     model
 
@@ -116,11 +125,11 @@ circle =
     Circle
 
 
-renderShapes : List Shape -> Model -> Html Msg
-renderShapes shapes model =
+renderShapes : Computer -> List Shape -> Html Msg
+renderShapes computer shapes =
     let
         screen =
-            model.screen
+            computer.screen
 
         x =
             screen.left
@@ -219,15 +228,19 @@ render x y width height color children =
         )
 
 
-type alias Picture =
-    Program Flags Model Msg
+type alias Game memory =
+    Program Flags (Model memory) Msg
 
 
-picture : List Shape -> Picture
-picture shapes =
+game : memory -> List Shape -> Game memory
+game initialMemory shapes =
+    let
+        view (Model computer memory) =
+            renderShapes computer shapes
+    in
     Browser.element
-        { init = init
+        { init = init initialMemory
         , subscriptions = subscriptions
         , update = update
-        , view = renderShapes shapes
+        , view = view
         }

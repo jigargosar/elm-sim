@@ -1,39 +1,19 @@
 module GravitronV2.Main exposing (main)
 
 import GravitronV2.Draw exposing (..)
-
-
-type V
-    = V Float Float
-
-
-v : Float -> Float -> V
-v =
-    V
-
-
-fromRec : { a | x : Float, y : Float } -> V
-fromRec { x, y } =
-    v x y
-
-
-type alias XY =
-    { x : Float, y : Float }
-
-
-toRec : V -> XY
-toRec (V x y) =
-    { x = x, y = y }
+import GravitronV2.Vector2 as V exposing (..)
 
 
 type alias Memory =
-    { pos : V
+    { pos : Vec
+    , vel : Vec
     }
 
 
 initialMemory : Memory
 initialMemory =
-    { pos = v -150 0
+    { pos = vec -150 0
+    , vel = vec0
     }
 
 
@@ -47,9 +27,24 @@ setPos =
     mapPos << always
 
 
+springTo : Vec -> Vec -> Vec
+springTo v2 v1 =
+    v1
+
+
 update : Computer -> Memory -> Memory
 update c m =
-    setPos (fromRec c.mouse) m
+    let
+        mv =
+            fromRec c.mouse
+
+        vel =
+            springTo mv m.vel
+
+        pos =
+            plus m.pos vel
+    in
+    { m | pos = pos, vel = vel }
 
 
 view : Computer -> Memory -> List Shape

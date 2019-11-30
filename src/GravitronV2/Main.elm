@@ -19,8 +19,8 @@ initParticle =
 
 
 type alias Particle =
-    { pos : Vec
-    , vel : Vec
+    { position : Vec
+    , velocity : Vec
     , friction : Float
     }
 
@@ -28,20 +28,20 @@ type alias Particle =
 springTo : Vec -> Float -> Particle -> Particle
 springTo springPoint k model =
     { model
-        | vel =
-            springForceFrom model.pos springPoint k
-                |> integrate model.vel
+        | velocity =
+            springForceFrom model.position springPoint k
+                |> integrate model.velocity
     }
 
 
 applyFriction : Particle -> Particle
 applyFriction model =
-    { model | pos = multiply model.friction model.vel }
+    { model | position = multiply model.friction model.velocity }
 
 
 applyVelocity : Particle -> Particle
 applyVelocity model =
-    { model | pos = integrate model.pos model.vel }
+    { model | position = integrate model.position model.velocity }
 
 
 update : Computer -> Memory -> Memory
@@ -63,7 +63,7 @@ view : Computer -> Memory -> List Shape
 view c m =
     let
         xy =
-            toRec m.pos
+            toRec m.position
     in
     [ circle xy.x xy.y 10 red ]
 

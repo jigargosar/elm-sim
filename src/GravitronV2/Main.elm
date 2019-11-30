@@ -9,7 +9,7 @@ type alias Memory =
 
 
 initialMemory =
-    { x = -100 }
+    { x = -120 }
 
 
 view : Computer -> Memory -> List Shape

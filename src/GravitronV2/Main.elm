@@ -4,7 +4,7 @@ import Browser
 import Browser.Dom
 import Browser.Events
 import Color
-import GravitronV2.Render as Render
+import GravitronV2.Draw as Draw
 import Html exposing (Html)
 import Html.Attributes exposing (style)
 import Json.Decode as JD
@@ -27,7 +27,7 @@ type alias Flags =
 
 type alias Model =
     { mouse : Mouse
-    , screen : Render.Screen
+    , screen : Draw.Screen
     }
 
 
@@ -40,7 +40,7 @@ type alias Mouse =
 init : Flags -> ( Model, Cmd Msg )
 init _ =
     ( { mouse = Mouse 100 100
-      , screen = Render.screenFromWidthHeight 600 600
+      , screen = Draw.screenFromWidthHeight 600 600
       }
     , Browser.Dom.getViewport |> Task.perform OnViewport
     )
@@ -128,11 +128,11 @@ view model =
         h =
             screen.height
     in
-    Render.fullScreenCanvas x
+    Draw.fullScreenCanvas x
         y
         w
         h
-        Render.black
+        Draw.black
         []
 
 

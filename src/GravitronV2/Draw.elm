@@ -1,4 +1,4 @@
-module GravitronV2.Render exposing (Color, Screen, black, canvas, fillRectLeftTop, fullScreenCanvas, screenFromWidthHeight)
+module GravitronV2.Draw exposing (Color, Screen, black, canvas, fillRectLeftTop, fullScreenCanvas, screenFromWidthHeight)
 
 import Color
 import Html exposing (Html)

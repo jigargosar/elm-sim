@@ -17,6 +17,15 @@ xin =
     Tuple.first
 
 
+mapX : (Float -> Float) -> V -> V
+mapX =
+    Tuple.mapFirst
+
+
+inc =
+    (+) 1
+
+
 type alias Memory =
     { pos : V
     }
@@ -28,6 +37,16 @@ initialMemory =
     }
 
 
+mapPos : (a -> a) -> { b | pos : a } -> { b | pos : a }
+mapPos func model =
+    { model | pos = func model.pos }
+
+
+update : Computer -> Memory -> Memory
+update c m =
+    mapPos (mapX inc) m
+
+
 view : Computer -> Memory -> List Shape
 view c m =
     [ circle (xin m.pos) 0 10 red ]
@@ -35,4 +54,4 @@ view c m =
 
 main : Game Memory
 main =
-    game initialMemory view
+    game initialMemory update view

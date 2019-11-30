@@ -73,11 +73,11 @@ subscriptions _ =
         |> Sub.batch
 
 
-update : Msg -> Model memory -> ( Model memory, Cmd Msg )
-update message (Model computer memory) =
+update : Update memory -> Msg -> Model memory -> ( Model memory, Cmd Msg )
+update updateMemory message (Model computer memory) =
     case message of
         Tick _ ->
-            ( Model computer memory
+            ( Model computer (updateMemory computer memory)
             , Cmd.none
             )
 
@@ -232,15 +232,23 @@ type alias Game memory =
     Program Flags (Model memory) Msg
 
 
-game : memory -> (Computer -> memory -> List Shape) -> Game memory
-game initialMemory view_ =
+type alias Update memory =
+    Computer -> memory -> memory
+
+
+type alias View memory =
+    Computer -> memory -> List Shape
+
+
+game : memory -> Update memory -> View memory -> Game memory
+game initialMemory updateMemory viewMemory =
     let
         view (Model computer memory) =
-            renderShapes computer (view_ computer memory)
+            renderShapes computer (viewMemory computer memory)
     in
     Browser.element
         { init = init initialMemory
         , subscriptions = subscriptions
-        , update = update
+        , update = update updateMemory
         , view = view
         }

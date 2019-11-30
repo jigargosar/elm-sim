@@ -15,7 +15,7 @@ initialMemory =
 
 
 update : Computer -> Memory -> Memory
-update c m =
+update c model =
     let
         springPoint =
             fromRec c.mouse
@@ -25,8 +25,11 @@ update c m =
 
         friction =
             0.9
+
+        particle =
+            model
     in
-    m
+    particle
         |> P.applySpringForceTowardsPoint springPoint springConstant
         |> P.applyFriction friction
         |> P.applyVelocity

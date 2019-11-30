@@ -3,6 +3,15 @@ module GravitronV2.Main exposing (main)
 import GravitronV2.Draw exposing (..)
 
 
+type alias V =
+    ( Float, Float )
+
+
+v : Float -> Float -> V
+v =
+    Tuple.pair
+
+
 type alias Memory =
     { x : Float
     }

@@ -12,18 +12,25 @@ v =
     Tuple.pair
 
 
+xin : V -> Float
+xin =
+    Tuple.first
+
+
 type alias Memory =
-    { x : Float
+    { pos : V
     }
 
 
+initialMemory : Memory
 initialMemory =
-    { x = -120 }
+    { pos = v -150 0
+    }
 
 
 view : Computer -> Memory -> List Shape
-view computer memory =
-    [ circle memory.x 0 10 red ]
+view c m =
+    [ circle (xin m.pos) 0 10 red ]
 
 
 main : Game Memory

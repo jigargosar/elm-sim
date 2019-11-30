@@ -32,11 +32,11 @@ type alias Model =
 
 
 type alias Screen =
-    { w : Float
-    , h : Float
-    , l : Float
+    { width : Float
+    , height : Float
+    , left : Float
     , r : Float
-    , t : Float
+    , top : Float
     , b : Float
     }
 
@@ -50,11 +50,11 @@ toScreen sw sh =
         scy =
             sh / 2
     in
-    { w = sw
-    , h = sh
-    , l = -scx
+    { width = sw
+    , height = sh
+    , left = -scx
     , r = scx
-    , t = -scy
+    , top = -scy
     , b = scy
     }
 
@@ -114,7 +114,7 @@ update message model =
                 screen =
                     model.screen
             in
-            ( { model | mouse = { mouse | x = mx + screen.l, y = my + screen.t } }
+            ( { model | mouse = { mouse | x = mx + screen.left, y = my + screen.top } }
             , Cmd.none
             )
 
@@ -145,23 +145,21 @@ view model =
             model.screen
 
         x =
-            screen.l
+            screen.left
 
         y =
-            screen.t
+            screen.top
 
         w =
-            screen.w
+            screen.width
 
         h =
-            screen.h
+            screen.height
     in
-    TypedSvg.svg
-        [ style "position" "fixed"
-        , viewBox x y w h
-        , width w
-        , height h
-        ]
+    Render.canvas x
+        y
+        w
+        h
         [ Render.fillRectTopLeft x y w h Render.black
         ]
 

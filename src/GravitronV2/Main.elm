@@ -27,9 +27,10 @@ setPos =
     mapPos << always
 
 
-springTo : Vec -> Vec -> Vec
-springTo a b =
-    len a b
+
+--springTo : Vec -> Vec -> Vec
+--springTo a b =
+--    Basics.fromPolar (len a b, angleBetween a b)
 
 
 update : Computer -> Memory -> Memory
@@ -39,7 +40,8 @@ update c m =
             fromRec c.mouse
 
         vel =
-            springTo mv m.vel
+            --springTo mv m.vel
+            m.vel
 
         pos =
             plus m.pos vel

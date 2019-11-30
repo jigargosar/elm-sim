@@ -6,6 +6,8 @@ module GravitronV2.Vector2 exposing
     , dirX
     , dirY
     , fromRec
+    , len
+    , len2
     , mapX
     , opp
     , plus

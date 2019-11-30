@@ -116,8 +116,8 @@ circle =
     Circle
 
 
-view : List Shape -> Model -> Html Msg
-view shapes model =
+renderShapes : List Shape -> Model -> Html Msg
+renderShapes shapes model =
     let
         screen =
             model.screen
@@ -134,7 +134,7 @@ view shapes model =
         h =
             screen.height
     in
-    fullScreenCanvas x
+    render x
         y
         w
         h
@@ -142,8 +142,15 @@ view shapes model =
         (List.map renderShape shapes)
 
 
+fillColor : Color -> Svg.Attribute msg
+fillColor (Color c) =
+    TypedSvg.Attributes.fill (TypedSvg.Types.Fill c)
+
+
 renderShape shape =
-    Svg.g [] []
+    case shape of
+        Circle cx cy r c ->
+            Svg.circle [ InPx.cx cx, InPx.cy cy, InPx.r r, fillColor c ] []
 
 
 
@@ -192,8 +199,8 @@ red =
     Color Color.red
 
 
-fullScreenCanvas : Float -> Float -> Float -> Float -> Color -> List (Svg msg) -> Html msg
-fullScreenCanvas x y width height (Color fillColor) children =
+render : Float -> Float -> Float -> Float -> Color -> List (Svg msg) -> Html msg
+render x y width height color children =
     TypedSvg.svg
         [ Html.Attributes.style "position" "fixed"
         , TypedSvg.Attributes.viewBox x y width height
@@ -205,7 +212,7 @@ fullScreenCanvas x y width height (Color fillColor) children =
             , InPx.y y
             , InPx.width width
             , InPx.height height
-            , TypedSvg.Attributes.fill (TypedSvg.Types.Fill fillColor)
+            , fillColor color
             ]
             []
             :: children
@@ -222,5 +229,5 @@ picture shapes =
         { init = init
         , subscriptions = subscriptions
         , update = update
-        , view = view shapes
+        , view = renderShapes shapes
         }

@@ -11,7 +11,7 @@ type alias Memory =
 
 initialMemory : Memory
 initialMemory =
-    P.initParticle (vec -150 0) vec1
+    P.fromPointVelocity (vec -150 0) vec1
 
 
 update : Computer -> Memory -> Memory

@@ -12,6 +12,11 @@ initialMemory =
     { x = -100 }
 
 
+view : Computer -> Memory -> List Shape
+view computer memory =
+    [ circle memory.x 0 10 red ]
+
+
 main : Game Memory
 main =
-    game initialMemory [ circle -110 0 10 red ]
+    game initialMemory view

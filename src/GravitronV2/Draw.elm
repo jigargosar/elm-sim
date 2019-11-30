@@ -1,4 +1,4 @@
-module GravitronV2.Draw exposing (Game, circle, game, red)
+module GravitronV2.Draw exposing (Computer, Game, Shape, circle, game, red)
 
 import Browser
 import Browser.Dom
@@ -232,11 +232,11 @@ type alias Game memory =
     Program Flags (Model memory) Msg
 
 
-game : memory -> List Shape -> Game memory
-game initialMemory shapes =
+game : memory -> (Computer -> memory -> List Shape) -> Game memory
+game initialMemory view_ =
     let
         view (Model computer memory) =
-            renderShapes computer shapes
+            renderShapes computer (view_ computer memory)
     in
     Browser.element
         { init = init initialMemory

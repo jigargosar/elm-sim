@@ -1,4 +1,4 @@
-module GravitronV2.Draw exposing (Color, Screen, black, fullScreenCanvas, main, screenFromWidthHeight)
+module GravitronV2.Draw exposing (main)
 
 import Browser
 import Browser.Dom

@@ -141,17 +141,8 @@ updateBullet c player bullet =
                 gv =
                     V.vecFrom model.position toPoint
 
-                distanceSquared =
-                    V.len2 gv
-
-                mag =
-                    mass / distanceSquared
-
-                angle =
-                    V.angle gv
-
                 force =
-                    V.fromRTheta mag angle
+                    V.fromRTheta (mass / V.len2 gv) (V.angle gv)
             in
             applyForce force model
 

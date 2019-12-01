@@ -179,7 +179,7 @@ renderBullet bullet =
 type alias Memory =
     { player : Player
     , turret : Turret
-    , bullet : Bullet
+    , bullets : List Bullet
     }
 
 
@@ -187,7 +187,7 @@ initialMemory : Memory
 initialMemory =
     { player = initPlayer
     , turret = initTurret
-    , bullet = initBullet
+    , bullets = [ initBullet ]
     }
 
 
@@ -195,16 +195,15 @@ update : Computer -> Memory -> Memory
 update c model =
     { model
         | player = updatePlayer c model.player
-        , bullet = updateBullet c model.bullet
+        , bullets = List.map (updateBullet c) model.bullets
     }
 
 
 view : Computer -> Memory -> List Shape
 view _ model =
-    [ renderPlayer model.player
-    , renderTurret model.turret
-    , renderBullet model.bullet
-    ]
+    renderPlayer model.player
+        :: renderTurret model.turret
+        :: List.map renderBullet model.bullets
 
 
 main : Game Memory

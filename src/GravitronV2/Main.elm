@@ -29,9 +29,12 @@ initPlayer =
     }
 
 
-updatePlayer : Vec -> Player -> Player
-updatePlayer springPoint particle =
+updatePlayer : Computer -> Player -> Player
+updatePlayer c particle =
     let
+        springPoint =
+            fromRec c.mouse
+
         applyFriction : Float -> Player -> Player
         applyFriction friction model =
             { model | position = multiply friction model.velocity }
@@ -89,7 +92,7 @@ update c model =
         springPlayerTo =
             fromRec c.mouse
     in
-    { model | player = updatePlayer springPlayerTo model.player }
+    { model | player = updatePlayer c model.player }
 
 
 view : Computer -> Memory -> List Shape

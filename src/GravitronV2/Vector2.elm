@@ -43,7 +43,7 @@ getY (Vec _ y) =
 
 toTuple : Vec -> ( Float, Float )
 toTuple =
-    apply2 Tuple.pair
+    apply Tuple.pair
 
 
 vec : Float -> Float -> Vec
@@ -171,6 +171,6 @@ springForceFrom a b k =
 -}
 
 
-apply2 : (Float -> Float -> a) -> Vec -> a
-apply2 func (Vec x y) =
+apply : (Float -> Float -> a) -> Vec -> a
+apply func (Vec x y) =
     func x y

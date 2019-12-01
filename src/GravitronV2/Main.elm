@@ -194,32 +194,34 @@ initialMemory =
     }
 
 
+addBulletEveryXSeconds : Int -> Int -> List Bullet -> List Bullet
+addBulletEveryXSeconds seconds ticks list =
+    let
+        bulletCount =
+            List.length list
+
+        maxBullets =
+            10
+
+        period =
+            modBy (seconds * 60) ticks
+
+        shouldAddBullet =
+            period == 0 && bulletCount < maxBullets
+    in
+    if shouldAddBullet then
+        initBullet (toFloat bulletCount) :: list
+
+    else
+        list
+
+
 update : Computer -> Memory -> Memory
 update c model =
     let
-        addBulletEveryXSeconds seconds list =
-            let
-                bulletCount =
-                    List.length list
-
-                maxBullets =
-                    10
-
-                period =
-                    modBy (seconds * 60) model.ticks
-
-                shouldAddBullet =
-                    period == 0 && bulletCount < maxBullets
-            in
-            if shouldAddBullet then
-                initBullet (toFloat bulletCount) :: list
-
-            else
-                list
-
         bullets =
             List.map (updateBullet c) model.bullets
-                |> addBulletEveryXSeconds 1
+                |> addBulletEveryXSeconds 1 model.ticks
     in
     { model
         | player = updatePlayer c model.player

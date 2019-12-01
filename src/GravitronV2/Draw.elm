@@ -1,4 +1,4 @@
-module GravitronV2.Draw exposing (Color, Computer, Game, Shape, circle, game, green, red, white)
+module GravitronV2.Draw exposing (Color, Computer, Game, Screen, Shape, circle, game, green, red, white)
 
 import Browser
 import Browser.Dom

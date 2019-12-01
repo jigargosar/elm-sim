@@ -119,14 +119,49 @@ initBullet =
     }
 
 
-updateBullet : Bullet -> Bullet
-updateBullet bullet =
+updateBullet : Computer -> Bullet -> Bullet
+updateBullet c bullet =
     let
+        bounceOffScreen : Screen -> Bullet -> Bullet
+        bounceOffScreen screen model =
+            let
+                xy =
+                    toRec model.position
+
+                vxy =
+                    toRec model.velocity
+
+                bounceX left right x vx =
+                    if x < left && vx < 0 then
+                        negate vx
+
+                    else if x > right && vx > 0 then
+                        negate vx
+
+                    else
+                        vx
+
+                bounceY top bottom y vy =
+                    if y < top && vy < 0 then
+                        negate vy
+
+                    else if y > bottom && vy > 0 then
+                        negate vy
+
+                    else
+                        vy
+
+                velocity =
+                    vec (bounceX screen.left screen.right xy.x vxy.x)
+                        (bounceY screen.top screen.bottom xy.y vxy.y)
+            in
+            { model | velocity = velocity }
+
         applyVelocity : Bullet -> Bullet
         applyVelocity model =
             { model | position = integrate model.position model.velocity }
     in
-    bullet |> applyVelocity
+    bullet |> bounceOffScreen c.screen |> applyVelocity
 
 
 renderBullet : Bullet -> Shape
@@ -161,7 +196,7 @@ update : Computer -> Memory -> Memory
 update c model =
     { model
         | player = updatePlayer c model.player
-        , bullet = updateBullet model.bullet
+        , bullet = updateBullet c model.bullet
     }
 
 

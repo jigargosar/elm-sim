@@ -197,9 +197,29 @@ initialMemory =
 update : Computer -> Memory -> Memory
 update c model =
     let
+        addBulletEveryXSeconds seconds list =
+            let
+                bulletCount =
+                    List.length list
+
+                maxBullets =
+                    10
+
+                period =
+                    modBy (seconds * 60) model.ticks
+
+                shouldAddBullet =
+                    period == 0 && bulletCount < maxBullets
+            in
+            if shouldAddBullet then
+                initBullet (toFloat bulletCount) :: list
+
+            else
+                list
+
         bullets =
             List.map (updateBullet c) model.bullets
-                |> when (always (modBy 60 model.ticks == 0)) ((::) (initBullet 0))
+                |> addBulletEveryXSeconds 1
     in
     { model
         | player = updatePlayer c model.player

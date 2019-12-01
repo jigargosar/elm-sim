@@ -113,7 +113,7 @@ type alias Bullet =
 initBullet : Bullet
 initBullet =
     { position = vec -200 0
-    , velocity = vec1
+    , velocity = vec 10 10
     , radius = 5
     , color = white
     }

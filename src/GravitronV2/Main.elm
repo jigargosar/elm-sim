@@ -203,8 +203,11 @@ addBulletEveryXSeconds periodInSeconds ticks bullets =
         maxBullets =
             10
 
+        ticksPerSecond =
+            60
+
         period =
-            modBy (periodInSeconds * 60) ticks
+            modBy (periodInSeconds * ticksPerSecond) ticks
 
         shouldAddBullet =
             period == 0 && bulletCount < maxBullets

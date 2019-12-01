@@ -16,6 +16,7 @@ initParticle =
     Particle (vec 0 0) (vec 0 0) 0.1 0.9
 
 
+updateParticle : Vec -> Particle -> Particle
 updateParticle springPoint particle =
     let
         applyFriction : Float -> Particle -> Particle

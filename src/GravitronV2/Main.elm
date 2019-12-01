@@ -1,9 +1,7 @@
 module GravitronV2.Main exposing (main)
 
-import Basics.Extra
 import GravitronV2.Draw exposing (..)
 import GravitronV2.Vector2 as V exposing (..)
-import PointFree exposing (when)
 
 
 
@@ -118,6 +116,7 @@ type alias Bullet =
     HasPositionVelocity
         { radius : Float
         , color : Color
+        , isAlive : Bool
         }
 
 
@@ -127,6 +126,7 @@ initBullet position =
     , velocity = vec 10 10
     , radius = 5
     , color = white
+    , isAlive = True
     }
 
 
@@ -229,8 +229,26 @@ update c model =
         |> handleCollision c
 
 
-handleCollision c model =
-    model
+handleBulletCollision : List Bullet -> List Bullet -> List Bullet
+handleBulletCollision processed remaining =
+    case remaining of
+        [] ->
+            processed
+
+        bullet :: [] ->
+            bullet :: processed
+
+        bullet :: rest ->
+            if bullet.isAlive then
+                handleBulletCollision (bullet :: processed) rest
+
+            else
+                handleBulletCollision (bullet :: processed) rest
+
+
+handleCollision : Computer -> Memory -> Memory
+handleCollision _ model =
+    { model | bullets = handleBulletCollision [] model.bullets }
 
 
 view : Computer -> Memory -> List Shape

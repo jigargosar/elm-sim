@@ -185,4 +185,4 @@ lenFrom a b =
 
 len : Vec -> Float
 len (Vec x y) =
-    atan2 y x
+    x ^ 2 + y ^ 2 |> sqrt

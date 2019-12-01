@@ -1,5 +1,6 @@
 module GravitronV2.Main exposing (main)
 
+import Basics.Extra
 import GravitronV2.Draw exposing (..)
 import GravitronV2.Vector2 as V exposing (..)
 import PointFree exposing (when)
@@ -181,7 +182,7 @@ type alias Memory =
     { player : Player
     , turret : Turret
     , bullets : List Bullet
-    , ticks : Int
+    , ticks : Float
     }
 
 
@@ -194,7 +195,7 @@ initialMemory =
     }
 
 
-addBulletEveryXSeconds : Int -> Int -> List Bullet -> List Bullet
+addBulletEveryXSeconds : Float -> Float -> List Bullet -> List Bullet
 addBulletEveryXSeconds periodInSeconds ticks bullets =
     let
         bulletCount =
@@ -207,7 +208,7 @@ addBulletEveryXSeconds periodInSeconds ticks bullets =
             60
 
         period =
-            modBy (periodInSeconds * ticksPerSecond) ticks
+            Basics.Extra.fractionalModBy (periodInSeconds * ticksPerSecond) ticks
 
         shouldAddBullet =
             period == 0 && bulletCount < maxBullets
@@ -224,7 +225,7 @@ update c model =
     let
         bullets =
             List.map (updateBullet c) model.bullets
-                |> addBulletEveryXSeconds 5 model.ticks
+                |> addBulletEveryXSeconds 4.5 model.ticks
     in
     { model
         | player = updatePlayer c model.player

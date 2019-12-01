@@ -182,7 +182,7 @@ type alias Memory =
     { player : Player
     , turret : Turret
     , bullets : List Bullet
-    , elapsed : Float
+    , elapsed : Int
     }
 
 
@@ -195,8 +195,8 @@ initialMemory =
     }
 
 
-fireBulletAt : Float -> Float -> List Bullet -> List Bullet
-fireBulletAt periodInSeconds elapsedSeconds bullets =
+fireBulletAt : Int -> Int -> List Bullet -> List Bullet
+fireBulletAt rate elapsedTicks bullets =
     let
         bulletCount =
             List.length bullets
@@ -205,10 +205,10 @@ fireBulletAt periodInSeconds elapsedSeconds bullets =
             10
 
         period =
-            Basics.Extra.fractionalModBy periodInSeconds elapsedSeconds
+            modBy rate elapsedTicks
 
         shouldAddBullet =
-            period < 0.0000001 && bulletCount < maxBullets
+            period == 0 && bulletCount < maxBullets
     in
     if shouldAddBullet then
         initBullet (toFloat bulletCount) :: bullets
@@ -221,19 +221,16 @@ update : Computer -> Memory -> Memory
 update c model =
     let
         fireBulletRate =
-            1
+            60
 
         bullets =
             List.map (updateBullet c) model.bullets
                 |> fireBulletAt fireBulletRate model.elapsed
-
-        secondsPerTick =
-            1 / 60
     in
     { model
         | player = updatePlayer c model.player
         , bullets = bullets
-        , elapsed = model.elapsed + secondsPerTick
+        , elapsed = model.elapsed + 1
     }
 
 

@@ -64,10 +64,10 @@ updatePlayer c player =
 renderPlayer : Player -> Shape
 renderPlayer player =
     let
-        xy =
-            toRec player.position
+        ( x, y ) =
+            toTuple player.position
     in
-    circle xy.x xy.y player.radius player.color
+    circle x y player.radius player.color
 
 
 
@@ -92,10 +92,10 @@ initTurret =
 renderTurret : Turret -> Shape
 renderTurret turret =
     let
-        xy =
-            toRec turret.position
+        ( x, y ) =
+            toTuple turret.position
     in
-    circle xy.x xy.y turret.radius turret.color
+    circle x y turret.radius turret.color
 
 
 

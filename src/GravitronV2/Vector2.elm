@@ -2,6 +2,7 @@ module GravitronV2.Vector2 exposing
     ( RecXY
     , Vec
     , add
+    , apply2
     , dirOppX
     , dirOppY
     , dirX
@@ -49,8 +50,13 @@ toTuple =
 
 
 map2 : (Float -> Float -> Float) -> Vec -> Vec -> Vec
-map2 func (Vec xa ya) (Vec xb yb) =
-    vec (func xa xb) (func ya yb)
+map2 func =
+    apply2 func func
+
+
+apply2 : (Float -> Float -> Float) -> (Float -> Float -> Float) -> Vec -> Vec -> Vec
+apply2 funcX funcY (Vec xa ya) (Vec xb yb) =
+    vec (funcX xa xb) (funcY ya yb)
 
 
 mapEach : (Float -> Float) -> Vec -> Vec

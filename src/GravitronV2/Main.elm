@@ -195,20 +195,20 @@ initialMemory =
     }
 
 
-fireBulletPer : Int -> Int -> Vec -> List Bullet -> List Bullet
-fireBulletPer rate elapsedTicks position bullets =
+fireBullet : Int -> Vec -> List Bullet -> List Bullet
+fireBullet elapsedTicks position bullets =
     let
+        fireBulletRate =
+            60
+
         bulletCount =
             List.length bullets
 
         maxBullets =
             10
 
-        period =
-            modBy rate elapsedTicks
-
         shouldAddBullet =
-            period == 0 && bulletCount < maxBullets
+            modBy fireBulletRate elapsedTicks == 0 && bulletCount < maxBullets
     in
     if shouldAddBullet then
         initBullet position :: bullets
@@ -220,12 +220,9 @@ fireBulletPer rate elapsedTicks position bullets =
 update : Computer -> Memory -> Memory
 update c model =
     let
-        fireBulletRate =
-            60
-
         bullets =
             List.map (updateBullet c) model.bullets
-                |> fireBulletPer fireBulletRate model.elapsed model.turret.position
+                |> fireBullet model.elapsed model.turret.position
     in
     { model
         | player = updatePlayer c model.player

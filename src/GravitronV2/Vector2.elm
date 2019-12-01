@@ -29,6 +29,8 @@ module GravitronV2.Vector2 exposing
     , vecFrom
     )
 
+import Basics.Extra exposing (flip)
+
 
 type Vec
     = Vec Float Float
@@ -150,7 +152,7 @@ plus =
 
 subtract : Vec -> Vec -> Vec
 subtract =
-    map2 (-)
+    map2 (flip (-))
 
 
 vecFrom : Vec -> Vec -> Vec

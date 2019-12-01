@@ -120,6 +120,7 @@ type alias Bullet =
         , color : Color
         , isAlive : Bool
         , bounceFriction : Float
+        , friction : Float
         }
 
 
@@ -131,6 +132,7 @@ initBullet position =
     , color = white
     , isAlive = True
     , bounceFriction = 0.8
+    , friction = 0.9
     }
 
 

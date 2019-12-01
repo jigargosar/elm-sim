@@ -195,8 +195,8 @@ initialMemory =
     }
 
 
-addBulletEveryXSeconds : Float -> Float -> List Bullet -> List Bullet
-addBulletEveryXSeconds periodInSeconds ticks bullets =
+fireBulletAt : Float -> Float -> List Bullet -> List Bullet
+fireBulletAt periodInSeconds ticks bullets =
     let
         bulletCount =
             List.length bullets
@@ -223,9 +223,12 @@ addBulletEveryXSeconds periodInSeconds ticks bullets =
 update : Computer -> Memory -> Memory
 update c model =
     let
+        fireBulletRate =
+            4.5
+
         bullets =
             List.map (updateBullet c) model.bullets
-                |> addBulletEveryXSeconds 4.5 model.ticks
+                |> fireBulletAt fireBulletRate model.ticks
     in
     { model
         | player = updatePlayer c model.player

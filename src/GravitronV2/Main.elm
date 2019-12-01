@@ -277,8 +277,8 @@ circleCircleCollision c1 c2 =
     V.lenFrom c1.position c2.position <= c1.radius + c2.radius
 
 
-handleBulletCollision : List Bullet -> List Bullet -> List Bullet
-handleBulletCollision processed remaining =
+handleBulletsCollision : List Bullet -> List Bullet -> List Bullet
+handleBulletsCollision processed remaining =
     case remaining of
         [] ->
             processed
@@ -299,18 +299,34 @@ handleBulletCollision processed remaining =
                     ( processedBullet, newRemaining ) =
                         List.foldl reducer ( first, [] ) rest
                 in
-                handleBulletCollision (processedBullet :: processed) newRemaining
+                handleBulletsCollision (processedBullet :: processed) newRemaining
 
             else
-                handleBulletCollision (first :: processed) rest
+                handleBulletsCollision (first :: processed) rest
+
+
+handlePlayerBulletsCollision player bullets =
+    let
+        reducer b ( p, bArr ) =
+            if circleCircleCollision b p then
+                ( p, b :: bArr )
+
+            else
+                ( p, b :: bArr )
+    in
+    List.foldl reducer ( player, [] ) bullets
 
 
 handleCollision : Computer -> Memory -> Memory
 handleCollision _ model =
+    let
+        ( player, bullets ) =
+            handleBulletsCollision [] model.bullets
+                |> handlePlayerBulletsCollision model.player
+    in
     { model
-        | bullets =
-            handleBulletCollision [] model.bullets
-                |> List.filter .isAlive
+        | bullets = bullets |> List.filter .isAlive
+        , player = player
     }
 
 

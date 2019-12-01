@@ -25,7 +25,7 @@ type alias HasPositionVelocityFriction a =
 
 applyFriction : HasPositionVelocityFriction a -> HasPositionVelocityFriction a
 applyFriction model =
-    { model | position = multiply model.friction model.velocity }
+    { model | velocity = multiply model.friction model.velocity }
 
 
 
@@ -78,8 +78,8 @@ updatePlayer c player =
     in
     player
         |> applySpringForceTowardsPoint springPoint player.springConstant
-        |> applyVelocity
         |> applyFriction
+        |> applyVelocity
 
 
 renderPlayer : Player -> Shape

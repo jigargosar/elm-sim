@@ -247,6 +247,7 @@ isBulletExplosionAnimating model =
     model.elapsed < model.maxTicks
 
 
+renderBulletExplosions : BulletExplosion -> BulletExplosion
 renderBulletExplosions model =
     let
         ( x, y ) =

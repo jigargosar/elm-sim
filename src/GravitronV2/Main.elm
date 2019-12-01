@@ -2,6 +2,7 @@ module GravitronV2.Main exposing (main)
 
 import GravitronV2.Draw exposing (..)
 import GravitronV2.Vector2 as V exposing (..)
+import PointFree exposing (when)
 
 
 
@@ -119,18 +120,13 @@ type alias Bullet =
         }
 
 
-initBullets : List Bullet
-initBullets =
-    let
-        initBullet : Float -> Bullet
-        initBullet i =
-            { position = vec -200 (i * 10)
-            , velocity = vec 10 10
-            , radius = 5
-            , color = white
-            }
-    in
-    List.range 0 10 |> List.map (toFloat >> initBullet)
+initBullet : Float -> Bullet
+initBullet i =
+    { position = vec -200 (i * 10)
+    , velocity = vec 10 10
+    , radius = 5
+    , color = white
+    }
 
 
 updateBullet : Computer -> Bullet -> Bullet
@@ -185,6 +181,7 @@ type alias Memory =
     { player : Player
     , turret : Turret
     , bullets : List Bullet
+    , ticks : Int
     }
 
 
@@ -192,7 +189,8 @@ initialMemory : Memory
 initialMemory =
     { player = initPlayer
     , turret = initTurret
-    , bullets = initBullets
+    , bullets = []
+    , ticks = 0
     }
 
 
@@ -201,10 +199,12 @@ update c model =
     let
         bullets =
             List.map (updateBullet c) model.bullets
+                |> when (always (modBy 60 model.ticks == 0)) ((::) (initBullet 0))
     in
     { model
         | player = updatePlayer c model.player
         , bullets = bullets
+        , ticks = model.ticks + 1
     }
 
 

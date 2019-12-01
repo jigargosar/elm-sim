@@ -119,13 +119,18 @@ type alias Bullet =
         }
 
 
-initBullet : Bullet
-initBullet =
-    { position = vec -200 0
-    , velocity = vec 10 10
-    , radius = 5
-    , color = white
-    }
+initBullets : List Bullet
+initBullets =
+    let
+        initBullet : Bullet
+        initBullet =
+            { position = vec -200 0
+            , velocity = vec 10 10
+            , radius = 5
+            , color = white
+            }
+    in
+    List.range 0 10 |> List.map (\_ -> initBullet)
 
 
 updateBullet : Computer -> Bullet -> Bullet
@@ -187,7 +192,7 @@ initialMemory : Memory
 initialMemory =
     { player = initPlayer
     , turret = initTurret
-    , bullets = [ initBullet ]
+    , bullets = initBullets
     }
 
 

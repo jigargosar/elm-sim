@@ -95,13 +95,21 @@ updatePlayer c player =
         |> applyVelocity
 
 
-renderPlayer : Player -> Shape
+renderPlayer : Player -> List Shape
 renderPlayer player =
     let
         ( x, y ) =
             toTuple player.position
+
+        remainingHealthRadius =
+            player.radius
+                * (toFloat (clamp 0 player.maxHealth player.health)
+                    / toFloat player.maxHealth
+                  )
     in
-    circle x y player.radius player.color
+    [ circle x y player.radius (withAlpha 0.5 player.color)
+    , circle x y remainingHealthRadius player.color
+    ]
 
 
 
@@ -267,16 +275,14 @@ renderBulletExplosions model =
         progress =
             clamp 0 model.maxTicks model.elapsed
                 / model.maxTicks
-                |> Debug.log "progress"
-                |> (-) 1
 
-        maxExtraRadius =
-            4
+        radius =
+            bullet.radius + (2 * progress)
+
+        color =
+            withAlpha (1 - progress) bullet.color
     in
-    circle x
-        y
-        bullet.radius
-        (withAlpha progress bullet.color)
+    circle x y radius color
 
 
 
@@ -418,8 +424,8 @@ handleCollision model =
 view : Computer -> Memory -> List Shape
 view _ model =
     renderPlayer model.player
-        :: renderTurret model.turret
-        :: List.map renderBullet model.bullets
+        ++ [ renderTurret model.turret ]
+        ++ List.map renderBullet model.bullets
         ++ List.map renderBulletExplosions model.bulletExplosions
 
 

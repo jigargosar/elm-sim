@@ -279,8 +279,11 @@ update c model =
 handleDeath : Memory -> Memory
 handleDeath model =
     let
-        ( bulletExplosions, bullets ) =
-            ( [], model.bullets )
+        ( bullets, deadBullets ) =
+            List.partition .isAlive model.bullets
+
+        bulletExplosions =
+            deadBullets ++ model.bulletExplosions
     in
     { model
         | bullets = bullets

@@ -28,6 +28,11 @@ applyFriction model =
     { model | velocity = multiply model.friction model.velocity }
 
 
+scaleVelocityBy : Float -> { a | velocity : Vec } -> { a | velocity : Vec }
+scaleVelocityBy scale model =
+    { model | velocity = multiply scale model.velocity }
+
+
 
 -- Player
 
@@ -186,7 +191,12 @@ updateBullet c player bullet =
                     vec (bounceVelocityPart screen.left screen.right x vx)
                         (bounceVelocityPart screen.top screen.bottom y vy)
             in
-            { model | velocity = velocity }
+            if velocity /= model.velocity then
+                { model | velocity = velocity }
+                    |> scaleVelocityBy model.bounceFriction
+
+            else
+                model
 
         applyVelocity : HasPositionVelocity a -> HasPositionVelocity a
         applyVelocity model =

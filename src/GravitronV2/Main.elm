@@ -195,10 +195,10 @@ initialMemory =
 
 
 addBulletEveryXSeconds : Int -> Int -> List Bullet -> List Bullet
-addBulletEveryXSeconds seconds ticks list =
+addBulletEveryXSeconds seconds ticks bullets =
     let
         bulletCount =
-            List.length list
+            List.length bullets
 
         maxBullets =
             10
@@ -210,10 +210,10 @@ addBulletEveryXSeconds seconds ticks list =
             period == 0 && bulletCount < maxBullets
     in
     if shouldAddBullet then
-        initBullet (toFloat bulletCount) :: list
+        initBullet (toFloat bulletCount) :: bullets
 
     else
-        list
+        bullets
 
 
 update : Computer -> Memory -> Memory

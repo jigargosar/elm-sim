@@ -25,6 +25,7 @@ type alias Player =
         , color : Color
         , springConstant : Float
         , friction : Float
+        , mass : Float
         }
 
 
@@ -36,6 +37,7 @@ initPlayer =
     , color = red
     , springConstant = 0.1
     , friction = 0.9
+    , mass = 20000
     }
 
 
@@ -133,6 +135,18 @@ initBullet position =
 updateBullet : Computer -> Player -> Bullet -> Bullet
 updateBullet c player bullet =
     let
+        applyGravityForce : Vec -> Float -> HasPositionVelocity a -> HasPositionVelocity a
+        applyGravityForce toPoint mass model =
+            let
+                force =
+                    vec0
+            in
+            applyForce force model
+
+        applyForce : Vec -> HasPositionVelocity a -> HasPositionVelocity a
+        applyForce force model =
+            { model | velocity = integrate force model.velocity }
+
         bounceWithinScreen : Screen -> Bullet -> Bullet
         bounceWithinScreen screen model =
             let
@@ -162,7 +176,10 @@ updateBullet c player bullet =
         applyVelocity model =
             { model | position = integrate model.position model.velocity }
     in
-    bullet |> bounceWithinScreen c.screen |> applyVelocity
+    bullet
+        |> bounceWithinScreen c.screen
+        |> applyGravityForce player.position player.mass
+        |> applyVelocity
 
 
 renderBullet : Bullet -> Shape

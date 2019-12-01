@@ -229,6 +229,10 @@ update c model =
         |> handleCollision c
 
 
+circleCircleCollision c1 c2 =
+    V.lenFrom c1.position c2.position <= c1.radius + c2.radius
+
+
 handleBulletCollision : List Bullet -> List Bullet -> List Bullet
 handleBulletCollision processed remaining =
     case remaining of
@@ -238,12 +242,23 @@ handleBulletCollision processed remaining =
         bullet :: [] ->
             bullet :: processed
 
-        bullet :: rest ->
-            if bullet.isAlive then
-                handleBulletCollision (bullet :: processed) rest
+        first :: rest ->
+            if first.isAlive then
+                let
+                    reducer b2 ( b1, acc ) =
+                        if circleCircleCollision b1 b2 then
+                            ( { b1 | isAlive = False }, { b2 | isAlive = False } :: acc )
+
+                        else
+                            ( b1, b2 :: acc )
+
+                    ( processedBullet, newRemaining ) =
+                        List.foldl reducer ( first, [] ) rest
+                in
+                handleBulletCollision (processedBullet :: processed) newRemaining
 
             else
-                handleBulletCollision (bullet :: processed) rest
+                handleBulletCollision (first :: processed) rest
 
 
 handleCollision : Computer -> Memory -> Memory

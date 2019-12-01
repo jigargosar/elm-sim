@@ -11,6 +11,8 @@ module GravitronV2.Vector2 exposing
     , getX
     , getY
     , integrate
+    , len
+    , lenFrom
     , map2
     , mapEach
     , mapX
@@ -173,3 +175,14 @@ springForceFrom a b k =
 apply : (Float -> Float -> a) -> Vec -> a
 apply func (Vec x y) =
     func x y
+
+
+lenFrom : Vec -> Vec -> Float
+lenFrom a b =
+    vecFrom a b
+        |> len
+
+
+len : Vec -> Float
+len (Vec x y) =
+    atan2 y x

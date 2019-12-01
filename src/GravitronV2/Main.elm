@@ -257,14 +257,17 @@ renderBulletExplosions model =
             model.bullet
 
         progress =
-            model.maxTicks
-                / model.elapsed
-                |> clamp 0 model.elapsed
+            clamp 0.0001 model.maxTicks model.elapsed
+                / model.maxTicks
+                |> Debug.log "progress"
 
         maxExtraRadius =
-            5
+            1
     in
-    circle x y (bullet.radius + (progress * maxExtraRadius)) (withAlpha progress bullet.color)
+    circle x
+        y
+        (bullet.radius + (progress * maxExtraRadius))
+        (withAlpha (1 - progress) bullet.color)
 
 
 

@@ -199,7 +199,7 @@ fireBullet : Int -> Vec -> List Bullet -> List Bullet
 fireBullet elapsedTicks position bullets =
     let
         fireBulletRate =
-            60
+            27
 
         bulletCount =
             List.length bullets

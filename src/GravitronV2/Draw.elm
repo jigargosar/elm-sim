@@ -9,6 +9,7 @@ module GravitronV2.Draw exposing
     , green
     , red
     , white
+    , withAlpha
     )
 
 import Browser
@@ -227,6 +228,16 @@ green =
 white : Color
 white =
     Color Color.white
+
+
+withAlpha : Float -> Color -> Color
+withAlpha alpha (Color c) =
+    Color.toRgba c |> setAlphaHelp alpha |> Color.fromRgba |> Color
+
+
+setAlphaHelp : a -> { b | alpha : a } -> { b | alpha : a }
+setAlphaHelp alpha rgba =
+    { rgba | alpha = alpha }
 
 
 render : Float -> Float -> Float -> Float -> Color -> List (Svg msg) -> Html msg

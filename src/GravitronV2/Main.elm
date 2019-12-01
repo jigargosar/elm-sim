@@ -256,7 +256,7 @@ renderBulletExplosions model =
         bullet =
             model.bullet
     in
-    circle x y bullet.radius bullet.color
+    circle x y bullet.radius (withAlpha 0.5 bullet.color)
 
 
 

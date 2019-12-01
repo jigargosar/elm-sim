@@ -138,8 +138,20 @@ updateBullet c player bullet =
         applyGravityForce : Vec -> Float -> HasPositionVelocity a -> HasPositionVelocity a
         applyGravityForce toPoint mass model =
             let
+                gv =
+                    V.vecFrom model.position toPoint
+
+                distanceSquared =
+                    V.len2 gv
+
+                mag =
+                    mass / distanceSquared
+
+                angle =
+                    V.angle gv
+
                 force =
-                    vec0
+                    V.fromRTheta mag angle
             in
             applyForce force model
 

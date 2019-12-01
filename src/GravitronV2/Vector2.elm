@@ -2,16 +2,19 @@ module GravitronV2.Vector2 exposing
     ( RecXY
     , Vec
     , add
+    , angle
     , apply2
     , dirOppX
     , dirOppY
     , dirX
     , dirY
+    , fromRTheta
     , fromRec
     , getX
     , getY
     , integrate
     , len
+    , len2
     , lenFrom
     , map2
     , mapEach
@@ -183,6 +186,22 @@ lenFrom a b =
         |> len
 
 
+len2 : Vec -> Float
+len2 (Vec x y) =
+    x ^ 2 + y ^ 2
+
+
 len : Vec -> Float
-len (Vec x y) =
-    x ^ 2 + y ^ 2 |> sqrt
+len =
+    len2 >> sqrt
+
+
+angle : Vec -> Float
+angle (Vec x y) =
+    atan2 y x
+
+
+fromRTheta : Float -> Float -> Vec
+fromRTheta r theta =
+    vec ((*) r (cos theta))
+        ((*) r (sin theta))

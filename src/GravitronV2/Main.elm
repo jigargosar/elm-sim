@@ -399,8 +399,8 @@ handleCollision model =
                 |> handlePlayerBulletsCollision model.player
     in
     { model
-        | bullets = bullets
-        , player = player
+        | player = player
+        , bullets = bullets
     }
 
 

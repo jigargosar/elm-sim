@@ -5,7 +5,7 @@ import GravitronV2.Vector2 exposing (..)
 
 
 
--- Particle
+-- Player
 
 
 type alias Player =

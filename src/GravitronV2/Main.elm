@@ -119,6 +119,7 @@ type alias Bullet =
         { radius : Float
         , color : Color
         , isAlive : Bool
+        , bounceFriction : Float
         }
 
 
@@ -129,6 +130,7 @@ initBullet position =
     , radius = 5
     , color = white
     , isAlive = True
+    , bounceFriction = 0.8
     }
 
 

@@ -195,8 +195,8 @@ initialMemory =
     }
 
 
-fireBulletAt : Int -> Int -> List Bullet -> List Bullet
-fireBulletAt rate elapsedTicks bullets =
+fireBulletPer : Int -> Int -> List Bullet -> List Bullet
+fireBulletPer rate elapsedTicks bullets =
     let
         bulletCount =
             List.length bullets
@@ -225,7 +225,7 @@ update c model =
 
         bullets =
             List.map (updateBullet c) model.bullets
-                |> fireBulletAt fireBulletRate model.elapsed
+                |> fireBulletPer fireBulletRate model.elapsed
     in
     { model
         | player = updatePlayer c model.player

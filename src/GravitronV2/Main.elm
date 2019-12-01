@@ -87,11 +87,6 @@ initialMemory =
 
 update : Computer -> Memory -> Memory
 update c model =
-    let
-        springPlayerTo : Vec
-        springPlayerTo =
-            fromRec c.mouse
-    in
     { model | player = updatePlayer c model.player }
 
 

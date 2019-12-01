@@ -1,8 +1,47 @@
 module GravitronV2.Main exposing (main)
 
 import GravitronV2.Draw exposing (..)
-import GravitronV2.Particle as P exposing (Particle)
 import GravitronV2.Vector2 exposing (..)
+
+
+type alias Particle =
+    { position : Vec
+    , velocity : Vec
+    , springConstant : Float
+    , friction : Float
+    }
+
+
+initParticle =
+    Particle (vec 0 0) (vec 0 0) 0.1 0.9
+
+
+updateParticle springPoint particle =
+    let
+        applyFriction : Float -> Particle -> Particle
+        applyFriction friction model =
+            { model | position = multiply friction model.velocity }
+
+        applySpringForceTowardsPoint : Vec -> Float -> Particle -> Particle
+        applySpringForceTowardsPoint toPoint k model =
+            let
+                force =
+                    springForceFrom model.position toPoint k
+            in
+            applyForce force model
+
+        applyForce : Vec -> Particle -> Particle
+        applyForce force model =
+            { model | velocity = integrate force model.velocity }
+
+        applyVelocity : Particle -> Particle
+        applyVelocity model =
+            { model | position = integrate model.position model.velocity }
+    in
+    particle
+        |> applySpringForceTowardsPoint springPoint particle.springConstant
+        |> applyFriction particle.friction
+        |> applyVelocity
 
 
 type alias Memory =
@@ -11,7 +50,7 @@ type alias Memory =
 
 initialMemory : Memory
 initialMemory =
-    P.fromPointVelocity (vec -150 0) vec1
+    initParticle
 
 
 update : Computer -> Memory -> Memory
@@ -20,19 +59,10 @@ update c model =
         springPoint =
             fromRec c.mouse
 
-        springConstant =
-            0.1
-
-        friction =
-            0.9
-
         particle =
             model
     in
-    particle
-        |> P.applySpringForceTowardsPoint springPoint springConstant
-        |> P.applyFriction friction
-        |> P.applyVelocity
+    updateParticle springPoint particle
 
 
 view : Computer -> Memory -> List Shape

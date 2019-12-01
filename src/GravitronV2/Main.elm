@@ -67,7 +67,7 @@ renderPlayer particle =
         xy =
             toRec particle.position
     in
-    circle xy.x xy.y 10 red
+    circle xy.x xy.y particle.radius particle.color
 
 
 
@@ -75,24 +75,27 @@ renderPlayer particle =
 
 
 type alias Memory =
-    { player : Player }
+    { player : Player
+    }
 
 
 initialMemory : Memory
 initialMemory =
-    { player =
-        initPlayer
+    { player = initPlayer
     }
 
 
 update : Computer -> Memory -> Memory
 update c model =
-    { model | player = updatePlayer c model.player }
+    { model
+        | player = updatePlayer c model.player
+    }
 
 
 view : Computer -> Memory -> List Shape
 view c model =
-    [ renderPlayer model.player ]
+    [ renderPlayer model.player
+    ]
 
 
 main : Game Memory

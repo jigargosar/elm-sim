@@ -399,7 +399,7 @@ handlePlayerBulletsCollision =
             else
                 ( player, bullet :: bulletList )
     in
-    \player bullets -> List.foldl reducer ( player, [] ) bullets
+    \player -> List.foldl reducer ( player, [] )
 
 
 handleCollision : Memory -> Memory

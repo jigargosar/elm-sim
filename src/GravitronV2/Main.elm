@@ -50,7 +50,7 @@ initPlayer =
     , color = red
     , springConstant = 0.1
     , friction = 0.5
-    , mass = 20000
+    , mass = 2000
     }
 
 
@@ -136,12 +136,12 @@ type alias Bullet =
 initBullet : Vec -> Bullet
 initBullet position =
     { position = position
-    , velocity = vec 5 5
+    , velocity = vec 10 10
     , radius = 5
     , color = white
     , isAlive = True
     , bounceFriction = 0.8
-    , friction = 0.9
+    , friction = 1
     }
 
 

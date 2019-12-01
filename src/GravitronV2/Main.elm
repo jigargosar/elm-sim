@@ -122,8 +122,8 @@ initBullet =
 updateBullet : Computer -> Bullet -> Bullet
 updateBullet c bullet =
     let
-        bounceOffScreen : Screen -> Bullet -> Bullet
-        bounceOffScreen screen model =
+        bounceWithinScreen : Screen -> Bullet -> Bullet
+        bounceWithinScreen screen model =
             let
                 bounceVelocityPart lo high positionPart velocityPart =
                     if
@@ -151,7 +151,7 @@ updateBullet c bullet =
         applyVelocity model =
             { model | position = integrate model.position model.velocity }
     in
-    bullet |> bounceOffScreen c.screen |> applyVelocity
+    bullet |> bounceWithinScreen c.screen |> applyVelocity
 
 
 renderBullet : Bullet -> Shape

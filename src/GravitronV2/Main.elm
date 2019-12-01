@@ -93,8 +93,8 @@ update c model =
 
 
 view : Computer -> Memory -> List Shape
-view c m =
-    [ renderPlayer m ]
+view c model =
+    [ renderPlayer model.player ]
 
 
 main : Game Memory

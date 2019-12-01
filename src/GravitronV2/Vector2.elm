@@ -10,6 +10,7 @@ module GravitronV2.Vector2 exposing
     , getX
     , getY
     , integrate
+    , map2
     , mapX
     , minus
     , multiply
@@ -44,6 +45,11 @@ getY (Vec _ y) =
 toTuple : Vec -> ( Float, Float )
 toTuple =
     apply Tuple.pair
+
+
+map2 : (Float -> Float -> Float) -> Vec -> Vec -> Vec
+map2 func (Vec xa ya) (Vec xb yb) =
+    vec (func xa xb) (func ya yb)
 
 
 vec : Float -> Float -> Vec
@@ -148,27 +154,6 @@ minus =
 springForceFrom : Vec -> Vec -> Float -> Vec
 springForceFrom a b k =
     vecFrom a b |> multiply k
-
-
-
-{-
-   len2 : Vec -> Vec -> Float
-   len2 a b =
-       subtract a b
-           |> mapEach ((^) 2)
-           |> apply2 (+)
-
-
-   len : Vec -> Vec -> Float
-   len a b =
-       len2 a b |> sqrt
--}
-{-
-   mapEach : (Float -> Float) -> Vec -> Vec
-   mapEach func (Vec x y) =
-       vec (func x) (func y)
-
--}
 
 
 apply : (Float -> Float -> a) -> Vec -> a

@@ -69,8 +69,8 @@ updatePlayer c player =
     in
     player
         |> applySpringForceTowardsPoint springPoint player.springConstant
-        |> applyFriction player.friction
         |> applyVelocity
+        |> applyFriction player.friction
 
 
 renderPlayer : Player -> Shape
@@ -139,6 +139,10 @@ initBullet position =
 updateBullet : Computer -> Player -> Bullet -> Bullet
 updateBullet c player bullet =
     let
+        applyFriction : Float -> Player -> Player
+        applyFriction friction model =
+            { model | velocity = multiply friction model.velocity }
+
         applyGravityForce : Vec -> Float -> HasPositionVelocity a -> HasPositionVelocity a
         applyGravityForce toPoint mass model =
             let

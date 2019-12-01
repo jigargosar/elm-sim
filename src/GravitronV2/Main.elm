@@ -123,8 +123,9 @@ update c model =
 
 
 view : Computer -> Memory -> List Shape
-view c model =
+view _ model =
     [ renderPlayer model.player
+    , renderTurret model.turret
     ]
 
 

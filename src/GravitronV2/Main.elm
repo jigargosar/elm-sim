@@ -247,11 +247,11 @@ isBulletExplosionAnimating model =
     model.elapsed < model.maxTicks
 
 
-renderBulletExplosions : BulletExplosion -> BulletExplosion
+renderBulletExplosions : BulletExplosion -> Shape
 renderBulletExplosions model =
     let
         ( x, y ) =
-            V.toTuple model.bullet.position
+            V.toTuple bullet.position
 
         bullet =
             model.bullet

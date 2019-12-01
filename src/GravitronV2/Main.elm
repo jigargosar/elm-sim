@@ -208,7 +208,7 @@ fireBulletAt periodInSeconds elapsedSeconds bullets =
             Basics.Extra.fractionalModBy periodInSeconds elapsedSeconds
 
         shouldAddBullet =
-            period == 0 && bulletCount < maxBullets
+            period < 0.0000001 && bulletCount < maxBullets
     in
     if shouldAddBullet then
         initBullet (toFloat bulletCount) :: bullets
@@ -227,13 +227,13 @@ update c model =
             List.map (updateBullet c) model.bullets
                 |> fireBulletAt fireBulletRate model.elapsed
 
-        ticksPerSecond =
+        secondsPerTick =
             1 / 60
     in
     { model
         | player = updatePlayer c model.player
         , bullets = bullets
-        , elapsed = model.elapsed + ticksPerSecond
+        , elapsed = model.elapsed + secondsPerTick
     }
 
 

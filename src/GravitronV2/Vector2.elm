@@ -137,7 +137,7 @@ setX =
 
 integrate : Vec -> Vec -> Vec
 integrate =
-    map2 (+)
+    map2 (flip (+))
 
 
 add : Vec -> Vec -> Vec

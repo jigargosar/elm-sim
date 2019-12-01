@@ -388,16 +388,16 @@ handleBulletsCollision processed remaining =
 
 
 handlePlayerBulletsCollision : Player -> List Bullet -> ( Player, List Bullet )
-handlePlayerBulletsCollision player bullets =
+handlePlayerBulletsCollision =
     let
-        reducer b ( p, acc ) =
-            if circleCircleCollision b p then
-                ( p, { b | isAlive = False } :: acc )
+        reducer bullet ( player, bulletList ) =
+            if circleCircleCollision bullet player then
+                ( { player | health = player.health - 1 }, { bullet | isAlive = False } :: bulletList )
 
             else
-                ( p, b :: acc )
+                ( player, bullet :: bulletList )
     in
-    List.foldl reducer ( player, [] ) bullets
+    \player bullets -> List.foldl reducer ( player, [] ) bullets
 
 
 handleCollision : Memory -> Memory

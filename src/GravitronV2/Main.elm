@@ -392,7 +392,9 @@ handlePlayerBulletsCollision =
     let
         reducer bullet ( player, bulletList ) =
             if circleCircleCollision bullet player then
-                ( { player | health = max 0 (player.health - 1) }, { bullet | isAlive = False } :: bulletList )
+                ( { player | health = max 0 (player.health - 1) }
+                , { bullet | isAlive = False } :: bulletList
+                )
 
             else
                 ( player, bullet :: bulletList )

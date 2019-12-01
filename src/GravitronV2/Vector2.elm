@@ -11,6 +11,7 @@ module GravitronV2.Vector2 exposing
     , getY
     , integrate
     , map2
+    , mapEach
     , mapX
     , minus
     , multiply
@@ -50,6 +51,11 @@ toTuple =
 map2 : (Float -> Float -> Float) -> Vec -> Vec -> Vec
 map2 func (Vec xa ya) (Vec xb yb) =
     vec (func xa xb) (func ya yb)
+
+
+mapEach : (Float -> Float) -> Vec -> Vec
+mapEach func (Vec x y) =
+    vec (func x) (func y)
 
 
 vec : Float -> Float -> Vec
@@ -93,8 +99,8 @@ opp =
 
 
 multiply : Float -> Vec -> Vec
-multiply s (Vec x y) =
-    vec (x * s) (y * s)
+multiply s =
+    mapEach (\n -> n * s)
 
 
 fromRec : { a | x : Float, y : Float } -> Vec
@@ -122,8 +128,8 @@ setX =
 
 
 integrate : Vec -> Vec -> Vec
-integrate (Vec x1 y1) (Vec x2 y2) =
-    vec (x1 + x2) (y1 + y2)
+integrate =
+    map2 (+)
 
 
 add : Vec -> Vec -> Vec

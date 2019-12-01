@@ -121,9 +121,9 @@ type alias Bullet =
         }
 
 
-initBullet : Float -> Bullet
-initBullet i =
-    { position = vec -200 (i * 10)
+initBullet : Vec -> Bullet
+initBullet position =
+    { position = position
     , velocity = vec 10 10
     , radius = 5
     , color = white
@@ -195,8 +195,8 @@ initialMemory =
     }
 
 
-fireBulletPer : Int -> Int -> List Bullet -> List Bullet
-fireBulletPer rate elapsedTicks bullets =
+fireBulletPer : Int -> Int -> Vec -> List Bullet -> List Bullet
+fireBulletPer rate elapsedTicks position bullets =
     let
         bulletCount =
             List.length bullets
@@ -211,7 +211,7 @@ fireBulletPer rate elapsedTicks bullets =
             period == 0 && bulletCount < maxBullets
     in
     if shouldAddBullet then
-        initBullet (toFloat bulletCount) :: bullets
+        initBullet position :: bullets
 
     else
         bullets
@@ -225,7 +225,7 @@ update c model =
 
         bullets =
             List.map (updateBullet c) model.bullets
-                |> fireBulletPer fireBulletRate model.elapsed
+                |> fireBulletPer fireBulletRate model.elapsed model.turret.position
     in
     { model
         | player = updatePlayer c model.player

@@ -122,15 +122,15 @@ type alias Bullet =
 initBullets : List Bullet
 initBullets =
     let
-        initBullet : Bullet
-        initBullet =
-            { position = vec -200 0
+        initBullet : Float -> Bullet
+        initBullet i =
+            { position = vec -200 (i * 10)
             , velocity = vec 10 10
             , radius = 5
             , color = white
             }
     in
-    List.range 0 10 |> List.map (\_ -> initBullet)
+    List.range 0 10 |> List.map (toFloat >> initBullet)
 
 
 updateBullet : Computer -> Bullet -> Bullet

@@ -4,16 +4,29 @@ import GravitronV2.Draw exposing (..)
 import GravitronV2.Vector2 exposing (..)
 
 
+
+-- Particle
+
+
 type alias Particle =
     { position : Vec
     , velocity : Vec
+    , radius : Float
+    , color : Color
     , springConstant : Float
     , friction : Float
     }
 
 
+initParticle : Particle
 initParticle =
-    Particle (vec 0 0) (vec 0 0) 0.1 0.9
+    { position = vec0
+    , velocity = vec0
+    , radius = 10
+    , color = red
+    , springConstant = 0.1
+    , friction = 0.9
+    }
 
 
 updateParticle : Vec -> Particle -> Particle
@@ -45,6 +58,19 @@ updateParticle springPoint particle =
         |> applyVelocity
 
 
+renderParticle : Particle -> Shape
+renderParticle particle =
+    let
+        xy =
+            toRec particle.position
+    in
+    circle xy.x xy.y 10 red
+
+
+
+-- Game
+
+
 type alias Memory =
     Particle
 
@@ -68,11 +94,7 @@ update c model =
 
 view : Computer -> Memory -> List Shape
 view c m =
-    let
-        xy =
-            toRec m.position
-    in
-    [ circle xy.x xy.y 10 red ]
+    [ renderParticle m ]
 
 
 main : Game Memory

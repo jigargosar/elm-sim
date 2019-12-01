@@ -5,17 +5,27 @@ import GravitronV2.Vector2 as V exposing (..)
 
 
 
+-- Common
+
+
+type alias HasPositionVelocity a =
+    { a
+        | position : Vec
+        , velocity : Vec
+    }
+
+
+
 -- Player
 
 
 type alias Player =
-    { position : Vec
-    , velocity : Vec
-    , radius : Float
-    , color : Color
-    , springConstant : Float
-    , friction : Float
-    }
+    HasPositionVelocity
+        { radius : Float
+        , color : Color
+        , springConstant : Float
+        , friction : Float
+        }
 
 
 initPlayer : Player
@@ -103,11 +113,10 @@ renderTurret turret =
 
 
 type alias Bullet =
-    { position : Vec
-    , velocity : Vec
-    , radius : Float
-    , color : Color
-    }
+    HasPositionVelocity
+        { radius : Float
+        , color : Color
+        }
 
 
 initBullet : Bullet

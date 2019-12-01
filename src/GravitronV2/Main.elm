@@ -325,7 +325,7 @@ handleCollision _ model =
                 |> handlePlayerBulletsCollision model.player
     in
     { model
-        | bullets = bullets |> List.filter .isAlive
+        | bullets = bullets
         , player = player
     }
 

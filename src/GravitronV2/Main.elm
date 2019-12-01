@@ -195,7 +195,7 @@ initialMemory =
 
 
 addBulletEveryXSeconds : Int -> Int -> List Bullet -> List Bullet
-addBulletEveryXSeconds seconds ticks bullets =
+addBulletEveryXSeconds periodInSeconds ticks bullets =
     let
         bulletCount =
             List.length bullets
@@ -204,7 +204,7 @@ addBulletEveryXSeconds seconds ticks bullets =
             10
 
         period =
-            modBy (seconds * 60) ticks
+            modBy (periodInSeconds * 60) ticks
 
         shouldAddBullet =
             period == 0 && bulletCount < maxBullets

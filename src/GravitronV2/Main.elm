@@ -8,7 +8,7 @@ import GravitronV2.Vector2 exposing (..)
 -- Particle
 
 
-type alias Particle =
+type alias Player =
     { position : Vec
     , velocity : Vec
     , radius : Float
@@ -18,8 +18,8 @@ type alias Particle =
     }
 
 
-initParticle : Particle
-initParticle =
+initPlayer : Player
+initPlayer =
     { position = vec0
     , velocity = vec0
     , radius = 10
@@ -29,14 +29,14 @@ initParticle =
     }
 
 
-updateParticle : Vec -> Particle -> Particle
-updateParticle springPoint particle =
+updatePlayer : Vec -> Player -> Player
+updatePlayer springPoint particle =
     let
-        applyFriction : Float -> Particle -> Particle
+        applyFriction : Float -> Player -> Player
         applyFriction friction model =
             { model | position = multiply friction model.velocity }
 
-        applySpringForceTowardsPoint : Vec -> Float -> Particle -> Particle
+        applySpringForceTowardsPoint : Vec -> Float -> Player -> Player
         applySpringForceTowardsPoint toPoint k model =
             let
                 force =
@@ -44,11 +44,11 @@ updateParticle springPoint particle =
             in
             applyForce force model
 
-        applyForce : Vec -> Particle -> Particle
+        applyForce : Vec -> Player -> Player
         applyForce force model =
             { model | velocity = integrate force model.velocity }
 
-        applyVelocity : Particle -> Particle
+        applyVelocity : Player -> Player
         applyVelocity model =
             { model | position = integrate model.position model.velocity }
     in
@@ -58,8 +58,8 @@ updateParticle springPoint particle =
         |> applyVelocity
 
 
-renderParticle : Particle -> Shape
-renderParticle particle =
+renderPlayer : Player -> Shape
+renderPlayer particle =
     let
         xy =
             toRec particle.position
@@ -72,12 +72,12 @@ renderParticle particle =
 
 
 type alias Memory =
-    Particle
+    Player
 
 
 initialMemory : Memory
 initialMemory =
-    initParticle
+    initPlayer
 
 
 update : Computer -> Memory -> Memory
@@ -89,12 +89,12 @@ update c model =
         particle =
             model
     in
-    updateParticle springPoint particle
+    updatePlayer springPoint particle
 
 
 view : Computer -> Memory -> List Shape
 view c m =
-    [ renderParticle m ]
+    [ renderPlayer m ]
 
 
 main : Game Memory

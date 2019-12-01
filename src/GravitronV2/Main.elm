@@ -198,9 +198,13 @@ initialMemory =
 
 update : Computer -> Memory -> Memory
 update c model =
+    let
+        bullets =
+            List.map (updateBullet c) model.bullets
+    in
     { model
         | player = updatePlayer c model.player
-        , bullets = List.map (updateBullet c) model.bullets
+        , bullets = bullets
     }
 
 

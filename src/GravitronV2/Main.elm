@@ -224,12 +224,12 @@ update c model =
     let
         bullets =
             List.map (updateBullet c) model.bullets
-                |> addBulletEveryXSeconds 1 model.ticks
+                |> addBulletEveryXSeconds 5 model.ticks
     in
     { model
         | player = updatePlayer c model.player
         , bullets = bullets
-        , ticks = model.ticks + 5
+        , ticks = model.ticks + 1
     }
 
 

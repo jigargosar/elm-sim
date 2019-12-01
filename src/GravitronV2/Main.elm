@@ -125,35 +125,25 @@ updateBullet c bullet =
         bounceOffScreen : Screen -> Bullet -> Bullet
         bounceOffScreen screen model =
             let
-                xy =
-                    toRec model.position
-
-                vxy =
-                    toRec model.velocity
-
-                bounceX left right x vx =
-                    if x < left && vx < 0 then
-                        negate vx
-
-                    else if x > right && vx > 0 then
-                        negate vx
+                bounceVelocityPart lo high positionPart velocityPart =
+                    if
+                        (positionPart < lo && velocityPart < 0)
+                            || (positionPart > high && velocityPart > 0)
+                    then
+                        negate velocityPart
 
                     else
-                        vx
+                        velocityPart
 
-                bounceY top bottom y vy =
-                    if y < top && vy < 0 then
-                        negate vy
+                ( x, y ) =
+                    V.toTuple model.position
 
-                    else if y > bottom && vy > 0 then
-                        negate vy
-
-                    else
-                        vy
+                ( vx, vy ) =
+                    V.toTuple model.velocity
 
                 velocity =
-                    vec (bounceX screen.left screen.right xy.x vxy.x)
-                        (bounceY screen.top screen.bottom xy.y vxy.y)
+                    vec (bounceVelocityPart screen.left screen.right x vx)
+                        (bounceVelocityPart screen.top screen.bottom y vy)
             in
             { model | velocity = velocity }
 

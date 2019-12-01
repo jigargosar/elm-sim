@@ -219,6 +219,25 @@ renderBullet bullet =
 
 
 
+-- BulletExplosion
+
+
+type alias BulletExplosion =
+    { bullet : Bullet
+    , maxTicks : Int
+    , elapsed : Int
+    }
+
+
+explosionFromBullet : Bullet -> BulletExplosion
+explosionFromBullet bullet =
+    { bullet = bullet
+    , maxTicks = 60
+    , elapsed = 0
+    }
+
+
+
 -- Game
 
 
@@ -227,7 +246,7 @@ type alias Memory =
     , turret : Turret
     , bullets : List Bullet
     , elapsed : Int
-    , bulletExplosions : List Bullet
+    , bulletExplosions : List BulletExplosion
     }
 
 
@@ -283,7 +302,7 @@ handleDeath model =
             List.partition .isAlive model.bullets
 
         bulletExplosions =
-            deadBullets ++ model.bulletExplosions
+            List.map explosionFromBullet deadBullets ++ model.bulletExplosions
     in
     { model
         | bullets = bullets

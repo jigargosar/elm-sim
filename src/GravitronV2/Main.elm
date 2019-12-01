@@ -130,8 +130,8 @@ initBullet position =
     }
 
 
-updateBullet : Computer -> Bullet -> Bullet
-updateBullet c bullet =
+updateBullet : Computer -> Player -> Bullet -> Bullet
+updateBullet c player bullet =
     let
         bounceWithinScreen : Screen -> Bullet -> Bullet
         bounceWithinScreen screen model =
@@ -222,7 +222,7 @@ update c model =
     { model
         | player = updatePlayer c model.player
         , bullets =
-            List.map (updateBullet c) model.bullets
+            List.map (updateBullet c model.player) model.bullets
                 |> fireBullet model.elapsed model.turret.position
         , elapsed = model.elapsed + 1
     }

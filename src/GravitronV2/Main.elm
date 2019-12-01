@@ -247,6 +247,17 @@ isBulletExplosionAnimating model =
     model.elapsed < model.maxTicks
 
 
+renderBulletExplosions model =
+    let
+        ( x, y ) =
+            V.toTuple model.bullet.position
+
+        bullet =
+            model.bullet
+    in
+    circle x y bullet.radius bullet.color
+
+
 
 -- Game
 
@@ -385,6 +396,7 @@ view _ model =
     renderPlayer model.player
         :: renderTurret model.turret
         :: List.map renderBullet model.bullets
+        ++ List.map renderBulletExplosions model.bulletExplosions
 
 
 main : Game Memory

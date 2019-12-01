@@ -227,6 +227,7 @@ type alias Memory =
     , turret : Turret
     , bullets : List Bullet
     , elapsed : Int
+    , bulletExplosions : List Bullet
     }
 
 
@@ -236,6 +237,7 @@ initialMemory =
     , turret = initTurret
     , bullets = []
     , elapsed = 0
+    , bulletExplosions = []
     }
 
 
@@ -270,7 +272,20 @@ update c model =
                 |> fireBullet model.elapsed model.turret.position
         , elapsed = model.elapsed + 1
     }
-        |> handleCollision c
+        |> handleCollision
+        |> handleDeath
+
+
+handleDeath : Memory -> Memory
+handleDeath model =
+    let
+        ( bulletExplosions, bullets ) =
+            ( [], model.bullets )
+    in
+    { model
+        | bullets = bullets
+        , bulletExplosions = bulletExplosions
+    }
 
 
 circleCircleCollision c1 c2 =
@@ -317,8 +332,8 @@ handlePlayerBulletsCollision player bullets =
     List.foldl reducer ( player, [] ) bullets
 
 
-handleCollision : Computer -> Memory -> Memory
-handleCollision _ model =
+handleCollision : Memory -> Memory
+handleCollision model =
     let
         ( player, bullets ) =
             handleBulletsCollision [] model.bullets

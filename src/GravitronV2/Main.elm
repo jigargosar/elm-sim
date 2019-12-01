@@ -58,7 +58,7 @@ updatePlayer c player =
         applyForce force model =
             { model | velocity = integrate force model.velocity }
 
-        applyVelocity : Player -> Player
+        applyVelocity : HasPositionVelocity a -> HasPositionVelocity a
         applyVelocity model =
             { model | position = integrate model.position model.velocity }
 
@@ -156,7 +156,7 @@ updateBullet c bullet =
             in
             { model | velocity = velocity }
 
-        applyVelocity : Bullet -> Bullet
+        applyVelocity : HasPositionVelocity a -> HasPositionVelocity a
         applyVelocity model =
             { model | position = integrate model.position model.velocity }
     in

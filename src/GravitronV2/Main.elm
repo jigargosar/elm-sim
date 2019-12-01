@@ -224,8 +224,8 @@ renderBullet bullet =
 
 type alias BulletExplosion =
     { bullet : Bullet
-    , maxTicks : Int
-    , elapsed : Int
+    , maxTicks : Float
+    , elapsed : Float
     }
 
 
@@ -255,8 +255,16 @@ renderBulletExplosions model =
 
         bullet =
             model.bullet
+
+        progress =
+            model.maxTicks
+                / model.elapsed
+                |> clamp 0 model.elapsed
+
+        maxExtraRadius =
+            5
     in
-    circle x y bullet.radius (withAlpha 0.5 bullet.color)
+    circle x y (bullet.radius + (progress * maxExtraRadius)) (withAlpha progress bullet.color)
 
 
 

@@ -15,6 +15,14 @@ type alias HasPositionVelocity a =
     }
 
 
+type alias HasFriction a =
+    { a | friction : Float }
+
+
+type alias HasPositionVelocityFriction a =
+    HasPositionVelocity (HasFriction a)
+
+
 
 -- Player
 
@@ -139,9 +147,9 @@ initBullet position =
 updateBullet : Computer -> Player -> Bullet -> Bullet
 updateBullet c player bullet =
     let
-        applyFriction : Float -> Player -> Player
-        applyFriction friction model =
-            { model | velocity = multiply friction model.velocity }
+        applyFriction : HasPositionVelocityFriction a -> HasPositionVelocityFriction a
+        applyFriction model =
+            { model | position = multiply model.friction model.velocity }
 
         applyGravityForce : Vec -> Float -> HasPositionVelocity a -> HasPositionVelocity a
         applyGravityForce toPoint mass model =
@@ -191,6 +199,7 @@ updateBullet c player bullet =
         |> bounceWithinScreen c.screen
         |> applyGravityForce player.position player.mass
         |> applyVelocity
+        |> applyFriction
 
 
 renderBullet : Bullet -> Shape

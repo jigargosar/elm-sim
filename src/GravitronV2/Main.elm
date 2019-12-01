@@ -44,11 +44,17 @@ type alias Player =
         , springConstant : Float
         , friction : Float
         , mass : Float
+        , health : Int
+        , maxHealth : Int
         }
 
 
 initPlayer : Player
 initPlayer =
+    let
+        maxHealth =
+            100
+    in
     { position = vec0
     , velocity = vec0
     , radius = 10
@@ -56,6 +62,8 @@ initPlayer =
     , springConstant = 0.1
     , friction = 0.5
     , mass = 2000
+    , health = maxHealth
+    , maxHealth = maxHealth
     }
 
 

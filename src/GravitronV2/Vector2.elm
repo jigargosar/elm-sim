@@ -143,8 +143,8 @@ plus =
 
 
 subtract : Vec -> Vec -> Vec
-subtract (Vec xa ya) (Vec xb yb) =
-    vec (xb - xa) (yb - ya)
+subtract =
+    map2 (-)
 
 
 vecFrom : Vec -> Vec -> Vec

@@ -226,6 +226,11 @@ update c model =
                 |> fireBullet model.elapsed model.turret.position
         , elapsed = model.elapsed + 1
     }
+        |> handleCollision c
+
+
+handleCollision c model =
+    model
 
 
 view : Computer -> Memory -> List Shape

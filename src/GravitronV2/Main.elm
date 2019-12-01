@@ -141,7 +141,7 @@ type alias Bullet =
 initBullet : Vec -> Bullet
 initBullet position =
     { position = position
-    , velocity = vec 10 10
+    , velocity = vec 5 5
     , radius = 5
     , color = white
     , isAlive = True
@@ -304,7 +304,7 @@ fireBullet elapsedTicks position bullets =
             List.length bullets
 
         maxBullets =
-            10
+            100
 
         shouldAddBullet =
             modBy fireBulletRate elapsedTicks == 0 && bulletCount < maxBullets

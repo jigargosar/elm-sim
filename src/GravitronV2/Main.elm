@@ -229,7 +229,7 @@ update c model =
     { model
         | player = updatePlayer c model.player
         , bullets = bullets
-        , ticks = model.ticks + 1
+        , ticks = model.ticks + 5
     }
 
 

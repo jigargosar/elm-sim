@@ -62,12 +62,12 @@ updatePlayer c particle =
 
 
 renderPlayer : Player -> Shape
-renderPlayer particle =
+renderPlayer player =
     let
         xy =
-            toRec particle.position
+            toRec player.position
     in
-    circle xy.x xy.y particle.radius particle.color
+    circle xy.x xy.y player.radius player.color
 
 
 

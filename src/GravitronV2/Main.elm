@@ -219,14 +219,11 @@ fireBullet elapsedTicks position bullets =
 
 update : Computer -> Memory -> Memory
 update c model =
-    let
-        bullets =
-            List.map (updateBullet c) model.bullets
-                |> fireBullet model.elapsed model.turret.position
-    in
     { model
         | player = updatePlayer c model.player
-        , bullets = bullets
+        , bullets =
+            List.map (updateBullet c) model.bullets
+                |> fireBullet model.elapsed model.turret.position
         , elapsed = model.elapsed + 1
     }
 

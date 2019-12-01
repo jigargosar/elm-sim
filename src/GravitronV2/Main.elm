@@ -83,7 +83,7 @@ type alias Turret =
 
 initTurret : Turret
 initTurret =
-    { position = vec -100 0
+    { position = vec -200 0
     , radius = 10
     , color = green
     }

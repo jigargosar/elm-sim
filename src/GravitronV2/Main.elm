@@ -30,7 +30,7 @@ initPlayer =
 
 
 updatePlayer : Computer -> Player -> Player
-updatePlayer c particle =
+updatePlayer c player =
     let
         applyFriction : Float -> Player -> Player
         applyFriction friction model =
@@ -55,9 +55,9 @@ updatePlayer c particle =
         springPoint =
             fromRec c.mouse
     in
-    particle
-        |> applySpringForceTowardsPoint springPoint particle.springConstant
-        |> applyFriction particle.friction
+    player
+        |> applySpringForceTowardsPoint springPoint player.springConstant
+        |> applyFriction player.friction
         |> applyVelocity
 
 
@@ -99,12 +99,53 @@ renderTurret turret =
 
 
 
+-- Bullet
+
+
+type alias Bullet =
+    { position : Vec
+    , velocity : Vec
+    , radius : Float
+    , color : Color
+    }
+
+
+initBullet : Bullet
+initBullet =
+    { position = vec -200 0
+    , velocity = vec1
+    , radius = 5
+    , color = white
+    }
+
+
+updateBullet : Bullet -> Bullet
+updateBullet bullet =
+    let
+        applyVelocity : Bullet -> Bullet
+        applyVelocity model =
+            { model | position = integrate model.position model.velocity }
+    in
+    bullet |> applyVelocity
+
+
+renderBullet : Bullet -> Shape
+renderBullet bullet =
+    let
+        xy =
+            toRec bullet.position
+    in
+    circle xy.x xy.y bullet.radius bullet.color
+
+
+
 -- Game
 
 
 type alias Memory =
     { player : Player
     , turret : Turret
+    , bullet : Bullet
     }
 
 
@@ -112,6 +153,7 @@ initialMemory : Memory
 initialMemory =
     { player = initPlayer
     , turret = initTurret
+    , bullet = initBullet
     }
 
 
@@ -119,6 +161,7 @@ update : Computer -> Memory -> Memory
 update c model =
     { model
         | player = updatePlayer c model.player
+        , bullet = updateBullet model.bullet
     }
 
 
@@ -126,6 +169,7 @@ view : Computer -> Memory -> List Shape
 view _ model =
     [ renderPlayer model.player
     , renderTurret model.turret
+    , renderBullet model.bullet
     ]
 
 

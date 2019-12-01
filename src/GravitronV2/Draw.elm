@@ -1,4 +1,4 @@
-module GravitronV2.Draw exposing (Color, Computer, Game, Shape, circle, game, green, red)
+module GravitronV2.Draw exposing (Color, Computer, Game, Shape, circle, game, green, red, white)
 
 import Browser
 import Browser.Dom
@@ -211,6 +211,11 @@ red =
 green : Color
 green =
     Color Color.green
+
+
+white : Color
+white =
+    Color Color.white
 
 
 render : Float -> Float -> Float -> Float -> Color -> List (Svg msg) -> Html msg

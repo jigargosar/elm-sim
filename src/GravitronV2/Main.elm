@@ -49,7 +49,7 @@ initPlayer =
     , radius = 10
     , color = red
     , springConstant = 0.1
-    , friction = 0.9
+    , friction = 0.5
     , mass = 20000
     }
 

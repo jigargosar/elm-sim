@@ -263,7 +263,11 @@ handleBulletCollision processed remaining =
 
 handleCollision : Computer -> Memory -> Memory
 handleCollision _ model =
-    { model | bullets = handleBulletCollision [] model.bullets }
+    { model
+        | bullets =
+            handleBulletCollision [] model.bullets
+                |> List.filter .isAlive
+    }
 
 
 view : Computer -> Memory -> List Shape

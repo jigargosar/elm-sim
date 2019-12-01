@@ -72,24 +72,24 @@ renderPlayer particle =
 
 
 type alias Memory =
-    Player
+    { player : Player }
 
 
 initialMemory : Memory
 initialMemory =
-    initPlayer
+    { player =
+        initPlayer
+    }
 
 
 update : Computer -> Memory -> Memory
 update c model =
     let
-        springPoint =
+        springPlayerTo : Vec
+        springPlayerTo =
             fromRec c.mouse
-
-        particle =
-            model
     in
-    updatePlayer springPoint particle
+    { model | player = updatePlayer springPlayerTo model.player }
 
 
 view : Computer -> Memory -> List Shape

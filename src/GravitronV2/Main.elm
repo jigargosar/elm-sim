@@ -237,6 +237,16 @@ explosionFromBullet bullet =
     }
 
 
+updateBulletExplosion : BulletExplosion -> BulletExplosion
+updateBulletExplosion model =
+    { model | elapsed = model.elapsed + 1 }
+
+
+isBulletExplosionAnimating : BulletExplosion -> Bool
+isBulletExplosionAnimating model =
+    model.elapsed < model.maxTicks
+
+
 
 -- Game
 
@@ -289,6 +299,7 @@ update c model =
         , bullets =
             List.map (updateBullet c model.player) model.bullets
                 |> fireBullet model.elapsed model.turret.position
+        , bulletExplosions = List.map updateBulletExplosion model.bulletExplosions
         , elapsed = model.elapsed + 1
     }
         |> handleCollision
@@ -302,7 +313,9 @@ handleDeath model =
             List.partition .isAlive model.bullets
 
         bulletExplosions =
-            List.map explosionFromBullet deadBullets ++ model.bulletExplosions
+            List.map explosionFromBullet deadBullets
+                ++ model.bulletExplosions
+                |> List.filter isBulletExplosionAnimating
     in
     { model
         | bullets = bullets

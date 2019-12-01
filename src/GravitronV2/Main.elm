@@ -23,6 +23,11 @@ type alias HasPositionVelocityFriction a =
     HasPositionVelocity (HasFriction a)
 
 
+applyFriction : HasPositionVelocityFriction a -> HasPositionVelocityFriction a
+applyFriction model =
+    { model | position = multiply model.friction model.velocity }
+
+
 
 -- Player
 
@@ -52,10 +57,6 @@ initPlayer =
 updatePlayer : Computer -> Player -> Player
 updatePlayer c player =
     let
-        applyFriction : Float -> Player -> Player
-        applyFriction friction model =
-            { model | position = multiply friction model.velocity }
-
         applySpringForceTowardsPoint : Vec -> Float -> Player -> Player
         applySpringForceTowardsPoint toPoint k model =
             let
@@ -78,7 +79,7 @@ updatePlayer c player =
     player
         |> applySpringForceTowardsPoint springPoint player.springConstant
         |> applyVelocity
-        |> applyFriction player.friction
+        |> applyFriction
 
 
 renderPlayer : Player -> Shape
@@ -147,10 +148,6 @@ initBullet position =
 updateBullet : Computer -> Player -> Bullet -> Bullet
 updateBullet c player bullet =
     let
-        applyFriction : HasPositionVelocityFriction a -> HasPositionVelocityFriction a
-        applyFriction model =
-            { model | position = multiply model.friction model.velocity }
-
         applyGravityForce : Vec -> Float -> HasPositionVelocity a -> HasPositionVelocity a
         applyGravityForce toPoint mass model =
             let

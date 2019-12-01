@@ -32,9 +32,6 @@ initPlayer =
 updatePlayer : Computer -> Player -> Player
 updatePlayer c particle =
     let
-        springPoint =
-            fromRec c.mouse
-
         applyFriction : Float -> Player -> Player
         applyFriction friction model =
             { model | position = multiply friction model.velocity }
@@ -54,6 +51,9 @@ updatePlayer c particle =
         applyVelocity : Player -> Player
         applyVelocity model =
             { model | position = integrate model.position model.velocity }
+
+        springPoint =
+            fromRec c.mouse
     in
     particle
         |> applySpringForceTowardsPoint springPoint particle.springConstant

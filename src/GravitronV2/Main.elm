@@ -240,25 +240,25 @@ handleBulletCollision processed remaining =
             processed
 
         bullet :: [] ->
-            processed ++ [ bullet ]
+            bullet :: processed
 
         first :: rest ->
             if first.isAlive then
                 let
                     reducer b2 ( b1, acc ) =
                         if circleCircleCollision b1 b2 then
-                            ( { b1 | isAlive = False }, acc ++ [ { b2 | isAlive = False } ] )
+                            ( { b1 | isAlive = False }, { b2 | isAlive = False } :: acc )
 
                         else
-                            ( b1, acc ++ [ b2 ] )
+                            ( b1, b2 :: acc )
 
                     ( processedBullet, newRemaining ) =
                         List.foldl reducer ( first, [] ) rest
                 in
-                handleBulletCollision (processed ++ [ processedBullet ]) newRemaining
+                handleBulletCollision (processedBullet :: processed) newRemaining
 
             else
-                handleBulletCollision (processed ++ [ first ]) rest
+                handleBulletCollision (first :: processed) rest
 
 
 handleCollision : Computer -> Memory -> Memory

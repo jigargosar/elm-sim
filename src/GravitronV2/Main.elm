@@ -194,6 +194,7 @@ initialMemory =
     }
 
 
+addBulletEveryXSeconds : Int -> Int -> List Bullet -> List Bullet
 addBulletEveryXSeconds seconds ticks list =
     let
         bulletCount =

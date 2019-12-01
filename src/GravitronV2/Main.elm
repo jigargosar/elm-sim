@@ -71,17 +71,47 @@ renderPlayer player =
 
 
 
+-- Turret
+
+
+type alias Turret =
+    { position : Vec
+    , radius : Float
+    , color : Color
+    }
+
+
+initTurret : Turret
+initTurret =
+    { position = vec -100 0
+    , radius = 10
+    , color = green
+    }
+
+
+renderTurret : Turret -> Shape
+renderTurret turret =
+    let
+        xy =
+            toRec turret.position
+    in
+    circle xy.x xy.y turret.radius turret.color
+
+
+
 -- Game
 
 
 type alias Memory =
     { player : Player
+    , turret : Turret
     }
 
 
 initialMemory : Memory
 initialMemory =
     { player = initPlayer
+    , turret = initTurret
     }
 
 

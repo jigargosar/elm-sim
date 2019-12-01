@@ -379,6 +379,7 @@ handleBulletsCollision processed remaining =
                 handleBulletsCollision (first :: processed) rest
 
 
+handlePlayerBulletsCollision : Player -> List Bullet -> ( Player, List Bullet )
 handlePlayerBulletsCollision player bullets =
     let
         reducer b ( p, bArr ) =

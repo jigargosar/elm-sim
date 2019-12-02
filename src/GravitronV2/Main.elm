@@ -45,14 +45,14 @@ type alias HasPositionVelocityFriction a =
     HasPositionVelocity (HasFriction a)
 
 
-applyFriction : HasPositionVelocityFriction a -> HasPositionVelocityFriction a
-applyFriction model =
-    { model | velocity = multiply model.friction model.velocity }
+applyScalarForce : Float -> { a | velocity : Vec } -> { a | velocity : Vec }
+applyScalarForce force model =
+    { model | velocity = V.multiply force model.velocity }
 
 
-scaleVelocityBy : Float -> { a | velocity : Vec } -> { a | velocity : Vec }
-scaleVelocityBy scale model =
-    { model | velocity = multiply scale model.velocity }
+applyInternalFrictionForce : HasPositionVelocityFriction a -> HasPositionVelocityFriction a
+applyInternalFrictionForce model =
+    applyScalarForce model.friction model
 
 
 
@@ -113,7 +113,7 @@ updatePlayer c player =
     in
     player
         |> applySpringForceTowardsPoint springPoint player.springConstant
-        |> applyFriction
+        |> applyInternalFrictionForce
         |> applyVelocity
 
 
@@ -231,7 +231,7 @@ updateBullet c player bullet =
             in
             if velocity /= model.velocity then
                 { model | velocity = velocity }
-                    |> scaleVelocityBy model.bounceFriction
+                    |> applyScalarForce model.bounceFriction
 
             else
                 model
@@ -244,7 +244,7 @@ updateBullet c player bullet =
         |> bounceWithinScreen c.screen
         |> applyGravityForce player.position player.mass
         |> applyVelocity
-        |> applyFriction
+        |> applyInternalFrictionForce
 
 
 renderBullet : Bullet -> Shape

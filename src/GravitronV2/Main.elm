@@ -5,7 +5,29 @@ import GravitronV2.Vector2 as V exposing (..)
 
 
 
--- Common
+-- Unit Interfaces
+
+
+type alias HasPosition a =
+    { a
+        | position : Vec
+    }
+
+
+type alias HasVelocity a =
+    { a | velocity : Vec }
+
+
+type alias HasRadius a =
+    { a | radius : Float }
+
+
+
+-- CombinationInterfaces
+
+
+type alias HasPositionRadius a =
+    HasPosition (HasRadius a)
 
 
 type alias HasPositionVelocity a =
@@ -361,6 +383,7 @@ handleDeath model =
     }
 
 
+circleCircleCollision : HasPositionRadius a -> HasPositionRadius a -> Bool
 circleCircleCollision c1 c2 =
     V.lenFrom c1.position c2.position <= c1.radius + c2.radius
 

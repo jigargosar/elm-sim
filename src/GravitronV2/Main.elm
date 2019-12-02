@@ -314,8 +314,8 @@ type alias Memory =
     }
 
 
-initialMemory : Int -> Memory
-initialMemory elapsed =
+initMemory : Int -> Memory
+initMemory elapsed =
     { player = initPlayer
     , turret = initTurret
     , bullets = []
@@ -387,7 +387,7 @@ update c model =
                     60 * 3
             in
             if model.elapsed - at > maxGameOverTicks then
-                initialMemory model.elapsed
+                initMemory model.elapsed
 
             else
                 { model
@@ -553,4 +553,4 @@ view _ model =
 
 main : Game Memory
 main =
-    game (initialMemory 0) update view
+    game (initMemory 0) update view

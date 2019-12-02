@@ -53,16 +53,16 @@ type alias HasPositionVelocity a =
     HasPosition (HasVelocity a)
 
 
-type alias HasPositionVelocityFriction a =
-    HasPosition (HasVelocity (HasFriction a))
-
-
-applyScalarForce : Float -> { a | velocity : Vec } -> { a | velocity : Vec }
+applyScalarForce : Float -> HasVelocity a -> HasVelocity a
 applyScalarForce force model =
     { model | velocity = V.multiply force model.velocity }
 
 
-applyInternalFrictionForce : HasPositionVelocityFriction a -> HasPositionVelocityFriction a
+type alias HasVelocityFriction a =
+    HasVelocity (HasFriction a)
+
+
+applyInternalFrictionForce : HasVelocityFriction a -> HasVelocityFriction a
 applyInternalFrictionForce model =
     applyScalarForce model.friction model
 

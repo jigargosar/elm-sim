@@ -47,10 +47,6 @@ type alias HasPosition a =
     { a | position : Vec }
 
 
-type alias HasVelocity a =
-    { a | velocity : Vec }
-
-
 type alias HasRadius a =
     { a | radius : Float }
 
@@ -74,6 +70,10 @@ circleCircleCollision c1 c2 =
 
 
 -- Physics Interfaces
+
+
+type alias HasVelocity a =
+    { a | velocity : Vec }
 
 
 type alias HasPositionVelocity a =

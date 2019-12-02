@@ -401,6 +401,7 @@ update c model =
         |> incElapsed
 
 
+incElapsed : Memory -> Memory
 incElapsed model =
     { model | elapsed = model.elapsed + 1 }
 

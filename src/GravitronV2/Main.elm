@@ -84,9 +84,9 @@ initPlayer =
     , velocity = vec 0 -10
     , radius = 10
     , color = red
-    , springConstant = 0.1
+    , springConstant = 0.2
     , friction = 0.5
-    , mass = 2000
+    , mass = 500
     , health = Health.init 100
     }
 
@@ -184,11 +184,11 @@ defaultBullet =
 initBullet : Vec -> Bullet
 initBullet position =
     { position = position
-    , velocity = vec 5 5
+    , velocity = vec 2 2
     , radius = 5
     , color = white
     , health = Health.init 1
-    , bounceFriction = 0.9
+    , bounceFriction = 0.8
     , friction = 1
     }
 

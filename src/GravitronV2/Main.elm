@@ -400,17 +400,23 @@ handlePlayerBulletsCollision =
     \player -> List.foldl reducer ( player, [] )
 
 
-handleCollision : Memory -> Memory
-handleCollision model =
+mapBullets : (a -> a) -> { b | bullets : a } -> { b | bullets : a }
+mapBullets func model =
+    { model | bullets = func model.bullets }
+
+
+mapPlayerBullets func model =
     let
         ( player, bullets ) =
-            handleBulletsCollision [] model.bullets
-                |> handlePlayerBulletsCollision model.player
+            func model.player model.bullets
     in
-    { model
-        | player = player
-        , bullets = bullets
-    }
+    { model | player = player, bullets = bullets }
+
+
+handleCollision : Memory -> Memory
+handleCollision model =
+    mapBullets (handleBulletsCollision []) model
+        |> mapPlayerBullets handlePlayerBulletsCollision
 
 
 view : Computer -> Memory -> List Shape

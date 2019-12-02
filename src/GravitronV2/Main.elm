@@ -295,12 +295,17 @@ renderBulletExplosions model =
 -- Game
 
 
+type GameState
+    = Running
+
+
 type alias Memory =
     { player : Player
     , turret : Turret
     , bullets : List Bullet
     , elapsed : Int
     , bulletExplosions : List BulletExplosion
+    , state : GameState
     }
 
 
@@ -311,6 +316,7 @@ initialMemory =
     , bullets = []
     , elapsed = 0
     , bulletExplosions = []
+    , state = Running
     }
 
 

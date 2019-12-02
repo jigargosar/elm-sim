@@ -321,7 +321,7 @@ initMemory elapsed =
     { player = initPlayer
     , turrets =
         [ vec -1 -1, vec 1 -1, vec 1 1, vec -1 1 ]
-            |> List.map (V.multiply 100 >> initTurret)
+            |> List.map (V.multiply 150 >> initTurret)
     , bullets = []
     , elapsed = elapsed
     , bulletExplosions = []

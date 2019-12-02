@@ -161,6 +161,7 @@ type alias Turret =
     , radius : Float
     , color : Color
     , health : Health
+    , bulletTimer : Timer
     }
 
 
@@ -170,6 +171,7 @@ initTurret =
     , radius = 10
     , color = green
     , health = Health.init 3
+    , bulletTimer = initTimer 60
     }
 
 

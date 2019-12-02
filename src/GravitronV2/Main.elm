@@ -40,19 +40,19 @@ decHealth =
 
 
 
--- Unit Interfaces
+-- Universal Interfaces
 
 
 type alias HasPosition a =
     { a | position : Vec }
 
 
-type alias HasRadius a =
-    { a | radius : Float }
-
-
 
 -- Geometric Interfaces
+
+
+type alias HasRadius a =
+    { a | radius : Float }
 
 
 type alias Circular a =

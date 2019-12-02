@@ -9,9 +9,7 @@ import GravitronV2.Vector2 as V exposing (..)
 
 
 type alias HasPosition a =
-    { a
-        | position : Vec
-    }
+    { a | position : Vec }
 
 
 type alias HasVelocity a =

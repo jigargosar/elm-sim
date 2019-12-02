@@ -397,6 +397,29 @@ fireBullet timerFired turret player bullets =
         bullets
 
 
+fireBullet2 : Player -> Turret -> Bullet
+fireBullet2 player turret =
+    let
+        bullet =
+            defaultBullet
+
+        angle =
+            V.vecFrom turret.position player.position
+                |> V.angle
+
+        position =
+            V.fromRTheta (turret.radius + bullet.radius + 1) angle
+                |> V.integrate turret.position
+
+        velocity =
+            V.fromRTheta (V.len bullet.velocity) angle
+    in
+    { bullet
+        | position = position
+        , velocity = velocity
+    }
+
+
 updateTurret : Turret -> ( Maybe TimerFired, Turret )
 updateTurret turret =
     let
@@ -406,20 +429,38 @@ updateTurret turret =
     ( timerFired, { turret | bulletTimer = bulletTimer } )
 
 
+updateTurret2 : Player -> Turret -> ( Maybe Bullet, Turret )
+updateTurret2 player turret =
+    let
+        ( timerFired, bulletTimer ) =
+            updateTimer turret.bulletTimer
+    in
+    ( timerFired
+        |> Maybe.map (\_ -> fireBullet2 player turret)
+    , { turret | bulletTimer = bulletTimer }
+    )
+
+
 update : Computer -> Memory -> Memory
 update c model =
     (case model.state of
         Running ->
             let
-                ( timerFired, turret ) =
-                    updateTurret model.turret
+                ( maybeBullet, turret ) =
+                    updateTurret2 model.player model.turret
             in
             { model
                 | player = updatePlayer c model.player
                 , turret = turret
                 , bullets =
                     List.map (updateBullet c model.player) model.bullets
-                        |> fireBullet timerFired model.turret model.player
+                        |> (case maybeBullet of
+                                Nothing ->
+                                    identity
+
+                                Just bullet ->
+                                    (::) bullet
+                           )
                 , bulletExplosions = List.map stepBulletExplosionAnimation model.bulletExplosions
             }
                 |> handleCollision

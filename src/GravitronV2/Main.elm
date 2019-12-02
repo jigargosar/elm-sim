@@ -42,11 +42,20 @@ type alias HasFriction a =
 
 
 
--- CombinationInterfaces
+-- Geometric Interfaces
 
 
 type alias Circular a =
     HasPosition (HasRadius a)
+
+
+circleCircleCollision : Circular a -> Circular b -> Bool
+circleCircleCollision c1 c2 =
+    V.lenFrom c1.position c2.position <= c1.radius + c2.radius
+
+
+
+-- Physics Interfaces
 
 
 type alias HasPositionVelocity a =
@@ -396,11 +405,6 @@ handleDeath model =
         | bullets = bullets
         , bulletExplosions = bulletExplosions
     }
-
-
-circleCircleCollision : Circular a -> Circular b -> Bool
-circleCircleCollision c1 c2 =
-    V.lenFrom c1.position c2.position <= c1.radius + c2.radius
 
 
 handleBulletsCollision : List Bullet -> List Bullet -> List Bullet

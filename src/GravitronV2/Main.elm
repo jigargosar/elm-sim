@@ -145,13 +145,18 @@ initTurret =
     }
 
 
-renderTurret : Turret -> Shape
+renderTurret : Turret -> List Shape
 renderTurret turret =
     let
         ( x, y ) =
             toTuple turret.position
+
+        remainingHealthRadius =
+            turret.radius * Health.normalize turret.health
     in
-    circle x y turret.radius turret.color
+    [ circle x y turret.radius (withAlpha 0.5 turret.color)
+    , circle x y remainingHealthRadius turret.color
+    ]
 
 
 
@@ -499,7 +504,7 @@ handleCollision model =
 view : Computer -> Memory -> List Shape
 view _ model =
     renderPlayer model.player
-        ++ [ renderTurret model.turret ]
+        ++ renderTurret model.turret
         ++ List.map renderBullet model.bullets
         ++ List.map renderBulletExplosions model.bulletExplosions
 

@@ -400,6 +400,21 @@ handlePlayerBulletsCollision =
     \player -> List.foldl reducer ( player, [] )
 
 
+handleTurretBulletsCollision : Turret -> List Bullet -> ( Turret, List Bullet )
+handleTurretBulletsCollision =
+    let
+        reducer bullet ( turret, bulletList ) =
+            if circleCircleCollision bullet turret then
+                ( mapHealth Health.dec turret
+                , mapHealth Health.dec bullet :: bulletList
+                )
+
+            else
+                ( turret, bullet :: bulletList )
+    in
+    \turret -> List.foldl reducer ( turret, [] )
+
+
 mapBullets : (a -> a) -> { b | bullets : a } -> { b | bullets : a }
 mapBullets func model =
     { model | bullets = func model.bullets }
@@ -427,6 +442,19 @@ mapPlayerAndTurret func model =
     { model | player = player, turret = turret }
 
 
+type alias Bullets =
+    List Bullet
+
+
+mapTurretAndBullets : (Turret -> Bullets -> ( Turret, Bullets )) -> Memory -> Memory
+mapTurretAndBullets func model =
+    let
+        ( turret, bullets ) =
+            func model.turret model.bullets
+    in
+    { model | turret = turret, bullets = bullets }
+
+
 handlePlayerTurretCollision : Player -> Turret -> ( Player, Turret )
 handlePlayerTurretCollision player turret =
     if circleCircleCollision player turret then
@@ -440,6 +468,7 @@ handleCollision : Memory -> Memory
 handleCollision model =
     mapBullets (handleBulletsCollision []) model
         |> mapPlayerAndBullets handlePlayerBulletsCollision
+        |> mapTurretAndBullets handleTurretBulletsCollision
         |> mapPlayerAndTurret handlePlayerTurretCollision
 
 

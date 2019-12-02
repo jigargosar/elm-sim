@@ -305,7 +305,7 @@ initialMemory =
 fireBullet : Int -> Vec -> List Bullet -> List Bullet
 fireBullet elapsedTicks position bullets =
     let
-        fireBulletRate =
+        oncePerXTicks =
             27
 
         bulletCount =
@@ -315,7 +315,7 @@ fireBullet elapsedTicks position bullets =
             100
 
         shouldAddBullet =
-            modBy fireBulletRate elapsedTicks == 0 && bulletCount < maxBullets
+            modBy oncePerXTicks elapsedTicks == 0 && bulletCount < maxBullets
     in
     if shouldAddBullet then
         initBullet position :: bullets

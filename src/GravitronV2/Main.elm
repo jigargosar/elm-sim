@@ -379,7 +379,6 @@ update c model =
             }
                 |> handleCollision
                 |> handleDeath
-                |> handleGameOver
 
         GameOver at ->
             let
@@ -402,15 +401,6 @@ incElapsed model =
     { model | elapsed = model.elapsed + 1 }
 
 
-handleGameOver : Memory -> Memory
-handleGameOver model =
-    if model.player.health |> Health.isAlive then
-        model
-
-    else
-        { model | state = GameOver model.elapsed }
-
-
 handleDeath : Memory -> Memory
 handleDeath model =
     let
@@ -425,6 +415,12 @@ handleDeath model =
     { model
         | bullets = bullets
         , bulletExplosions = bulletExplosions
+        , state =
+            if model.player.health |> Health.isAlive then
+                GameOver model.elapsed
+
+            else
+                model.state
     }
 
 

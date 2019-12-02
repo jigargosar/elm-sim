@@ -27,7 +27,7 @@ updateTimer onTrigger timer =
             timer.current + 1
     in
     if current > timer.duration then
-        ( Just (onTrigger ()), { timer | current = current } )
+        ( Just (onTrigger ()), { timer | current = 0 } )
 
     else
         ( Nothing, { timer | current = current } )

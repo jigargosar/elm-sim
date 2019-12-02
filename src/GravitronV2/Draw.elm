@@ -23,9 +23,9 @@ import Json.Decode as JD
 import Svg exposing (Svg)
 import Task
 import TypedSvg
-import TypedSvg.Attributes
+import TypedSvg.Attributes as TA
 import TypedSvg.Attributes.InPx as InPx
-import TypedSvg.Types
+import TypedSvg.Types as TT exposing (AnchorAlignment(..))
 
 
 
@@ -120,11 +120,6 @@ update updateMemory message (Model computer memory) =
             )
 
 
-onTick : Model memory -> Model memory
-onTick model =
-    model
-
-
 
 -- View
 
@@ -172,7 +167,7 @@ renderShapes computer shapes =
 
 fillColor : Color -> Svg.Attribute msg
 fillColor (Color c) =
-    TypedSvg.Attributes.fill (TypedSvg.Types.Fill c)
+    TA.fill (TT.Fill c)
 
 
 renderShape shape =
@@ -181,7 +176,13 @@ renderShape shape =
             Svg.circle [ InPx.cx cx, InPx.cy cy, InPx.r r, fillColor c ] []
 
         Text x y str ->
-            Svg.text_ [ InPx.x x, InPx.y y, fillColor white ] [ Svg.text str ]
+            Svg.text_
+                [ InPx.x x
+                , InPx.y y
+                , fillColor white
+                , TA.textAnchor TT.AnchorMiddle
+                ]
+                [ Svg.text str ]
 
 
 
@@ -254,7 +255,7 @@ render : Float -> Float -> Float -> Float -> Color -> List (Svg msg) -> Html msg
 render x y width height color children =
     TypedSvg.svg
         [ Html.Attributes.style "position" "fixed"
-        , TypedSvg.Attributes.viewBox x y width height
+        , TA.viewBox x y width height
         , InPx.width width
         , InPx.height height
         ]

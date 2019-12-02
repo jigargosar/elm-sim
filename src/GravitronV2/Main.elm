@@ -27,11 +27,28 @@ type alias ExampleBody =
     }
 
 
+exampleBody : ExampleBody
+exampleBody =
+    { group = "default"
+    , health = initHealth 0
+    }
+
+
+inGroup : a -> { b | group : a } -> { b | group : a }
+inGroup group model =
+    { model | group = group }
+
+
+withHealth : Float -> { b | health : Health } -> { b | health : Health }
+withHealth maxHealth model =
+    { model | health = initHealth maxHealth }
+
+
 initExampleBody : ExampleBody
 initExampleBody =
-    ExampleBody
-        |> (|>) "example"
-        |> (|>) (initHealth 10)
+    exampleBody
+        |> inGroup "eg"
+        |> withHealth 10
 
 
 

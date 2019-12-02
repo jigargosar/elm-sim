@@ -22,6 +22,10 @@ type alias HasRadius a =
     { a | radius : Float }
 
 
+type alias HasFriction a =
+    { a | friction : Float }
+
+
 
 -- CombinationInterfaces
 
@@ -35,10 +39,6 @@ type alias HasPositionVelocity a =
         | position : Vec
         , velocity : Vec
     }
-
-
-type alias HasFriction a =
-    { a | friction : Float }
 
 
 type alias HasPositionVelocityFriction a =

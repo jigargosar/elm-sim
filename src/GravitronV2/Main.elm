@@ -229,10 +229,10 @@ updateBullet c player bullet =
 renderBullet : Bullet -> Shape
 renderBullet bullet =
     let
-        xy =
-            toRec bullet.position
+        ( x, y ) =
+            V.toTuple bullet.position
     in
-    circle xy.x xy.y bullet.radius bullet.color
+    circle x y bullet.radius bullet.color
 
 
 

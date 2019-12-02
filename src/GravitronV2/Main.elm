@@ -1,5 +1,6 @@
 module GravitronV2.Main exposing (main)
 
+import Basics.Extra exposing (flip)
 import GravitronV2.Draw exposing (..)
 import GravitronV2.Health as Health exposing (Health)
 import GravitronV2.Vector2 as V exposing (..)
@@ -306,7 +307,7 @@ type GameState
 
 type alias Memory =
     { player : Player
-    , turret : Turret
+    , turrets : List Turret
     , bullets : List Bullet
     , elapsed : Int
     , bulletExplosions : List BulletExplosion
@@ -317,7 +318,7 @@ type alias Memory =
 initMemory : Int -> Memory
 initMemory elapsed =
     { player = initPlayer
-    , turret = initTurret
+    , turrets = [ initTurret ]
     , bullets = []
     , elapsed = elapsed
     , bulletExplosions = []
@@ -325,8 +326,8 @@ initMemory elapsed =
     }
 
 
-fireBullet : Int -> Turret -> Player -> List Bullet -> List Bullet
-fireBullet elapsedTicks turret player bullets =
+fireBullet : Int -> Player -> Turret -> List Bullet -> List Bullet
+fireBullet elapsedTicks player turret bullets =
     let
         oncePerXTicks =
             60
@@ -366,6 +367,11 @@ fireBullet elapsedTicks turret player bullets =
         bullets
 
 
+fireBullets : Int -> Player -> List Bullet -> Turrets -> List Bullet
+fireBullets elapsedTicks player bullets =
+    List.foldl (fireBullet elapsedTicks player) bullets
+
+
 update : Computer -> Memory -> Memory
 update c model =
     (case model.state of
@@ -374,7 +380,7 @@ update c model =
                 | player = updatePlayer c model.player
                 , bullets =
                     List.map (updateBullet c model.player) model.bullets
-                        |> fireBullet model.elapsed model.turret model.player
+                        |> (\bullets -> fireBullets model.elapsed model.player bullets model.turrets)
                 , bulletExplosions = List.map stepBulletExplosionAnimation model.bulletExplosions
             }
                 |> handleCollision
@@ -482,6 +488,16 @@ handleTurretBulletsCollision =
     \turret -> List.foldl reducer ( turret, [] )
 
 
+handleTurretsBulletsCollision : Turrets -> List Bullet -> ( Turrets, List Bullet )
+handleTurretsBulletsCollision =
+    let
+        reducer turret ( turretList, bulletList ) =
+            handleTurretBulletsCollision turret bulletList
+                |> Tuple.mapFirst (flip (::) turretList)
+    in
+    \turrets bullets -> List.foldl reducer ( [], bullets ) turrets
+
+
 mapBullets : (a -> a) -> { b | bullets : a } -> { b | bullets : a }
 mapBullets func model =
     { model | bullets = func model.bullets }
@@ -500,49 +516,57 @@ mapPlayerAndBullets func model =
     { model | player = player, bullets = bullets }
 
 
-mapPlayerAndTurret : (Player -> Turret -> ( Player, Turret )) -> Memory -> Memory
-mapPlayerAndTurret func model =
+type alias Turrets =
+    List Turret
+
+
+mapPlayerAndTurrets : (Player -> Turrets -> ( Player, Turrets )) -> Memory -> Memory
+mapPlayerAndTurrets func model =
     let
-        ( player, turret ) =
-            func model.player model.turret
+        ( player, turrets ) =
+            func model.player model.turrets
     in
-    { model | player = player, turret = turret }
+    { model | player = player, turrets = turrets }
 
 
 type alias Bullets =
     List Bullet
 
 
-mapTurretAndBullets : (Turret -> Bullets -> ( Turret, Bullets )) -> Memory -> Memory
-mapTurretAndBullets func model =
+mapTurretsAndBullets : (Turrets -> Bullets -> ( Turrets, Bullets )) -> Memory -> Memory
+mapTurretsAndBullets func model =
     let
-        ( turret, bullets ) =
-            func model.turret model.bullets
+        ( turrets, bullets ) =
+            func model.turrets model.bullets
     in
-    { model | turret = turret, bullets = bullets }
+    { model | turrets = turrets, bullets = bullets }
 
 
-handlePlayerTurretCollision : Player -> Turret -> ( Player, Turret )
-handlePlayerTurretCollision player turret =
-    if circleCircleCollision player turret then
-        ( mapHealth Health.kill player, turret )
+handlePlayerTurretsCollision : Player -> Turrets -> ( Player, Turrets )
+handlePlayerTurretsCollision =
+    let
+        reducer turret player =
+            if circleCircleCollision player turret then
+                mapHealth Health.kill player
 
-    else
-        ( player, turret )
+            else
+                player
+    in
+    \player turrets -> List.foldl reducer player turrets |> flip Tuple.pair turrets
 
 
 handleCollision : Memory -> Memory
 handleCollision model =
     mapBullets (handleBulletsCollision []) model
         |> mapPlayerAndBullets handlePlayerBulletsCollision
-        |> mapTurretAndBullets handleTurretBulletsCollision
-        |> mapPlayerAndTurret handlePlayerTurretCollision
+        |> mapTurretsAndBullets handleTurretsBulletsCollision
+        |> mapPlayerAndTurrets handlePlayerTurretsCollision
 
 
 view : Computer -> Memory -> List Shape
 view _ model =
     renderPlayer model.player
-        ++ renderTurret model.turret
+        ++ List.concatMap renderTurret model.turrets
         ++ List.map renderBullet model.bullets
         ++ List.map renderBulletExplosions model.bulletExplosions
         ++ viewGameState model.state

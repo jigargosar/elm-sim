@@ -180,15 +180,6 @@ initBullet position =
     }
 
 
-gravityVectorFrom : Vec -> Vec -> Float -> Vec
-gravityVectorFrom from to mass =
-    let
-        gv =
-            V.vecFrom from to
-    in
-    V.fromRTheta (mass / V.len2 gv) (V.angle gv)
-
-
 updateBullet : Computer -> Player -> Bullet -> Bullet
 updateBullet c player bullet =
     let
@@ -224,7 +215,7 @@ updateBullet c player bullet =
     in
     bullet
         |> bounceWithinScreen c.screen
-        |> applyForce (gravityVectorFrom bullet.position player.position player.mass)
+        |> applyForce (V.gravityFrom bullet.position player.position player.mass)
         |> applyScalarForce bullet.friction
         |> applyVelocity
 

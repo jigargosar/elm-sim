@@ -12,6 +12,7 @@ module GravitronV2.Vector2 exposing
     , fromRec
     , getX
     , getY
+    , gravityFrom
     , integrate
     , len
     , len2
@@ -205,3 +206,12 @@ fromRTheta : Float -> Float -> Vec
 fromRTheta r theta =
     vec ((*) r (cos theta))
         ((*) r (sin theta))
+
+
+gravityFrom : Vec -> Vec -> Float -> Vec
+gravityFrom from to mass =
+    let
+        gv =
+            vecFrom from to
+    in
+    fromRTheta (mass / len2 gv) (angle gv)

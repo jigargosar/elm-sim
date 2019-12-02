@@ -21,36 +21,6 @@ type alias HasHealth a =
     { a | health : Health }
 
 
-type alias ExampleBody =
-    { group : String
-    , health : Health
-    }
-
-
-exampleBody : ExampleBody
-exampleBody =
-    { group = "default"
-    , health = initHealth 0
-    }
-
-
-inGroup : a -> { b | group : a } -> { b | group : a }
-inGroup group model =
-    { model | group = group }
-
-
-withHealth : Float -> { b | health : Health } -> { b | health : Health }
-withHealth maxHealth model =
-    { model | health = initHealth maxHealth }
-
-
-initExampleBody : ExampleBody
-initExampleBody =
-    exampleBody
-        |> inGroup "eg"
-        |> withHealth 10
-
-
 
 -- Unit Interfaces
 
@@ -101,16 +71,19 @@ applyInternalFrictionForce model =
 -- Player
 
 
+type alias PlayerCustomProps =
+    { radius : Float
+    , color : Color
+    , friction : Float
+    , springConstant : Float
+    , mass : Float
+    , health : Int
+    , maxHealth : Int
+    }
+
+
 type alias Player =
-    HasPositionVelocity
-        { radius : Float
-        , color : Color
-        , springConstant : Float
-        , friction : Float
-        , mass : Float
-        , health : Int
-        , maxHealth : Int
-        }
+    HasPosition (HasVelocity PlayerCustomProps)
 
 
 initPlayer : Player

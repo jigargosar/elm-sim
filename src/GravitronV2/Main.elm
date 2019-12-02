@@ -81,7 +81,7 @@ type alias Player =
 initPlayer : Player
 initPlayer =
     { position = vec0
-    , velocity = vec0
+    , velocity = vec 0 -10
     , radius = 10
     , color = red
     , springConstant = 0.1
@@ -104,6 +104,7 @@ updatePlayer c player =
 
         springPoint =
             fromRec c.mouse
+                |> Debug.log "mouse"
     in
     player
         |> applySpringForceTowardsPoint springPoint player.springConstant

@@ -55,7 +55,7 @@ type alias Mouse =
 init : memory -> Flags -> ( Model memory, Cmd Msg )
 init initialMemory _ =
     ( Model
-        { mouse = Mouse 100 100
+        { mouse = Mouse 0 0
         , screen = screenFromWidthHeight 600 600
         }
         initialMemory

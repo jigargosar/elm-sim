@@ -45,7 +45,7 @@ type alias HasFriction a =
 -- CombinationInterfaces
 
 
-type alias HasPositionRadius a =
+type alias Circular a =
     HasPosition (HasRadius a)
 
 
@@ -398,7 +398,7 @@ handleDeath model =
     }
 
 
-circleCircleCollision : HasPositionRadius a -> HasPositionRadius b -> Bool
+circleCircleCollision : Circular a -> Circular b -> Bool
 circleCircleCollision c1 c2 =
     V.lenFrom c1.position c2.position <= c1.radius + c2.radius
 

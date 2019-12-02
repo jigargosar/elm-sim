@@ -435,7 +435,10 @@ update c model =
 
             else
                 { model
-                    | bulletExplosions = List.map stepBulletExplosionAnimation model.bulletExplosions
+                    | bulletExplosions =
+                        List.map
+                            stepBulletExplosionAnimation
+                            model.bulletExplosions
                 }
     )
         |> incElapsed

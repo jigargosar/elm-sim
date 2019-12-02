@@ -3,7 +3,6 @@ module GravitronV2.Health exposing
     , dec
     , init
     , isAlive
-    , isDead
     , kill
     , normalize
     )
@@ -27,11 +26,6 @@ init maxHealth =
 isAlive : Health -> Bool
 isAlive (Health _ health) =
     health > 0
-
-
-isDead : Health -> Bool
-isDead =
-    isAlive >> not
 
 
 kill : Health -> Health

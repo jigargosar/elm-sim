@@ -6,38 +6,6 @@ import GravitronV2.Vector2 as V exposing (..)
 
 
 
--- Timer
-
-
-type alias Timer =
-    { duration : Int
-    , current : Int
-    }
-
-
-initTimer : Int -> Timer
-initTimer duration =
-    { duration = abs duration + 1, current = 0 }
-
-
-type TimerFired
-    = TimerFired
-
-
-updateTimer : Timer -> ( Maybe TimerFired, Timer )
-updateTimer timer =
-    let
-        current =
-            timer.current + 1
-    in
-    if current > timer.duration then
-        ( Just TimerFired, { timer | current = 0 } )
-
-    else
-        ( Nothing, { timer | current = current } )
-
-
-
 -- Universal Interfaces
 
 
@@ -165,7 +133,6 @@ type alias Turret =
     , radius : Float
     , color : Color
     , health : Health
-    , bulletTimer : Timer
     }
 
 
@@ -175,7 +142,6 @@ initTurret =
     , radius = 10
     , color = green
     , health = Health.init 3
-    , bulletTimer = initTimer 60
     }
 
 
@@ -359,9 +325,12 @@ initMemory elapsed =
     }
 
 
-fireBullet : Maybe TimerFired -> Turret -> Player -> List Bullet -> List Bullet
-fireBullet timerFired turret player bullets =
+fireBullet : Int -> Turret -> Player -> List Bullet -> List Bullet
+fireBullet elapsedTicks turret player bullets =
     let
+        oncePerXTicks =
+            60
+
         bulletCount =
             List.length bullets
 
@@ -369,7 +338,7 @@ fireBullet timerFired turret player bullets =
             100
 
         shouldAddBullet =
-            timerFired /= Nothing && bulletCount < maxBullets
+            modBy oncePerXTicks elapsedTicks == 0 && bulletCount < maxBullets
     in
     if shouldAddBullet then
         let
@@ -397,70 +366,15 @@ fireBullet timerFired turret player bullets =
         bullets
 
 
-fireBullet2 : Player -> Turret -> Bullet
-fireBullet2 player turret =
-    let
-        bullet =
-            defaultBullet
-
-        angle =
-            V.vecFrom turret.position player.position
-                |> V.angle
-
-        position =
-            V.fromRTheta (turret.radius + bullet.radius + 1) angle
-                |> V.integrate turret.position
-
-        velocity =
-            V.fromRTheta (V.len bullet.velocity) angle
-    in
-    { bullet
-        | position = position
-        , velocity = velocity
-    }
-
-
-updateTurret : Turret -> ( Maybe TimerFired, Turret )
-updateTurret turret =
-    let
-        ( timerFired, bulletTimer ) =
-            updateTimer turret.bulletTimer
-    in
-    ( timerFired, { turret | bulletTimer = bulletTimer } )
-
-
-updateTurret2 : Player -> Turret -> ( Maybe Bullet, Turret )
-updateTurret2 player turret =
-    let
-        ( timerFired, bulletTimer ) =
-            updateTimer turret.bulletTimer
-    in
-    ( timerFired
-        |> Maybe.map (\_ -> fireBullet2 player turret)
-    , { turret | bulletTimer = bulletTimer }
-    )
-
-
 update : Computer -> Memory -> Memory
 update c model =
     (case model.state of
         Running ->
-            let
-                ( maybeBullet, turret ) =
-                    updateTurret2 model.player model.turret
-            in
             { model
                 | player = updatePlayer c model.player
-                , turret = turret
                 , bullets =
                     List.map (updateBullet c model.player) model.bullets
-                        |> (case maybeBullet of
-                                Nothing ->
-                                    identity
-
-                                Just bullet ->
-                                    (::) bullet
-                           )
+                        |> fireBullet model.elapsed model.turret model.player
                 , bulletExplosions = List.map stepBulletExplosionAnimation model.bulletExplosions
             }
                 |> handleCollision
@@ -476,10 +390,7 @@ update c model =
 
             else
                 { model
-                    | bulletExplosions =
-                        List.map
-                            stepBulletExplosionAnimation
-                            model.bulletExplosions
+                    | bulletExplosions = List.map stepBulletExplosionAnimation model.bulletExplosions
                 }
     )
         |> incElapsed
@@ -505,11 +416,11 @@ handleDeath model =
         | bullets = bullets
         , bulletExplosions = bulletExplosions
         , state =
-            if Health.isDead model.player.health then
-                GameOver model.elapsed
+            if model.player.health |> Health.isAlive then
+                model.state
 
             else
-                model.state
+                GameOver model.elapsed
     }
 
 

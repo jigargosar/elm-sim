@@ -86,7 +86,7 @@ initPlayer =
     , springConstant = 0.1
     , friction = 0.5
     , mass = 1500
-    , health = Health.init 10
+    , health = Health.init 3
     }
 
 
@@ -297,7 +297,7 @@ renderBulletExplosions model =
 
 type GameState
     = Running
-    | GameOver
+    | GameOver Int
 
 
 
@@ -382,19 +382,30 @@ update c model =
                 |> handleDeath
                 |> handleGameOver
 
-        GameOver ->
-            { model
-                | bulletExplosions = List.map stepBulletExplosionAnimation model.bulletExplosions
-                , elapsed = model.elapsed + 1
-            }
+        GameOver at ->
+            let
+                maxGameOverTicks =
+                    60 * 3
+            in
+            if at - model.elapsed > maxGameOverTicks then
+                { initialMemory
+                    | elapsed = model.elapsed + 1
+                }
+
+            else
+                { model
+                    | bulletExplosions = List.map stepBulletExplosionAnimation model.bulletExplosions
+                    , elapsed = model.elapsed + 1
+                }
 
 
+handleGameOver : Memory -> Memory
 handleGameOver model =
     if model.player.health |> Health.isAlive then
         model
 
     else
-        { model | state = GameOver }
+        { model | state = GameOver model.elapsed }
 
 
 handleDeath : Memory -> Memory

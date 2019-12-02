@@ -6,6 +6,34 @@ import GravitronV2.Vector2 as V exposing (..)
 
 
 
+-- Timer
+
+
+type alias Timer =
+    { duration : Int
+    , current : Int
+    }
+
+
+initTimer : Int -> Timer
+initTimer duration =
+    { duration = abs duration + 1, current = 0 }
+
+
+updateTimer : (() -> a) -> Timer -> ( Maybe a, Timer )
+updateTimer onTrigger timer =
+    let
+        current =
+            timer.current + 1
+    in
+    if current > timer.duration then
+        ( Just (onTrigger ()), { timer | current = current } )
+
+    else
+        ( Nothing, { timer | current = current } )
+
+
+
 -- Universal Interfaces
 
 

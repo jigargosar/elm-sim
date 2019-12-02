@@ -104,7 +104,6 @@ updatePlayer c player =
 
         springPoint =
             fromRec c.mouse
-                |> Debug.log "mouse"
     in
     player
         |> applySpringForceTowardsPoint springPoint player.springConstant

@@ -69,15 +69,11 @@ circleCircleCollision c1 c2 =
 
 
 
--- Physics Interfaces
+-- Physics Velocity : Apply Force
 
 
 type alias HasVelocity a =
     { a | velocity : Vec }
-
-
-type alias HasPositionVelocity a =
-    HasPosition (HasVelocity a)
 
 
 applyForce : Vec -> HasVelocity a -> HasVelocity a
@@ -90,6 +86,10 @@ applyScalarForce force model =
     { model | velocity = V.multiply force model.velocity }
 
 
+
+-- Physics Velocity: Apply Internal Friction
+
+
 type alias HasVelocityFriction a =
     HasVelocity (HasFriction a)
 
@@ -97,6 +97,19 @@ type alias HasVelocityFriction a =
 applyInternalFrictionForce : HasVelocityFriction a -> HasVelocityFriction a
 applyInternalFrictionForce model =
     applyScalarForce model.friction model
+
+
+
+-- Physics Velocity: Update Position
+
+
+type alias HasPositionVelocity a =
+    HasPosition (HasVelocity a)
+
+
+applyVelocity : HasPositionVelocity a -> HasPositionVelocity a
+applyVelocity model =
+    { model | position = integrate model.position model.velocity }
 
 
 
@@ -138,10 +151,6 @@ updatePlayer c player =
                     springForceFrom model.position toPoint k
             in
             applyForce force model
-
-        applyVelocity : HasPositionVelocity a -> HasPositionVelocity a
-        applyVelocity model =
-            { model | position = integrate model.position model.velocity }
 
         springPoint =
             fromRec c.mouse
@@ -264,10 +273,6 @@ updateBullet c player bullet =
 
             else
                 model
-
-        applyVelocity : HasPositionVelocity a -> HasPositionVelocity a
-        applyVelocity model =
-            { model | position = integrate model.position model.velocity }
     in
     bullet
         |> bounceWithinScreen c.screen

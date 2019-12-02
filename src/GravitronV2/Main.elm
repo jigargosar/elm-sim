@@ -80,8 +80,10 @@ applyInternalFrictionForce model =
 -- Player
 
 
-type alias PlayerCustomProps =
-    { radius : Float
+type alias Player =
+    { position : Vec
+    , velocity : Vec
+    , radius : Float
     , color : Color
     , friction : Float
     , springConstant : Float
@@ -89,10 +91,6 @@ type alias PlayerCustomProps =
     , health : Int
     , maxHealth : Int
     }
-
-
-type alias Player =
-    HasPosition (HasVelocity PlayerCustomProps)
 
 
 initPlayer : Player

@@ -304,8 +304,8 @@ initialMemory =
     }
 
 
-fireBullet : Int -> Vec -> List Bullet -> List Bullet
-fireBullet elapsedTicks position bullets =
+fireBullet : Int -> Turret -> Player -> List Bullet -> List Bullet
+fireBullet elapsedTicks turret player bullets =
     let
         oncePerXTicks =
             27
@@ -320,7 +320,29 @@ fireBullet elapsedTicks position bullets =
             modBy oncePerXTicks elapsedTicks == 0 && bulletCount < maxBullets
     in
     if shouldAddBullet then
-        initBullet position :: bullets
+        let
+            angle =
+                V.vecFrom turret.position player.position
+                    |> V.angle
+
+            bullet =
+                initBullet turret.position
+                    |> (\b ->
+                            let
+                                position =
+                                    V.fromRTheta (turret.radius + b.radius) angle
+                                        |> V.integrate b.position
+
+                                velocity =
+                                    V.fromRTheta (V.len b.velocity) angle
+                            in
+                            { b
+                                | position = position
+                                , velocity = velocity
+                            }
+                       )
+        in
+        bullet :: bullets
 
     else
         bullets
@@ -332,7 +354,7 @@ update c model =
         | player = updatePlayer c model.player
         , bullets =
             List.map (updateBullet c model.player) model.bullets
-                |> fireBullet model.elapsed model.turret.position
+                |> fireBullet model.elapsed model.turret model.player
         , bulletExplosions = List.map stepBulletExplosionAnimation model.bulletExplosions
         , elapsed = model.elapsed + 1
     }

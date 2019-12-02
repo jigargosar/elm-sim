@@ -85,8 +85,8 @@ initPlayer =
     , color = red
     , springConstant = 0.1
     , friction = 0.5
-    , mass = 1500
-    , health = Health.init 3
+    , mass = 2000
+    , health = Health.init 100
     }
 
 
@@ -182,11 +182,11 @@ defaultBullet =
 initBullet : Vec -> Bullet
 initBullet position =
     { position = position
-    , velocity = vec 3 3
+    , velocity = vec 5 5
     , radius = 5
     , color = white
     , health = Health.init 1
-    , bounceFriction = 0.8
+    , bounceFriction = 0.9
     , friction = 1
     }
 
@@ -329,7 +329,7 @@ fireBullet : Int -> Turret -> Player -> List Bullet -> List Bullet
 fireBullet elapsedTicks turret player bullets =
     let
         oncePerXTicks =
-            127
+            10
 
         bulletCount =
             List.length bullets

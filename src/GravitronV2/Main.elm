@@ -22,6 +22,16 @@ initHealth maxHealth =
     Health absMaxHealth absMaxHealth
 
 
+isAlive : Health -> Bool
+isAlive (Health _ health) =
+    health > 0
+
+
+kill : Health -> Health
+kill =
+    mapCurrentHealth (always 0)
+
+
 normalizedHealth : Health -> Float
 normalizedHealth (Health maxHealth health) =
     clamp0 maxHealth health / maxHealth
@@ -196,7 +206,7 @@ type alias Bullet =
     , velocity : Vec
     , radius : Float
     , color : Color
-    , isAlive : Bool
+    , health : Health
     , bounceFriction : Float
     , friction : Float
     }
@@ -208,7 +218,7 @@ initBullet position =
     , velocity = vec 5 5
     , radius = 5
     , color = white
-    , isAlive = True
+    , health = initHealth 1
     , bounceFriction = 0.8
     , friction = 1
     }
@@ -388,7 +398,7 @@ handleDeath : Memory -> Memory
 handleDeath model =
     let
         ( bullets, deadBullets ) =
-            List.partition .isAlive model.bullets
+            List.partition (.health >> isAlive) model.bullets
 
         bulletExplosions =
             List.map explosionFromBullet deadBullets
@@ -411,11 +421,11 @@ handleBulletsCollision processed remaining =
             bullet :: processed
 
         first :: rest ->
-            if first.isAlive then
+            if isAlive first.health then
                 let
                     reducer b2 ( b1, acc ) =
                         if circleCircleCollision b1 b2 then
-                            ( { b1 | isAlive = False }, { b2 | isAlive = False } :: acc )
+                            ( { b1 | health = kill b1.health }, { b2 | health = kill b1.health } :: acc )
 
                         else
                             ( b1, b2 :: acc )

@@ -138,7 +138,7 @@ type alias Turret =
 
 initTurret : Turret
 initTurret =
-    { position = vec -200 0
+    { position = vec -100 -150
     , radius = 10
     , color = green
     , health = Health.init 10
@@ -182,7 +182,7 @@ defaultBullet =
 initBullet : Vec -> Bullet
 initBullet position =
     { position = position
-    , velocity = vec 5 5
+    , velocity = vec 3 3
     , radius = 5
     , color = white
     , health = Health.init 1
@@ -318,7 +318,7 @@ fireBullet : Int -> Turret -> Player -> List Bullet -> List Bullet
 fireBullet elapsedTicks turret player bullets =
     let
         oncePerXTicks =
-            27
+            127
 
         bulletCount =
             List.length bullets

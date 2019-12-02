@@ -8,6 +8,7 @@ module GravitronV2.Draw exposing
     , game
     , green
     , red
+    , text
     , white
     , withAlpha
     )
@@ -130,11 +131,17 @@ onTick model =
 
 type Shape
     = Circle Float Float Float Color
+    | Text Float Float String
 
 
 circle : Float -> Float -> Float -> Color -> Shape
 circle =
     Circle
+
+
+text : Float -> Float -> String -> Shape
+text =
+    Text
 
 
 renderShapes : Computer -> List Shape -> Html Msg
@@ -172,6 +179,9 @@ renderShape shape =
     case shape of
         Circle cx cy r c ->
             Svg.circle [ InPx.cx cx, InPx.cy cy, InPx.r r, fillColor c ] []
+
+        Text x y str ->
+            Svg.text_ [ InPx.x x, InPx.y y, fillColor white ] [ Svg.text str ]
 
 
 

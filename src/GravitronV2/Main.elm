@@ -556,10 +556,10 @@ viewGameState : GameState -> List Shape
 viewGameState state =
     case state of
         Running ->
-            []
+            [ text 0 0 "Running" ]
 
         GameOver _ ->
-            []
+            [ text 0 0 "Game Over" ]
 
 
 main : Game Memory

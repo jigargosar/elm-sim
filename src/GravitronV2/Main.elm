@@ -326,7 +326,7 @@ fireBullet elapsedTicks turret player bullets =
     in
     if shouldAddBullet then
         let
-            b =
+            bullet =
                 defaultBullet
 
             angle =
@@ -334,19 +334,17 @@ fireBullet elapsedTicks turret player bullets =
                     |> V.angle
 
             position =
-                V.fromRTheta (turret.radius + b.radius + 1) angle
+                V.fromRTheta (turret.radius + bullet.radius + 1) angle
                     |> V.integrate turret.position
 
             velocity =
-                V.fromRTheta (V.len b.velocity) angle
-
-            bullet =
-                { b
-                    | position = position
-                    , velocity = velocity
-                }
+                V.fromRTheta (V.len bullet.velocity) angle
         in
-        bullet :: bullets
+        { bullet
+            | position = position
+            , velocity = velocity
+        }
+            :: bullets
 
     else
         bullets

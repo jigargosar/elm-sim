@@ -87,19 +87,6 @@ applyScalarForce force model =
 
 
 
--- Physics Velocity: Apply Internal Friction
-
-
-type alias HasVelocityFriction a =
-    HasVelocity (HasFriction a)
-
-
-applyInternalFrictionForce : HasVelocityFriction a -> HasVelocityFriction a
-applyInternalFrictionForce model =
-    applyScalarForce model.friction model
-
-
-
 -- Physics Velocity: Update Position
 
 
@@ -157,7 +144,7 @@ updatePlayer c player =
     in
     player
         |> applySpringForceTowardsPoint springPoint player.springConstant
-        |> applyInternalFrictionForce
+        |> applyScalarForce player.friction
         |> applyVelocity
 
 
@@ -278,7 +265,7 @@ updateBullet c player bullet =
         |> bounceWithinScreen c.screen
         |> applyGravityForce player.position player.mass
         |> applyVelocity
-        |> applyInternalFrictionForce
+        |> applyScalarForce bullet.friction
 
 
 renderBullet : Bullet -> Shape

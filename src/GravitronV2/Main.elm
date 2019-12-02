@@ -368,7 +368,7 @@ fireBullet elapsedTicks turret player bullets =
 
 update : Computer -> Memory -> Memory
 update c model =
-    case model.state of
+    (case model.state of
         Running ->
             { model
                 | player = updatePlayer c model.player
@@ -397,6 +397,12 @@ update c model =
                     | bulletExplosions = List.map stepBulletExplosionAnimation model.bulletExplosions
                     , elapsed = model.elapsed + 1
                 }
+    )
+        |> incElapsed
+
+
+incElapsed model =
+    { model | elapsed = model.elapsed + 1 }
 
 
 handleGameOver : Memory -> Memory

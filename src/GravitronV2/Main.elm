@@ -462,10 +462,10 @@ handleDeath model =
         , bulletExplosions = bulletExplosions
         , state =
             if model.player.health |> Health.isAlive then
-                GameOver model.elapsed
+                model.state
 
             else
-                model.state
+                GameOver model.elapsed
     }
 
 

@@ -297,6 +297,11 @@ renderBulletExplosions model =
 
 type GameState
     = Running
+    | GameOver
+
+
+
+-- Memory
 
 
 type alias Memory =
@@ -363,16 +368,30 @@ fireBullet elapsedTicks turret player bullets =
 
 update : Computer -> Memory -> Memory
 update c model =
-    { model
-        | player = updatePlayer c model.player
-        , bullets =
-            List.map (updateBullet c model.player) model.bullets
-                |> fireBullet model.elapsed model.turret model.player
-        , bulletExplosions = List.map stepBulletExplosionAnimation model.bulletExplosions
-        , elapsed = model.elapsed + 1
-    }
-        |> handleCollision
-        |> handleDeath
+    case model.state of
+        Running ->
+            { model
+                | player = updatePlayer c model.player
+                , bullets =
+                    List.map (updateBullet c model.player) model.bullets
+                        |> fireBullet model.elapsed model.turret model.player
+                , bulletExplosions = List.map stepBulletExplosionAnimation model.bulletExplosions
+                , elapsed = model.elapsed + 1
+            }
+                |> handleCollision
+                |> handleDeath
+                |> handleGameOver
+
+        GameOver ->
+            model
+
+
+handleGameOver model =
+    if model.player.health |> Health.isAlive then
+        model
+
+    else
+        { model | state = GameOver }
 
 
 handleDeath : Memory -> Memory
@@ -386,14 +405,10 @@ handleDeath model =
                 ++ model.bulletExplosions
                 |> List.filter isBulletExplosionAnimating
     in
-    if model.player.health |> Health.isAlive then
-        { model
-            | bullets = bullets
-            , bulletExplosions = bulletExplosions
-        }
-
-    else
-        initialMemory
+    { model
+        | bullets = bullets
+        , bulletExplosions = bulletExplosions
+    }
 
 
 handleBulletsCollision : List Bullet -> List Bullet -> List Bullet

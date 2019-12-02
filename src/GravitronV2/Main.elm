@@ -137,9 +137,9 @@ type alias Turret =
     }
 
 
-initTurret : Turret
-initTurret =
-    { position = vec -100 -150
+initTurret : Vec -> Turret
+initTurret position =
+    { position = position
     , radius = 10
     , color = green
     , health = Health.init 3
@@ -318,7 +318,7 @@ type alias Memory =
 initMemory : Int -> Memory
 initMemory elapsed =
     { player = initPlayer
-    , turrets = [ initTurret ]
+    , turrets = [ vec -1 -1, vec 1 -1, vec 1 1, vec -1 1 ] |> List.map (V.multiply 100 >> initTurret)
     , bullets = []
     , elapsed = elapsed
     , bulletExplosions = []
@@ -330,7 +330,7 @@ fireBullet : Int -> Player -> Turret -> List Bullet -> List Bullet
 fireBullet elapsedTicks player turret bullets =
     let
         oncePerXTicks =
-            60
+            61
 
         bulletCount =
             List.length bullets

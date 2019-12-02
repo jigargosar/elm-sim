@@ -1,52 +1,8 @@
 module GravitronV2.Main exposing (main)
 
 import GravitronV2.Draw exposing (..)
+import GravitronV2.Health as Components
 import GravitronV2.Vector2 as V exposing (..)
-import PointFree exposing (clamp0, dec)
-
-
-
--- HealthSystem
-
-
-type Health
-    = Health Float Float
-
-
-initHealth : Float -> Health
-initHealth maxHealth =
-    let
-        absMaxHealth =
-            abs maxHealth
-    in
-    Health absMaxHealth absMaxHealth
-
-
-isAlive : Health -> Bool
-isAlive (Health _ health) =
-    health > 0
-
-
-kill : Health -> Health
-kill =
-    mapCurrentHealth (always 0)
-
-
-normalizedHealth : Health -> Float
-normalizedHealth (Health maxHealth health) =
-    clamp0 maxHealth health / maxHealth
-
-
-mapCurrentHealth : (Float -> Float) -> Health -> Health
-mapCurrentHealth func (Health maxHealth health) =
-    func health
-        |> clamp0 maxHealth
-        |> Health maxHealth
-
-
-decHealth : Health -> Health
-decHealth =
-    mapCurrentHealth dec
 
 
 
@@ -117,7 +73,7 @@ type alias Player =
     , friction : Float
     , springConstant : Float
     , mass : Float
-    , health : Health
+    , health : Components.Health
     }
 
 
@@ -130,7 +86,7 @@ initPlayer =
     , springConstant = 0.1
     , friction = 0.5
     , mass = 2000
-    , health = initHealth 100
+    , health = Components.init 100
     }
 
 
@@ -162,7 +118,7 @@ renderPlayer player =
 
         remainingHealthRadius =
             player.radius
-                * normalizedHealth player.health
+                * Components.normalize player.health
     in
     [ circle x y player.radius (withAlpha 0.5 player.color)
     , circle x y remainingHealthRadius player.color
@@ -206,7 +162,7 @@ type alias Bullet =
     , velocity : Vec
     , radius : Float
     , color : Color
-    , health : Health
+    , health : Components.Health
     , bounceFriction : Float
     , friction : Float
     }
@@ -218,7 +174,7 @@ initBullet position =
     , velocity = vec 5 5
     , radius = 5
     , color = white
-    , health = initHealth 1
+    , health = Components.init 1
     , bounceFriction = 0.8
     , friction = 1
     }
@@ -398,7 +354,7 @@ handleDeath : Memory -> Memory
 handleDeath model =
     let
         ( bullets, deadBullets ) =
-            List.partition (.health >> isAlive) model.bullets
+            List.partition (.health >> Components.isAlive) model.bullets
 
         bulletExplosions =
             List.map explosionFromBullet deadBullets
@@ -421,11 +377,11 @@ handleBulletsCollision processed remaining =
             bullet :: processed
 
         first :: rest ->
-            if isAlive first.health then
+            if Components.isAlive first.health then
                 let
                     reducer b2 ( b1, acc ) =
                         if circleCircleCollision b1 b2 then
-                            ( { b1 | health = kill b1.health }, { b2 | health = kill b1.health } :: acc )
+                            ( { b1 | health = Components.kill b1.health }, { b2 | health = Components.kill b1.health } :: acc )
 
                         else
                             ( b1, b2 :: acc )
@@ -444,8 +400,8 @@ handlePlayerBulletsCollision =
     let
         reducer bullet ( player, bulletList ) =
             if circleCircleCollision bullet player then
-                ( { player | health = decHealth player.health }
-                , { bullet | isAlive = False } :: bulletList
+                ( { player | health = Components.dec player.health }
+                , { bullet | health = Components.kill player.health } :: bulletList
                 )
 
             else

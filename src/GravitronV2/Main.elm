@@ -387,7 +387,7 @@ update c model =
                 maxGameOverTicks =
                     60 * 3
             in
-            if at - model.elapsed > maxGameOverTicks then
+            if model.elapsed - at > maxGameOverTicks then
                 { initialMemory
                     | elapsed = model.elapsed + 1
                 }

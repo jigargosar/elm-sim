@@ -2,6 +2,7 @@ module GravitronV2.Main exposing (main)
 
 import GravitronV2.Draw exposing (..)
 import GravitronV2.Vector2 as V exposing (..)
+import PointFree exposing (clamp0, dec)
 
 
 
@@ -14,11 +15,28 @@ type Health
 
 initHealth : Float -> Health
 initHealth maxHealth =
-    Health maxHealth maxHealth
+    let
+        absMaxHealth =
+            abs maxHealth
+    in
+    Health absMaxHealth absMaxHealth
 
 
-type alias HasHealth a =
-    { a | health : Health }
+normalizedHealth : Health -> Float
+normalizedHealth (Health maxHealth health) =
+    clamp0 maxHealth health / maxHealth
+
+
+mapCurrentHealth : (Float -> Float) -> Health -> Health
+mapCurrentHealth func (Health maxHealth health) =
+    func health
+        |> clamp0 maxHealth
+        |> Health maxHealth
+
+
+decHealth : Health -> Health
+decHealth =
+    mapCurrentHealth dec
 
 
 
@@ -88,17 +106,12 @@ type alias Player =
     , friction : Float
     , springConstant : Float
     , mass : Float
-    , health : Int
-    , maxHealth : Int
+    , health : Health
     }
 
 
 initPlayer : Player
 initPlayer =
-    let
-        maxHealth =
-            100
-    in
     { position = vec0
     , velocity = vec0
     , radius = 10
@@ -106,8 +119,7 @@ initPlayer =
     , springConstant = 0.1
     , friction = 0.5
     , mass = 2000
-    , health = maxHealth
-    , maxHealth = maxHealth
+    , health = initHealth 100
     }
 
 
@@ -147,9 +159,7 @@ renderPlayer player =
 
         remainingHealthRadius =
             player.radius
-                * (toFloat (clamp 0 player.maxHealth player.health)
-                    / toFloat player.maxHealth
-                  )
+                * normalizedHealth player.health
     in
     [ circle x y player.radius (withAlpha 0.5 player.color)
     , circle x y remainingHealthRadius player.color
@@ -438,7 +448,7 @@ handlePlayerBulletsCollision =
     let
         reducer bullet ( player, bulletList ) =
             if circleCircleCollision bullet player then
-                ( { player | health = max 0 (player.health - 1) }
+                ( { player | health = decHealth player.health }
                 , { bullet | isAlive = False } :: bulletList
                 )
 

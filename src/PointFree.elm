@@ -18,3 +18,13 @@ when p t v =
 unless : (a -> Bool) -> (a -> a) -> a -> a
 unless p =
     when (p >> not)
+
+
+dec : number -> number
+dec =
+    (+) -1
+
+
+clamp0 : number -> number -> number
+clamp0 =
+    clamp 0

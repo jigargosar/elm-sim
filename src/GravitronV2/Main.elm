@@ -314,12 +314,12 @@ type alias Memory =
     }
 
 
-initialMemory : Memory
-initialMemory =
+initialMemory : Int -> Memory
+initialMemory elapsed =
     { player = initPlayer
     , turret = initTurret
     , bullets = []
-    , elapsed = 0
+    , elapsed = elapsed
     , bulletExplosions = []
     , state = Running
     }
@@ -376,7 +376,6 @@ update c model =
                     List.map (updateBullet c model.player) model.bullets
                         |> fireBullet model.elapsed model.turret model.player
                 , bulletExplosions = List.map stepBulletExplosionAnimation model.bulletExplosions
-                , elapsed = model.elapsed + 1
             }
                 |> handleCollision
                 |> handleDeath
@@ -388,14 +387,11 @@ update c model =
                     60 * 3
             in
             if model.elapsed - at > maxGameOverTicks then
-                { initialMemory
-                    | elapsed = model.elapsed + 1
-                }
+                initialMemory model.elapsed
 
             else
                 { model
                     | bulletExplosions = List.map stepBulletExplosionAnimation model.bulletExplosions
-                    , elapsed = model.elapsed + 1
                 }
     )
         |> incElapsed
@@ -557,4 +553,4 @@ view _ model =
 
 main : Game Memory
 main =
-    game initialMemory update view
+    game (initialMemory 0) update view

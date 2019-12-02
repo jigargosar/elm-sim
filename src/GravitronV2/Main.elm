@@ -80,6 +80,11 @@ type alias HasPositionVelocity a =
     HasPosition (HasVelocity a)
 
 
+applyForce : Vec -> HasVelocity a -> HasVelocity a
+applyForce force model =
+    { model | velocity = integrate force model.velocity }
+
+
 applyScalarForce : Float -> HasVelocity a -> HasVelocity a
 applyScalarForce force model =
     { model | velocity = V.multiply force model.velocity }
@@ -133,10 +138,6 @@ updatePlayer c player =
                     springForceFrom model.position toPoint k
             in
             applyForce force model
-
-        applyForce : Vec -> Player -> Player
-        applyForce force model =
-            { model | velocity = integrate force model.velocity }
 
         applyVelocity : HasPositionVelocity a -> HasPositionVelocity a
         applyVelocity model =
@@ -233,10 +234,6 @@ updateBullet c player bullet =
                     V.fromRTheta (mass / V.len2 gv) (V.angle gv)
             in
             applyForce force model
-
-        applyForce : Vec -> HasPositionVelocity a -> HasPositionVelocity a
-        applyForce force model =
-            { model | velocity = integrate force model.velocity }
 
         bounceWithinScreen : Screen -> Bullet -> Bullet
         bounceWithinScreen screen model =

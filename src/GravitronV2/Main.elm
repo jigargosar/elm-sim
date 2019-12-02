@@ -405,7 +405,12 @@ mapBullets func model =
     { model | bullets = func model.bullets }
 
 
-mapPlayerBullets func model =
+mapHealth : (a -> a) -> { b | health : a } -> { b | health : a }
+mapHealth func model =
+    { model | health = func model.health }
+
+
+mapPlayerAndBullets func model =
     let
         ( player, bullets ) =
             func model.player model.bullets
@@ -413,10 +418,29 @@ mapPlayerBullets func model =
     { model | player = player, bullets = bullets }
 
 
+mapPlayerAndTurret : (Player -> Turret -> ( Player, Turret )) -> Memory -> Memory
+mapPlayerAndTurret func model =
+    let
+        ( player, turret ) =
+            func model.player model.turret
+    in
+    { model | player = player, turret = turret }
+
+
+handlePlayerTurretCollision : Player -> Turret -> ( Player, Turret )
+handlePlayerTurretCollision player turret =
+    if circleCircleCollision player turret then
+        ( mapHealth Health.kill player, turret )
+
+    else
+        ( player, turret )
+
+
 handleCollision : Memory -> Memory
 handleCollision model =
     mapBullets (handleBulletsCollision []) model
-        |> mapPlayerBullets handlePlayerBulletsCollision
+        |> mapPlayerAndBullets handlePlayerBulletsCollision
+        |> mapPlayerAndTurret handlePlayerTurretCollision
 
 
 view : Computer -> Memory -> List Shape

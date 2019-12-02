@@ -549,6 +549,17 @@ view _ model =
         ++ renderTurret model.turret
         ++ List.map renderBullet model.bullets
         ++ List.map renderBulletExplosions model.bulletExplosions
+        ++ viewGameState model.state
+
+
+viewGameState : GameState -> List Shape
+viewGameState state =
+    case state of
+        Running ->
+            []
+
+        GameOver _ ->
+            []
 
 
 main : Game Memory

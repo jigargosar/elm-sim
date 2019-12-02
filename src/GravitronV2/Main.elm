@@ -383,7 +383,10 @@ update c model =
                 |> handleGameOver
 
         GameOver ->
-            model
+            { model
+                | bulletExplosions = List.map stepBulletExplosionAnimation model.bulletExplosions
+                , elapsed = model.elapsed + 1
+            }
 
 
 handleGameOver model =

@@ -1,7 +1,7 @@
 module GravitronV2.Main exposing (main)
 
 import GravitronV2.Draw exposing (..)
-import GravitronV2.Health as Health
+import GravitronV2.Health as Health exposing (Health)
 import GravitronV2.Vector2 as V exposing (..)
 
 
@@ -132,6 +132,7 @@ type alias Turret =
     { position : Vec
     , radius : Float
     , color : Color
+    , health : Health
     }
 
 
@@ -140,6 +141,7 @@ initTurret =
     { position = vec -200 0
     , radius = 10
     , color = green
+    , health = Health.init 10
     }
 
 

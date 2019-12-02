@@ -329,7 +329,7 @@ fireBullet : Int -> Turret -> Player -> List Bullet -> List Bullet
 fireBullet elapsedTicks turret player bullets =
     let
         oncePerXTicks =
-            10
+            60
 
         bulletCount =
             List.length bullets

@@ -51,10 +51,6 @@ type alias HasRadius a =
     { a | radius : Float }
 
 
-type alias HasFriction a =
-    { a | friction : Float }
-
-
 
 -- Geometric Interfaces
 

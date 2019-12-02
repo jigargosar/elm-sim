@@ -321,26 +321,27 @@ fireBullet elapsedTicks turret player bullets =
     in
     if shouldAddBullet then
         let
-            angle =
-                V.vecFrom turret.position player.position
-                    |> V.angle
+            setupBullet b =
+                let
+                    angle =
+                        V.vecFrom turret.position player.position
+                            |> V.angle
+
+                    position =
+                        V.fromRTheta (turret.radius + b.radius + 1) angle
+                            |> V.integrate b.position
+
+                    velocity =
+                        V.fromRTheta (V.len b.velocity) angle
+                in
+                { b
+                    | position = position
+                    , velocity = velocity
+                }
 
             bullet =
                 initBullet turret.position
-                    |> (\b ->
-                            let
-                                position =
-                                    V.fromRTheta (turret.radius + b.radius + 1) angle
-                                        |> V.integrate b.position
-
-                                velocity =
-                                    V.fromRTheta (V.len b.velocity) angle
-                            in
-                            { b
-                                | position = position
-                                , velocity = velocity
-                            }
-                       )
+                    |> setupBullet
         in
         bullet :: bullets
 

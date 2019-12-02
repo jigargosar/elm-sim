@@ -380,10 +380,14 @@ handleDeath model =
                 ++ model.bulletExplosions
                 |> List.filter isBulletExplosionAnimating
     in
-    { model
-        | bullets = bullets
-        , bulletExplosions = bulletExplosions
-    }
+    if model.player.health |> Health.isAlive then
+        { model
+            | bullets = bullets
+            , bulletExplosions = bulletExplosions
+        }
+
+    else
+        initialMemory
 
 
 handleBulletsCollision : List Bullet -> List Bullet -> List Bullet

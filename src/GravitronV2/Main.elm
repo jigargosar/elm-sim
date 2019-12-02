@@ -330,7 +330,7 @@ fireBullet elapsedTicks turret player bullets =
                     |> (\b ->
                             let
                                 position =
-                                    V.fromRTheta (turret.radius + b.radius) angle
+                                    V.fromRTheta (turret.radius + b.radius + 1) angle
                                         |> V.integrate b.position
 
                                 velocity =

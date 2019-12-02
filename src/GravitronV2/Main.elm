@@ -20,14 +20,18 @@ initTimer duration =
     { duration = abs duration + 1, current = 0 }
 
 
-updateTimer : (() -> a) -> Timer -> ( Maybe a, Timer )
-updateTimer onTrigger timer =
+type TimerFired
+    = TimerFired
+
+
+updateTimer : Timer -> ( Maybe TimerFired, Timer )
+updateTimer timer =
     let
         current =
             timer.current + 1
     in
     if current > timer.duration then
-        ( Just (onTrigger ()), { timer | current = 0 } )
+        ( Just TimerFired, { timer | current = 0 } )
 
     else
         ( Nothing, { timer | current = current } )
@@ -355,12 +359,9 @@ initMemory elapsed =
     }
 
 
-fireBullet : Int -> Turret -> Player -> List Bullet -> List Bullet
-fireBullet elapsedTicks turret player bullets =
+fireBullet : Maybe TimerFired -> Turret -> Player -> List Bullet -> List Bullet
+fireBullet timerFired turret player bullets =
     let
-        oncePerXTicks =
-            60
-
         bulletCount =
             List.length bullets
 
@@ -368,7 +369,7 @@ fireBullet elapsedTicks turret player bullets =
             100
 
         shouldAddBullet =
-            modBy oncePerXTicks elapsedTicks == 0 && bulletCount < maxBullets
+            timerFired /= Nothing && bulletCount < maxBullets
     in
     if shouldAddBullet then
         let
@@ -396,15 +397,29 @@ fireBullet elapsedTicks turret player bullets =
         bullets
 
 
+updateTurret : Turret -> ( Maybe TimerFired, Turret )
+updateTurret turret =
+    let
+        ( timerFired, bulletTimer ) =
+            updateTimer turret.bulletTimer
+    in
+    ( timerFired, { turret | bulletTimer = bulletTimer } )
+
+
 update : Computer -> Memory -> Memory
 update c model =
     (case model.state of
         Running ->
+            let
+                ( timerFired, turret ) =
+                    updateTurret model.turret
+            in
             { model
                 | player = updatePlayer c model.player
+                , turret = turret
                 , bullets =
                     List.map (updateBullet c model.player) model.bullets
-                        |> fireBullet model.elapsed model.turret model.player
+                        |> fireBullet timerFired model.turret model.player
                 , bulletExplosions = List.map stepBulletExplosionAnimation model.bulletExplosions
             }
                 |> handleCollision

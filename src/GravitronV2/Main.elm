@@ -383,7 +383,7 @@ handleDeath model =
     }
 
 
-circleCircleCollision : HasPositionRadius a -> HasPositionRadius a -> Bool
+circleCircleCollision : HasPositionRadius a -> HasPositionRadius b -> Bool
 circleCircleCollision c1 c2 =
     V.lenFrom c1.position c2.position <= c1.radius + c2.radius
 

@@ -192,13 +192,14 @@ renderTurret turret =
 
 
 type alias Bullet =
-    HasPositionVelocity
-        { radius : Float
-        , color : Color
-        , isAlive : Bool
-        , bounceFriction : Float
-        , friction : Float
-        }
+    { position : Vec
+    , velocity : Vec
+    , radius : Float
+    , color : Color
+    , isAlive : Bool
+    , bounceFriction : Float
+    , friction : Float
+    }
 
 
 initBullet : Vec -> Bullet

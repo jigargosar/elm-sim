@@ -5,6 +5,36 @@ import GravitronV2.Vector2 as V exposing (..)
 
 
 
+-- HealthSystem
+
+
+type Health
+    = Health Float Float
+
+
+initHealth : Float -> Health
+initHealth maxHealth =
+    Health maxHealth maxHealth
+
+
+type alias HasHealth a =
+    { a | health : Health }
+
+
+type alias ExampleBody =
+    { group : String
+    , health : Health
+    }
+
+
+initExampleBody : ExampleBody
+initExampleBody =
+    ExampleBody
+        |> (|>) "example"
+        |> (|>) (initHealth 10)
+
+
+
 -- Unit Interfaces
 
 

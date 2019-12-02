@@ -1,7 +1,7 @@
 module GravitronV2.Main exposing (main)
 
 import GravitronV2.Draw exposing (..)
-import GravitronV2.Health as Components
+import GravitronV2.Health as Health
 import GravitronV2.Vector2 as V exposing (..)
 
 
@@ -73,7 +73,7 @@ type alias Player =
     , friction : Float
     , springConstant : Float
     , mass : Float
-    , health : Components.Health
+    , health : Health.Health
     }
 
 
@@ -86,7 +86,7 @@ initPlayer =
     , springConstant = 0.1
     , friction = 0.5
     , mass = 2000
-    , health = Components.init 100
+    , health = Health.init 100
     }
 
 
@@ -117,8 +117,7 @@ renderPlayer player =
             toTuple player.position
 
         remainingHealthRadius =
-            player.radius
-                * Components.normalize player.health
+            player.radius * Health.normalize player.health
     in
     [ circle x y player.radius (withAlpha 0.5 player.color)
     , circle x y remainingHealthRadius player.color
@@ -162,7 +161,7 @@ type alias Bullet =
     , velocity : Vec
     , radius : Float
     , color : Color
-    , health : Components.Health
+    , health : Health.Health
     , bounceFriction : Float
     , friction : Float
     }
@@ -174,7 +173,7 @@ initBullet position =
     , velocity = vec 5 5
     , radius = 5
     , color = white
-    , health = Components.init 1
+    , health = Health.init 1
     , bounceFriction = 0.8
     , friction = 1
     }
@@ -343,7 +342,7 @@ handleDeath : Memory -> Memory
 handleDeath model =
     let
         ( bullets, deadBullets ) =
-            List.partition (.health >> Components.isAlive) model.bullets
+            List.partition (.health >> Health.isAlive) model.bullets
 
         bulletExplosions =
             List.map explosionFromBullet deadBullets
@@ -366,11 +365,11 @@ handleBulletsCollision processed remaining =
             bullet :: processed
 
         first :: rest ->
-            if Components.isAlive first.health then
+            if Health.isAlive first.health then
                 let
                     reducer b2 ( b1, acc ) =
                         if circleCircleCollision b1 b2 then
-                            ( { b1 | health = Components.kill b1.health }, { b2 | health = Components.kill b1.health } :: acc )
+                            ( { b1 | health = Health.kill b1.health }, { b2 | health = Health.kill b1.health } :: acc )
 
                         else
                             ( b1, b2 :: acc )
@@ -389,8 +388,8 @@ handlePlayerBulletsCollision =
     let
         reducer bullet ( player, bulletList ) =
             if circleCircleCollision bullet player then
-                ( { player | health = Components.dec player.health }
-                , { bullet | health = Components.kill player.health } :: bulletList
+                ( { player | health = Health.dec player.health }
+                , { bullet | health = Health.kill player.health } :: bulletList
                 )
 
             else

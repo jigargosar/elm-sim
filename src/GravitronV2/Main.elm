@@ -247,8 +247,8 @@ explosionFromBullet bullet =
     }
 
 
-updateBulletExplosion : BulletExplosion -> BulletExplosion
-updateBulletExplosion model =
+stepBulletExplosionAnimation : BulletExplosion -> BulletExplosion
+stepBulletExplosionAnimation model =
     { model | elapsed = model.elapsed + 1 }
 
 
@@ -331,7 +331,7 @@ update c model =
         , bullets =
             List.map (updateBullet c model.player) model.bullets
                 |> fireBullet model.elapsed model.turret.position
-        , bulletExplosions = List.map updateBulletExplosion model.bulletExplosions
+        , bulletExplosions = List.map stepBulletExplosionAnimation model.bulletExplosions
         , elapsed = model.elapsed + 1
     }
         |> handleCollision

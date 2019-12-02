@@ -35,14 +35,11 @@ type alias HasPositionRadius a =
 
 
 type alias HasPositionVelocity a =
-    { a
-        | position : Vec
-        , velocity : Vec
-    }
+    HasPosition (HasVelocity a)
 
 
 type alias HasPositionVelocityFriction a =
-    HasPositionVelocity (HasFriction a)
+    HasPosition (HasVelocity (HasFriction a))
 
 
 applyScalarForce : Float -> { a | velocity : Vec } -> { a | velocity : Vec }

@@ -169,6 +169,11 @@ type alias Bullet =
     }
 
 
+defaultBullet : Bullet
+defaultBullet =
+    initBullet vec0
+
+
 initBullet : Vec -> Bullet
 initBullet position =
     { position = position
@@ -321,15 +326,18 @@ fireBullet elapsedTicks turret player bullets =
     in
     if shouldAddBullet then
         let
-            setupBullet b =
+            bullet =
                 let
+                    b =
+                        defaultBullet
+
                     angle =
                         V.vecFrom turret.position player.position
                             |> V.angle
 
                     position =
                         V.fromRTheta (turret.radius + b.radius + 1) angle
-                            |> V.integrate b.position
+                            |> V.integrate turret.position
 
                     velocity =
                         V.fromRTheta (V.len b.velocity) angle
@@ -338,10 +346,6 @@ fireBullet elapsedTicks turret player bullets =
                     | position = position
                     , velocity = velocity
                 }
-
-            bullet =
-                initBullet turret.position
-                    |> setupBullet
         in
         bullet :: bullets
 

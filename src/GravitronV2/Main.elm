@@ -85,7 +85,7 @@ initPlayer =
     , color = red
     , springConstant = 0.1
     , friction = 0.5
-    , mass = 2000
+    , mass = 1500
     , health = Health.init 10
     }
 
@@ -141,7 +141,7 @@ initTurret =
     { position = vec -100 -150
     , radius = 10
     , color = green
-    , health = Health.init 1
+    , health = Health.init 3
     }
 
 

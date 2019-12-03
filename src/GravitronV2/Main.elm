@@ -3,6 +3,7 @@ module GravitronV2.Main exposing (main)
 import Basics.Extra exposing (flip)
 import GravitronV2.Draw exposing (..)
 import GravitronV2.Health as Health exposing (Health)
+import GravitronV2.Timer as Timer exposing (Timer)
 import GravitronV2.Vector2 as V exposing (..)
 
 
@@ -134,53 +135,34 @@ type alias Turret =
     , radius : Float
     , color : Color
     , health : Health
-    , triggerElapsedTicks : Int
-    , triggerMaxTicks : Int
+    , triggerTimer : Timer
     }
 
 
-initTurret : Int -> Vec -> Turret
-initTurret i position =
+initTurret : Float -> Vec -> Turret
+initTurret clock position =
     let
         triggerMaxTicks =
             60 * 5
-
-        triggerElapsedTicks =
-            triggerMaxTicks - (i * (triggerMaxTicks // 10))
     in
     { position = position
     , radius = 10
     , color = green
     , health = Health.init 1
-    , triggerElapsedTicks = triggerElapsedTicks
-    , triggerMaxTicks = triggerMaxTicks
+    , triggerTimer = Timer.start clock triggerMaxTicks
     }
 
 
-stepTurretTimer : Turret -> ( Bool, Turret )
-stepTurretTimer turret =
-    let
-        triggerFired =
-            turret.triggerElapsedTicks + 1 >= turret.triggerMaxTicks
-    in
-    ( triggerFired
-    , { turret
-        | triggerElapsedTicks = turret.triggerElapsedTicks + 1 |> modBy turret.triggerMaxTicks
-      }
-    )
+turretRestartTriggerTimer : Float -> Turret -> Turret
+turretRestartTriggerTimer clock turret =
+    { turret | triggerTimer = Timer.restart clock turret.triggerTimer }
 
 
-turretTriggerProgress : Turret -> Float
-turretTriggerProgress turret =
-    toFloat turret.triggerElapsedTicks
-        / toFloat turret.triggerMaxTicks
-
-
-renderTurret : Turret -> List Shape
-renderTurret turret =
+renderTurret : Float -> Turret -> List Shape
+renderTurret rTicks turret =
     let
         progress =
-            turretTriggerProgress turret
+            Timer.value rTicks turret.triggerTimer
 
         ( x, y ) =
             toTuple turret.position
@@ -422,10 +404,14 @@ type alias Memory =
     }
 
 
-allTurrets =
+allTurretsPositions =
     [ vec -1 -1, vec 1 -1, vec 1 1, vec -1 1 ]
         |> List.map (V.multiply 150)
-        |> List.indexedMap initTurret
+
+
+initTurretsForStage : Int -> Float -> Turrets
+initTurretsForStage stage clock =
+    allTurretsPositions |> List.take stage |> List.map (initTurret clock)
 
 
 initMemory : Int -> Memory
@@ -433,16 +419,19 @@ initMemory elapsed =
     let
         stage =
             4
+
+        rTicks =
+            0
     in
     { player = initPlayer
-    , turrets = allTurrets |> List.take stage
+    , turrets = initTurretsForStage stage rTicks |> List.take stage
     , bullets = []
     , elapsed = elapsed
     , bulletExplosions = []
     , turretExplosions = []
     , stage = stage
     , state = Running
-    , rTicks = 0
+    , rTicks = rTicks
     }
 
 
@@ -548,18 +537,17 @@ update c model =
 stepTimers : Memory -> Memory
 stepTimers model =
     let
-        reducer turret ( bullets, turrets ) =
-            let
-                ( shouldFireBullet, newTurret ) =
-                    stepTurretTimer turret
-            in
-            ( if shouldFireBullet then
-                fireBulletFromTurretTo model.player turret :: bullets
+        rTicks =
+            model.rTicks
 
-              else
-                bullets
-            , newTurret :: turrets
-            )
+        reducer turret ( bullets, turrets ) =
+            if Timer.isDone rTicks turret.triggerTimer then
+                ( fireBulletFromTurretTo model.player turret :: bullets
+                , turretRestartTriggerTimer rTicks turret :: turrets
+                )
+
+            else
+                ( bullets, turrets )
 
         ( firedBullets, newTurrets ) =
             List.foldl reducer ( [], [] ) model.turrets
@@ -632,10 +620,10 @@ handleDeath model =
         , turrets =
             if List.isEmpty turrets then
                 let
-                    newTurretCount =
-                        model.stage + 1 |> modBy (List.length allTurrets + 1)
+                    nextStage =
+                        model.stage + 1 |> modBy 4
                 in
-                allTurrets |> List.take newTurretCount
+                initTurretsForStage nextStage model.rTicks
 
             else
                 turrets
@@ -783,9 +771,13 @@ handleCollision model =
 
 view : Computer -> Memory -> List Shape
 view _ model =
+    let
+        rTicks =
+            model.rTicks
+    in
     renderPlayer model.player
         ++ List.map renderTurretExplosions model.turretExplosions
-        ++ List.concatMap renderTurret model.turrets
+        ++ List.concatMap (renderTurret rTicks) model.turrets
         ++ List.map renderBullet model.bullets
         ++ List.map renderBulletExplosions model.bulletExplosions
         ++ viewGameState model.state

@@ -542,7 +542,7 @@ update c model =
                 stepAnimations model
     )
         |> incElapsed
-        |> incClock
+        |> incRunningTicks
 
 
 stepTimers : Memory -> Memory
@@ -591,8 +591,8 @@ incElapsed model =
     { model | elapsed = model.elapsed + 1 }
 
 
-incClock : Memory -> Memory
-incClock model =
+incRunningTicks : Memory -> Memory
+incRunningTicks model =
     { model | rTicks = model.rTicks + 1 }
 
 

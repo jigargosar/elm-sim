@@ -79,6 +79,8 @@ type Msg
     | MouseMoved Float Float
     | OnResize Int Int
     | OnViewport Browser.Dom.Viewport
+    | OnKeyDown String
+    | OnKeyUp String
 
 
 subscriptions : Model memory -> Sub Msg
@@ -89,6 +91,8 @@ subscriptions _ =
         (JD.field "pageY" JD.float)
         |> Browser.Events.onMouseMove
     , Browser.Events.onResize OnResize
+    , JD.map OnKeyDown (JD.field "key" JD.string)
+        |> Browser.Events.onKeyDown
     ]
         |> Sub.batch
 
@@ -125,6 +129,12 @@ update updateMemory message (Model computer memory) =
                 memory
             , Cmd.none
             )
+
+        OnKeyDown key ->
+            ( Model computer memory, Cmd.none )
+
+        OnKeyUp key ->
+            ( Model computer memory, Cmd.none )
 
 
 

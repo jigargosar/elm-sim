@@ -489,10 +489,10 @@ update c model =
 
         GameOver elapsed ->
             let
-                maxGameOverTicks =
+                maxTicks =
                     60 * 3
             in
-            if elapsed > maxGameOverTicks then
+            if elapsed > maxTicks then
                 initMemory
 
             else

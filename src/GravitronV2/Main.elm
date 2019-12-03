@@ -469,42 +469,6 @@ fireBulletFromTurretTo player turret =
     { bullet | position = position, velocity = velocity }
 
 
-
-{-
-   fireBullet : Int -> Player -> Turret -> List Bullet -> List Bullet
-   fireBullet elapsedTicks player turret bullets =
-       if fireBulletModByElapsed elapsedTicks == 0 then
-           let
-               bullet =
-                   defaultBullet
-
-               angle =
-                   V.vecFrom turret.position player.position
-                       |> V.angle
-
-               position =
-                   V.fromRTheta (turret.radius + bullet.radius + 1) angle
-                       |> V.integrate turret.position
-
-               velocity =
-                   V.fromRTheta (V.len bullet.velocity) angle
-           in
-           { bullet
-               | position = position
-               , velocity = velocity
-           }
-               :: bullets
-
-       else
-           bullets
-
-
-   fireBullets : Int -> Player -> List Bullet -> Turrets -> List Bullet
-   fireBullets elapsedTicks player bullets =
-       List.foldl (fireBullet elapsedTicks player) bullets
--}
-
-
 update : Computer -> Memory -> Memory
 update c model =
     (case model.state of

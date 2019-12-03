@@ -424,7 +424,7 @@ initMemory elapsed =
             0
     in
     { player = initPlayer
-    , turrets = initTurretsForStage stage rTicks |> List.take stage
+    , turrets = initTurretsForStage stage rTicks
     , bullets = []
     , elapsed = elapsed
     , bulletExplosions = []

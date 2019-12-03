@@ -387,13 +387,17 @@ initMemory elapsed =
     }
 
 
-fireBullet : Int -> Player -> Turret -> List Bullet -> List Bullet
-fireBullet elapsedTicks player turret bullets =
+fireBulletProgress elapsedTicks =
     let
         oncePerXTicks =
             60 * 1
     in
-    if modBy oncePerXTicks elapsedTicks == 0 then
+    modBy oncePerXTicks elapsedTicks
+
+
+fireBullet : Int -> Player -> Turret -> List Bullet -> List Bullet
+fireBullet elapsedTicks player turret bullets =
+    if fireBulletProgress elapsedTicks == 0 then
         let
             bullet =
                 defaultBullet

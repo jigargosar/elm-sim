@@ -66,12 +66,15 @@ type alias Mouse =
 
 type alias Keyboard =
     { keys : Set String
+    , prevKeys : Set String
     }
 
 
 initKeyboard : Keyboard
 initKeyboard =
-    { keys = Set.empty }
+    { keys = Set.empty
+    , prevKeys = Set.empty
+    }
 
 
 

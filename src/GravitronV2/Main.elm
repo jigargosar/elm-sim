@@ -412,7 +412,6 @@ type alias Memory =
     , state : GameState
     , stage : Int
     , rTicks : Float
-    , prevKeys : Set String
     }
 
 
@@ -511,11 +510,6 @@ update c model =
     )
         |> incElapsed
         |> incRunningTicks
-        |> savePrevKeys c
-
-
-savePrevKeys c model =
-    { model | prevKeys = c.keyboard.keys }
 
 
 stepTimers : Memory -> Memory

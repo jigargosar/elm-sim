@@ -516,13 +516,20 @@ stepTimers model =
                 ( shouldFireBullet, newTurret ) =
                     stepTurretTimer turret
             in
-            ( bullets, newTurret :: turrets )
+            ( if shouldFireBullet then
+                fireBulletFromTurretTo model.player turret :: bullets
 
-        ( newBullets, newTurrets ) =
+              else
+                bullets
+            , newTurret :: turrets
+            )
+
+        ( firedBullets, newTurrets ) =
             List.foldl reducer ( [], [] ) model.turrets
     in
     { model
         | turrets = newTurrets
+        , bullets = firedBullets ++ model.bullets
     }
 
 

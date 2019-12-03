@@ -406,7 +406,6 @@ type alias Memory =
     { player : Player
     , turrets : List Turret
     , bullets : List Bullet
-    , elapsed : Int
     , bulletExplosions : List BulletExplosion
     , turretExplosions : List TurretExplosion
     , state : GameState
@@ -429,8 +428,8 @@ initTurretsForStage stage_ rTicks =
     allTurretsPositions |> List.take stage |> List.map (initTurret rTicks)
 
 
-initMemory : Int -> Memory
-initMemory elapsed =
+initMemory : Memory
+initMemory =
     let
         stage =
             4
@@ -441,7 +440,6 @@ initMemory elapsed =
     { player = initPlayer
     , turrets = initTurretsForStage stage rTicks
     , bullets = []
-    , elapsed = elapsed
     , bulletExplosions = []
     , turretExplosions = []
     , stage = stage
@@ -489,16 +487,17 @@ update c model =
                     |> handleCollision
                     |> handleDeath
 
-        GameOver at ->
+        GameOver elapsed ->
             let
                 maxGameOverTicks =
                     60 * 3
             in
-            if model.elapsed - at > maxGameOverTicks then
-                initMemory model.elapsed
+            if elapsed > maxGameOverTicks then
+                initMemory
 
             else
-                stepAnimations model
+                { model | state = GameOver (elapsed + 1) }
+                    |> stepAnimations
 
         Paused ->
             if spacePressed c then
@@ -602,7 +601,7 @@ handleDeath model =
                 turrets
         , state =
             if model.player.health |> Health.isDead then
-                GameOver model.elapsed
+                GameOver 0
 
             else
                 model.state

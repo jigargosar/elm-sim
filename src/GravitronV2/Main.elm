@@ -1,16 +1,9 @@
 module GravitronV2.Main exposing (main)
 
-import Angle
-import Arc2d
 import Basics.Extra exposing (flip)
-import Color
-import Geometry.Svg
 import GravitronV2.Draw exposing (..)
 import GravitronV2.Health as Health exposing (Health)
 import GravitronV2.Vector2 as V exposing (..)
-import Point2d
-import TypedSvg.Attributes
-import TypedSvg.Types
 
 
 
@@ -141,6 +134,7 @@ type alias Turret =
     , radius : Float
     , color : Color
     , health : Health
+    , triggerElapsed : Int
     }
 
 
@@ -150,6 +144,7 @@ initTurret position =
     , radius = 10
     , color = green
     , health = Health.init 1
+    , triggerElapsed = 0
     }
 
 

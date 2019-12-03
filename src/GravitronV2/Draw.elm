@@ -82,7 +82,7 @@ initKeyboard =
 type Msg
     = Tick Float
     | MouseMoved Float Float
-    | OnResize Int Int
+    | Resized Int Int
     | OnViewport Browser.Dom.Viewport
     | KeyChanged Bool String
 
@@ -94,7 +94,7 @@ subscriptions _ =
         (JD.field "pageX" JD.float)
         (JD.field "pageY" JD.float)
         |> Browser.Events.onMouseMove
-    , Browser.Events.onResize OnResize
+    , Browser.Events.onResize Resized
     , JD.map (KeyChanged True) (JD.field "key" JD.string)
         |> Browser.Events.onKeyDown
     , JD.map (KeyChanged False) (JD.field "key" JD.string)
@@ -123,7 +123,7 @@ gameUpdate updateMemory message (Model memory computer) =
         OnViewport { scene } ->
             Model memory { computer | screen = screenFromWidthHeight scene.width scene.height }
 
-        OnResize width height ->
+        Resized width height ->
             Model memory { computer | screen = screenFromWidthHeight (toFloat width) (toFloat height) }
 
         KeyChanged isDown key ->

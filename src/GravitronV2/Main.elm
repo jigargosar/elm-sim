@@ -392,17 +392,8 @@ fireBullet elapsedTicks player turret bullets =
     let
         oncePerXTicks =
             60 * 1
-
-        bulletCount =
-            List.length bullets
-
-        maxBullets =
-            100
-
-        shouldAddBullet =
-            modBy oncePerXTicks elapsedTicks == 0 && bulletCount < maxBullets
     in
-    if shouldAddBullet then
+    if modBy oncePerXTicks elapsedTicks == 0 then
         let
             bullet =
                 defaultBullet

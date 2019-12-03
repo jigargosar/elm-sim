@@ -395,8 +395,7 @@ renderTurretExplosions model =
 type GameState
     = Running
     | GameOver Int
-    | PauseKeyDown
-    | PauseKeyUp
+    | Paused
 
 
 
@@ -473,8 +472,9 @@ fireBulletFromTurretTo player turret =
     { bullet | position = position, velocity = velocity }
 
 
-isSpaceKeyDown c =
-    Set.member " " c.keyboard.keys
+isSpaceKeyPressed c prevKeys =
+    not (Set.member " " c.keyboard.keys)
+        && Set.member " " prevKeys
 
 
 update : Computer -> Memory -> Memory
@@ -485,8 +485,8 @@ update c model =
     in
     (case model.state of
         Running ->
-            if isSpaceKeyDown c then
-                { model | state = PauseKeyDown }
+            if isSpaceKeyPressed c model.prevKeys then
+                { model | state = Paused }
 
             else
                 model
@@ -507,22 +507,20 @@ update c model =
             else
                 stepAnimations model
 
-        PauseKeyDown ->
-            if isSpaceKeyDown c then
+        Paused ->
+            if isSpaceKeyPressed c model.prevKeys then
                 model
 
             else
-                { model | state = PauseKeyUp }
-
-        PauseKeyUp ->
-            if isSpaceKeyDown c then
                 { model | state = Running }
-
-            else
-                model
     )
         |> incElapsed
         |> incRunningTicks
+        |> savePrevKeys c
+
+
+savePrevKeys c model =
+    { model | prevKeys = c.keyboard.keys }
 
 
 stepTimers : Memory -> Memory
@@ -779,10 +777,7 @@ viewGameState state =
         GameOver _ ->
             [ text 0 0 "Game Over" ]
 
-        PauseKeyDown ->
-            [ text 0 0 "Paused" ]
-
-        PauseKeyUp ->
+        Paused ->
             [ text 0 0 "Paused" ]
 
 

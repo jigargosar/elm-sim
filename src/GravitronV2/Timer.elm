@@ -1,4 +1,4 @@
-module GravitronV2.Timer exposing (Timer, isDone, restart, value)
+module GravitronV2.Timer exposing (Timer, isDone, restart, start, value)
 
 
 type alias Timer =

@@ -497,7 +497,11 @@ update c model =
                 stepAnimations model
 
         Paused ->
-            model
+            if Set.member " " c.keyboard.keys then
+                { model | state = Running }
+
+            else
+                model
     )
         |> incElapsed
         |> incRunningTicks

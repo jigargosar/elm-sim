@@ -130,16 +130,16 @@ gameUpdate updateMemory message (Game memory computer) =
                     | keyboard = setPrevKeys computer.keyboard
                 }
 
-        MouseMoved mx my ->
+        MouseMoved pageX pageY ->
             let
-                mouse =
-                    computer.mouse
+                x =
+                    computer.screen.left + pageX
 
-                screen =
-                    computer.screen
+                y =
+                    computer.screen.top + pageY
             in
             Game memory
-                { computer | mouse = { mouse | x = mx + screen.left, y = my + screen.top } }
+                { computer | mouse = mouseMove x y computer.mouse }
 
         GotViewport { scene } ->
             Game memory { computer | screen = toScreen scene.width scene.height }
@@ -152,6 +152,11 @@ gameUpdate updateMemory message (Game memory computer) =
                 { computer
                     | keyboard = updateKeyboard isDown key computer.keyboard
                 }
+
+
+mouseMove : Float -> Float -> Mouse -> Mouse
+mouseMove x y mouse =
+    { mouse | x = x, y = y }
 
 
 updateKeyboard : Bool -> String -> Keyboard -> Keyboard

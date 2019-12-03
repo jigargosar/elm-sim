@@ -320,11 +320,14 @@ turretPositions =
         |> List.map (V.multiply 150)
 
 
+allTurrets =
+    turretPositions |> List.map initTurret
+
+
 initMemory : Int -> Memory
 initMemory elapsed =
     { player = initPlayer
-    , turrets =
-        turretPositions |> List.take 1 |> List.map initTurret
+    , turrets = allTurrets |> List.take 1
     , bullets = []
     , elapsed = elapsed
     , bulletExplosions = []
@@ -427,12 +430,22 @@ handleDeath model =
     { model
         | bullets = bullets
         , bulletExplosions = bulletExplosions
-        , state =
-            if model.player.health |> Health.isAlive then
-                model.state
+        , turrets =
+            if List.all (.health >> Health.isDead) model.turrets then
+                let
+                    newTurretCount =
+                        List.length model.turrets |> modBy (List.length allTurrets)
+                in
+                allTurrets |> List.take newTurretCount
 
             else
+                model.turrets
+        , state =
+            if model.player.health |> Health.isDead then
                 GameOver model.elapsed
+
+            else
+                model.state
     }
 
 

@@ -134,7 +134,8 @@ type alias Turret =
     , radius : Float
     , color : Color
     , health : Health
-    , triggerElapsed : Int
+    , triggerElapsedTicks : Int
+    , triggerMaxTicks : Int
     }
 
 
@@ -144,7 +145,8 @@ initTurret position =
     , radius = 10
     , color = green
     , health = Health.init 1
-    , triggerElapsed = 0
+    , triggerElapsedTicks = 0
+    , triggerMaxTicks = 60
     }
 
 

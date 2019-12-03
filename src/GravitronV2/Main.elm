@@ -449,20 +449,6 @@ initMemory elapsed =
     }
 
 
-
---fireBulletAfterTicks =
---    60 * 1
---
---
---fireBulletModByElapsed elapsedTicks =
---    modBy fireBulletAfterTicks elapsedTicks
---
---
---fireBulletProgress elapsedTicks =
---    1 / fireBulletAfterTicks * toFloat (fireBulletModByElapsed elapsedTicks)
---
-
-
 fireBulletFromTurretTo : Player -> Turret -> Bullet
 fireBulletFromTurretTo player turret =
     let
@@ -480,10 +466,7 @@ fireBulletFromTurretTo player turret =
         velocity =
             V.fromRTheta (V.len bullet.velocity) angle
     in
-    { bullet
-        | position = position
-        , velocity = velocity
-    }
+    { bullet | position = position, velocity = velocity }
 
 
 

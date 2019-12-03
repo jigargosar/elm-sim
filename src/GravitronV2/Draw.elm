@@ -46,6 +46,7 @@ type alias Flags =
 type alias Computer =
     { mouse : Mouse
     , screen : Screen
+    , keyboard : Keyboard
     }
 
 
@@ -59,11 +60,21 @@ type alias Mouse =
     }
 
 
+type alias Keyboard =
+    {}
+
+
+initKeyboard : Keyboard
+initKeyboard =
+    {}
+
+
 init : memory -> Flags -> ( Model memory, Cmd Msg )
 init initialMemory _ =
     ( Model
         { mouse = Mouse 0 0
         , screen = screenFromWidthHeight 600 600
+        , keyboard = initKeyboard
         }
         initialMemory
     , Browser.Dom.getViewport |> Task.perform OnViewport
@@ -133,10 +144,30 @@ update updateMemory message (Model computer memory) =
             )
 
         OnKeyDown key ->
-            ( Model computer memory, Cmd.none )
+            ( Model
+                { computer
+                    | keyboard = onKeyDown key computer.keyboard
+                }
+                memory
+            , Cmd.none
+            )
 
         OnKeyUp key ->
-            ( Model computer memory, Cmd.none )
+            ( Model
+                { computer
+                    | keyboard = onKeyUp key computer.keyboard
+                }
+                memory
+            , Cmd.none
+            )
+
+
+onKeyDown key keyboard =
+    keyboard
+
+
+onKeyUp key keyboard =
+    keyboard
 
 
 

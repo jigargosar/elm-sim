@@ -5,6 +5,7 @@ module GravitronV2.Game exposing
     , Shape
     , circle
     , customShape
+    , freshKeyDown
     , game
     , green
     , noShape
@@ -75,6 +76,21 @@ initKeyboard =
     { keys = Set.empty
     , prevKeys = Set.empty
     }
+
+
+freshKeyDown : String -> Computer -> Bool
+freshKeyDown key c =
+    let
+        prev =
+            c.keyboard.prevKeys
+
+        curr =
+            c.keyboard.keys
+
+        isDown =
+            Set.member key
+    in
+    isDown curr && not (isDown prev)
 
 
 

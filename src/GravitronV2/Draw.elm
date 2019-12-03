@@ -103,7 +103,7 @@ subscriptions _ =
         |> Sub.batch
 
 
-gameUpdate : Update memory -> Msg -> Model memory -> Model memory
+gameUpdate : (Computer -> memory -> memory) -> Msg -> Model memory -> Model memory
 gameUpdate updateMemory message (Model memory computer) =
     case message of
         Tick _ ->
@@ -332,15 +332,7 @@ type alias Game memory =
     Program () (Model memory) Msg
 
 
-type alias Update memory =
-    Computer -> memory -> memory
-
-
-type alias View memory =
-    Computer -> memory -> List Shape
-
-
-game : memory -> Update memory -> View memory -> Game memory
+game : memory -> (Computer -> memory -> memory) -> (Computer -> memory -> List Shape) -> Game memory
 game initialMemory updateMemory viewMemory =
     let
         view (Model memory computer) =

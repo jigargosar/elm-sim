@@ -540,6 +540,17 @@ stepTimers model =
         rTicks =
             model.rTicks
 
+        firedBullets =
+            List.filterMap
+                (\t ->
+                    if Timer.isDone rTicks t.triggerTimer then
+                        Just <| fireBulletFromTurretTo model.player t
+
+                    else
+                        Nothing
+                )
+                model.turrets
+
         reducer turret ( bullets, turrets ) =
             if Timer.isDone rTicks turret.triggerTimer then
                 ( fireBulletFromTurretTo model.player turret :: bullets
@@ -547,9 +558,9 @@ stepTimers model =
                 )
 
             else
-                ( bullets, turrets )
+                ( bullets, turret :: turrets )
 
-        ( firedBullets, newTurrets ) =
+        ( _, newTurrets ) =
             List.foldl reducer ( [], [] ) model.turrets
     in
     { model

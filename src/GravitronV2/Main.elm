@@ -419,7 +419,11 @@ allTurretsPositions =
 
 
 initTurretsForStage : Int -> Float -> Turrets
-initTurretsForStage stage rTicks =
+initTurretsForStage stage_ rTicks =
+    let
+        stage =
+            stage_ + 1 |> modBy (List.length allTurretsPositions)
+    in
     allTurretsPositions |> List.take stage |> List.map (initTurret rTicks)
 
 
@@ -628,11 +632,7 @@ handleDeath model =
                 model.stage
         , turrets =
             if List.isEmpty turrets then
-                let
-                    nextStage =
-                        model.stage + 1 |> modBy 4
-                in
-                initTurretsForStage nextStage model.rTicks
+                initTurretsForStage (model.stage + 1) model.rTicks
 
             else
                 turrets

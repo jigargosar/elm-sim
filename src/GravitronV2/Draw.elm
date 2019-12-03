@@ -8,6 +8,7 @@ module GravitronV2.Draw exposing
     , customShape
     , game
     , green
+    , noShape
     , red
     , strokeArc
     , text
@@ -135,11 +136,17 @@ type Shape
     | Text Float Float String
     | StrokeArc ( Float, Float ) Float ( Float, Float ) Color
     | Custom (Svg Never)
+    | NoShape
 
 
 circle : Float -> Float -> Float -> Color -> Shape
 circle =
     Circle
+
+
+noShape : Shape
+noShape =
+    NoShape
 
 
 text : Float -> Float -> String -> Shape
@@ -224,6 +231,9 @@ renderShape shape =
                     (Angle.radians angle)
                     (Point2d.unitless sx sy)
                 )
+
+        NoShape ->
+            Svg.text ""
 
 
 

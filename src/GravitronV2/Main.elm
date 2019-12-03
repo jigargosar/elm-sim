@@ -167,7 +167,6 @@ turretTriggerProgress : Turret -> Float
 turretTriggerProgress turret =
     toFloat turret.triggerElapsedTicks
         / toFloat turret.triggerMaxTicks
-        |> max 0.000001
 
 
 renderTurret : Turret -> List Shape
@@ -184,7 +183,11 @@ renderTurret turret =
     in
     [ circle x y turret.radius (withAlpha 0.5 turret.color)
     , circle x y remainingHealthRadius turret.color
-    , strokeArc ( x, y ) (turns progress) ( x + turret.radius + (turret.radius / 4), y ) white
+    , if progress > 0 then
+        strokeArc ( x, y ) (turns progress) ( x + turret.radius + (turret.radius / 4), y ) white
+
+      else
+        noShape
     ]
 
 

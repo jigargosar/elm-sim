@@ -143,10 +143,13 @@ initTurret : Int -> Vec -> Turret
 initTurret i position =
     let
         triggerMaxTicks =
-            60
+            60 * 3
+
+        quarter =
+            triggerMaxTicks // 4
 
         triggerElapsedTicks =
-            0
+            quarter + quarter * (4 - modBy 4 i)
     in
     { position = position
     , radius = 10
@@ -429,13 +432,17 @@ allTurrets =
 
 initMemory : Int -> Memory
 initMemory elapsed =
+    let
+        stage =
+            4
+    in
     { player = initPlayer
-    , turrets = allTurrets |> List.take 1
+    , turrets = allTurrets |> List.take stage
     , bullets = []
     , elapsed = elapsed
     , bulletExplosions = []
     , turretExplosions = []
-    , stage = 1
+    , stage = stage
     , state = Running
     }
 

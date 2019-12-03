@@ -418,6 +418,7 @@ type alias Memory =
     , turretExplosions : List TurretExplosion
     , state : GameState
     , stage : Int
+    , clock : Float
     }
 
 
@@ -441,6 +442,7 @@ initMemory elapsed =
     , turretExplosions = []
     , stage = stage
     , state = Running
+    , clock = 0
     }
 
 
@@ -540,6 +542,7 @@ update c model =
                 stepAnimations model
     )
         |> incElapsed
+        |> incClock
 
 
 stepTimers : Memory -> Memory
@@ -586,6 +589,11 @@ handleUpdate c model =
 incElapsed : Memory -> Memory
 incElapsed model =
     { model | elapsed = model.elapsed + 1 }
+
+
+incClock : Memory -> Memory
+incClock model =
+    { model | clock = model.clock + 1 }
 
 
 handleDeath : Memory -> Memory

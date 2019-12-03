@@ -284,7 +284,7 @@ renderBulletExplosions model =
                 / model.maxTicks
 
         radius =
-            bullet.radius + (2 * progress)
+            bullet.radius + (bullet.radius * progress)
 
         color =
             withAlpha (1 - progress) bullet.color
@@ -335,7 +335,7 @@ renderTurretExplosions model =
                 / model.maxTicks
 
         radius =
-            turret.radius + (2 * progress)
+            turret.radius + (turret.radius * progress)
 
         color =
             withAlpha (1 - progress) turret.color
@@ -653,6 +653,7 @@ handleCollision model =
 view : Computer -> Memory -> List Shape
 view _ model =
     renderPlayer model.player
+        ++ List.map renderTurretExplosions model.turretExplosions
         ++ List.concatMap renderTurret model.turrets
         ++ List.map renderBullet model.bullets
         ++ List.map renderBulletExplosions model.bulletExplosions

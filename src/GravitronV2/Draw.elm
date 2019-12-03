@@ -92,8 +92,7 @@ type Msg
     | MouseMoved Float Float
     | OnResize Int Int
     | OnViewport Browser.Dom.Viewport
-    | OnKeyDown String
-    | OnKeyUp String
+    | KeyChanged Bool String
 
 
 subscriptions : Model memory -> Sub Msg
@@ -104,9 +103,9 @@ subscriptions _ =
         (JD.field "pageY" JD.float)
         |> Browser.Events.onMouseMove
     , Browser.Events.onResize OnResize
-    , JD.map OnKeyDown (JD.field "key" JD.string)
+    , JD.map (KeyChanged True) (JD.field "key" JD.string)
         |> Browser.Events.onKeyDown
-    , JD.map OnKeyUp (JD.field "key" JD.string)
+    , JD.map (KeyChanged False) (JD.field "key" JD.string)
         |> Browser.Events.onKeyUp
     ]
         |> Sub.batch
@@ -145,33 +144,26 @@ update updateMemory message (Model computer memory) =
             , Cmd.none
             )
 
-        OnKeyDown key ->
+        KeyChanged isDown key ->
             ( Model
                 { computer
-                    | keyboard = onKeyDown key computer.keyboard
-                }
-                memory
-            , Cmd.none
-            )
-
-        OnKeyUp key ->
-            ( Model
-                { computer
-                    | keyboard = onKeyUp key computer.keyboard
+                    | keyboard = updateKeyboard isDown key computer.keyboard
                 }
                 memory
             , Cmd.none
             )
 
 
-onKeyDown : String -> Keyboard -> Keyboard
-onKeyDown key keyboard =
-    { keyboard | keys = Set.insert key keyboard.keys }
+updateKeyboard : Bool -> String -> Keyboard -> Keyboard
+updateKeyboard isDown key keyboard =
+    { keyboard
+        | keys =
+            if isDown then
+                Set.insert key keyboard.keys
 
-
-onKeyUp : String -> Keyboard -> Keyboard
-onKeyUp key keyboard =
-    { keyboard | keys = Set.remove key keyboard.keys }
+            else
+                Set.remove key keyboard.keys
+    }
 
 
 

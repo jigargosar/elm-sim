@@ -83,7 +83,7 @@ type Msg
     = Tick Float
     | MouseMoved Float Float
     | Resized Int Int
-    | OnViewport Browser.Dom.Viewport
+    | GotViewport Browser.Dom.Viewport
     | KeyChanged Bool String
 
 
@@ -120,7 +120,7 @@ gameUpdate updateMemory message (Game memory computer) =
             Game memory
                 { computer | mouse = { mouse | x = mx + screen.left, y = my + screen.top } }
 
-        OnViewport { scene } ->
+        GotViewport { scene } ->
             Game memory { computer | screen = screenFromWidthHeight scene.width scene.height }
 
         Resized width height ->
@@ -342,7 +342,7 @@ game initialMemory updateMemory viewMemory =
             ( Game
                 initialMemory
                 initialComputer
-            , Browser.Dom.getViewport |> Task.perform OnViewport
+            , Browser.Dom.getViewport |> Task.perform GotViewport
             )
 
         update msg model =

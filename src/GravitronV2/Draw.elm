@@ -9,18 +9,23 @@ module GravitronV2.Draw exposing
     , game
     , green
     , red
+    , strokeArc
     , text
     , white
     , withAlpha
     )
 
+import Angle
+import Arc2d
 import Browser
 import Browser.Dom
 import Browser.Events
 import Color
+import Geometry.Svg
 import Html exposing (Html)
 import Html.Attributes
 import Json.Decode as JD
+import Point2d
 import Svg exposing (Svg)
 import Task
 import TypedSvg
@@ -128,6 +133,7 @@ update updateMemory message (Model computer memory) =
 type Shape
     = Circle Float Float Float Color
     | Text Float Float String
+    | StrokeArc ( Float, Float ) Float ( Float, Float ) Color
     | Custom (Svg Never)
 
 
@@ -139,6 +145,11 @@ circle =
 text : Float -> Float -> String -> Shape
 text =
     Text
+
+
+strokeArc : ( Float, Float ) -> Float -> ( Float, Float ) -> Color -> Shape
+strokeArc =
+    StrokeArc
 
 
 customShape : Svg Never -> Shape
@@ -177,6 +188,16 @@ fillColor (Color c) =
     TA.fill (TT.Fill c)
 
 
+fillNone : Svg.Attribute msg
+fillNone =
+    TA.fill TT.FillNone
+
+
+strokeColor : Color -> Svg.Attribute msg
+strokeColor (Color c) =
+    TA.stroke c
+
+
 renderShape shape =
     case shape of
         Circle cx cy r c ->
@@ -193,6 +214,16 @@ renderShape shape =
 
         Custom custom ->
             custom |> Svg.map never
+
+        StrokeArc ( cx, cy ) angle ( sx, sy ) c ->
+            Geometry.Svg.arc2d
+                [ strokeColor c
+                , fillNone
+                ]
+                (Arc2d.sweptAround (Point2d.unitless cx cy)
+                    (Angle.radians angle)
+                    (Point2d.unitless sx sy)
+                )
 
 
 

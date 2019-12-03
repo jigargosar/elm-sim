@@ -157,15 +157,7 @@ renderTurret : Int -> Turret -> List Shape
 renderTurret elapsedTicks turret =
     let
         progress =
-            fireBulletProgress elapsedTicks
-
-        progressAngle =
-            Angle.degrees (360 * progress)
-
-        arc =
-            Arc2d.sweptAround (Point2d.unitless x y)
-                progressAngle
-                (Point2d.unitless (x + turret.radius + (turret.radius / 4)) y)
+            fireBulletProgress elapsedTicks + 0.000001
 
         ( x, y ) =
             toTuple turret.position
@@ -175,13 +167,7 @@ renderTurret elapsedTicks turret =
     in
     [ circle x y turret.radius (withAlpha 0.5 turret.color)
     , circle x y remainingHealthRadius turret.color
-    , customShape
-        (Geometry.Svg.arc2d
-            [ TypedSvg.Attributes.stroke Color.white
-            , TypedSvg.Attributes.fill TypedSvg.Types.FillNone
-            ]
-            arc
-        )
+    , strokeArc ( x, y ) (turns progress) ( x + turret.radius + (turret.radius / 4), y ) white
     ]
 
 

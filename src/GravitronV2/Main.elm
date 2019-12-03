@@ -293,6 +293,57 @@ renderBulletExplosions model =
 
 
 
+-- TurretExplosion
+
+
+type alias TurretExplosion =
+    { turret : Turret
+    , maxTicks : Float
+    , elapsed : Float
+    }
+
+
+explosionFromTurret : Turret -> TurretExplosion
+explosionFromTurret turret =
+    { turret = turret
+    , maxTicks = 60
+    , elapsed = 0
+    }
+
+
+stepTurretExplosionAnimation : TurretExplosion -> TurretExplosion
+stepTurretExplosionAnimation model =
+    { model | elapsed = model.elapsed + 1 }
+
+
+isTurretExplosionAnimating : TurretExplosion -> Bool
+isTurretExplosionAnimating model =
+    model.elapsed < model.maxTicks
+
+
+renderTurretExplosions : TurretExplosion -> Shape
+renderTurretExplosions model =
+    let
+        ( x, y ) =
+            V.toTuple turret.position
+
+        turret =
+            model.turret
+
+        progress =
+            clamp 0 model.maxTicks model.elapsed
+                / model.maxTicks
+
+        radius =
+            turret.radius + (2 * progress)
+
+        color =
+            withAlpha (1 - progress) turret.color
+    in
+    circle x y radius color
+
+
+
 -- Game
 
 
@@ -311,6 +362,7 @@ type alias Memory =
     , bullets : List Bullet
     , elapsed : Int
     , bulletExplosions : List BulletExplosion
+    , turretExplosions : List TurretExplosion
     , state : GameState
     , stage : Int
     }
@@ -329,6 +381,7 @@ initMemory elapsed =
     , bullets = []
     , elapsed = elapsed
     , bulletExplosions = []
+    , turretExplosions = []
     , stage = 1
     , state = Running
     }
@@ -428,10 +481,16 @@ handleDeath model =
 
         ( turrets, deadTurrets ) =
             List.partition (.health >> Health.isAlive) model.turrets
+
+        turretExplosions =
+            List.map explosionFromTurret deadTurrets
+                ++ model.turretExplosions
+                |> List.filter isTurretExplosionAnimating
     in
     { model
         | bullets = bullets
         , bulletExplosions = bulletExplosions
+        , turretExplosions = turretExplosions
         , stage =
             if List.isEmpty turrets then
                 model.stage + 1

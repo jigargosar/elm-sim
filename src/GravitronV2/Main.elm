@@ -159,6 +159,11 @@ turretRestartTriggerTimer clock turret =
     { turret | triggerTimer = Timer.restart clock turret.triggerTimer }
 
 
+turretTriggerTimerDone : Float -> Turret -> Bool
+turretTriggerTimerDone rTicks turret =
+    Timer.isDone rTicks turret.triggerTimer
+
+
 turretRestartTriggerTimerIfDone : Float -> Turret -> Turret
 turretRestartTriggerTimerIfDone rTicks turret =
     if Timer.isDone rTicks turret.triggerTimer then
@@ -517,7 +522,7 @@ stepTimers model =
         firedBullets =
             List.foldl
                 (\turret ->
-                    if turretTriggerTimerDone turret then
+                    if turretTriggerTimerDone rTicks turret then
                         (::) (fireBulletFromTurretTo model.player turret)
 
                     else
@@ -525,9 +530,6 @@ stepTimers model =
                 )
                 []
                 model.turrets
-
-        turretTriggerTimerDone turret =
-            turret.triggerTimer |> Timer.isDone rTicks
     in
     { model
         | turrets = List.map (turretRestartTriggerTimerIfDone rTicks) model.turrets

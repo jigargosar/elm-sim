@@ -18,7 +18,6 @@ module GravitronV2.Draw exposing
 
 import Angle
 import Arc2d
-import Basics.Extra exposing (flip)
 import Browser
 import Browser.Dom
 import Browser.Events
@@ -231,6 +230,7 @@ strokeColor (Color c) =
     TA.stroke c
 
 
+renderShape : Shape -> Svg msg
 renderShape shape =
     case shape of
         Circle cx cy r c ->

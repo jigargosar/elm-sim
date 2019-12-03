@@ -472,9 +472,9 @@ fireBulletFromTurretTo player turret =
     { bullet | position = position, velocity = velocity }
 
 
-isSpaceKeyPressed c prevKeys =
-    not (Set.member " " c.keyboard.keys)
-        && Set.member " " prevKeys
+isSpaceKeyJustPressed c prevKeys =
+    Set.member " " c.keyboard.keys
+        && not (Set.member " " prevKeys)
 
 
 update : Computer -> Memory -> Memory
@@ -485,7 +485,7 @@ update c model =
     in
     (case model.state of
         Running ->
-            if isSpaceKeyPressed c model.prevKeys then
+            if isSpaceKeyJustPressed c model.prevKeys then
                 { model | state = Paused }
 
             else
@@ -508,7 +508,7 @@ update c model =
                 stepAnimations model
 
         Paused ->
-            if isSpaceKeyPressed c model.prevKeys then
+            if isSpaceKeyJustPressed c model.prevKeys then
                 { model | state = Running }
 
             else

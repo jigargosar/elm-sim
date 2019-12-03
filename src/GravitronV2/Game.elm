@@ -1,7 +1,6 @@
-module GravitronV2.Draw exposing
+module GravitronV2.Game exposing
     ( Color
     , Computer
-    , Game
     , Screen
     , Shape
     , circle

@@ -158,6 +158,15 @@ turretRestartTriggerTimer clock turret =
     { turret | triggerTimer = Timer.restart clock turret.triggerTimer }
 
 
+turretRestartTriggerTimerIfDone : Float -> Turret -> Turret
+turretRestartTriggerTimerIfDone rTicks turret =
+    if Timer.isDone rTicks turret.triggerTimer then
+        turretRestartTriggerTimer rTicks turret
+
+    else
+        turret
+
+
 renderTurret : Float -> Turret -> List Shape
 renderTurret rTicks turret =
     let
@@ -551,21 +560,9 @@ stepTimers model =
                 )
                 []
                 model.turrets
-
-        reducer turret ( bullets, turrets ) =
-            if Timer.isDone rTicks turret.triggerTimer then
-                ( fireBulletFromTurretTo model.player turret :: bullets
-                , turretRestartTriggerTimer rTicks turret :: turrets
-                )
-
-            else
-                ( bullets, turret :: turrets )
-
-        ( _, newTurrets ) =
-            List.foldl reducer ( [], [] ) model.turrets
     in
     { model
-        | turrets = newTurrets
+        | turrets = List.map (turretRestartTriggerTimerIfDone rTicks) model.turrets
         , bullets = firedBullets ++ model.bullets
     }
 

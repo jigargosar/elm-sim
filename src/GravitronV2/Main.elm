@@ -5,6 +5,7 @@ import GravitronV2.Game exposing (..)
 import GravitronV2.Health as Health exposing (Health)
 import GravitronV2.Timer as Timer exposing (Timer)
 import GravitronV2.Vector2 as V exposing (..)
+import Set
 
 
 
@@ -473,12 +474,16 @@ update : Computer -> Memory -> Memory
 update c model =
     (case model.state of
         Running ->
-            model
-                |> stepAnimations
-                |> stepTimers
-                |> handleUpdate c
-                |> handleCollision
-                |> handleDeath
+            if Set.member " " c.keyboard.keys then
+                { model | state = Paused }
+
+            else
+                model
+                    |> stepAnimations
+                    |> stepTimers
+                    |> handleUpdate c
+                    |> handleCollision
+                    |> handleDeath
 
         GameOver at ->
             let

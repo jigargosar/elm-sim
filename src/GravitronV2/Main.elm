@@ -408,7 +408,7 @@ type alias Memory =
     , turretExplosions : List TurretExplosion
     , state : GameState
     , stage : Int
-    , clock : Float
+    , rTicks : Float
     }
 
 
@@ -442,7 +442,7 @@ initMemory =
     , turretExplosions = []
     , stage = stage
     , state = Running
-    , clock = rTicks
+    , rTicks = rTicks
     }
 
 
@@ -511,7 +511,7 @@ stepTimers : Memory -> Memory
 stepTimers model =
     let
         rTicks =
-            model.clock
+            model.rTicks
 
         firedBullets =
             List.foldl
@@ -550,7 +550,7 @@ handleUpdate c model =
 incRunningTicks : Memory -> Memory
 incRunningTicks model =
     if model.state == Running then
-        { model | clock = model.clock + 1 }
+        { model | rTicks = model.rTicks + 1 }
 
     else
         model
@@ -587,7 +587,7 @@ handleDeath model =
                 model.stage
         , turrets =
             if List.isEmpty turrets then
-                initTurretsForStage (model.stage + 1) model.clock
+                initTurretsForStage (model.stage + 1) model.rTicks
 
             else
                 turrets
@@ -737,7 +737,7 @@ view : G.Computer -> Memory -> List G.Shape
 view _ model =
     let
         rTicks =
-            model.clock
+            model.rTicks
     in
     renderPlayer model.player
         ++ List.map renderTurretExplosions model.turretExplosions

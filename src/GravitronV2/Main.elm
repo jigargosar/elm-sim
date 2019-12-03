@@ -452,6 +452,7 @@ update c model =
     (case model.state of
         Running ->
             model
+                |> stepAnimations
                 |> handleTick
                 |> handleUpdate c
                 |> handleCollision
@@ -466,15 +467,21 @@ update c model =
                 initMemory model.elapsed
 
             else
-                { model
-                    | bulletExplosions = List.map stepBulletExplosionAnimation model.bulletExplosions
-                }
+                stepAnimations model
     )
         |> incElapsed
 
 
 handleTick : Memory -> Memory
 handleTick model =
+    { model
+        | bulletExplosions = List.map stepBulletExplosionAnimation model.bulletExplosions
+        , turretExplosions = List.map stepTurretExplosionAnimation model.turretExplosions
+    }
+
+
+stepAnimations : Memory -> Memory
+stepAnimations model =
     { model
         | bulletExplosions = List.map stepBulletExplosionAnimation model.bulletExplosions
         , turretExplosions = List.map stepTurretExplosionAnimation model.turretExplosions

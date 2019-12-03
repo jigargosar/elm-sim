@@ -4,8 +4,7 @@ import Basics.Extra exposing (flip)
 import GravitronV2.Game exposing (..)
 import GravitronV2.Health as Health exposing (Health)
 import GravitronV2.Timer as Timer exposing (Timer)
-import GravitronV2.Vector2 as V exposing (..)
-import Set exposing (Set)
+import GravitronV2.Vector2 as V exposing (Vec, vec, vec0)
 
 
 
@@ -43,7 +42,7 @@ type alias HasVelocity a =
 
 applyForce : Vec -> HasVelocity a -> HasVelocity a
 applyForce force model =
-    { model | velocity = integrate force model.velocity }
+    { model | velocity = V.integrate force model.velocity }
 
 
 applyScalarForce : Float -> HasVelocity a -> HasVelocity a
@@ -61,7 +60,7 @@ type alias HasPositionVelocity a =
 
 applyVelocity : HasPositionVelocity a -> HasPositionVelocity a
 applyVelocity model =
-    { model | position = integrate model.position model.velocity }
+    { model | position = V.integrate model.position model.velocity }
 
 
 
@@ -100,12 +99,12 @@ updatePlayer c player =
         applySpringForceTowardsPoint toPoint k model =
             let
                 force =
-                    springForceFrom model.position toPoint k
+                    V.springForceFrom model.position toPoint k
             in
             applyForce force model
 
         springPoint =
-            fromRec c.mouse
+            V.fromRec c.mouse
     in
     player
         |> applySpringForceTowardsPoint springPoint player.springConstant
@@ -117,7 +116,7 @@ renderPlayer : Player -> List Shape
 renderPlayer player =
     let
         ( x, y ) =
-            toTuple player.position
+            V.toTuple player.position
 
         remainingHealthRadius =
             player.radius * Health.normalize player.health
@@ -175,7 +174,7 @@ renderTurret rTicks turret =
             Timer.value rTicks turret.triggerTimer
 
         ( x, y ) =
-            toTuple turret.position
+            V.toTuple turret.position
 
         remainingHealthRadius =
             turret.radius * Health.normalize turret.health
@@ -506,7 +505,6 @@ update c model =
             else
                 model
     )
-        |> incElapsed
         |> incRunningTicks
 
 
@@ -548,11 +546,6 @@ handleUpdate c model =
         | player = updatePlayer c model.player
         , bullets = List.map (updateBullet c model.player) model.bullets
     }
-
-
-incElapsed : Memory -> Memory
-incElapsed model =
-    { model | elapsed = model.elapsed + 1 }
 
 
 incRunningTicks : Memory -> Memory
@@ -769,4 +762,4 @@ viewGameState state =
 
 
 main =
-    game (initMemory 0) update view
+    game initMemory update view

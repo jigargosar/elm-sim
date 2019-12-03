@@ -509,10 +509,10 @@ update c model =
 
         Paused ->
             if isSpaceKeyPressed c model.prevKeys then
-                model
+                { model | state = Running }
 
             else
-                { model | state = Running }
+                model
     )
         |> incElapsed
         |> incRunningTicks

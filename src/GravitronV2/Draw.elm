@@ -56,7 +56,7 @@ initialComputer =
 
 
 type Game memory
-    = Model memory Computer
+    = Game memory Computer
 
 
 type alias Mouse =
@@ -104,10 +104,10 @@ subscriptions _ =
 
 
 gameUpdate : (Computer -> memory -> memory) -> Msg -> Game memory -> Game memory
-gameUpdate updateMemory message (Model memory computer) =
+gameUpdate updateMemory message (Game memory computer) =
     case message of
         Tick _ ->
-            Model (updateMemory computer memory) computer
+            Game (updateMemory computer memory) computer
 
         MouseMoved mx my ->
             let
@@ -117,17 +117,17 @@ gameUpdate updateMemory message (Model memory computer) =
                 screen =
                     computer.screen
             in
-            Model memory
+            Game memory
                 { computer | mouse = { mouse | x = mx + screen.left, y = my + screen.top } }
 
         OnViewport { scene } ->
-            Model memory { computer | screen = screenFromWidthHeight scene.width scene.height }
+            Game memory { computer | screen = screenFromWidthHeight scene.width scene.height }
 
         Resized width height ->
-            Model memory { computer | screen = screenFromWidthHeight (toFloat width) (toFloat height) }
+            Game memory { computer | screen = screenFromWidthHeight (toFloat width) (toFloat height) }
 
         KeyChanged isDown key ->
-            Model memory
+            Game memory
                 { computer
                     | keyboard = updateKeyboard isDown key computer.keyboard
                 }
@@ -335,11 +335,11 @@ game :
     -> Program () (Game memory) Msg
 game initialMemory updateMemory viewMemory =
     let
-        view (Model memory computer) =
+        view (Game memory computer) =
             render computer.screen (viewMemory computer memory)
 
         init () =
-            ( Model
+            ( Game
                 initialMemory
                 initialComputer
             , Browser.Dom.getViewport |> Task.perform OnViewport

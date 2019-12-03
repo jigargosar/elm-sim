@@ -1,7 +1,7 @@
 module GravitronV2.Main exposing (main)
 
 import Basics.Extra exposing (flip)
-import GravitronV2.Game exposing (..)
+import GravitronV2.Game as G
 import GravitronV2.Health as Health exposing (Health)
 import GravitronV2.Timer as Timer exposing (Timer)
 import GravitronV2.Vector2 as V exposing (Vec, vec, vec0)
@@ -71,7 +71,7 @@ type alias Player =
     { position : Vec
     , velocity : Vec
     , radius : Float
-    , color : Color
+    , color : G.Color
     , friction : Float
     , springConstant : Float
     , mass : Float
@@ -84,7 +84,7 @@ initPlayer =
     { position = vec0
     , velocity = vec 0 -10
     , radius = 10
-    , color = red
+    , color = G.red
     , springConstant = 0.2
     , friction = 0.5
     , mass = 300
@@ -92,7 +92,7 @@ initPlayer =
     }
 
 
-updatePlayer : Computer -> Player -> Player
+updatePlayer : G.Computer -> Player -> Player
 updatePlayer c player =
     let
         applySpringForceTowardsPoint : Vec -> Float -> Player -> Player
@@ -112,7 +112,7 @@ updatePlayer c player =
         |> applyVelocity
 
 
-renderPlayer : Player -> List Shape
+renderPlayer : Player -> List G.Shape
 renderPlayer player =
     let
         ( x, y ) =
@@ -121,8 +121,8 @@ renderPlayer player =
         remainingHealthRadius =
             player.radius * Health.normalize player.health
     in
-    [ circle x y player.radius (withAlpha 0.5 player.color)
-    , circle x y remainingHealthRadius player.color
+    [ G.circle x y player.radius (G.withAlpha 0.5 player.color)
+    , G.circle x y remainingHealthRadius player.color
     ]
 
 
@@ -133,7 +133,7 @@ renderPlayer player =
 type alias Turret =
     { position : Vec
     , radius : Float
-    , color : Color
+    , color : G.Color
     , health : Health
     , triggerTimer : Timer
     }
@@ -147,7 +147,7 @@ initTurret clock position =
     in
     { position = position
     , radius = 10
-    , color = green
+    , color = G.green
     , health = Health.init 1
     , triggerTimer = Timer.start clock triggerMaxTicks
     }
@@ -167,7 +167,7 @@ turretRestartTriggerTimerIfDone rTicks turret =
         turret
 
 
-renderTurret : Float -> Turret -> List Shape
+renderTurret : Float -> Turret -> List G.Shape
 renderTurret rTicks turret =
     let
         progress =
@@ -179,14 +179,13 @@ renderTurret rTicks turret =
         remainingHealthRadius =
             turret.radius * Health.normalize turret.health
     in
-    [ circle x y turret.radius (withAlpha 0.5 turret.color)
-    , circle x y remainingHealthRadius turret.color
+    [ G.circle x y turret.radius (G.withAlpha 0.5 turret.color)
+    , G.circle x y remainingHealthRadius turret.color
     , if progress > 0 then
-        strokeArc ( x, y ) (turns progress) ( x + turret.radius + (turret.radius / 4), y ) white
+        G.strokeArc ( x, y ) (turns progress) ( x + turret.radius + (turret.radius / 4), y ) G.white
 
       else
-        noShape
-    , noShape
+        G.noShape
     ]
 
 
@@ -199,7 +198,7 @@ type alias Bullet =
     , velocity : Vec
     , maxSpeed : Float
     , radius : Float
-    , color : Color
+    , color : G.Color
     , health : Health.Health
     , bounceFriction : Float
     , friction : Float
@@ -224,17 +223,17 @@ initBullet position =
     , velocity = vec speed speed
     , maxSpeed = maxSpeed
     , radius = 5
-    , color = white
+    , color = G.white
     , health = Health.init 1
     , bounceFriction = 0.85
     , friction = 1
     }
 
 
-updateBullet : Computer -> Player -> Bullet -> Bullet
+updateBullet : G.Computer -> Player -> Bullet -> Bullet
 updateBullet c player bullet =
     let
-        bounceWithinScreen : Screen -> Bullet -> Bullet
+        bounceWithinScreen : G.Screen -> Bullet -> Bullet
         bounceWithinScreen screen model =
             let
                 bounceVelocityPart lo high positionPart velocityPart =
@@ -276,13 +275,13 @@ updateBullet c player bullet =
         |> applyVelocity
 
 
-renderBullet : Bullet -> Shape
+renderBullet : Bullet -> G.Shape
 renderBullet bullet =
     let
         ( x, y ) =
             V.toTuple bullet.position
     in
-    circle x y bullet.radius bullet.color
+    G.circle x y bullet.radius bullet.color
 
 
 
@@ -314,7 +313,7 @@ isBulletExplosionAnimating model =
     model.elapsed < model.maxTicks
 
 
-renderBulletExplosions : BulletExplosion -> Shape
+renderBulletExplosions : BulletExplosion -> G.Shape
 renderBulletExplosions model =
     let
         ( x, y ) =
@@ -331,9 +330,9 @@ renderBulletExplosions model =
             bullet.radius + (bullet.radius * progress)
 
         color =
-            withAlpha (1 - progress) bullet.color
+            G.withAlpha (1 - progress) bullet.color
     in
-    circle x y radius color
+    G.circle x y radius color
 
 
 
@@ -365,7 +364,7 @@ isTurretExplosionAnimating model =
     model.elapsed < model.maxTicks
 
 
-renderTurretExplosions : TurretExplosion -> Shape
+renderTurretExplosions : TurretExplosion -> G.Shape
 renderTurretExplosions model =
     let
         ( x, y ) =
@@ -382,9 +381,9 @@ renderTurretExplosions model =
             turret.radius + (turret.radius * progress)
 
         color =
-            withAlpha (1 - progress) turret.color
+            G.withAlpha (1 - progress) turret.color
     in
-    circle x y radius color
+    G.circle x y radius color
 
 
 
@@ -468,10 +467,10 @@ fireBulletFromTurretTo player turret =
 
 
 spacePressed =
-    freshKeyDown " "
+    G.freshKeyDown " "
 
 
-update : Computer -> Memory -> Memory
+update : G.Computer -> Memory -> Memory
 update c model =
     (case model.state of
         Running ->
@@ -540,7 +539,7 @@ stepAnimations model =
     }
 
 
-handleUpdate : Computer -> Memory -> Memory
+handleUpdate : G.Computer -> Memory -> Memory
 handleUpdate c model =
     { model
         | player = updatePlayer c model.player
@@ -734,7 +733,7 @@ handleCollision model =
         |> mapPlayerAndTurrets handlePlayerTurretsCollision
 
 
-view : Computer -> Memory -> List Shape
+view : G.Computer -> Memory -> List G.Shape
 view _ model =
     let
         rTicks =
@@ -748,18 +747,18 @@ view _ model =
         ++ viewGameState model.state
 
 
-viewGameState : GameState -> List Shape
+viewGameState : GameState -> List G.Shape
 viewGameState state =
     case state of
         Running ->
-            [ text 0 0 "Running" ]
+            [ G.text 0 0 "Running" ]
 
         GameOver _ ->
-            [ text 0 0 "Game Over" ]
+            [ G.text 0 0 "Game Over" ]
 
         Paused ->
-            [ text 0 0 "Paused" ]
+            [ G.text 0 0 "Paused" ]
 
 
 main =
-    game initMemory update view
+    G.game initMemory update view

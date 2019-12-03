@@ -4,6 +4,7 @@ module GravitronV2.Vector2 exposing
     , add
     , angle
     , apply2
+    , clampMagnitude
     , dirOppX
     , dirOppY
     , dirX
@@ -35,7 +36,7 @@ module GravitronV2.Vector2 exposing
     , vecFrom
     )
 
-import Basics.Extra exposing (flip)
+import Basics.Extra exposing (flip, uncurry)
 
 
 type Vec
@@ -215,3 +216,15 @@ gravityFrom from to mass =
             vecFrom from to
     in
     fromRTheta (mass / len2 gv) (angle gv)
+
+
+clampMagnitude : Float -> Vec -> Vec
+clampMagnitude hi =
+    let
+        absHi =
+            abs hi
+
+        lo =
+            negate absHi
+    in
+    toTuple >> toPolar >> Tuple.mapFirst (clamp lo hi) >> fromPolar >> uncurry vec

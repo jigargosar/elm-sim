@@ -178,6 +178,7 @@ renderTurret elapsedTicks turret =
 type alias Bullet =
     { position : Vec
     , velocity : Vec
+    , maxSpeed : Float
     , radius : Float
     , color : Color
     , health : Health.Health
@@ -194,7 +195,8 @@ defaultBullet =
 initBullet : Vec -> Bullet
 initBullet position =
     { position = position
-    , velocity = vec 2 2
+    , velocity = vec 5 5
+    , maxSpeed = 10
     , radius = 5
     , color = white
     , health = Health.init 1
@@ -235,11 +237,16 @@ updateBullet c player bullet =
 
             else
                 model
+
+        limitSpeed : Float -> HasVelocity a -> HasVelocity a
+        limitSpeed maxSpeed model =
+            { model | velocity = V.clampMagnitude maxSpeed model.velocity }
     in
     bullet
         |> bounceWithinScreen c.screen
         |> applyForce (V.gravityFrom bullet.position player.position player.mass)
         |> applyScalarForce bullet.friction
+        |> limitSpeed bullet.maxSpeed
         |> applyVelocity
 
 

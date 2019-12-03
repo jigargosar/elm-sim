@@ -27,6 +27,7 @@ import Html exposing (Html)
 import Html.Attributes
 import Json.Decode as JD
 import Point2d
+import Set exposing (Set)
 import Svg exposing (Svg)
 import Task
 import TypedSvg
@@ -61,12 +62,13 @@ type alias Mouse =
 
 
 type alias Keyboard =
-    {}
+    { keys : Set String
+    }
 
 
 initKeyboard : Keyboard
 initKeyboard =
-    {}
+    { keys = Set.empty }
 
 
 init : memory -> Flags -> ( Model memory, Cmd Msg )
@@ -162,12 +164,14 @@ update updateMemory message (Model computer memory) =
             )
 
 
+onKeyDown : String -> Keyboard -> Keyboard
 onKeyDown key keyboard =
-    keyboard
+    { keyboard | keys = Set.insert key keyboard.keys }
 
 
+onKeyUp : String -> Keyboard -> Keyboard
 onKeyUp key keyboard =
-    keyboard
+    { keyboard | keys = Set.remove key keyboard.keys }
 
 
 

@@ -55,7 +55,7 @@ initialComputer =
     }
 
 
-type Model memory
+type Game memory
     = Model memory Computer
 
 
@@ -87,7 +87,7 @@ type Msg
     | KeyChanged Bool String
 
 
-subscriptions : Model memory -> Sub Msg
+subscriptions : Game memory -> Sub Msg
 subscriptions _ =
     [ Browser.Events.onAnimationFrameDelta Tick
     , JD.map2 MouseMoved
@@ -103,7 +103,7 @@ subscriptions _ =
         |> Sub.batch
 
 
-gameUpdate : (Computer -> memory -> memory) -> Msg -> Model memory -> Model memory
+gameUpdate : (Computer -> memory -> memory) -> Msg -> Game memory -> Game memory
 gameUpdate updateMemory message (Model memory computer) =
     case message of
         Tick _ ->
@@ -328,11 +328,11 @@ setAlphaHelp alpha rgba =
     { rgba | alpha = alpha }
 
 
-type alias Game memory =
-    Program () (Model memory) Msg
-
-
-game : memory -> (Computer -> memory -> memory) -> (Computer -> memory -> List Shape) -> Game memory
+game :
+    memory
+    -> (Computer -> memory -> memory)
+    -> (Computer -> memory -> List Shape)
+    -> Program () (Game memory) Msg
 game initialMemory updateMemory viewMemory =
     let
         view (Model memory computer) =

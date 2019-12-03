@@ -1,9 +1,16 @@
 module GravitronV2.Main exposing (main)
 
+import Angle
+import Arc2d
 import Basics.Extra exposing (flip)
+import Color
+import Geometry.Svg
 import GravitronV2.Draw exposing (..)
 import GravitronV2.Health as Health exposing (Health)
 import GravitronV2.Vector2 as V exposing (..)
+import Point2d
+import TypedSvg.Attributes
+import TypedSvg.Types
 
 
 
@@ -153,7 +160,14 @@ renderTurret elapsedTicks turret =
             fireBulletProgress elapsedTicks
 
         progressAngle =
-            turns 1 * progress
+            360
+                * progress
+                |> Angle.degrees
+
+        arc =
+            Arc2d.sweptAround (Point2d.unitless x y)
+                progressAngle
+                (Point2d.unitless (x + turret.radius + 10) y)
 
         ( x, y ) =
             toTuple turret.position
@@ -163,6 +177,13 @@ renderTurret elapsedTicks turret =
     in
     [ circle x y turret.radius (withAlpha 0.5 turret.color)
     , circle x y remainingHealthRadius turret.color
+    , customShape
+        (Geometry.Svg.arc2d
+            [ TypedSvg.Attributes.stroke Color.darkPurple
+            , TypedSvg.Attributes.fill TypedSvg.Types.FillNone
+            ]
+            arc
+        )
     ]
 
 
@@ -402,7 +423,7 @@ fireBulletModByElapsed elapsedTicks =
 
 
 fireBulletProgress elapsedTicks =
-    fireBulletAfterTicks / toFloat (fireBulletModByElapsed elapsedTicks)
+    1 / fireBulletAfterTicks * toFloat (fireBulletModByElapsed elapsedTicks)
 
 
 fireBullet : Int -> Player -> Turret -> List Bullet -> List Bullet

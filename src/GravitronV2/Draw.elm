@@ -5,6 +5,7 @@ module GravitronV2.Draw exposing
     , Screen
     , Shape
     , circle
+    , customShape
     , game
     , green
     , red
@@ -127,6 +128,7 @@ update updateMemory message (Model computer memory) =
 type Shape
     = Circle Float Float Float Color
     | Text Float Float String
+    | Custom (Svg Never)
 
 
 circle : Float -> Float -> Float -> Color -> Shape
@@ -137,6 +139,11 @@ circle =
 text : Float -> Float -> String -> Shape
 text =
     Text
+
+
+customShape : Svg Never -> Shape
+customShape =
+    Custom
 
 
 renderShapes : Computer -> List Shape -> Html Msg
@@ -183,6 +190,9 @@ renderShape shape =
                 , TA.textAnchor TT.AnchorMiddle
                 ]
                 [ Svg.text str ]
+
+        Custom custom ->
+            custom |> Svg.map never
 
 
 

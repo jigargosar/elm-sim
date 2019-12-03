@@ -167,7 +167,7 @@ renderTurret elapsedTicks turret =
         arc =
             Arc2d.sweptAround (Point2d.unitless x y)
                 progressAngle
-                (Point2d.unitless (x + turret.radius + 10) y)
+                (Point2d.unitless (x + turret.radius + (turret.radius / 4)) y)
 
         ( x, y ) =
             toTuple turret.position
@@ -179,7 +179,7 @@ renderTurret elapsedTicks turret =
     , circle x y remainingHealthRadius turret.color
     , customShape
         (Geometry.Svg.arc2d
-            [ TypedSvg.Attributes.stroke Color.darkPurple
+            [ TypedSvg.Attributes.stroke Color.white
             , TypedSvg.Attributes.fill TypedSvg.Types.FillNone
             ]
             arc

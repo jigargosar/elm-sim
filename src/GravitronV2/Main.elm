@@ -5,7 +5,6 @@ import GravitronV2.Game as G
 import GravitronV2.Health as Health exposing (Health)
 import GravitronV2.Timer as Timer exposing (Timer)
 import GravitronV2.Vector2 as V exposing (Vec, vec, vec0)
-import PointFree exposing (when, with)
 
 
 
@@ -239,8 +238,8 @@ initBullet position =
 updateBullet : G.Computer -> Player -> Bullet -> Bullet
 updateBullet c player bullet =
     let
-        bounceWithinScreen : G.Screen -> Bullet -> Bullet
-        bounceWithinScreen screen model =
+        bounceVF : G.Screen -> { a | position : Vec, bounceFriction : Float } -> Vec -> Vec
+        bounceVF screen { position, bounceFriction } velocity =
             let
                 bounceVelocityPart lo high positionPart velocityPart =
                     if
@@ -253,32 +252,37 @@ updateBullet c player bullet =
                         velocityPart
 
                 ( x, y ) =
-                    V.toTuple model.position
+                    V.toTuple position
 
                 ( vx, vy ) =
-                    V.toTuple model.velocity
+                    V.toTuple velocity
 
-                velocity =
+                newBouncedVelocity =
                     vec (bounceVelocityPart screen.left screen.right x vx)
                         (bounceVelocityPart screen.top screen.bottom y vy)
             in
-            if velocity /= model.velocity then
-                { model | velocity = velocity }
-                    |> applyScalarForce model.bounceFriction
+            if velocity /= newBouncedVelocity then
+                newBouncedVelocity
+                    |> V.multiply bounceFriction
 
             else
-                model
+                newBouncedVelocity
 
-        limitSpeed : Float -> HasVelocity a -> HasVelocity a
-        limitSpeed maxSpeed model =
-            { model | velocity = V.clampMagnitude maxSpeed model.velocity }
+        newVelocity =
+            [ bounceVF c.screen bullet
+            , V.integrate (V.gravityFrom bullet.position player.position player.mass)
+            , V.multiply bullet.friction
+            , V.clampMagnitude bullet.maxSpeed
+            ]
+                |> List.foldl (\f v -> f v) bullet.velocity
+
+        newPosition =
+            V.integrate bullet.position newVelocity
     in
-    bullet
-        |> bounceWithinScreen c.screen
-        |> applyForce (V.gravityFrom bullet.position player.position player.mass)
-        |> applyScalarForce bullet.friction
-        |> limitSpeed bullet.maxSpeed
-        |> applyVelocity
+    { bullet
+        | velocity = newVelocity
+        , position = newPosition
+    }
 
 
 renderBullet : Bullet -> G.Shape

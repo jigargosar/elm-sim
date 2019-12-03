@@ -443,6 +443,7 @@ update c model =
                     List.map (updateBullet c model.player) model.bullets
                         |> (\bullets -> fireBullets model.elapsed model.player bullets model.turrets)
                 , bulletExplosions = List.map stepBulletExplosionAnimation model.bulletExplosions
+                , turretExplosions = List.map stepTurretExplosionAnimation model.turretExplosions
             }
                 |> handleCollision
                 |> handleDeath

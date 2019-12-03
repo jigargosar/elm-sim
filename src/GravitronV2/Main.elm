@@ -86,7 +86,7 @@ initPlayer =
     , color = red
     , springConstant = 0.2
     , friction = 0.5
-    , mass = 800
+    , mass = 1200
     , health = Health.init 100
     }
 
@@ -227,7 +227,7 @@ initBullet position =
             3
 
         maxSpeed =
-            7
+            8
     in
     { position = position
     , velocity = vec speed speed
@@ -235,7 +235,7 @@ initBullet position =
     , radius = 5
     , color = white
     , health = Health.init 1
-    , bounceFriction = 0.9
+    , bounceFriction = 1
     , friction = 1
     }
 

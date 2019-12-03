@@ -513,6 +513,15 @@ update c model =
         |> incRunningTicks
 
 
+prependWhen : (c -> Bool) -> (c -> a) -> c -> List a -> List a
+prependWhen pred t v =
+    if pred v then
+        (::) (t v)
+
+    else
+        identity
+
+
 stepTimers : Memory -> Memory
 stepTimers model =
     let

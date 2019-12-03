@@ -50,7 +50,7 @@ type alias Computer =
 initialComputer : Computer
 initialComputer =
     { mouse = Mouse 0 0
-    , screen = screenFromWidthHeight 600 600
+    , screen = toScreen 600 600
     , keyboard = initKeyboard
     }
 
@@ -121,10 +121,10 @@ gameUpdate updateMemory message (Game memory computer) =
                 { computer | mouse = { mouse | x = mx + screen.left, y = my + screen.top } }
 
         GotViewport { scene } ->
-            Game memory { computer | screen = screenFromWidthHeight scene.width scene.height }
+            Game memory { computer | screen = toScreen scene.width scene.height }
 
-        Resized width height ->
-            Game memory { computer | screen = screenFromWidthHeight (toFloat width) (toFloat height) }
+        Resized w h ->
+            Game memory { computer | screen = toScreen (toFloat w) (toFloat h) }
 
         KeyChanged isDown key ->
             Game memory
@@ -276,8 +276,8 @@ type alias Screen =
     }
 
 
-screenFromWidthHeight : Float -> Float -> Screen
-screenFromWidthHeight width height =
+toScreen : Float -> Float -> Screen
+toScreen width height =
     let
         halfWidth =
             width / 2

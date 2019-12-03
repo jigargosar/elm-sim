@@ -395,7 +395,8 @@ renderTurretExplosions model =
 type GameState
     = Running
     | GameOver Int
-    | Paused Timer
+    | PauseKeyDown
+    | PauseKeyUp
 
 
 
@@ -470,12 +471,16 @@ fireBulletFromTurretTo player turret =
     { bullet | position = position, velocity = velocity }
 
 
+isSpaceKeyDown c =
+    Set.member " " c.keyboard.keys
+
+
 update : Computer -> Memory -> Memory
 update c model =
     (case model.state of
         Running ->
-            if Set.member " " c.keyboard.keys then
-                { model | state = Paused (Timer.start (toFloat model.elapsed) 10) }
+            if isSpaceKeyDown c then
+                { model | state = PauseKeyDown }
 
             else
                 model
@@ -496,11 +501,15 @@ update c model =
             else
                 stepAnimations model
 
-        Paused timer ->
-            if
-                Timer.isDone (toFloat model.elapsed) timer
-                    && Set.member " " c.keyboard.keys
-            then
+        PauseKeyDown ->
+            if isSpaceKeyDown c then
+                model
+
+            else
+                { model | state = PauseKeyUp }
+
+        PauseKeyUp ->
+            if isSpaceKeyDown c then
                 { model | state = Running }
 
             else
@@ -764,7 +773,10 @@ viewGameState state =
         GameOver _ ->
             [ text 0 0 "Game Over" ]
 
-        Paused _ ->
+        PauseKeyDown ->
+            [ text 0 0 "Paused" ]
+
+        PauseKeyUp ->
             [ text 0 0 "Paused" ]
 
 

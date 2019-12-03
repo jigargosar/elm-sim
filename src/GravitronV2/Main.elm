@@ -5,7 +5,7 @@ import GravitronV2.Game exposing (..)
 import GravitronV2.Health as Health exposing (Health)
 import GravitronV2.Timer as Timer exposing (Timer)
 import GravitronV2.Vector2 as V exposing (..)
-import Set
+import Set exposing (Set)
 
 
 
@@ -413,6 +413,7 @@ type alias Memory =
     , state : GameState
     , stage : Int
     , rTicks : Float
+    , prevKeys : Set String
     }
 
 
@@ -448,6 +449,7 @@ initMemory elapsed =
     , stage = stage
     , state = Running
     , rTicks = rTicks
+    , prevKeys = Set.empty
     }
 
 
@@ -477,6 +479,10 @@ isSpaceKeyDown c =
 
 update : Computer -> Memory -> Memory
 update c model =
+    let
+        _ =
+            Debug.log "c.keyboard" ( c.keyboard, model.state )
+    in
     (case model.state of
         Running ->
             if isSpaceKeyDown c then

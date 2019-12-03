@@ -338,9 +338,7 @@ game initialMemory updateMemory viewMemory =
             render computer.screen (viewMemory computer memory)
 
         init () =
-            ( Game
-                initialMemory
-                initialComputer
+            ( Game initialMemory initialComputer
             , Browser.Dom.getViewport |> Task.perform GotViewport
             )
 

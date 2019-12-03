@@ -5,6 +5,7 @@ import GravitronV2.Game as G
 import GravitronV2.Health as Health exposing (Health)
 import GravitronV2.Timer as Timer exposing (Timer)
 import GravitronV2.Vector2 as V exposing (Vec, vec, vec0)
+import PointFree exposing (when, with)
 
 
 
@@ -516,7 +517,7 @@ stepTimers model =
         firedBullets =
             List.foldl
                 (\turret ->
-                    if Timer.isDone rTicks turret.triggerTimer then
+                    if turretTriggerTimerDone turret then
                         (::) (fireBulletFromTurretTo model.player turret)
 
                     else
@@ -524,6 +525,9 @@ stepTimers model =
                 )
                 []
                 model.turrets
+
+        turretTriggerTimerDone turret =
+            turret.triggerTimer |> Timer.isDone rTicks
     in
     { model
         | turrets = List.map (turretRestartTriggerTimerIfDone rTicks) model.turrets

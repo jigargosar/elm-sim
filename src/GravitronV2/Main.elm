@@ -86,7 +86,7 @@ initPlayer =
     , color = red
     , springConstant = 0.2
     , friction = 0.5
-    , mass = 500
+    , mass = 2000
     , health = Health.init 100
     }
 
@@ -215,13 +215,20 @@ defaultBullet =
 
 initBullet : Vec -> Bullet
 initBullet position =
+    let
+        speed =
+            3
+
+        maxSpeed =
+            speed + 3
+    in
     { position = position
-    , velocity = vec 5 5
-    , maxSpeed = 10
+    , velocity = vec speed speed
+    , maxSpeed = maxSpeed
     , radius = 5
     , color = white
     , health = Health.init 1
-    , bounceFriction = 0.8
+    , bounceFriction = 0.9
     , friction = 1
     }
 

@@ -125,7 +125,10 @@ gameUpdate : (Computer -> memory -> memory) -> Msg -> Game memory -> Game memory
 gameUpdate updateMemory message (Game memory computer) =
     case message of
         Tick _ ->
-            Game (updateMemory computer memory) computer
+            Game (updateMemory computer memory)
+                { computer
+                    | keyboard = setPrevKeys computer.keyboard
+                }
 
         MouseMoved mx my ->
             let
@@ -161,6 +164,11 @@ updateKeyboard isDown key keyboard =
             else
                 Set.remove key keyboard.keys
     }
+
+
+setPrevKeys : Keyboard -> Keyboard
+setPrevKeys keyboard =
+    { keyboard | prevKeys = keyboard.keys }
 
 
 

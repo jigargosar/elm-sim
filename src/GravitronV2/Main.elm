@@ -235,7 +235,7 @@ initBullet position =
     , radius = 5
     , color = white
     , health = Health.init 1
-    , bounceFriction = 0.8
+    , bounceFriction = 0.85
     , friction = 1
     }
 

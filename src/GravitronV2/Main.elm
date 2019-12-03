@@ -447,7 +447,6 @@ initMemory elapsed =
     , stage = stage
     , state = Running
     , rTicks = rTicks
-    , prevKeys = Set.empty
     }
 
 

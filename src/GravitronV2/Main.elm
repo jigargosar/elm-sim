@@ -530,12 +530,8 @@ stepTimers model =
 
         firedBullets =
             List.foldl
-                (\turret ->
-                    if turretTriggerTimerDone rTicks turret then
-                        (::) (fireBulletFromTurretTo model.player turret)
-
-                    else
-                        identity
+                (prependWhen (turretTriggerTimerDone rTicks)
+                    (fireBulletFromTurretTo model.player)
                 )
                 []
                 model.turrets

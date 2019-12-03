@@ -450,37 +450,40 @@ fireBulletFromTurretTo player turret =
     }
 
 
-fireBullet : Int -> Player -> Turret -> List Bullet -> List Bullet
-fireBullet elapsedTicks player turret bullets =
-    if fireBulletModByElapsed elapsedTicks == 0 then
-        let
-            bullet =
-                defaultBullet
 
-            angle =
-                V.vecFrom turret.position player.position
-                    |> V.angle
+{-
+   fireBullet : Int -> Player -> Turret -> List Bullet -> List Bullet
+   fireBullet elapsedTicks player turret bullets =
+       if fireBulletModByElapsed elapsedTicks == 0 then
+           let
+               bullet =
+                   defaultBullet
 
-            position =
-                V.fromRTheta (turret.radius + bullet.radius + 1) angle
-                    |> V.integrate turret.position
+               angle =
+                   V.vecFrom turret.position player.position
+                       |> V.angle
 
-            velocity =
-                V.fromRTheta (V.len bullet.velocity) angle
-        in
-        { bullet
-            | position = position
-            , velocity = velocity
-        }
-            :: bullets
+               position =
+                   V.fromRTheta (turret.radius + bullet.radius + 1) angle
+                       |> V.integrate turret.position
 
-    else
-        bullets
+               velocity =
+                   V.fromRTheta (V.len bullet.velocity) angle
+           in
+           { bullet
+               | position = position
+               , velocity = velocity
+           }
+               :: bullets
+
+       else
+           bullets
 
 
-fireBullets : Int -> Player -> List Bullet -> Turrets -> List Bullet
-fireBullets elapsedTicks player bullets =
-    List.foldl (fireBullet elapsedTicks player) bullets
+   fireBullets : Int -> Player -> List Bullet -> Turrets -> List Bullet
+   fireBullets elapsedTicks player bullets =
+       List.foldl (fireBullet elapsedTicks player) bullets
+-}
 
 
 update : Computer -> Memory -> Memory
@@ -545,9 +548,7 @@ handleUpdate : Computer -> Memory -> Memory
 handleUpdate c model =
     { model
         | player = updatePlayer c model.player
-        , bullets =
-            List.map (updateBullet c model.player) model.bullets
-                |> (\bullets -> fireBullets model.elapsed model.player bullets model.turrets)
+        , bullets = List.map (updateBullet c model.player) model.bullets
     }
 
 

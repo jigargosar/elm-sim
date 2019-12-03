@@ -453,7 +453,7 @@ update c model =
         Running ->
             model
                 |> stepAnimations
-                |> handleTick
+                |> stepTimers
                 |> handleUpdate c
                 |> handleCollision
                 |> handleDeath
@@ -472,11 +472,14 @@ update c model =
         |> incElapsed
 
 
-handleTick : Memory -> Memory
-handleTick model =
+stepTimers : Memory -> Memory
+stepTimers model =
+    let
+        turrets =
+            model.turrets
+    in
     { model
-        | bulletExplosions = List.map stepBulletExplosionAnimation model.bulletExplosions
-        , turretExplosions = List.map stepTurretExplosionAnimation model.turretExplosions
+        | turrets = turrets
     }
 
 

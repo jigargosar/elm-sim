@@ -394,6 +394,7 @@ renderTurretExplosions model =
 type GameState
     = Running
     | GameOver Int
+    | Paused
 
 
 
@@ -542,6 +543,9 @@ update c model =
 
             else
                 stepAnimations model
+
+        Paused ->
+            model
     )
         |> incElapsed
         |> incRunningTicks
@@ -800,6 +804,9 @@ viewGameState state =
 
         GameOver _ ->
             [ text 0 0 "Game Over" ]
+
+        Paused ->
+            [ text 0 0 "Paused" ]
 
 
 main : Game Memory

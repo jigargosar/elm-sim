@@ -142,7 +142,7 @@ initTurret position =
     { position = position
     , radius = 10
     , color = green
-    , health = Health.init 3
+    , health = Health.init 1
     }
 
 
@@ -312,16 +312,14 @@ type alias Memory =
     , elapsed : Int
     , bulletExplosions : List BulletExplosion
     , state : GameState
+    , stage : Int
     }
 
 
-turretPositions =
+allTurrets =
     [ vec -1 -1, vec 1 -1, vec 1 1, vec -1 1 ]
         |> List.map (V.multiply 150)
-
-
-allTurrets =
-    turretPositions |> List.map initTurret
+        |> List.map initTurret
 
 
 initMemory : Int -> Memory
@@ -331,6 +329,7 @@ initMemory elapsed =
     , bullets = []
     , elapsed = elapsed
     , bulletExplosions = []
+    , stage = 1
     , state = Running
     }
 
@@ -339,7 +338,7 @@ fireBullet : Int -> Player -> Turret -> List Bullet -> List Bullet
 fireBullet elapsedTicks player turret bullets =
     let
         oncePerXTicks =
-            60 * 4
+            60 * 1
 
         bulletCount =
             List.length bullets
@@ -426,20 +425,29 @@ handleDeath model =
             List.map explosionFromBullet deadBullets
                 ++ model.bulletExplosions
                 |> List.filter isBulletExplosionAnimating
+
+        ( turrets, deadTurrets ) =
+            List.partition (.health >> Health.isAlive) model.turrets
     in
     { model
         | bullets = bullets
         , bulletExplosions = bulletExplosions
+        , stage =
+            if List.isEmpty turrets then
+                model.stage + 1
+
+            else
+                model.stage
         , turrets =
-            if List.all (.health >> Health.isDead) model.turrets then
+            if List.isEmpty turrets then
                 let
                     newTurretCount =
-                        List.length model.turrets |> modBy (List.length allTurrets)
+                        model.stage + 1 |> modBy (List.length allTurrets + 1)
                 in
                 allTurrets |> List.take newTurretCount
 
             else
-                model.turrets
+                turrets
         , state =
             if model.player.health |> Health.isDead then
                 GameOver model.elapsed

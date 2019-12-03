@@ -139,14 +139,21 @@ type alias Turret =
     }
 
 
-initTurret : Vec -> Turret
-initTurret position =
+initTurret : Int -> Vec -> Turret
+initTurret i position =
+    let
+        triggerMaxTicks =
+            60
+
+        triggerElapsedTicks =
+            0
+    in
     { position = position
     , radius = 10
     , color = green
     , health = Health.init 1
-    , triggerElapsedTicks = 0
-    , triggerMaxTicks = 60
+    , triggerElapsedTicks = triggerElapsedTicks
+    , triggerMaxTicks = triggerMaxTicks
     }
 
 
@@ -417,7 +424,7 @@ type alias Memory =
 allTurrets =
     [ vec -1 -1, vec 1 -1, vec 1 1, vec -1 1 ]
         |> List.map (V.multiply 150)
-        |> List.map initTurret
+        |> List.indexedMap initTurret
 
 
 initMemory : Int -> Memory

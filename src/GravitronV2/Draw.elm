@@ -93,6 +93,8 @@ subscriptions _ =
     , Browser.Events.onResize OnResize
     , JD.map OnKeyDown (JD.field "key" JD.string)
         |> Browser.Events.onKeyDown
+    , JD.map OnKeyUp (JD.field "key" JD.string)
+        |> Browser.Events.onKeyUp
     ]
         |> Sub.batch
 

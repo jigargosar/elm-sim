@@ -235,41 +235,42 @@ initBullet position =
     }
 
 
+bounceWithinScreen : G.Screen -> { a | position : Vec, bounceFriction : Float } -> Vec -> Vec
+bounceWithinScreen screen { position, bounceFriction } velocity =
+    let
+        bounceVelocityPart lo high positionPart velocityPart =
+            if
+                (positionPart < lo && velocityPart < 0)
+                    || (positionPart > high && velocityPart > 0)
+            then
+                negate velocityPart
+
+            else
+                velocityPart
+
+        ( x, y ) =
+            V.toTuple position
+
+        ( vx, vy ) =
+            V.toTuple velocity
+
+        newBouncedVelocity =
+            vec (bounceVelocityPart screen.left screen.right x vx)
+                (bounceVelocityPart screen.top screen.bottom y vy)
+    in
+    if velocity /= newBouncedVelocity then
+        newBouncedVelocity
+            |> V.multiply bounceFriction
+
+    else
+        newBouncedVelocity
+
+
 updateBullet : G.Computer -> Player -> Bullet -> Bullet
 updateBullet c player bullet =
     let
-        bounceVF : G.Screen -> { a | position : Vec, bounceFriction : Float } -> Vec -> Vec
-        bounceVF screen { position, bounceFriction } velocity =
-            let
-                bounceVelocityPart lo high positionPart velocityPart =
-                    if
-                        (positionPart < lo && velocityPart < 0)
-                            || (positionPart > high && velocityPart > 0)
-                    then
-                        negate velocityPart
-
-                    else
-                        velocityPart
-
-                ( x, y ) =
-                    V.toTuple position
-
-                ( vx, vy ) =
-                    V.toTuple velocity
-
-                newBouncedVelocity =
-                    vec (bounceVelocityPart screen.left screen.right x vx)
-                        (bounceVelocityPart screen.top screen.bottom y vy)
-            in
-            if velocity /= newBouncedVelocity then
-                newBouncedVelocity
-                    |> V.multiply bounceFriction
-
-            else
-                newBouncedVelocity
-
         newVelocity =
-            [ bounceVF c.screen bullet
+            [ bounceWithinScreen c.screen bullet
             , V.integrate (V.gravityFrom bullet.position player.position player.mass)
             , V.multiply bullet.friction
             , V.clampMagnitude bullet.maxSpeed

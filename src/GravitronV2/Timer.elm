@@ -1,4 +1,4 @@
-module GravitronV2.Timer exposing (Timer)
+module GravitronV2.Timer exposing (Timer, isDone, restart, value)
 
 
 type alias Timer =
@@ -7,17 +7,28 @@ type alias Timer =
     }
 
 
-start : Float -> Timer
-start clock =
-    { startedAt
+start : Float -> Float -> Timer
+start startedAt_ duration =
+    { startedAt = startedAt_
+    , duration = duration
     }
 
 
-step : Timer -> Timer
-step model =
-    { model
-        | elapsed = model.elapsed + 1
-    }
+elapsed : Float -> Timer -> Float
+elapsed clock model =
+    clock - model.startedAt |> max 0
 
-isDone =
 
+isDone : Float -> Timer -> Bool
+isDone clock model =
+    elapsed clock model > model.duration
+
+
+restart : Float -> Timer -> Timer
+restart clock model =
+    { model | startedAt = clock }
+
+
+value : Float -> Timer -> Float
+value clock model =
+    model.duration / elapsed clock model |> clamp 0 1

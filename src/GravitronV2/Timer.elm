@@ -31,4 +31,4 @@ restart clock model =
 
 value : Float -> Timer -> Float
 value clock model =
-    model.duration / elapsed clock model |> clamp 0 1
+    elapsed clock model / model.duration |> clamp 0 1

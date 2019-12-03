@@ -188,6 +188,7 @@ renderTurret turret =
 
       else
         noShape
+    , noShape
     ]
 
 

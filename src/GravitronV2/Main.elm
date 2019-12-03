@@ -593,7 +593,11 @@ incElapsed model =
 
 incRunningTicks : Memory -> Memory
 incRunningTicks model =
-    { model | rTicks = model.rTicks + 1 }
+    if model.state == Running then
+        { model | rTicks = model.rTicks + 1 }
+
+    else
+        model
 
 
 handleDeath : Memory -> Memory

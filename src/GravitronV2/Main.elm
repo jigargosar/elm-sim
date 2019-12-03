@@ -150,6 +150,19 @@ initTurret position =
     }
 
 
+stepTurretTimer : Turret -> ( Bool, Turret )
+stepTurretTimer turret =
+    let
+        triggerFired =
+            turret.triggerElapsedTicks + 1 >= turret.triggerMaxTicks
+    in
+    ( triggerFired
+    , { turret
+        | triggerElapsedTicks = turret.triggerElapsedTicks + 1 |> modBy turret.triggerMaxTicks
+      }
+    )
+
+
 renderTurret : Int -> Turret -> List Shape
 renderTurret elapsedTicks turret =
     let
@@ -414,6 +427,29 @@ fireBulletProgress elapsedTicks =
     1 / fireBulletAfterTicks * toFloat (fireBulletModByElapsed elapsedTicks)
 
 
+fireBulletFromTurretTo : Player -> Turret -> Bullet
+fireBulletFromTurretTo player turret =
+    let
+        bullet =
+            defaultBullet
+
+        angle =
+            V.vecFrom turret.position player.position
+                |> V.angle
+
+        position =
+            V.fromRTheta (turret.radius + bullet.radius + 1) angle
+                |> V.integrate turret.position
+
+        velocity =
+            V.fromRTheta (V.len bullet.velocity) angle
+    in
+    { bullet
+        | position = position
+        , velocity = velocity
+    }
+
+
 fireBullet : Int -> Player -> Turret -> List Bullet -> List Bullet
 fireBullet elapsedTicks player turret bullets =
     if fireBulletModByElapsed elapsedTicks == 0 then
@@ -475,11 +511,18 @@ update c model =
 stepTimers : Memory -> Memory
 stepTimers model =
     let
-        turrets =
-            model.turrets
+        reducer turret ( bullets, turrets ) =
+            let
+                ( shouldFireBullet, newTurret ) =
+                    stepTurretTimer turret
+            in
+            ( bullets, newTurret :: turrets )
+
+        ( newBullets, newTurrets ) =
+            List.foldl reducer ( [], [] ) model.turrets
     in
     { model
-        | turrets = turrets
+        | turrets = newTurrets
     }
 
 

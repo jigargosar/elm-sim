@@ -451,14 +451,9 @@ update : Computer -> Memory -> Memory
 update c model =
     (case model.state of
         Running ->
-            { model
-                | player = updatePlayer c model.player
-                , bullets =
-                    List.map (updateBullet c model.player) model.bullets
-                        |> (\bullets -> fireBullets model.elapsed model.player bullets model.turrets)
-                , bulletExplosions = List.map stepBulletExplosionAnimation model.bulletExplosions
-                , turretExplosions = List.map stepTurretExplosionAnimation model.turretExplosions
-            }
+            model
+                |> handleTick
+                |> handleUpdate c
                 |> handleCollision
                 |> handleDeath
 
@@ -476,6 +471,24 @@ update c model =
                 }
     )
         |> incElapsed
+
+
+handleTick : Memory -> Memory
+handleTick model =
+    { model
+        | bulletExplosions = List.map stepBulletExplosionAnimation model.bulletExplosions
+        , turretExplosions = List.map stepTurretExplosionAnimation model.turretExplosions
+    }
+
+
+handleUpdate : Computer -> Memory -> Memory
+handleUpdate c model =
+    { model
+        | player = updatePlayer c model.player
+        , bullets =
+            List.map (updateBullet c model.player) model.bullets
+                |> (\bullets -> fireBullets model.elapsed model.player bullets model.turrets)
+    }
 
 
 incElapsed : Memory -> Memory

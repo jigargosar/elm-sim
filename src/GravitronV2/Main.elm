@@ -146,9 +146,15 @@ initTurret position =
     }
 
 
-renderTurret : Turret -> List Shape
-renderTurret turret =
+renderTurret : Int -> Turret -> List Shape
+renderTurret elapsedTicks turret =
     let
+        progress =
+            fireBulletProgress elapsedTicks
+
+        progressAngle =
+            turns 1 * progress
+
         ( x, y ) =
             toTuple turret.position
 
@@ -387,17 +393,21 @@ initMemory elapsed =
     }
 
 
+fireBulletAfterTicks =
+    60 * 1
+
+
+fireBulletModByElapsed elapsedTicks =
+    modBy fireBulletAfterTicks elapsedTicks
+
+
 fireBulletProgress elapsedTicks =
-    let
-        oncePerXTicks =
-            60 * 1
-    in
-    modBy oncePerXTicks elapsedTicks
+    fireBulletAfterTicks / toFloat (fireBulletModByElapsed elapsedTicks)
 
 
 fireBullet : Int -> Player -> Turret -> List Bullet -> List Bullet
 fireBullet elapsedTicks player turret bullets =
-    if fireBulletProgress elapsedTicks == 0 then
+    if fireBulletModByElapsed elapsedTicks == 0 then
         let
             bullet =
                 defaultBullet
@@ -649,7 +659,7 @@ view : Computer -> Memory -> List Shape
 view _ model =
     renderPlayer model.player
         ++ List.map renderTurretExplosions model.turretExplosions
-        ++ List.concatMap renderTurret model.turrets
+        ++ List.concatMap (renderTurret model.elapsed) model.turrets
         ++ List.map renderBullet model.bullets
         ++ List.map renderBulletExplosions model.bulletExplosions
         ++ viewGameState model.state

@@ -163,11 +163,18 @@ stepTurretTimer turret =
     )
 
 
-renderTurret : Int -> Turret -> List Shape
-renderTurret elapsedTicks turret =
+turretTriggerProgress : Turret -> Float
+turretTriggerProgress turret =
+    toFloat turret.triggerElapsedTicks
+        / toFloat turret.triggerMaxTicks
+        |> max 0.000001
+
+
+renderTurret : Turret -> List Shape
+renderTurret turret =
     let
         progress =
-            fireBulletProgress elapsedTicks + 0.000001
+            turretTriggerProgress turret
 
         ( x, y ) =
             toTuple turret.position
@@ -415,16 +422,18 @@ initMemory elapsed =
     }
 
 
-fireBulletAfterTicks =
-    60 * 1
 
-
-fireBulletModByElapsed elapsedTicks =
-    modBy fireBulletAfterTicks elapsedTicks
-
-
-fireBulletProgress elapsedTicks =
-    1 / fireBulletAfterTicks * toFloat (fireBulletModByElapsed elapsedTicks)
+--fireBulletAfterTicks =
+--    60 * 1
+--
+--
+--fireBulletModByElapsed elapsedTicks =
+--    modBy fireBulletAfterTicks elapsedTicks
+--
+--
+--fireBulletProgress elapsedTicks =
+--    1 / fireBulletAfterTicks * toFloat (fireBulletModByElapsed elapsedTicks)
+--
 
 
 fireBulletFromTurretTo : Player -> Turret -> Bullet
@@ -742,7 +751,7 @@ view : Computer -> Memory -> List Shape
 view _ model =
     renderPlayer model.player
         ++ List.map renderTurretExplosions model.turretExplosions
-        ++ List.concatMap (renderTurret model.elapsed) model.turrets
+        ++ List.concatMap renderTurret model.turrets
         ++ List.map renderBullet model.bullets
         ++ List.map renderBulletExplosions model.bulletExplosions
         ++ viewGameState model.state

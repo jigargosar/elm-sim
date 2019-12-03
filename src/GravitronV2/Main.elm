@@ -410,8 +410,8 @@ allTurretsPositions =
 
 
 initTurretsForStage : Int -> Float -> Turrets
-initTurretsForStage stage clock =
-    allTurretsPositions |> List.take stage |> List.map (initTurret clock)
+initTurretsForStage stage rTicks =
+    allTurretsPositions |> List.take stage |> List.map (initTurret rTicks)
 
 
 initMemory : Int -> Memory

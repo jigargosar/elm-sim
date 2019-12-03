@@ -52,8 +52,16 @@ type alias Computer =
     }
 
 
+initialComputer : Computer
+initialComputer =
+    { mouse = Mouse 0 0
+    , screen = screenFromWidthHeight 600 600
+    , keyboard = initKeyboard
+    }
+
+
 type Model memory
-    = Model Computer memory
+    = Model memory Computer
 
 
 type alias Mouse =
@@ -70,18 +78,6 @@ type alias Keyboard =
 initKeyboard : Keyboard
 initKeyboard =
     { keys = Set.empty }
-
-
-init : memory -> Flags -> ( Model memory, Cmd Msg )
-init initialMemory _ =
-    ( Model
-        { mouse = Mouse 0 0
-        , screen = screenFromWidthHeight 600 600
-        , keyboard = initKeyboard
-        }
-        initialMemory
-    , Browser.Dom.getViewport |> Task.perform OnViewport
-    )
 
 
 
@@ -112,11 +108,11 @@ subscriptions _ =
         |> Sub.batch
 
 
-update : Update memory -> Msg -> Model memory -> Model memory
-update updateMemory message (Model computer memory) =
+gameUpdate : Update memory -> Msg -> Model memory -> Model memory
+gameUpdate updateMemory message (Model memory computer) =
     case message of
         Tick _ ->
-            Model computer (updateMemory computer memory)
+            Model (updateMemory computer memory) computer
 
         MouseMoved mx my ->
             let
@@ -126,23 +122,20 @@ update updateMemory message (Model computer memory) =
                 screen =
                     computer.screen
             in
-            Model { computer | mouse = { mouse | x = mx + screen.left, y = my + screen.top } }
-                memory
+            Model memory
+                { computer | mouse = { mouse | x = mx + screen.left, y = my + screen.top } }
 
         OnViewport { scene } ->
-            Model { computer | screen = screenFromWidthHeight scene.width scene.height }
-                memory
+            Model memory { computer | screen = screenFromWidthHeight scene.width scene.height }
 
         OnResize width height ->
-            Model { computer | screen = screenFromWidthHeight (toFloat width) (toFloat height) }
-                memory
+            Model memory { computer | screen = screenFromWidthHeight (toFloat width) (toFloat height) }
 
         KeyChanged isDown key ->
-            Model
+            Model memory
                 { computer
                     | keyboard = updateKeyboard isDown key computer.keyboard
                 }
-                memory
 
 
 updateKeyboard : Bool -> String -> Keyboard -> Keyboard
@@ -194,12 +187,9 @@ customShape =
     Custom
 
 
-renderShapes : Computer -> List Shape -> Html Msg
-renderShapes computer shapes =
+render : Screen -> List Shape -> Html Msg
+render screen shapes =
     let
-        screen =
-            computer.screen
-
         x =
             screen.left
 
@@ -367,12 +357,22 @@ type alias View memory =
 game : memory -> Update memory -> View memory -> Game memory
 game initialMemory updateMemory viewMemory =
     let
-        view (Model computer memory) =
-            renderShapes computer (viewMemory computer memory)
+        view (Model memory computer) =
+            render computer.screen (viewMemory computer memory)
+
+        init () =
+            ( Model
+                initialMemory
+                initialComputer
+            , Browser.Dom.getViewport |> Task.perform OnViewport
+            )
+
+        update msg model =
+            ( gameUpdate updateMemory msg model, Cmd.none )
     in
     Browser.element
-        { init = init initialMemory
+        { init = init
         , subscriptions = subscriptions
-        , update = update updateMemory >> flip Tuple.pair Cmd.none
+        , update = update
         , view = view
         }

@@ -160,9 +160,7 @@ renderTurret elapsedTicks turret =
             fireBulletProgress elapsedTicks
 
         progressAngle =
-            360
-                * progress
-                |> Angle.degrees
+            Angle.degrees (360 * progress)
 
         arc =
             Arc2d.sweptAround (Point2d.unitless x y)

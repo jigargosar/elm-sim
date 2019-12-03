@@ -41,10 +41,6 @@ import TypedSvg.Types as TT exposing (AnchorAlignment(..))
 -- Model
 
 
-type alias Flags =
-    ()
-
-
 type alias Computer =
     { mouse : Mouse
     , screen : Screen
@@ -202,12 +198,22 @@ render screen shapes =
         h =
             screen.height
     in
-    render x
-        y
-        w
-        h
-        black
-        (List.map renderShape shapes)
+    TypedSvg.svg
+        [ Html.Attributes.style "position" "fixed"
+        , TA.viewBox x y w h
+        , InPx.width w
+        , InPx.height h
+        ]
+        (TypedSvg.rect
+            [ InPx.x x
+            , InPx.y y
+            , InPx.width w
+            , InPx.height h
+            , fillColor black
+            ]
+            []
+            :: List.map renderShape shapes
+        )
 
 
 fillColor : Color -> Svg.Attribute msg
@@ -322,28 +328,8 @@ setAlphaHelp alpha rgba =
     { rgba | alpha = alpha }
 
 
-render : Float -> Float -> Float -> Float -> Color -> List (Svg msg) -> Html msg
-render x y width height color children =
-    TypedSvg.svg
-        [ Html.Attributes.style "position" "fixed"
-        , TA.viewBox x y width height
-        , InPx.width width
-        , InPx.height height
-        ]
-        (TypedSvg.rect
-            [ InPx.x x
-            , InPx.y y
-            , InPx.width width
-            , InPx.height height
-            , fillColor color
-            ]
-            []
-            :: children
-        )
-
-
 type alias Game memory =
-    Program Flags (Model memory) Msg
+    Program () (Model memory) Msg
 
 
 type alias Update memory =

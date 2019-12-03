@@ -18,6 +18,7 @@ module GravitronV2.Draw exposing
 
 import Angle
 import Arc2d
+import Basics.Extra exposing (flip)
 import Browser
 import Browser.Dom
 import Browser.Events
@@ -111,13 +112,11 @@ subscriptions _ =
         |> Sub.batch
 
 
-update : Update memory -> Msg -> Model memory -> ( Model memory, Cmd Msg )
+update : Update memory -> Msg -> Model memory -> Model memory
 update updateMemory message (Model computer memory) =
     case message of
         Tick _ ->
-            ( Model computer (updateMemory computer memory)
-            , Cmd.none
-            )
+            Model computer (updateMemory computer memory)
 
         MouseMoved mx my ->
             let
@@ -127,31 +126,23 @@ update updateMemory message (Model computer memory) =
                 screen =
                     computer.screen
             in
-            ( Model { computer | mouse = { mouse | x = mx + screen.left, y = my + screen.top } }
+            Model { computer | mouse = { mouse | x = mx + screen.left, y = my + screen.top } }
                 memory
-            , Cmd.none
-            )
 
         OnViewport { scene } ->
-            ( Model { computer | screen = screenFromWidthHeight scene.width scene.height }
+            Model { computer | screen = screenFromWidthHeight scene.width scene.height }
                 memory
-            , Cmd.none
-            )
 
         OnResize width height ->
-            ( Model { computer | screen = screenFromWidthHeight (toFloat width) (toFloat height) }
+            Model { computer | screen = screenFromWidthHeight (toFloat width) (toFloat height) }
                 memory
-            , Cmd.none
-            )
 
         KeyChanged isDown key ->
-            ( Model
+            Model
                 { computer
                     | keyboard = updateKeyboard isDown key computer.keyboard
                 }
                 memory
-            , Cmd.none
-            )
 
 
 updateKeyboard : Bool -> String -> Keyboard -> Keyboard
@@ -382,6 +373,6 @@ game initialMemory updateMemory viewMemory =
     Browser.element
         { init = init initialMemory
         , subscriptions = subscriptions
-        , update = update updateMemory
+        , update = update updateMemory >> flip Tuple.pair Cmd.none
         , view = view
         }

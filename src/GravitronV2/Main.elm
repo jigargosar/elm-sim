@@ -479,10 +479,6 @@ isSpaceKeyJustPressed c prevKeys =
 
 update : Computer -> Memory -> Memory
 update c model =
-    let
-        _ =
-            Debug.log "c.keyboard" ( c.keyboard, model.state )
-    in
     (case model.state of
         Running ->
             if isSpaceKeyJustPressed c model.prevKeys then

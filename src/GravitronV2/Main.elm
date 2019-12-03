@@ -395,7 +395,7 @@ renderTurretExplosions model =
 type GameState
     = Running
     | GameOver Int
-    | Paused
+    | Paused Timer
 
 
 
@@ -475,7 +475,7 @@ update c model =
     (case model.state of
         Running ->
             if Set.member " " c.keyboard.keys then
-                { model | state = Paused }
+                { model | state = Paused (Timer.start (toFloat model.elapsed) 10) }
 
             else
                 model
@@ -496,8 +496,11 @@ update c model =
             else
                 stepAnimations model
 
-        Paused ->
-            if Set.member " " c.keyboard.keys then
+        Paused timer ->
+            if
+                Timer.isDone (toFloat model.elapsed) timer
+                    && Set.member " " c.keyboard.keys
+            then
                 { model | state = Running }
 
             else
@@ -761,7 +764,7 @@ viewGameState state =
         GameOver _ ->
             [ text 0 0 "Game Over" ]
 
-        Paused ->
+        Paused _ ->
             [ text 0 0 "Paused" ]
 
 

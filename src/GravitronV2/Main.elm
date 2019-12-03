@@ -143,13 +143,10 @@ initTurret : Int -> Vec -> Turret
 initTurret i position =
     let
         triggerMaxTicks =
-            60 * 3
-
-        quarter =
-            triggerMaxTicks // 4
+            60 * 5
 
         triggerElapsedTicks =
-            quarter + quarter * (4 - modBy 4 i)
+            triggerMaxTicks - (i * (triggerMaxTicks // 10))
     in
     { position = position
     , radius = 10

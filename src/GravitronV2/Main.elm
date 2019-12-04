@@ -512,7 +512,7 @@ updateMemory computer model =
 
             else
                 model
-                    |> handleUpdate computer
+                    |> updateEntities computer
                     |> handleCollision
                     |> handleDeath
                     |> incRunningTicks
@@ -554,8 +554,8 @@ stepAnimations model =
     }
 
 
-handleUpdate : G.Computer -> Memory -> Memory
-handleUpdate computer model =
+updateEntities : G.Computer -> Memory -> Memory
+updateEntities computer model =
     let
         { mouse, screen } =
             computer
@@ -571,13 +571,12 @@ handleUpdate computer model =
         |> stepAnimations
 
 
-incRunningTicks : Memory -> Memory
-incRunningTicks model =
-    if model.state == Running then
-        { model | rTicks = model.rTicks + 1 }
-
-    else
-        model
+handleCollision : Memory -> Memory
+handleCollision model =
+    mapBullets (handleBulletsCollision []) model
+        |> mapPlayerAndBullets handlePlayerBulletsCollision
+        |> mapTurretsAndBullets handleTurretsBulletsCollision
+        |> mapPlayerAndTurrets handlePlayerTurretsCollision
 
 
 handleDeath : Memory -> Memory
@@ -622,6 +621,19 @@ handleDeath model =
             else
                 model.state
     }
+
+
+incRunningTicks : Memory -> Memory
+incRunningTicks model =
+    if model.state == Running then
+        { model | rTicks = model.rTicks + 1 }
+
+    else
+        model
+
+
+
+-- Collision Helpers
 
 
 handleBulletsCollision : List Bullet -> List Bullet -> List Bullet
@@ -747,14 +759,6 @@ handlePlayerTurretsCollision =
                 player
     in
     \player turrets -> List.foldl reducer player turrets |> flip Tuple.pair turrets
-
-
-handleCollision : Memory -> Memory
-handleCollision model =
-    mapBullets (handleBulletsCollision []) model
-        |> mapPlayerAndBullets handlePlayerBulletsCollision
-        |> mapTurretsAndBullets handleTurretsBulletsCollision
-        |> mapPlayerAndTurrets handlePlayerTurretsCollision
 
 
 viewMemory : G.Computer -> Memory -> List G.Shape

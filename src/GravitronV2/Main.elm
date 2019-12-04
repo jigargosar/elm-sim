@@ -574,10 +574,10 @@ updateEntities computer model =
 handleCollision : Memory -> Memory
 handleCollision model =
     model
-        |> mapPlayerAndBullets handlePlayerBulletsCollision
+        |> mapPlayerAndBullets (foldMap (onCircularCollisionMapBoth decHealth killHealth))
         |> mapPlayerAndTurrets handlePlayerTurretsCollision
         |> mapTurretsAndBullets handleTurretsBulletsCollision
-        |> mapBullets (Tuple.pair [] >> handleBulletsBulletsCollision)
+        |> mapBullets (foldMapSelf (onCircularCollisionMapBoth killHealth killHealth))
 
 
 handleDeath : Memory -> Memory
@@ -692,33 +692,11 @@ onCircularCollisionMapBoth funcA funcB a b =
         ( a, b )
 
 
-handleBulletsBulletsCollision : ( List Bullet, List Bullet ) -> List Bullet
-handleBulletsBulletsCollision ( processed, remaining ) =
-    case remaining of
-        [] ->
-            processed
-
-        first :: rest ->
-            foldMap (onCircularCollisionMapBoth killHealth killHealth) first rest
-                |> Tuple.mapFirst (flip (::) processed)
-                |> handleBulletsBulletsCollision
-
-
-handlePlayerBulletsCollision : Player -> List Bullet -> ( Player, List Bullet )
-handlePlayerBulletsCollision =
-    foldMap (onCircularCollisionMapBoth decHealth killHealth)
-
-
-handleTurretBulletsCollision : Turret -> List Bullet -> ( Turret, List Bullet )
-handleTurretBulletsCollision =
-    foldMap (onCircularCollisionMapBoth decHealth decHealth)
-
-
 handleTurretsBulletsCollision : Turrets -> List Bullet -> ( Turrets, List Bullet )
 handleTurretsBulletsCollision =
     let
         reducer turret ( turretList, bulletList ) =
-            handleTurretBulletsCollision turret bulletList
+            foldMap (onCircularCollisionMapBoth decHealth decHealth) turret bulletList
                 |> Tuple.mapFirst (flip (::) turretList)
     in
     \turrets bullets -> List.foldl reducer ( [], bullets ) turrets

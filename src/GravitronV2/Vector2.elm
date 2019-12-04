@@ -20,7 +20,6 @@ module GravitronV2.Vector2 exposing
     , map2
     , mapEach
     , mapX
-    , minus
     , multiply
     , opp
     , setX
@@ -152,11 +151,6 @@ subtract =
 
 vecFrom : Vec -> Vec -> Vec
 vecFrom =
-    subtract
-
-
-minus : Vec -> Vec -> Vec
-minus =
     subtract
 
 

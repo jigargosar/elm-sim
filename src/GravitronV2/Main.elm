@@ -693,33 +693,13 @@ handleBulletsCollision ( processed, remaining ) =
 
 
 handlePlayerBulletsCollision : Player -> List Bullet -> ( Player, List Bullet )
-handlePlayerBulletsCollision =
-    let
-        reducer bullet ( player, bulletList ) =
-            if circleCircleCollision bullet player then
-                ( decHealth player
-                , killHealth bullet :: bulletList
-                )
-
-            else
-                ( player, bullet :: bulletList )
-    in
-    \player -> List.foldl reducer ( player, [] )
+handlePlayerBulletsCollision player bullets =
+    onCircularAndCircularListCollisionMapBoth decHealth killHealth ( player, bullets )
 
 
 handleTurretBulletsCollision : Turret -> List Bullet -> ( Turret, List Bullet )
-handleTurretBulletsCollision =
-    let
-        reducer bullet ( turret, bulletList ) =
-            if circleCircleCollision bullet turret then
-                ( mapHealth Health.dec turret
-                , mapHealth Health.dec bullet :: bulletList
-                )
-
-            else
-                ( turret, bullet :: bulletList )
-    in
-    \turret -> List.foldl reducer ( turret, [] )
+handleTurretBulletsCollision turret bullets =
+    onCircularAndCircularListCollisionMapBoth decHealth decHealth ( turret, bullets )
 
 
 handleTurretsBulletsCollision : Turrets -> List Bullet -> ( Turrets, List Bullet )

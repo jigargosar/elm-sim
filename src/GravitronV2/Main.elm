@@ -651,31 +651,31 @@ decHealth =
     mapHealth Health.dec
 
 
-foldMap : (a -> b -> ( a, b )) -> ( a, List b ) -> ( a, List b )
+foldMap : (a -> b -> ( a, b )) -> a -> List b -> ( a, List b )
 foldMap func =
     let
         reducer b ( a, bList ) =
             func a b
                 |> Tuple.mapSecond (\newB -> newB :: bList)
     in
-    \( a, bList ) -> List.foldl reducer ( a, [] ) bList
+    \a bList -> List.foldl reducer ( a, [] ) bList
 
 
-onCircularAndCircularListCollisionMapBoth :
-    (Circular a -> Circular a)
-    -> (Circular b -> Circular b)
-    -> ( Circular a, List (Circular b) )
-    -> ( Circular a, List (Circular b) )
-onCircularAndCircularListCollisionMapBoth funcA funcB =
-    let
-        reducer b ( a, bList ) =
-            if circleCircleCollision a b then
-                ( funcA a, funcB b :: bList )
+foldMapSelf : (a -> a -> ( a, a )) -> List a -> List a
+foldMapSelf func list =
+    foldMapSelfHelp func ( [], list )
 
-            else
-                ( a, b :: bList )
-    in
-    \( a, bList ) -> List.foldl reducer ( a, [] ) bList
+
+foldMapSelfHelp : (a -> a -> ( a, a )) -> ( List a, List a ) -> List a
+foldMapSelfHelp func ( processedList, pendingList ) =
+    case pendingList of
+        [] ->
+            processedList
+
+        first :: rest ->
+            foldMap func first rest
+                |> Tuple.mapFirst (\newFirst -> newFirst :: processedList)
+                |> foldMapSelfHelp func
 
 
 onCircularCollisionMapBoth :
@@ -699,19 +699,19 @@ handleBulletsBulletsCollision ( processed, remaining ) =
             processed
 
         first :: rest ->
-            foldMap (onCircularCollisionMapBoth killHealth killHealth) ( first, rest )
+            foldMap (onCircularCollisionMapBoth killHealth killHealth) first rest
                 |> Tuple.mapFirst (flip (::) processed)
                 |> handleBulletsBulletsCollision
 
 
 handlePlayerBulletsCollision : Player -> List Bullet -> ( Player, List Bullet )
-handlePlayerBulletsCollision player bullets =
-    onCircularAndCircularListCollisionMapBoth decHealth killHealth ( player, bullets )
+handlePlayerBulletsCollision =
+    foldMap (onCircularCollisionMapBoth decHealth killHealth)
 
 
 handleTurretBulletsCollision : Turret -> List Bullet -> ( Turret, List Bullet )
-handleTurretBulletsCollision turret bullets =
-    onCircularAndCircularListCollisionMapBoth decHealth decHealth ( turret, bullets )
+handleTurretBulletsCollision =
+    foldMap (onCircularCollisionMapBoth decHealth decHealth)
 
 
 handleTurretsBulletsCollision : Turrets -> List Bullet -> ( Turrets, List Bullet )
@@ -769,8 +769,8 @@ mapTurretsAndBullets func model =
 
 
 handlePlayerTurretsCollision : Player -> Turrets -> ( Player, Turrets )
-handlePlayerTurretsCollision player turrets =
-    onCircularAndCircularListCollisionMapBoth killHealth identity ( player, turrets )
+handlePlayerTurretsCollision =
+    foldMap (onCircularCollisionMapBoth killHealth identity)
 
 
 

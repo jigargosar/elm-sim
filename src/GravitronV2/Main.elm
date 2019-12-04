@@ -266,7 +266,7 @@ updateBullet screen player bullet =
     let
         gravity =
             V.vecFrom bullet.position player.position
-                |> V.mapMagnitude ((*) 0.2)
+                |> V.mapMagnitude (\m -> 20 / m)
 
         newVelocity =
             [ bounceWithinScreen screen bullet

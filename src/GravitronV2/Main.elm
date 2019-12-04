@@ -42,7 +42,7 @@ type alias HasVelocity a =
 
 applyForce : Vec -> HasVelocity a -> HasVelocity a
 applyForce force model =
-    { model | velocity = V.integrate force model.velocity }
+    { model | velocity = V.add force model.velocity }
 
 
 applyScalarForce : Float -> HasVelocity a -> HasVelocity a
@@ -60,7 +60,7 @@ type alias HasPositionVelocity a =
 
 applyVelocity : HasPositionVelocity a -> HasPositionVelocity a
 applyVelocity model =
-    { model | position = V.integrate model.position model.velocity }
+    { model | position = V.add model.position model.velocity }
 
 
 
@@ -271,14 +271,14 @@ updateBullet c player bullet =
     let
         newVelocity =
             [ bounceWithinScreen c.screen bullet
-            , V.integrate (V.gravityFrom bullet.position player.position player.mass)
+            , V.add (V.gravityFrom bullet.position player.position player.mass)
             , V.multiply bullet.friction
             , V.clampMagnitude bullet.maxSpeed
             ]
                 |> List.foldl (\f v -> f v) bullet.velocity
 
         newPosition =
-            V.integrate bullet.position newVelocity
+            V.add bullet.position newVelocity
     in
     { bullet
         | velocity = newVelocity
@@ -469,7 +469,7 @@ fireBulletFromTurretTo player turret =
 
         position =
             V.fromRTheta (turret.radius + bullet.radius + 1) angle
-                |> V.integrate turret.position
+                |> V.add turret.position
 
         velocity =
             V.fromRTheta (V.len bullet.velocity) angle

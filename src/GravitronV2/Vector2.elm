@@ -14,7 +14,6 @@ module GravitronV2.Vector2 exposing
     , getX
     , getY
     , gravityFrom
-    , integrate
     , len
     , len2
     , lenFrom
@@ -142,19 +141,17 @@ setX =
     mapX << always
 
 
-integrate : Vec -> Vec -> Vec
-integrate =
-    map2 (+)
-
-
 add : Vec -> Vec -> Vec
 add =
-    integrate
+    map2 (+)
+add : Vec -> Vec -> Vec
+add =
+    add
 
 
 plus : Vec -> Vec -> Vec
 plus =
-    integrate
+    add
 
 
 subtract : Vec -> Vec -> Vec

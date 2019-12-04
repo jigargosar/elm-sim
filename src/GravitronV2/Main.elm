@@ -636,6 +636,25 @@ incRunningTicks model =
 -- Collision Helpers
 
 
+type alias HasHealth a =
+    { a | health : Health }
+
+
+kill : HasHealth a -> HasHealth a
+kill =
+    mapHealth Health.kill
+
+
+handleBulletBulletCollision bullet1 bullet2 =
+    if circleCircleCollision bullet1 bullet2 then
+        ( kill bullet1
+        , kill bullet2
+        )
+
+    else
+        ( bullet1, bullet2 )
+
+
 handleBulletsCollision : List Bullet -> List Bullet -> List Bullet
 handleBulletsCollision processed remaining =
     case remaining of

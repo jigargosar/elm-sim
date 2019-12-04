@@ -602,23 +602,19 @@ handleDeath model =
         ( bullets, deadBullets ) =
             List.partition (.health >> Health.isAlive) model.bullets
 
-        bulletExplosions =
-            List.map explosionFromBullet deadBullets
-                ++ model.bulletExplosions
-                |> List.filter isBulletExplosionAnimating
-
         ( turrets, deadTurrets ) =
             List.partition (.health >> Health.isAlive) model.turrets
-
-        turretExplosions =
-            List.map explosionFromTurret deadTurrets
-                ++ model.turretExplosions
-                |> List.filter isTurretExplosionAnimating
     in
     { model
         | bullets = bullets
-        , bulletExplosions = bulletExplosions
-        , turretExplosions = turretExplosions
+        , bulletExplosions =
+            List.map explosionFromBullet deadBullets
+                ++ model.bulletExplosions
+                |> List.filter isBulletExplosionAnimating
+        , turretExplosions =
+            List.map explosionFromTurret deadTurrets
+                ++ model.turretExplosions
+                |> List.filter isTurretExplosionAnimating
         , stage =
             if List.isEmpty turrets then
                 model.stage + 1

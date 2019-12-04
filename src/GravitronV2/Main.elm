@@ -785,5 +785,9 @@ viewGameState state =
             [ G.text 0 0 "Paused" ]
 
 
+
+-- MAIN
+
+
 main =
     G.game initMemory update view

@@ -503,8 +503,8 @@ spacePressed =
     G.freshKeyDown " "
 
 
-update : G.Computer -> Memory -> Memory
-update c model =
+updateMemory : G.Computer -> Memory -> Memory
+updateMemory c model =
     (case model.state of
         Running ->
             if spacePressed c then
@@ -758,8 +758,8 @@ handleCollision model =
         |> mapPlayerAndTurrets handlePlayerTurretsCollision
 
 
-view : G.Computer -> Memory -> List G.Shape
-view _ model =
+viewMemory : G.Computer -> Memory -> List G.Shape
+viewMemory _ model =
     let
         rTicks =
             model.rTicks
@@ -790,4 +790,4 @@ viewGameState state =
 
 
 main =
-    G.game initMemory update view
+    G.game initMemory updateMemory viewMemory

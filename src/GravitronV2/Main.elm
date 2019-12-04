@@ -450,15 +450,12 @@ allTurretsPositions =
 
 
 initTurretsForStage : Int -> Float -> Turrets
-initTurretsForStage stage_ rTicks =
+initTurretsForStage stage rTicks =
     let
         maxTurrets =
             List.length allTurretsPositions
-
-        stage =
-            stage_ |> modBy maxTurrets |> (+) 1
     in
-    allTurretsPositions |> List.take stage |> List.map (initTurret rTicks)
+    allTurretsPositions |> List.take (modBy maxTurrets stage + 1) |> List.map (initTurret rTicks)
 
 
 initMemory : Memory

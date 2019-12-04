@@ -266,11 +266,11 @@ updateBullet screen player bullet =
     let
         gravity =
             V.vecFrom bullet.position player.position
-                |> V.map2
+                |> V.mapMagnitude ((*) 0.2)
 
         newVelocity =
             [ bounceWithinScreen screen bullet
-            , V.add (V.gravityFrom bullet.position player.position player.mass)
+            , V.add gravity
             , V.multiply bullet.friction
             , V.clampMagnitude bullet.maxSpeed
             ]

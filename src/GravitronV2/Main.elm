@@ -577,7 +577,7 @@ handleCollision model =
         |> mapPlayerAndBullets handlePlayerBulletsCollision
         |> mapPlayerAndTurrets handlePlayerTurretsCollision
         |> mapTurretsAndBullets handleTurretsBulletsCollision
-        |> mapBullets (Tuple.pair [] >> handleBulletsCollision)
+        |> mapBullets (Tuple.pair [] >> handleBulletsBulletsCollision)
 
 
 handleDeath : Memory -> Memory
@@ -681,8 +681,8 @@ onCircularAndCircularListCollisionMapBoth funcA funcB =
     \( a, bList ) -> List.foldl reducer ( a, [] ) bList
 
 
-handleBulletsCollision : ( List Bullet, List Bullet ) -> List Bullet
-handleBulletsCollision ( processed, remaining ) =
+handleBulletsBulletsCollision : ( List Bullet, List Bullet ) -> List Bullet
+handleBulletsBulletsCollision ( processed, remaining ) =
     case remaining of
         [] ->
             processed
@@ -690,7 +690,7 @@ handleBulletsCollision ( processed, remaining ) =
         first :: rest ->
             onCircularAndCircularListCollisionMapBoth killHealth killHealth ( first, rest )
                 |> Tuple.mapFirst (flip (::) processed)
-                |> handleBulletsCollision
+                |> handleBulletsBulletsCollision
 
 
 handlePlayerBulletsCollision : Player -> List Bullet -> ( Player, List Bullet )

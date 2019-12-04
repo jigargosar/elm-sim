@@ -457,11 +457,14 @@ initTurretsForStage stage rTicks =
         triggerTimerDuration =
             60 * 5
 
+        delayPerTurret =
+            triggerTimerDuration / toFloat turretCountForStage
+
         triggerTimer : Int -> Timer
         triggerTimer idx =
             Timer.delayedStart rTicks
                 triggerTimerDuration
-                (toFloat idx * (toFloat triggerTimerDuration / toFloat turretCountForStage))
+                (toFloat idx * delayPerTurret)
 
         initTurretAtIdx : Int -> Vec -> Turret
         initTurretAtIdx =

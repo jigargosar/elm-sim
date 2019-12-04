@@ -504,15 +504,15 @@ spacePressed =
 
 
 updateMemory : G.Computer -> Memory -> Memory
-updateMemory c model =
+updateMemory computer model =
     (case model.state of
         Running ->
-            if spacePressed c then
+            if spacePressed computer then
                 { model | state = Paused }
 
             else
                 model
-                    |> handleUpdate c
+                    |> handleUpdate computer
                     |> handleCollision
                     |> handleDeath
 
@@ -529,7 +529,7 @@ updateMemory c model =
                     |> stepAnimations
 
         Paused ->
-            if spacePressed c then
+            if spacePressed computer then
                 { model | state = Running }
 
             else

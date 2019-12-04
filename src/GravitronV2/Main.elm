@@ -646,14 +646,12 @@ kill =
 
 
 handleBulletBulletCollision : Bullet -> Bullet -> ( Bullet, Bullet )
-handleBulletBulletCollision bullet1 bullet2 =
-    if circleCircleCollision bullet1 bullet2 then
-        ( kill bullet1
-        , kill bullet2
-        )
+handleBulletBulletCollision a b =
+    if circleCircleCollision a b then
+        ( kill a, kill b )
 
     else
-        ( bullet1, bullet2 )
+        ( a, b )
 
 
 handleBulletsCollision : List Bullet -> List Bullet -> List Bullet

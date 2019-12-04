@@ -412,17 +412,12 @@ type GameState
 -- Memory
 
 
-type GameObject
-    = PlayerObject Player
-
-
 type alias Memory =
     { player : Player
     , turrets : List Turret
     , bullets : List Bullet
     , bulletExplosions : List BulletExplosion
     , turretExplosions : List TurretExplosion
-    , gameObjects : Dict Int GameObject
     , state : GameState
     , stage : Int
     , rTicks : Float
@@ -457,26 +452,25 @@ initMemory =
     , bullets = []
     , bulletExplosions = []
     , turretExplosions = []
-    , gameObjects = Dict.empty
     , stage = stage
     , state = Running
     , rTicks = rTicks
     }
 
 
-fireBulletFromTurretTo : Player -> Turret -> Bullet
-fireBulletFromTurretTo player turret =
+createNewBullet : { from : Vec, to : Vec, offset : Float } -> Bullet
+createNewBullet { from, to, offset } =
     let
         bullet =
             defaultBullet
 
         angle =
-            V.vecFrom turret.position player.position
+            V.vecFrom from to
                 |> V.angle
 
         position =
-            V.fromRTheta (turret.radius + bullet.radius + 1) angle
-                |> V.add turret.position
+            V.fromRTheta (offset + bullet.radius + 1) angle
+                |> V.add from
 
         velocity =
             V.fromRTheta (V.len bullet.velocity) angle
@@ -549,7 +543,14 @@ handleUpdate c model =
         firedBullets =
             List.foldl
                 (prependWhen (turretTriggerTimerDone rTicks)
-                    (fireBulletFromTurretTo model.player)
+                    --(fireBulletFromTurretTo model.player)
+                    (\t ->
+                        createNewBullet
+                            { from = t.position
+                            , to = model.player.position
+                            , offset = t.radius
+                            }
+                    )
                 )
                 []
                 model.turrets

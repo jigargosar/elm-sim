@@ -1,6 +1,8 @@
 module GravitronV2.Game exposing
     ( Color
     , Computer
+    , Keyboard
+    , Mouse
     , Screen
     , Shape
     , circle

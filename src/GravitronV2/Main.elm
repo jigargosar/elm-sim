@@ -93,8 +93,8 @@ initPlayer =
     }
 
 
-updatePlayer : G.Computer -> Player -> Player
-updatePlayer c player =
+updatePlayer : G.Mouse -> Player -> Player
+updatePlayer mouse player =
     let
         applySpringForceTowardsPoint : Vec -> Float -> Player -> Player
         applySpringForceTowardsPoint toPoint k model =
@@ -105,7 +105,7 @@ updatePlayer c player =
             applyForce force model
 
         springPoint =
-            V.fromRec c.mouse
+            V.fromRec mouse
     in
     player
         |> applySpringForceTowardsPoint springPoint player.springConstant
@@ -267,11 +267,11 @@ bounceWithinScreen screen { position, bounceFriction } velocity =
         newBouncedVelocity
 
 
-updateBullet : G.Computer -> Player -> Bullet -> Bullet
-updateBullet c player bullet =
+updateBullet : G.Screen -> Player -> Bullet -> Bullet
+updateBullet screen player bullet =
     let
         newVelocity =
-            [ bounceWithinScreen c.screen bullet
+            [ bounceWithinScreen screen bullet
             , V.add (V.gravityFrom bullet.position player.position player.mass)
             , V.multiply bullet.friction
             , V.clampMagnitude bullet.maxSpeed
@@ -556,11 +556,18 @@ stepAnimations model =
 
 
 handleUpdate : G.Computer -> Memory -> Memory
-handleUpdate c model =
+handleUpdate computer model =
+    let
+        { mouse, screen } =
+            computer
+
+        { player, rTicks, turrets, bullets } =
+            model
+    in
     { model
-        | player = updatePlayer c model.player
-        , turrets = List.map (turretRestartTriggerTimerIfDone model.rTicks) model.turrets
-        , bullets = updateBullets c model.rTicks model.player model.turrets model.bullets
+        | player = updatePlayer mouse player
+        , turrets = List.map (turretRestartTriggerTimerIfDone rTicks) turrets
+        , bullets = updateBullets screen rTicks player turrets bullets
     }
         |> stepAnimations
 

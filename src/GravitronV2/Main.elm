@@ -1,6 +1,5 @@
 module GravitronV2.Main exposing (main)
 
-import Basics.Extra exposing (flip)
 import GravitronV2.Game as G exposing (Screen)
 import GravitronV2.Health as Health exposing (Health)
 import GravitronV2.Timer as Timer exposing (Timer)
@@ -575,8 +574,8 @@ handleCollision : Memory -> Memory
 handleCollision model =
     model
         |> mapPlayerAndBullets (foldMap (onCircularCollisionMapBoth decHealth killHealth))
-        |> mapPlayerAndTurrets handlePlayerTurretsCollision
-        |> mapTurretsAndBullets handleTurretsBulletsCollision
+        |> mapPlayerAndTurrets (foldMap (onCircularCollisionMapBoth killHealth identity))
+        |> mapTurretsAndBullets (foldMapList (onCircularCollisionMapBoth decHealth decHealth))
         |> mapBullets (foldMapSelf (onCircularCollisionMapBoth killHealth killHealth))
 
 
@@ -702,16 +701,6 @@ onCircularCollisionMapBoth funcA funcB a b =
         ( a, b )
 
 
-handleTurretsBulletsCollision : Turrets -> List Bullet -> ( Turrets, List Bullet )
-handleTurretsBulletsCollision =
-    let
-        reducer turret ( turretList, bulletList ) =
-            foldMap (onCircularCollisionMapBoth decHealth decHealth) turret bulletList
-                |> Tuple.mapFirst (flip (::) turretList)
-    in
-    \turrets bullets -> List.foldl reducer ( [], bullets ) turrets
-
-
 mapBullets : (a -> a) -> { b | bullets : a } -> { b | bullets : a }
 mapBullets func model =
     { model | bullets = func model.bullets }
@@ -754,11 +743,6 @@ mapTurretsAndBullets func model =
             func model.turrets model.bullets
     in
     { model | turrets = turrets, bullets = bullets }
-
-
-handlePlayerTurretsCollision : Player -> Turrets -> ( Player, Turrets )
-handlePlayerTurretsCollision =
-    foldMap (onCircularCollisionMapBoth killHealth identity)
 
 
 

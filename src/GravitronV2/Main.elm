@@ -645,6 +645,7 @@ kill =
     mapHealth Health.kill
 
 
+handleBulletBulletCollision : Bullet -> Bullet -> ( Bullet, Bullet )
 handleBulletBulletCollision bullet1 bullet2 =
     if circleCircleCollision bullet1 bullet2 then
         ( kill bullet1

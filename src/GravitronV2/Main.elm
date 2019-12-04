@@ -138,17 +138,13 @@ type alias Turret =
     }
 
 
-initTurret : Float -> Vec -> Turret
-initTurret clock position =
-    let
-        triggerMaxTicks =
-            60 * 5
-    in
+initTurret : Timer -> Vec -> Turret
+initTurret triggerTimer position =
     { position = position
     , radius = 10
     , color = G.green
     , health = Health.init 1
-    , triggerTimer = Timer.start clock triggerMaxTicks
+    , triggerTimer = triggerTimer
     }
 
 
@@ -457,10 +453,25 @@ initTurretsForStage stage rTicks =
 
         turretCountForStage =
             modBy maxTurrets (stage - 1) + 1
+
+        triggerTimerDuration =
+            60 * 5
+
+        triggerDelayFromIdx : Int -> Float
+        triggerDelayFromIdx idx =
+            toFloat idx * (toFloat triggerTimerDuration / toFloat turretCountForStage)
+
+        triggerTimer : Float -> Timer
+        triggerTimer =
+            Timer.delayedStart rTicks triggerTimerDuration
+
+        initTurretAtIdx : Int -> Vec -> Turret
+        initTurretAtIdx idx =
+            initTurret (triggerTimer (triggerDelayFromIdx idx))
     in
     allTurretsPositions
         |> List.take turretCountForStage
-        |> List.map (initTurret rTicks)
+        |> List.indexedMap initTurretAtIdx
 
 
 initMemory : Memory
@@ -759,11 +770,6 @@ viewMemory _ model =
     let
         rTicks =
             model.rTicks
-
-        turretCount =
-            model.turrets
-                |> List.length
-                |> Debug.log "tc"
     in
     renderPlayer model.player
         ++ List.map renderTurretExplosions model.turretExplosions

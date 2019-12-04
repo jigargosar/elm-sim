@@ -573,7 +573,7 @@ updateEntities computer model =
 
 handleCollision : Memory -> Memory
 handleCollision model =
-    mapBullets (handleBulletsCollision []) model
+    mapBullets (Tuple.pair [] >> handleBulletsCollision) model
         |> mapPlayerAndBullets handlePlayerBulletsCollision
         |> mapTurretsAndBullets handleTurretsBulletsCollision
         |> mapPlayerAndTurrets handlePlayerTurretsCollision
@@ -645,17 +645,22 @@ kill =
     mapHealth Health.kill
 
 
-handleBulletBulletCollision : Bullet -> Bullet -> ( Bullet, Bullet )
-handleBulletBulletCollision a b =
-    if circleCircleCollision a b then
-        ( kill a, kill b )
+handleBulletCollisionWithOtherBullets : ( Bullet, Bullets ) -> ( Bullet, Bullets )
+handleBulletCollisionWithOtherBullets ( first, rest ) =
+    List.foldl
+        (\b2 ( b1, acc ) ->
+            if circleCircleCollision b1 b2 then
+                ( kill b1, kill b2 :: acc )
 
-    else
-        ( a, b )
+            else
+                ( b1, b2 :: acc )
+        )
+        ( first, [] )
+        rest
 
 
-handleBulletsCollision : List Bullet -> List Bullet -> List Bullet
-handleBulletsCollision processed remaining =
+handleBulletsCollision : ( List Bullet, List Bullet ) -> List Bullet
+handleBulletsCollision ( processed, remaining ) =
     case remaining of
         [] ->
             processed
@@ -664,24 +669,9 @@ handleBulletsCollision processed remaining =
             bullet :: processed
 
         first :: rest ->
-            if Health.isAlive first.health then
-                let
-                    reducer b2 ( b1, acc ) =
-                        if circleCircleCollision b1 b2 then
-                            ( { b1 | health = Health.kill b1.health }
-                            , { b2 | health = Health.kill b1.health } :: acc
-                            )
-
-                        else
-                            ( b1, b2 :: acc )
-
-                    ( processedBullet, newRemaining ) =
-                        List.foldl reducer ( first, [] ) rest
-                in
-                handleBulletsCollision (processedBullet :: processed) newRemaining
-
-            else
-                handleBulletsCollision (first :: processed) rest
+            handleBulletCollisionWithOtherBullets ( first, rest )
+                |> Tuple.mapFirst (flip (::) processed)
+                |> handleBulletsCollision
 
 
 handlePlayerBulletsCollision : Player -> List Bullet -> ( Player, List Bullet )

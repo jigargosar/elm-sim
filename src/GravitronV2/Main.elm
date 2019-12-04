@@ -757,16 +757,8 @@ mapTurretsAndBullets func model =
 
 
 handlePlayerTurretsCollision : Player -> Turrets -> ( Player, Turrets )
-handlePlayerTurretsCollision =
-    let
-        reducer turret player =
-            if circleCircleCollision player turret then
-                mapHealth Health.kill player
-
-            else
-                player
-    in
-    \player turrets -> List.foldl reducer player turrets |> flip Tuple.pair turrets
+handlePlayerTurretsCollision player turrets =
+    onCircularAndCircularListCollisionMapBoth killHealth identity ( player, turrets )
 
 
 viewMemory : G.Computer -> Memory -> List G.Shape

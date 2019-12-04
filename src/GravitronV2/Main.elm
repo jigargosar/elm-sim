@@ -505,7 +505,7 @@ spacePressed =
 
 updateMemory : G.Computer -> Memory -> Memory
 updateMemory computer model =
-    (case model.state of
+    case model.state of
         Running ->
             if spacePressed computer then
                 { model | state = Paused }
@@ -515,6 +515,7 @@ updateMemory computer model =
                     |> handleUpdate computer
                     |> handleCollision
                     |> handleDeath
+                    |> incRunningTicks
 
         GameOver elapsed ->
             let
@@ -534,8 +535,6 @@ updateMemory computer model =
 
             else
                 model
-    )
-        |> incRunningTicks
 
 
 prependWhen : (c -> Bool) -> (c -> a) -> c -> List a -> List a

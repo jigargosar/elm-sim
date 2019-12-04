@@ -665,9 +665,6 @@ handleBulletsCollision ( processed, remaining ) =
         [] ->
             processed
 
-        bullet :: [] ->
-            bullet :: processed
-
         first :: rest ->
             handleBulletCollisionWithOtherBullets ( first, rest )
                 |> Tuple.mapFirst (flip (::) processed)

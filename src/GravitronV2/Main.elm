@@ -452,8 +452,11 @@ allTurretsPositions =
 initTurretsForStage : Int -> Float -> Turrets
 initTurretsForStage stage_ rTicks =
     let
+        maxTurrets =
+            List.length allTurretsPositions
+
         stage =
-            stage_ + 1 |> modBy (List.length allTurretsPositions)
+            stage_ |> modBy maxTurrets |> (+) 1
     in
     allTurretsPositions |> List.take stage |> List.map (initTurret rTicks)
 
@@ -462,13 +465,13 @@ initMemory : Memory
 initMemory =
     let
         stage =
-            4
+            3
 
         rTicks =
             0
     in
     { player = initPlayer
-    , turrets = initTurretsForStage stage rTicks
+    , turrets = initTurretsForStage stage rTicks |> Debug.log "it"
     , bullets = []
     , bulletExplosions = []
     , turretExplosions = []
@@ -754,6 +757,11 @@ viewMemory _ model =
     let
         rTicks =
             model.rTicks
+
+        turretCount =
+            model.turrets
+                |> List.length
+                |> Debug.log "tc"
     in
     renderPlayer model.player
         ++ List.map renderTurretExplosions model.turretExplosions

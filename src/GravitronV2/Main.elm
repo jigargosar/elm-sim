@@ -499,7 +499,6 @@ update c model =
             else
                 model
                     |> stepAnimations
-                    |> stepTimers
                     |> handleUpdate c
                     |> handleCollision
                     |> handleDeath
@@ -535,8 +534,16 @@ prependWhen pred t v =
         identity
 
 
-stepTimers : Memory -> Memory
-stepTimers model =
+stepAnimations : Memory -> Memory
+stepAnimations model =
+    { model
+        | bulletExplosions = List.map stepBulletExplosionAnimation model.bulletExplosions
+        , turretExplosions = List.map stepTurretExplosionAnimation model.turretExplosions
+    }
+
+
+handleUpdate : G.Computer -> Memory -> Memory
+handleUpdate c model =
     let
         rTicks =
             model.rTicks
@@ -550,24 +557,12 @@ stepTimers model =
                 model.turrets
     in
     { model
-        | turrets = List.map (turretRestartTriggerTimerIfDone rTicks) model.turrets
-        , bullets = firedBullets ++ model.bullets
-    }
-
-
-stepAnimations : Memory -> Memory
-stepAnimations model =
-    { model
-        | bulletExplosions = List.map stepBulletExplosionAnimation model.bulletExplosions
-        , turretExplosions = List.map stepTurretExplosionAnimation model.turretExplosions
-    }
-
-
-handleUpdate : G.Computer -> Memory -> Memory
-handleUpdate c model =
-    { model
         | player = updatePlayer c model.player
-        , bullets = List.map (updateBullet c model.player) model.bullets
+        , turrets = List.map (turretRestartTriggerTimerIfDone rTicks) model.turrets
+        , bullets =
+            firedBullets
+                ++ model.bullets
+                |> List.map (updateBullet c model.player)
     }
 
 

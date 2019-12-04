@@ -287,6 +287,27 @@ updateBullet c player bullet =
     }
 
 
+updateBullets c rTicks player turrets bullets =
+    let
+        firedBullets =
+            List.foldl
+                (prependWhen (turretTriggerTimerDone rTicks)
+                    (\t ->
+                        fireNewBullet
+                            { from = t.position
+                            , to = player.position
+                            , offset = t.radius
+                            }
+                    )
+                )
+                []
+                turrets
+    in
+    firedBullets
+        ++ bullets
+        |> List.map (updateBullet c player)
+
+
 renderBullet : Bullet -> G.Shape
 renderBullet bullet =
     let
@@ -536,31 +557,10 @@ stepAnimations model =
 
 handleUpdate : G.Computer -> Memory -> Memory
 handleUpdate c model =
-    let
-        rTicks =
-            model.rTicks
-
-        firedBullets =
-            List.foldl
-                (prependWhen (turretTriggerTimerDone rTicks)
-                    (\t ->
-                        fireNewBullet
-                            { from = t.position
-                            , to = model.player.position
-                            , offset = t.radius
-                            }
-                    )
-                )
-                []
-                model.turrets
-    in
     { model
         | player = updatePlayer c model.player
-        , turrets = List.map (turretRestartTriggerTimerIfDone rTicks) model.turrets
-        , bullets =
-            firedBullets
-                ++ model.bullets
-                |> List.map (updateBullet c model.player)
+        , turrets = List.map (turretRestartTriggerTimerIfDone model.rTicks) model.turrets
+        , bullets = updateBullets c model.rTicks model.player model.turrets model.bullets
     }
         |> stepAnimations
 

@@ -761,6 +761,10 @@ handlePlayerTurretsCollision player turrets =
     onCircularAndCircularListCollisionMapBoth killHealth identity ( player, turrets )
 
 
+
+-- View
+
+
 viewMemory : G.Computer -> Memory -> List G.Shape
 viewMemory _ model =
     let

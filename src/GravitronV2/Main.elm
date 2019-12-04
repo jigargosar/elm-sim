@@ -1,7 +1,6 @@
 module GravitronV2.Main exposing (main)
 
 import Basics.Extra exposing (flip)
-import Dict exposing (Dict)
 import GravitronV2.Game as G exposing (Screen)
 import GravitronV2.Health as Health exposing (Health)
 import GravitronV2.Timer as Timer exposing (Timer)

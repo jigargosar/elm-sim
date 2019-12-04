@@ -437,6 +437,14 @@ initTurretsForStage stage_ rTicks =
     allTurretsPositions |> List.take stage |> List.map (initTurret rTicks)
 
 
+type GameEntity
+    = Player
+    | Turret
+    | Bullet
+    | BulletExplosions
+    | TurretExplosions
+
+
 initMemory : Memory
 initMemory =
     let

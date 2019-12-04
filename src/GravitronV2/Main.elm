@@ -458,8 +458,8 @@ initMemory =
     }
 
 
-createNewBullet : { from : Vec, to : Vec, offset : Float } -> Bullet
-createNewBullet { from, to, offset } =
+fireNewBullet : { from : Vec, to : Vec, offset : Float } -> Bullet
+fireNewBullet { from, to, offset } =
     let
         bullet =
             defaultBullet
@@ -544,7 +544,7 @@ handleUpdate c model =
             List.foldl
                 (prependWhen (turretTriggerTimerDone rTicks)
                     (\t ->
-                        createNewBullet
+                        fireNewBullet
                             { from = t.position
                             , to = model.player.position
                             , offset = t.radius

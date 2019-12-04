@@ -650,18 +650,34 @@ decHealth =
     mapHealth Health.dec
 
 
-handleBulletCollisionWithOtherBullets : ( Bullet, Bullets ) -> ( Bullet, Bullets )
-handleBulletCollisionWithOtherBullets ( first, rest ) =
-    List.foldl
-        (\b2 ( b1, acc ) ->
-            if circleCircleCollision b1 b2 then
-                ( killHealth b1, killHealth b2 :: acc )
+onCircularCollisionMapBoth :
+    (Circular a -> Circular a)
+    -> (Circular b -> Circular b)
+    -> ( Circular a, Circular b )
+    -> ( Circular a, Circular b )
+onCircularCollisionMapBoth func1 func2 ( c1, c2 ) =
+    if circleCircleCollision c1 c2 then
+        ( func1 c1, func2 c2 )
+
+    else
+        ( c1, c2 )
+
+
+onCircularAndCircularListCollisionMapBoth :
+    (Circular a -> Circular a)
+    -> (Circular b -> Circular b)
+    -> ( Circular a, List (Circular b) )
+    -> ( Circular a, List (Circular b) )
+onCircularAndCircularListCollisionMapBoth funcA funcB =
+    let
+        reducer b ( a, bList ) =
+            if circleCircleCollision a b then
+                ( funcA a, funcB b :: bList )
 
             else
-                ( b1, b2 :: acc )
-        )
-        ( first, [] )
-        rest
+                ( a, b :: bList )
+    in
+    \( a, bList ) -> List.foldl reducer ( a, [] ) bList
 
 
 handleBulletsCollision : ( List Bullet, List Bullet ) -> List Bullet
@@ -671,7 +687,7 @@ handleBulletsCollision ( processed, remaining ) =
             processed
 
         first :: rest ->
-            handleBulletCollisionWithOtherBullets ( first, rest )
+            onCircularAndCircularListCollisionMapBoth killHealth killHealth ( first, rest )
                 |> Tuple.mapFirst (flip (::) processed)
                 |> handleBulletsCollision
 

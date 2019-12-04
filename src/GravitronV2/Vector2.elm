@@ -19,6 +19,7 @@ module GravitronV2.Vector2 exposing
     , lenFrom
     , map2
     , mapEach
+    , mapMagnitude
     , mapX
     , multiply
     , opp
@@ -209,4 +210,9 @@ clampMagnitude hi =
         lo =
             negate absHi
     in
-    toTuple >> toPolar >> Tuple.mapFirst (clamp lo hi) >> fromPolar >> uncurry vec
+    mapMagnitude (clamp lo hi)
+
+
+mapMagnitude : (Float -> Float) -> Vec -> Vec
+mapMagnitude func =
+    toTuple >> toPolar >> Tuple.mapFirst func >> fromPolar >> uncurry vec

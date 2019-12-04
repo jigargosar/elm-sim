@@ -264,6 +264,10 @@ bounceWithinScreen screen { position, bounceFriction } velocity =
 updateBullet : G.Screen -> Player -> Bullet -> Bullet
 updateBullet screen player bullet =
     let
+        gravity =
+            V.vecFrom bullet.position player.position
+                |> V.map2
+
         newVelocity =
             [ bounceWithinScreen screen bullet
             , V.add (V.gravityFrom bullet.position player.position player.mass)

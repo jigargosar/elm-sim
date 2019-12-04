@@ -650,7 +650,9 @@ handleBulletsCollision processed remaining =
                 let
                     reducer b2 ( b1, acc ) =
                         if circleCircleCollision b1 b2 then
-                            ( { b1 | health = Health.kill b1.health }, { b2 | health = Health.kill b1.health } :: acc )
+                            ( { b1 | health = Health.kill b1.health }
+                            , { b2 | health = Health.kill b1.health } :: acc
+                            )
 
                         else
                             ( b1, b2 :: acc )

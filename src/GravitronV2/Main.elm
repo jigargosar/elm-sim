@@ -573,10 +573,11 @@ updateEntities computer model =
 
 handleCollision : Memory -> Memory
 handleCollision model =
-    mapBullets (Tuple.pair [] >> handleBulletsCollision) model
+    model
         |> mapPlayerAndBullets handlePlayerBulletsCollision
-        |> mapTurretsAndBullets handleTurretsBulletsCollision
         |> mapPlayerAndTurrets handlePlayerTurretsCollision
+        |> mapTurretsAndBullets handleTurretsBulletsCollision
+        |> mapBullets (Tuple.pair [] >> handleBulletsCollision)
 
 
 handleDeath : Memory -> Memory

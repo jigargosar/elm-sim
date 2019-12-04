@@ -438,9 +438,9 @@ initTurretsForStage stage_ rTicks =
 
 
 type CollisionEntities
-    = Player
-    | Bullet
-    | Turret
+    = PlayerCollision
+    | BulletCollision
+    | TurretCollision
 
 
 onCollide : CollisionEntities -> CollisionEntities -> number
@@ -450,22 +450,22 @@ onCollide e1 e2 =
             onCollide e2 e1
     in
     case ( e1, e2 ) of
-        ( Player, Bullet ) ->
+        ( PlayerCollision, BulletCollision ) ->
             1
 
-        ( Bullet, Player ) ->
+        ( BulletCollision, PlayerCollision ) ->
             flipEntities ()
 
-        ( Player, Turret ) ->
+        ( PlayerCollision, TurretCollision ) ->
             1
 
-        ( Turret, Player ) ->
+        ( TurretCollision, PlayerCollision ) ->
             flipEntities ()
 
-        ( Bullet, Turret ) ->
+        ( BulletCollision, TurretCollision ) ->
             1
 
-        ( Turret, Bullet ) ->
+        ( TurretCollision, BulletCollision ) ->
             flipEntities ()
 
 

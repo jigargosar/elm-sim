@@ -2,7 +2,7 @@ module GravitronV2.Main exposing (main)
 
 import Basics.Extra exposing (flip)
 import Dict exposing (Dict)
-import GravitronV2.Game as G
+import GravitronV2.Game as G exposing (Screen)
 import GravitronV2.Health as Health exposing (Health)
 import GravitronV2.Timer as Timer exposing (Timer)
 import GravitronV2.Vector2 as V exposing (Vec, vec, vec0)
@@ -287,7 +287,8 @@ updateBullet screen player bullet =
     }
 
 
-updateBullets c rTicks player turrets bullets =
+updateBullets : Screen -> Float -> Player -> Turrets -> Bullets -> Bullets
+updateBullets screen rTicks player turrets bullets =
     let
         firedBullets =
             List.foldl
@@ -305,7 +306,7 @@ updateBullets c rTicks player turrets bullets =
     in
     firedBullets
         ++ bullets
-        |> List.map (updateBullet c player)
+        |> List.map (updateBullet screen player)
 
 
 renderBullet : Bullet -> G.Shape

@@ -640,8 +640,8 @@ type alias HasHealth a =
     { a | health : Health }
 
 
-kill : HasHealth a -> HasHealth a
-kill =
+killHealth : HasHealth a -> HasHealth a
+killHealth =
     mapHealth Health.kill
 
 
@@ -655,7 +655,7 @@ handleBulletCollisionWithOtherBullets ( first, rest ) =
     List.foldl
         (\b2 ( b1, acc ) ->
             if circleCircleCollision b1 b2 then
-                ( kill b1, kill b2 :: acc )
+                ( killHealth b1, killHealth b2 :: acc )
 
             else
                 ( b1, b2 :: acc )
@@ -682,7 +682,7 @@ handlePlayerBulletsCollision =
         reducer bullet ( player, bulletList ) =
             if circleCircleCollision bullet player then
                 ( decHealth player
-                , kill bullet :: bulletList
+                , killHealth bullet :: bulletList
                 )
 
             else

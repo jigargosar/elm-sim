@@ -651,19 +651,6 @@ decHealth =
     mapHealth Health.dec
 
 
-onCircularCollisionMapBoth :
-    (Circular a -> Circular a)
-    -> (Circular b -> Circular b)
-    -> ( Circular a, Circular b )
-    -> ( Circular a, Circular b )
-onCircularCollisionMapBoth func1 func2 ( c1, c2 ) =
-    if circleCircleCollision c1 c2 then
-        ( func1 c1, func2 c2 )
-
-    else
-        ( c1, c2 )
-
-
 onCircularAndCircularListCollisionMapBoth :
     (Circular a -> Circular a)
     -> (Circular b -> Circular b)

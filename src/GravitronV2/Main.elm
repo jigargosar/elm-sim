@@ -645,6 +645,11 @@ kill =
     mapHealth Health.kill
 
 
+decHealth : HasHealth a -> HasHealth a
+decHealth =
+    mapHealth Health.dec
+
+
 handleBulletCollisionWithOtherBullets : ( Bullet, Bullets ) -> ( Bullet, Bullets )
 handleBulletCollisionWithOtherBullets ( first, rest ) =
     List.foldl
@@ -676,8 +681,8 @@ handlePlayerBulletsCollision =
     let
         reducer bullet ( player, bulletList ) =
             if circleCircleCollision bullet player then
-                ( { player | health = Health.dec player.health }
-                , { bullet | health = Health.kill player.health } :: bulletList
+                ( decHealth player
+                , kill bullet :: bulletList
                 )
 
             else

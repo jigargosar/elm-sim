@@ -498,7 +498,6 @@ update c model =
 
             else
                 model
-                    |> stepAnimations
                     |> handleUpdate c
                     |> handleCollision
                     |> handleDeath
@@ -564,6 +563,7 @@ handleUpdate c model =
                 ++ model.bullets
                 |> List.map (updateBullet c model.player)
     }
+        |> stepAnimations
 
 
 incRunningTicks : Memory -> Memory

@@ -651,6 +651,16 @@ decHealth =
     mapHealth Health.dec
 
 
+foldMap : (a -> b -> ( a, b )) -> ( a, List b ) -> ( a, List b )
+foldMap func =
+    let
+        reducer b ( a, bList ) =
+            func a b
+                |> Tuple.mapSecond (\newB -> newB :: bList)
+    in
+    \( a, bList ) -> List.foldl reducer ( a, [] ) bList
+
+
 onCircularAndCircularListCollisionMapBoth :
     (Circular a -> Circular a)
     -> (Circular b -> Circular b)

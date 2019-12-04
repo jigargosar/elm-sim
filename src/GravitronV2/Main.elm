@@ -1,6 +1,7 @@
 module GravitronV2.Main exposing (main)
 
 import Basics.Extra exposing (flip)
+import Dict exposing (Dict)
 import GravitronV2.Game as G
 import GravitronV2.Health as Health exposing (Health)
 import GravitronV2.Timer as Timer exposing (Timer)
@@ -411,12 +412,17 @@ type GameState
 -- Memory
 
 
+type GameObject
+    = PlayerObject Player
+
+
 type alias Memory =
     { player : Player
     , turrets : List Turret
     , bullets : List Bullet
     , bulletExplosions : List BulletExplosion
     , turretExplosions : List TurretExplosion
+    , gameObjects : Dict Int GameObject
     , state : GameState
     , stage : Int
     , rTicks : Float
@@ -451,6 +457,7 @@ initMemory =
     , bullets = []
     , bulletExplosions = []
     , turretExplosions = []
+    , gameObjects = Dict.empty
     , stage = stage
     , state = Running
     , rTicks = rTicks

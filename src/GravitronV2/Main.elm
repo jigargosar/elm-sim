@@ -661,6 +661,16 @@ foldMap func =
     \a bList -> List.foldl reducer ( a, [] ) bList
 
 
+foldMapList : (a -> b -> ( a, b )) -> List a -> List b -> ( List a, List b )
+foldMapList func =
+    let
+        reducer a ( listA, listB ) =
+            foldMap func a listB
+                |> Tuple.mapFirst (\newA -> newA :: listA)
+    in
+    \listA listB -> List.foldl reducer ( [], listB ) listA
+
+
 foldMapSelf : (a -> a -> ( a, a )) -> List a -> List a
 foldMapSelf func list =
     foldMapSelfHelp func ( [], list )

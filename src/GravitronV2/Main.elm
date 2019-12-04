@@ -678,6 +678,20 @@ onCircularAndCircularListCollisionMapBoth funcA funcB =
     \( a, bList ) -> List.foldl reducer ( a, [] ) bList
 
 
+onCircularCollisionMapBoth :
+    (Circular a -> Circular a)
+    -> (Circular b -> Circular b)
+    -> Circular a
+    -> Circular b
+    -> ( Circular a, Circular b )
+onCircularCollisionMapBoth funcA funcB a b =
+    if circleCircleCollision a b then
+        ( funcA a, funcB b )
+
+    else
+        ( a, b )
+
+
 handleBulletsBulletsCollision : ( List Bullet, List Bullet ) -> List Bullet
 handleBulletsBulletsCollision ( processed, remaining ) =
     case remaining of
@@ -685,7 +699,7 @@ handleBulletsBulletsCollision ( processed, remaining ) =
             processed
 
         first :: rest ->
-            onCircularAndCircularListCollisionMapBoth killHealth killHealth ( first, rest )
+            foldMap (onCircularCollisionMapBoth killHealth killHealth) ( first, rest )
                 |> Tuple.mapFirst (flip (::) processed)
                 |> handleBulletsBulletsCollision
 

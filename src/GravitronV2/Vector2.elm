@@ -23,7 +23,6 @@ module GravitronV2.Vector2 exposing
     , minus
     , multiply
     , opp
-    , plus
     , setX
     , springForceFrom
     , subtract
@@ -144,14 +143,6 @@ setX =
 add : Vec -> Vec -> Vec
 add =
     map2 (+)
-add : Vec -> Vec -> Vec
-add =
-    add
-
-
-plus : Vec -> Vec -> Vec
-plus =
-    add
 
 
 subtract : Vec -> Vec -> Vec

@@ -543,7 +543,6 @@ handleUpdate c model =
         firedBullets =
             List.foldl
                 (prependWhen (turretTriggerTimerDone rTicks)
-                    --(fireBulletFromTurretTo model.player)
                     (\t ->
                         createNewBullet
                             { from = t.position

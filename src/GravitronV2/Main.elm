@@ -437,38 +437,6 @@ initTurretsForStage stage_ rTicks =
     allTurretsPositions |> List.take stage |> List.map (initTurret rTicks)
 
 
-type CollisionEntities
-    = PlayerCollision
-    | BulletCollision
-    | TurretCollision
-
-
-onCollide : CollisionEntities -> CollisionEntities -> number
-onCollide e1 e2 =
-    let
-        flipEntities _ =
-            onCollide e2 e1
-    in
-    case ( e1, e2 ) of
-        ( PlayerCollision, BulletCollision ) ->
-            1
-
-        ( BulletCollision, PlayerCollision ) ->
-            flipEntities ()
-
-        ( PlayerCollision, TurretCollision ) ->
-            1
-
-        ( TurretCollision, PlayerCollision ) ->
-            flipEntities ()
-
-        ( BulletCollision, TurretCollision ) ->
-            1
-
-        ( TurretCollision, BulletCollision ) ->
-            flipEntities ()
-
-
 initMemory : Memory
 initMemory =
     let

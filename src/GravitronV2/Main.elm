@@ -219,13 +219,10 @@ renderTurret rTicks turret =
 
                 ExplodeAndReleaseFiveBulletsOnDeathTurret ->
                     let
-                        placeholderBulletRadius =
-                            turret.radius / 5
-
                         renderBulletPlaceholderAtOffset ( ox, oy ) =
                             G.circle ox
                                 oy
-                                placeholderBulletRadius
+                                (turret.radius / 5)
                                 (G.withAlpha 0.5 G.white)
                     in
                     getNEqualAngles 5

@@ -155,7 +155,7 @@ stageArray =
             TurretConfig 2 G.blue GravitySingle MovingTurret FiveBulletsOnDeathTurret
 
         yellow5Homing =
-            TurretConfig 2 G.blue HomingSingle StaticTurret NoBulletsOnDeathTurret
+            TurretConfig 5 G.yellow HomingSingle StaticTurret NoBulletsOnDeathTurret
     in
     [ -- level 1
       [ red1 ]
@@ -580,7 +580,7 @@ initMemory : Memory
 initMemory =
     let
         stage =
-            stageNumFromLevel ( 2, 4 )
+            stageNumFromLevel ( 2, 5 )
 
         rTicks =
             0

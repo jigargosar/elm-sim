@@ -18,6 +18,7 @@ module GravitronV2.Game exposing
     , text
     , white
     , withAlpha
+    , yellow
     )
 
 import Angle
@@ -346,6 +347,11 @@ red =
 blue : Color
 blue =
     Color Color.blue
+
+
+yellow : Color
+yellow =
+    Color Color.yellow
 
 
 green : Color

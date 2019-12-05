@@ -95,11 +95,17 @@ updatePlayer mouse player =
         springToMouseForce =
             V.vecFrom player.position (V.fromRec mouse)
                 |> V.multiply player.springConstant
+
+        newVelocity =
+            [ V.add springToMouseForce
+            , V.multiply player.friction
+            ]
+                |> List.foldl (<|) player.velocity
     in
-    player
-        |> applyForce springToMouseForce
-        |> applyScalarForce player.friction
-        |> applyVelocity
+    { player
+        | velocity = newVelocity
+        , position = V.add player.position newVelocity
+    }
 
 
 renderPlayer : Player -> List G.Shape

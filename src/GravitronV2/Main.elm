@@ -5,6 +5,7 @@ import GravitronV2.Game as G exposing (Color, Screen)
 import GravitronV2.HasHealth as HasHealth
 import GravitronV2.Timer as Timer exposing (Timer)
 import GravitronV2.Vector2 as V exposing (Vec, vec)
+import PointFree exposing (subBA)
 
 
 
@@ -287,13 +288,12 @@ updateBullets screen rTicks player turrets bullets =
             List.foldl
                 (prependWhen isTurretTriggerTimerDone
                     (\t ->
-                        [ fireNewBullet
+                        fireNewBullet
                             { from = t.position
                             , to = player.position
                             , offset = t.radius
                             , bulletType = t.bulletType
                             }
-                        ]
                     )
                 )
                 []
@@ -533,24 +533,28 @@ initMemory =
     }
 
 
-fireNewBullet : { from : Vec, to : Vec, offset : Float, bulletType : BulletType } -> Bullet
-fireNewBullet { from, to, offset } =
+fireNewBullet : { from : Vec, to : Vec, offset : Float, bulletType : BulletType } -> Bullets
+fireNewBullet { from, to, offset, bulletType } =
     let
         bullet =
             defaultBullet
 
-        angle =
-            V.fromPt from to
-                |> V.angle
+        angleList =
+            let
+                angle =
+                    V.fromPt from to |> V.angle
+            in
+            [ angle - degrees 30, angle, angle + degrees 30 ]
 
-        position =
-            V.fromRTheta (offset + bullet.radius + 1) angle
-                |> V.add from
-
-        velocity =
-            V.fromRTheta (V.len bullet.velocity) angle
+        bulletFromAngle angle =
+            { bullet
+                | position =
+                    V.fromRTheta (offset + bullet.radius + 1) angle
+                        |> V.add from
+                , velocity = V.fromRTheta (V.len bullet.velocity) angle
+            }
     in
-    { bullet | position = position, velocity = velocity }
+    angleList |> List.map bulletFromAngle
 
 
 spacePressed =

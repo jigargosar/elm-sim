@@ -135,21 +135,22 @@ renderTurret rTicks turret =
     let
         ( x, y ) =
             V.toTuple turret.position
-
-        remainingHealthRadius =
-            turret.radius * HasHealth.normalized turret
     in
     [ G.circle x y turret.radius (G.withAlpha 0.5 turret.color)
-    , G.circle x y remainingHealthRadius turret.color
     , let
-        triggerProgress =
+        remainingHealthRadius =
+            turret.radius * HasHealth.normalized turret
+      in
+      G.circle x y remainingHealthRadius turret.color
+    , let
+        progress =
             Timer.value rTicks turret.triggerTimer
 
         xOffset =
             turret.radius + turret.radius / 4
       in
-      if triggerProgress > 0 then
-        G.strokeArc ( x, y ) (turns triggerProgress) ( x + xOffset, y ) G.white
+      if progress > 0 then
+        G.strokeArc ( x, y ) (turns progress) ( x + xOffset, y ) G.white
 
       else
         G.noShape

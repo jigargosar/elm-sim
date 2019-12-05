@@ -130,16 +130,6 @@ stageArray =
         |> Array.fromList
 
 
-initTurret : Timer -> Vec -> Turret
-initTurret triggerTimer position =
-    { position = position
-    , radius = 10
-    , color = G.green
-    , health = HasHealth.init 1
-    , triggerTimer = triggerTimer
-    }
-
-
 initTurretWithConfig : Timer -> Vec -> TurretConfig -> Turret
 initTurretWithConfig triggerTimer position config =
     { position = position
@@ -437,36 +427,6 @@ allTurretsPositions =
         |> List.map (V.multiply 150)
 
 
-initTurretsForStage : Int -> Float -> Turrets
-initTurretsForStage stage rTicks =
-    let
-        maxTurrets =
-            List.length allTurretsPositions
-
-        turretCountForStage =
-            modBy maxTurrets (stage - 1) + 1
-
-        triggerTimerDuration =
-            60 * 5
-
-        delayPerTurret =
-            triggerTimerDuration / toFloat turretCountForStage
-
-        triggerTimer : Int -> Timer
-        triggerTimer idx =
-            Timer.delayedStart rTicks
-                triggerTimerDuration
-                (toFloat idx * delayPerTurret)
-
-        initTurretAtIdx : Int -> Vec -> Turret
-        initTurretAtIdx =
-            triggerTimer >> initTurret
-    in
-    allTurretsPositions
-        |> List.take turretCountForStage
-        |> List.indexedMap initTurretAtIdx
-
-
 getStageConfig : Int -> StageConfig
 getStageConfig stageNum =
     let
@@ -476,11 +436,16 @@ getStageConfig stageNum =
         stageIdx =
             modBy maxStages (stageNum - 1) + 1
     in
-    stageArray |> Array.get stageIdx |> Maybe.withDefault (getStageConfig stageIdx)
+    case stageArray |> Array.get stageIdx of
+        Just c ->
+            c
+
+        Nothing ->
+            getStageConfig stageNum
 
 
-initTurretsForStage_ : Int -> Float -> Turrets
-initTurretsForStage_ stageNum rTicks =
+initTurretsForStage : Int -> Float -> Turrets
+initTurretsForStage stageNum rTicks =
     let
         config : StageConfig
         config =

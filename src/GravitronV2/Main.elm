@@ -58,7 +58,7 @@ updatePlayer : G.Mouse -> Player -> Player
 updatePlayer mouse player =
     let
         springToMouseForce =
-            V.vecFrom player.position (V.fromRec mouse)
+            V.fromPt player.position (V.fromRec mouse)
                 -- springConstant
                 |> V.multiply 0.2
 
@@ -223,7 +223,7 @@ updateBullet : G.Screen -> Player -> Bullet -> Bullet
 updateBullet screen player bullet =
     let
         gravityVec =
-            V.vecFrom bullet.position player.position
+            V.fromPt bullet.position player.position
                 |> V.mapMagnitude (\m -> 20 / m)
 
         newVelocity =
@@ -459,7 +459,7 @@ fireNewBullet { from, to, offset } =
             defaultBullet
 
         angle =
-            V.vecFrom from to
+            V.fromPt from to
                 |> V.angle
 
         position =

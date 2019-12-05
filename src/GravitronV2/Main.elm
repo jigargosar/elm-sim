@@ -133,9 +133,6 @@ turretRestartTriggerTimerIfDone rTicks turret =
 renderTurret : Float -> Turret -> List G.Shape
 renderTurret rTicks turret =
     let
-        triggerProgress =
-            Timer.value rTicks turret.triggerTimer
-
         ( x, y ) =
             V.toTuple turret.position
 
@@ -144,11 +141,14 @@ renderTurret rTicks turret =
     in
     [ G.circle x y turret.radius (G.withAlpha 0.5 turret.color)
     , G.circle x y remainingHealthRadius turret.color
-    , if triggerProgress > 0 then
-        let
-            xOffset =
-                turret.radius + turret.radius / 4
-        in
+    , let
+        triggerProgress =
+            Timer.value rTicks turret.triggerTimer
+
+        xOffset =
+            turret.radius + turret.radius / 4
+      in
+      if triggerProgress > 0 then
         G.strokeArc ( x, y ) (turns triggerProgress) ( x + xOffset, y ) G.white
 
       else

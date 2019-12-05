@@ -153,15 +153,19 @@ stageArray =
         blue2M5 =
             TurretConfig 2 G.blue SingleBullet StaticTurret ExplodeAndReleaseFiveBulletsOnDeathTurret
     in
-    [ [ red1 ]
+    [ -- level1
+      [ red1 ]
     , [ red1, red1 ]
     , [ red1, blue2 ]
     , [ blue2, blue2 ]
     , [ blue2, blue2, blue2, blue2 ]
+
+    -- level 2
     , [ green3 ]
     , [ red1, green3, blue2 ]
     , [ green3, blue2M5 ]
     , [ blue2M5, blue2M5, green3 ]
+    , []
     ]
         |> Array.fromList
 

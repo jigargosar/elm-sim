@@ -330,6 +330,9 @@ updateBullet screen player bullet =
             V.fromPt bullet.position player.position
                 |> V.mapMagnitude (\m -> 20 / m)
 
+        homingVec =
+            gravityVec
+
         newVelocity =
             [ bounceWithinScreen screen bullet.position 0.5
             , case bullet.bulletType of
@@ -337,7 +340,7 @@ updateBullet screen player bullet =
                     V.add gravityVec
 
                 HomingBullet ->
-                    V.add gravityVec
+                    V.add homingVec
             ]
                 |> List.foldl (<|) bullet.velocity
     in

@@ -106,9 +106,15 @@ type alias Turret =
     }
 
 
+type BulletType
+    = SingleBullet
+    | TripleBullet
+
+
 type alias TurretConfig =
     { hp : Float
     , color : Color
+    , bulletType : BulletType
     }
 
 
@@ -120,16 +126,21 @@ stageArray : Array StageConfig
 stageArray =
     let
         red1 =
-            TurretConfig 1 G.red
+            TurretConfig 1 G.red SingleBullet
 
         blue2 =
-            TurretConfig 2 G.blue
+            TurretConfig 2 G.blue SingleBullet
+
+        green3 =
+            TurretConfig 3 G.blue TripleBullet
     in
     [ [ red1 ]
     , [ red1, red1 ]
     , [ red1, blue2 ]
     , [ blue2, blue2 ]
     , [ blue2, blue2, blue2, blue2 ]
+    , [ green3 ]
+    , [ red1, blue2, green3 ]
     ]
         |> Array.fromList
 

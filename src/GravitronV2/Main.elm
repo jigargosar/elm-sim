@@ -3,7 +3,7 @@ module GravitronV2.Main exposing (main)
 import GravitronV2.Game as G exposing (Screen)
 import GravitronV2.HasHealth as HasHealth
 import GravitronV2.Timer as Timer exposing (Timer)
-import GravitronV2.Vector2 as V exposing (Vec, vec, vec0)
+import GravitronV2.Vector2 as V exposing (Vec, vec)
 
 
 
@@ -46,7 +46,7 @@ type alias Player =
 
 initPlayer : Player
 initPlayer =
-    { position = vec0
+    { position = V.vec0
     , velocity = vec 0 -10
     , radius = 10
     , color = G.red
@@ -168,7 +168,7 @@ type alias Bullet =
 
 defaultBullet : Bullet
 defaultBullet =
-    initBullet vec0
+    initBullet V.vec0
 
 
 initBullet : Vec -> Bullet

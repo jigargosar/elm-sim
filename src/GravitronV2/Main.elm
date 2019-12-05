@@ -757,7 +757,7 @@ mapTurretsAndBullets func model =
 
 
 viewMemory : G.Computer -> Memory -> List G.Shape
-viewMemory _ model =
+viewMemory computer model =
     let
         rTicks =
             model.rTicks
@@ -767,11 +767,20 @@ viewMemory _ model =
         ++ List.concatMap (renderTurret rTicks) model.turrets
         ++ List.map renderBullet model.bullets
         ++ List.map renderBulletExplosions model.bulletExplosions
-        ++ viewGameState model.state
+        ++ viewGameState computer.screen model.state
+        ++ viewLevel computer.screen model.stage
 
 
-viewGameState : GameState -> List G.Shape
-viewGameState state =
+viewLevel screen stageNum =
+    let
+        levelName =
+            getLevelNameFromStageNum stageNum
+    in
+    [ G.text 0 (screen.top + 20) levelName ]
+
+
+viewGameState : Screen -> GameState -> List G.Shape
+viewGameState screen state =
     case state of
         Running ->
             [ G.text 0 0 "Running" ]

@@ -1,7 +1,7 @@
 module GravitronV2.Main exposing (main)
 
 import GravitronV2.Game as G exposing (Screen)
-import GravitronV2.Health as Health exposing (Health)
+import GravitronV2.HasHealth as HasHealth
 import GravitronV2.Timer as Timer exposing (Timer)
 import GravitronV2.Vector2 as V exposing (Vec, vec, vec0)
 
@@ -40,7 +40,7 @@ type alias Player =
     , velocity : Vec
     , radius : Float
     , color : G.Color
-    , health : Health.Health
+    , health : HasHealth.Health
     }
 
 
@@ -50,7 +50,7 @@ initPlayer =
     , velocity = vec 0 -10
     , radius = 10
     , color = G.red
-    , health = Health.init 100
+    , health = HasHealth.init 100
     }
 
 
@@ -81,7 +81,7 @@ renderPlayer player =
             V.toTuple player.position
 
         remainingHealthRadius =
-            player.radius * Health.normalized player.health
+            player.radius * HasHealth.normalized player
     in
     [ G.circle x y player.radius (G.withAlpha 0.5 player.color)
     , G.circle x y remainingHealthRadius player.color
@@ -96,7 +96,7 @@ type alias Turret =
     { position : Vec
     , radius : Float
     , color : G.Color
-    , health : Health
+    , health : HasHealth.Health
     , triggerTimer : Timer
     }
 
@@ -106,7 +106,7 @@ initTurret triggerTimer position =
     { position = position
     , radius = 10
     , color = G.green
-    , health = Health.init 1
+    , health = HasHealth.init 1
     , triggerTimer = triggerTimer
     }
 
@@ -140,7 +140,7 @@ renderTurret rTicks turret =
             V.toTuple turret.position
 
         remainingHealthRadius =
-            turret.radius * Health.normalized turret.health
+            turret.radius * HasHealth.normalized turret
     in
     [ G.circle x y turret.radius (G.withAlpha 0.5 turret.color)
     , G.circle x y remainingHealthRadius turret.color
@@ -162,7 +162,7 @@ type alias Bullet =
     , maxSpeed : Float
     , radius : Float
     , color : G.Color
-    , health : Health.Health
+    , health : HasHealth.Health
     , bounceFriction : Float
     }
 
@@ -186,7 +186,7 @@ initBullet position =
     , maxSpeed = maxSpeed
     , radius = 5
     , color = G.white
-    , health = Health.init 1
+    , health = HasHealth.init 1
     , bounceFriction = 0.85
     }
 
@@ -549,20 +549,20 @@ updateEntities computer model =
 handleCollision : Memory -> Memory
 handleCollision model =
     model
-        |> mapPlayerAndBullets (foldMap (onCircularCollisionMapBoth decHealth killHealth))
-        |> mapPlayerAndTurrets (foldMap (onCircularCollisionMapBoth killHealth identity))
-        |> mapTurretsAndBullets (foldMapList (onCircularCollisionMapBoth decHealth decHealth))
-        |> mapBullets (foldMapSelf (onCircularCollisionMapBoth killHealth killHealth))
+        |> mapPlayerAndBullets (foldMap (onCircularCollisionMapBoth HasHealth.dec HasHealth.kill))
+        |> mapPlayerAndTurrets (foldMap (onCircularCollisionMapBoth HasHealth.kill identity))
+        |> mapTurretsAndBullets (foldMapList (onCircularCollisionMapBoth HasHealth.dec HasHealth.dec))
+        |> mapBullets (foldMapSelf (onCircularCollisionMapBoth HasHealth.kill HasHealth.kill))
 
 
 handleDeath : Memory -> Memory
 handleDeath model =
     let
         ( bullets, deadBullets ) =
-            List.partition (.health >> Health.isAlive) model.bullets
+            List.partition HasHealth.isAlive model.bullets
 
         ( turrets, deadTurrets ) =
-            List.partition (.health >> Health.isAlive) model.turrets
+            List.partition HasHealth.isAlive model.turrets
     in
     { model
         | bullets = bullets
@@ -587,7 +587,7 @@ handleDeath model =
             else
                 turrets
         , state =
-            if model.player.health |> Health.isDead then
+            if model.player |> HasHealth.isDead then
                 GameOver 0
 
             else
@@ -606,30 +606,6 @@ incRunningTicks model =
 
 
 -- Collision Helpers
-
-
-type alias HasHealth a =
-    { a | health : Health }
-
-
-killHealth : HasHealth a -> HasHealth a
-killHealth =
-    mapHealth Health.kill
-
-
-decHealth : HasHealth a -> HasHealth a
-decHealth =
-    mapHealth Health.dec
-
-
-isAlive : HasHealth a -> Bool
-isAlive =
-    .health >> Health.isAlive
-
-
-isDead : HasHealth a -> Bool
-isDead =
-    .health >> Health.isDead
 
 
 foldMap : (a -> b -> ( a, b )) -> a -> List b -> ( a, List b )
@@ -686,11 +662,6 @@ onCircularCollisionMapBoth funcA funcB a b =
 mapBullets : (a -> a) -> { b | bullets : a } -> { b | bullets : a }
 mapBullets func model =
     { model | bullets = func model.bullets }
-
-
-mapHealth : (a -> a) -> { b | health : a } -> { b | health : a }
-mapHealth func model =
-    { model | health = func model.health }
 
 
 mapPlayerAndBullets func model =

@@ -50,7 +50,7 @@ initPlayer =
     { position = V.zero
     , velocity = vec 0 -10
     , radius = 10
-    , color = G.red
+    , color = G.green
     , health = HasHealth.init 100
     }
 

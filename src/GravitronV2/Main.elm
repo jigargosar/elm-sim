@@ -308,7 +308,7 @@ updateBullets screen rTicks player turrets bullets =
             List.foldl
                 (prependWhen isTurretTriggerTimerDone
                     (\t ->
-                        fireNewBullet
+                        fireNewBullets
                             { from = t.position
                             , to = player.position
                             , offset = t.radius
@@ -553,8 +553,8 @@ initMemory =
     }
 
 
-fireNewBullet : { from : Vec, to : Vec, offset : Float, bulletType : BulletType } -> Bullets
-fireNewBullet { from, to, offset, bulletType } =
+fireNewBullets : { from : Vec, to : Vec, offset : Float, bulletType : BulletType } -> Bullets
+fireNewBullets { from, to, offset, bulletType } =
     let
         bullet =
             defaultBullet
@@ -683,16 +683,22 @@ handleDeath model =
         newTurretExplosions =
             List.map explosionFromTurret deadTurrets
 
+        newBullets : Bullets
         newBullets =
             deadTurrets
                 |> List.concatMap
                     (\t ->
                         case t.deathType of
                             ExplodeOnDeathTurret ->
-                                [ t ]
+                                []
 
                             ExplodeAndReleaseFiveBulletsOnDeathTurret ->
-                                [ t ]
+                                fireNewBullets
+                                    { from = t.position
+                                    , to = model.player.position
+                                    , offset = t.radius
+                                    , bulletType = FiveBullets
+                                    }
                     )
     in
     { model

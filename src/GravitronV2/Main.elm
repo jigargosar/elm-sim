@@ -223,21 +223,25 @@ renderTurret rTicks turret =
                             turret.radius / 5
 
                         renderBulletPlaceholderAtOffset ( ox, oy ) =
-                            G.circle (x + ox)
-                                (y + oy)
+                            G.circle ox
+                                oy
                                 placeholderBulletRadius
                                 (G.withAlpha 0.5 G.white)
                     in
-                    List.range 0 4
+                    getNEqualAngles 5
                         |> List.map
-                            (toFloat
-                                >> (*) (1 / 5)
-                                >> turns
-                                >> V.fromRTheta progressArcRadius
+                            (V.fromRTheta progressArcRadius
+                                >> V.add turret.position
                                 >> V.toTuple
                                 >> renderBulletPlaceholderAtOffset
                             )
            )
+
+
+getNEqualAngles : Int -> List Float
+getNEqualAngles n =
+    List.range 0 (n - 1)
+        |> List.map (toFloat >> (*) (1 / toFloat n) >> turns)
 
 
 

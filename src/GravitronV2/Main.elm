@@ -332,7 +332,12 @@ updateBullet screen player bullet =
 
         newVelocity =
             [ bounceWithinScreen screen bullet.position 0.5
-            , V.add gravityVec
+            , case bullet.bulletType of
+                GravityBullet ->
+                    V.add gravityVec
+
+                HomingBullet ->
+                    V.add gravityVec
             ]
                 |> List.foldl (<|) bullet.velocity
     in

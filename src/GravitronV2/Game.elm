@@ -5,6 +5,7 @@ module GravitronV2.Game exposing
     , Mouse
     , Screen
     , Shape
+    , blue
     , circle
     , customShape
     , freshKeyDown
@@ -339,6 +340,11 @@ black =
 red : Color
 red =
     Color Color.red
+
+
+blue : Color
+blue =
+    Color Color.blue
 
 
 green : Color

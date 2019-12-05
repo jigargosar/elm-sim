@@ -1,6 +1,7 @@
 module GravitronV2.Main exposing (main)
 
-import GravitronV2.Game as G exposing (Screen)
+import Array exposing (Array)
+import GravitronV2.Game as G exposing (Color, Screen)
 import GravitronV2.HasHealth as HasHealth
 import GravitronV2.Timer as Timer exposing (Timer)
 import GravitronV2.Vector2 as V exposing (Vec, vec)
@@ -99,6 +100,25 @@ type alias Turret =
     , health : HasHealth.Health
     , triggerTimer : Timer
     }
+
+
+type alias TurretConfig =
+    { hp : Int
+    , color : Color
+    }
+
+
+type alias StageConfig =
+    List TurretConfig
+
+
+stageArray : Array StageConfig
+stageArray =
+    [ [ TurretConfig 1 G.red ]
+    , [ TurretConfig 1 G.red, TurretConfig 1 G.red ]
+    , [ TurretConfig 1 G.red, TurretConfig 2 G.blue ]
+    ]
+        |> Array.fromList
 
 
 initTurret : Timer -> Vec -> Turret

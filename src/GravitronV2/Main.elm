@@ -111,11 +111,6 @@ initTurret triggerTimer position =
     }
 
 
-turretRestartTriggerTimer : Float -> Turret -> Turret
-turretRestartTriggerTimer clock turret =
-    { turret | triggerTimer = Timer.restart clock turret.triggerTimer }
-
-
 turretTriggerTimerDone : Float -> Turret -> Bool
 turretTriggerTimerDone rTicks turret =
     Timer.isDone rTicks turret.triggerTimer
@@ -124,7 +119,7 @@ turretTriggerTimerDone rTicks turret =
 turretRestartTriggerTimerIfDone : Float -> Turret -> Turret
 turretRestartTriggerTimerIfDone rTicks turret =
     if Timer.isDone rTicks turret.triggerTimer then
-        turretRestartTriggerTimer rTicks turret
+        { turret | triggerTimer = Timer.restart rTicks turret.triggerTimer }
 
     else
         turret

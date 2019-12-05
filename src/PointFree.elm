@@ -1,5 +1,7 @@
 module PointFree exposing (..)
 
+import Basics.Extra exposing (flip)
+
 
 with : (a -> b) -> (b -> a -> c) -> a -> c
 with func1 func2 model =
@@ -28,3 +30,13 @@ dec =
 clamp0 : number -> number -> number
 clamp0 =
     clamp 0
+
+
+appendAB : appendable -> appendable -> appendable
+appendAB =
+    (++)
+
+
+appendBA : appendable -> appendable -> appendable
+appendBA =
+    flip appendAB

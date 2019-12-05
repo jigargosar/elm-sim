@@ -5,14 +5,8 @@ module GravitronV2.Vector2 exposing
     , angle
     , apply2
     , clampMagnitude
-    , dirOppX
-    , dirOppY
-    , dirX
-    , dirY
     , fromRTheta
     , fromRec
-    , getX
-    , getY
     , gravityFrom
     , len
     , len2
@@ -20,13 +14,9 @@ module GravitronV2.Vector2 exposing
     , map2
     , mapEach
     , mapMagnitude
-    , mapX
     , multiply
-    , opp
-    , setX
     , springForceFrom
     , subtract
-    , toRec
     , toTuple
     , vec
     , vec0
@@ -39,16 +29,6 @@ import Basics.Extra exposing (flip, uncurry)
 
 type Vec
     = Vec Float Float
-
-
-getX : Vec -> Float
-getX (Vec x _) =
-    x
-
-
-getY : Vec -> Float
-getY (Vec _ y) =
-    y
 
 
 toTuple : Vec -> ( Float, Float )
@@ -86,31 +66,6 @@ vec1 =
     vec 1 1
 
 
-dirX : Vec
-dirX =
-    vec 1 0
-
-
-dirY : Vec
-dirY =
-    vec 0 1
-
-
-dirOppX : Vec
-dirOppX =
-    vec -1 0
-
-
-dirOppY : Vec
-dirOppY =
-    vec 0 -1
-
-
-opp : Vec -> Vec
-opp =
-    multiply -1
-
-
 multiply : Float -> Vec -> Vec
 multiply s =
     mapEach (\n -> n * s)
@@ -123,21 +78,6 @@ fromRec { x, y } =
 
 type alias RecXY =
     { x : Float, y : Float }
-
-
-toRec : Vec -> RecXY
-toRec (Vec x y) =
-    { x = x, y = y }
-
-
-mapX : (Float -> Float) -> Vec -> Vec
-mapX func (Vec x y) =
-    Vec (func x) y
-
-
-setX : Float -> Vec -> Vec
-setX =
-    mapX << always
 
 
 add : Vec -> Vec -> Vec

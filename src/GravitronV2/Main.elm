@@ -163,7 +163,6 @@ type alias Bullet =
     , radius : Float
     , color : G.Color
     , health : HasHealth.Health
-    , bounceFriction : Float
     }
 
 
@@ -187,7 +186,6 @@ initBullet position =
     , radius = 5
     , color = G.white
     , health = HasHealth.init 1
-    , bounceFriction = 0.85
     }
 
 
@@ -229,7 +227,7 @@ updateBullet screen player bullet =
                 |> V.mapMagnitude (\m -> 20 / m)
 
         newVelocity =
-            [ bounceWithinScreen screen bullet.position bullet.bounceFriction
+            [ bounceWithinScreen screen bullet.position 0.5
             , V.add gravityVec
             ]
                 |> List.foldl (<|) bullet.velocity

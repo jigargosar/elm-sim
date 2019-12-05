@@ -151,7 +151,7 @@ stageArray =
             TurretConfig 3 G.green TripleBullet StaticTurret ExplodeOnDeathTurret
 
         blue2M5 =
-            TurretConfig 2 G.purple SingleBullet StaticTurret ExplodeAndReleaseFiveBulletsOnDeathTurret
+            TurretConfig 2 G.blue SingleBullet StaticTurret ExplodeAndReleaseFiveBulletsOnDeathTurret
     in
     [ [ red1 ]
     , [ red1, red1 ]

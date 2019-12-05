@@ -437,11 +437,16 @@ getLevelNameFromStageNum stageNum =
     let
         minorLevel =
             modBy 5 stageNum
+                |> levelToString
 
         majorLevel =
-            maxStages // stageNum
+            (maxStages // stageNum)
+                |> levelToString
+
+        levelToString =
+            (+) 1 >> String.fromInt
     in
-    "Level " ++ String.fromInt minorLevel
+    "Level " ++ majorLevel ++ "-" ++ minorLevel
 
 
 getStageConfig : Int -> StageConfig

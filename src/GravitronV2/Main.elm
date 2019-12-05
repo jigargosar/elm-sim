@@ -73,7 +73,6 @@ type alias Player =
     , color : G.Color
     , friction : Float
     , springConstant : Float
-    , mass : Float
     , health : Health.Health
     }
 
@@ -86,7 +85,6 @@ initPlayer =
     , color = G.red
     , springConstant = 0.2
     , friction = 0.5
-    , mass = 300
     , health = Health.init 100
     }
 

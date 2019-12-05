@@ -255,18 +255,16 @@ bounceWithinScreen screen { position, bounceFriction } velocity =
 updateBullet : G.Screen -> Player -> Bullet -> Bullet
 updateBullet screen player bullet =
     let
-        gravity =
+        gravityVec =
             V.vecFrom bullet.position player.position
                 |> V.mapMagnitude (\m -> 20 / m)
 
         newVelocity =
             [ bounceWithinScreen screen bullet
-            , V.add gravity
+            , V.add gravityVec
             , V.multiply bullet.friction
-
-            --, V.clampMagnitude bullet.maxSpeed
             ]
-                |> List.foldl (\f v -> f v) bullet.velocity
+                |> List.foldl (<|) bullet.velocity
 
         newPosition =
             V.add bullet.position newVelocity

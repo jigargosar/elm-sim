@@ -683,8 +683,8 @@ handleDeath model =
         newTurretExplosions =
             List.map explosionFromTurret deadTurrets
 
-        newBullets : Bullets
-        newBullets =
+        generatedBullets : Bullets
+        generatedBullets =
             deadTurrets
                 |> List.concatMap
                     (\t ->
@@ -702,7 +702,7 @@ handleDeath model =
                     )
     in
     { model
-        | bullets = newBullets
+        | bullets = generatedBullets ++ newBullets
         , bulletExplosions = newBulletExplosions ++ model.bulletExplosions
         , turretExplosions = newTurretExplosions ++ model.turretExplosions
         , stage =

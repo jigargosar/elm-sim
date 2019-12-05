@@ -94,10 +94,13 @@ updatePlayer mouse player =
     let
         springToMouseForce =
             V.vecFrom player.position (V.fromRec mouse)
+                -- springConstant
                 |> V.multiply player.springConstant
 
         newVelocity =
             [ V.add springToMouseForce
+
+            -- friction
             , V.multiply player.friction
             ]
                 |> List.foldl (<|) player.velocity

@@ -46,7 +46,7 @@ type alias Player =
 
 initPlayer : Player
 initPlayer =
-    { position = V.vec0
+    { position = V.zero
     , velocity = vec 0 -10
     , radius = 10
     , color = G.red
@@ -168,7 +168,7 @@ type alias Bullet =
 
 defaultBullet : Bullet
 defaultBullet =
-    initBullet V.vec0
+    initBullet V.zero
 
 
 initBullet : Vec -> Bullet

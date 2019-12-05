@@ -19,9 +19,9 @@ module GravitronV2.Vector2 exposing
     , subtract
     , toTuple
     , vec
-    , vec0
     , vec1
     , vecFrom
+    , zero
     )
 
 import Basics.Extra exposing (flip, uncurry)
@@ -56,8 +56,8 @@ vec =
     Vec
 
 
-vec0 : Vec
-vec0 =
+zero : Vec
+zero =
     vec 0 0
 
 

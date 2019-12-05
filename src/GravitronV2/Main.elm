@@ -110,9 +110,10 @@ type alias Turret =
 
 
 type BulletType
-    = SingleBullet
-    | TripleBullet
-    | FiveBullets
+    = GravitySingle
+    | GravityTriple
+    | GravityFive
+    | SingleHoming
 
 
 type TurretType
@@ -142,19 +143,19 @@ stageArray : Array StageConfig
 stageArray =
     let
         red1 =
-            TurretConfig 1 G.red SingleBullet StaticTurret ExplodeOnDeathTurret
+            TurretConfig 1 G.red GravitySingle StaticTurret ExplodeOnDeathTurret
 
         blue2 =
-            TurretConfig 2 G.blue SingleBullet StaticTurret ExplodeOnDeathTurret
+            TurretConfig 2 G.blue GravitySingle StaticTurret ExplodeOnDeathTurret
 
         green3 =
-            TurretConfig 3 G.green TripleBullet StaticTurret ExplodeOnDeathTurret
+            TurretConfig 3 G.green GravityTriple StaticTurret ExplodeOnDeathTurret
 
         blue2D5Mv =
-            TurretConfig 2 G.blue SingleBullet StaticTurret ExplodeAndReleaseFiveBulletsOnDeathTurret
+            TurretConfig 2 G.blue GravitySingle MovingTurret ExplodeAndReleaseFiveBulletsOnDeathTurret
 
-        yellow5Missile =
-            TurretConfig 2 G.blue SingleBullet StaticTurret ExplodeAndReleaseFiveBulletsOnDeathTurret
+        yellow5Homing =
+            TurretConfig 2 G.blue GravitySingle StaticTurret ExplodeAndReleaseFiveBulletsOnDeathTurret
     in
     [ -- level 1
       [ red1 ]
@@ -168,7 +169,7 @@ stageArray =
     , [ red1, green3, blue2 ]
     , [ green3, blue2D5Mv ]
     , [ blue2D5Mv, blue2D5Mv, green3 ]
-    , [ green3, yellow5Missile, blue2D5Mv ]
+    , [ green3, yellow5Homing, blue2D5Mv ]
     , []
     ]
         |> Array.fromList
@@ -601,22 +602,7 @@ fireNewBullets { from, to, offset, bulletType } =
         bullet =
             defaultBullet
 
-        angleList =
-            let
-                angle =
-                    V.fromPt from to |> V.angle
-            in
-            case bulletType of
-                SingleBullet ->
-                    List.singleton angle
-
-                TripleBullet ->
-                    [ angle - degrees 30, angle, angle + degrees 30 ]
-
-                FiveBullets ->
-                    List.range 0 4 |> List.map (toFloat >> (*) (1 / 5) >> turns >> (+) angle)
-
-        bulletFromAngle angle =
+        gravityBullet angle =
             { bullet
                 | position =
                     V.fromRTheta (offset + bullet.radius + 1) angle
@@ -624,7 +610,30 @@ fireNewBullets { from, to, offset, bulletType } =
                 , velocity = V.fromRTheta (V.len bullet.velocity) angle
             }
     in
-    angleList |> List.map bulletFromAngle
+    let
+        angle =
+            V.fromPt from to |> V.angle
+    in
+    case bulletType of
+        GravitySingle ->
+            [ gravityBullet angle ]
+
+        GravityTriple ->
+            [ angle - degrees 30, angle, angle + degrees 30 ]
+                |> List.map gravityBullet
+
+        GravityFive ->
+            List.range 0 4
+                |> List.map
+                    (toFloat
+                        >> (*) (1 / 5)
+                        >> turns
+                        >> (+) angle
+                        >> gravityBullet
+                    )
+
+        SingleHoming ->
+            []
 
 
 spacePressed =
@@ -739,7 +748,7 @@ handleDeath model =
                                     { from = t.position
                                     , to = model.player.position
                                     , offset = t.radius
-                                    , bulletType = FiveBullets
+                                    , bulletType = GravityFive
                                     }
                     )
     in

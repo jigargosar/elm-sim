@@ -434,7 +434,7 @@ getStageConfig stageNum =
             stageArray |> Array.length
 
         stageIdx =
-            modBy maxStages (stageNum - 1) + 1
+            modBy maxStages stageNum
     in
     case stageArray |> Array.get stageIdx of
         Just c ->
@@ -478,7 +478,7 @@ initMemory : Memory
 initMemory =
     let
         stage =
-            4
+            0
 
         rTicks =
             0

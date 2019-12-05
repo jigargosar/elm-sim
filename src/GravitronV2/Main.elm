@@ -172,7 +172,7 @@ stageArray =
 
 stageNumFromLevel : ( Int, Int ) -> Int
 stageNumFromLevel ( majorLevel, minorLevel ) =
-    modBy maxStages (majorLevel * 5 + minorLevel)
+    modBy maxStages ((majorLevel - 1) * 5 + (minorLevel - 1))
 
 
 initTurretWithConfig : Timer -> Vec -> TurretConfig -> Turret
@@ -518,7 +518,7 @@ getLevelNameFromStageNum stageNum =
                 |> levelToString
 
         majorLevel =
-            (maxStages // stageNum)
+            (stageNum // 5)
                 |> levelToString
 
         levelToString =
@@ -575,7 +575,7 @@ initMemory : Memory
 initMemory =
     let
         stage =
-            8 - 1
+            stageNumFromLevel ( 1, 2 )
 
         rTicks =
             0

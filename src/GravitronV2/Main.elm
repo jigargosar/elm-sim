@@ -113,7 +113,7 @@ type BulletType
     = GravitySingle
     | GravityTriple
     | GravityFive
-    | SingleHoming
+    | HomingSingle
 
 
 type TurretType
@@ -155,7 +155,7 @@ stageArray =
             TurretConfig 2 G.blue GravitySingle MovingTurret ExplodeAndReleaseFiveBulletsOnDeathTurret
 
         yellow5Homing =
-            TurretConfig 2 G.blue GravitySingle StaticTurret ExplodeAndReleaseFiveBulletsOnDeathTurret
+            TurretConfig 2 G.blue HomingSingle StaticTurret ExplodeOnDeathTurret
     in
     [ -- level 1
       [ red1 ]
@@ -609,6 +609,9 @@ fireNewBullets { from, to, offset, bulletType } =
                         |> V.add from
                 , velocity = V.fromRTheta (V.len bullet.velocity) angle
             }
+
+        homingBullet angle =
+            gravityBullet angle
     in
     let
         angle =
@@ -632,8 +635,8 @@ fireNewBullets { from, to, offset, bulletType } =
                         >> gravityBullet
                     )
 
-        SingleHoming ->
-            []
+        HomingSingle ->
+            [ homingBullet angle ]
 
 
 spacePressed =

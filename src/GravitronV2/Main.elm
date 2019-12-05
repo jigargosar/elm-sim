@@ -272,7 +272,8 @@ updateBullet screen player bullet =
             [ bounceWithinScreen screen bullet
             , V.add gravity
             , V.multiply bullet.friction
-            , V.clampMagnitude bullet.maxSpeed
+
+            --, V.clampMagnitude bullet.maxSpeed
             ]
                 |> List.foldl (\f v -> f v) bullet.velocity
 

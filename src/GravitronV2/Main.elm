@@ -5,7 +5,6 @@ import GravitronV2.Game as G exposing (Color, Screen)
 import GravitronV2.HasHealth as HasHealth
 import GravitronV2.Timer as Timer exposing (Timer)
 import GravitronV2.Vector2 as V exposing (Vec, vec)
-import PointFree exposing (subBA)
 
 
 
@@ -104,7 +103,7 @@ type alias Turret =
     , color : G.Color
     , health : HasHealth.Health
     , triggerTimer : Timer
-    , bulletType : TurretWeapon
+    , weapon : TurretWeapon
     , deathType : TurretDeathAction
     }
 
@@ -186,7 +185,7 @@ initTurretWithConfig triggerTimer position config =
     , radius = playerRadius * 1.2
     , color = config.color
     , health = HasHealth.init config.hp
-    , bulletType = config.bulletType
+    , weapon = config.bulletType
     , triggerTimer = triggerTimer
     , deathType = config.turretDeathType
     }
@@ -355,7 +354,7 @@ updateBullets screen rTicks player turrets bullets =
                             { from = t.position
                             , to = player.position
                             , offset = t.radius
-                            , bulletType = t.bulletType
+                            , weapon = t.weapon
                             }
                     )
                 )
@@ -599,8 +598,8 @@ initMemory =
     }
 
 
-fireNewBullets : { from : Vec, to : Vec, offset : Float, bulletType : TurretWeapon } -> Bullets
-fireNewBullets { from, to, offset, bulletType } =
+fireNewBullets : { from : Vec, to : Vec, offset : Float, weapon : TurretWeapon } -> Bullets
+fireNewBullets { from, to, offset, weapon } =
     let
         bullet =
             defaultBullet
@@ -620,7 +619,7 @@ fireNewBullets { from, to, offset, bulletType } =
         angle =
             V.fromPt from to |> V.angle
     in
-    case bulletType of
+    case weapon of
         GravitySingle ->
             [ gravityBullet angle ]
 
@@ -754,7 +753,7 @@ handleDeath model =
                                     { from = t.position
                                     , to = model.player.position
                                     , offset = t.radius
-                                    , bulletType = GravityFive
+                                    , weapon = GravityFive
                                     }
                     )
     in

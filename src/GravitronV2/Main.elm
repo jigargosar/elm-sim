@@ -103,7 +103,7 @@ type alias Turret =
 
 
 type alias TurretConfig =
-    { hp : Int
+    { hp : Float
     , color : Color
     }
 
@@ -136,6 +136,16 @@ initTurret triggerTimer position =
     , radius = 10
     , color = G.green
     , health = HasHealth.init 1
+    , triggerTimer = triggerTimer
+    }
+
+
+initTurretWithConfig : Timer -> Vec -> TurretConfig -> Turret
+initTurretWithConfig triggerTimer position config =
+    { position = position
+    , radius = 10
+    , color = config.color
+    , health = HasHealth.init config.hp
     , triggerTimer = triggerTimer
     }
 
@@ -423,7 +433,7 @@ type alias Memory =
 
 
 allTurretsPositions =
-    [ vec -1 -1, vec 1 -1, vec 1 1, vec -1 1 ]
+    [ vec -1 -1, vec 1 1, vec 1 -1, vec -1 1 ]
         |> List.map (V.multiply 150)
 
 
@@ -454,6 +464,48 @@ initTurretsForStage stage rTicks =
     in
     allTurretsPositions
         |> List.take turretCountForStage
+        |> List.indexedMap initTurretAtIdx
+
+
+getStageConfig : Int -> StageConfig
+getStageConfig stageNum =
+    let
+        maxStages =
+            stageArray |> Array.length
+
+        stageIdx =
+            modBy maxStages (stageNum - 1) + 1
+    in
+    stageArray |> Array.get stageIdx |> Maybe.withDefault (getStageConfig stageIdx)
+
+
+initTurretsForStage_ : Int -> Float -> Turrets
+initTurretsForStage_ stageNum rTicks =
+    let
+        config : StageConfig
+        config =
+            getStageConfig stageNum
+
+        turretCountForStage =
+            List.length config
+
+        triggerTimerDuration =
+            60 * 5
+
+        delayPerTurret =
+            triggerTimerDuration / toFloat turretCountForStage
+
+        triggerTimer : Int -> Timer
+        triggerTimer idx =
+            Timer.delayedStart rTicks
+                triggerTimerDuration
+                (toFloat idx * delayPerTurret)
+
+        initTurretAtIdx : Int -> ( Vec, TurretConfig ) -> Turret
+        initTurretAtIdx idx ( position, tc ) =
+            initTurretWithConfig (triggerTimer idx) position tc
+    in
+    List.map2 Tuple.pair allTurretsPositions config
         |> List.indexedMap initTurretAtIdx
 
 

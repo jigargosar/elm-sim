@@ -268,6 +268,11 @@ type alias Bullet =
     }
 
 
+type BulletType
+    = GravityBullet
+    | HomingBullet
+
+
 defaultBullet : Bullet
 defaultBullet =
     initBullet V.zero

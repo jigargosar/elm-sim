@@ -122,8 +122,8 @@ type TurretType
 
 
 type TurretDeathType
-    = ExplodeOnDeathTurret
-    | ExplodeAndReleaseFiveBulletsOnDeathTurret
+    = NoBulletsOnDeathTurret
+    | FiveBulletsOnDeathTurret
 
 
 type alias TurretConfig =
@@ -143,19 +143,19 @@ stageArray : Array StageConfig
 stageArray =
     let
         red1 =
-            TurretConfig 1 G.red GravitySingle StaticTurret ExplodeOnDeathTurret
+            TurretConfig 1 G.red GravitySingle StaticTurret NoBulletsOnDeathTurret
 
         blue2 =
-            TurretConfig 2 G.blue GravitySingle StaticTurret ExplodeOnDeathTurret
+            TurretConfig 2 G.blue GravitySingle StaticTurret NoBulletsOnDeathTurret
 
         green3 =
-            TurretConfig 3 G.green GravityTriple StaticTurret ExplodeOnDeathTurret
+            TurretConfig 3 G.green GravityTriple StaticTurret NoBulletsOnDeathTurret
 
         blue2D5Mv =
-            TurretConfig 2 G.blue GravitySingle MovingTurret ExplodeAndReleaseFiveBulletsOnDeathTurret
+            TurretConfig 2 G.blue GravitySingle MovingTurret FiveBulletsOnDeathTurret
 
         yellow5Homing =
-            TurretConfig 2 G.blue HomingSingle StaticTurret ExplodeOnDeathTurret
+            TurretConfig 2 G.blue HomingSingle StaticTurret NoBulletsOnDeathTurret
     in
     [ -- level 1
       [ red1 ]
@@ -228,10 +228,10 @@ renderTurret rTicks turret =
         G.noShape
     ]
         ++ (case turret.deathType of
-                ExplodeOnDeathTurret ->
+                NoBulletsOnDeathTurret ->
                     [ G.noShape ]
 
-                ExplodeAndReleaseFiveBulletsOnDeathTurret ->
+                FiveBulletsOnDeathTurret ->
                     let
                         renderBulletPlaceholderAtOffset ( ox, oy ) =
                             G.circle ox
@@ -743,10 +743,10 @@ handleDeath model =
                 |> List.concatMap
                     (\t ->
                         case t.deathType of
-                            ExplodeOnDeathTurret ->
+                            NoBulletsOnDeathTurret ->
                                 []
 
-                            ExplodeAndReleaseFiveBulletsOnDeathTurret ->
+                            FiveBulletsOnDeathTurret ->
                                 fireNewBullets
                                     { from = t.position
                                     , to = model.player.position

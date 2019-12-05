@@ -220,7 +220,10 @@ renderTurret rTicks turret =
                             turret.radius / 5
 
                         renderTurretBulletAt ( ox, oy ) =
-                            G.circle (x + ox) (y + oy) borderBulletRadius G.white
+                            G.circle (x + ox)
+                                (y + oy)
+                                borderBulletRadius
+                                (G.withAlpha 0.5 G.white)
                     in
                     List.range 0 4
                         |> List.map

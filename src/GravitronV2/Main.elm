@@ -606,7 +606,7 @@ fireNewBullets { from, to, offset, weapon } =
         bullet =
             defaultBullet
 
-        gravityBullet angle =
+        bulletFromAnge angle =
             { bullet
                 | position =
                     V.fromRTheta (offset + bullet.radius + 1) angle
@@ -615,7 +615,8 @@ fireNewBullets { from, to, offset, weapon } =
             }
 
         homingBullet angle =
-            gravityBullet angle
+            bulletFromAnge angle
+                |> (\b -> { b | bulletType = HomingBullet })
     in
     let
         angle =
@@ -623,11 +624,11 @@ fireNewBullets { from, to, offset, weapon } =
     in
     case weapon of
         GravitySingle ->
-            [ gravityBullet angle ]
+            [ bulletFromAnge angle ]
 
         GravityTriple ->
             [ angle - degrees 30, angle, angle + degrees 30 ]
-                |> List.map gravityBullet
+                |> List.map bulletFromAnge
 
         GravityFive ->
             List.range 0 4
@@ -636,7 +637,7 @@ fireNewBullets { from, to, offset, weapon } =
                         >> (*) (1 / 5)
                         >> turns
                         >> (+) angle
-                        >> gravityBullet
+                        >> bulletFromAnge
                     )
 
         HomingSingle ->

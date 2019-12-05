@@ -422,17 +422,31 @@ type alias Memory =
     }
 
 
+allTurretsPositions : List Vec
 allTurretsPositions =
     [ vec -1 -1, vec 1 1, vec 1 -1, vec -1 1 ]
         |> List.map (V.multiply 150)
 
 
+maxStages =
+    stageArray |> Array.length
+
+
+getLevelNameFromStageNum : Int -> String
+getLevelNameFromStageNum stageNum =
+    let
+        minorLevel =
+            modBy 5 stageNum
+
+        majorLevel =
+            maxStages // stageNum
+    in
+    "Level " ++ String.fromInt minorLevel
+
+
 getStageConfig : Int -> StageConfig
 getStageConfig stageNum =
     let
-        maxStages =
-            stageArray |> Array.length
-
         stageIdx =
             modBy maxStages stageNum
     in

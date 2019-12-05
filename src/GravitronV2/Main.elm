@@ -544,7 +544,12 @@ fireNewBullet { from, to, offset, bulletType } =
                 angle =
                     V.fromPt from to |> V.angle
             in
-            [ angle - degrees 30, angle, angle + degrees 30 ]
+            case bulletType of
+                SingleBullet ->
+                    List.singleton angle
+
+                TripleBullet ->
+                    [ angle - degrees 30, angle, angle + degrees 30 ]
 
         bulletFromAngle angle =
             { bullet

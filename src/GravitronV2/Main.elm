@@ -262,13 +262,10 @@ updateBullet screen player bullet =
             , V.add gravityVec
             ]
                 |> List.foldl (<|) bullet.velocity
-
-        newPosition =
-            V.add bullet.position newVelocity
     in
     { bullet
         | velocity = newVelocity
-        , position = newPosition
+        , position = V.add bullet.position newVelocity
     }
 
 

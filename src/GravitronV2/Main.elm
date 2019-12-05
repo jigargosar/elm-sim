@@ -145,7 +145,11 @@ renderTurret rTicks turret =
     [ G.circle x y turret.radius (G.withAlpha 0.5 turret.color)
     , G.circle x y remainingHealthRadius turret.color
     , if progress > 0 then
-        G.strokeArc ( x, y ) (turns progress) ( x + turret.radius + (turret.radius / 4), y ) G.white
+        let
+            arcXOffset =
+                turret.radius + turret.radius / 4
+        in
+        G.strokeArc ( x, y ) (turns progress) ( x + arcXOffset, y ) G.white
 
       else
         G.noShape

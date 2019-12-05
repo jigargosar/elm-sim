@@ -105,6 +105,7 @@ type alias Turret =
     , health : HasHealth.Health
     , triggerTimer : Timer
     , bulletType : BulletType
+    , deathType : TurretDeathType
     }
 
 
@@ -173,6 +174,7 @@ initTurretWithConfig triggerTimer position config =
     , health = HasHealth.init config.hp
     , bulletType = config.bulletType
     , triggerTimer = triggerTimer
+    , deathType = config.turretDeathType
     }
 
 
@@ -675,9 +677,23 @@ handleDeath model =
             List.partition HasHealth.isAlive model.bullets
                 |> Tuple.mapSecond (List.map explosionFromBullet)
 
-        ( newTurrets, newTurretExplosions ) =
+        ( newTurrets, deadTurrets ) =
             List.partition HasHealth.isAlive model.turrets
-                |> Tuple.mapSecond (List.map explosionFromTurret)
+
+        newTurretExplosions =
+            List.map explosionFromTurret deadTurrets
+
+        newBullets =
+            deadTurrets
+                |> List.concatMap
+                    (\t ->
+                        case t.deathType of
+                            ExplodeOnDeathTurret ->
+                                [ t ]
+
+                            ExplodeAndReleaseFiveBulletsOnDeathTurret ->
+                                [ t ]
+                    )
     in
     { model
         | bullets = newBullets

@@ -150,7 +150,10 @@ stageArray =
         green3 =
             TurretConfig 3 G.green TripleBullet StaticTurret ExplodeOnDeathTurret
 
-        blue2M5 =
+        blue2D5Mv =
+            TurretConfig 2 G.blue SingleBullet StaticTurret ExplodeAndReleaseFiveBulletsOnDeathTurret
+
+        yellow5Missile =
             TurretConfig 2 G.blue SingleBullet StaticTurret ExplodeAndReleaseFiveBulletsOnDeathTurret
     in
     [ -- level 1
@@ -163,8 +166,9 @@ stageArray =
     -- level 2
     , [ green3 ]
     , [ red1, green3, blue2 ]
-    , [ green3, blue2M5 ]
-    , [ blue2M5, blue2M5, green3 ]
+    , [ green3, blue2D5Mv ]
+    , [ blue2D5Mv, blue2D5Mv, green3 ]
+    , [ green3, yellow5Missile, blue2D5Mv ]
     , []
     ]
         |> Array.fromList
@@ -575,7 +579,7 @@ initMemory : Memory
 initMemory =
     let
         stage =
-            stageNumFromLevel ( 1, 2 )
+            stageNumFromLevel ( 2, 4 )
 
         rTicks =
             0

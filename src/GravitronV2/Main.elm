@@ -118,11 +118,7 @@ isTurretTriggerTimerDone rTicks turret =
 
 turretRestartTriggerTimerIfDone : Float -> Turret -> Turret
 turretRestartTriggerTimerIfDone rTicks turret =
-    if Timer.isDone rTicks turret.triggerTimer then
-        { turret | triggerTimer = Timer.restart rTicks turret.triggerTimer }
-
-    else
-        turret
+    { turret | triggerTimer = Timer.restartIfDone rTicks turret.triggerTimer }
 
 
 renderTurret : Float -> Turret -> List G.Shape

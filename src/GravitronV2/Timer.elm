@@ -1,4 +1,6 @@
-module GravitronV2.Timer exposing (Timer, delayedStart, isDone, restart, start, value)
+module GravitronV2.Timer exposing (Timer, delayedStart, isDone, restart, restartIfDone, start, value)
+
+import PointFree exposing (when)
 
 
 type alias Timer =
@@ -29,6 +31,11 @@ elapsed clock model =
 isDone : Float -> Timer -> Bool
 isDone clock model =
     elapsed clock model > model.duration
+
+
+restartIfDone : Float -> Timer -> Timer
+restartIfDone clock =
+    when (isDone clock) (restart clock)
 
 
 restart : Float -> Timer -> Timer

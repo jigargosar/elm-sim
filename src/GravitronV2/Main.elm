@@ -132,7 +132,7 @@ stageArray =
             TurretConfig 2 G.blue SingleBullet
 
         green3 =
-            TurretConfig 3 G.blue TripleBullet
+            TurretConfig 3 G.green TripleBullet
     in
     [ [ red1 ]
     , [ red1, red1 ]
@@ -140,7 +140,7 @@ stageArray =
     , [ blue2, blue2 ]
     , [ blue2, blue2, blue2, blue2 ]
     , [ green3 ]
-    , [ red1, blue2, green3 ]
+    , [ red1, green3, blue2 ]
     ]
         |> Array.fromList
 
@@ -512,7 +512,7 @@ initMemory : Memory
 initMemory =
     let
         stage =
-            0
+            6
 
         rTicks =
             0

@@ -558,14 +558,14 @@ handleCollision model =
 handleDeath : Memory -> Memory
 handleDeath model =
     let
-        ( bullets, deadBullets ) =
+        ( newBullets, deadBullets ) =
             List.partition HasHealth.isAlive model.bullets
 
-        ( turrets, deadTurrets ) =
+        ( newTurrets, deadTurrets ) =
             List.partition HasHealth.isAlive model.turrets
     in
     { model
-        | bullets = bullets
+        | bullets = newBullets
         , bulletExplosions =
             List.map explosionFromBullet deadBullets
                 ++ model.bulletExplosions
@@ -575,17 +575,17 @@ handleDeath model =
                 ++ model.turretExplosions
                 |> List.filter isTurretExplosionAnimating
         , stage =
-            if List.isEmpty turrets then
+            if List.isEmpty newTurrets then
                 model.stage + 1
 
             else
                 model.stage
         , turrets =
-            if List.isEmpty turrets then
+            if List.isEmpty newTurrets then
                 initTurretsForStage (model.stage + 1) model.rTicks
 
             else
-                turrets
+                newTurrets
         , state =
             if model.player |> HasHealth.isDead then
                 GameOver 0

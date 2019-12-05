@@ -190,7 +190,7 @@ initBullet position =
 
 
 bounceWithinScreen : G.Screen -> Vec -> Float -> Vec -> Vec
-bounceWithinScreen screen position bounceFriction velocity =
+bounceWithinScreen screen position bounceFactor velocity =
     let
         bounceVelocityPart lo high positionPart velocityPart =
             if
@@ -213,7 +213,7 @@ bounceWithinScreen screen position bounceFriction velocity =
                 (bounceVelocityPart screen.top screen.bottom y vy)
     in
     if velocity /= newBouncedVelocity then
-        newBouncedVelocity |> V.multiply bounceFriction
+        newBouncedVelocity |> V.mapMagnitude ((*) bounceFactor)
 
     else
         newBouncedVelocity

@@ -243,8 +243,7 @@ bounceWithinScreen screen position bounceFriction velocity =
                 (bounceVelocityPart screen.top screen.bottom y vy)
     in
     if velocity /= newBouncedVelocity then
-        newBouncedVelocity
-            |> V.multiply bounceFriction
+        newBouncedVelocity |> V.multiply bounceFriction
 
     else
         newBouncedVelocity

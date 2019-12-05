@@ -153,7 +153,7 @@ stageArray =
         blue2M5 =
             TurretConfig 2 G.blue SingleBullet StaticTurret ExplodeAndReleaseFiveBulletsOnDeathTurret
     in
-    [ -- level1
+    [ -- level 1
       [ red1 ]
     , [ red1, red1 ]
     , [ red1, blue2 ]
@@ -168,6 +168,11 @@ stageArray =
     , []
     ]
         |> Array.fromList
+
+
+stageNumFromLevel : ( Int, Int ) -> Int
+stageNumFromLevel ( majorLevel, minorLevel ) =
+    modBy maxStages (majorLevel * 5 + minorLevel)
 
 
 initTurretWithConfig : Timer -> Vec -> TurretConfig -> Turret

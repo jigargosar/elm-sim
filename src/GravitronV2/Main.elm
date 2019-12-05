@@ -136,6 +136,9 @@ stageArray =
 
         green3 =
             TurretConfig 3 G.green TripleBullet
+
+        blue2Cluster =
+            TurretConfig 2 G.purple FiveBullets
     in
     [ [ red1 ]
     , [ red1, red1 ]
@@ -144,6 +147,8 @@ stageArray =
     , [ blue2, blue2, blue2, blue2 ]
     , [ green3 ]
     , [ red1, green3, blue2 ]
+    , [ green3, blue2Cluster ]
+    , [ blue2Cluster, blue2Cluster, green3 ]
     ]
         |> Array.fromList
 
@@ -518,7 +523,7 @@ initMemory : Memory
 initMemory =
     let
         stage =
-            5 - 1
+            8 - 1
 
         rTicks =
             0
@@ -551,6 +556,9 @@ fireNewBullet { from, to, offset, bulletType } =
 
                 TripleBullet ->
                     [ angle - degrees 30, angle, angle + degrees 30 ]
+
+                FiveBullets ->
+                    List.range 0 4 |> List.map (toFloat >> (*) (1 / 5) >> turns >> (+) angle)
 
         bulletFromAngle angle =
             { bullet

@@ -12,6 +12,7 @@ module GravitronV2.Game exposing
     , game
     , green
     , noShape
+    , purple
     , red
     , strokeArc
     , text
@@ -350,6 +351,11 @@ blue =
 green : Color
 green =
     Color Color.green
+
+
+purple : Color
+purple =
+    Color Color.purple
 
 
 white : Color

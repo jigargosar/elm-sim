@@ -114,10 +114,22 @@ type BulletType
     | FiveBullets
 
 
+type TurretType
+    = StaticTurret
+    | MovingTurret
+
+
+type TurretDeathType
+    = ExplodeOnDeathTurret
+    | ExplodeAndReleaseFiveBulletsOnDeathTurret
+
+
 type alias TurretConfig =
     { hp : Float
     , color : Color
     , bulletType : BulletType
+    , turretType : TurretType
+    , turretDeathType : TurretDeathType
     }
 
 
@@ -129,16 +141,16 @@ stageArray : Array StageConfig
 stageArray =
     let
         red1 =
-            TurretConfig 1 G.red SingleBullet
+            TurretConfig 1 G.red SingleBullet StaticTurret ExplodeOnDeathTurret
 
         blue2 =
-            TurretConfig 2 G.blue SingleBullet
+            TurretConfig 2 G.blue SingleBullet StaticTurret ExplodeOnDeathTurret
 
         green3 =
-            TurretConfig 3 G.green TripleBullet
+            TurretConfig 3 G.green TripleBullet StaticTurret ExplodeOnDeathTurret
 
-        blue2Cluster =
-            TurretConfig 2 G.purple FiveBullets
+        blue2M5 =
+            TurretConfig 2 G.purple SingleBullet StaticTurret ExplodeAndReleaseFiveBulletsOnDeathTurret
     in
     [ [ red1 ]
     , [ red1, red1 ]
@@ -147,8 +159,8 @@ stageArray =
     , [ blue2, blue2, blue2, blue2 ]
     , [ green3 ]
     , [ red1, green3, blue2 ]
-    , [ green3, blue2Cluster ]
-    , [ blue2Cluster, blue2Cluster, green3 ]
+    , [ green3, blue2M5 ]
+    , [ blue2M5, blue2M5, green3 ]
     ]
         |> Array.fromList
 

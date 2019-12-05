@@ -45,11 +45,15 @@ type alias Player =
     }
 
 
+playerRadius =
+    15
+
+
 initPlayer : Player
 initPlayer =
     { position = V.zero
     , velocity = vec 0 -10
-    , radius = 10
+    , radius = playerRadius
     , color = G.green
     , health = HasHealth.init 100
     }
@@ -133,7 +137,7 @@ stageArray =
 initTurretWithConfig : Timer -> Vec -> TurretConfig -> Turret
 initTurretWithConfig triggerTimer position config =
     { position = position
-    , radius = 10
+    , radius = playerRadius * 1.2
     , color = config.color
     , health = HasHealth.init config.hp
     , triggerTimer = triggerTimer

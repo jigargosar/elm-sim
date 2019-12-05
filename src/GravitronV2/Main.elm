@@ -265,6 +265,7 @@ type alias Bullet =
     , radius : Float
     , color : G.Color
     , health : HasHealth.Health
+    , bulletType : BulletType
     }
 
 
@@ -275,11 +276,6 @@ type BulletType
 
 defaultBullet : Bullet
 defaultBullet =
-    initBullet V.zero
-
-
-initBullet : Vec -> Bullet
-initBullet position =
     let
         speed =
             2.8
@@ -287,12 +283,13 @@ initBullet position =
         maxSpeed =
             7
     in
-    { position = position
+    { position = V.zero
     , velocity = vec speed speed
     , maxSpeed = maxSpeed
     , radius = 5
     , color = G.white
     , health = HasHealth.init 1
+    , bulletType = GravityBullet
     }
 
 

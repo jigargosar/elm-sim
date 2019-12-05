@@ -32,37 +32,6 @@ circleCircleCollision c1 c2 =
 
 
 
--- Physics Velocity : Apply Force
-
-
-type alias HasVelocity a =
-    { a | velocity : Vec }
-
-
-applyForce : Vec -> HasVelocity a -> HasVelocity a
-applyForce force model =
-    { model | velocity = V.add force model.velocity }
-
-
-applyScalarForce : Float -> HasVelocity a -> HasVelocity a
-applyScalarForce force model =
-    { model | velocity = V.multiply force model.velocity }
-
-
-
--- Physics Velocity: Update Position
-
-
-type alias HasPositionVelocity a =
-    HasPosition (HasVelocity a)
-
-
-applyVelocity : HasPositionVelocity a -> HasPositionVelocity a
-applyVelocity model =
-    { model | position = V.add model.position model.velocity }
-
-
-
 -- Player
 
 
@@ -71,8 +40,6 @@ type alias Player =
     , velocity : Vec
     , radius : Float
     , color : G.Color
-    , friction : Float
-    , springConstant : Float
     , health : Health.Health
     }
 
@@ -83,8 +50,6 @@ initPlayer =
     , velocity = vec 0 -10
     , radius = 10
     , color = G.red
-    , springConstant = 0.2
-    , friction = 0.5
     , health = Health.init 100
     }
 

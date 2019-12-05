@@ -103,6 +103,7 @@ type alias Turret =
     , color : G.Color
     , health : HasHealth.Health
     , triggerTimer : Timer
+    , bulletType : BulletType
     }
 
 
@@ -151,6 +152,7 @@ initTurretWithConfig triggerTimer position config =
     , radius = playerRadius * 1.2
     , color = config.color
     , health = HasHealth.init config.hp
+    , bulletType = config.bulletType
     , triggerTimer = triggerTimer
     }
 
@@ -285,15 +287,18 @@ updateBullets screen rTicks player turrets bullets =
             List.foldl
                 (prependWhen isTurretTriggerTimerDone
                     (\t ->
-                        fireNewBullet
+                        [ fireNewBullet
                             { from = t.position
                             , to = player.position
                             , offset = t.radius
+                            , bulletType = t.bulletType
                             }
+                        ]
                     )
                 )
                 []
                 turrets
+                |> List.concat
     in
     firedBullets
         ++ bullets
@@ -528,7 +533,7 @@ initMemory =
     }
 
 
-fireNewBullet : { from : Vec, to : Vec, offset : Float } -> Bullet
+fireNewBullet : { from : Vec, to : Vec, offset : Float, bulletType : BulletType } -> Bullet
 fireNewBullet { from, to, offset } =
     let
         bullet =
@@ -800,7 +805,7 @@ viewLevel screen stageNum =
 
 
 viewGameState : Screen -> GameState -> List G.Shape
-viewGameState screen state =
+viewGameState _ state =
     case state of
         Running ->
             [ G.text 0 0 "Running" ]

@@ -111,8 +111,8 @@ initTurret triggerTimer position =
     }
 
 
-turretTriggerTimerDone : Float -> Turret -> Bool
-turretTriggerTimerDone rTicks turret =
+isTurretTriggerTimerDone : Float -> Turret -> Bool
+isTurretTriggerTimerDone rTicks turret =
     Timer.isDone rTicks turret.triggerTimer
 
 
@@ -245,7 +245,7 @@ updateBullets screen rTicks player turrets bullets =
     let
         firedBullets =
             List.foldl
-                (prependWhen (turretTriggerTimerDone rTicks)
+                (prependWhen (isTurretTriggerTimerDone rTicks)
                     (\t ->
                         fireNewBullet
                             { from = t.position

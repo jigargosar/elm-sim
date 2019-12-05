@@ -219,7 +219,7 @@ renderTurret rTicks turret =
                         borderBulletRadius =
                             turret.radius / 5
 
-                        renderTurretBulletAt ( ox, oy ) =
+                        renderBulletPlaceholderAtOffset ( ox, oy ) =
                             G.circle (x + ox)
                                 (y + oy)
                                 borderBulletRadius
@@ -232,7 +232,7 @@ renderTurret rTicks turret =
                                 >> turns
                                 >> V.fromRTheta (turret.radius + turret.radius / 4)
                                 >> V.toTuple
-                                >> renderTurretBulletAt
+                                >> renderBulletPlaceholderAtOffset
                             )
            )
 

@@ -516,8 +516,11 @@ maxStages =
 
 
 getLevelNameFromStageNum : Int -> String
-getLevelNameFromStageNum stageNum =
+getLevelNameFromStageNum stage =
     let
+        stageNum =
+            modBy maxStages stage
+
         minorLevel =
             modBy 5 stageNum
                 |> levelToString
@@ -580,7 +583,7 @@ initMemory : Memory
 initMemory =
     let
         stage =
-            stageNumFromLevel ( 2, 5 )
+            stageNumFromLevel ( 3, 1 )
 
         rTicks =
             0

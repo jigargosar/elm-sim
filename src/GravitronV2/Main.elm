@@ -517,7 +517,7 @@ initMemory : Memory
 initMemory =
     let
         stage =
-            5
+            5 - 1
 
         rTicks =
             0

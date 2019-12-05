@@ -558,20 +558,22 @@ handleCollision model =
 handleDeath : Memory -> Memory
 handleDeath model =
     let
-        ( newBullets, deadBullets ) =
+        ( newBullets, newBulletExplosions ) =
             List.partition HasHealth.isAlive model.bullets
+                |> Tuple.mapSecond (List.map explosionFromBullet)
 
-        ( newTurrets, deadTurrets ) =
+        ( newTurrets, newTurretExplosions ) =
             List.partition HasHealth.isAlive model.turrets
+                |> Tuple.mapSecond (List.map explosionFromTurret)
     in
     { model
         | bullets = newBullets
         , bulletExplosions =
-            List.map explosionFromBullet deadBullets
+            newBulletExplosions
                 ++ model.bulletExplosions
                 |> List.filter isBulletExplosionAnimating
         , turretExplosions =
-            List.map explosionFromTurret deadTurrets
+            newTurretExplosions
                 ++ model.turretExplosions
                 |> List.filter isTurretExplosionAnimating
         , stage =

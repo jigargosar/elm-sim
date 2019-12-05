@@ -104,24 +104,24 @@ type alias Turret =
     , color : G.Color
     , health : HasHealth.Health
     , triggerTimer : Timer
-    , bulletType : BulletType
-    , deathType : TurretDeathType
+    , bulletType : TurretWeapon
+    , deathType : TurretDeathAction
     }
 
 
-type BulletType
+type TurretWeapon
     = GravitySingle
     | GravityTriple
     | GravityFive
     | HomingSingle
 
 
-type TurretType
+type TurretMovement
     = StaticTurret
     | MovingTurret
 
 
-type TurretDeathType
+type TurretDeathAction
     = NoBulletsOnDeathTurret
     | FiveBulletsOnDeathTurret
 
@@ -129,9 +129,9 @@ type TurretDeathType
 type alias TurretConfig =
     { hp : Float
     , color : Color
-    , bulletType : BulletType
-    , turretType : TurretType
-    , turretDeathType : TurretDeathType
+    , bulletType : TurretWeapon
+    , turretType : TurretMovement
+    , turretDeathType : TurretDeathAction
     }
 
 
@@ -599,7 +599,7 @@ initMemory =
     }
 
 
-fireNewBullets : { from : Vec, to : Vec, offset : Float, bulletType : BulletType } -> Bullets
+fireNewBullets : { from : Vec, to : Vec, offset : Float, bulletType : TurretWeapon } -> Bullets
 fireNewBullets { from, to, offset, bulletType } =
     let
         bullet =

@@ -81,7 +81,7 @@ renderPlayer player =
             V.toTuple player.position
 
         remainingHealthRadius =
-            player.radius * Health.normalize player.health
+            player.radius * Health.normalized player.health
     in
     [ G.circle x y player.radius (G.withAlpha 0.5 player.color)
     , G.circle x y remainingHealthRadius player.color
@@ -140,7 +140,7 @@ renderTurret rTicks turret =
             V.toTuple turret.position
 
         remainingHealthRadius =
-            turret.radius * Health.normalize turret.health
+            turret.radius * Health.normalized turret.health
     in
     [ G.circle x y turret.radius (G.withAlpha 0.5 turret.color)
     , G.circle x y remainingHealthRadius turret.color
@@ -620,6 +620,16 @@ killHealth =
 decHealth : HasHealth a -> HasHealth a
 decHealth =
     mapHealth Health.dec
+
+
+isAlive : HasHealth a -> Bool
+isAlive =
+    .health >> Health.isAlive
+
+
+isDead : HasHealth a -> Bool
+isDead =
+    .health >> Health.isDead
 
 
 foldMap : (a -> b -> ( a, b )) -> a -> List b -> ( a, List b )

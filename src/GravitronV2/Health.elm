@@ -5,7 +5,7 @@ module GravitronV2.Health exposing
     , isAlive
     , isDead
     , kill
-    , normalize
+    , normalized
     )
 
 import PointFree exposing (clamp0)
@@ -39,8 +39,8 @@ kill =
     mapCurrentHealth (always 0)
 
 
-normalize : Health -> Float
-normalize (Health maxHealth health) =
+normalized : Health -> Float
+normalized (Health maxHealth health) =
     clamp0 maxHealth health / maxHealth
 
 

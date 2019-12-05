@@ -188,6 +188,9 @@ renderTurret rTicks turret =
     let
         ( x, y ) =
             V.toTuple turret.position
+
+        progressArcRadius =
+            turret.radius + turret.radius / 4
     in
     [ G.circle x y turret.radius (G.withAlpha 0.5 turret.color)
     , -- Remaining Health Indicator
@@ -202,10 +205,10 @@ renderTurret rTicks turret =
             Timer.value rTicks turret.triggerTimer
 
         xOffset =
-            turret.radius + turret.radius / 4
+            progressArcRadius
       in
       if progress > 0 then
-        G.strokeArc ( x, y ) (turns progress) ( x + xOffset, y ) G.white
+        G.strokeArc ( x, y ) (turns progress) ( x + xOffset, y ) (G.withAlpha 0.5 G.white)
 
       else
         G.noShape
@@ -230,7 +233,7 @@ renderTurret rTicks turret =
                             (toFloat
                                 >> (*) (1 / 5)
                                 >> turns
-                                >> V.fromRTheta (turret.radius + turret.radius / 4)
+                                >> V.fromRTheta progressArcRadius
                                 >> V.toTuple
                                 >> renderBulletPlaceholderAtOffset
                             )

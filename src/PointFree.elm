@@ -40,3 +40,13 @@ appendAB =
 appendBA : appendable -> appendable -> appendable
 appendBA =
     flip appendAB
+
+
+subAB : number -> number -> number
+subAB =
+    (-)
+
+
+subBA : number -> number -> number
+subBA =
+    flip subAB

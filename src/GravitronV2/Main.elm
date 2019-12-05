@@ -114,11 +114,18 @@ type alias StageConfig =
 
 stageArray : Array StageConfig
 stageArray =
-    [ [ TurretConfig 1 G.red ]
-    , [ TurretConfig 1 G.red, TurretConfig 1 G.red ]
-    , [ TurretConfig 1 G.red, TurretConfig 2 G.blue ]
-    , [ TurretConfig 1 G.blue, TurretConfig 2 G.blue ]
-    , [ TurretConfig 1 G.blue, TurretConfig 2 G.blue, TurretConfig 1 G.blue, TurretConfig 2 G.blue ]
+    let
+        red1 =
+            TurretConfig 1 G.red
+
+        blue2 =
+            TurretConfig 2 G.blue
+    in
+    [ [ red1 ]
+    , [ red1, red1 ]
+    , [ red1, blue2 ]
+    , [ blue2, blue2 ]
+    , [ blue2, blue2, blue2, blue2 ]
     ]
         |> Array.fromList
 

@@ -484,7 +484,7 @@ initMemory =
             0
     in
     { player = initPlayer
-    , turrets = initTurretsForStage stage rTicks |> Debug.log "it"
+    , turrets = initTurretsForStage stage rTicks
     , bullets = []
     , bulletExplosions = []
     , turretExplosions = []

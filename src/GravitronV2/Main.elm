@@ -219,8 +219,8 @@ initBullet position =
     }
 
 
-bounceWithinScreen : G.Screen -> { a | position : Vec, bounceFriction : Float } -> Vec -> Vec
-bounceWithinScreen screen { position, bounceFriction } velocity =
+bounceWithinScreen : G.Screen -> Vec -> Float -> Vec -> Vec
+bounceWithinScreen screen position bounceFriction velocity =
     let
         bounceVelocityPart lo high positionPart velocityPart =
             if
@@ -258,7 +258,7 @@ updateBullet screen player bullet =
                 |> V.mapMagnitude (\m -> 20 / m)
 
         newVelocity =
-            [ bounceWithinScreen screen bullet
+            [ bounceWithinScreen screen bullet.position bullet.bounceFriction
             , V.add gravityVec
             ]
                 |> List.foldl (<|) bullet.velocity

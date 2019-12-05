@@ -94,19 +94,11 @@ initPlayer =
 updatePlayer : G.Mouse -> Player -> Player
 updatePlayer mouse player =
     let
-        applySpringForceTowardsPoint : Vec -> Float -> Player -> Player
-        applySpringForceTowardsPoint toPoint k model =
-            let
-                force =
-                    V.springForceFrom model.position toPoint k
-            in
-            applyForce force model
-
         springPoint =
             V.fromRec mouse
     in
     player
-        |> applySpringForceTowardsPoint springPoint player.springConstant
+        |> applyForce (V.vecFrom player.position springPoint |> V.multiply player.springConstant)
         |> applyScalarForce player.friction
         |> applyVelocity
 

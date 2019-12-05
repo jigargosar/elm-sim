@@ -111,6 +111,7 @@ type alias Turret =
 type BulletType
     = SingleBullet
     | TripleBullet
+    | FiveBullets
 
 
 type alias TurretConfig =

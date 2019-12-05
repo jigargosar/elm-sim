@@ -524,8 +524,12 @@ prependWhen pred t v =
 stepAnimations : Memory -> Memory
 stepAnimations model =
     { model
-        | bulletExplosions = List.map stepBulletExplosionAnimation model.bulletExplosions
-        , turretExplosions = List.map stepTurretExplosionAnimation model.turretExplosions
+        | bulletExplosions =
+            List.map stepBulletExplosionAnimation model.bulletExplosions
+                |> List.filter isBulletExplosionAnimating
+        , turretExplosions =
+            List.map stepTurretExplosionAnimation model.turretExplosions
+                |> List.filter isTurretExplosionAnimating
     }
 
 
@@ -568,14 +572,8 @@ handleDeath model =
     in
     { model
         | bullets = newBullets
-        , bulletExplosions =
-            newBulletExplosions
-                ++ model.bulletExplosions
-                |> List.filter isBulletExplosionAnimating
-        , turretExplosions =
-            newTurretExplosions
-                ++ model.turretExplosions
-                |> List.filter isTurretExplosionAnimating
+        , bulletExplosions = newBulletExplosions ++ model.bulletExplosions
+        , turretExplosions = newTurretExplosions ++ model.turretExplosions
         , stage =
             if List.isEmpty newTurrets then
                 model.stage + 1

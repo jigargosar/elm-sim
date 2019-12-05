@@ -168,7 +168,8 @@ stageArray =
     , [ red1, green3, blue2 ]
     , [ green3, blue2D5Mv ]
     , [ blue2D5Mv, blue2D5Mv, green3 ]
-    , [ green3, yellow5Homing, blue2D5Mv ]
+    , -- [ green3, yellow5Homing, blue2D5Mv ]
+      [ yellow5Homing ]
     , []
     ]
         |> Array.fromList
@@ -331,7 +332,8 @@ updateBullet screen player bullet =
                 |> V.mapMagnitude (\m -> 20 / m)
 
         homingVec =
-            gravityVec
+            V.fromPt bullet.position player.position
+                |> V.mapMagnitude (always 0.3)
 
         newVelocity =
             [ bounceWithinScreen screen bullet.position 0.5
@@ -341,6 +343,7 @@ updateBullet screen player bullet =
 
                 HomingBullet ->
                     V.add homingVec
+                        >> V.mapMagnitude ((*) 0.98)
             ]
                 |> List.foldl (<|) bullet.velocity
     in

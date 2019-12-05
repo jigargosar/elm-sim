@@ -210,6 +210,28 @@ renderTurret rTicks turret =
       else
         G.noShape
     ]
+        ++ (case turret.deathType of
+                ExplodeOnDeathTurret ->
+                    [ G.noShape ]
+
+                ExplodeAndReleaseFiveBulletsOnDeathTurret ->
+                    let
+                        borderBulletRadius =
+                            turret.radius / 5
+
+                        renderTurretBulletAt ( ox, oy ) =
+                            G.circle (x + ox) (y + oy) borderBulletRadius G.white
+                    in
+                    List.range 0 4
+                        |> List.map
+                            (toFloat
+                                >> (*) (1 / 5)
+                                >> turns
+                                >> V.fromRTheta (turret.radius + turret.radius / 4)
+                                >> V.toTuple
+                                >> renderTurretBulletAt
+                            )
+           )
 
 
 

@@ -117,6 +117,8 @@ stageArray =
     [ [ TurretConfig 1 G.red ]
     , [ TurretConfig 1 G.red, TurretConfig 1 G.red ]
     , [ TurretConfig 1 G.red, TurretConfig 2 G.blue ]
+    , [ TurretConfig 1 G.blue, TurretConfig 2 G.blue ]
+    , [ TurretConfig 1 G.blue, TurretConfig 2 G.blue, TurretConfig 1 G.blue, TurretConfig 2 G.blue ]
     ]
         |> Array.fromList
 

@@ -137,12 +137,14 @@ renderTurret rTicks turret =
             V.toTuple turret.position
     in
     [ G.circle x y turret.radius (G.withAlpha 0.5 turret.color)
-    , let
+    , -- Remaining Health Indicator
+      let
         remainingHealthRadius =
             turret.radius * HasHealth.normalized turret
       in
       G.circle x y remainingHealthRadius turret.color
-    , let
+    , -- Trigger Arc
+      let
         progress =
             Timer.value rTicks turret.triggerTimer
 

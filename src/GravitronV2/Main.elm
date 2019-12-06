@@ -811,12 +811,7 @@ type Entity
 
 
 type Entities
-    = Entities
-        { player : Player
-        , turrets : Turrets
-        , bullets : Bullets
-        }
-        (List Entity)
+    = Entities Player (List Entity)
 
 
 entitiesFromRecord :
@@ -836,8 +831,20 @@ entitiesToRecord :
         , turrets : Turrets
         , bullets : Bullets
         }
-entitiesToRecord =
-    Debug.todo "impl"
+entitiesToRecord (Entities initialPlayer list) =
+    let
+        reducer e rec =
+            case e of
+                PlayerE player ->
+                    { rec | player = player }
+
+                TurretE turret ->
+                    { rec | turrets = turret :: rec.turrets }
+
+                BulletE bullet ->
+                    { rec | bullets = bullet :: rec.bullets }
+    in
+    List.foldl reducer { player = initialPlayer, turrets = [], bullets = [] } list
 
 
 

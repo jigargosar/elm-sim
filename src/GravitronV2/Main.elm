@@ -1,7 +1,7 @@
 module GravitronV2.Main exposing (main)
 
 import Array exposing (Array)
-import Basics.Extra exposing (swap, uncurry)
+import Basics.Extra exposing (swap)
 import Color
 import GravitronV2.Game as G exposing (Color, Screen, Shape)
 import GravitronV2.HasHealth as HasHealth
@@ -566,10 +566,18 @@ type GameState
 -- Memory
 
 
+type alias Turrets =
+    List Turret
+
+
+type alias Bullets =
+    List Bullet
+
+
 type alias Memory =
     { player : Player
-    , turrets : List Turret
-    , bullets : List Bullet
+    , turrets : Turrets
+    , bullets : Bullets
     , bulletExplosions : List BulletExplosion
     , turretExplosions : List TurretExplosion
     , state : GameState
@@ -739,7 +747,7 @@ updateMemory computer model =
             else
                 model
                     |> updateEntities computer
-                    |> handleCollision2
+                    |> handleCollision
                     |> handleDeath
                     |> incRunningTicks
 
@@ -802,7 +810,7 @@ updateEntities computer model =
 
 
 
--- Blast: Trying out New Collision Model
+-- Collision
 
 
 type Entity
@@ -913,8 +921,8 @@ onEntityEntityCollision e1 e2 =
                 |> Tuple.mapBoth BulletE BulletE
 
 
-handleCollision2 : Memory -> Memory
-handleCollision2 model =
+handleCollision : Memory -> Memory
+handleCollision model =
     let
         { player, turrets, bullets } =
             model
@@ -926,24 +934,17 @@ handleCollision2 model =
 
 
 
--- Collision
-
-
-handleCollision : Memory -> Memory
-handleCollision model =
-    model
-        |> mapPlayerAndBullets (foldMap (onCircularCollisionMapBoth HasHealth.dec HasHealth.kill))
-        |> mapPlayerAndTurrets (foldMap (onCircularCollisionMapBoth HasHealth.kill identity))
-        |> mapTurretsAndBullets (foldMapList (onCircularCollisionMapBoth HasHealth.dec HasHealth.dec))
-        |> mapBullets (foldMapSelf (onCircularCollisionMapBoth HasHealth.kill HasHealth.kill))
+-- DEATH
 
 
 handleDeath : Memory -> Memory
 handleDeath model =
     let
-        ( newBullets, newBulletExplosions ) =
+        ( newBullets, deadBullets ) =
             List.partition HasHealth.isAlive model.bullets
-                |> Tuple.mapSecond (List.map explosionFromBullet)
+
+        newBulletExplosions =
+            List.map explosionFromBullet deadBullets
 
         ( newTurrets, deadTurrets ) =
             List.partition HasHealth.isAlive model.turrets
@@ -1017,16 +1018,6 @@ foldMap func =
     \a bList -> List.foldl reducer ( a, [] ) bList
 
 
-foldMapList : (a -> b -> ( a, b )) -> List a -> List b -> ( List a, List b )
-foldMapList func =
-    let
-        reducer a ( listA, listB ) =
-            foldMap func a listB
-                |> Tuple.mapFirst (\newA -> newA :: listA)
-    in
-    \listA listB -> List.foldl reducer ( [], listB ) listA
-
-
 foldMapSelf : (a -> a -> ( a, a )) -> List a -> List a
 foldMapSelf func list =
     foldMapSelfHelp func ( [], list )
@@ -1056,45 +1047,6 @@ onCircularCollisionMapBoth funcA funcB a b =
 
     else
         ( a, b )
-
-
-mapBullets : (a -> a) -> { b | bullets : a } -> { b | bullets : a }
-mapBullets func model =
-    { model | bullets = func model.bullets }
-
-
-mapPlayerAndBullets func model =
-    let
-        ( player, bullets ) =
-            func model.player model.bullets
-    in
-    { model | player = player, bullets = bullets }
-
-
-type alias Turrets =
-    List Turret
-
-
-mapPlayerAndTurrets : (Player -> Turrets -> ( Player, Turrets )) -> Memory -> Memory
-mapPlayerAndTurrets func model =
-    let
-        ( player, turrets ) =
-            func model.player model.turrets
-    in
-    { model | player = player, turrets = turrets }
-
-
-type alias Bullets =
-    List Bullet
-
-
-mapTurretsAndBullets : (Turrets -> Bullets -> ( Turrets, Bullets )) -> Memory -> Memory
-mapTurretsAndBullets func model =
-    let
-        ( turrets, bullets ) =
-            func model.turrets model.bullets
-    in
-    { model | turrets = turrets, bullets = bullets }
 
 
 

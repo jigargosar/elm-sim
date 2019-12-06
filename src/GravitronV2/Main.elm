@@ -361,6 +361,9 @@ updateBullet screen player bullet =
                     in
                     V.add homingVec
                         >> V.mapMagnitude ((*) 0.98)
+
+                TimeBombBullet ->
+                    identity
             ]
                 |> List.foldl (<|) bullet.velocity
     in
@@ -402,11 +405,13 @@ renderBullet bullet =
     let
         ( x, y ) =
             V.toTuple bullet.position
+
+        simpleBulletCircle =
+            G.circle x y bullet.radius bullet.color
     in
-    [ G.circle x y bullet.radius bullet.color
-    , case bullet.bulletType of
+    case bullet.bulletType of
         GravityBullet ->
-            G.noShape
+            [ simpleBulletCircle ]
 
         HomingBullet ->
             let
@@ -427,7 +432,8 @@ renderBullet bullet =
                     V.add bullet.position (V.multiply -1 extVec)
                         |> V.toTuple
             in
-            G.customShape
+            [ simpleBulletCircle
+            , G.customShape
                 (TypedSvg.line
                     [ InPx.x1 x1
                     , InPx.y1 y1
@@ -437,7 +443,10 @@ renderBullet bullet =
                     ]
                     []
                 )
-    ]
+            ]
+
+        TimeBombBullet ->
+            [ simpleBulletCircle ]
 
 
 

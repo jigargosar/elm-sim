@@ -117,7 +117,7 @@ type TurretWeapon
 
 type TurretMovement
     = StaticTurret
-    | MovingTurret
+    | WanderingTurret
 
 
 type TurretDeathAction
@@ -151,7 +151,7 @@ stageArray =
             TurretConfig 3 G.green GravityTriple StaticTurret NoBulletsOnDeathTurret
 
         blue2D5Mv =
-            TurretConfig 2 G.blue GravitySingle MovingTurret FiveBulletsOnDeathTurret
+            TurretConfig 2 G.blue GravitySingle WanderingTurret FiveBulletsOnDeathTurret
 
         yellow5Homing =
             TurretConfig 5 G.yellow HomingSingle StaticTurret NoBulletsOnDeathTurret

@@ -804,44 +804,40 @@ updateEntities computer model =
 -- Blast: Trying out New Collision Model
 
 
-type alias Blast =
-    { position : Vec
-    , radius : Float
+type Entity
+    = PlayerE Player
+    | TurretE Turret
+    | BulletE Bullet
+
+
+type Entities
+    = Entities
+        { player : Player
+        , turrets : Turrets
+        , bullets : Bullets
+        }
+        (List Entity)
+
+
+entitiesFromRecord :
+    { player : Player
+    , turrets : Turrets
+    , bullets : Bullets
     }
-
-
-type CollisionEntity
-    = PlayerC
-    | TurretC
-    | BulletC
-
-
-blastFromCollidingEntities : CollisionEntity -> CollisionEntity -> Blast
-blastFromCollidingEntities c1 c2 =
+    -> Entities
+entitiesFromRecord =
     Debug.todo "impl"
 
 
-resolveBlastWithPlayer : Blast -> Player -> ( List Blast, Player )
-resolveBlastWithPlayer blast player =
+entitiesToRecord :
+    Entities
+    ->
+        { player : Player
+        , turrets : Turrets
+        , bullets : Bullets
+        }
+entitiesToRecord =
     Debug.todo "impl"
-
-
-resolveBlastWithBullet : Blast -> Bullet -> ( List Blast, Bullet )
-resolveBlastWithBullet =
-    Debug.todo "impl"
-
-
-handleBlast : Memory -> Memory
-handleBlast model =
-    let
-        { player, turrets, bullets } =
-            model
-
-        blasts : List Blast
-        blasts =
-            Debug.todo "impl"
-    in
-    model
 
 
 

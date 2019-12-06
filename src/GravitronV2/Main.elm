@@ -1,6 +1,7 @@
 module GravitronV2.Main exposing (main)
 
 import Array exposing (Array)
+import Basics.Extra exposing (swap, uncurry)
 import Color
 import GravitronV2.Game as G exposing (Color, Screen, Shape)
 import GravitronV2.HasHealth as HasHealth
@@ -814,6 +815,15 @@ type Entities
     = Entities Player (List Entity)
 
 
+type EntityPair
+    = PlayerTurret Player Turret
+    | PlayerBullet Player Bullet
+    | TurretBullet Turret Bullet
+    | PlayerPlayer Player Player
+    | TurretTurret Turret Turret
+    | BulletBullet Bullet Bullet
+
+
 entitiesFromRecord :
     { player : Player
     , turrets : Turrets
@@ -859,42 +869,100 @@ handleEntitiesCollision (Entities initialPlayer list) =
         (foldMapSelf onEntityEntityCollision list)
 
 
+toEntityPair : Entity -> Entity -> EntityPair
+toEntityPair e1 e2 =
+    case ( e1, e2 ) of
+        ( PlayerE p, TurretE t ) ->
+            PlayerTurret p t
+
+        ( TurretE t, PlayerE p ) ->
+            PlayerTurret p t
+
+        ( PlayerE p, BulletE b ) ->
+            PlayerBullet p b
+
+        ( BulletE b, PlayerE p ) ->
+            PlayerBullet p b
+
+        ( PlayerE p1, PlayerE p2 ) ->
+            PlayerPlayer p1 p2
+
+        ( TurretE t, BulletE b ) ->
+            TurretBullet t b
+
+        ( BulletE b, TurretE t ) ->
+            TurretBullet t b
+
+        ( TurretE t1, TurretE t2 ) ->
+            TurretTurret t1 t2
+
+        ( BulletE b1, BulletE b2 ) ->
+            BulletBullet b1 b2
+
+
+onEntityPairCollision : EntityPair -> EntityPair
+onEntityPairCollision entityPair =
+    case entityPair of
+        PlayerTurret player turret ->
+            onCircularCollisionMapBoth HasHealth.kill identity player turret
+                |> uncurry PlayerTurret
+
+        PlayerBullet player bullet ->
+            entityPair
+
+        TurretBullet turret bullet ->
+            entityPair
+
+        PlayerPlayer player player2 ->
+            entityPair
+
+        TurretTurret turret turret2 ->
+            entityPair
+
+        BulletBullet bullet bullet2 ->
+            entityPair
+
+
 onEntityEntityCollision : Entity -> Entity -> ( Entity, Entity )
 onEntityEntityCollision e1 e2 =
     let
-        flipCall =
-            onEntityEntityCollision e2 e1
+        flipCallSwap () =
+            onEntityEntityCollision e2 e1 |> swap
 
         noOp =
             ( e1, e2 )
     in
     case ( e1, e2 ) of
         ( PlayerE p, TurretE t ) ->
-            noOp
+            onCircularCollisionMapBoth HasHealth.kill identity p t
+                |> Tuple.mapBoth PlayerE TurretE
 
-        ( TurretE t, PlayerE p ) ->
-            flipCall
+        ( TurretE _, PlayerE _ ) ->
+            flipCallSwap ()
 
         ( PlayerE p, BulletE b ) ->
-            noOp
+            onCircularCollisionMapBoth HasHealth.dec HasHealth.dec p b
+                |> Tuple.mapBoth PlayerE BulletE
 
-        ( BulletE b, PlayerE p ) ->
-            flipCall
+        ( BulletE _, PlayerE _ ) ->
+            flipCallSwap ()
 
         ( PlayerE _, PlayerE _ ) ->
             noOp
 
         ( TurretE t, BulletE b ) ->
-            noOp
+            onCircularCollisionMapBoth HasHealth.dec HasHealth.dec t b
+                |> Tuple.mapBoth TurretE BulletE
 
-        ( BulletE b, TurretE t ) ->
-            flipCall
+        ( BulletE _, TurretE _ ) ->
+            flipCallSwap ()
 
         ( TurretE _, TurretE _ ) ->
             noOp
 
         ( BulletE b1, BulletE b2 ) ->
-            noOp
+            onCircularCollisionMapBoth HasHealth.dec HasHealth.dec b1 b2
+                |> Tuple.mapBoth BulletE BulletE
 
 
 

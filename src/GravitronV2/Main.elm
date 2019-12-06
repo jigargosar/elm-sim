@@ -721,7 +721,7 @@ fireNewBullets { from, to, offset, weapon } =
             [ homingBullet angle ]
 
         TimeBombSingle ->
-            [ homingBullet angle ]
+            [ timeBombBullet angle ]
 
 
 spacePressed =

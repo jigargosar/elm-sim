@@ -937,6 +937,24 @@ handleCollision model =
 -- DEATH
 
 
+type alias Blast =
+    { position : Vec
+    , radius : Float
+    }
+
+
+blastsFromBullet : Bullet -> List Blast
+blastsFromBullet bullet =
+    if bullet.bulletType == TimeBombBullet then
+        [ { position = bullet.position
+          , radius = bullet.radius * 5
+          }
+        ]
+
+    else
+        []
+
+
 handleDeath : Memory -> Memory
 handleDeath model =
     let
@@ -945,6 +963,9 @@ handleDeath model =
 
         newBulletExplosions =
             List.map explosionFromBullet deadBullets
+
+        newBlastsFromDeadBullets =
+            List.concatMap blastsFromBullet deadBullets
 
         ( newTurrets, deadTurrets ) =
             List.partition HasHealth.isAlive model.turrets

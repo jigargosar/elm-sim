@@ -553,6 +553,57 @@ renderTurretExplosions model =
 
 
 
+-- BlastExplosion
+
+
+type alias BlastExplosion =
+    { blast : Blast
+    , maxTicks : Float
+    , elapsed : Float
+    }
+
+
+explosionFromBlast : Blast -> BlastExplosion
+explosionFromBlast blast =
+    { blast = blast
+    , maxTicks = 60
+    , elapsed = 0
+    }
+
+
+stepBlastExplosionAnimation : BlastExplosion -> BlastExplosion
+stepBlastExplosionAnimation model =
+    { model | elapsed = model.elapsed + 1 }
+
+
+isBlastExplosionAnimating : BlastExplosion -> Bool
+isBlastExplosionAnimating model =
+    model.elapsed < model.maxTicks
+
+
+renderBlastExplosions : BlastExplosion -> G.Shape
+renderBlastExplosions model =
+    let
+        ( x, y ) =
+            V.toTuple blast.position
+
+        blast =
+            model.blast
+
+        progress =
+            clamp 0 model.maxTicks model.elapsed
+                / model.maxTicks
+
+        radius =
+            blast.radius + (blast.radius * progress)
+
+        color =
+            G.withAlpha (1 - progress) blast.color
+    in
+    G.circle x y radius color
+
+
+
 -- GameState
 
 
@@ -578,8 +629,10 @@ type alias Memory =
     { player : Player
     , turrets : Turrets
     , bullets : Bullets
+    , blasts : Blasts
     , bulletExplosions : List BulletExplosion
     , turretExplosions : List TurretExplosion
+    , blastExplosions : List BlastExplosion
     , state : GameState
     , stage : Int
     , rTicks : Float
@@ -674,8 +727,10 @@ initMemory =
     { player = initPlayer
     , turrets = initTurretsForStage stage rTicks
     , bullets = []
+    , blasts = []
     , bulletExplosions = []
     , turretExplosions = []
+    , blastExplosions = []
     , stage = stage
     , state = Running
     , rTicks = rTicks
@@ -789,6 +844,9 @@ stepAnimations model =
         , turretExplosions =
             List.map stepTurretExplosionAnimation model.turretExplosions
                 |> List.filter isTurretExplosionAnimating
+        , blastExplosions =
+            List.map stepBlastExplosionAnimation model.blastExplosions
+                |> List.filter isBlastExplosionAnimating
     }
 
 
@@ -817,6 +875,7 @@ type Entity
     = PlayerE Player
     | TurretE Turret
     | BulletE Bullet
+    | BlastE Blast
 
 
 type Entities
@@ -828,6 +887,7 @@ entitiesFromRecord :
         | player : Player
         , turrets : Turrets
         , bullets : Bullets
+        , blasts : Blasts
     }
     -> Entities
 entitiesFromRecord { player, turrets, bullets } =
@@ -846,6 +906,7 @@ entitiesToRecord :
         { player : Player
         , turrets : Turrets
         , bullets : Bullets
+        , blasts : Blasts
         }
 entitiesToRecord (Entities initialPlayer list) =
     let
@@ -859,8 +920,17 @@ entitiesToRecord (Entities initialPlayer list) =
 
                 BulletE bullet ->
                     { rec | bullets = bullet :: rec.bullets }
+
+                BlastE blast ->
+                    { rec | blasts = blast :: rec.blasts }
     in
-    List.foldl reducer { player = initialPlayer, turrets = [], bullets = [] } list
+    List.foldl reducer
+        { player = initialPlayer
+        , turrets = []
+        , bullets = []
+        , blasts = []
+        }
+        list
 
 
 handleEntitiesCollision : Entities -> Entities
@@ -898,6 +968,13 @@ onEntityEntityCollision e1 e2 =
         ( BulletE _, PlayerE _ ) ->
             flipCallSwap ()
 
+        ( PlayerE p, BlastE bl ) ->
+            onCircularCollisionMapBoth HasHealth.dec identity p bl
+                |> Tuple.mapBoth PlayerE BlastE
+
+        ( BlastE _, PlayerE p ) ->
+            flipCallSwap ()
+
         ( PlayerE _, PlayerE _ ) ->
             noOp
 
@@ -913,12 +990,29 @@ onEntityEntityCollision e1 e2 =
         ( BulletE _, TurretE _ ) ->
             flipCallSwap ()
 
+        ( TurretE t, BlastE bl ) ->
+            onCircularCollisionMapBoth HasHealth.dec identity t bl
+                |> Tuple.mapBoth TurretE BlastE
+
+        ( BlastE bl, TurretE t ) ->
+            flipCallSwap ()
+
         ( TurretE _, TurretE _ ) ->
             noOp
+
+        ( BulletE b, BlastE bl ) ->
+            onCircularCollisionMapBoth HasHealth.dec identity b bl
+                |> Tuple.mapBoth BulletE BlastE
+
+        ( BlastE _, BulletE _ ) ->
+            flipCallSwap ()
 
         ( BulletE b1, BulletE b2 ) ->
             onCircularCollisionMapBoth HasHealth.dec HasHealth.dec b1 b2
                 |> Tuple.mapBoth BulletE BulletE
+
+        ( BlastE _, BlastE _ ) ->
+            noOp
 
 
 handleCollision : Memory -> Memory
@@ -940,7 +1034,12 @@ handleCollision model =
 type alias Blast =
     { position : Vec
     , radius : Float
+    , color : G.Color
     }
+
+
+type alias Blasts =
+    List Blast
 
 
 blastsFromBullet : Bullet -> List Blast
@@ -948,6 +1047,7 @@ blastsFromBullet bullet =
     if bullet.bulletType == TimeBombBullet then
         [ { position = bullet.position
           , radius = bullet.radius * 5
+          , color = G.green
           }
         ]
 
@@ -964,8 +1064,12 @@ handleDeath model =
         newBulletExplosions =
             List.map explosionFromBullet deadBullets
 
-        newBlastsFromDeadBullets =
+        newBlasts : Blasts
+        newBlasts =
             List.concatMap blastsFromBullet deadBullets
+
+        newBlastExplosions =
+            List.map explosionFromBlast model.blasts
 
         ( newTurrets, deadTurrets ) =
             List.partition HasHealth.isAlive model.turrets
@@ -993,8 +1097,10 @@ handleDeath model =
     in
     { model
         | bullets = generatedBullets ++ newBullets
+        , blasts = newBlasts
         , bulletExplosions = newBulletExplosions ++ model.bulletExplosions
         , turretExplosions = newTurretExplosions ++ model.turretExplosions
+        , blastExplosions = newBlastExplosions ++ model.blastExplosions
         , stage =
             if List.isEmpty newTurrets then
                 model.stage + 1
@@ -1082,6 +1188,7 @@ viewMemory computer model =
     in
     renderPlayer model.player
         ++ List.map renderTurretExplosions model.turretExplosions
+        ++ List.map renderBlastExplosions model.blastExplosions
         ++ List.concatMap (renderTurret rTicks) model.turrets
         ++ List.concatMap renderBullet model.bullets
         ++ List.map renderBulletExplosions model.bulletExplosions

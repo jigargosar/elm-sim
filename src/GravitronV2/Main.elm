@@ -820,8 +820,14 @@ entitiesFromRecord :
     , bullets : Bullets
     }
     -> Entities
-entitiesFromRecord =
-    Debug.todo "impl"
+entitiesFromRecord { player, turrets, bullets } =
+    let
+        list =
+            [ PlayerE player ]
+                ++ List.map TurretE turrets
+                ++ List.map BulletE bullets
+    in
+    Entities player list
 
 
 entitiesToRecord :

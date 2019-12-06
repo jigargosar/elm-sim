@@ -11,6 +11,7 @@ module GravitronV2.Game exposing
     , freshKeyDown
     , game
     , green
+    , hsl
     , lightRed
     , noShape
     , purple
@@ -358,6 +359,12 @@ yellow =
 lightRed : Color
 lightRed =
     Color Color.lightRed
+
+
+hsl : Float -> Float -> Float -> Color
+hsl h s l =
+    Color.hsl h s l
+        |> Color
 
 
 green : Color

@@ -161,8 +161,11 @@ stageArray =
         yellow5Homing =
             TurretConfig 5 G.yellow HomingSingle StaticTurret NoBulletsOnDeathTurret
 
+        colorRose =
+            G.hsl (1 / 359 * 13) 0.75 0.5
+
         timeBombRose =
-            TurretConfig 3 G.lightRed TimeBombSingle StaticTurret NoBulletsOnDeathTurret
+            TurretConfig 3 colorRose TimeBombSingle StaticTurret NoBulletsOnDeathTurret
     in
     [ -- level 1
       [ red1 ]

@@ -853,6 +853,15 @@ entitiesToRecord (Entities initialPlayer list) =
     List.foldl reducer { player = initialPlayer, turrets = [], bullets = [] } list
 
 
+handleEntitiesCollision : Entities -> Entities
+handleEntitiesCollision (Entities initialPlayer list) =
+    let
+        newList =
+            list
+    in
+    Entities initialPlayer list
+
+
 
 -- Collision
 

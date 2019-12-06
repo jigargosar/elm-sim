@@ -894,8 +894,13 @@ onEntityEntityCollision e1 e2 =
             noOp
 
         ( TurretE t, BulletE b ) ->
-            onCircularCollisionMapBoth HasHealth.dec HasHealth.dec t b
-                |> Tuple.mapBoth TurretE BulletE
+            if b.bulletType == TimeBombBullet then
+                onCircularCollisionMapBoth identity HasHealth.dec t b
+                    |> Tuple.mapBoth TurretE BulletE
+
+            else
+                onCircularCollisionMapBoth HasHealth.dec HasHealth.dec t b
+                    |> Tuple.mapBoth TurretE BulletE
 
         ( BulletE _, TurretE _ ) ->
             flipCallSwap ()

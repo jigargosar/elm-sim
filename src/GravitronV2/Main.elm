@@ -810,6 +810,40 @@ updateEntities computer model =
         |> stepAnimations
 
 
+type CollisionEntity
+    = PlayerC
+    | TurretC
+    | BulletC
+
+
+blastFromCollidingEntities : CollisionEntity -> CollisionEntity -> Blast
+blastFromCollidingEntities c1 c2 =
+    Debug.todo "impl"
+
+
+resolveBlastWithPlayer : Blast -> Player -> ( List Blast, Player )
+resolveBlastWithPlayer blast player =
+    Debug.todo "impl"
+
+
+resolveBlastWithBullet : Blast -> Bullet -> ( List Blast, Bullet )
+resolveBlastWithBullet =
+    Debug.todo "impl"
+
+
+handleBlast : Memory -> Memory
+handleBlast model =
+    let
+        { player, turrets, bullets } =
+            model
+
+        blasts : List Blast
+        blasts =
+            Debug.todo "impl"
+    in
+    model
+
+
 handleCollision : Memory -> Memory
 handleCollision model =
     model

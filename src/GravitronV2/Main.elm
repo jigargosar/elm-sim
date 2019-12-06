@@ -9,7 +9,6 @@ import GravitronV2.Vector2 as V exposing (Vec, vec)
 import TypedSvg
 import TypedSvg.Attributes
 import TypedSvg.Attributes.InPx as InPx
-import TypedSvg.Types
 
 
 
@@ -118,6 +117,7 @@ type TurretWeapon
     | GravityTriple
     | GravityFive
     | HomingSingle
+    | TimeBombSingle
 
 
 type TurretMovement
@@ -160,6 +160,9 @@ stageArray =
 
         yellow5Homing =
             TurretConfig 5 G.yellow HomingSingle StaticTurret NoBulletsOnDeathTurret
+
+        timeBombRose =
+            TurretConfig 3 G.lightRed TimeBombSingle StaticTurret NoBulletsOnDeathTurret
     in
     [ -- level 1
       [ red1 ]
@@ -173,8 +176,11 @@ stageArray =
     , [ red1, green3, blue2 ]
     , [ green3, blue2D5Mv ]
     , [ blue2D5Mv, blue2D5Mv, green3 ]
-    , -- [ green3, yellow5Homing, blue2D5Mv ]
-      [ yellow5Homing ]
+    , [ green3, yellow5Homing, blue2D5Mv ]
+
+    -- level 3
+    , [ timeBombRose ]
+    , [ timeBombRose, yellow5Homing ]
     , []
     ]
         |> Array.fromList
@@ -638,7 +644,7 @@ initMemory : Memory
 initMemory =
     let
         stage =
-            stageNumFromLevel ( 2, 5 )
+            stageNumFromLevel ( 3, 1 )
 
         rTicks =
             0
@@ -695,6 +701,9 @@ fireNewBullets { from, to, offset, weapon } =
                     )
 
         HomingSingle ->
+            [ homingBullet angle ]
+
+        TimeBombSingle ->
             [ homingBullet angle ]
 
 

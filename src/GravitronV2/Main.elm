@@ -327,21 +327,23 @@ bounceWithinScreen screen position bounceFactor velocity =
 updateBullet : G.Screen -> Player -> Bullet -> Bullet
 updateBullet screen player bullet =
     let
-        gravityVec =
-            V.fromPt bullet.position player.position
-                |> V.mapMagnitude (\m -> 20 / m)
-
-        homingVec =
-            V.fromPt bullet.position player.position
-                |> V.mapMagnitude (always 0.3)
-
         newVelocity =
             [ bounceWithinScreen screen bullet.position 0.5
             , case bullet.bulletType of
                 GravityBullet ->
+                    let
+                        gravityVec =
+                            V.fromPt bullet.position player.position
+                                |> V.mapMagnitude (\m -> 20 / m)
+                    in
                     V.add gravityVec
 
                 HomingBullet ->
+                    let
+                        homingVec =
+                            V.fromPt bullet.position player.position
+                                |> V.mapMagnitude (always 0.3)
+                    in
                     V.add homingVec
                         >> V.mapMagnitude ((*) 0.98)
             ]

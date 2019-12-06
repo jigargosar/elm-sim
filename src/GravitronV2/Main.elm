@@ -552,16 +552,6 @@ renderTurretExplosions model =
 
 
 
--- Blast
-
-
-type alias Blast =
-    { position : Vec
-    , radius : Float
-    }
-
-
-
 -- GameState
 
 
@@ -810,6 +800,16 @@ updateEntities computer model =
         |> stepAnimations
 
 
+
+-- Blast: Trying out New Collision Model
+
+
+type alias Blast =
+    { position : Vec
+    , radius : Float
+    }
+
+
 type CollisionEntity
     = PlayerC
     | TurretC
@@ -842,6 +842,10 @@ handleBlast model =
             Debug.todo "impl"
     in
     model
+
+
+
+-- Collision
 
 
 handleCollision : Memory -> Memory

@@ -1,10 +1,15 @@
 module GravitronV2.Main exposing (main)
 
 import Array exposing (Array)
+import Color
 import GravitronV2.Game as G exposing (Color, Screen, Shape)
 import GravitronV2.HasHealth as HasHealth
 import GravitronV2.Timer as Timer exposing (Timer)
 import GravitronV2.Vector2 as V exposing (Vec, vec)
+import TypedSvg
+import TypedSvg.Attributes
+import TypedSvg.Attributes.InPx as InPx
+import TypedSvg.Types
 
 
 
@@ -394,7 +399,34 @@ renderBullet bullet =
             G.noShape
 
         HomingBullet ->
-            G.noShape
+            let
+                angle =
+                    V.angle bullet.velocity
+
+                extRadius =
+                    bullet.radius * 2
+
+                extVec =
+                    V.fromRTheta extRadius angle
+
+                ( x1, y1 ) =
+                    V.add bullet.position extVec
+                        |> V.toTuple
+
+                ( x2, y2 ) =
+                    V.add bullet.position (V.multiply -1 extVec)
+                        |> V.toTuple
+            in
+            G.customShape
+                (TypedSvg.line
+                    [ InPx.x1 x1
+                    , InPx.y1 y1
+                    , InPx.x2 x2
+                    , InPx.y2 y2
+                    , TypedSvg.Attributes.stroke Color.white
+                    ]
+                    []
+                )
     ]
 
 

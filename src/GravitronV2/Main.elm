@@ -658,7 +658,7 @@ initMemory : Memory
 initMemory =
     let
         stage =
-            stageNumFromLevel ( 3, 1 )
+            stageNumFromLevel ( 1, 1 )
 
         rTicks =
             0
@@ -739,7 +739,7 @@ updateMemory computer model =
             else
                 model
                     |> updateEntities computer
-                    |> handleCollision
+                    |> handleCollision2
                     |> handleDeath
                     |> incRunningTicks
 
@@ -816,9 +816,10 @@ type Entities
 
 
 entitiesFromRecord :
-    { player : Player
-    , turrets : Turrets
-    , bullets : Bullets
+    { a
+        | player : Player
+        , turrets : Turrets
+        , bullets : Bullets
     }
     -> Entities
 entitiesFromRecord { player, turrets, bullets } =
@@ -900,6 +901,18 @@ onEntityEntityCollision e1 e2 =
         ( BulletE b1, BulletE b2 ) ->
             onCircularCollisionMapBoth HasHealth.dec HasHealth.dec b1 b2
                 |> Tuple.mapBoth BulletE BulletE
+
+
+handleCollision2 : Memory -> Memory
+handleCollision2 model =
+    let
+        { player, turrets, bullets } =
+            model
+                |> entitiesFromRecord
+                |> handleEntitiesCollision
+                |> entitiesToRecord
+    in
+    { model | player = player, turrets = turrets, bullets = bullets }
 
 
 

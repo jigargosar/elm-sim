@@ -613,10 +613,12 @@ initTurretsForStage stageNum rTicks =
             List.length config
 
         triggerTimerDuration =
-            60 * 5
+            (60 * 5)
+                |> always 50
 
         delayPerTurret =
-            triggerTimerDuration / toFloat turretCountForStage
+            (triggerTimerDuration / toFloat turretCountForStage)
+                |> always 0
 
         triggerTimer : Int -> Timer
         triggerTimer idx =

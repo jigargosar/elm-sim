@@ -287,6 +287,7 @@ type alias Bullet =
 type BulletType
     = GravityBullet
     | HomingBullet
+    | TimeBombBullet
 
 
 defaultBullet : Bullet
@@ -680,6 +681,10 @@ fireNewBullets { from, to, offset, weapon } =
         homingBullet angle =
             bulletFromAnge angle
                 |> (\b -> { b | bulletType = HomingBullet })
+
+        timeBombBullet angle =
+            bulletFromAnge angle
+                |> (\b -> { b | bulletType = TimeBombBullet })
     in
     let
         angle =

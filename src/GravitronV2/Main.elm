@@ -614,7 +614,7 @@ initTurretsForStage stageNum rTicks =
 
         triggerTimerDuration =
             (60 * 5)
-                |> always 50
+                |> always 60
 
         delayPerTurret =
             (triggerTimerDuration / toFloat turretCountForStage)

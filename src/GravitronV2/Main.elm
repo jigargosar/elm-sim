@@ -552,6 +552,16 @@ renderTurretExplosions model =
 
 
 
+-- Blast
+
+
+type alias Blast =
+    { position : Vec
+    , radius : Float
+    }
+
+
+
 -- GameState
 
 

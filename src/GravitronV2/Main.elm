@@ -1,7 +1,7 @@
 module GravitronV2.Main exposing (main)
 
 import Array exposing (Array)
-import GravitronV2.Game as G exposing (Color, Screen)
+import GravitronV2.Game as G exposing (Color, Screen, Shape)
 import GravitronV2.HasHealth as HasHealth
 import GravitronV2.Timer as Timer exposing (Timer)
 import GravitronV2.Vector2 as V exposing (Vec, vec)
@@ -382,13 +382,13 @@ updateBullets screen rTicks player turrets bullets =
         |> List.map (updateBullet screen player)
 
 
-renderBullet : Bullet -> G.Shape
+renderBullet : Bullet -> List Shape
 renderBullet bullet =
     let
         ( x, y ) =
             V.toTuple bullet.position
     in
-    G.circle x y bullet.radius bullet.color
+    [ G.circle x y bullet.radius bullet.color ]
 
 
 
@@ -914,7 +914,7 @@ viewMemory computer model =
     renderPlayer model.player
         ++ List.map renderTurretExplosions model.turretExplosions
         ++ List.concatMap (renderTurret rTicks) model.turrets
-        ++ List.map renderBullet model.bullets
+        ++ List.concatMap renderBullet model.bullets
         ++ List.map renderBulletExplosions model.bulletExplosions
         ++ viewGameState computer.screen model.state
         ++ viewLevel computer.screen model.stage

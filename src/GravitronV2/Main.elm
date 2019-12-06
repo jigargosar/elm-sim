@@ -364,7 +364,12 @@ updateBullet screen player bullet =
                         >> V.mapMagnitude ((*) 0.98)
 
                 TimeBombBullet ->
-                    identity
+                    let
+                        gravityVec =
+                            V.fromPt bullet.position player.position
+                                |> V.mapMagnitude (\m -> 20 / m)
+                    in
+                    V.add gravityVec
             ]
                 |> List.foldl (<|) bullet.velocity
     in
@@ -719,7 +724,7 @@ initMemory : Memory
 initMemory =
     let
         stage =
-            stageNumFromLevel ( 1, 1 )
+            stageNumFromLevel ( 3, 1 )
 
         rTicks =
             0
@@ -890,12 +895,13 @@ entitiesFromRecord :
         , blasts : Blasts
     }
     -> Entities
-entitiesFromRecord { player, turrets, bullets } =
+entitiesFromRecord { player, turrets, bullets, blasts } =
     let
         list =
             [ PlayerE player ]
                 ++ List.map TurretE turrets
                 ++ List.map BulletE bullets
+                ++ List.map BlastE blasts
     in
     Entities player list
 
@@ -1018,13 +1024,13 @@ onEntityEntityCollision e1 e2 =
 handleCollision : Memory -> Memory
 handleCollision model =
     let
-        { player, turrets, bullets } =
+        { player, turrets, bullets, blasts } =
             model
                 |> entitiesFromRecord
                 |> handleEntitiesCollision
                 |> entitiesToRecord
     in
-    { model | player = player, turrets = turrets, bullets = bullets }
+    { model | player = player, turrets = turrets, bullets = bullets, blasts = blasts }
 
 
 
@@ -1046,7 +1052,7 @@ blastsFromBullet : Bullet -> List Blast
 blastsFromBullet bullet =
     if bullet.bulletType == TimeBombBullet then
         [ { position = bullet.position
-          , radius = bullet.radius * 5
+          , radius = bullet.radius * 15
           , color = G.green
           }
         ]

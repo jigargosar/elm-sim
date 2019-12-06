@@ -855,11 +855,46 @@ entitiesToRecord (Entities initialPlayer list) =
 
 handleEntitiesCollision : Entities -> Entities
 handleEntitiesCollision (Entities initialPlayer list) =
+    Entities initialPlayer
+        (foldMapSelf onEntityEntityCollision list)
+
+
+onEntityEntityCollision : Entity -> Entity -> ( Entity, Entity )
+onEntityEntityCollision e1 e2 =
     let
-        newList =
-            list
+        flipCall =
+            onEntityEntityCollision e2 e1
+
+        noOp =
+            ( e1, e2 )
     in
-    Entities initialPlayer list
+    case ( e1, e2 ) of
+        ( PlayerE p, TurretE t ) ->
+            noOp
+
+        ( TurretE t, PlayerE p ) ->
+            flipCall
+
+        ( PlayerE p, BulletE b ) ->
+            noOp
+
+        ( BulletE b, PlayerE p ) ->
+            flipCall
+
+        ( PlayerE _, PlayerE _ ) ->
+            noOp
+
+        ( TurretE t, BulletE b ) ->
+            noOp
+
+        ( BulletE b, TurretE t ) ->
+            flipCall
+
+        ( TurretE _, TurretE _ ) ->
+            noOp
+
+        ( BulletE b1, BulletE b2 ) ->
+            noOp
 
 
 

@@ -815,15 +815,6 @@ type Entities
     = Entities Player (List Entity)
 
 
-type EntityPair
-    = PlayerTurret Player Turret
-    | PlayerBullet Player Bullet
-    | TurretBullet Turret Bullet
-    | PlayerPlayer Player Player
-    | TurretTurret Turret Turret
-    | BulletBullet Bullet Bullet
-
-
 entitiesFromRecord :
     { player : Player
     , turrets : Turrets
@@ -867,60 +858,6 @@ handleEntitiesCollision : Entities -> Entities
 handleEntitiesCollision (Entities initialPlayer list) =
     Entities initialPlayer
         (foldMapSelf onEntityEntityCollision list)
-
-
-toEntityPair : Entity -> Entity -> EntityPair
-toEntityPair e1 e2 =
-    case ( e1, e2 ) of
-        ( PlayerE p, TurretE t ) ->
-            PlayerTurret p t
-
-        ( TurretE t, PlayerE p ) ->
-            PlayerTurret p t
-
-        ( PlayerE p, BulletE b ) ->
-            PlayerBullet p b
-
-        ( BulletE b, PlayerE p ) ->
-            PlayerBullet p b
-
-        ( PlayerE p1, PlayerE p2 ) ->
-            PlayerPlayer p1 p2
-
-        ( TurretE t, BulletE b ) ->
-            TurretBullet t b
-
-        ( BulletE b, TurretE t ) ->
-            TurretBullet t b
-
-        ( TurretE t1, TurretE t2 ) ->
-            TurretTurret t1 t2
-
-        ( BulletE b1, BulletE b2 ) ->
-            BulletBullet b1 b2
-
-
-onEntityPairCollision : EntityPair -> EntityPair
-onEntityPairCollision entityPair =
-    case entityPair of
-        PlayerTurret player turret ->
-            onCircularCollisionMapBoth HasHealth.kill identity player turret
-                |> uncurry PlayerTurret
-
-        PlayerBullet player bullet ->
-            entityPair
-
-        TurretBullet turret bullet ->
-            entityPair
-
-        PlayerPlayer player player2 ->
-            entityPair
-
-        TurretTurret turret turret2 ->
-            entityPair
-
-        BulletBullet bullet bullet2 ->
-            entityPair
 
 
 onEntityEntityCollision : Entity -> Entity -> ( Entity, Entity )

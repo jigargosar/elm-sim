@@ -388,7 +388,14 @@ renderBullet bullet =
         ( x, y ) =
             V.toTuple bullet.position
     in
-    [ G.circle x y bullet.radius bullet.color ]
+    [ G.circle x y bullet.radius bullet.color
+    , case bullet.bulletType of
+        GravityBullet ->
+            G.noShape
+
+        HomingBullet ->
+            G.noShape
+    ]
 
 
 

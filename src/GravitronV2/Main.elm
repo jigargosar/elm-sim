@@ -864,15 +864,6 @@ updateMemory computer model =
                 model
 
 
-prependWhen : (c -> Bool) -> (c -> a) -> c -> List a -> List a
-prependWhen pred t v =
-    if pred v then
-        (::) (t v)
-
-    else
-        identity
-
-
 stepAnimations : Memory -> Memory
 stepAnimations model =
     { model

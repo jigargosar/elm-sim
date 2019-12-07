@@ -839,7 +839,7 @@ updateMemory computer model =
 
             else
                 model
-                    |> updateEntities computer
+                    |> stepEntities computer
                     |> handleCollision
                     |> handleDeath
                     |> incRunningTicks
@@ -888,8 +888,8 @@ stepAnimations model =
     }
 
 
-updateEntities : G.Computer -> Memory -> Memory
-updateEntities computer model =
+stepEntities : G.Computer -> Memory -> Memory
+stepEntities computer model =
     let
         { mouse, screen } =
             computer

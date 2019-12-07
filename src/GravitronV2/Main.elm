@@ -1062,17 +1062,18 @@ handleDeath model =
             else
                 []
 
-        newDeathAnimations =
-            toDeathAnimationList model BulletDeathAnim deadBullets
-                ++ toDeathAnimationList model TurretDeathAnim deadTurrets
-                ++ toDeathAnimationList model BlastDeathAnim deadBlasts
-                ++ toDeathAnimationList model PlayerDeathAnim deadPlayers
-
         ( newBlasts, deadBlasts ) =
             ( List.concatMap blastsFromBullet deadBullets, model.blasts )
 
         ( newTurrets, deadTurrets ) =
             List.partition HasHealth.isAlive model.turrets
+
+        newDeathAnimations : List DeathAnimation
+        newDeathAnimations =
+            toDeathAnimationList model BulletDeathAnim deadBullets
+                ++ toDeathAnimationList model TurretDeathAnim deadTurrets
+                ++ toDeathAnimationList model BlastDeathAnim deadBlasts
+                ++ toDeathAnimationList model PlayerDeathAnim deadPlayers
 
         generatedBullets : Bullets
         generatedBullets =

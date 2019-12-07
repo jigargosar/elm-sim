@@ -1,4 +1,4 @@
-module GravitronV2.Velocity exposing (Velocity)
+module GravitronV2.Velocity exposing (Velocity, zero)
 
 
 type Velocity

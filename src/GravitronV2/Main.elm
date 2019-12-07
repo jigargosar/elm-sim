@@ -496,7 +496,7 @@ renderDA mem model =
             Timer.value mem.rTicks model.timer
 
         maxOpacity =
-            0.5
+            0.8
     in
     case model.kind of
         BulletDeathAnim bullet ->

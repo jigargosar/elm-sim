@@ -38,6 +38,7 @@ import Json.Decode as JD
 import Point2d
 import Set exposing (Set)
 import Svg exposing (Svg)
+import Svg.Attributes as SA
 import Task
 import TypedSvg
 import TypedSvg.Attributes as TA
@@ -193,7 +194,7 @@ type Form
 
 
 type Shape
-    = Shape Float Float Float Form
+    = Shape Float Float Float Float Form
     | Text Float Float String
     | StrokeArc ( Float, Float ) Float ( Float, Float ) Color
     | Custom (Svg Never)
@@ -202,16 +203,18 @@ type Shape
 
 circleAt : Float -> Float -> Float -> Color -> Shape
 circleAt x y r c =
-    Shape x y 1 (Circle r c)
+    Shape x y 1 1 (Circle r c)
 
 
 circle : Float -> Color -> Shape
 circle r c =
-    initShape (Circle r c)
+    Circle r c
+        |> toShape
 
 
-initShape =
-    Shape 0 0 1
+toShape : Form -> Shape
+toShape =
+    Shape 0 0 1 1
 
 
 noShape : Shape
@@ -282,13 +285,38 @@ strokeColor (Color c) =
     TA.stroke c
 
 
+type alias Number =
+    Float
+
+
+renderTransform : Number -> Number -> Number -> Number -> String
+renderTransform x y a s =
+    if a == 0 then
+        if s == 1 then
+            "translate(" ++ String.fromFloat x ++ "," ++ String.fromFloat -y ++ ")"
+
+        else
+            "translate(" ++ String.fromFloat x ++ "," ++ String.fromFloat -y ++ ") scale(" ++ String.fromFloat s ++ ")"
+
+    else if s == 1 then
+        "translate(" ++ String.fromFloat x ++ "," ++ String.fromFloat -y ++ ") rotate(" ++ String.fromFloat -a ++ ")"
+
+    else
+        "translate(" ++ String.fromFloat x ++ "," ++ String.fromFloat -y ++ ") rotate(" ++ String.fromFloat -a ++ ") scale(" ++ String.fromFloat s ++ ")"
+
+
 renderShape : Shape -> Svg msg
 renderShape shape =
     case shape of
-        Shape x y s form ->
+        Shape x y a s form ->
+            let
+                transformAttr =
+                    renderTransform x y a s
+                        |> SA.transform
+            in
             case form of
                 Circle r c ->
-                    Svg.circle [ InPx.cx x, InPx.cy y, InPx.r r, fillColor c ] []
+                    Svg.circle [ transformAttr, InPx.r r, fillColor c ] []
 
         Text x y str ->
             Svg.text_

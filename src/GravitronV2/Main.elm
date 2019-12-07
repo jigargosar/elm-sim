@@ -530,6 +530,7 @@ type alias Memory =
     , state : GameState
     , stage : Int
     , rTicks : Float
+    , daClock : Float
     }
 
 
@@ -626,6 +627,7 @@ initMemory =
     , stage = stage
     , state = Running
     , rTicks = rTicks
+    , daClock = 0
     }
 
 
@@ -781,13 +783,20 @@ updateMemory computer model =
                 model
 
 
-stepAnimations : Memory -> Memory
+stepAnimations :
+    { a | daClock : Float, deathAnimations : List DeathAnimation }
+    -> { a | daClock : Float, deathAnimations : List DeathAnimation }
 stepAnimations model =
+    let
+        clock =
+            model.daClock
+    in
     { model
         | deathAnimations =
             List.Extra.filterNot
-                (.timer >> Timer.isDone model.rTicks)
+                (.timer >> Timer.isDone clock)
                 model.deathAnimations
+        , daClock = clock + 1
     }
 
 

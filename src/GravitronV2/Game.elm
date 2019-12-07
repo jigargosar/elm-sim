@@ -194,7 +194,7 @@ type Form
 
 
 type Shape
-    = Shape Float Float Float Float Form
+    = Shape Number Number Number Number Number Form
     | Text Float Float String
     | StrokeArc ( Float, Float ) Float ( Float, Float ) Color
     | Custom (Svg Never)
@@ -203,7 +203,7 @@ type Shape
 
 circleAt : Float -> Float -> Float -> Color -> Shape
 circleAt x y r c =
-    Shape x y 1 1 (Circle r c)
+    Shape x y 0 1 1 (Circle r c)
 
 
 circle : Float -> Color -> Shape
@@ -214,7 +214,7 @@ circle r c =
 
 toShape : Form -> Shape
 toShape =
-    Shape 0 0 1 1
+    Shape 0 0 0 1 1
 
 
 noShape : Shape
@@ -308,15 +308,15 @@ renderTransform x y a s =
 renderShape : Shape -> Svg msg
 renderShape shape =
     case shape of
-        Shape x y a s form ->
-            let
-                transformAttr =
-                    renderTransform x y a s
-                        |> SA.transform
-            in
+        Shape x y a s o form ->
             case form of
                 Circle r c ->
-                    Svg.circle [ transformAttr, InPx.r r, fillColor c ] []
+                    Svg.circle
+                        [ renderTransform x y a s |> SA.transform
+                        , InPx.r r
+                        , fillColor c
+                        ]
+                        []
 
         Text x y str ->
             Svg.text_

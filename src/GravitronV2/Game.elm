@@ -7,6 +7,7 @@ module GravitronV2.Game exposing
     , Shape
     , blue
     , circle
+    , circleAt
     , customShape
     , freshKeyDown
     , game
@@ -187,17 +188,30 @@ setPrevKeys keyboard =
 -- View
 
 
+type Form
+    = Circle Float Color
+
+
 type Shape
-    = Circle Float Float Float Color
+    = Shape Float Float Float Form
     | Text Float Float String
     | StrokeArc ( Float, Float ) Float ( Float, Float ) Color
     | Custom (Svg Never)
     | NoShape
 
 
-circle : Float -> Float -> Float -> Color -> Shape
-circle =
-    Circle
+circleAt : Float -> Float -> Float -> Color -> Shape
+circleAt x y r c =
+    Shape x y 1 (Circle r c)
+
+
+circle : Float -> Color -> Shape
+circle r c =
+    initShape (Circle r c)
+
+
+initShape =
+    Shape 0 0 1
 
 
 noShape : Shape
@@ -271,8 +285,10 @@ strokeColor (Color c) =
 renderShape : Shape -> Svg msg
 renderShape shape =
     case shape of
-        Circle cx cy r c ->
-            Svg.circle [ InPx.cx cx, InPx.cy cy, InPx.r r, fillColor c ] []
+        Shape x y s form ->
+            case form of
+                Circle r c ->
+                    Svg.circle [ InPx.cx x, InPx.cy y, InPx.r r, fillColor c ] []
 
         Text x y str ->
             Svg.text_

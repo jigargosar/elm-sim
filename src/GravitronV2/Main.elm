@@ -85,8 +85,8 @@ renderPlayer player =
         remainingHealthRadius =
             player.radius * HasHealth.normalized player
     in
-    [ G.circle x y player.radius (G.withAlpha 0.5 player.color)
-    , G.circle x y remainingHealthRadius player.color
+    [ G.circleAt x y player.radius (G.withAlpha 0.5 player.color)
+    , G.circleAt x y remainingHealthRadius player.color
     ]
 
 
@@ -219,13 +219,13 @@ renderTurret rTicks turret =
         progressArcRadius =
             turret.radius + turret.radius / 4
     in
-    [ G.circle x y turret.radius (G.withAlpha 0.5 turret.color)
+    [ G.circleAt x y turret.radius (G.withAlpha 0.5 turret.color)
     , -- Remaining Health Indicator
       let
         remainingHealthRadius =
             turret.radius * HasHealth.normalized turret
       in
-      G.circle x y remainingHealthRadius turret.color
+      G.circleAt x y remainingHealthRadius turret.color
     , -- Trigger Arc
       let
         progress =
@@ -247,7 +247,7 @@ renderTurret rTicks turret =
                 FiveBulletsOnDeathTurret ->
                     let
                         renderBulletPlaceholderAtOffset ( ox, oy ) =
-                            G.circle ox
+                            G.circleAt ox
                                 oy
                                 (turret.radius / 5)
                                 (G.withAlpha 0.5 G.white)
@@ -384,7 +384,7 @@ renderBullet bullet =
             V.toTuple bullet.position
 
         simpleBulletCircle =
-            G.circle x y bullet.radius bullet.color
+            G.circleAt x y bullet.radius bullet.color
     in
     case bullet.bulletType of
         GravityBullet ->
@@ -474,7 +474,7 @@ renderBulletExplosions model =
         color =
             G.withAlpha (1 - progress) bullet.color
     in
-    G.circle x y radius color
+    G.circleAt x y radius color
 
 
 renderDA : Memory -> DeathAnimation -> List G.Shape
@@ -495,7 +495,7 @@ renderDA mem model =
                 color =
                     G.withAlpha (1 - progress) bullet.color
             in
-            [ G.circle x y radius color ]
+            [ G.circleAt x y radius color ]
 
         _ ->
             []
@@ -554,7 +554,7 @@ renderTurretExplosions model =
         color =
             G.withAlpha (1 - progress) turret.color
     in
-    G.circle x y radius color
+    G.circleAt x y radius color
 
 
 
@@ -605,7 +605,7 @@ renderBlastExplosions model =
         color =
             G.withAlpha (1 - progress) blast.color
     in
-    G.circle x y radius color
+    G.circleAt x y radius color
 
 
 

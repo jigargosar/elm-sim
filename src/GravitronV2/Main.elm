@@ -494,12 +494,15 @@ renderDA mem model =
     let
         progress =
             Timer.value mem.rTicks model.timer
+
+        maxOpacity =
+            0.5
     in
     case model.kind of
         BulletDeathAnim bullet ->
             renderBullet bullet
                 |> G.scale (1 + progress)
-                |> G.fade (1 - progress)
+                |> G.fade (maxOpacity - (progress * maxOpacity))
 
         _ ->
             G.noShape

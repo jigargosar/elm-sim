@@ -65,8 +65,8 @@ initPlayer =
     }
 
 
-updatePlayer : G.Mouse -> Player -> Player
-updatePlayer mouse player =
+stepPlayer : G.Mouse -> Player -> Player
+stepPlayer mouse player =
     player
         |> Particle.mapVelocity
             (V.add (V.fromToScaled player.position mouse.position 0.2)
@@ -856,7 +856,7 @@ updateEntities computer model =
             model
     in
     { model
-        | player = updatePlayer mouse player
+        | player = stepPlayer mouse player
         , turrets = List.map (turretRestartTriggerTimerIfDone rTicks) turrets
         , bullets = updateBullets screen rTicks player turrets bullets
     }

@@ -369,8 +369,9 @@ stepBullet screen target bullet =
     in
     bullet
         |> Particle.mapVelocity
-            (applyAccForce
+            (identity
                 >> bounceWithinScreen screen bullet.position 0.5
+                >> applyAccForce
             )
         |> Particle.step
 

@@ -8,6 +8,7 @@ import GravitronV2.HasHealth as HasHealth
 import GravitronV2.Particle as Particle exposing (Particle)
 import GravitronV2.Timer as Timer exposing (Timer)
 import GravitronV2.Vec as V exposing (Vec, vec)
+import List.Extra
 import TypedSvg
 import TypedSvg.Attributes
 import TypedSvg.Attributes.InPx as InPx
@@ -890,6 +891,10 @@ stepAnimations model =
         , blastsEA =
             List.map stepBlastExplosionAnimation model.blastsEA
                 |> List.filter isBlastExplosionAnimating
+        , deathAnimations =
+            List.Extra.filterNot
+                (.timer >> Timer.isDone model.rTicks)
+                model.deathAnimations
     }
 
 
@@ -1112,6 +1117,10 @@ handleDeath model =
         ( newBullets, deadBullets ) =
             List.partition HasHealth.isAlive model.bullets
 
+        bulletDeathAnimations : List DeathAnimation
+        bulletDeathAnimations =
+            deadBullets |> List.map (BulletDeathAnim >> DeathAnimation (Timer.start model.rTicks 60))
+
         newBulletExplosions =
             List.map explosionFromBullet deadBullets
 
@@ -1152,6 +1161,7 @@ handleDeath model =
         , bulletsEA = newBulletExplosions ++ model.bulletsEA
         , turretsEA = newTurretExplosions ++ model.turretsEA
         , blastsEA = newBlastExplosions ++ model.blastsEA
+        , deathAnimations = bulletDeathAnimations ++ model.deathAnimations
         , stage =
             if List.isEmpty newTurrets then
                 model.stage + 1

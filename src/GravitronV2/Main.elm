@@ -620,6 +620,7 @@ type alias Memory =
     , bulletsEA : List BulletExplosion
     , turretsEA : List TurretExplosion
     , blastsEA : List BlastExplosion
+    , deathAnimations : List DeathAnimation
     , state : GameState
     , stage : Int
     , rTicks : Float
@@ -718,6 +719,7 @@ initMemory =
     , bulletsEA = []
     , turretsEA = []
     , blastsEA = []
+    , deathAnimations = []
     , stage = stage
     , state = Running
     , rTicks = rTicks

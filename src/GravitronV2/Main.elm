@@ -4,8 +4,6 @@ import Array exposing (Array)
 import Basics.Extra exposing (swap)
 import Color
 import GravitronV2.Game as G exposing (Color, Screen, Shape)
-import GravitronV2.Geometry.Point as Point exposing (Point)
-import GravitronV2.Geometry.Velocity as Velocity
 import GravitronV2.HasHealth as HasHealth
 import GravitronV2.Timer as Timer exposing (Timer)
 import GravitronV2.Vec as V exposing (Vec, vec)

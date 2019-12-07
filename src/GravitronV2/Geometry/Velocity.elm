@@ -1,24 +1,24 @@
 module GravitronV2.Geometry.Velocity exposing (Velocity, add, fromToScaled, fromVec__, scale, toVec__, zero)
 
-import GravitronV2.Geometry.Internal exposing (ILocation, IVelocity)
+import GravitronV2.Geometry.Internal exposing (TPoint(..), TVelocity(..))
 import GravitronV2.Vec as Vec exposing (Vec)
 
 
 type alias Velocity =
-    IVelocity
+    TVelocity
 
 
 type alias Location =
-    ILocation
+    TPoint
 
 
 wrap : Vec -> Velocity
 wrap =
-    IVelocity
+    TVelocity
 
 
 unwrap : Velocity -> Vec
-unwrap (IVelocity vec) =
+unwrap (TVelocity vec) =
     vec
 
 
@@ -33,7 +33,7 @@ zero =
 
 
 fromToScaled : Location -> Location -> Float -> Velocity
-fromToScaled (ILocation p1) (ILocation p2) scaleBy =
+fromToScaled (TPoint p1) (TPoint p2) scaleBy =
     Vec.fromPt p1 p2 |> Vec.multiply scaleBy |> wrap
 
 

@@ -1,16 +1,16 @@
 module GravitronV2.Geometry.Point exposing (Point, fromVec__, xy, zero)
 
-import GravitronV2.Geometry.Internal exposing (ILocation)
+import GravitronV2.Geometry.Internal exposing (TPoint(..))
 import GravitronV2.Vec as Vec exposing (Vec, vec)
 
 
 type alias Point =
-    ILocation
+    TPoint
 
 
 wrap : Vec -> Point
 wrap =
-    ILocation
+    TPoint
 
 
 xy : Float -> Float -> Point

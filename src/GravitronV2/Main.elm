@@ -1013,24 +1013,26 @@ blastsFromBullet bullet =
         []
 
 
+toDeathAnimationList : { x | daClock : Float } -> (a -> DeathAnimationKind) -> List a -> List DeathAnimation
+toDeathAnimationList { daClock } kind =
+    let
+        toDeathAnimation : DeathAnimationKind -> DeathAnimation
+        toDeathAnimation =
+            DeathAnimation (Timer.start daClock 60)
+    in
+    List.map (kind >> toDeathAnimation)
+
+
 handleDeath : Memory -> Memory
 handleDeath model =
     let
         ( newBullets, deadBullets ) =
             List.partition HasHealth.isAlive model.bullets
 
-        toDeathAnimation : DeathAnimationKind -> DeathAnimation
-        toDeathAnimation =
-            DeathAnimation (Timer.start model.rTicks 60)
-
-        toDeathAnimationList : (a -> DeathAnimationKind) -> List a -> List DeathAnimation
-        toDeathAnimationList kind =
-            List.map (kind >> toDeathAnimation)
-
         newDeathAnimations =
-            toDeathAnimationList BulletDeathAnim deadBullets
-                ++ toDeathAnimationList TurretDeathAnim deadTurrets
-                ++ toDeathAnimationList BlastDeathAnim deadBlasts
+            toDeathAnimationList model BulletDeathAnim deadBullets
+                ++ toDeathAnimationList model TurretDeathAnim deadTurrets
+                ++ toDeathAnimationList model BlastDeathAnim deadBlasts
 
         ( newBlasts, deadBlasts ) =
             ( List.concatMap blastsFromBullet deadBullets, model.blasts )

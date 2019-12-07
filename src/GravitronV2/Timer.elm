@@ -1,4 +1,4 @@
-module GravitronV2.Timer exposing (Timer, delayedStart, isDone, restart, restartIfDone, start, value)
+module GravitronV2.Timer exposing (Timer, delayedStart, getStart, isDone, restart, restartIfDone, start, value)
 
 import PointFree exposing (when)
 
@@ -46,3 +46,8 @@ restart clock model =
 value : Float -> Timer -> Float
 value clock model =
     elapsed clock model / model.duration |> clamp 0 1
+
+
+getStart : Timer -> Float
+getStart =
+    .start

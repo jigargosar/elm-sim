@@ -210,11 +210,23 @@ stepTurret rTicks target turret =
     )
 
 
-renderTurret : Float -> Turret -> List G.Shape
+renderTurret : Float -> Turret -> G.Shape
 renderTurret rTicks turret =
     let
         ( x, y ) =
             V.toTuple turret.position
+    in
+    renderTurretHelp rTicks turret |> G.group |> G.move x y
+
+
+renderTurretHelp : Float -> Turret -> List Shape
+renderTurretHelp rTicks turret =
+    let
+        ( x, y ) =
+            ( 0, 0 )
+
+        position =
+            V.zero
 
         progressArcRadius =
             turret.radius + turret.radius / 4
@@ -255,7 +267,7 @@ renderTurret rTicks turret =
                     getNEqualAngles 5
                         |> List.map
                             (V.fromRTheta progressArcRadius
-                                >> V.add turret.position
+                                >> V.add position
                                 >> V.toTuple
                                 >> renderBulletPlaceholderAtOffset
                             )
@@ -439,57 +451,6 @@ renderBullet bullet =
 
 
 
--- TurretExplosion
-
-
-type alias TurretExplosion =
-    { turret : Turret
-    , maxTicks : Float
-    , elapsed : Float
-    }
-
-
-explosionFromTurret : Turret -> TurretExplosion
-explosionFromTurret turret =
-    { turret = turret
-    , maxTicks = 60
-    , elapsed = 0
-    }
-
-
-stepTurretExplosionAnimation : TurretExplosion -> TurretExplosion
-stepTurretExplosionAnimation model =
-    { model | elapsed = model.elapsed + 1 }
-
-
-isTurretExplosionAnimating : TurretExplosion -> Bool
-isTurretExplosionAnimating model =
-    model.elapsed < model.maxTicks
-
-
-renderTurretExplosions : TurretExplosion -> G.Shape
-renderTurretExplosions model =
-    let
-        ( x, y ) =
-            V.toTuple turret.position
-
-        turret =
-            model.turret
-
-        progress =
-            clamp 0 model.maxTicks model.elapsed
-                / model.maxTicks
-
-        radius =
-            turret.radius + (turret.radius * progress)
-
-        color =
-            G.withAlpha (1 - progress) turret.color
-    in
-    G.circleAt x y radius color
-
-
-
 -- BlastExplosion
 
 
@@ -550,23 +511,37 @@ type alias DeathAnimation =
     }
 
 
-renderDA : Float -> DeathAnimation -> G.Shape
-renderDA rTicks anim =
+renderDeathAnimation : Float -> DeathAnimation -> G.Shape
+renderDeathAnimation rTicks anim =
     let
         progress =
             Timer.value rTicks anim.timer
 
+        timeOfDeath =
+            Timer.getStart anim.timer
+
         maxOpacity =
             0.8
-    in
-    case anim.kind of
-        BulletDeathAnim bullet ->
-            renderBullet bullet
-                |> G.scale (1 + progress)
-                |> G.fade (maxOpacity - (progress * maxOpacity))
 
-        _ ->
-            G.noShape
+        shapeOfAnim =
+            case anim.kind of
+                BulletDeathAnim bullet ->
+                    renderBullet bullet
+
+                TurretDeathAnim turret ->
+                    renderTurret timeOfDeath turret
+
+                BlastDeathAnim blast ->
+                    let
+                        ( x, y ) =
+                            V.toTuple blast.position
+                    in
+                    G.circle blast.radius blast.color
+                        |> G.move x y
+    in
+    shapeOfAnim
+        |> G.scale (1 + progress)
+        |> G.fade (maxOpacity - (progress * maxOpacity))
 
 
 
@@ -602,7 +577,6 @@ type alias Memory =
     , turrets : Turrets
     , bullets : Bullets
     , blasts : Blasts
-    , turretsEA : List TurretExplosion
     , blastsEA : List BlastExplosion
     , deathAnimations : List DeathAnimation
     , state : GameState
@@ -700,7 +674,6 @@ initMemory =
     , turrets = initTurretsForStage stage rTicks
     , bullets = []
     , blasts = []
-    , turretsEA = []
     , blastsEA = []
     , deathAnimations = []
     , stage = stage
@@ -864,10 +837,7 @@ updateMemory computer model =
 stepAnimations : Memory -> Memory
 stepAnimations model =
     { model
-        | turretsEA =
-            List.map stepTurretExplosionAnimation model.turretsEA
-                |> List.filter isTurretExplosionAnimating
-        , blastsEA =
+        | blastsEA =
             List.map stepBlastExplosionAnimation model.blastsEA
                 |> List.filter isBlastExplosionAnimating
         , deathAnimations =
@@ -1096,22 +1066,27 @@ handleDeath model =
         ( newBullets, deadBullets ) =
             List.partition HasHealth.isAlive model.bullets
 
-        bulletDeathAnimations : List DeathAnimation
-        bulletDeathAnimations =
-            deadBullets |> List.map (BulletDeathAnim >> DeathAnimation (Timer.start model.rTicks 60))
+        toDeathAnimation : DeathAnimationKind -> DeathAnimation
+        toDeathAnimation =
+            DeathAnimation (Timer.start model.rTicks 60)
 
-        newBlasts : Blasts
-        newBlasts =
-            List.concatMap blastsFromBullet deadBullets
+        toDeathAnimationList : (a -> DeathAnimationKind) -> List a -> List DeathAnimation
+        toDeathAnimationList kind =
+            List.map (kind >> toDeathAnimation)
+
+        newDeathAnimations =
+            toDeathAnimationList BulletDeathAnim deadBullets
+                ++ toDeathAnimationList TurretDeathAnim deadTurrets
+                ++ toDeathAnimationList BlastDeathAnim deadBlasts
+
+        ( newBlasts, deadBlasts ) =
+            ( List.concatMap blastsFromBullet deadBullets, model.blasts )
 
         newBlastExplosions =
             List.map explosionFromBlast model.blasts
 
         ( newTurrets, deadTurrets ) =
             List.partition HasHealth.isAlive model.turrets
-
-        newTurretExplosions =
-            List.map explosionFromTurret deadTurrets
 
         generatedBullets : Bullets
         generatedBullets =
@@ -1134,9 +1109,8 @@ handleDeath model =
     { model
         | bullets = generatedBullets ++ newBullets
         , blasts = newBlasts
-        , turretsEA = newTurretExplosions ++ model.turretsEA
         , blastsEA = newBlastExplosions ++ model.blastsEA
-        , deathAnimations = bulletDeathAnimations ++ model.deathAnimations
+        , deathAnimations = newDeathAnimations ++ model.deathAnimations
         , stage =
             if List.isEmpty newTurrets then
                 model.stage + 1
@@ -1223,10 +1197,9 @@ viewMemory computer model =
             model.rTicks
     in
     renderPlayer model.player
-        ++ List.map renderTurretExplosions model.turretsEA
         ++ List.map renderBlastExplosions model.blastsEA
-        ++ List.map (renderDA model.rTicks) model.deathAnimations
-        ++ List.concatMap (renderTurret rTicks) model.turrets
+        ++ List.map (renderDeathAnimation model.rTicks) model.deathAnimations
+        ++ List.map (renderTurret rTicks) model.turrets
         ++ List.map renderBullet model.bullets
         -- ++ List.map renderBulletExplosions model.bulletsEA
         ++ viewGameState computer.screen model.state

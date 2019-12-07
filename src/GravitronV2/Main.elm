@@ -605,9 +605,9 @@ type alias Memory =
     , turrets : Turrets
     , bullets : Bullets
     , blasts : Blasts
-    , bulletExplosions : List BulletExplosion
-    , turretExplosions : List TurretExplosion
-    , blastExplosions : List BlastExplosion
+    , bulletsEA : List BulletExplosion
+    , turretsEA : List TurretExplosion
+    , blastsEA : List BlastExplosion
     , state : GameState
     , stage : Int
     , rTicks : Float
@@ -703,9 +703,9 @@ initMemory =
     , turrets = initTurretsForStage stage rTicks
     , bullets = []
     , blasts = []
-    , bulletExplosions = []
-    , turretExplosions = []
-    , blastExplosions = []
+    , bulletsEA = []
+    , turretsEA = []
+    , blastsEA = []
     , stage = stage
     , state = Running
     , rTicks = rTicks
@@ -876,14 +876,14 @@ prependWhen pred t v =
 stepAnimations : Memory -> Memory
 stepAnimations model =
     { model
-        | bulletExplosions =
-            List.map stepBulletExplosionAnimation model.bulletExplosions
+        | bulletsEA =
+            List.map stepBulletExplosionAnimation model.bulletsEA
                 |> List.filter isBulletExplosionAnimating
-        , turretExplosions =
-            List.map stepTurretExplosionAnimation model.turretExplosions
+        , turretsEA =
+            List.map stepTurretExplosionAnimation model.turretsEA
                 |> List.filter isTurretExplosionAnimating
-        , blastExplosions =
-            List.map stepBlastExplosionAnimation model.blastExplosions
+        , blastsEA =
+            List.map stepBlastExplosionAnimation model.blastsEA
                 |> List.filter isBlastExplosionAnimating
     }
 
@@ -1144,9 +1144,9 @@ handleDeath model =
     { model
         | bullets = generatedBullets ++ newBullets
         , blasts = newBlasts
-        , bulletExplosions = newBulletExplosions ++ model.bulletExplosions
-        , turretExplosions = newTurretExplosions ++ model.turretExplosions
-        , blastExplosions = newBlastExplosions ++ model.blastExplosions
+        , bulletsEA = newBulletExplosions ++ model.bulletsEA
+        , turretsEA = newTurretExplosions ++ model.turretsEA
+        , blastsEA = newBlastExplosions ++ model.blastsEA
         , stage =
             if List.isEmpty newTurrets then
                 model.stage + 1
@@ -1233,11 +1233,11 @@ viewMemory computer model =
             model.rTicks
     in
     renderPlayer model.player
-        ++ List.map renderTurretExplosions model.turretExplosions
-        ++ List.map renderBlastExplosions model.blastExplosions
+        ++ List.map renderTurretExplosions model.turretsEA
+        ++ List.map renderBlastExplosions model.blastsEA
         ++ List.concatMap (renderTurret rTicks) model.turrets
         ++ List.concatMap renderBullet model.bullets
-        ++ List.map renderBulletExplosions model.bulletExplosions
+        ++ List.map renderBulletExplosions model.bulletsEA
         ++ viewGameState computer.screen model.state
         ++ viewLevel computer.screen model.stage
 

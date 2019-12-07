@@ -8,6 +8,7 @@ import GravitronV2.HasHealth as HasHealth
 import GravitronV2.Particle as Particle exposing (Particle)
 import GravitronV2.Timer as Timer exposing (Timer)
 import GravitronV2.Vec as V exposing (Vec, vec)
+import List.Extra
 import TypedSvg
 import TypedSvg.Attributes
 import TypedSvg.Attributes.InPx as InPx
@@ -198,9 +199,9 @@ initTurretWithConfig triggerTimer position config =
     }
 
 
-stepTurret : Float -> Turret -> Turret
+stepTurret : Float -> Turret -> ( Bullets, Turret )
 stepTurret rTicks turret =
-    { turret | triggerTimer = Timer.restartIfDone rTicks turret.triggerTimer }
+    ( [], { turret | triggerTimer = Timer.restartIfDone rTicks turret.triggerTimer } )
 
 
 renderTurret : Float -> Turret -> List G.Shape
@@ -853,11 +854,19 @@ updateEntities computer model =
 
         { player, rTicks, turrets, bullets } =
             model
+
+        ( generatedBullets, updatedTurrets ) =
+            List.map (stepTurret rTicks) turrets
+                |> List.unzip
+                |> Tuple.mapFirst List.concat
     in
     { model
         | player = stepPlayer mouse player
-        , turrets = List.map (stepTurret rTicks) turrets
-        , bullets = updateBullets screen rTicks player turrets bullets
+        , turrets = updatedTurrets
+        , bullets =
+            generatedBullets
+                ++ bullets
+                |> updateBullets screen rTicks player turrets
     }
         |> stepAnimations
 

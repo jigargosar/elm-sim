@@ -5,7 +5,7 @@ import Basics.Extra exposing (swap)
 import Color
 import GravitronV2.Game as G exposing (Color, Screen, Shape)
 import GravitronV2.HasHealth as HasHealth
-import GravitronV2.Particle as Particle
+import GravitronV2.Particle as Particle exposing (Particle)
 import GravitronV2.Timer as Timer exposing (Timer)
 import GravitronV2.Vec as V exposing (Vec, vec)
 import TypedSvg
@@ -94,14 +94,13 @@ renderPlayer player =
 
 
 type alias Turret =
-    { position : Vec
-    , radius : Float
-    , color : G.Color
-    , health : HasHealth.Health
-    , triggerTimer : Timer
-    , weapon : TurretWeapon
-    , deathType : TurretDeathAction
-    }
+    Particle
+        { color : G.Color
+        , health : HasHealth.Health
+        , triggerTimer : Timer
+        , weapon : TurretWeapon
+        , deathType : TurretDeathAction
+        }
 
 
 type TurretWeapon
@@ -189,6 +188,7 @@ stageNumFromLevel ( majorLevel, minorLevel ) =
 initTurretWithConfig : Timer -> Vec -> TurretConfig -> Turret
 initTurretWithConfig triggerTimer position config =
     { position = position
+    , velocity = V.zero
     , radius = playerRadius * 1.2
     , color = config.color
     , health = HasHealth.init config.hp

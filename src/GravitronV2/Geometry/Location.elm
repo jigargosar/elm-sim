@@ -1,4 +1,4 @@
-module GravitronV2.Location exposing (Location, xy, zero)
+module GravitronV2.Geometry.Location exposing (Location, xy, zero)
 
 import GravitronV2.Geometry.Internal as Internal
 import GravitronV2.Vec as Vec exposing (Vec, vec)

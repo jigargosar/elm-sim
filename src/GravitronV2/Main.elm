@@ -1173,9 +1173,16 @@ viewMemory computer model =
 
         screen =
             computer.screen
+
+        alivePlayers =
+            if model.player |> HasHealth.isAlive then
+                [ model.player ]
+
+            else
+                []
     in
-    renderPlayer model.player
-        :: List.map (renderDeathAnimation model) model.deathAnimations
+    List.map renderPlayer alivePlayers
+        ++ List.map (renderDeathAnimation model) model.deathAnimations
         ++ List.map (renderTurret rTicks) model.turrets
         ++ List.map renderBullet model.bullets
         ++ viewGameState screen model.state

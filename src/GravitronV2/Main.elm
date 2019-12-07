@@ -460,11 +460,11 @@ type alias DeathAnimation =
     }
 
 
-renderDeathAnimation : Float -> DeathAnimation -> G.Shape
-renderDeathAnimation rTicks anim =
+renderDeathAnimation : { a | daClock : Float } -> DeathAnimation -> G.Shape
+renderDeathAnimation { daClock } anim =
     let
         progress =
-            Timer.value rTicks anim.timer
+            Timer.value daClock anim.timer
 
         timeOfDeath =
             Timer.getStart anim.timer
@@ -1151,7 +1151,7 @@ viewMemory computer model =
             computer.screen
     in
     renderPlayer model.player
-        ++ List.map (renderDeathAnimation rTicks) model.deathAnimations
+        ++ List.map (renderDeathAnimation model) model.deathAnimations
         ++ List.map (renderTurret rTicks) model.turrets
         ++ List.map renderBullet model.bullets
         ++ viewGameState screen model.state

@@ -5,10 +5,8 @@ import Basics.Extra exposing (swap)
 import Color
 import GravitronV2.Game as G exposing (Color, Screen, Shape)
 import GravitronV2.HasHealth as HasHealth
-import GravitronV2.Location as Location exposing (Location)
 import GravitronV2.Timer as Timer exposing (Timer)
 import GravitronV2.Vector2 as V exposing (Vec, vec)
-import GravitronV2.Velocity as Velocity exposing (Velocity)
 import TypedSvg
 import TypedSvg.Attributes
 import TypedSvg.Attributes.InPx as InPx
@@ -44,8 +42,8 @@ circleCircleCollision c1 c2 =
 
 
 type alias Player =
-    { position : Location
-    , velocity : Velocity
+    { position : Vec
+    , velocity : Vec
     , radius : Float
     , color : G.Color
     , health : HasHealth.Health
@@ -58,8 +56,8 @@ playerRadius =
 
 initPlayer : Player
 initPlayer =
-    { position = Location.zero
-    , velocity = Velocity.zero
+    { position = V.zero
+    , velocity = vec 0 -10
     , radius = playerRadius
     , color = G.green
     , health = HasHealth.init 100

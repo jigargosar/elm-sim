@@ -2,8 +2,11 @@ module GravitronV2.Physics exposing
     ( Location
     , Velocity
     , locationFromXY
+    , locationFromXYRec
     , locationZero
+    , velocityAdd
     , velocityFromToLocationScaled
+    , velocityScale
     , velocityZero
     )
 
@@ -27,6 +30,11 @@ type Magnitude
 locationFromXY : Float -> Float -> Location
 locationFromXY =
     Location
+
+
+locationFromXYRec : { a | x : Float, y : Float } -> Location
+locationFromXYRec { x, y } =
+    Location x y
 
 
 locationZero : Location
@@ -65,3 +73,13 @@ velocityFromToLocationScaled (Location x1 y1) (Location x2 y2) scale =
             atan2 dy dx |> Angle
     in
     Velocity magnitude angle
+
+
+velocityAdd : Velocity -> Velocity -> Velocity
+velocityAdd (Velocity (Magnitude m1) (Angle a1)) (Velocity (Magnitude m2) (Angle a2)) =
+    velocityZero
+
+
+velocityScale : Float -> Velocity -> Velocity
+velocityScale scale (Velocity (Magnitude m1) (Angle a1)) =
+    velocityZero

@@ -1,4 +1,4 @@
-module GravitronV2.Location exposing (Location)
+module GravitronV2.Location exposing (Location, xy, zero)
 
 
 type Location

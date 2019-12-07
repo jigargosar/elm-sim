@@ -978,7 +978,7 @@ onEntityEntityCollision e1 e2 =
             onCircularCollisionMapBoth HasHealth.dec identity p bl
                 |> Tuple.mapBoth PlayerE BlastE
 
-        ( BlastE _, PlayerE p ) ->
+        ( BlastE _, PlayerE _ ) ->
             flipCallSwap ()
 
         ( PlayerE _, PlayerE _ ) ->
@@ -1000,7 +1000,7 @@ onEntityEntityCollision e1 e2 =
             onCircularCollisionMapBoth HasHealth.dec identity t bl
                 |> Tuple.mapBoth TurretE BlastE
 
-        ( BlastE bl, TurretE t ) ->
+        ( BlastE _, TurretE _ ) ->
             flipCallSwap ()
 
         ( TurretE _, TurretE _ ) ->

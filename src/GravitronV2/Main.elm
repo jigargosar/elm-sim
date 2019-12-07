@@ -6,7 +6,7 @@ import Color
 import GravitronV2.Game as G exposing (Color, Screen, Shape)
 import GravitronV2.HasHealth as HasHealth
 import GravitronV2.Timer as Timer exposing (Timer)
-import GravitronV2.Vector2 as V exposing (Vec, vec)
+import GravitronV2.Vec as V exposing (Vec, vec)
 import TypedSvg
 import TypedSvg.Attributes
 import TypedSvg.Attributes.InPx as InPx

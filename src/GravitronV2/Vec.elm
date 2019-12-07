@@ -1,4 +1,4 @@
-module GravitronV2.Vector2 exposing
+module GravitronV2.Vec exposing
     ( RecXY
     , Vec
     , add

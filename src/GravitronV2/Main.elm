@@ -1135,14 +1135,16 @@ viewMemory computer model =
     let
         rTicks =
             model.rTicks
+
+        screen =
+            computer.screen
     in
     renderPlayer model.player
-        ++ List.map (renderDeathAnimation model.rTicks) model.deathAnimations
+        ++ List.map (renderDeathAnimation rTicks) model.deathAnimations
         ++ List.map (renderTurret rTicks) model.turrets
         ++ List.map renderBullet model.bullets
-        -- ++ List.map renderBulletExplosions model.bulletsEA
-        ++ viewGameState computer.screen model.state
-        ++ viewLevel computer.screen model.stage
+        ++ viewGameState screen model.state
+        ++ viewLevel screen model.stage
 
 
 viewLevel screen stageNum =

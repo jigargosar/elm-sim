@@ -331,8 +331,8 @@ bounceWithinScreen screen position bounceFactor velocity =
         newBouncedVelocity
 
 
-stepBullet : G.Screen -> Player -> Bullet -> Bullet
-stepBullet screen player bullet =
+stepBullet : G.Screen -> HasPosition a -> Bullet -> Bullet
+stepBullet screen target bullet =
     let
         newVelocity =
             [ bounceWithinScreen screen bullet.position 0.5
@@ -340,7 +340,7 @@ stepBullet screen player bullet =
                 GravityBullet ->
                     let
                         gravityVec =
-                            V.fromPt bullet.position player.position
+                            V.fromPt bullet.position target.position
                                 |> V.mapMagnitude (\m -> 20 / m)
                     in
                     V.add gravityVec
@@ -348,7 +348,7 @@ stepBullet screen player bullet =
                 HomingBullet ->
                     let
                         homingVec =
-                            V.fromPt bullet.position player.position
+                            V.fromPt bullet.position target.position
                                 |> V.mapMagnitude (always 0.3)
                     in
                     V.add homingVec
@@ -357,7 +357,7 @@ stepBullet screen player bullet =
                 TimeBombBullet ->
                     let
                         gravityVec =
-                            V.fromPt bullet.position player.position
+                            V.fromPt bullet.position target.position
                                 |> V.mapMagnitude (\m -> 20 / m)
                     in
                     V.add gravityVec

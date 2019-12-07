@@ -377,11 +377,14 @@ stepBullet screen target bullet =
         |> Particle.step
 
 
-renderBullet : Bullet -> List Shape
-renderBullet bullet =
+renderBulletHelp : Bullet -> List Shape
+renderBulletHelp bullet =
     let
         ( x, y ) =
-            V.toTuple bullet.position
+            ( 0, 0 )
+
+        position =
+            V.zero
 
         simpleBulletCircle =
             G.circleAt x y bullet.radius bullet.color
@@ -402,12 +405,10 @@ renderBullet bullet =
                     V.fromRTheta extRadius angle
 
                 ( x1, y1 ) =
-                    V.add bullet.position extVec
-                        |> V.toTuple
+                    V.add position extVec |> V.toTuple
 
                 ( x2, y2 ) =
-                    V.add bullet.position (V.scaleBy -1 extVec)
-                        |> V.toTuple
+                    V.add position (V.scaleBy -1 extVec) |> V.toTuple
             in
             [ simpleBulletCircle
             , G.customShape
@@ -424,6 +425,17 @@ renderBullet bullet =
 
         TimeBombBullet ->
             [ simpleBulletCircle ]
+
+
+renderBullet : Bullet -> Shape
+renderBullet bullet =
+    let
+        ( x, y ) =
+            V.toTuple bullet.position
+    in
+    renderBulletHelp bullet
+        |> G.group
+        |> G.move x y
 
 
 

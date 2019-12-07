@@ -12,6 +12,7 @@ module GravitronV2.Game exposing
     , freshKeyDown
     , game
     , green
+    , group
     , hsl
     , lightRed
     , move
@@ -202,6 +203,11 @@ type Shape
     | StrokeArc ( Float, Float ) Float ( Float, Float ) Color
     | Custom (Svg Never)
     | NoShape
+
+
+group : List Shape -> Shape
+group l =
+    Group l |> toShape
 
 
 circleAt : Float -> Float -> Float -> Color -> Shape

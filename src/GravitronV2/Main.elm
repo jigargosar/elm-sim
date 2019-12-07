@@ -8,7 +8,6 @@ import GravitronV2.HasHealth as HasHealth
 import GravitronV2.Particle as Particle exposing (Particle)
 import GravitronV2.Timer as Timer exposing (Timer)
 import GravitronV2.Vec as V exposing (Vec, vec)
-import List.Extra
 import TypedSvg
 import TypedSvg.Attributes
 import TypedSvg.Attributes.InPx as InPx
@@ -199,9 +198,15 @@ initTurretWithConfig triggerTimer position config =
     }
 
 
-stepTurret : Float -> Turret -> ( Bullets, Turret )
-stepTurret rTicks turret =
-    ( [], { turret | triggerTimer = Timer.restartIfDone rTicks turret.triggerTimer } )
+stepTurret : Float -> HasPosition a -> Turret -> ( Bullets, Turret )
+stepTurret rTicks target turret =
+    ( if Timer.isDone rTicks turret.triggerTimer then
+        turretStepWeapon target turret
+
+      else
+        []
+    , { turret | triggerTimer = Timer.restartIfDone rTicks turret.triggerTimer }
+    )
 
 
 renderTurret : Float -> Turret -> List G.Shape
@@ -368,33 +373,6 @@ stepBullet screen target bullet =
                 >> bounceWithinScreen screen bullet.position 0.5
             )
         |> Particle.step
-
-
-updateBullets : Screen -> Float -> Player -> Turrets -> Bullets -> Bullets
-updateBullets screen rTicks player turrets bullets =
-    let
-        isTurretTriggerTimerDone turret =
-            Timer.isDone rTicks turret.triggerTimer
-
-        firedBullets =
-            List.foldl
-                (prependWhen isTurretTriggerTimerDone
-                    (\t ->
-                        fireNewBullets
-                            { from = t.position
-                            , to = player.position
-                            , offset = t.radius
-                            , weapon = t.weapon
-                            }
-                    )
-                )
-                []
-                turrets
-                |> List.concat
-    in
-    firedBullets
-        ++ bullets
-        |> List.map (stepBullet screen player)
 
 
 renderBullet : Bullet -> List Shape
@@ -919,7 +897,7 @@ updateEntities computer model =
             model
 
         ( generatedBullets, updatedTurrets ) =
-            List.map (stepTurret rTicks) turrets
+            List.map (stepTurret rTicks player) turrets
                 |> List.unzip
                 |> Tuple.mapFirst List.concat
     in
@@ -927,9 +905,8 @@ updateEntities computer model =
         | player = stepPlayer mouse player
         , turrets = updatedTurrets
         , bullets =
-            generatedBullets
-                ++ bullets
-                |> updateBullets screen rTicks player turrets
+            List.map (stepBullet screen player) bullets
+                |> (++) generatedBullets
     }
         |> stepAnimations
 

@@ -305,17 +305,27 @@ renderTransform x y a s =
         "translate(" ++ String.fromFloat x ++ "," ++ String.fromFloat -y ++ ") rotate(" ++ String.fromFloat -a ++ ") scale(" ++ String.fromFloat s ++ ")"
 
 
+renderAlpha : Number -> List (Svg.Attribute msg)
+renderAlpha alpha =
+    if alpha == 1 then
+        []
+
+    else
+        [ SA.opacity (String.fromFloat (clamp 0 1 alpha)) ]
+
+
 renderShape : Shape -> Svg msg
 renderShape shape =
     case shape of
-        Shape x y a s o form ->
+        Shape x y angle s alpha form ->
             case form of
                 Circle r c ->
                     Svg.circle
-                        [ renderTransform x y a s |> SA.transform
-                        , InPx.r r
-                        , fillColor c
-                        ]
+                        (InPx.r r
+                            :: fillColor c
+                            :: SA.transform (renderTransform x y angle s)
+                            :: renderAlpha alpha
+                        )
                         []
 
         Text x y str ->

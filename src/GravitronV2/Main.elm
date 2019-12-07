@@ -1,10 +1,11 @@
 module GravitronV2.Main exposing (main)
 
 import Array exposing (Array)
-import Basics.Extra exposing (swap, uncurry)
+import Basics.Extra exposing (swap)
 import Color
 import GravitronV2.Game as G exposing (Color, Screen, Shape)
-import GravitronV2.Geometry.Location as Location exposing (Location)
+import GravitronV2.Geometry.Point as Point exposing (Point)
+import GravitronV2.Geometry.Velocity as Velocity
 import GravitronV2.HasHealth as HasHealth
 import GravitronV2.Timer as Timer exposing (Timer)
 import GravitronV2.Vec as V exposing (Vec, vec)
@@ -65,24 +66,18 @@ initPlayer =
     }
 
 
-vecToPosition : Vec -> Location
-vecToPosition =
-    V.toTuple >> uncurry Location.xy
-
-
 updatePlayer : G.Mouse -> Player -> Player
 updatePlayer mouse player =
     let
         springToMouseForce =
-            V.fromPt player.position (V.fromRec mouse)
-                -- springConstant
-                |> V.multiply 0.2
+            Velocity.fromToScaled (Point.fromVec__ player.position) mouse.position 0.2
 
         newVelocity =
-            [ V.add springToMouseForce
-            , V.multiply 0.5 -- friction
+            [ Velocity.add springToMouseForce
+            , Velocity.scale 0.5
             ]
-                |> List.foldl (<|) player.velocity
+                |> List.foldl (<|) (Velocity.fromVec__ player.velocity)
+                |> Velocity.toVec__
     in
     { player
         | velocity = newVelocity

@@ -30,7 +30,7 @@ import Browser.Dom
 import Browser.Events
 import Color
 import Geometry.Svg
-import GravitronV2.Geometry.Location as Location exposing (Location)
+import GravitronV2.Geometry.Point as Location exposing (Point)
 import Html exposing (Html)
 import Html.Attributes
 import Json.Decode as JD
@@ -70,7 +70,7 @@ type Game memory
 type alias Mouse =
     { x : Float
     , y : Float
-    , position : Location
+    , position : Point
     }
 
 

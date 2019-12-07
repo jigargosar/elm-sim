@@ -489,16 +489,16 @@ renderBulletExplosions model =
     G.circleAt x y radius color
 
 
-renderDA : Memory -> DeathAnimation -> G.Shape
-renderDA mem model =
+renderDA : Float -> DeathAnimation -> G.Shape
+renderDA rTicks anim =
     let
         progress =
-            Timer.value mem.rTicks model.timer
+            Timer.value rTicks anim.timer
 
         maxOpacity =
             0.8
     in
-    case model.kind of
+    case anim.kind of
         BulletDeathAnim bullet ->
             renderBullet bullet
                 |> G.scale (1 + progress)
@@ -506,11 +506,6 @@ renderDA mem model =
 
         _ ->
             G.noShape
-
-
-renderDeathAnimations : Memory -> List DeathAnimation -> List Shape
-renderDeathAnimations mem =
-    List.map (renderDA mem)
 
 
 
@@ -1286,7 +1281,7 @@ viewMemory computer model =
     renderPlayer model.player
         ++ List.map renderTurretExplosions model.turretsEA
         ++ List.map renderBlastExplosions model.blastsEA
-        ++ renderDeathAnimations model model.deathAnimations
+        ++ List.map (renderDA model.rTicks) model.deathAnimations
         ++ List.concatMap (renderTurret rTicks) model.turrets
         ++ List.map renderBullet model.bullets
         -- ++ List.map renderBulletExplosions model.bulletsEA

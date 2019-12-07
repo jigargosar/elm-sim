@@ -8,6 +8,7 @@ module GravitronV2.Vec exposing
     , fromPt
     , fromRTheta
     , fromRec
+    , fromToScaled
     , gravityFrom
     , len
     , len2
@@ -15,7 +16,7 @@ module GravitronV2.Vec exposing
     , map2
     , mapEach
     , mapMagnitude
-    , multiply
+    , scaleBy
     , springForceFrom
     , subtract
     , toTuple
@@ -66,8 +67,8 @@ vec1 =
     vec 1 1
 
 
-multiply : Float -> Vec -> Vec
-multiply s =
+scaleBy : Float -> Vec -> Vec
+scaleBy s =
     mapEach (\n -> n * s)
 
 
@@ -97,7 +98,7 @@ fromPt =
 
 springForceFrom : Vec -> Vec -> Float -> Vec
 springForceFrom a b k =
-    fromPt a b |> multiply k
+    fromPt a b |> scaleBy k
 
 
 apply : (Float -> Float -> a) -> Vec -> a
@@ -156,3 +157,8 @@ clampMagnitude hi =
 mapMagnitude : (Float -> Float) -> Vec -> Vec
 mapMagnitude func =
     toTuple >> toPolar >> Tuple.mapFirst func >> fromPolar >> uncurry vec
+
+
+fromToScaled : Vec -> Vec -> Float -> Vec
+fromToScaled from to factor =
+    fromPt from to |> scaleBy factor

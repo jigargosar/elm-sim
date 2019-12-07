@@ -67,16 +67,12 @@ initPlayer =
 
 updatePlayer : G.Mouse -> Player -> Player
 updatePlayer mouse player =
-    let
-        newVelocity =
-            player.velocity
-                |> V.add (Particle.fromToScaled player.position mouse.position 0.2)
-                |> Particle.scale 0.5
-    in
-    { player
-        | velocity = newVelocity
-        , position = V.add player.position newVelocity
-    }
+    player
+        |> Particle.mapVelocity
+            (V.add (V.fromToScaled player.position mouse.position 0.2)
+                >> V.scaleBy 0.5
+            )
+        |> Particle.step
 
 
 renderPlayer : Player -> List G.Shape
@@ -430,7 +426,7 @@ renderBullet bullet =
                         |> V.toTuple
 
                 ( x2, y2 ) =
-                    V.add bullet.position (V.multiply -1 extVec)
+                    V.add bullet.position (V.scaleBy -1 extVec)
                         |> V.toTuple
             in
             [ simpleBulletCircle
@@ -642,7 +638,7 @@ type alias Memory =
 allTurretsPositions : List Vec
 allTurretsPositions =
     [ vec -1 -1, vec 1 1, vec 1 -1, vec -1 1 ]
-        |> List.map (V.multiply 150)
+        |> List.map (V.scaleBy 150)
 
 
 maxStages =

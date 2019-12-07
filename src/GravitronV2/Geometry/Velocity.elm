@@ -34,7 +34,7 @@ zero =
 
 fromToScaled : Location -> Location -> Float -> Velocity
 fromToScaled (TPoint p1) (TPoint p2) scaleBy =
-    Vec.fromPt p1 p2 |> Vec.multiply scaleBy |> wrap
+    Vec.fromPt p1 p2 |> Vec.scaleBy scaleBy |> wrap
 
 
 add : Velocity -> Velocity -> Velocity
@@ -44,7 +44,7 @@ add v1 v2 =
 
 scale : Float -> Velocity -> Velocity
 scale by =
-    map <| Vec.multiply by
+    map <| Vec.scaleBy by
 
 
 fromVec__ : Vec -> Velocity

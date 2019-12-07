@@ -11,11 +11,11 @@ type alias Particle a =
     }
 
 
-fromToScaled : Vec -> Vec -> Float -> Vec
-fromToScaled from to factor =
-    Vec.fromPt from to |> Vec.multiply factor
+mapVelocity : (Vec -> Vec) -> Particle a -> Particle a
+mapVelocity func model =
+    { model | velocity = func model.velocity }
 
 
-scale : Float -> Vec -> Vec
-scale =
-    Vec.multiply
+step : Particle a -> Particle a
+step model =
+    { model | position = Vec.add model.position model.velocity }

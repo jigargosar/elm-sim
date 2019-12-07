@@ -439,76 +439,6 @@ renderBullet bullet =
 
 
 
--- BulletExplosion
-
-
-type alias BulletExplosion =
-    { bullet : Bullet
-    , maxTicks : Float
-    , elapsed : Float
-    }
-
-
-explosionFromBullet : Bullet -> BulletExplosion
-explosionFromBullet bullet =
-    { bullet = bullet
-    , maxTicks = 60
-    , elapsed = 0
-    }
-
-
-stepBulletExplosionAnimation : BulletExplosion -> BulletExplosion
-stepBulletExplosionAnimation model =
-    { model | elapsed = model.elapsed + 1 }
-
-
-isBulletExplosionAnimating : BulletExplosion -> Bool
-isBulletExplosionAnimating model =
-    model.elapsed < model.maxTicks
-
-
-renderBulletExplosions : BulletExplosion -> G.Shape
-renderBulletExplosions model =
-    let
-        ( x, y ) =
-            V.toTuple bullet.position
-
-        bullet =
-            model.bullet
-
-        progress =
-            clamp 0 model.maxTicks model.elapsed
-                / model.maxTicks
-
-        radius =
-            bullet.radius + (bullet.radius * progress)
-
-        color =
-            G.withAlpha (1 - progress) bullet.color
-    in
-    G.circleAt x y radius color
-
-
-renderDA : Float -> DeathAnimation -> G.Shape
-renderDA rTicks anim =
-    let
-        progress =
-            Timer.value rTicks anim.timer
-
-        maxOpacity =
-            0.8
-    in
-    case anim.kind of
-        BulletDeathAnim bullet ->
-            renderBullet bullet
-                |> G.scale (1 + progress)
-                |> G.fade (maxOpacity - (progress * maxOpacity))
-
-        _ ->
-            G.noShape
-
-
-
 -- TurretExplosion
 
 
@@ -611,6 +541,35 @@ renderBlastExplosions model =
 
 
 
+-- DA
+
+
+type alias DeathAnimation =
+    { timer : Timer
+    , kind : DeathAnimationKind
+    }
+
+
+renderDA : Float -> DeathAnimation -> G.Shape
+renderDA rTicks anim =
+    let
+        progress =
+            Timer.value rTicks anim.timer
+
+        maxOpacity =
+            0.8
+    in
+    case anim.kind of
+        BulletDeathAnim bullet ->
+            renderBullet bullet
+                |> G.scale (1 + progress)
+                |> G.fade (maxOpacity - (progress * maxOpacity))
+
+        _ ->
+            G.noShape
+
+
+
 -- GameState
 
 
@@ -638,18 +597,11 @@ type DeathAnimationKind
     | BlastDeathAnim Blast
 
 
-type alias DeathAnimation =
-    { timer : Timer
-    , kind : DeathAnimationKind
-    }
-
-
 type alias Memory =
     { player : Player
     , turrets : Turrets
     , bullets : Bullets
     , blasts : Blasts
-    , bulletsEA : List BulletExplosion
     , turretsEA : List TurretExplosion
     , blastsEA : List BlastExplosion
     , deathAnimations : List DeathAnimation
@@ -748,7 +700,6 @@ initMemory =
     , turrets = initTurretsForStage stage rTicks
     , bullets = []
     , blasts = []
-    , bulletsEA = []
     , turretsEA = []
     , blastsEA = []
     , deathAnimations = []
@@ -913,10 +864,7 @@ updateMemory computer model =
 stepAnimations : Memory -> Memory
 stepAnimations model =
     { model
-        | bulletsEA =
-            List.map stepBulletExplosionAnimation model.bulletsEA
-                |> List.filter isBulletExplosionAnimating
-        , turretsEA =
+        | turretsEA =
             List.map stepTurretExplosionAnimation model.turretsEA
                 |> List.filter isTurretExplosionAnimating
         , blastsEA =
@@ -1152,9 +1100,6 @@ handleDeath model =
         bulletDeathAnimations =
             deadBullets |> List.map (BulletDeathAnim >> DeathAnimation (Timer.start model.rTicks 60))
 
-        newBulletExplosions =
-            List.map explosionFromBullet deadBullets
-
         newBlasts : Blasts
         newBlasts =
             List.concatMap blastsFromBullet deadBullets
@@ -1189,7 +1134,6 @@ handleDeath model =
     { model
         | bullets = generatedBullets ++ newBullets
         , blasts = newBlasts
-        , bulletsEA = newBulletExplosions ++ model.bulletsEA
         , turretsEA = newTurretExplosions ++ model.turretsEA
         , blastsEA = newBlastExplosions ++ model.blastsEA
         , deathAnimations = bulletDeathAnimations ++ model.deathAnimations

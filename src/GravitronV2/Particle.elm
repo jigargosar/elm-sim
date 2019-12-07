@@ -1,4 +1,4 @@
-module GravitronV2.Movable exposing (..)
+module GravitronV2.Particle exposing (..)
 
 import GravitronV2.Vec exposing (Vec)
 

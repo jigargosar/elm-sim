@@ -1,28 +1,17 @@
-module GravitronV2.Velocity exposing (Velocity, zero)
+module GravitronV2.Velocity exposing (Velocity, betweenScaled, zero)
+
+import GravitronV2.Physics as Physics exposing (Location)
 
 
-type Velocity
-    = Velocity Magnitude Angle
-
-
-type Angle
-    = Angle Float
-
-
-type Magnitude
-    = Magnitude Float
-
-
-zeroAngle : Angle
-zeroAngle =
-    Angle 0
-
-
-zeroMagnitude : Magnitude
-zeroMagnitude =
-    Magnitude 0
+type alias Velocity =
+    Physics.Velocity
 
 
 zero : Velocity
 zero =
-    Velocity zeroMagnitude zeroAngle
+    Physics.velocityZero
+
+
+betweenScaled : Location -> Location -> Float -> Velocity
+betweenScaled =
+    Physics.velocityFromToLocationScaled

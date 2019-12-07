@@ -1,15 +1,17 @@
 module GravitronV2.Location exposing (Location, xy, zero)
 
+import GravitronV2.Physics as Physics
 
-type Location
-    = Location Float Float
+
+type alias Location =
+    Physics.Location
 
 
 xy : Float -> Float -> Location
 xy =
-    Location
+    Physics.locationFromXY
 
 
 zero : Location
 zero =
-    Location 0 0
+    Physics.locationZero

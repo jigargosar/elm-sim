@@ -600,6 +600,18 @@ type alias Bullets =
     List Bullet
 
 
+type DeathAnimationKind
+    = TurretDeathAnim Turret
+    | BulletDeathAnim Bullet
+    | BlastDeathAnim Blast
+
+
+type alias DeathAnimation =
+    { timer : Timer
+    , kind : DeathAnimationKind
+    }
+
+
 type alias Memory =
     { player : Player
     , turrets : Turrets

@@ -784,6 +784,69 @@ fireNewBullets { from, to, offset, weapon } =
             [ timeBombBullet angle ]
 
 
+turretStepWeapon : HasPosition a -> Turret -> Bullets
+turretStepWeapon target turret =
+    let
+        from =
+            turret.position
+
+        to =
+            target.position
+
+        offset =
+            turret.radius
+
+        weapon =
+            turret.weapon
+
+        bullet =
+            defaultBullet
+
+        bulletFromAnge angle =
+            { bullet
+                | position =
+                    V.fromRTheta (offset + bullet.radius + 1) angle
+                        |> V.add from
+                , velocity = V.fromRTheta (V.len bullet.velocity) angle
+            }
+
+        homingBullet angle =
+            bulletFromAnge angle
+                |> (\b -> { b | bulletType = HomingBullet })
+
+        timeBombBullet angle =
+            bulletFromAnge angle
+                |> (\b -> { b | bulletType = TimeBombBullet })
+    in
+    let
+        angle =
+            V.fromPt from to |> V.angle
+    in
+    case weapon of
+        GravitySingle ->
+            [ bulletFromAnge angle ]
+
+        GravityTriple ->
+            [ angle - degrees 30, angle, angle + degrees 30 ]
+                |> List.map bulletFromAnge
+
+        GravityFive ->
+            List.range 0 4
+                |> List.map
+                    (toFloat
+                        >> (*) (1 / 5)
+                        >> turns
+                        >> (+) angle
+                        >> bulletFromAnge
+                    )
+
+        HomingSingle ->
+            [ homingBullet angle ]
+
+        TimeBombSingle ->
+            [ timeBombBullet angle ]
+
+
 spacePressed =
     G.freshKeyDown " "
 

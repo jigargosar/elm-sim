@@ -489,7 +489,7 @@ renderBulletExplosions model =
     G.circleAt x y radius color
 
 
-renderDA : Memory -> DeathAnimation -> List G.Shape
+renderDA : Memory -> DeathAnimation -> G.Shape
 renderDA mem model =
     let
         progress =
@@ -497,25 +497,17 @@ renderDA mem model =
     in
     case model.kind of
         BulletDeathAnim bullet ->
-            let
-                ( x, y ) =
-                    V.toTuple bullet.position
-
-                radius =
-                    bullet.radius + (bullet.radius * progress)
-
-                color =
-                    G.withAlpha (1 - progress) bullet.color
-            in
-            [ G.circleAt x y radius color ]
+            renderBullet bullet
+                |> G.scale (1 + progress)
+                |> G.fade (1 - progress)
 
         _ ->
-            []
+            G.noShape
 
 
 renderDeathAnimations : Memory -> List DeathAnimation -> List Shape
 renderDeathAnimations mem =
-    List.concatMap (renderDA mem)
+    List.map (renderDA mem)
 
 
 

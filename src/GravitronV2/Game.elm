@@ -9,6 +9,7 @@ module GravitronV2.Game exposing
     , circle
     , circleAt
     , customShape
+    , fade
     , freshKeyDown
     , game
     , green
@@ -225,6 +226,16 @@ scale ns =
     mapScale ((*) ns)
 
 
+fade : Number -> Shape -> Shape
+fade o shape =
+    case shape of
+        Shape x y a s _ f ->
+            Shape x y a s o f
+
+        _ ->
+            shape
+
+
 mapXY : (Number -> Number) -> (Number -> Number) -> Shape -> Shape
 mapXY funcX funcY shape =
     case shape of
@@ -329,7 +340,14 @@ type alias Number =
 
 
 renderTransform : Number -> Number -> Number -> Number -> String
-renderTransform x y a s =
+renderTransform x y_ a_ s =
+    let
+        y =
+            -y_
+
+        a =
+            -a_
+    in
     if a == 0 then
         if s == 1 then
             "translate(" ++ String.fromFloat x ++ "," ++ String.fromFloat -y ++ ")"

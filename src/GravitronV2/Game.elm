@@ -192,6 +192,7 @@ setPrevKeys keyboard =
 
 type Form
     = Circle Float Color
+    | Group (List Shape)
 
 
 type Shape
@@ -343,6 +344,13 @@ renderShape shape =
                             :: renderAlpha alpha
                         )
                         []
+
+                Group list ->
+                    Svg.g
+                        (SA.transform (renderTransform x y angle s)
+                            :: renderAlpha alpha
+                        )
+                        (List.map renderShape list)
 
         Text x y str ->
             Svg.text_

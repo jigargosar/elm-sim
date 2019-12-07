@@ -5,6 +5,7 @@ import Basics.Extra exposing (swap)
 import Color
 import GravitronV2.Game as G exposing (Color, Screen, Shape)
 import GravitronV2.HasHealth as HasHealth
+import GravitronV2.Particle as Particle
 import GravitronV2.Timer as Timer exposing (Timer)
 import GravitronV2.Vec as V exposing (Vec, vec)
 import TypedSvg
@@ -67,15 +68,10 @@ initPlayer =
 updatePlayer : G.Mouse -> Player -> Player
 updatePlayer mouse player =
     let
-        springToMouseForce =
-            V.fromPt player.position mouse.position
-                |> V.multiply 0.2
-
         newVelocity =
-            [ V.add springToMouseForce
-            , V.multiply 0.5
-            ]
-                |> List.foldl (<|) player.velocity
+            player.velocity
+                |> V.add (Particle.fromToScaled player.position mouse.position 0.2)
+                |> Particle.scale 0.5
     in
     { player
         | velocity = newVelocity

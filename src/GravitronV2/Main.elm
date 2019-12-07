@@ -1035,10 +1035,19 @@ handleDeath model =
         ( newBullets, deadBullets ) =
             List.partition HasHealth.isAlive model.bullets
 
+        deadPlayers : List Player
+        deadPlayers =
+            if isPlayerDead then
+                [ model.player ]
+
+            else
+                []
+
         newDeathAnimations =
             toDeathAnimationList model BulletDeathAnim deadBullets
                 ++ toDeathAnimationList model TurretDeathAnim deadTurrets
                 ++ toDeathAnimationList model BlastDeathAnim deadBlasts
+                ++ toDeathAnimationList model PlayerDeathAnim deadPlayers
 
         ( newBlasts, deadBlasts ) =
             ( List.concatMap blastsFromBullet deadBullets, model.blasts )
@@ -1064,8 +1073,11 @@ handleDeath model =
                                     }
                     )
 
-        isGameOver =
+        isPlayerDead =
             model.player |> HasHealth.isDead
+
+        isGameOver =
+            isPlayerDead
 
         shouldSetupNextStage =
             not isGameOver && List.isEmpty newTurrets

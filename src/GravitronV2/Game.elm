@@ -319,10 +319,10 @@ renderShape shape =
     case shape of
         Shape x y angle s alpha form ->
             case form of
-                Circle r c ->
+                Circle radius color ->
                     Svg.circle
-                        (InPx.r r
-                            :: fillColor c
+                        (InPx.r radius
+                            :: fillColor color
                             :: SA.transform (renderTransform x y angle s)
                             :: renderAlpha alpha
                         )

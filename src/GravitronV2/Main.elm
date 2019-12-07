@@ -331,8 +331,8 @@ bounceWithinScreen screen position bounceFactor velocity =
         newBouncedVelocity
 
 
-updateBullet : G.Screen -> Player -> Bullet -> Bullet
-updateBullet screen player bullet =
+stepBullet : G.Screen -> Player -> Bullet -> Bullet
+stepBullet screen player bullet =
     let
         newVelocity =
             [ bounceWithinScreen screen bullet.position 0.5
@@ -394,7 +394,7 @@ updateBullets screen rTicks player turrets bullets =
     in
     firedBullets
         ++ bullets
-        |> List.map (updateBullet screen player)
+        |> List.map (stepBullet screen player)
 
 
 renderBullet : Bullet -> List Shape

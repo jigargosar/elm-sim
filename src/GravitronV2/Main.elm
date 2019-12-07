@@ -1019,7 +1019,11 @@ blastsFromBullet bullet =
         []
 
 
-toDeathAnimationList : { x | daClock : Float } -> (a -> DeathAnimationKind) -> List a -> List DeathAnimation
+toDeathAnimationList :
+    { x | daClock : Float }
+    -> (a -> DeathAnimationKind)
+    -> List a
+    -> List DeathAnimation
 toDeathAnimationList { daClock } kind =
     let
         toDeathAnimation : DeathAnimationKind -> DeathAnimation

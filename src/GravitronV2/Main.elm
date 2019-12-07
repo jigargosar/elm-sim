@@ -76,7 +76,7 @@ stepPlayer mouse player =
         |> Particle.step
 
 
-renderPlayer : Player -> List G.Shape
+renderPlayer : Player -> G.Shape
 renderPlayer player =
     let
         ( x, y ) =
@@ -85,9 +85,11 @@ renderPlayer player =
         remainingHealthRadius =
             player.radius * HasHealth.normalized player
     in
-    [ G.circleAt x y player.radius (G.withAlpha 0.5 player.color)
-    , G.circleAt x y remainingHealthRadius player.color
+    [ G.circle player.radius (G.withAlpha 0.5 player.color)
+    , G.circle remainingHealthRadius player.color
     ]
+        |> G.group
+        |> G.move x y
 
 
 
@@ -487,6 +489,9 @@ renderDeathAnimation { daClock } anim =
                     in
                     G.circle blast.radius blast.color
                         |> G.move x y
+
+                PlayerDeathAnim player ->
+                    renderPlayer player
     in
     shapeOfAnim
         |> G.scale (1 + progress)
@@ -519,6 +524,7 @@ type DeathAnimationKind
     = TurretDeathAnim Turret
     | BulletDeathAnim Bullet
     | BlastDeathAnim Blast
+    | PlayerDeathAnim Player
 
 
 type alias Memory =
@@ -1157,7 +1163,7 @@ viewMemory computer model =
             computer.screen
     in
     renderPlayer model.player
-        ++ List.map (renderDeathAnimation model) model.deathAnimations
+        :: List.map (renderDeathAnimation model) model.deathAnimations
         ++ List.map (renderTurret rTicks) model.turrets
         ++ List.map renderBullet model.bullets
         ++ viewGameState screen model.state

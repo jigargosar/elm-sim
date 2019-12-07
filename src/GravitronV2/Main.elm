@@ -198,8 +198,8 @@ initTurretWithConfig triggerTimer position config =
     }
 
 
-turretRestartTriggerTimerIfDone : Float -> Turret -> Turret
-turretRestartTriggerTimerIfDone rTicks turret =
+stepTurret : Float -> Turret -> Turret
+stepTurret rTicks turret =
     { turret | triggerTimer = Timer.restartIfDone rTicks turret.triggerTimer }
 
 
@@ -857,7 +857,7 @@ updateEntities computer model =
     in
     { model
         | player = stepPlayer mouse player
-        , turrets = List.map (turretRestartTriggerTimerIfDone rTicks) turrets
+        , turrets = List.map (stepTurret rTicks) turrets
         , bullets = updateBullets screen rTicks player turrets bullets
     }
         |> stepAnimations

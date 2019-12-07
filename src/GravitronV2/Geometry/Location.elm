@@ -18,6 +18,7 @@ xy =
     apply2Then vec wrap
 
 
+apply2Then : (c -> d -> a) -> (a -> b) -> c -> d -> b
 apply2Then func1 func2 a b =
     func1 a b |> func2
 

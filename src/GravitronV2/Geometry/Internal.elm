@@ -1,17 +1,17 @@
 module GravitronV2.Geometry.Internal exposing
-    ( Location(..)
-    , Velocity(..)
+    ( ILocation(..)
+    , IVelocity(..)
     )
 
 import GravitronV2.Vec exposing (Vec)
 
 
-type Location
-    = Location Vec
+type ILocation
+    = ILocation Vec
 
 
-type Velocity
-    = Velocity Vec
+type IVelocity
+    = IVelocity Vec
 
 
 

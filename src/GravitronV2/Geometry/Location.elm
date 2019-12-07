@@ -1,16 +1,16 @@
 module GravitronV2.Geometry.Location exposing (Location, xy, zero)
 
-import GravitronV2.Geometry.Internal as Internal
+import GravitronV2.Geometry.Internal exposing (ILocation)
 import GravitronV2.Vec as Vec exposing (Vec, vec)
 
 
 type alias Location =
-    Internal.Location
+    ILocation
 
 
 wrap : Vec -> Location
 wrap =
-    Internal.Location
+    ILocation
 
 
 xy : Float -> Float -> Location

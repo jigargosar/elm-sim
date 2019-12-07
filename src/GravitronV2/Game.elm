@@ -30,6 +30,7 @@ import Browser.Dom
 import Browser.Events
 import Color
 import Geometry.Svg
+import GravitronV2.Geometry.Location as Location exposing (Location)
 import Html exposing (Html)
 import Html.Attributes
 import Json.Decode as JD
@@ -56,7 +57,7 @@ type alias Computer =
 
 initialComputer : Computer
 initialComputer =
-    { mouse = Mouse 0 0
+    { mouse = Mouse 0 0 Location.zero
     , screen = toScreen 600 600
     , keyboard = initKeyboard
     }
@@ -69,6 +70,7 @@ type Game memory
 type alias Mouse =
     { x : Float
     , y : Float
+    , position : Location
     }
 
 
@@ -163,7 +165,7 @@ gameUpdate updateMemory message (Game memory computer) =
 
 mouseMove : Float -> Float -> Mouse -> Mouse
 mouseMove x y mouse =
-    { mouse | x = x, y = y }
+    { mouse | x = x, y = y, position = Location.xy x y }
 
 
 updateKeyboard : Bool -> String -> Keyboard -> Keyboard

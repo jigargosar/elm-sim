@@ -1,9 +1,10 @@
 module GravitronV2.Main exposing (main)
 
 import Array exposing (Array)
-import Basics.Extra exposing (swap)
+import Basics.Extra exposing (swap, uncurry)
 import Color
 import GravitronV2.Game as G exposing (Color, Screen, Shape)
+import GravitronV2.Geometry.Location as Location exposing (Location)
 import GravitronV2.HasHealth as HasHealth
 import GravitronV2.Timer as Timer exposing (Timer)
 import GravitronV2.Vec as V exposing (Vec, vec)
@@ -62,6 +63,11 @@ initPlayer =
     , color = G.green
     , health = HasHealth.init 100
     }
+
+
+vecToPosition : Vec -> Location
+vecToPosition =
+    V.toTuple >> uncurry Location.xy
 
 
 updatePlayer : G.Mouse -> Player -> Player

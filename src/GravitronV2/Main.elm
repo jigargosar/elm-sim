@@ -334,9 +334,8 @@ bounceWithinScreen screen position bounceFactor velocity =
 stepBullet : G.Screen -> HasPosition a -> Bullet -> Bullet
 stepBullet screen target bullet =
     let
-        newVelocity =
-            [ bounceWithinScreen screen bullet.position 0.5
-            , case bullet.bulletType of
+        applyAccForce =
+            case bullet.bulletType of
                 GravityBullet ->
                     let
                         gravityVec =
@@ -361,13 +360,13 @@ stepBullet screen target bullet =
                                 |> V.mapMagnitude (\m -> 20 / m)
                     in
                     V.add gravityVec
-            ]
-                |> List.foldl (<|) bullet.velocity
     in
-    { bullet
-        | velocity = newVelocity
-        , position = V.add bullet.position newVelocity
-    }
+    bullet
+        |> Particle.mapVelocity
+            (applyAccForce
+                >> bounceWithinScreen screen bullet.position 0.5
+            )
+        |> Particle.step
 
 
 updateBullets : Screen -> Float -> Player -> Turrets -> Bullets -> Bullets

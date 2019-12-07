@@ -451,57 +451,6 @@ renderBullet bullet =
 
 
 
--- BlastExplosion
-
-
-type alias BlastExplosion =
-    { blast : Blast
-    , maxTicks : Float
-    , elapsed : Float
-    }
-
-
-explosionFromBlast : Blast -> BlastExplosion
-explosionFromBlast blast =
-    { blast = blast
-    , maxTicks = 60
-    , elapsed = 0
-    }
-
-
-stepBlastExplosionAnimation : BlastExplosion -> BlastExplosion
-stepBlastExplosionAnimation model =
-    { model | elapsed = model.elapsed + 1 }
-
-
-isBlastExplosionAnimating : BlastExplosion -> Bool
-isBlastExplosionAnimating model =
-    model.elapsed < model.maxTicks
-
-
-renderBlastExplosions : BlastExplosion -> G.Shape
-renderBlastExplosions model =
-    let
-        ( x, y ) =
-            V.toTuple blast.position
-
-        blast =
-            model.blast
-
-        progress =
-            clamp 0 model.maxTicks model.elapsed
-                / model.maxTicks
-
-        radius =
-            blast.radius + (blast.radius * progress)
-
-        color =
-            G.withAlpha (1 - progress) blast.color
-    in
-    G.circleAt x y radius color
-
-
-
 -- DA
 
 
@@ -577,7 +526,6 @@ type alias Memory =
     , turrets : Turrets
     , bullets : Bullets
     , blasts : Blasts
-    , blastsEA : List BlastExplosion
     , deathAnimations : List DeathAnimation
     , state : GameState
     , stage : Int
@@ -674,7 +622,6 @@ initMemory =
     , turrets = initTurretsForStage stage rTicks
     , bullets = []
     , blasts = []
-    , blastsEA = []
     , deathAnimations = []
     , stage = stage
     , state = Running
@@ -837,10 +784,7 @@ updateMemory computer model =
 stepAnimations : Memory -> Memory
 stepAnimations model =
     { model
-        | blastsEA =
-            List.map stepBlastExplosionAnimation model.blastsEA
-                |> List.filter isBlastExplosionAnimating
-        , deathAnimations =
+        | deathAnimations =
             List.Extra.filterNot
                 (.timer >> Timer.isDone model.rTicks)
                 model.deathAnimations
@@ -1082,9 +1026,6 @@ handleDeath model =
         ( newBlasts, deadBlasts ) =
             ( List.concatMap blastsFromBullet deadBullets, model.blasts )
 
-        newBlastExplosions =
-            List.map explosionFromBlast model.blasts
-
         ( newTurrets, deadTurrets ) =
             List.partition HasHealth.isAlive model.turrets
 
@@ -1109,7 +1050,6 @@ handleDeath model =
     { model
         | bullets = generatedBullets ++ newBullets
         , blasts = newBlasts
-        , blastsEA = newBlastExplosions ++ model.blastsEA
         , deathAnimations = newDeathAnimations ++ model.deathAnimations
         , stage =
             if List.isEmpty newTurrets then
@@ -1197,7 +1137,6 @@ viewMemory computer model =
             model.rTicks
     in
     renderPlayer model.player
-        ++ List.map renderBlastExplosions model.blastsEA
         ++ List.map (renderDeathAnimation model.rTicks) model.deathAnimations
         ++ List.map (renderTurret rTicks) model.turrets
         ++ List.map renderBullet model.bullets

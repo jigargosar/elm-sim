@@ -18,6 +18,7 @@ module GravitronV2.Game exposing
     , noShape
     , purple
     , red
+    , scale
     , strokeArc
     , text
     , white
@@ -213,11 +214,26 @@ move dx dy =
     mapXY ((+) dx) ((+) dy)
 
 
+scale : Number -> Shape -> Shape
+scale ns =
+    mapScale ((*) ns)
+
+
 mapXY : (Number -> Number) -> (Number -> Number) -> Shape -> Shape
 mapXY funcX funcY shape =
     case shape of
         Shape x y a s o f ->
             Shape (funcX x) (funcY y) a s o f
+
+        _ ->
+            shape
+
+
+mapScale : (Number -> Number) -> Shape -> Shape
+mapScale func shape =
+    case shape of
+        Shape x y a s o f ->
+            Shape x y a (func s) o f
 
         _ ->
             shape

@@ -1293,7 +1293,7 @@ viewMemory computer model =
         ++ List.map renderBlastExplosions model.blastsEA
         ++ renderDeathAnimations model model.deathAnimations
         ++ List.concatMap (renderTurret rTicks) model.turrets
-        ++ List.concatMap renderBullet model.bullets
+        ++ List.map renderBullet model.bullets
         -- ++ List.map renderBulletExplosions model.bulletsEA
         ++ viewGameState computer.screen model.state
         ++ viewLevel computer.screen model.stage

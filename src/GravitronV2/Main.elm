@@ -9,6 +9,7 @@ import GravitronV2.Particle as Particle exposing (Particle)
 import GravitronV2.Timer as Timer exposing (Timer)
 import GravitronV2.Vec as V exposing (Vec, vec)
 import List.Extra
+import PointFree exposing (when)
 import TypedSvg
 import TypedSvg.Attributes
 import TypedSvg.Attributes.InPx as InPx
@@ -755,6 +756,11 @@ spacePressed =
     G.freshKeyDown " "
 
 
+gameOverDuration : number
+gameOverDuration =
+    60 * 3
+
+
 updateMemory : G.Computer -> Memory -> Memory
 updateMemory computer model =
     case model.state of
@@ -770,11 +776,7 @@ updateMemory computer model =
                     |> incRunningTicks
 
         GameOver elapsed ->
-            let
-                maxTicks =
-                    60 * 3
-            in
-            if elapsed > maxTicks then
+            if elapsed > gameOverDuration then
                 initMemory
 
             else
@@ -1033,6 +1035,19 @@ toDeathAnimationList { daClock } kind =
     List.map (kind >> toDeathAnimation)
 
 
+increaseDeathAnimationDurationIf : Bool -> List DeathAnimation -> List DeathAnimation
+increaseDeathAnimationDurationIf bool =
+    let
+        inc da =
+            { da | timer = Timer.setDuration gameOverDuration da.timer }
+    in
+    if bool then
+        List.map inc
+
+    else
+        identity
+
+
 handleDeath : Memory -> Memory
 handleDeath model =
     let
@@ -1089,7 +1104,10 @@ handleDeath model =
     { model
         | bullets = generatedBullets ++ newBullets
         , blasts = newBlasts
-        , deathAnimations = newDeathAnimations ++ model.deathAnimations
+        , deathAnimations =
+            newDeathAnimations
+                ++ model.deathAnimations
+                |> increaseDeathAnimationDurationIf isPlayerDead
         , stage =
             if shouldSetupNextStage then
                 model.stage + 1

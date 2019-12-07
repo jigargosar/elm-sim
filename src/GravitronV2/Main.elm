@@ -9,7 +9,6 @@ import GravitronV2.Particle as Particle exposing (Particle)
 import GravitronV2.Timer as Timer exposing (Timer)
 import GravitronV2.Vec as V exposing (Vec, vec)
 import List.Extra
-import PointFree exposing (when)
 import TypedSvg
 import TypedSvg.Attributes
 import TypedSvg.Attributes.InPx as InPx
@@ -1021,20 +1020,6 @@ blastsFromBullet bullet =
         []
 
 
-toDeathAnimationList :
-    { x | daClock : Float }
-    -> (a -> DeathAnimationKind)
-    -> List a
-    -> List DeathAnimation
-toDeathAnimationList { daClock } kind =
-    let
-        toDeathAnimation : DeathAnimationKind -> DeathAnimation
-        toDeathAnimation =
-            DeathAnimation (Timer.start daClock 60)
-    in
-    List.map (kind >> toDeathAnimation)
-
-
 increaseDeathAnimationDurationIf : Bool -> List DeathAnimation -> List DeathAnimation
 increaseDeathAnimationDurationIf bool =
     let
@@ -1070,10 +1055,11 @@ handleDeath model =
 
         newDeathAnimations : List DeathAnimation
         newDeathAnimations =
-            toDeathAnimationList model BulletDeathAnim deadBullets
-                ++ toDeathAnimationList model TurretDeathAnim deadTurrets
-                ++ toDeathAnimationList model BlastDeathAnim deadBlasts
-                ++ toDeathAnimationList model PlayerDeathAnim deadPlayers
+            List.map BulletDeathAnim deadBullets
+                ++ List.map TurretDeathAnim deadTurrets
+                ++ List.map BlastDeathAnim deadBlasts
+                ++ List.map PlayerDeathAnim deadPlayers
+                |> List.map (DeathAnimation (Timer.start model.daClock 60))
 
         generatedBullets : Bullets
         generatedBullets =

@@ -1057,25 +1057,31 @@ handleDeath model =
                                     , weapon = GravityFive
                                     }
                     )
+
+        isGameOver =
+            model.player |> HasHealth.isDead
+
+        shouldSetupNextStage =
+            not isGameOver && List.isEmpty newTurrets
     in
     { model
         | bullets = generatedBullets ++ newBullets
         , blasts = newBlasts
         , deathAnimations = newDeathAnimations ++ model.deathAnimations
         , stage =
-            if List.isEmpty newTurrets then
+            if shouldSetupNextStage then
                 model.stage + 1
 
             else
                 model.stage
         , turrets =
-            if List.isEmpty newTurrets then
+            if shouldSetupNextStage then
                 initTurretsForStage (model.stage + 1) model.rTicks
 
             else
                 newTurrets
         , state =
-            if model.player |> HasHealth.isDead then
+            if isGameOver then
                 GameOver 0
 
             else

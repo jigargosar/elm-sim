@@ -14,6 +14,7 @@ module GravitronV2.Game exposing
     , green
     , hsl
     , lightRed
+    , move
     , noShape
     , purple
     , red
@@ -203,7 +204,22 @@ type Shape
 
 circleAt : Float -> Float -> Float -> Color -> Shape
 circleAt x y r c =
-    Shape x y 0 1 1 (Circle r c)
+    circle r c |> move x y
+
+
+move : Number -> Number -> Shape -> Shape
+move dx dy =
+    mapXY ((+) dx) ((+) dy)
+
+
+mapXY : (Number -> Number) -> (Number -> Number) -> Shape -> Shape
+mapXY funcX funcY shape =
+    case shape of
+        Shape x y a s o f ->
+            Shape (funcX x) (funcY y) a s o f
+
+        _ ->
+            shape
 
 
 circle : Float -> Color -> Shape

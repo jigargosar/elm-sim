@@ -70,14 +70,14 @@ updatePlayer : G.Mouse -> Player -> Player
 updatePlayer mouse player =
     let
         springToMouseForce =
-            Velocity.fromToScaled (Point.fromVec__ player.position) mouse.position 0.2
+            V.fromPt player.position mouse.position
+                |> V.multiply 0.2
 
         newVelocity =
-            [ Velocity.add springToMouseForce
-            , Velocity.scale 0.5
+            [ V.add springToMouseForce
+            , V.multiply 0.5
             ]
-                |> List.foldl (<|) (Velocity.fromVec__ player.velocity)
-                |> Velocity.toVec__
+                |> List.foldl (<|) player.velocity
     in
     { player
         | velocity = newVelocity

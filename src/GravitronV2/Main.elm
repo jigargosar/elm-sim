@@ -908,7 +908,7 @@ onEntityEntityCollision e1 e2 =
     in
     case ( e1, e2 ) of
         ( PlayerE p, TurretE t ) ->
-            onCircularCollisionMapBoth HasHealth.kill identity p t
+            onCircularCollisionMapBoth HasHealth.kill HasHealth.kill p t
                 |> Tuple.mapBoth PlayerE TurretE
 
         ( TurretE _, PlayerE _ ) ->

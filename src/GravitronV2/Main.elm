@@ -779,7 +779,7 @@ updateMemory computer model =
                     |> stepAnimations
                     |> stepGameObjects model.rTicks computer
                     |> handleCollision
-                    |> handleDeath
+                    |> handleDeathAndGameOver
                     |> incRunningTicks
 
         GameOver counter ->
@@ -1053,8 +1053,8 @@ increaseDeathAnimationDurationIf bool =
         identity
 
 
-handleDeath : Memory -> Memory
-handleDeath model =
+handleDeathAndGameOver : Memory -> Memory
+handleDeathAndGameOver model =
     let
         ( newBullets, deadBullets ) =
             List.partition HasHealth.isAlive model.bullets

@@ -776,8 +776,8 @@ updateMemory computer model =
 
             else
                 model
-                    |> stepGameObjects model.rTicks computer
                     |> stepAnimations
+                    |> stepGameObjects model.rTicks computer
                     |> handleCollision
                     |> handleDeath
                     |> incRunningTicks
@@ -1000,7 +1000,7 @@ onEntityEntityCollision e1 e2 =
             noOp
 
 
-handleCollision : Memory -> Memory
+handleCollision : HasGameObjects a -> HasGameObjects a
 handleCollision model =
     let
         { player, turrets, bullets, blasts } =

@@ -780,7 +780,7 @@ updateMemory computer model =
                 ( isComplete, newCounter ) =
                     Counter.step counter
             in
-            if isComplete then
+            if isComplete || spacePressed computer then
                 initMemory
 
             else

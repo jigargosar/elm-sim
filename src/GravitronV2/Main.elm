@@ -776,10 +776,10 @@ updateMemory computer model =
 
             else
                 model
-                    |> stepAnimations
+                    |> stepDeathAnimations
                     |> stepGameObjects model.rTicks computer
-                    |> handleCollision
-                    |> handleDeathAndGameOver
+                    |> addNewDeathAnimations
+                    |> handleGameOver
                     |> incRunningTicks
 
         GameOver counter ->
@@ -792,7 +792,7 @@ updateMemory computer model =
 
             else
                 { model | state = GameOver newCounter }
-                    |> stepAnimations
+                    |> stepDeathAnimations
 
         Paused ->
             if spacePressed computer then
@@ -806,8 +806,8 @@ type alias HasDeathAnimations a =
     { a | deathAnimationsClock : Float, deathAnimations : List DeathAnimation }
 
 
-stepAnimations : HasDeathAnimations a -> HasDeathAnimations a
-stepAnimations model =
+stepDeathAnimations : HasDeathAnimations a -> HasDeathAnimations a
+stepDeathAnimations model =
     let
         clock =
             model.deathAnimationsClock
@@ -828,7 +828,7 @@ type alias HasGameObjects a =
     }
 
 
-stepGameObjects : Float -> G.Computer -> HasGameObjects a -> HasGameObjects a
+stepGameObjects : Float -> G.Computer -> HasGameObjects a -> ( List DeathAnimationKind, HasGameObjects a )
 stepGameObjects rTicks computer model =
     let
         { mouse, screen } =
@@ -849,6 +849,8 @@ stepGameObjects rTicks computer model =
             List.map (stepBullet screen player) bullets
                 |> (++) generatedBullets
     }
+        |> handleCollision
+        |> handleDeath
 
 
 
@@ -1111,56 +1113,18 @@ handleDeath model =
     )
 
 
-handleDeathAndGameOver : Memory -> Memory
-handleDeathAndGameOver model =
-    let
-        ( newBullets, deadBullets ) =
-            List.partition HasHealth.isAlive model.bullets
-
-        deadPlayers : List Player
-        deadPlayers =
-            if isPlayerDead then
-                [ model.player ]
-
-            else
-                []
-
-        ( newBlasts, deadBlasts ) =
-            ( List.concatMap blastsFromBullet deadBullets, model.blasts )
-
-        ( newTurrets, deadTurrets ) =
-            List.partition HasHealth.isAlive model.turrets
-
-        newDeathAnimationKinds : List DeathAnimationKind
-        newDeathAnimationKinds =
-            List.map BulletDeathAnim deadBullets
-                ++ List.map TurretDeathAnim deadTurrets
-                ++ List.map BlastDeathAnim deadBlasts
-                ++ List.map PlayerDeathAnim deadPlayers
-
-        newDeathAnimations : List DeathAnimation
-        newDeathAnimations =
-            newDeathAnimationKinds
+addNewDeathAnimations : ( List DeathAnimationKind, HasDeathAnimations a ) -> HasDeathAnimations a
+addNewDeathAnimations ( kinds, model ) =
+    { model
+        | deathAnimations =
+            kinds
                 |> List.map (DeathAnimation (Timer.start model.deathAnimationsClock 60))
+    }
 
-        generatedBullets : Bullets
-        generatedBullets =
-            deadTurrets
-                |> List.concatMap
-                    (\t ->
-                        case t.deathType of
-                            NoBulletsOnDeathTurret ->
-                                []
 
-                            FiveBulletsOnDeathTurret ->
-                                fireNewBullets
-                                    { from = t.position
-                                    , to = model.player.position
-                                    , offset = t.radius
-                                    , weapon = GravityFive
-                                    }
-                    )
-
+handleGameOver : Memory -> Memory
+handleGameOver model =
+    let
         isPlayerDead =
             model.player |> HasHealth.isDead
 
@@ -1168,16 +1132,10 @@ handleDeathAndGameOver model =
             isPlayerDead
 
         shouldSetupNextStage =
-            not isGameOver && List.isEmpty newTurrets
+            not isGameOver && List.isEmpty model.turrets
     in
     { model
-        | bullets = generatedBullets ++ newBullets
-        , blasts = newBlasts
-        , deathAnimations =
-            newDeathAnimations
-                ++ model.deathAnimations
-                |> increaseDeathAnimationDurationIf isPlayerDead
-        , stage =
+        | stage =
             if shouldSetupNextStage then
                 model.stage + 1
 
@@ -1188,7 +1146,7 @@ handleDeathAndGameOver model =
                 initTurretsForStage (model.stage + 1) model.rTicks
 
             else
-                newTurrets
+                model.turrets
         , state =
             if isGameOver then
                 GameOver (Counter.init gameOverDuration)

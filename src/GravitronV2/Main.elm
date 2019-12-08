@@ -770,6 +770,7 @@ updateMemory computer model =
             else
                 model
                     |> stepEntities computer
+                    |> stepAnimations
                     |> handleCollision
                     |> handleDeath
                     |> incRunningTicks
@@ -832,7 +833,6 @@ stepEntities computer model =
             List.map (stepBullet screen player) bullets
                 |> (++) generatedBullets
     }
-        |> stepAnimations
 
 
 

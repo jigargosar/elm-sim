@@ -1139,10 +1139,14 @@ handleDeath model =
 
 addNewDeathAnimations : ( List DeathAnimationKind, HasDeathAnimations a ) -> HasDeathAnimations a
 addNewDeathAnimations ( kinds, model ) =
-    { model
-        | deathAnimations =
+    let
+        newDeathAnimations =
             kinds
                 |> List.map (DeathAnimation (Timer.start model.deathAnimationsClock 60))
+    in
+    { model
+        | deathAnimations =
+            model.deathAnimations ++ newDeathAnimations
     }
 
 

@@ -529,16 +529,15 @@ type DeathAnimationKind
 
 
 type alias Memory =
-    { player : Player
-    , turrets : Turrets
-    , bullets : Bullets
-    , blasts : Blasts
-    , deathAnimations : List DeathAnimation
-    , state : GameState
-    , stage : Int
-    , rTicks : Float
-    , daClock : Float
-    }
+    HasDeathAnimations
+        { player : Player
+        , turrets : Turrets
+        , bullets : Bullets
+        , blasts : Blasts
+        , state : GameState
+        , stage : Int
+        , rTicks : Float
+        }
 
 
 allTurretsPositions : List Vec
@@ -631,10 +630,10 @@ initMemory =
     , bullets = []
     , blasts = []
     , deathAnimations = []
+    , deathAnimationsClock = 0
     , stage = stage
     , state = Running
     , rTicks = rTicks
-    , daClock = 0
     }
 
 
@@ -795,20 +794,22 @@ updateMemory computer model =
                 model
 
 
-stepAnimations :
-    { a | daClock : Float, deathAnimations : List DeathAnimation }
-    -> { a | daClock : Float, deathAnimations : List DeathAnimation }
+type alias HasDeathAnimations a =
+    { a | deathAnimationsClock : Float, deathAnimations : List DeathAnimation }
+
+
+stepAnimations : HasDeathAnimations a -> HasDeathAnimations a
 stepAnimations model =
     let
         clock =
-            model.daClock
+            model.deathAnimationsClock
     in
     { model
         | deathAnimations =
             List.Extra.filterNot
                 (.timer >> Timer.isDone clock)
                 model.deathAnimations
-        , daClock = clock + 1
+        , deathAnimationsClock = clock + 1
     }
 
 

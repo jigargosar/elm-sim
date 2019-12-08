@@ -463,11 +463,16 @@ type alias DeathAnimation =
     }
 
 
-renderDeathAnimation : { a | daClock : Float } -> DeathAnimation -> G.Shape
-renderDeathAnimation { daClock } anim =
+renderDeathAnimations : HasDeathAnimations a -> List Shape
+renderDeathAnimations model =
+    List.map (renderDeathAnimation model.deathAnimationsClock) model.deathAnimations
+
+
+renderDeathAnimation : Float -> DeathAnimation -> G.Shape
+renderDeathAnimation clock anim =
     let
         progress =
-            Timer.value daClock anim.timer
+            Timer.value clock anim.timer
 
         timeOfDeath =
             Timer.getStart anim.timer
@@ -530,14 +535,16 @@ type DeathAnimationKind
 
 type alias Memory =
     HasDeathAnimations
-        { player : Player
-        , turrets : Turrets
-        , bullets : Bullets
-        , blasts : Blasts
-        , state : GameState
-        , stage : Int
-        , rTicks : Float
-        }
+        (HasGameObjects
+            { player : Player
+            , turrets : Turrets
+            , bullets : Bullets
+            , blasts : Blasts
+            , rTicks : Float
+            , state : GameState
+            , stage : Int
+            }
+        )
 
 
 allTurretsPositions : List Vec
@@ -769,7 +776,7 @@ updateMemory computer model =
 
             else
                 model
-                    |> stepEntities computer
+                    |> stepGameObjects model.rTicks computer
                     |> stepAnimations
                     |> handleCollision
                     |> handleDeath
@@ -812,13 +819,22 @@ stepAnimations model =
     }
 
 
-stepEntities : G.Computer -> Memory -> Memory
-stepEntities computer model =
+type alias HasGameObjects a =
+    { a
+        | player : Player
+        , turrets : Turrets
+        , bullets : Bullets
+        , blasts : Blasts
+    }
+
+
+stepGameObjects : Float -> G.Computer -> HasGameObjects a -> HasGameObjects a
+stepGameObjects rTicks computer model =
     let
         { mouse, screen } =
             computer
 
-        { player, rTicks, turrets, bullets } =
+        { player, turrets, bullets } =
             model
 
         ( generatedBullets, updatedTurrets ) =
@@ -1195,7 +1211,7 @@ viewMemory computer model =
                 []
     in
     List.map renderPlayer alivePlayers
-        ++ List.map (renderDeathAnimation model) model.deathAnimations
+        ++ renderDeathAnimations model
         ++ List.map (renderTurret rTicks) model.turrets
         ++ List.map renderBullet model.bullets
         ++ viewGameState screen model.state

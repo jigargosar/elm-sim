@@ -828,53 +828,44 @@ type alias HasGameObjects a =
     }
 
 
-stepGameObjects : Float -> G.Computer -> HasGameObjects a -> ( List DeathAnimationKind, HasGameObjects a )
+stepGameObjects :
+    Float
+    -> G.Computer
+    -> HasGameObjects a
+    -> ( List DeathAnimationKind, HasGameObjects a )
 stepGameObjects rTicks computer model =
     let
-        { mouse, screen } =
-            computer
-
-        { player, turrets, bullets } =
+        { player, turrets, bullets, blasts } =
             model
-
-        ( generatedBullets, updatedTurrets ) =
-            List.map (stepTurret rTicks player) turrets
-                |> List.unzip
-                |> Tuple.mapFirst List.concat
+                |> entitiesFromRecord
+                |> mapEntities (List.concatMap (stepEntity rTicks computer model.player))
+                |> handleEntitiesCollision
+                |> entitiesToRecord
     in
-    { model
-        | player = stepPlayer mouse player
-        , turrets = updatedTurrets
-        , bullets =
-            List.map (stepBullet screen player) bullets
-                |> (++) generatedBullets
-    }
-        |> handleCollision
+    { model | player = player, turrets = turrets, bullets = bullets, blasts = blasts }
         |> handleDeath
 
 
-stepEntity : Float -> G.Computer -> Player -> Entity -> ( List Entity, Entity )
+stepEntity : Float -> G.Computer -> Player -> Entity -> List Entity
 stepEntity rTicks computer player entity =
     let
-        noOp =
-            ( [], entity )
-
         { mouse, screen } =
             computer
     in
     case entity of
         PlayerE model ->
-            ( [], stepPlayer mouse model |> PlayerE )
+            [ stepPlayer mouse model |> PlayerE ]
 
         TurretE turret ->
             stepTurret rTicks player turret
                 |> Tuple.mapBoth (List.map BulletE) TurretE
+                |> (\( l, i ) -> i :: l)
 
         BulletE bullet ->
-            ( [], stepBullet screen player bullet |> BulletE )
+            [ stepBullet screen player bullet |> BulletE ]
 
-        BlastE _ ->
-            noOp
+        BlastE blast ->
+            [ BlastE blast ]
 
 
 
@@ -1026,16 +1017,9 @@ onEntityEntityCollision e1 e2 =
             noOp
 
 
-handleCollision : HasGameObjects a -> HasGameObjects a
-handleCollision model =
-    let
-        { player, turrets, bullets, blasts } =
-            model
-                |> entitiesFromRecord
-                |> handleEntitiesCollision
-                |> entitiesToRecord
-    in
-    { model | player = player, turrets = turrets, bullets = bullets, blasts = blasts }
+mapEntities : (List Entity -> List Entity) -> Entities -> Entities
+mapEntities func (Entities initialPlayer list) =
+    Entities initialPlayer (func list)
 
 
 
@@ -1163,7 +1147,8 @@ handleGameOver model =
             not isGameOver && List.isEmpty model.turrets
     in
     { model
-        | stage =
+        | deathAnimations = increaseDeathAnimationDurationIf isGameOver model.deathAnimations
+        , stage =
             if shouldSetupNextStage then
                 model.stage + 1
 

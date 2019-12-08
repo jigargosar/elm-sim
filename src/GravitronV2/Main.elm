@@ -1053,6 +1053,64 @@ increaseDeathAnimationDurationIf bool =
         identity
 
 
+handleDeath : HasGameObjects a -> ( List DeathAnimationKind, HasGameObjects a )
+handleDeath model =
+    let
+        ( newBullets, deadBullets ) =
+            List.partition HasHealth.isAlive model.bullets
+
+        deadPlayers : List Player
+        deadPlayers =
+            if model.player |> HasHealth.isDead then
+                [ model.player ]
+
+            else
+                []
+
+        ( newBlasts, deadBlasts ) =
+            ( List.concatMap blastsFromBullet deadBullets, model.blasts )
+
+        ( newTurrets, deadTurrets ) =
+            List.partition HasHealth.isAlive model.turrets
+
+        newDeathAnimationKinds : List DeathAnimationKind
+        newDeathAnimationKinds =
+            List.map BulletDeathAnim deadBullets
+                ++ List.map TurretDeathAnim deadTurrets
+                ++ List.map BlastDeathAnim deadBlasts
+                ++ List.map PlayerDeathAnim deadPlayers
+
+        --        newDeathAnimations : List DeathAnimation
+        --        newDeathAnimations =
+        --            newDeathAnimationKinds
+        --                |> List.map (DeathAnimation (Timer.start model.deathAnimationsClock 60))
+        generatedBullets : Bullets
+        generatedBullets =
+            deadTurrets
+                |> List.concatMap
+                    (\t ->
+                        case t.deathType of
+                            NoBulletsOnDeathTurret ->
+                                []
+
+                            FiveBulletsOnDeathTurret ->
+                                fireNewBullets
+                                    { from = t.position
+                                    , to = model.player.position
+                                    , offset = t.radius
+                                    , weapon = GravityFive
+                                    }
+                    )
+    in
+    ( newDeathAnimationKinds
+    , { model
+        | bullets = generatedBullets ++ newBullets
+        , blasts = newBlasts
+        , turrets = newTurrets
+      }
+    )
+
+
 handleDeathAndGameOver : Memory -> Memory
 handleDeathAndGameOver model =
     let
@@ -1073,12 +1131,16 @@ handleDeathAndGameOver model =
         ( newTurrets, deadTurrets ) =
             List.partition HasHealth.isAlive model.turrets
 
-        newDeathAnimations : List DeathAnimation
-        newDeathAnimations =
+        newDeathAnimationKinds : List DeathAnimationKind
+        newDeathAnimationKinds =
             List.map BulletDeathAnim deadBullets
                 ++ List.map TurretDeathAnim deadTurrets
                 ++ List.map BlastDeathAnim deadBlasts
                 ++ List.map PlayerDeathAnim deadPlayers
+
+        newDeathAnimations : List DeathAnimation
+        newDeathAnimations =
+            newDeathAnimationKinds
                 |> List.map (DeathAnimation (Timer.start model.deathAnimationsClock 60))
 
         generatedBullets : Bullets

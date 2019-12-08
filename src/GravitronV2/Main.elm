@@ -1140,14 +1140,14 @@ handleDeath model =
 addNewDeathAnimations : ( List DeathAnimationKind, HasDeathAnimations a ) -> HasDeathAnimations a
 addNewDeathAnimations ( kinds, model ) =
     let
+        toDeathAnimation : DeathAnimationKind -> DeathAnimation
+        toDeathAnimation =
+            DeathAnimation (Timer.start model.deathAnimationsClock 60)
+
         newDeathAnimations =
-            kinds
-                |> List.map (DeathAnimation (Timer.start model.deathAnimationsClock 60))
+            model.deathAnimations ++ List.map toDeathAnimation kinds
     in
-    { model
-        | deathAnimations =
-            model.deathAnimations ++ newDeathAnimations
-    }
+    { model | deathAnimations = newDeathAnimations }
 
 
 handleGameOver : Memory -> Memory

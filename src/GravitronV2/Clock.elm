@@ -1,15 +1,15 @@
 module GravitronV2.Clock exposing (Clock, init, step)
 
 
-type Clock
+type Clock tag
     = Clock Float
 
 
-init : Clock
+init : Clock tag
 init =
     Clock 0
 
 
-step : Clock -> Clock
+step : Clock tag -> Clock tag
 step (Clock num) =
     num + 1 |> Clock

@@ -806,9 +806,7 @@ stepAnimations model =
     in
     { model
         | deathAnimations =
-            List.Extra.filterNot
-                (.timer >> Timer.isDone clock)
-                model.deathAnimations
+            List.Extra.filterNot (.timer >> Timer.isDone clock) model.deathAnimations
         , deathAnimationsClock = clock + 1
     }
 
@@ -1065,7 +1063,7 @@ handleDeath model =
                 ++ List.map TurretDeathAnim deadTurrets
                 ++ List.map BlastDeathAnim deadBlasts
                 ++ List.map PlayerDeathAnim deadPlayers
-                |> List.map (DeathAnimation (Timer.start model.daClock 60))
+                |> List.map (DeathAnimation (Timer.start model.deathAnimationsClock 60))
 
         generatedBullets : Bullets
         generatedBullets =

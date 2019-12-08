@@ -853,6 +853,30 @@ stepGameObjects rTicks computer model =
         |> handleDeath
 
 
+stepEntity : Float -> G.Computer -> Player -> Entity -> ( List Entity, Entity )
+stepEntity rTicks computer player entity =
+    let
+        noOp =
+            ( [], entity )
+
+        { mouse, screen } =
+            computer
+    in
+    case entity of
+        PlayerE model ->
+            ( [], stepPlayer mouse model |> PlayerE )
+
+        TurretE turret ->
+            stepTurret rTicks player turret
+                |> Tuple.mapBoth (List.map BulletE) TurretE
+
+        BulletE bullet ->
+            ( [], stepBullet screen player bullet |> BulletE )
+
+        BlastE _ ->
+            noOp
+
+
 
 -- Collision
 

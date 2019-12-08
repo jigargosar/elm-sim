@@ -1,25 +1,23 @@
 module GravitronV2.Counter exposing (Counter, init, step)
 
 
-type alias Counter =
-    { num : Int
-    , maxSteps : Int
-    }
+type Counter tag
+    = Counter Int Int
 
 
-init : Int -> Counter
-init maxSteps_ =
-    { num = 0, maxSteps = maxSteps_ }
+init : Int -> Counter tag
+init =
+    Counter 0
 
 
-step : Counter -> ( Bool, Counter )
-step counter =
+step : Counter tag -> ( Bool, Counter tag )
+step (Counter num maxSteps) =
     let
         nextNum =
-            counter.num + 1
+            num + 1
     in
-    if nextNum >= counter.maxSteps then
-        ( True, { counter | num = 0 } )
+    if nextNum >= maxSteps then
+        ( True, Counter 0 maxSteps )
 
     else
-        ( False, { counter | num = nextNum } )
+        ( False, Counter nextNum maxSteps )

@@ -13,56 +13,56 @@ module GravitronV2.Timer exposing
 import PointFree exposing (when)
 
 
-type alias Timer =
-    { start : Float
-    , duration : Float
-    , delay : Float
-    }
+type Timer tag
+    = Timer
+        -- start
+        Float
+        -- duration
+        Float
+        --delay
+        Float
 
 
-start : Float -> Float -> Timer
+start : Float -> Float -> Timer tag
 start startedAt_ duration =
-    { start = startedAt_
-    , duration = duration
-    , delay = 0
-    }
+    Timer startedAt_ duration 0
 
 
-delayedStart : Float -> Float -> Float -> Timer
+delayedStart : Float -> Float -> Float -> Timer tag
 delayedStart start_ duration_ delay_ =
-    { start = start_, duration = duration_, delay = delay_ }
+    Timer start_ duration_ delay_
 
 
-elapsed : Float -> Timer -> Float
-elapsed clock model =
-    clock - model.start - model.delay |> max 0
+elapsed : Float -> Timer tag -> Float
+elapsed clock (Timer st _ delay) =
+    clock - st - delay |> max 0
 
 
-isDone : Float -> Timer -> Bool
-isDone clock model =
-    elapsed clock model > model.duration
+isDone : Float -> Timer tag -> Bool
+isDone clock ((Timer _ dur _) as model) =
+    elapsed clock model > dur
 
 
-restartIfDone : Float -> Timer -> Timer
+restartIfDone : Float -> Timer tag -> Timer tag
 restartIfDone clock =
     when (isDone clock) (restart clock)
 
 
-restart : Float -> Timer -> Timer
-restart clock model =
-    { model | start = clock, delay = 0 }
+restart : Float -> Timer tag -> Timer tag
+restart clock (Timer _ dur _) =
+    Timer clock dur 0
 
 
-value : Float -> Timer -> Float
-value clock model =
-    elapsed clock model / model.duration |> clamp 0 1
+value : Float -> Timer tag -> Float
+value clock ((Timer _ dur _) as model) =
+    elapsed clock model / dur |> clamp 0 1
 
 
-getStart : Timer -> Float
-getStart =
-    .start
+getStart : Timer tag -> Float
+getStart (Timer st _ _) =
+    st
 
 
-setDuration : Float -> Timer -> Timer
-setDuration newDuration model =
-    { model | duration = newDuration }
+setDuration : Float -> Timer tag -> Timer tag
+setDuration newDuration (Timer st _ de) =
+    Timer st newDuration de

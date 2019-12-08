@@ -97,11 +97,15 @@ renderPlayer player =
 -- Turret
 
 
+type TriggerTimer
+    = TriggerTimer
+
+
 type alias Turret =
     Particle
         { color : G.Color
         , health : HasHealth.Health
-        , triggerTimer : Timer
+        , triggerTimer : Timer TriggerTimer
         , weapon : TurretWeapon
         , deathType : TurretDeathAction
         }
@@ -189,7 +193,7 @@ stageNumFromLevel ( majorLevel, minorLevel ) =
     modBy maxStages ((majorLevel - 1) * 5 + (minorLevel - 1))
 
 
-initTurretWithConfig : Timer -> Vec -> TurretConfig -> Turret
+initTurretWithConfig : Timer TriggerTimer -> Vec -> TurretConfig -> Turret
 initTurretWithConfig triggerTimer position config =
     { position = position
     , velocity = V.zero
@@ -457,8 +461,12 @@ renderBullet bullet =
 -- DA
 
 
+type DeathAnimTimer
+    = DeathAnimTimer
+
+
 type alias DeathAnimation =
-    { timer : Timer
+    { timer : Timer DeathAnimTimer
     , kind : DeathAnimationKind
     }
 
@@ -503,9 +511,13 @@ renderDeathAnimation { daClock } anim =
 -- GameState
 
 
+type GameOverStateTag
+    = GameOverStateTag
+
+
 type GameState
     = Running
-    | GameOver Counter
+    | GameOver (Counter GameOverStateTag)
     | Paused
 
 
@@ -603,7 +615,7 @@ initTurretsForStage stageNum rTicks =
             (triggerTimerDuration / toFloat turretCountForStage)
                 |> always 0
 
-        triggerTimer : Int -> Timer
+        triggerTimer : Int -> Timer TriggerTimer
         triggerTimer idx =
             Timer.delayedStart rTicks
                 triggerTimerDuration

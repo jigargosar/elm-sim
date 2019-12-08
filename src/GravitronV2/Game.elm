@@ -1,6 +1,7 @@
 module GravitronV2.Game exposing
     ( Color
     , Computer
+    , GameProgram
     , Keyboard
     , Mouse
     , Screen
@@ -510,11 +511,15 @@ setAlphaHelp alpha rgba =
     { rgba | alpha = alpha }
 
 
+type alias GameProgram memory =
+    Program () (Game memory) Msg
+
+
 game :
     memory
     -> (Computer -> memory -> memory)
     -> (Computer -> memory -> List Shape)
-    -> Program () (Game memory) Msg
+    -> GameProgram memory
 game initialMemory updateMemory viewMemory =
     let
         view (Game memory computer) =

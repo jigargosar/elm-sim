@@ -1223,5 +1223,6 @@ viewGameState _ state =
 -- MAIN
 
 
+main : G.GameProgram Memory
 main =
     G.game initMemory updateMemory viewMemory

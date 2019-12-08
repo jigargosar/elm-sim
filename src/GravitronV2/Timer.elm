@@ -1,4 +1,14 @@
-module GravitronV2.Timer exposing (Timer, delayedStart, getStart, isDone, restart, restartIfDone, setDuration, start, value)
+module GravitronV2.Timer exposing
+    ( Timer
+    , delayedStart
+    , getStart
+    , isDone
+    , restart
+    , restartIfDone
+    , setDuration
+    , start
+    , value
+    )
 
 import PointFree exposing (when)
 

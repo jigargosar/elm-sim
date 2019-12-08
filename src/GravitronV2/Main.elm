@@ -3,6 +3,7 @@ module GravitronV2.Main exposing (main)
 import Array exposing (Array)
 import Basics.Extra exposing (swap)
 import Color
+import GravitronV2.Counter as Counter exposing (Counter)
 import GravitronV2.Game as G exposing (Color, Screen, Shape)
 import GravitronV2.HasHealth as HasHealth
 import GravitronV2.Particle as Particle exposing (Particle)
@@ -504,7 +505,7 @@ renderDeathAnimation { daClock } anim =
 
 type GameState
     = Running
-    | GameOver Int
+    | GameOver Counter
     | Paused
 
 
@@ -774,12 +775,16 @@ updateMemory computer model =
                     |> handleDeath
                     |> incRunningTicks
 
-        GameOver elapsed ->
-            if elapsed > gameOverDuration then
+        GameOver counter ->
+            let
+                ( isComplete, newCounter ) =
+                    Counter.step counter
+            in
+            if isComplete then
                 initMemory
 
             else
-                { model | state = GameOver (elapsed + 1) }
+                { model | state = GameOver newCounter }
                     |> stepAnimations
 
         Paused ->
@@ -1109,7 +1114,7 @@ handleDeath model =
                 newTurrets
         , state =
             if isGameOver then
-                GameOver 0
+                GameOver (Counter.init gameOverDuration)
 
             else
                 model.state

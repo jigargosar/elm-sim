@@ -787,12 +787,13 @@ stepGameObjects rTicks computer model =
                 |> mapEntityListWithPlayer (stepEntity rTicks computer >> List.concatMap)
                 |> mapEntityList (foldMapSelf onEntityEntityCollision)
                 |> mapAccumEntityList
-                    (List.Extra.mapAccuml
-                        (\acc ->
-                            handleEntityDeath >> Tuple.mapFirst ((++) acc)
-                        )
-                        []
-                        >> Tuple.mapSecond List.concat
+                    (\player_ ->
+                        List.Extra.mapAccuml
+                            (\acc ->
+                                handleEntityDeath player_ >> Tuple.mapFirst ((++) acc)
+                            )
+                            []
+                            >> Tuple.mapSecond List.concat
                     )
                 |> Tuple.mapSecond entitiesToRecord
     in
@@ -823,8 +824,8 @@ stepEntity rTicks computer player entity =
             [ BlastE blast ]
 
 
-handleEntityDeath : Entity -> ( List DeathAnimationKind, List Entity )
-handleEntityDeath entity =
+handleEntityDeath : HasPosition x -> Entity -> ( List DeathAnimationKind, List Entity )
+handleEntityDeath target entity =
     let
         noOp =
             ( [], [ entity ] )
@@ -842,7 +843,15 @@ handleEntityDeath entity =
 
         TurretE turret ->
             if HasHealth.isDead turret then
-                ( [ TurretDeathAnim turret ], [] )
+                ( [ TurretDeathAnim turret ]
+                , case turret.deathType of
+                    NoBulletsOnDeathTurret ->
+                        []
+
+                    FiveBulletsOnDeathTurret ->
+                        turretGenerateBulletForWeapon target GravityFive turret
+                            |> List.map BulletE
+                )
 
             else
                 noOp
@@ -1023,9 +1032,9 @@ setEntityList_ list (Entities initialPlayer _) =
     Entities initialPlayer list
 
 
-mapAccumEntityList : (List Entity -> ( a, List Entity )) -> Entities -> ( a, Entities )
+mapAccumEntityList : (Player -> List Entity -> ( a, List Entity )) -> Entities -> ( a, Entities )
 mapAccumEntityList func model =
-    func (getEntityList_ model)
+    func (getPlayerEntity_ model) (getEntityList_ model)
         |> Tuple.mapSecond (flip setEntityList_ model)
 
 

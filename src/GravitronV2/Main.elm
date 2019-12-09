@@ -1012,6 +1012,34 @@ onEntityEntityCollision e1 e2 =
             noOp
 
 
+mapAccumEntitiesAsList : (Player -> List Entity -> ( a, List Entity )) -> Entities -> ( a, Entities )
+mapAccumEntitiesAsList func model =
+    func (getPlayerEntity_ model) (getEntityList_ model)
+        |> Tuple.mapSecond (flip setEntityList_ model)
+
+
+mapEntitiesAsList : (Player -> List Entity -> List Entity) -> Entities -> Entities
+mapEntitiesAsList func (Entities initialPlayer list) =
+    let
+        entityToPlayer entity found =
+            if found == Nothing then
+                case entity of
+                    PlayerE model ->
+                        Just model
+
+                    _ ->
+                        Nothing
+
+            else
+                found
+
+        player =
+            List.foldl entityToPlayer Nothing list
+                |> Maybe.withDefault initialPlayer
+    in
+    Entities initialPlayer (func player list)
+
+
 getEntityList_ : Entities -> List Entity
 getEntityList_ (Entities _ list) =
     list
@@ -1039,34 +1067,6 @@ getPlayerEntity_ (Entities initialPlayer list) =
 setEntityList_ : List Entity -> Entities -> Entities
 setEntityList_ list (Entities initialPlayer _) =
     Entities initialPlayer list
-
-
-mapAccumEntitiesAsList : (Player -> List Entity -> ( a, List Entity )) -> Entities -> ( a, Entities )
-mapAccumEntitiesAsList func model =
-    func (getPlayerEntity_ model) (getEntityList_ model)
-        |> Tuple.mapSecond (flip setEntityList_ model)
-
-
-mapEntitiesAsList : (Player -> List Entity -> List Entity) -> Entities -> Entities
-mapEntitiesAsList func (Entities initialPlayer list) =
-    let
-        entityToPlayer entity found =
-            if found == Nothing then
-                case entity of
-                    PlayerE model ->
-                        Just model
-
-                    _ ->
-                        Nothing
-
-            else
-                found
-
-        player =
-            List.foldl entityToPlayer Nothing list
-                |> Maybe.withDefault initialPlayer
-    in
-    Entities initialPlayer (func player list)
 
 
 

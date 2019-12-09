@@ -37,6 +37,24 @@ type BulletType
     | TimeBombBullet Timer
 
 
+init : Vec -> Vec -> Float -> BulletType -> Bullet
+init from to offset type_ =
+    let
+        bullet =
+            defaultBullet
+
+        angle =
+            V.fromPt from to |> V.angle
+    in
+    { bullet
+        | position =
+            V.fromRTheta (offset + bullet.radius + 1) angle
+                |> V.add from
+        , velocity = V.fromRTheta (V.len bullet.velocity) angle
+        , bulletType = type_
+    }
+
+
 defaultBullet : Bullet
 defaultBullet =
     let

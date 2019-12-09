@@ -211,30 +211,11 @@ turretGenerateBulletForWeapon rTicks target weapon turret =
         to =
             target.position
 
-        offset =
-            turret.radius
-
-        bullet =
-            Bullet.defaultBullet
-
-        bulletFromAnge angle =
-            Bullet.init
-                { position = turret.position
-                , offset = turret.radius
-                , angle = angle
-                }
-
-        homingBullet angle =
-            bulletFromAnge angle
-                |> (\b -> { b | bulletType = Bullet.HomingBullet })
-
-        timeBombBullet angle =
-            let
-                bombTimer =
-                    Timer.start rTicks (60 * 5)
-            in
-            bulletFromAnge angle
-                |> (\b -> { b | bulletType = Bullet.TimeBombBullet bombTimer })
+        configFromAngle angle =
+            { position = turret.position
+            , offset = turret.radius
+            , angle = angle
+            }
     in
     let
         angle =
@@ -242,11 +223,11 @@ turretGenerateBulletForWeapon rTicks target weapon turret =
     in
     case weapon of
         GravitySingle ->
-            [ bulletFromAnge angle ]
+            [ Bullet.initGravity (configFromAngle angle) ]
 
         GravityTriple ->
             [ angle - degrees 30, angle, angle + degrees 30 ]
-                |> List.map bulletFromAnge
+                |> List.map (configFromAngle >> Bullet.initGravity)
 
         GravityFive ->
             List.range 0 4
@@ -255,14 +236,15 @@ turretGenerateBulletForWeapon rTicks target weapon turret =
                         >> (*) (1 / 5)
                         >> turns
                         >> (+) angle
-                        >> bulletFromAnge
+                        >> configFromAngle
+                        >> Bullet.initGravity
                     )
 
         HomingSingle ->
-            [ homingBullet angle ]
+            [ Bullet.initHoming (configFromAngle angle) ]
 
         TimeBombSingle ->
-            [ timeBombBullet angle ]
+            [ Bullet.initTimeBomb rTicks (configFromAngle angle) ]
 
 
 renderTurret : Float -> Turret -> G.Shape

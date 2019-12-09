@@ -3,6 +3,9 @@ module GravitronV2.Bullet exposing
     , BulletType(..)
     , defaultBullet
     , init
+    , initGravity
+    , initHoming
+    , initTimeBomb
     , renderBullet
     , stepBullet
     )
@@ -38,7 +41,11 @@ type BulletType
     | TimeBombBullet Timer
 
 
-init : { position : Vec, offset : Float, angle : Float } -> Bullet
+type alias Config =
+    { position : Vec, offset : Float, angle : Float }
+
+
+init : Config -> Bullet
 init { position, offset, angle } =
     let
         translateVec =
@@ -51,6 +58,21 @@ init { position, offset, angle } =
         | position = V.add position translateVec
         , velocity = V.fromRTheta speed angle
     }
+
+
+initGravity : Config -> Bullet
+initGravity =
+    init >> (\model -> { model | bulletType = GravityBullet })
+
+
+initHoming : Config -> Bullet
+initHoming =
+    init >> (\model -> { model | bulletType = HomingBullet })
+
+
+initTimeBomb : Float -> Config -> Bullet
+initTimeBomb rTicks =
+    init >> (\model -> { model | bulletType = TimeBombBullet (Timer.start rTicks (60 * 5)) })
 
 
 defaultBullet : Bullet

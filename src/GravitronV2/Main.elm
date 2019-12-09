@@ -10,6 +10,7 @@ import GravitronV2.Particle as Particle exposing (Particle)
 import GravitronV2.Timer as Timer exposing (Timer)
 import GravitronV2.Vec as V exposing (Vec, vec)
 import List.Extra
+import PointFree exposing (when)
 import TypedSvg
 import TypedSvg.Attributes
 import TypedSvg.Attributes.InPx as InPx
@@ -417,8 +418,8 @@ bounceWithinScreen screen position bounceFactor velocity =
         newBouncedVelocity
 
 
-stepBullet : G.Screen -> HasPosition a -> Bullet -> Bullet
-stepBullet screen target bullet =
+stepBullet : Float -> G.Screen -> HasPosition a -> Bullet -> Bullet
+stepBullet rTicks screen target bullet =
     let
         applyAccForce =
             case bullet.bulletType of
@@ -454,6 +455,17 @@ stepBullet screen target bullet =
                 >> applyAccForce
             )
         |> Particle.step
+        |> when (timeBombFired rTicks) HasHealth.kill
+
+
+timeBombFired : Float -> Bullet -> Bool
+timeBombFired rTicks bullet =
+    case bullet.bulletType of
+        TimeBombBullet timer ->
+            Timer.isDone rTicks timer
+
+        _ ->
+            False
 
 
 renderBulletHelp : Bullet -> List Shape
@@ -941,7 +953,7 @@ stepEntity rTicks computer player entity =
                 |> (\( l, i ) -> i :: l)
 
         BulletE bullet ->
-            [ stepBullet screen player bullet |> BulletE ]
+            [ stepBullet rTicks screen player bullet |> BulletE ]
 
         BlastE blast ->
             [ BlastE blast ]

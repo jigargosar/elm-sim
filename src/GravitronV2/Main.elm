@@ -783,7 +783,7 @@ stepGameObjects rTicks computer model =
     let
         ( newDeathAnimationKinds, { player, turrets, bullets, blasts } ) =
             model
-                |> entitiesFromRecord
+                |> entitiesFromHasGameObjects
                 |> mapEntitiesAsList (stepEntity rTicks computer >> List.concatMap)
                 |> mapEntitiesAsList (\_ -> foldMapSelf onEntityEntityCollision)
                 |> mapAccumEntitiesAsList
@@ -795,7 +795,7 @@ stepGameObjects rTicks computer model =
                             []
                             >> Tuple.mapSecond List.concat
                     )
-                |> Tuple.mapSecond (flip updateHasGameObjectsFromEntities model)
+                |> Tuple.mapSecond (flip replaceGameObjectsFromEntities model)
     in
     ( newDeathAnimationKinds
     , { model
@@ -884,15 +884,8 @@ type Entities
     = Entities Player (List Entity)
 
 
-entitiesFromRecord :
-    { a
-        | player : Player
-        , turrets : Turrets
-        , bullets : Bullets
-        , blasts : Blasts
-    }
-    -> Entities
-entitiesFromRecord { player, turrets, bullets, blasts } =
+entitiesFromHasGameObjects : HasGameObjects a -> Entities
+entitiesFromHasGameObjects { player, turrets, bullets, blasts } =
     let
         list =
             [ PlayerE player ]
@@ -903,8 +896,8 @@ entitiesFromRecord { player, turrets, bullets, blasts } =
     Entities player list
 
 
-updateHasGameObjectsFromEntities : Entities -> HasGameObjects a -> HasGameObjects a
-updateHasGameObjectsFromEntities (Entities initialPlayer list) model =
+replaceGameObjectsFromEntities : Entities -> HasGameObjects a -> HasGameObjects a
+replaceGameObjectsFromEntities (Entities initialPlayer list) model =
     let
         reducer e rec =
             case e of

@@ -781,7 +781,7 @@ stepGameObjects :
     -> ( List DeathAnimationKind, HasGameObjects a )
 stepGameObjects rTicks computer model =
     let
-        { player, turrets, bullets, blasts } =
+        ( newDeathAnimationKinds, { player, turrets, bullets, blasts } ) =
             model
                 |> entitiesFromRecord
                 |> mapEntityListWithPlayer (stepEntity rTicks computer >> List.concatMap)
@@ -794,11 +794,11 @@ stepGameObjects rTicks computer model =
                         []
                         >> Tuple.mapSecond List.concat
                     )
-                |> Tuple.second
-                |> entitiesToRecord
+                |> Tuple.mapSecond entitiesToRecord
     in
     { model | player = player, turrets = turrets, bullets = bullets, blasts = blasts }
         |> handleDeath
+        |> Tuple.mapFirst ((++) newDeathAnimationKinds)
 
 
 stepEntity : Float -> G.Computer -> Player -> Entity -> List Entity

@@ -565,6 +565,124 @@ renderDeathAnimation clock anim =
 
 
 
+-- Entities
+
+
+type Entity
+    = PlayerE Player
+    | TurretE Turret
+    | BulletE Bullet
+    | BlastE Blast
+
+
+type Entities
+    = Entities Player (List Entity)
+
+
+entitiesFromHasGameObjects : HasGameObjects a -> Entities
+entitiesFromHasGameObjects { player, turrets, bullets, blasts } =
+    let
+        list =
+            [ PlayerE player ]
+                ++ List.map TurretE turrets
+                ++ List.map BulletE bullets
+                ++ List.map BlastE blasts
+    in
+    Entities player list
+
+
+replaceGameObjectsFromEntities : Entities -> HasGameObjects a -> HasGameObjects a
+replaceGameObjectsFromEntities (Entities initialPlayer list) model =
+    let
+        reducer e rec =
+            case e of
+                PlayerE player ->
+                    { rec | player = player }
+
+                TurretE turret ->
+                    { rec | turrets = turret :: rec.turrets }
+
+                BulletE bullet ->
+                    { rec | bullets = bullet :: rec.bullets }
+
+                BlastE blast ->
+                    { rec | blasts = blast :: rec.blasts }
+
+        newGameObjects =
+            List.foldl reducer
+                { player = initialPlayer
+                , turrets = []
+                , bullets = []
+                , blasts = []
+                }
+                list
+    in
+    replaceGameObjectsFrom newGameObjects model
+
+
+replaceGameObjectsFrom : HasGameObjects a -> HasGameObjects b -> HasGameObjects b
+replaceGameObjectsFrom { player, turrets, bullets, blasts } model =
+    { model | player = player, turrets = turrets, bullets = bullets, blasts = blasts }
+
+
+mapAccumEntitiesAsList : (Player -> List Entity -> ( a, List Entity )) -> Entities -> ( a, Entities )
+mapAccumEntitiesAsList func model =
+    func (getPlayerEntity_ model) (getEntityList_ model)
+        |> Tuple.mapSecond (flip setEntityList_ model)
+
+
+mapEntitiesAsList : (Player -> List Entity -> List Entity) -> Entities -> Entities
+mapEntitiesAsList func (Entities initialPlayer list) =
+    let
+        entityToPlayer entity found =
+            if found == Nothing then
+                case entity of
+                    PlayerE model ->
+                        Just model
+
+                    _ ->
+                        Nothing
+
+            else
+                found
+
+        player =
+            List.foldl entityToPlayer Nothing list
+                |> Maybe.withDefault initialPlayer
+    in
+    Entities initialPlayer (func player list)
+
+
+getEntityList_ : Entities -> List Entity
+getEntityList_ (Entities _ list) =
+    list
+
+
+getPlayerEntity_ : Entities -> Player
+getPlayerEntity_ (Entities initialPlayer list) =
+    let
+        entityToPlayer entity found =
+            if found == Nothing then
+                case entity of
+                    PlayerE player ->
+                        Just player
+
+                    _ ->
+                        Nothing
+
+            else
+                found
+    in
+    List.foldl entityToPlayer Nothing list
+        |> Maybe.withDefault initialPlayer
+
+
+setEntityList_ : List Entity -> Entities -> Entities
+setEntityList_ list (Entities initialPlayer _) =
+    Entities initialPlayer list
+
+
+
 -- GameState
 
 
@@ -873,63 +991,6 @@ handleEntityDeath target entity =
 -- Collision
 
 
-type Entity
-    = PlayerE Player
-    | TurretE Turret
-    | BulletE Bullet
-    | BlastE Blast
-
-
-type Entities
-    = Entities Player (List Entity)
-
-
-entitiesFromHasGameObjects : HasGameObjects a -> Entities
-entitiesFromHasGameObjects { player, turrets, bullets, blasts } =
-    let
-        list =
-            [ PlayerE player ]
-                ++ List.map TurretE turrets
-                ++ List.map BulletE bullets
-                ++ List.map BlastE blasts
-    in
-    Entities player list
-
-
-replaceGameObjectsFromEntities : Entities -> HasGameObjects a -> HasGameObjects a
-replaceGameObjectsFromEntities (Entities initialPlayer list) model =
-    let
-        reducer e rec =
-            case e of
-                PlayerE player ->
-                    { rec | player = player }
-
-                TurretE turret ->
-                    { rec | turrets = turret :: rec.turrets }
-
-                BulletE bullet ->
-                    { rec | bullets = bullet :: rec.bullets }
-
-                BlastE blast ->
-                    { rec | blasts = blast :: rec.blasts }
-
-        newGameObjects =
-            List.foldl reducer
-                { player = initialPlayer
-                , turrets = []
-                , bullets = []
-                , blasts = []
-                }
-                list
-    in
-    replaceGameObjectsFrom newGameObjects model
-
-
-replaceGameObjectsFrom : HasGameObjects a -> HasGameObjects b -> HasGameObjects b
-replaceGameObjectsFrom { player, turrets, bullets, blasts } model =
-    { model | player = player, turrets = turrets, bullets = bullets, blasts = blasts }
-
-
 onEntityEntityCollision : Entity -> Entity -> ( Entity, Entity )
 onEntityEntityCollision e1 e2 =
     let
@@ -1004,63 +1065,6 @@ onEntityEntityCollision e1 e2 =
 
         ( BlastE _, BlastE _ ) ->
             noOp
-
-
-mapAccumEntitiesAsList : (Player -> List Entity -> ( a, List Entity )) -> Entities -> ( a, Entities )
-mapAccumEntitiesAsList func model =
-    func (getPlayerEntity_ model) (getEntityList_ model)
-        |> Tuple.mapSecond (flip setEntityList_ model)
-
-
-mapEntitiesAsList : (Player -> List Entity -> List Entity) -> Entities -> Entities
-mapEntitiesAsList func (Entities initialPlayer list) =
-    let
-        entityToPlayer entity found =
-            if found == Nothing then
-                case entity of
-                    PlayerE model ->
-                        Just model
-
-                    _ ->
-                        Nothing
-
-            else
-                found
-
-        player =
-            List.foldl entityToPlayer Nothing list
-                |> Maybe.withDefault initialPlayer
-    in
-    Entities initialPlayer (func player list)
-
-
-getEntityList_ : Entities -> List Entity
-getEntityList_ (Entities _ list) =
-    list
-
-
-getPlayerEntity_ : Entities -> Player
-getPlayerEntity_ (Entities initialPlayer list) =
-    let
-        entityToPlayer entity found =
-            if found == Nothing then
-                case entity of
-                    PlayerE player ->
-                        Just player
-
-                    _ ->
-                        Nothing
-
-            else
-                found
-    in
-    List.foldl entityToPlayer Nothing list
-        |> Maybe.withDefault initialPlayer
-
-
-setEntityList_ : List Entity -> Entities -> Entities
-setEntityList_ list (Entities initialPlayer _) =
-    Entities initialPlayer list
 
 
 

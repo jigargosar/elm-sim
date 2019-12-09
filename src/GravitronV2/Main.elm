@@ -785,17 +785,11 @@ stepGameObjects rTicks computer model =
             model
                 |> entitiesFromRecord
                 |> mapEntityListWithPlayer (stepEntity rTicks computer >> List.concatMap)
-                |> handleEntitiesCollision
+                |> mapEntityList (foldMapSelf onEntityEntityCollision)
                 |> entitiesToRecord
     in
     { model | player = player, turrets = turrets, bullets = bullets, blasts = blasts }
         |> handleDeath
-
-
-handleEntitiesCollision : Entities -> Entities
-handleEntitiesCollision (Entities initialPlayer list) =
-    Entities initialPlayer
-        (foldMapSelf onEntityEntityCollision list)
 
 
 stepEntity : Float -> G.Computer -> Player -> Entity -> List Entity

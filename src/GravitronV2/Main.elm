@@ -786,7 +786,14 @@ stepGameObjects rTicks computer model =
                 |> entitiesFromRecord
                 |> mapEntityListWithPlayer (stepEntity rTicks computer >> List.concatMap)
                 |> mapEntityList (foldMapSelf onEntityEntityCollision)
-                |> mapAccumEntityList (Tuple.pair ())
+                |> mapAccumEntityList
+                    (List.Extra.mapAccuml
+                        (\acc ->
+                            handleEntityDeath >> Tuple.mapFirst ((++) acc)
+                        )
+                        []
+                        >> Tuple.mapSecond List.concat
+                    )
                 |> Tuple.second
                 |> entitiesToRecord
     in
@@ -814,6 +821,11 @@ stepEntity rTicks computer player entity =
 
         BlastE blast ->
             [ BlastE blast ]
+
+
+handleEntityDeath : Entity -> ( List DeathAnimationKind, List Entity )
+handleEntityDeath entity =
+    ( [], [ entity ] )
 
 
 

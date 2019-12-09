@@ -1091,8 +1091,8 @@ blastsFromBullet bullet =
         []
 
 
-setDeathAnimDuration : Float -> DeathAnimation -> DeathAnimation
-setDeathAnimDuration duration model =
+deathAnimSetDuration : Float -> DeathAnimation -> DeathAnimation
+deathAnimSetDuration duration model =
     { model | timer = Timer.setDuration duration model.timer }
 
 
@@ -1123,7 +1123,7 @@ handleGameOver model =
     in
     if isPlayerDead then
         { model
-            | deathAnimations = List.map (setDeathAnimDuration gameOverDuration) model.deathAnimations
+            | deathAnimations = List.map (deathAnimSetDuration gameOverDuration) model.deathAnimations
             , state = GameOver (Counter.init gameOverDuration)
         }
 

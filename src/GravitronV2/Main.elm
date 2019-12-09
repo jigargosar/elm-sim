@@ -792,6 +792,12 @@ stepGameObjects rTicks computer model =
         |> handleDeath
 
 
+handleEntitiesCollision : Entities -> Entities
+handleEntitiesCollision (Entities initialPlayer list) =
+    Entities initialPlayer
+        (foldMapSelf onEntityEntityCollision list)
+
+
 stepEntity : Float -> G.Computer -> Player -> Entity -> List Entity
 stepEntity rTicks computer player entity =
     let
@@ -879,12 +885,6 @@ entitiesToRecord (Entities initialPlayer list) =
         , blasts = []
         }
         list
-
-
-handleEntitiesCollision : Entities -> Entities
-handleEntitiesCollision (Entities initialPlayer list) =
-    Entities initialPlayer
-        (foldMapSelf onEntityEntityCollision list)
 
 
 onEntityEntityCollision : Entity -> Entity -> ( Entity, Entity )

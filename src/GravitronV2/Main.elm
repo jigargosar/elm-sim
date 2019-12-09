@@ -784,7 +784,7 @@ stepGameObjects rTicks computer model =
         { player, turrets, bullets, blasts } =
             model
                 |> entitiesFromRecord
-                |> mapEntities (stepEntity rTicks computer >> List.concatMap)
+                |> mapEntityListWithPlayer (stepEntity rTicks computer >> List.concatMap)
                 |> handleEntitiesCollision
                 |> entitiesToRecord
     in
@@ -963,8 +963,13 @@ onEntityEntityCollision e1 e2 =
             noOp
 
 
-mapEntities : (Player -> List Entity -> List Entity) -> Entities -> Entities
-mapEntities func (Entities initialPlayer list) =
+mapEntityList : (List Entity -> List Entity) -> Entities -> Entities
+mapEntityList func =
+    mapEntityListWithPlayer (always func)
+
+
+mapEntityListWithPlayer : (Player -> List Entity -> List Entity) -> Entities -> Entities
+mapEntityListWithPlayer func (Entities initialPlayer list) =
     let
         entityToPlayer entity found =
             if found == Nothing then

@@ -1128,9 +1128,13 @@ handleGameOver model =
         }
 
     else if isStageComplete then
+        let
+            nextStage =
+                model.stage + 1
+        in
         { model
-            | stage = model.stage + 1
-            , turrets = initTurretsForStage (model.stage + 1) model.rTicks
+            | stage = nextStage
+            , turrets = initTurretsForStage nextStage model.rTicks
         }
 
     else

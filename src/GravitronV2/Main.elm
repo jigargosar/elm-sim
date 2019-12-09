@@ -1129,27 +1129,34 @@ handleGameOver model =
         shouldSetupNextStage =
             not isGameOver && List.isEmpty model.turrets
     in
-    { model
-        | deathAnimations = increaseDeathAnimationDurationIf isGameOver model.deathAnimations
-        , stage =
-            if shouldSetupNextStage then
-                model.stage + 1
+    if isPlayerDead then
+        { model
+            | deathAnimations = increaseDeathAnimationDurationIf isGameOver model.deathAnimations
+            , state = GameOver (Counter.init gameOverDuration)
+        }
 
-            else
-                model.stage
-        , turrets =
-            if shouldSetupNextStage then
-                initTurretsForStage (model.stage + 1) model.rTicks
+    else
+        { model
+            | deathAnimations = increaseDeathAnimationDurationIf isGameOver model.deathAnimations
+            , stage =
+                if shouldSetupNextStage then
+                    model.stage + 1
 
-            else
-                model.turrets
-        , state =
-            if isGameOver then
-                GameOver (Counter.init gameOverDuration)
+                else
+                    model.stage
+            , turrets =
+                if shouldSetupNextStage then
+                    initTurretsForStage (model.stage + 1) model.rTicks
 
-            else
-                model.state
-    }
+                else
+                    model.turrets
+            , state =
+                if isGameOver then
+                    GameOver (Counter.init gameOverDuration)
+
+                else
+                    model.state
+        }
 
 
 incRunningTicks : Memory -> Memory

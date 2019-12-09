@@ -839,8 +839,8 @@ updateMemory computer model =
                     |> stepDeathAnimations
                     |> stepGameObjects model.rTicks computer
                     |> addNewDeathAnimations
-                    |> handleGameOverOrNextStage
                     |> incRunningTicks
+                    |> handleGameOverOrNextStage
 
         GameOver counter ->
             let

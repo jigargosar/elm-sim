@@ -825,7 +825,22 @@ stepEntity rTicks computer player entity =
 
 handleEntityDeath : Entity -> ( List DeathAnimationKind, List Entity )
 handleEntityDeath entity =
-    ( [], [ entity ] )
+    let
+        noOp =
+            ( [], [ entity ] )
+    in
+    case entity of
+        BlastE bl ->
+            noOp
+
+        PlayerE player ->
+            noOp
+
+        TurretE turret ->
+            noOp
+
+        BulletE bullet ->
+            noOp
 
 
 

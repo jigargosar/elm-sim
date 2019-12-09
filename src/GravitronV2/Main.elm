@@ -218,12 +218,11 @@ turretGenerateBulletForWeapon rTicks target weapon turret =
             Bullet.defaultBullet
 
         bulletFromAnge angle =
-            { bullet
-                | position =
-                    V.fromRTheta (offset + bullet.radius + 1) angle
-                        |> V.add from
-                , velocity = V.fromRTheta (V.len bullet.velocity) angle
-            }
+            Bullet.init
+                { position = turret.position
+                , offset = turret.radius
+                , angle = angle
+                }
 
         homingBullet angle =
             bulletFromAnge angle

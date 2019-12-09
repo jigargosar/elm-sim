@@ -2,6 +2,7 @@ module GravitronV2.Bullet exposing
     ( Bullet
     , BulletType(..)
     , defaultBullet
+    , init
     , renderBullet
     , stepBullet
     )
@@ -37,21 +38,18 @@ type BulletType
     | TimeBombBullet Timer
 
 
-init : Vec -> Vec -> Float -> BulletType -> Bullet
-init from to offset type_ =
+init : { position : Vec, offset : Float, angle : Float } -> Bullet
+init { position, offset, angle } =
     let
-        bullet =
-            defaultBullet
+        translateVec =
+            V.fromRTheta (offset + defaultBullet.radius + 1) angle
 
-        angle =
-            V.fromPt from to |> V.angle
+        speed =
+            V.len defaultBullet.velocity
     in
-    { bullet
-        | position =
-            V.fromRTheta (offset + bullet.radius + 1) angle
-                |> V.add from
-        , velocity = V.fromRTheta (V.len bullet.velocity) angle
-        , bulletType = type_
+    { defaultBullet
+        | position = V.add position translateVec
+        , velocity = V.fromRTheta speed angle
     }
 
 

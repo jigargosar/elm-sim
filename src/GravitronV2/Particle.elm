@@ -3,6 +3,10 @@ module GravitronV2.Particle exposing (..)
 import GravitronV2.Vec as Vec exposing (Vec)
 
 
+type alias HasPosition a =
+    { a | position : Vec }
+
+
 type alias Particle a =
     { a
         | position : Vec

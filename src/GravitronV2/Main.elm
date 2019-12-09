@@ -1091,17 +1091,9 @@ blastsFromBullet bullet =
         []
 
 
-increaseDeathAnimationDurationIf : Bool -> List DeathAnimation -> List DeathAnimation
-increaseDeathAnimationDurationIf bool =
-    let
-        inc da =
-            { da | timer = Timer.setDuration gameOverDuration da.timer }
-    in
-    if bool then
-        List.map inc
-
-    else
-        identity
+setDeathAnimDuration : Float -> DeathAnimation -> DeathAnimation
+setDeathAnimDuration duration model =
+    { model | timer = Timer.setDuration duration model.timer }
 
 
 addNewDeathAnimations : ( List DeathAnimationKind, HasDeathAnimations a ) -> HasDeathAnimations a
@@ -1126,37 +1118,23 @@ handleGameOver model =
         isGameOver =
             isPlayerDead
 
-        shouldSetupNextStage =
-            not isGameOver && List.isEmpty model.turrets
+        isStageComplete =
+            List.isEmpty model.turrets
     in
     if isPlayerDead then
         { model
-            | deathAnimations = increaseDeathAnimationDurationIf isGameOver model.deathAnimations
+            | deathAnimations = List.map (setDeathAnimDuration gameOverDuration) model.deathAnimations
             , state = GameOver (Counter.init gameOverDuration)
         }
 
-    else
+    else if isStageComplete then
         { model
-            | deathAnimations = increaseDeathAnimationDurationIf isGameOver model.deathAnimations
-            , stage =
-                if shouldSetupNextStage then
-                    model.stage + 1
-
-                else
-                    model.stage
-            , turrets =
-                if shouldSetupNextStage then
-                    initTurretsForStage (model.stage + 1) model.rTicks
-
-                else
-                    model.turrets
-            , state =
-                if isGameOver then
-                    GameOver (Counter.init gameOverDuration)
-
-                else
-                    model.state
+            | stage = model.stage + 1
+            , turrets = initTurretsForStage (model.stage + 1) model.rTicks
         }
+
+    else
+        model
 
 
 incRunningTicks : Memory -> Memory

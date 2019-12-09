@@ -797,9 +797,14 @@ stepGameObjects rTicks computer model =
                     )
                 |> Tuple.mapSecond entitiesToRecord
     in
-    { model | player = player, turrets = turrets, bullets = bullets, blasts = blasts }
-        |> handleDeath
-        |> Tuple.mapFirst ((++) newDeathAnimationKinds)
+    ( newDeathAnimationKinds
+    , { model
+        | player = player
+        , turrets = turrets
+        , bullets = bullets
+        , blasts = blasts
+      }
+    )
 
 
 stepEntity : Float -> G.Computer -> Player -> Entity -> List Entity
@@ -857,7 +862,11 @@ handleEntityDeath target entity =
                 noOp
 
         BulletE bullet ->
-            noOp
+            if HasHealth.isDead bullet then
+                ( [ BulletDeathAnim bullet ], blastsFromBullet bullet |> List.map BlastE )
+
+            else
+                noOp
 
 
 
@@ -1104,54 +1113,6 @@ increaseDeathAnimationDurationIf bool =
 
     else
         identity
-
-
-handleDeath : HasGameObjects a -> ( List DeathAnimationKind, HasGameObjects a )
-handleDeath model =
-    let
-        ( newBullets, deadBullets ) =
-            List.partition HasHealth.isAlive model.bullets
-
-        deadPlayers : List Player
-        deadPlayers =
-            if model.player |> HasHealth.isDead then
-                [ model.player ]
-
-            else
-                []
-
-        newBlasts =
-            List.concatMap blastsFromBullet deadBullets
-
-        ( newTurrets, deadTurrets ) =
-            List.partition HasHealth.isAlive model.turrets
-
-        newDeathAnimationKinds : List DeathAnimationKind
-        newDeathAnimationKinds =
-            List.map BulletDeathAnim deadBullets
-                ++ List.map TurretDeathAnim deadTurrets
-                ++ List.map PlayerDeathAnim deadPlayers
-
-        generatedBullets : Bullets
-        generatedBullets =
-            deadTurrets
-                |> List.concatMap
-                    (\t ->
-                        case t.deathType of
-                            NoBulletsOnDeathTurret ->
-                                []
-
-                            FiveBulletsOnDeathTurret ->
-                                turretGenerateBulletForWeapon model.player GravityFive t
-                    )
-    in
-    ( newDeathAnimationKinds
-    , { model
-        | bullets = generatedBullets ++ newBullets
-        , blasts = newBlasts
-        , turrets = newTurrets
-      }
-    )
 
 
 addNewDeathAnimations : ( List DeathAnimationKind, HasDeathAnimations a ) -> HasDeathAnimations a

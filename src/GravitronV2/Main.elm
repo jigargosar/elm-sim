@@ -780,20 +780,31 @@ stepGameObjects :
     -> HasGameObjects a
     -> ( List DeathAnimationKind, HasGameObjects a )
 stepGameObjects rTicks computer model =
-    model
-        |> entitiesFromHasGameObjects
-        |> mapEntitiesAsList (stepEntity rTicks computer >> List.concatMap)
-        |> mapEntitiesAsList (\_ -> foldMapSelf onEntityEntityCollision)
-        |> mapAccumEntitiesAsList
-            (\player_ ->
-                List.Extra.mapAccuml
-                    (\acc ->
-                        handleEntityDeath player_ >> Tuple.mapFirst ((++) acc)
+    let
+        ( newDeathAnimationKinds, { player, turrets, bullets, blasts } ) =
+            model
+                |> entitiesFromRecord
+                |> mapEntitiesAsList (stepEntity rTicks computer >> List.concatMap)
+                |> mapEntitiesAsList (\_ -> foldMapSelf onEntityEntityCollision)
+                |> mapAccumEntitiesAsList
+                    (\player_ ->
+                        List.Extra.mapAccuml
+                            (\acc ->
+                                handleEntityDeath player_ >> Tuple.mapFirst ((++) acc)
+                            )
+                            []
+                            >> Tuple.mapSecond List.concat
                     )
-                    []
-                    >> Tuple.mapSecond List.concat
-            )
-        |> Tuple.mapSecond (flip updateHasGameObjectsFromEntities model)
+                |> Tuple.mapSecond (flip updateHasGameObjectsFromEntities model)
+    in
+    ( newDeathAnimationKinds
+    , { model
+        | player = player
+        , turrets = turrets
+        , bullets = bullets
+        , blasts = blasts
+      }
+    )
 
 
 stepEntity : Float -> G.Computer -> Player -> Entity -> List Entity
@@ -873,8 +884,15 @@ type Entities
     = Entities Player (List Entity)
 
 
-entitiesFromHasGameObjects : HasGameObjects a -> Entities
-entitiesFromHasGameObjects { player, turrets, bullets, blasts } =
+entitiesFromRecord :
+    { a
+        | player : Player
+        , turrets : Turrets
+        , bullets : Bullets
+        , blasts : Blasts
+    }
+    -> Entities
+entitiesFromRecord { player, turrets, bullets, blasts } =
     let
         list =
             [ PlayerE player ]
@@ -886,7 +904,7 @@ entitiesFromHasGameObjects { player, turrets, bullets, blasts } =
 
 
 updateHasGameObjectsFromEntities : Entities -> HasGameObjects a -> HasGameObjects a
-updateHasGameObjectsFromEntities (Entities _ list) model =
+updateHasGameObjectsFromEntities (Entities initialPlayer list) model =
     let
         reducer e rec =
             case e of
@@ -901,8 +919,22 @@ updateHasGameObjectsFromEntities (Entities _ list) model =
 
                 BlastE blast ->
                     { rec | blasts = blast :: rec.blasts }
+
+        newGameObjects =
+            List.foldl reducer
+                { player = initialPlayer
+                , turrets = []
+                , bullets = []
+                , blasts = []
+                }
+                list
     in
-    List.foldl reducer model list
+    replaceGameObjectsFrom newGameObjects model
+
+
+replaceGameObjectsFrom : HasGameObjects a -> HasGameObjects b -> HasGameObjects b
+replaceGameObjectsFrom { player, turrets, bullets, blasts } model =
+    { model | player = player, turrets = turrets, bullets = bullets, blasts = blasts }
 
 
 onEntityEntityCollision : Entity -> Entity -> ( Entity, Entity )

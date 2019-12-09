@@ -1,7 +1,7 @@
 module GravitronV2.Main exposing (main)
 
 import Array exposing (Array)
-import Basics.Extra exposing (swap)
+import Basics.Extra exposing (flip, swap)
 import Color
 import GravitronV2.Counter as Counter exposing (Counter)
 import GravitronV2.Game as G exposing (Color, Screen, Shape)
@@ -955,6 +955,41 @@ onEntityEntityCollision e1 e2 =
 
         ( BlastE _, BlastE _ ) ->
             noOp
+
+
+getEntityList_ : Entities -> List Entity
+getEntityList_ (Entities _ list) =
+    list
+
+
+getPlayerEntity_ : Entities -> Player
+getPlayerEntity_ (Entities initialPlayer list) =
+    let
+        entityToPlayer entity found =
+            if found == Nothing then
+                case entity of
+                    PlayerE player ->
+                        Just player
+
+                    _ ->
+                        Nothing
+
+            else
+                found
+    in
+    List.foldl entityToPlayer Nothing list
+        |> Maybe.withDefault initialPlayer
+
+
+setEntityList_ : List Entity -> Entities -> Entities
+setEntityList_ list (Entities initialPlayer _) =
+    Entities initialPlayer list
+
+
+mapAccumEntityList : (List Entity -> ( a, List Entity )) -> Entities -> ( a, Entities )
+mapAccumEntityList func model =
+    func (getEntityList_ model)
+        |> Tuple.mapSecond (flip setEntityList_ model)
 
 
 mapEntityList : (List Entity -> List Entity) -> Entities -> Entities

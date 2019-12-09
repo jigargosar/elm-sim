@@ -205,7 +205,7 @@ initTurretWithConfig triggerTimer position config =
 stepTurret : Float -> HasPosition a -> Turret -> ( Bullets, Turret )
 stepTurret rTicks target turret =
     ( if Timer.isDone rTicks turret.triggerTimer then
-        turretStepWeapon target turret
+        turretFireWeapon target turret.weapon turret
 
       else
         []
@@ -644,59 +644,8 @@ initMemory =
     }
 
 
-fireNewBullets : { from : Vec, to : Vec, offset : Float, weapon : TurretWeapon } -> Bullets
-fireNewBullets { from, to, offset, weapon } =
-    let
-        bullet =
-            defaultBullet
-
-        bulletFromAnge angle =
-            { bullet
-                | position =
-                    V.fromRTheta (offset + bullet.radius + 1) angle
-                        |> V.add from
-                , velocity = V.fromRTheta (V.len bullet.velocity) angle
-            }
-
-        homingBullet angle =
-            bulletFromAnge angle
-                |> (\b -> { b | bulletType = HomingBullet })
-
-        timeBombBullet angle =
-            bulletFromAnge angle
-                |> (\b -> { b | bulletType = TimeBombBullet })
-    in
-    let
-        angle =
-            V.fromPt from to |> V.angle
-    in
-    case weapon of
-        GravitySingle ->
-            [ bulletFromAnge angle ]
-
-        GravityTriple ->
-            [ angle - degrees 30, angle, angle + degrees 30 ]
-                |> List.map bulletFromAnge
-
-        GravityFive ->
-            List.range 0 4
-                |> List.map
-                    (toFloat
-                        >> (*) (1 / 5)
-                        >> turns
-                        >> (+) angle
-                        >> bulletFromAnge
-                    )
-
-        HomingSingle ->
-            [ homingBullet angle ]
-
-        TimeBombSingle ->
-            [ timeBombBullet angle ]
-
-
-turretStepWeapon : HasPosition a -> Turret -> Bullets
-turretStepWeapon target turret =
+turretFireWeapon : HasPosition a -> TurretWeapon -> Turret -> Bullets
+turretFireWeapon target weapon turret =
     let
         from =
             turret.position
@@ -706,9 +655,6 @@ turretStepWeapon target turret =
 
         offset =
             turret.radius
-
-        weapon =
-            turret.weapon
 
         bullet =
             defaultBullet
@@ -1121,12 +1067,7 @@ handleDeath model =
                                 []
 
                             FiveBulletsOnDeathTurret ->
-                                fireNewBullets
-                                    { from = t.position
-                                    , to = model.player.position
-                                    , offset = t.radius
-                                    , weapon = GravityFive
-                                    }
+                                turretFireWeapon model.player GravityFive t
                     )
     in
     ( newDeathAnimationKinds

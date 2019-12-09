@@ -784,9 +784,9 @@ stepGameObjects rTicks computer model =
         ( newDeathAnimationKinds, { player, turrets, bullets, blasts } ) =
             model
                 |> entitiesFromRecord
-                |> mapEntityListWithPlayer (stepEntity rTicks computer >> List.concatMap)
-                |> mapEntityList (foldMapSelf onEntityEntityCollision)
-                |> mapAccumEntityList
+                |> mapEntitiesAsList (stepEntity rTicks computer >> List.concatMap)
+                |> mapEntitiesAsList (\_ -> foldMapSelf onEntityEntityCollision)
+                |> mapAccumEntitiesAsList
                     (\player_ ->
                         List.Extra.mapAccuml
                             (\acc ->
@@ -1041,19 +1041,14 @@ setEntityList_ list (Entities initialPlayer _) =
     Entities initialPlayer list
 
 
-mapAccumEntityList : (Player -> List Entity -> ( a, List Entity )) -> Entities -> ( a, Entities )
-mapAccumEntityList func model =
+mapAccumEntitiesAsList : (Player -> List Entity -> ( a, List Entity )) -> Entities -> ( a, Entities )
+mapAccumEntitiesAsList func model =
     func (getPlayerEntity_ model) (getEntityList_ model)
         |> Tuple.mapSecond (flip setEntityList_ model)
 
 
-mapEntityList : (List Entity -> List Entity) -> Entities -> Entities
-mapEntityList func =
-    mapEntityListWithPlayer (always func)
-
-
-mapEntityListWithPlayer : (Player -> List Entity -> List Entity) -> Entities -> Entities
-mapEntityListWithPlayer func (Entities initialPlayer list) =
+mapEntitiesAsList : (Player -> List Entity -> List Entity) -> Entities -> Entities
+mapEntitiesAsList func (Entities initialPlayer list) =
     let
         entityToPlayer entity found =
             if found == Nothing then

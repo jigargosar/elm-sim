@@ -205,7 +205,7 @@ initTurretWithConfig triggerTimer position config =
 stepTurret : Float -> HasPosition a -> Turret -> ( Bullets, Turret )
 stepTurret rTicks target turret =
     ( if Timer.isDone rTicks turret.triggerTimer then
-        turretFireWeapon target turret.weapon turret
+        turretGenerateBulletForWeapon target turret.weapon turret
 
       else
         []
@@ -644,8 +644,8 @@ initMemory =
     }
 
 
-turretFireWeapon : HasPosition a -> TurretWeapon -> Turret -> Bullets
-turretFireWeapon target weapon turret =
+turretGenerateBulletForWeapon : HasPosition a -> TurretWeapon -> Turret -> Bullets
+turretGenerateBulletForWeapon target weapon turret =
     let
         from =
             turret.position
@@ -1067,7 +1067,7 @@ handleDeath model =
                                 []
 
                             FiveBulletsOnDeathTurret ->
-                                turretFireWeapon model.player GravityFive t
+                                turretGenerateBulletForWeapon model.player GravityFive t
                     )
     in
     ( newDeathAnimationKinds

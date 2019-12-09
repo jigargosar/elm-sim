@@ -468,8 +468,8 @@ timeBombFired rTicks bullet =
             False
 
 
-renderBulletHelp : Bullet -> List Shape
-renderBulletHelp bullet =
+renderBulletHelp : Float -> Bullet -> List Shape
+renderBulletHelp rTicks bullet =
     let
         ( x, y ) =
             ( 0, 0 )
@@ -514,17 +514,33 @@ renderBulletHelp bullet =
                 )
             ]
 
-        TimeBombBullet _ ->
-            [ simpleBulletCircle ]
+        TimeBombBullet bombTimer ->
+            [ simpleBulletCircle
+            , let
+                progressArcRadius =
+                    bullet.radius + bullet.radius / 2
+
+                progress =
+                    Timer.value rTicks bombTimer
+
+                xOffset =
+                    progressArcRadius
+              in
+              if progress > 0 then
+                G.strokeArc ( x, y ) (turns progress) ( x + xOffset, y ) (G.withAlpha 0.5 G.green)
+
+              else
+                G.noShape
+            ]
 
 
-renderBullet : Bullet -> Shape
-renderBullet bullet =
+renderBullet : Float -> Bullet -> Shape
+renderBullet rTicks bullet =
     let
         ( x, y ) =
             V.toTuple bullet.position
     in
-    renderBulletHelp bullet
+    renderBulletHelp rTicks bullet
         |> G.group
         |> G.move x y
 
@@ -559,7 +575,7 @@ renderDeathAnimation clock anim =
         shapeOfAnim =
             case anim.kind of
                 BulletDeathAnim bullet ->
-                    renderBullet bullet
+                    renderBullet timeOfDeath bullet
 
                 TurretDeathAnim turret ->
                     renderTurret timeOfDeath turret
@@ -1236,7 +1252,7 @@ viewMemory computer model =
     List.map renderPlayer alivePlayers
         ++ renderDeathAnimations model
         ++ List.map (renderTurret rTicks) model.turrets
-        ++ List.map renderBullet model.bullets
+        ++ List.map (renderBullet rTicks) model.bullets
         ++ viewGameState screen model.state
         ++ viewLevel screen model.stage
 

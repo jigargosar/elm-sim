@@ -408,6 +408,7 @@ renderShape shape =
         StrokeArc ( cx, cy ) angle ( sx, sy ) c ->
             Geometry.Svg.arc2d
                 [ strokeColor c
+                , InPx.strokeWidth 2
                 , fillNone
                 ]
                 (Arc2d.sweptAround (Point2d.unitless cx cy)

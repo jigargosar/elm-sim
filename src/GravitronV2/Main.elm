@@ -786,6 +786,8 @@ stepGameObjects rTicks computer model =
                 |> entitiesFromRecord
                 |> mapEntityListWithPlayer (stepEntity rTicks computer >> List.concatMap)
                 |> mapEntityList (foldMapSelf onEntityEntityCollision)
+                |> mapAccumEntityList (Tuple.pair ())
+                |> Tuple.second
                 |> entitiesToRecord
     in
     { model | player = player, turrets = turrets, bullets = bullets, blasts = blasts }

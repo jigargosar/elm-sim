@@ -834,10 +834,18 @@ handleEntityDeath entity =
             ( [ BlastDeathAnim bl ], [] )
 
         PlayerE player ->
-            noOp
+            if HasHealth.isDead player then
+                ( [ PlayerDeathAnim player ], [ entity ] )
+
+            else
+                noOp
 
         TurretE turret ->
-            noOp
+            if HasHealth.isDead turret then
+                ( [ TurretDeathAnim turret ], [] )
+
+            else
+                noOp
 
         BulletE bullet ->
             noOp

@@ -1114,9 +1114,6 @@ handleGameOver model =
     let
         isPlayerDead =
             model.player |> HasHealth.isDead
-
-        isStageComplete =
-            List.isEmpty model.turrets
     in
     if isPlayerDead then
         { model
@@ -1124,18 +1121,23 @@ handleGameOver model =
             , state = GameOver (Counter.init gameOverDuration)
         }
 
-    else if isStageComplete then
-        let
-            nextStage =
-                model.stage + 1
-        in
-        { model
-            | stage = nextStage
-            , turrets = initTurretsForStage nextStage model.rTicks
-        }
-
     else
-        model
+        let
+            isStageComplete =
+                List.isEmpty model.turrets
+        in
+        if isStageComplete then
+            let
+                nextStage =
+                    model.stage + 1
+            in
+            { model
+                | stage = nextStage
+                , turrets = initTurretsForStage nextStage model.rTicks
+            }
+
+        else
+            model
 
 
 incRunningTicks : Memory -> Memory

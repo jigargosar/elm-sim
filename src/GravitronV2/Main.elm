@@ -1115,9 +1115,6 @@ handleGameOver model =
         isPlayerDead =
             model.player |> HasHealth.isDead
 
-        isGameOver =
-            isPlayerDead
-
         isStageComplete =
             List.isEmpty model.turrets
     in

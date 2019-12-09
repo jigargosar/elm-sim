@@ -831,7 +831,7 @@ handleEntityDeath entity =
     in
     case entity of
         BlastE bl ->
-            noOp
+            ( [ BlastDeathAnim bl ], [] )
 
         PlayerE player ->
             noOp

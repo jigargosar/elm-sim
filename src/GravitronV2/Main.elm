@@ -714,11 +714,7 @@ type DeathAnimationKind
 type alias Memory =
     HasDeathAnimations
         (HasGameObjects
-            { player : Player
-            , turrets : Turrets
-            , bullets : Bullets
-            , blasts : Blasts
-            , rTicks : Float
+            { rTicks : Float
             , state : GameState
             , stage : Int
             }

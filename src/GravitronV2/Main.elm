@@ -205,7 +205,7 @@ initTurretWithConfig triggerTimer position config =
 stepTurret : Float -> HasPosition a -> Turret -> ( Bullets, Turret )
 stepTurret rTicks target turret =
     ( if Timer.isDone rTicks turret.triggerTimer then
-        turretGenerateBulletForWeapon target turret.weapon turret
+        turretGenerateBulletForWeapon rTicks target turret.weapon turret
 
       else
         []
@@ -213,8 +213,8 @@ stepTurret rTicks target turret =
     )
 
 
-turretGenerateBulletForWeapon : HasPosition a -> TurretWeapon -> Turret -> Bullets
-turretGenerateBulletForWeapon target weapon turret =
+turretGenerateBulletForWeapon : Float -> HasPosition a -> TurretWeapon -> Turret -> Bullets
+turretGenerateBulletForWeapon rTicks target weapon turret =
     let
         from =
             turret.position
@@ -241,8 +241,12 @@ turretGenerateBulletForWeapon target weapon turret =
                 |> (\b -> { b | bulletType = HomingBullet })
 
         timeBombBullet angle =
+            let
+                bombTimer =
+                    Timer.start rTicks (60 * 5)
+            in
             bulletFromAnge angle
-                |> (\b -> { b | bulletType = TimeBombBullet })
+                |> (\b -> { b | bulletType = TimeBombBullet bombTimer })
     in
     let
         angle =
@@ -361,7 +365,7 @@ type alias Bullet =
 type BulletType
     = GravityBullet
     | HomingBullet
-    | TimeBombBullet
+    | TimeBombBullet Timer
 
 
 defaultBullet : Bullet
@@ -435,7 +439,7 @@ stepBullet screen target bullet =
                     V.add homingVec
                         >> V.mapMagnitude ((*) 0.98)
 
-                TimeBombBullet ->
+                TimeBombBullet _ ->
                     let
                         gravityVec =
                             V.fromPt bullet.position target.position
@@ -498,7 +502,7 @@ renderBulletHelp bullet =
                 )
             ]
 
-        TimeBombBullet ->
+        TimeBombBullet _ ->
             [ simpleBulletCircle ]
 
 
@@ -904,7 +908,7 @@ stepGameObjects rTicks computer model =
                     (\player_ ->
                         List.Extra.mapAccuml
                             (\acc ->
-                                handleEntityDeath player_ >> Tuple.mapFirst ((++) acc)
+                                handleEntityDeath rTicks player_ >> Tuple.mapFirst ((++) acc)
                             )
                             []
                             >> Tuple.mapSecond List.concat
@@ -943,8 +947,8 @@ stepEntity rTicks computer player entity =
             [ BlastE blast ]
 
 
-handleEntityDeath : HasPosition x -> Entity -> ( List DeathAnimationKind, List Entity )
-handleEntityDeath target entity =
+handleEntityDeath : Float -> HasPosition x -> Entity -> ( List DeathAnimationKind, List Entity )
+handleEntityDeath rTicks target entity =
     let
         noOp =
             ( [], [ entity ] )
@@ -968,7 +972,7 @@ handleEntityDeath target entity =
                         []
 
                     FiveBulletsOnDeathTurret ->
-                        turretGenerateBulletForWeapon target GravityFive turret
+                        turretGenerateBulletForWeapon rTicks target GravityFive turret
                             |> List.map BulletE
                 )
 
@@ -1005,13 +1009,14 @@ onEntityEntityCollision e1 e2 =
             flipCallSwap ()
 
         ( PlayerE p, BulletE b ) ->
-            if b.bulletType == TimeBombBullet then
-                onCircularCollisionMapBoth identity HasHealth.dec p b
-                    |> Tuple.mapBoth PlayerE BulletE
+            case b.bulletType of
+                TimeBombBullet _ ->
+                    onCircularCollisionMapBoth identity HasHealth.dec p b
+                        |> Tuple.mapBoth PlayerE BulletE
 
-            else
-                onCircularCollisionMapBoth HasHealth.dec HasHealth.dec p b
-                    |> Tuple.mapBoth PlayerE BulletE
+                _ ->
+                    onCircularCollisionMapBoth HasHealth.dec HasHealth.dec p b
+                        |> Tuple.mapBoth PlayerE BulletE
 
         ( BulletE _, PlayerE _ ) ->
             flipCallSwap ()
@@ -1027,13 +1032,14 @@ onEntityEntityCollision e1 e2 =
             noOp
 
         ( TurretE t, BulletE b ) ->
-            if b.bulletType == TimeBombBullet then
-                onCircularCollisionMapBoth identity HasHealth.dec t b
-                    |> Tuple.mapBoth TurretE BulletE
+            case b.bulletType of
+                TimeBombBullet _ ->
+                    onCircularCollisionMapBoth identity HasHealth.dec t b
+                        |> Tuple.mapBoth TurretE BulletE
 
-            else
-                onCircularCollisionMapBoth HasHealth.dec HasHealth.dec t b
-                    |> Tuple.mapBoth TurretE BulletE
+                _ ->
+                    onCircularCollisionMapBoth HasHealth.dec HasHealth.dec t b
+                        |> Tuple.mapBoth TurretE BulletE
 
         ( BulletE _, TurretE _ ) ->
             flipCallSwap ()
@@ -1080,15 +1086,16 @@ type alias Blasts =
 
 blastsFromBullet : Bullet -> List Blast
 blastsFromBullet bullet =
-    if bullet.bulletType == TimeBombBullet then
-        [ { position = bullet.position
-          , radius = bullet.radius * 15
-          , color = G.green
-          }
-        ]
+    case bullet.bulletType of
+        TimeBombBullet _ ->
+            [ { position = bullet.position
+              , radius = bullet.radius * 15
+              , color = G.green
+              }
+            ]
 
-    else
-        []
+        _ ->
+            []
 
 
 deathAnimSetDuration : Float -> DeathAnimation -> DeathAnimation

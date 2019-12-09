@@ -527,7 +527,10 @@ renderBulletHelp rTicks bullet =
                     progressArcRadius
               in
               if progress > 0 then
-                G.strokeArc ( x, y ) (turns progress) ( x + xOffset, y ) (G.withAlpha 0.5 G.green)
+                G.strokeArc ( x, y )
+                    (turns progress)
+                    ( x + xOffset, y )
+                    G.green
 
               else
                 G.noShape

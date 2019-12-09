@@ -839,7 +839,7 @@ updateMemory computer model =
                     |> stepDeathAnimations
                     |> stepGameObjects model.rTicks computer
                     |> addNewDeathAnimations
-                    |> handleGameOver
+                    |> handleGameOverOrNextStage
                     |> incRunningTicks
 
         GameOver counter ->
@@ -1109,8 +1109,8 @@ addNewDeathAnimations ( kinds, model ) =
     { model | deathAnimations = newDeathAnimations }
 
 
-handleGameOver : Memory -> Memory
-handleGameOver model =
+handleGameOverOrNextStage : Memory -> Memory
+handleGameOverOrNextStage model =
     let
         isPlayerDead =
             model.player |> HasHealth.isDead

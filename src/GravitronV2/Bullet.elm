@@ -72,7 +72,12 @@ initHoming =
 
 initTimeBomb : Float -> Config -> Bullet
 initTimeBomb rTicks =
-    init >> (\model -> { model | bulletType = TimeBombBullet (Timer.start rTicks (60 * 5)) })
+    init
+        >> (\model ->
+                { model
+                    | bulletType = TimeBombBullet (Timer.start rTicks (60 * 2))
+                }
+           )
 
 
 defaultBullet : Bullet

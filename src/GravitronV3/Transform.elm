@@ -50,10 +50,6 @@ andThenScaleBy s prefix =
 
 renderTransform : Transform -> String
 renderTransform (Transform dx dy angle s) =
-    let
-        f =
-            String.fromFloat
-    in
     renderTranslate dx dy
         |> andThenRotateBy angle
         |> andThenScaleBy s

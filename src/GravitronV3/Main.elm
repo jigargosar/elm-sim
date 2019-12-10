@@ -52,13 +52,29 @@ view { screen } =
 type alias Model =
     { screen : Screen
     , clock : Clock
+    , game : Game
     }
+
+
+type alias Game =
+    {}
+
+
+initialGame : Game
+initialGame =
+    {}
+
+
+updateGame : Game -> Game
+updateGame game =
+    game
 
 
 init : () -> ( Model, Cmd Msg )
 init _ =
     ( { screen = Screen.initial
       , clock = Clock.initial
+      , game = initialGame
       }
     , Task.perform GotScreen Screen.get
     )
@@ -71,7 +87,11 @@ update message model =
             save { model | screen = screen }
 
         Tick posix ->
-            save { model | clock = Clock.onAnimationFrame posix model.clock }
+            save
+                { model
+                    | clock = Clock.onAnimationFrame posix model.clock
+                    , game = updateGame model.game
+                }
 
 
 subscriptions _ =

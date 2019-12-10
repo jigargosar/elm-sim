@@ -9,6 +9,7 @@ import Html exposing (Html)
 import Svg exposing (..)
 import Svg.Attributes exposing (..)
 import Task
+import Time exposing (Posix)
 import Update.Pipeline exposing (..)
 
 
@@ -27,6 +28,7 @@ toPx attr value =
 
 type Msg
     = GotScreen Screen
+    | Tick Posix
 
 
 view : Model -> Html Msg
@@ -45,12 +47,15 @@ view { screen } =
 
 type alias Model =
     { screen : Screen
+    , animationClock : Posix
     }
 
 
 init : () -> ( Model, Cmd Msg )
 init _ =
-    ( { screen = Screen.initial }
+    ( { screen = Screen.initial
+      , animationClock = Time.millisToPosix 0
+      }
     , Task.perform GotScreen Screen.get
     )
 
@@ -61,9 +66,15 @@ update message model =
         GotScreen screen ->
             save { model | screen = screen }
 
+        Tick animationClock ->
+            save { model | animationClock = animationClock }
+
 
 subscriptions _ =
-    Sub.batch [ Screen.onResize GotScreen ]
+    Sub.batch
+        [ Screen.onResize GotScreen
+        , E.onAnimationFrame Tick
+        ]
 
 
 main : Program () Model Msg

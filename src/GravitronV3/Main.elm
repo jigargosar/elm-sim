@@ -105,10 +105,20 @@ initialGame =
 
 updateGame : Game -> Game
 updateGame game =
-    { game | bodies = List.map stepBodies game.bodies }
+    { game | bodies = mapBodiesWithPlayer stepBodies game }
 
 
-stepBodies body =
+mapBodiesWithPlayer func { bodies } =
+    let
+        player : PlayerModel
+        player =
+            getPlayer { bodies = bodies }
+    in
+    List.map (func player) bodies
+
+
+stepBodies : PlayerModel -> Body -> Body
+stepBodies playerModel body =
     case body of
         Player _ ->
             body

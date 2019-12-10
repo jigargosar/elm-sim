@@ -147,7 +147,7 @@ handleCollision b o =
             b
 
         hit =
-            { b | hp = min 0 (b.hp - 1) }
+            { b | hp = max 0 (b.hp - 1) }
 
         kill =
             { b | hp = 0 }

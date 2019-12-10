@@ -78,7 +78,7 @@ initialGravityBullet =
 
 initTurret : Body
 initTurret =
-    { position = vec -400 -400
+    { position = vec -220 -220
     , velocity = Vec.zero
     , radius = 25
     , hp = 10

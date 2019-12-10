@@ -1,10 +1,14 @@
 module GravitronV3.Main exposing (main)
 
+import Basics.Extra exposing (flip)
 import Browser
 import Browser.Events as E
-import GravitronV3.Draw exposing (..)
+import GravitronV3.Canvas exposing (..)
+import GravitronV3.Range as Range
 import GravitronV3.Screen as Screen exposing (Screen)
 import Html exposing (Html)
+import List.Extra
+import PointFree exposing (subBA)
 import Task
 import Time exposing (Posix)
 import TimeTravel.Browser as TimeTravel
@@ -22,10 +26,34 @@ type Msg
 
 view : Model -> Html Msg
 view { screen } =
+    let
+        whiteRect =
+            fillRect "white" screen.width screen.height
+
+        blackRect =
+            fillRect "black" screen.width screen.height
+
+        scales : List Float
+        scales =
+            Range.init 1 0 |> Range.break 500
+
+        shapes : List Shape
+        shapes =
+            [ blackRect, whiteRect ] |> List.repeat 500 |> List.concat
+
+        scaledShapes : List Shape
+        scaledShapes =
+            List.map2 scale scales shapes
+    in
     renderShapes screen
-        [ rect "#000" screen.width screen.height
-        , rect "#fff" (screen.width / 2) (screen.height / 2)
-        ]
+        {- [ blackRect |> scale 1
+           , whiteRect |> scale 0.5
+           , blackRect |> scale 0.25
+           , whiteRect |> scale 0.5
+           , blackRect |> scale 0.25
+           ]
+        -}
+        scaledShapes
 
 
 type alias Model =

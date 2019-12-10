@@ -3,6 +3,7 @@ module GravitronV3.Transform exposing
     , initial
     , renderRectTransform
     , renderTransform
+    , scale
     )
 
 
@@ -13,6 +14,11 @@ type Transform
 initial : Transform
 initial =
     Transform 0 0 0 1
+
+
+scale : Float -> Transform -> Transform
+scale s (Transform x y a _) =
+    Transform x y a s
 
 
 renderRectTransform : Float -> Float -> Transform -> String

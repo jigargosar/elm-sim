@@ -1,0 +1,86 @@
+module GravitronV3.Canvas exposing (Shape, fillRect, rect, renderShapes, scale)
+
+import GravitronV3.Screen as Screen exposing (Screen)
+import GravitronV3.Transform as Transform exposing (Transform)
+import Html exposing (Html)
+import Svg exposing (..)
+import Svg.Attributes as S exposing (..)
+
+
+type Form
+    = Rect Float Float
+
+
+type Brush
+    = Fill String
+    | Stroke String Float
+    | NoBrush
+
+
+type Shape
+    = Shape Form Brush Transform
+
+
+fillRect : String -> Float -> Float -> Shape
+fillRect color width height =
+    Shape (Rect width height) (Fill color) Transform.initial
+
+
+rect : Float -> Float -> Shape
+rect width height =
+    Shape (Rect width height) NoBrush Transform.initial
+
+
+fill : String -> Shape -> Shape
+fill =
+    Fill >> setBrush
+
+
+setBrush : Brush -> Shape -> Shape
+setBrush b (Shape f _ t) =
+    Shape f b t
+
+
+mapTransform : (Transform -> Transform) -> Shape -> Shape
+mapTransform func (Shape f b t) =
+    Shape f b (func t)
+
+
+scale : Float -> Shape -> Shape
+scale =
+    Transform.scale >> mapTransform
+
+
+renderShapes : Screen -> List Shape -> Html msg
+renderShapes screen shapes =
+    Screen.toSvg screen (List.map renderShape shapes)
+
+
+renderShape : Shape -> Svg msg
+renderShape (Shape form brush t) =
+    let
+        f =
+            String.fromFloat
+    in
+    case form of
+        Rect w h ->
+            Svg.rect
+                ([ width <| f w
+                 , height <| f h
+                 , transform <| Transform.renderRectTransform w h t
+                 ]
+                    ++ renderBrush brush
+                )
+                []
+
+
+renderBrush brush =
+    case brush of
+        NoBrush ->
+            []
+
+        Fill fc ->
+            [ S.fill fc ]
+
+        Stroke sc sw ->
+            [ S.stroke sc, S.strokeWidth <| String.fromFloat sw ]

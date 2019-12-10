@@ -6,6 +6,7 @@ import Browser.Dom as Dom
 import Browser.Events as E
 import Color exposing (Color)
 import GravitronV3.Screen as Screen exposing (Screen)
+import GravitronV3.Transform as Transform exposing (Transform(..))
 import Html exposing (Html)
 import PointFree exposing (appendBA, appendIf, whenTrue)
 import Svg exposing (..)
@@ -53,10 +54,6 @@ type Form
     = Rect Float Float
 
 
-type Transform
-    = Transform Float Float Float Float
-
-
 type Brush
     = Brush String
 
@@ -67,7 +64,7 @@ type Shape
 
 rect : String -> Float -> Float -> Shape
 rect color width height =
-    Shape (Rect width height) (Brush color) (Transform 0 0 0 1)
+    Shape (Rect width height) (Brush color) Transform.initial
 
 
 renderShape : Shape -> Svg msg
@@ -82,53 +79,9 @@ renderShape (Shape form (Brush fillColor) t) =
                 [ width <| f w
                 , height <| f h
                 , fill fillColor
-                , transform <| renderRectTransform w h t
+                , transform <| Transform.renderRectTransform w h t
                 ]
                 []
-
-
-renderRectTransform : Float -> Float -> Transform -> String
-renderRectTransform w h t =
-    let
-        f =
-            String.fromFloat
-    in
-    renderTransform t
-        ++ (" translate(" ++ f (-w / 2) ++ "," ++ f (-h / 2) ++ ")")
-
-
-andThenRotateBy : Float -> String -> String
-andThenRotateBy angle prefix =
-    if angle == 0 then
-        prefix
-
-    else
-        prefix ++ (" rotate(" ++ String.fromFloat angle ++ ")")
-
-
-renderTranslate : Float -> Float -> String
-renderTranslate x y =
-    "translate(" ++ String.fromFloat x ++ "," ++ String.fromFloat y ++ ")"
-
-
-andThenScaleBy : Float -> String -> String
-andThenScaleBy s prefix =
-    if s == 1 then
-        prefix
-
-    else
-        prefix ++ (" scale(" ++ String.fromFloat s ++ ")")
-
-
-renderTransform : Transform -> String
-renderTransform (Transform dx dy angle s) =
-    let
-        f =
-            String.fromFloat
-    in
-    renderTranslate dx dy
-        |> andThenRotateBy angle
-        |> andThenScaleBy s
 
 
 type alias Model =

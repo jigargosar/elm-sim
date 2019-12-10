@@ -42,6 +42,29 @@ appendBA =
     flip appendAB
 
 
+appendIf : Bool -> appendable -> appendable -> appendable
+appendIf bool end start =
+    if bool then
+        start ++ end
+
+    else
+        start
+
+
+whenTrue : Bool -> (c -> c) -> c -> c
+whenTrue bool t v =
+    if bool then
+        t v
+
+    else
+        v
+
+
+whenFalse : Bool -> (c -> c) -> c -> c
+whenFalse bool =
+    whenTrue (not bool)
+
+
 pairedTo : b -> a -> ( a, b )
 pairedTo =
     flip Tuple.pair

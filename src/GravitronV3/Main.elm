@@ -7,6 +7,7 @@ import Browser.Events as E
 import Color exposing (Color)
 import GravitronV3.Screen as Screen exposing (Screen)
 import Html exposing (Html)
+import PointFree exposing (appendBA, appendIf, whenTrue)
 import Svg exposing (..)
 import Svg.Attributes exposing (..)
 import Task
@@ -100,18 +101,24 @@ renderTransform (Transform dx dy angle s) =
     let
         f =
             String.fromFloat
+
+        appendRotate prefix =
+            if angle == 0 then
+                prefix
+
+            else
+                prefix ++ (" rotate(" ++ f angle ++ ")")
+
+        appendScale prefix =
+            if s == 1 then
+                prefix
+
+            else
+                prefix ++ (" scale(" ++ f s ++ ")")
     in
     ("translate(" ++ f dx ++ "," ++ f dy ++ ")")
-        |> appendIf (angle /= 0) (" rotate(" ++ f angle ++ ")")
-        |> appendIf (s /= 1) (" scale(" ++ f s ++ ")")
-
-
-appendIf bool end start =
-    if bool then
-        start ++ end
-
-    else
-        start
+        |> appendRotate
+        |> appendScale
 
 
 type alias Model =

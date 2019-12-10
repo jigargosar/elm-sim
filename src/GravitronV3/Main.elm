@@ -21,12 +21,12 @@ import Update.Pipeline exposing (..)
 -- Game
 
 
-type alias BodyModel a =
-    { a
-        | position : Vec
-        , velocity : Vec
-        , hp : Float
-        , movement : MovementType
+type alias Body =
+    { position : Vec
+    , velocity : Vec
+    , hp : Float
+    , movement : MovementType
+    , type_ : BodyType
     }
 
 
@@ -39,20 +39,13 @@ playerConfig =
     }
 
 
-type alias PlayerModel =
-    { position : Vec
-    , velocity : Vec
-    , hp : Float
-    , movement : MovementType
-    }
-
-
-initialPlayer : PlayerModel
+initialPlayer : Body
 initialPlayer =
     { position = playerConfig.position
     , velocity = playerConfig.velocity
     , hp = playerConfig.hp
     , movement = playerConfig.movement
+    , type_ = Player
     }
 
 
@@ -61,33 +54,26 @@ type MovementType
     | SpringToMouse Float Float
 
 
-type alias BulletModel =
-    { position : Vec
-    , velocity : Vec
-    , hp : Float
-    , movement : MovementType
-    }
-
-
-initBullet : MovementType -> BulletModel
+initBullet : MovementType -> Body
 initBullet movement =
     { position = Vec.vec1
     , velocity = Vec.vec1
     , hp = 1
     , movement = movement
+    , type_ = Bullet
     }
 
 
-type Body
-    = Bullet BulletModel
-    | Player PlayerModel
+type BodyType
+    = Bullet
+    | Player
 
 
 type alias Game =
     { bodies : List Body }
 
 
-getPlayer : List Body -> PlayerModel
+getPlayer : List Body -> Body
 getPlayer =
     findMapWithDefault playerModelFromBody initialPlayer
 
@@ -97,11 +83,11 @@ getPlayerPosition =
     getPlayer >> .position
 
 
-playerModelFromBody : Body -> Maybe PlayerModel
+playerModelFromBody : Body -> Maybe Body
 playerModelFromBody body =
-    case body of
-        Player model ->
-            Just model
+    case body.type_ of
+        Player ->
+            Just body
 
         _ ->
             Nothing
@@ -110,8 +96,8 @@ playerModelFromBody body =
 initialGame : Game
 initialGame =
     { bodies =
-        [ initialPlayer |> Player
-        , initBullet (GravitateToPlayer 20) |> Bullet
+        [ initialPlayer
+        , initBullet (GravitateToPlayer 20)
         ]
     }
 
@@ -133,20 +119,11 @@ type alias Env =
 
 
 stepBody : Env -> Vec -> Body -> Body
-stepBody env playerPosition body =
-    let
-        stepMovementHelp =
-            stepMovement env playerPosition
-    in
-    case body of
-        Player model ->
-            model |> stepMovementHelp |> Player
-
-        Bullet model ->
-            model |> stepMovementHelp |> Player
+stepBody env playerPosition =
+    stepMovement env playerPosition
 
 
-stepMovement : Env -> Vec -> BodyModel x -> BodyModel x
+stepMovement : Env -> Vec -> Body -> Body
 stepMovement { mousePosition } playerPosition model =
     let
         newVelocity =
@@ -177,15 +154,15 @@ viewGame screen { bodies } =
 
 toShape : Body -> Shape
 toShape body =
-    case body of
-        Bullet bulletModel ->
+    case body.type_ of
+        Bullet ->
             rect 10 10
-                |> move (Vec.toTuple bulletModel.position)
+                |> move (Vec.toTuple body.position)
                 |> fill "black"
 
-        Player playerModel ->
+        Player ->
             rect 10 10
-                |> move (Vec.toTuple playerModel.position)
+                |> move (Vec.toTuple body.position)
                 |> fill "red"
 
 

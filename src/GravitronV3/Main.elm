@@ -66,8 +66,8 @@ initialPlayer =
 
 initialGravityBullet : Body
 initialGravityBullet =
-    { position = Vec.vec1
-    , velocity = Vec.vec1
+    { position = vec -100 -100
+    , velocity = vec -20 -10
     , radius = 10
     , hp = 1
     , movement = GravitateToPlayer 20

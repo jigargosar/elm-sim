@@ -130,7 +130,7 @@ circleCircleCollision c1 c2 =
 
 handleCollisions =
     List.Extra.select
-        >> List.map (uncurry (List.foldl (ifColliding handleCollision)))
+        >> List.map (uncurry (List.foldl (ifColliding handleCollisionOf)))
 
 
 ifColliding func b o =
@@ -141,20 +141,21 @@ ifColliding func b o =
         b
 
 
-handleCollision b o =
+handleCollisionOf : Body -> Body -> Body
+handleCollisionOf body other =
     let
         ignore =
-            b
+            body
 
         hit =
-            { b | hp = max 0 (b.hp - 1) }
+            { body | hp = max 0 (body.hp - 1) }
 
         kill =
-            { b | hp = 0 }
+            { body | hp = 0 }
     in
-    case b.type_ of
+    case body.type_ of
         Player ->
-            case o.type_ of
+            case other.type_ of
                 Player ->
                     ignore
 
@@ -162,7 +163,7 @@ handleCollision b o =
                     hit
 
         Bullet ->
-            case o.type_ of
+            case other.type_ of
                 Player ->
                     kill
 

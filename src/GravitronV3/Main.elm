@@ -130,19 +130,19 @@ circleCircleCollision c1 c2 =
 
 handleCollisions =
     List.Extra.select
-        >> List.map (uncurry (List.foldl (ifColliding handleCollisionOf)))
+        >> List.map (uncurry (List.foldl handleCollision))
 
 
-ifColliding func b o =
+handleCollision b o =
     if circleCircleCollision b o then
-        func b o
+        handleCollisionHelp b o
 
     else
         b
 
 
-handleCollisionOf : Body -> Body -> Body
-handleCollisionOf body other =
+handleCollisionHelp : Body -> Body -> Body
+handleCollisionHelp body other =
     let
         ignore =
             body

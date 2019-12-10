@@ -67,7 +67,7 @@ initialPlayer =
 initialGravityBullet : Body
 initialGravityBullet =
     { position = vec -100 -100
-    , velocity = vec -20 -10
+    , velocity = vec 2 -1
     , radius = 10
     , hp = 1
     , movement = GravitateToPlayer 20
@@ -78,10 +78,10 @@ initialGravityBullet =
 
 initTurret : Body
 initTurret =
-    { position = vec -100 -100
+    { position = Vec.zero
     , velocity = Vec.zero
     , radius = 25
-    , hp = 500
+    , hp = 10
     , movement = Stationary
     , screenCollision = IgnoreScreenCollision
     , type_ = Turret
@@ -184,10 +184,10 @@ resolveCollisionOf body other =
         Bullet ->
             case other.type_ of
                 Player ->
-                    kill
+                    ignore
 
                 Bullet ->
-                    kill
+                    ignore
 
                 Turret ->
                     ignore

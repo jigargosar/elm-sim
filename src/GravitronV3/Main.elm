@@ -24,10 +24,6 @@ type Msg
 view : Model -> Html Msg
 view { screen } =
     let
-        fullRect : Shape
-        fullRect =
-            rect screen.width screen.height
-
         idxToColor idx =
             if modBy 2 idx == 0 then
                 "white"
@@ -38,12 +34,11 @@ view { screen } =
         scaledShapes : List Shape
         scaledShapes =
             Range.init 1 0
-                |> Range.break 6
+                |> Range.break 1200
                 |> List.indexedMap
                     (\idx s ->
-                        fullRect
-                            |> scale s
-                            |> fill (idxToColor idx)
+                        rect (screen.width * s) (screen.height * s)
+                            |> stroke (idxToColor idx |> always "black")
                     )
     in
     renderShapes screen

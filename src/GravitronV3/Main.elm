@@ -55,13 +55,6 @@ view { screen } =
                     )
     in
     renderShapes screen
-        {- [ blackRect |> scale 1
-           , whiteRect |> scale 0.5
-           , blackRect |> scale 0.25
-           , whiteRect |> scale 0.5
-           , blackRect |> scale 0.25
-           ]
-        -}
         [ scaledShapes
             |> group
             |> fill "transparent"

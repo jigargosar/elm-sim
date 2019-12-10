@@ -115,7 +115,11 @@ findMapWithDefault func d =
 
 initialGame : Game
 initialGame =
-    { bodies = [ initialPlayer |> Player, initBullet (GravitateToPlayer 20) |> Bullet ] }
+    { bodies =
+        [ initialPlayer |> Player
+        , initBullet (GravitateToPlayer 20) |> Bullet
+        ]
+    }
 
 
 updateGame : Env -> Game -> Game

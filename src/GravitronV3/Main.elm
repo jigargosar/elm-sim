@@ -1,6 +1,6 @@
 module GravitronV3.Main exposing (main)
 
-import Basics.Extra exposing (flip)
+import Basics.Extra exposing (flip, uncurry)
 import Browser
 import Browser.Events as E
 import GravitronV3.Canvas exposing (..)
@@ -10,6 +10,7 @@ import GravitronV3.Screen as Screen exposing (Screen)
 import GravitronV3.Vec as Vec exposing (Vec, vec)
 import Html exposing (Html)
 import Json.Decode as D
+import List.Extra
 import PointFree as FP exposing (findMapWithDefault, findWithDefault)
 import Task
 import Time exposing (Posix)
@@ -115,7 +116,58 @@ initialGame =
 
 updateGame : Env -> Game -> Game
 updateGame env game =
-    { game | bodies = mapBodiesWithPlayerPosition (stepBody env) game.bodies }
+    { game
+        | bodies =
+            mapBodiesWithPlayerPosition (stepBody env) game.bodies
+                |> handleCollisions
+    }
+
+
+circleCircleCollision : Body -> Body -> Bool
+circleCircleCollision c1 c2 =
+    Vec.lenFrom c1.position c2.position < c1.radius + c2.radius
+
+
+handleCollisions =
+    List.Extra.select
+        >> List.map (uncurry (List.foldl (ifColliding handleCollision)))
+
+
+ifColliding func b o =
+    if circleCircleCollision b o then
+        func b o
+
+    else
+        b
+
+
+handleCollision b o =
+    let
+        ignore =
+            b
+
+        hit =
+            { b | hp = min 0 (b.hp - 1) }
+
+        kill =
+            { b | hp = 0 }
+    in
+    case b.type_ of
+        Player ->
+            case o.type_ of
+                Player ->
+                    ignore
+
+                Bullet ->
+                    hit
+
+        Bullet ->
+            case o.type_ of
+                Player ->
+                    kill
+
+                Bullet ->
+                    kill
 
 
 mapBodiesWithPlayerPosition : (Vec -> Body -> Body) -> List Body -> List Body

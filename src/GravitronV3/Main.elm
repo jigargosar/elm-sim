@@ -129,7 +129,9 @@ mapBodiesWithPlayerPosition func =
 
 
 type alias Env =
-    { mousePosition : Vec }
+    { mousePosition : Vec
+    , screen : Screen
+    }
 
 
 stepBody : Env -> Vec -> Body -> Body
@@ -237,10 +239,17 @@ update message model =
             save { model | screen = screen }
 
         Tick posix ->
+            let
+                env : Env
+                env =
+                    { mousePosition = Vec.zero
+                    , screen = model.screen
+                    }
+            in
             save
                 { model
                     | clock = Clock.onAnimationFrame posix model.clock
-                    , game = updateGame { mousePosition = Vec.zero } model.game
+                    , game = updateGame env model.game
                 }
 
         MouseMove pageX pageY ->

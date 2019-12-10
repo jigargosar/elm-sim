@@ -8,6 +8,7 @@ import GravitronV3.Range as Range
 import GravitronV3.Screen as Screen exposing (Screen)
 import GravitronV3.Vec as Vec exposing (Vec)
 import Html exposing (Html)
+import List.Extra
 import Task
 import Time exposing (Posix)
 import TimeTravel.Browser as TimeTravel
@@ -35,8 +36,8 @@ type alias PlayerModel =
     }
 
 
-initPlayer : PlayerModel
-initPlayer =
+initialPlayer : PlayerModel
+initialPlayer =
     { position = playerConfig.position
     , velocity = playerConfig.velocity
     , hp = playerConfig.hp
@@ -66,9 +67,31 @@ type alias Game =
     { bodies : List Body }
 
 
+getPlayer : Game -> PlayerModel
+getPlayer =
+    .bodies >> findMapWithDefault playerModelFromBody initialPlayer
+
+
+playerModelFromBody : Body -> Maybe PlayerModel
+playerModelFromBody body =
+    case body of
+        Player model ->
+            Just model
+
+        _ ->
+            Nothing
+
+
+findMapWithDefault : (a -> Maybe b) -> b -> List a -> b
+findMapWithDefault func d =
+    List.filterMap func
+        >> List.head
+        >> Maybe.withDefault d
+
+
 initialGame : Game
 initialGame =
-    { bodies = [ initPlayer |> Player ] }
+    { bodies = [ initialPlayer |> Player ] }
 
 
 updateGame : Game -> Game

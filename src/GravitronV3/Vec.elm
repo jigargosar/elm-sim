@@ -14,6 +14,7 @@ module GravitronV3.Vec exposing
     , len2
     , lenFrom
     , map2
+    , mapAngle
     , mapEach
     , mapMagnitude
     , scaleBy
@@ -157,6 +158,11 @@ clampMagnitude hi =
 mapMagnitude : (Float -> Float) -> Vec -> Vec
 mapMagnitude func =
     toTuple >> toPolar >> Tuple.mapFirst func >> fromPolar >> uncurry vec
+
+
+mapAngle : (Float -> Float) -> Vec -> Vec
+mapAngle func =
+    toTuple >> toPolar >> Tuple.mapSecond func >> fromPolar >> uncurry vec
 
 
 fromToScaled : Vec -> Vec -> Float -> Vec

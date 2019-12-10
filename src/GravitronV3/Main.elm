@@ -57,11 +57,17 @@ playerConfig =
 initialPlayer : Body
 initialPlayer =
     { position = playerConfig.position
-    , velocity = playerConfig.velocity
+
+    --, velocity = playerConfig.velocity
+    , velocity = Vec.fromRTheta 1 0
     , radius = 20
     , hp = playerConfig.hp
-    , movement = playerConfig.movement
-    , screenCollision = IgnoreScreenCollision
+
+    -- , movement = playerConfig.movement
+    , movement = Wanderer (Random.initialSeed 1203)
+
+    --, screenCollision = IgnoreScreenCollision
+    , screenCollision = BounceWithingScreen 1
     , type_ = Player
     }
 
@@ -328,7 +334,17 @@ stepMovement { mousePosition } playerPosition model =
                     model
 
                 Wanderer seed ->
-                    model
+                    let
+                        randomAngle =
+                            Random.float -0.1 0.1
+
+                        ( newAngleDiff, newSeed ) =
+                            Random.step randomAngle seed
+                    in
+                    { model
+                        | movement = Wanderer newSeed
+                        , velocity = Vec.mapAngle ((+) newAngleDiff) model.velocity
+                    }
     in
     { newModel | position = Vec.add newModel.position newModel.velocity }
 

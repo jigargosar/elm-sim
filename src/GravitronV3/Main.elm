@@ -120,6 +120,7 @@ updateGame env game =
         | bodies =
             mapBodiesWithPlayerPosition (stepBody env) game.bodies
                 |> handleCollisions
+                |> List.filter (.hp >> flip (>) 0)
     }
 
 

@@ -19,6 +19,15 @@ import Update.Pipeline exposing (..)
 -- Game
 
 
+type alias BodyModel a =
+    { a
+        | position : Vec
+        , velocity : Vec
+        , hp : Float
+        , movement : MovementType
+    }
+
+
 playerConfig =
     { hp = 100
     , lives = 3
@@ -136,6 +145,7 @@ stepBody env playerPosition body =
             model |> stepMovementHelp |> Player
 
 
+stepMovement : Env -> Vec -> BodyModel x -> BodyModel x
 stepMovement { mousePosition } playerPosition model =
     let
         newVelocity =

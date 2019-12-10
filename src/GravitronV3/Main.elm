@@ -238,6 +238,7 @@ stepGenerator env playerPosition body =
                 [ body ]
 
 
+placeBullet : Vec -> Body -> Body -> Body
 placeBullet toPosition fromBody body =
     let
         angle =

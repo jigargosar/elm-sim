@@ -145,20 +145,20 @@ circleCircleCollision c1 c2 =
 
 handleCollisions =
     List.Extra.select
-        >> List.map (\( body, others ) -> List.foldl handleCollisionOF body others)
+        >> List.map (\( body, others ) -> List.foldl handleCollisionWith body others)
 
 
-handleCollisionOF : Body -> Body -> Body
-handleCollisionOF body withOtherBody =
-    if circleCircleCollision body withOtherBody then
-        resolveCollisionOf body withOtherBody
+handleCollisionWith : Body -> Body -> Body
+handleCollisionWith otherBody body =
+    if circleCircleCollision otherBody body then
+        resolveCollisionOf otherBody body
 
     else
         body
 
 
 resolveCollisionOf : Body -> Body -> Body
-resolveCollisionOf body other =
+resolveCollisionOf otherBody body =
     let
         ignore =
             body
@@ -171,7 +171,7 @@ resolveCollisionOf body other =
     in
     case body.type_ of
         Player ->
-            case other.type_ of
+            case otherBody.type_ of
                 Player ->
                     ignore
 
@@ -182,7 +182,7 @@ resolveCollisionOf body other =
                     ignore
 
         Bullet ->
-            case other.type_ of
+            case otherBody.type_ of
                 Player ->
                     ignore
 
@@ -193,7 +193,7 @@ resolveCollisionOf body other =
                     ignore
 
         Turret ->
-            case other.type_ of
+            case otherBody.type_ of
                 Bullet ->
                     ignore
 

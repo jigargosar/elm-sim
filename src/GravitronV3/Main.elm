@@ -59,7 +59,7 @@ initialPlayer =
     { position = playerConfig.position
 
     --, velocity = playerConfig.velocity
-    , velocity = Vec.fromRTheta 1 0
+    , velocity = Vec.fromRTheta 4 0
     , radius = 20
     , hp = playerConfig.hp
 

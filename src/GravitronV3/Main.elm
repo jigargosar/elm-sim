@@ -36,10 +36,10 @@ view : Model -> Html Msg
 view { screen } =
     Screen.toSvg screen
         [ Svg.rect
-            [ toPx x 0
-            , toPx y 0
-            , width "100%"
-            , height "100%"
+            [ toPx x screen.left
+            , toPx y screen.top
+            , toPx width screen.width
+            , toPx height screen.height
             , fill "#000"
             ]
             []

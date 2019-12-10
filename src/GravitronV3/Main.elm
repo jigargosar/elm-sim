@@ -60,7 +60,7 @@ type alias Game =
 
 initialGame : Game
 initialGame =
-    { bodies = [ initPlayer ] }
+    { bodies = [ initPlayer |> Player ] }
 
 
 updateGame : Game -> Game

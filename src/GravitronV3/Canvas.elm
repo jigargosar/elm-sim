@@ -114,7 +114,7 @@ renderShape (Shape form brush t) =
                 (List.map renderShape shapes)
 
         Circle radius ->
-            Svg.rect
+            Svg.circle
                 ([ r <| f radius
                  , transform <| Transform.renderTransform t
                  ]

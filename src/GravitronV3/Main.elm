@@ -89,11 +89,6 @@ getPlayer =
     findWithDefault isPlayer initialPlayer
 
 
-getPlayerPosition : List Body -> Vec
-getPlayerPosition =
-    getPlayer >> .position
-
-
 isPlayer : Body -> Bool
 isPlayer body =
     case body.type_ of
@@ -102,6 +97,11 @@ isPlayer body =
 
         _ ->
             False
+
+
+getPlayerPosition : List Body -> Vec
+getPlayerPosition =
+    getPlayer >> .position
 
 
 initialGame : Game

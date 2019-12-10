@@ -4,9 +4,8 @@ import Basics.Extra exposing (flip, uncurry)
 import Browser
 import Browser.Events as E
 import GravitronV3.Canvas exposing (..)
-import GravitronV3.Clock as Clock exposing (Clock)
 import GravitronV3.Screen as Screen exposing (Screen)
-import GravitronV3.Timer exposing (Timer)
+import GravitronV3.Timer as Timer exposing (Timer)
 import GravitronV3.Vec as Vec exposing (Vec, vec)
 import Html exposing (Html)
 import Json.Decode as D
@@ -85,7 +84,7 @@ initTurret =
     , hp = 10
     , movement = Stationary
     , screenCollision = IgnoreScreenCollision
-    , type_ = Turret (Clock.initial |> Clock.timer 3000)
+    , type_ = Turret (Timer.start 0 (60 * 3))
     }
 
 
@@ -133,8 +132,9 @@ updateGame : Env -> Game -> Game
 updateGame env game =
     { game
         | bodies =
-            mapBodiesWithPlayerPosition (stepBody env) game.bodies
+            FP.with (getPlayerPosition >> stepBody env) List.map game.bodies
                 |> handleCollisions
+                |> List.concatMap (stepGenerator env)
                 |> List.filter (.hp >> flip (>) 0)
     }
 
@@ -205,14 +205,10 @@ resolveCollisionOf otherBody body =
                     ignore
 
 
-mapBodiesWithPlayerPosition : (Vec -> Body -> Body) -> List Body -> List Body
-mapBodiesWithPlayerPosition func =
-    FP.with (getPlayerPosition >> func) List.map
-
-
 type alias Env =
     { mousePosition : Vec
     , screen : Screen
+    , clock : Float
     }
 
 
@@ -220,6 +216,23 @@ stepBody : Env -> Vec -> Body -> Body
 stepBody env playerPosition =
     stepMovement env playerPosition
         >> stepScreenCollision env
+
+
+stepGenerator : Env -> Body -> List Body
+stepGenerator env body =
+    case body.type_ of
+        Bullet ->
+            [ body ]
+
+        Player ->
+            [ body ]
+
+        Turret timer ->
+            if Timer.isDone env.clock timer then
+                [ body ]
+
+            else
+                [ body ]
 
 
 bounceWithinScreen : Screen -> Vec -> Float -> Vec -> Vec
@@ -337,7 +350,7 @@ view { screen, game } =
 type alias Model =
     { screen : Screen
     , mousePosition : Vec
-    , clock : Clock
+    , clock : Float
     , game : Game
     }
 
@@ -346,7 +359,7 @@ init : () -> ( Model, Cmd Msg )
 init _ =
     ( { screen = Screen.initial
       , mousePosition = Vec.zero
-      , clock = Clock.initial
+      , clock = 0
       , game = initialGame
       }
     , Task.perform GotScreen Screen.get
@@ -365,11 +378,12 @@ update message model =
                 env =
                     { mousePosition = model.mousePosition
                     , screen = model.screen
+                    , clock = model.clock
                     }
             in
             save
                 { model
-                    | clock = Clock.onAnimationFrame posix model.clock
+                    | clock = model.clock + 1
                     , game = updateGame env model.game
                 }
 

@@ -28,7 +28,11 @@ playerConfig =
 
 
 type alias PlayerModel =
-    { position : Vec, velocity : Vec, hp : Float, movement : MovementType }
+    { position : Vec
+    , velocity : Vec
+    , hp : Float
+    , movement : MovementType
+    }
 
 
 initPlayer : PlayerModel
@@ -46,7 +50,11 @@ type MovementType
 
 
 type alias BulletModel =
-    { position : Vec, velocity : Vec, hp : Float, movement : MovementType }
+    { position : Vec
+    , velocity : Vec
+    , hp : Float
+    , movement : MovementType
+    }
 
 
 type Body

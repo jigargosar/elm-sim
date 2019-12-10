@@ -65,7 +65,8 @@ view =
 
 
 type alias Model =
-    { screen : Screen }
+    { screen : Screen
+    }
 
 
 main : Program () Model Msg

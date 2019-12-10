@@ -70,6 +70,7 @@ rect color width height =
     Shape (Rect width height) (Brush color) (Transform 0 0 0 1)
 
 
+renderShape : Shape -> Svg msg
 renderShape (Shape form (Brush fillColor) t) =
     let
         f =

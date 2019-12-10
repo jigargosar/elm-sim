@@ -1,13 +1,10 @@
 module GravitronV3.Main exposing (main)
 
-import Basics.Extra exposing (flip)
 import Browser
 import Browser.Events as E
-import GravitronV3.Draw as Draw
+import GravitronV3.Draw exposing (..)
 import GravitronV3.Screen as Screen exposing (Screen)
 import Html exposing (Html)
-import Svg exposing (..)
-import Svg.Attributes exposing (..)
 import Task
 import Time exposing (Posix)
 import TimeTravel.Browser as TimeTravel
@@ -25,10 +22,15 @@ type Msg
 
 view : Model -> Html Msg
 view { screen } =
-    Screen.toSvg screen
-        [ Draw.rect "#000" screen.width screen.height
-            |> Draw.renderShape
+    renderShapes screen
+        [ rect "#000" screen.width screen.height
         ]
+
+
+renderShapes : Screen -> List Shape -> Html msg
+renderShapes screen shapes =
+    Screen.toSvg screen
+        (List.map renderShape shapes)
 
 
 type alias Model =

@@ -10,6 +10,7 @@ import Svg exposing (..)
 import Svg.Attributes exposing (..)
 import Task
 import Time exposing (Posix)
+import TimeTravel.Browser as TimeTravel
 import Update.Pipeline exposing (..)
 
 
@@ -77,9 +78,13 @@ subscriptions _ =
         ]
 
 
-main : Program () Model Msg
+timeTravelElement =
+    TimeTravel.element Debug.toString Debug.toString TimeTravel.defaultConfig
+
+
 main =
-    Browser.element
+    timeTravelElement
+        --Browser.element
         { init = init
         , update = update
         , subscriptions = subscriptions

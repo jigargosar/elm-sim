@@ -134,7 +134,7 @@ updateGame env game =
         | bodies =
             FP.with (getPlayerPosition >> stepBody env) List.map game.bodies
                 |> handleCollisions
-                |> List.concatMap (stepGenerator env)
+                |> FP.with (getPlayerPosition >> stepGenerator env) List.concatMap
                 |> List.filter (.hp >> flip (>) 0)
     }
 
@@ -218,8 +218,8 @@ stepBody env playerPosition =
         >> stepScreenCollision env
 
 
-stepGenerator : Env -> Body -> List Body
-stepGenerator env body =
+stepGenerator : Env -> Vec -> Body -> List Body
+stepGenerator env playerPosition body =
     case body.type_ of
         Bullet ->
             [ body ]
@@ -229,10 +229,26 @@ stepGenerator env body =
 
         Turret timer ->
             if Timer.isDone env.clock timer then
-                [ body ]
+                { body | type_ = Turret (Timer.restart env.clock timer) }
+                    :: [ initialGravityBullet
+                            |> placeBullet playerPosition body
+                       ]
 
             else
                 [ body ]
+
+
+placeBullet toPosition fromBody body =
+    let
+        angle =
+            Vec.fromTo fromBody.position toPosition
+                |> Vec.angle
+    in
+    { body
+        | position =
+            Vec.add fromBody.position
+                (Vec.fromRTheta (body.radius + fromBody.radius) angle)
+    }
 
 
 bounceWithinScreen : Screen -> Vec -> Float -> Vec -> Vec

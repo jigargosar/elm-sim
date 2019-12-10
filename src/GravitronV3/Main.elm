@@ -1,5 +1,6 @@
 module GravitronV3.Main exposing (main)
 
+import Basics.Extra exposing (flip)
 import Browser
 import Browser.Events as E
 import GravitronV3.Canvas exposing (..)
@@ -70,8 +71,8 @@ type alias BulletModel =
 
 initBullet : MovementType -> BulletModel
 initBullet movement =
-    { position = Vec.zero
-    , velocity = Vec.zero
+    { position = Vec.vec1
+    , velocity = Vec.vec1
     , hp = 1
     , movement = movement
     }
@@ -154,7 +155,7 @@ stepMovement { mousePosition } playerPosition model =
                     model.velocity
                         |> Vec.add
                             (Vec.fromTo model.position playerPosition
-                                |> Vec.mapMagnitude ((/) g)
+                                |> Vec.mapMagnitude (\m -> 20 / m)
                             )
 
                 SpringToMouse k friction ->
@@ -163,8 +164,8 @@ stepMovement { mousePosition } playerPosition model =
                         |> Vec.scaleBy friction
     in
     { model
-        | position = Vec.add model.position newVelocity
-        , velocity = newVelocity
+        | velocity = newVelocity
+        , position = Vec.add model.position newVelocity
     }
 
 

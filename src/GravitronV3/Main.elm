@@ -27,11 +27,6 @@ view { screen } =
         ]
 
 
-renderShapes : Screen -> List Shape -> Html msg
-renderShapes screen shapes =
-    Screen.toSvg screen (List.map renderShape shapes)
-
-
 type alias Model =
     { screen : Screen
     , animationClock : Posix

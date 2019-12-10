@@ -1,6 +1,8 @@
-module GravitronV3.Draw exposing (Shape, rect, renderShape)
+module GravitronV3.Draw exposing (Shape, rect, renderShapes)
 
+import GravitronV3.Screen as Screen exposing (Screen)
 import GravitronV3.Transform as Transform exposing (Transform)
+import Html exposing (Html)
 import Svg exposing (..)
 import Svg.Attributes exposing (..)
 
@@ -20,6 +22,11 @@ type Shape
 rect : String -> Float -> Float -> Shape
 rect color width height =
     Shape (Rect width height) (Brush color) Transform.initial
+
+
+renderShapes : Screen -> List Shape -> Html msg
+renderShapes screen shapes =
+    Screen.toSvg screen (List.map renderShape shapes)
 
 
 renderShape : Shape -> Svg msg

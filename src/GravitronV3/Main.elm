@@ -45,7 +45,7 @@ initPlayer =
 
 
 type MovementType
-    = GravitateToPlayer
+    = GravitateToPlayer Float
     | SpringToMouse Float Float
 
 

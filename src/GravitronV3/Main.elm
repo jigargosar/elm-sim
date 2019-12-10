@@ -3,8 +3,8 @@ module GravitronV3.Main exposing (..)
 import Basics.Extra exposing (flip)
 import Browser
 import Browser.Dom as Dom
+import GravitronV3.Screen as Screen exposing (Screen)
 import Html.Attributes as H
-import Playground exposing (Screen)
 import Svg exposing (..)
 import Svg.Attributes exposing (..)
 import Task
@@ -42,17 +42,6 @@ type Msg
     = GotViewport Dom.Viewport
 
 
-toScreen : ( Float, Float ) -> Screen
-toScreen ( width, height ) =
-    { width = width
-    , height = height
-    , top = height / 2
-    , left = -width / 2
-    , right = width / 2
-    , bottom = -height / 2
-    }
-
-
 view =
     svg
         [ toViewBox 0 0 300 300
@@ -84,7 +73,7 @@ main =
     Browser.element
         { init =
             \_ ->
-                ( { screen = toScreen ( 600, 600 ) }
+                ( { screen = Screen.initial }
                 , Task.perform GotViewport Dom.getViewport
                 )
         , update = \_ -> pairedTo Cmd.none

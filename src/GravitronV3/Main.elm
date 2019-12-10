@@ -6,8 +6,9 @@ import GravitronV3.Canvas exposing (..)
 import GravitronV3.Clock as Clock exposing (Clock)
 import GravitronV3.Range as Range
 import GravitronV3.Screen as Screen exposing (Screen)
-import GravitronV3.Vec as Vec exposing (Vec)
+import GravitronV3.Vec as Vec exposing (Vec, vec)
 import Html exposing (Html)
+import Json.Decode as D
 import PointFree as FP
 import Task
 import Time exposing (Posix)
@@ -202,6 +203,7 @@ viewGame screen _ =
 type Msg
     = GotScreen Screen
     | Tick Posix
+    | MouseMove Float Float
 
 
 view : Model -> Html Msg
@@ -241,11 +243,15 @@ update message model =
                     , game = updateGame { mousePosition = Vec.zero } model.game
                 }
 
+        MouseMove pageX pageY ->
+            save { model | mousePosition = vec pageX pageY }
+
 
 subscriptions _ =
     Sub.batch
         [ Screen.onResize GotScreen
         , E.onAnimationFrame Tick
+        , E.onMouseMove (D.map2 MouseMove (D.field "pageX" D.float) (D.field "pageY" D.float))
         ]
 
 

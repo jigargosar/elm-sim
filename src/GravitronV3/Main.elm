@@ -36,8 +36,8 @@ type Msg
     = GotViewport Dom.Viewport
 
 
-toScreen : Float -> Float -> Screen
-toScreen width height =
+toScreen : ( Float, Float ) -> Screen
+toScreen ( width, height ) =
     { width = width
     , height = height
     , top = height / 2
@@ -50,7 +50,11 @@ toScreen width height =
 main : Program () { screen : Screen } Msg
 main =
     Browser.element
-        { init = \_ -> ( { screen = toScreen 600 600 }, Task.perform GotViewport Dom.getViewport )
+        { init =
+            \_ ->
+                ( { screen = toScreen ( 600, 600 ) }
+                , Task.perform GotViewport Dom.getViewport
+                )
         , update = \_ -> pairedTo Cmd.none
         , subscriptions = \_ -> Sub.none
         , view = \_ -> view

@@ -1,6 +1,7 @@
 module PointFree exposing (..)
 
 import Basics.Extra exposing (flip)
+import List.Extra
 
 
 with : (a -> b) -> (b -> a -> c) -> a -> c
@@ -95,3 +96,8 @@ findMapWithDefault func d =
     List.filterMap func
         >> List.head
         >> Maybe.withDefault d
+
+
+findWithDefault : (b -> Bool) -> b -> List b -> b
+findWithDefault pred d =
+    List.Extra.find pred >> Maybe.withDefault d

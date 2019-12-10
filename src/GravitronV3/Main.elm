@@ -10,7 +10,7 @@ import GravitronV3.Screen as Screen exposing (Screen)
 import GravitronV3.Vec as Vec exposing (Vec, vec)
 import Html exposing (Html)
 import Json.Decode as D
-import PointFree as FP exposing (findMapWithDefault)
+import PointFree as FP exposing (findMapWithDefault, findWithDefault)
 import Task
 import Time exposing (Posix)
 import TimeTravel.Browser as TimeTravel
@@ -86,7 +86,7 @@ type alias Game =
 
 getPlayer : List Body -> Body
 getPlayer =
-    findMapWithDefault playerModelFromBody initialPlayer
+    findWithDefault isPlayer initialPlayer
 
 
 getPlayerPosition : List Body -> Vec
@@ -94,14 +94,14 @@ getPlayerPosition =
     getPlayer >> .position
 
 
-playerModelFromBody : Body -> Maybe Body
-playerModelFromBody body =
+isPlayer : Body -> Bool
+isPlayer body =
     case body.type_ of
         Player ->
-            Just body
+            True
 
         _ ->
-            Nothing
+            False
 
 
 initialGame : Game

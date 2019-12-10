@@ -3,6 +3,7 @@ module GravitronV3.Main exposing (main)
 import Basics.Extra exposing (flip)
 import Browser
 import Browser.Dom as Dom
+import Browser.Events as E
 import GravitronV3.Screen as Screen exposing (Screen)
 import Html exposing (Html)
 import Svg exposing (..)
@@ -25,7 +26,7 @@ toPx attr value =
 
 
 type Msg
-    = GotViewport Dom.Viewport
+    = GotScreen Screen
 
 
 view : Model -> Html Msg
@@ -50,15 +51,19 @@ type alias Model =
 init : () -> ( Model, Cmd Msg )
 init _ =
     ( { screen = Screen.initial }
-    , Task.perform GotViewport Dom.getViewport
+    , Task.perform GotScreen Screen.get
     )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update message model =
     case message of
-        GotViewport viewport ->
-            save { model | screen = Screen.fromViewport viewport }
+        GotScreen screen ->
+            save { model | screen = screen }
+
+
+subscriptions _ =
+    Sub.batch [ Screen.onResize GotScreen ]
 
 
 main : Program () Model Msg
@@ -66,6 +71,6 @@ main =
     Browser.element
         { init = init
         , update = update
-        , subscriptions = \_ -> Sub.none
+        , subscriptions = subscriptions
         , view = view
         }

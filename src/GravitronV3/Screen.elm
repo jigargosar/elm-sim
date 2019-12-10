@@ -1,10 +1,13 @@
-module GravitronV3.Screen exposing (Screen, fromViewport, initial, toSvg)
+module GravitronV3.Screen exposing (Screen, get, initial, onResize, toSvg)
 
 import Browser.Dom as Dom
+import Browser.Events as E
 import Html exposing (Html)
 import Html.Attributes as H
+import PointFree exposing (mapEach)
 import Svg exposing (..)
 import Svg.Attributes exposing (..)
+import Task
 import TypedSvg.Attributes as T
 
 
@@ -20,11 +23,6 @@ type alias Screen =
     , right : Number
     , bottom : Number
     }
-
-
-fromViewport : Dom.Viewport -> Screen
-fromViewport { viewport } =
-    toScreen ( viewport.width, viewport.height )
 
 
 toScreen : ( Float, Float ) -> Screen
@@ -44,9 +42,9 @@ initial =
 
 
 toSvg : Screen -> List (Svg msg) -> Html msg
-toSvg screen =
+toSvg s =
     svg
-        [ T.viewBox 0 0 300 300
+        [ T.viewBox s.left s.top s.width s.height
         , width "100%"
         , height "100%"
         , H.style "position" "fixed"
@@ -55,3 +53,23 @@ toSvg screen =
         , width "100%"
         , height "100%"
         ]
+
+
+fromResizeEvent : Int -> Int -> Screen
+fromResizeEvent w h =
+    ( w, h ) |> mapEach toFloat |> toScreen
+
+
+onResize : (Screen -> msg) -> Sub msg
+onResize msg =
+    E.onResize fromResizeEvent |> Sub.map msg
+
+
+fromViewport : Dom.Viewport -> Screen
+fromViewport { viewport } =
+    toScreen ( viewport.width, viewport.height )
+
+
+get : Task.Task Never Screen
+get =
+    Dom.getViewport |> Task.map fromViewport

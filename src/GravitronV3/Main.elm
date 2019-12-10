@@ -4,6 +4,7 @@ import Basics.Extra exposing (flip)
 import Browser
 import Browser.Dom as Dom
 import Browser.Events as E
+import Color exposing (Color)
 import GravitronV3.Screen as Screen exposing (Screen)
 import Html exposing (Html)
 import Svg exposing (..)
@@ -11,6 +12,7 @@ import Svg.Attributes exposing (..)
 import Task
 import Time exposing (Posix)
 import TimeTravel.Browser as TimeTravel
+import TypedSvg.Types as TT
 import Update.Pipeline exposing (..)
 
 
@@ -44,6 +46,64 @@ view { screen } =
             ]
             []
         ]
+
+
+type Form
+    = Rect Float Float
+
+
+type Transform
+    = Transform Float Float Float Float
+
+
+type Brush
+    = Brush String
+
+
+type Shape
+    = Shape Form Brush Transform
+
+
+rect : String -> Float -> Float -> Shape
+rect color width height =
+    Shape (Rect width height) (Brush color) (Transform 0 0 0 1)
+
+
+renderShape (Shape form (Brush fillColor) t) =
+    let
+        f =
+            String.fromFloat
+    in
+    case form of
+        Rect w h ->
+            Svg.rect
+                [ width <| f w
+                , height <| f h
+                , fill fillColor
+                , transform <| renderRectTransform w h t
+                ]
+                []
+
+
+renderRectTransform : Float -> Float -> Transform -> String
+renderRectTransform w h t =
+    let
+        f =
+            String.fromFloat
+    in
+    renderTransform t
+        ++ (" translate(" ++ f (-w / 2) ++ "," ++ f (-h / 2) ++ ")")
+
+
+renderTransform : Transform -> String
+renderTransform (Transform dx dy angle s) =
+    let
+        f =
+            String.fromFloat
+    in
+    ("translate(" ++ f dx ++ "," ++ f dy ++ ")")
+        ++ (" rotate(" ++ f angle ++ ")")
+        ++ (" scale(" ++ f s ++ ")")
 
 
 type alias Model =

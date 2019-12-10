@@ -1,9 +1,13 @@
 module GravitronV3.Main exposing (..)
 
 import Basics.Extra exposing (flip)
+import Browser
+import Browser.Dom as Dom
 import Html.Attributes as H
+import Playground exposing (Screen)
 import Svg exposing (..)
 import Svg.Attributes exposing (..)
+import Task
 
 
 toViewBox : Float -> Float -> Float -> Float -> Svg.Attribute msg
@@ -20,7 +24,40 @@ toPx attr value =
     attr (value |> String.fromFloat |> appendWith "px")
 
 
+
+-- Main
+
+
+pairedTo =
+    flip Tuple.pair
+
+
+type Msg
+    = GotViewport Dom.Viewport
+
+
+toScreen : Float -> Float -> Screen
+toScreen width height =
+    { width = width
+    , height = height
+    , top = height / 2
+    , left = -width / 2
+    , right = width / 2
+    , bottom = -height / 2
+    }
+
+
+main : Program () { screen : Screen } Msg
 main =
+    Browser.element
+        { init = \_ -> ( { screen = toScreen 600 600 }, Task.perform GotViewport Dom.getViewport )
+        , update = \_ -> pairedTo Cmd.none
+        , subscriptions = \_ -> Sub.none
+        , view = \_ -> view
+        }
+
+
+view =
     svg
         [ toViewBox 0 0 300 300
         , width "100%"

@@ -11,6 +11,7 @@ import Html exposing (Html)
 import Json.Decode as D
 import List.Extra
 import PointFree as FP exposing (findWithDefault)
+import Random exposing (Seed)
 import Task
 import Time exposing (Posix)
 import TimeTravel.Browser as TimeTravel
@@ -36,6 +37,7 @@ type MovementType
     = GravitateToPlayer Float
     | SpringToMouse Float Float
     | Stationary
+    | Wanderer Seed
 
 
 type ScreenCollisionType
@@ -302,27 +304,33 @@ stepScreenCollision env body =
 stepMovement : Env -> Vec -> Body -> Body
 stepMovement { mousePosition } playerPosition model =
     let
-        newVelocity =
+        newModel =
             case model.movement of
                 GravitateToPlayer g ->
-                    model.velocity
-                        |> Vec.add
-                            (Vec.fromTo model.position playerPosition
-                                |> Vec.mapMagnitude (\m -> g / m)
-                            )
+                    { model
+                        | velocity =
+                            model.velocity
+                                |> Vec.add
+                                    (Vec.fromTo model.position playerPosition
+                                        |> Vec.mapMagnitude (\m -> g / m)
+                                    )
+                    }
 
                 SpringToMouse k friction ->
-                    model.velocity
-                        |> Vec.add (Vec.fromToScaled playerPosition mousePosition k)
-                        |> Vec.scaleBy friction
+                    { model
+                        | velocity =
+                            model.velocity
+                                |> Vec.add (Vec.fromToScaled playerPosition mousePosition k)
+                                |> Vec.scaleBy friction
+                    }
 
                 Stationary ->
-                    Vec.zero
+                    model
+
+                Wanderer seed ->
+                    model
     in
-    { model
-        | velocity = newVelocity
-        , position = Vec.add model.position newVelocity
-    }
+    { newModel | position = Vec.add newModel.position newModel.velocity }
 
 
 viewGame : Screen -> Game -> Html msg

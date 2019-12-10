@@ -124,12 +124,16 @@ type alias Env =
 
 stepBody : Env -> Vec -> Body -> Body
 stepBody env playerPosition body =
+    let
+        stepMovementHelp =
+            stepMovement env playerPosition
+    in
     case body of
         Player model ->
-            model |> stepMovement env playerPosition |> Player
+            model |> stepMovementHelp |> Player
 
         Bullet model ->
-            model |> stepMovement env playerPosition |> Player
+            model |> stepMovementHelp |> Player
 
 
 stepMovement { mousePosition } playerPosition model =

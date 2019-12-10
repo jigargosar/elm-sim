@@ -14,15 +14,6 @@ import TimeTravel.Browser as TimeTravel
 import Update.Pipeline exposing (..)
 
 
-appendWith =
-    flip (++)
-
-
-toPx : (String -> a) -> Float -> a
-toPx attr value =
-    attr (value |> String.fromFloat |> appendWith "px")
-
-
 
 -- Main
 
@@ -37,16 +28,6 @@ view { screen } =
     Screen.toSvg screen
         [ Draw.rect "#000" screen.width screen.height
             |> Draw.renderShape
-
-        {- Svg.rect
-           [ toPx x screen.left
-           , toPx y screen.top
-           , toPx width screen.width
-           , toPx height screen.height
-           , fill "#000"
-           ]
-           []
-        -}
         ]
 
 

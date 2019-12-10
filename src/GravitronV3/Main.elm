@@ -23,7 +23,7 @@ playerConfig =
     , lives = 3
     , position = Vec.zero
     , velocity = Vec.zero
-    , movement = SpringToMouse 1
+    , movement = SpringToMouse 0.2 0.5
     }
 
 
@@ -46,7 +46,7 @@ initPlayer =
 
 type MovementType
     = GravitateToPlayer
-    | SpringToMouse Float
+    | SpringToMouse Float Float
 
 
 type alias BulletModel =

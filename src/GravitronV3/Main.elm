@@ -102,8 +102,16 @@ renderTransform (Transform dx dy angle s) =
             String.fromFloat
     in
     ("translate(" ++ f dx ++ "," ++ f dy ++ ")")
-        ++ (" rotate(" ++ f angle ++ ")")
-        ++ (" scale(" ++ f s ++ ")")
+        |> appendIf (angle /= 0) (" rotate(" ++ f angle ++ ")")
+        |> appendIf (s /= 1) (" scale(" ++ f s ++ ")")
+
+
+appendIf bool end start =
+    if bool then
+        start ++ end
+
+    else
+        start
 
 
 type alias Model =

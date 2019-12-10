@@ -22,8 +22,8 @@ type Shape
 
 
 fillRect : String -> Float -> Float -> Shape
-fillRect color width height =
-    Shape (Rect width height) (Fill color) Transform.initial
+fillRect color w h =
+    rect w h |> fill color
 
 
 rect : Float -> Float -> Shape

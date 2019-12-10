@@ -75,7 +75,11 @@ view =
         ]
 
 
-main : Program () { screen : Screen } Msg
+type alias Model =
+    { screen : Screen }
+
+
+main : Program () Model Msg
 main =
     Browser.element
         { init =

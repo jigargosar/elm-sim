@@ -26,6 +26,7 @@ type alias Body =
     , velocity : Vec
     , hp : Float
     , movement : MovementType
+    , screenCollision : ScreenCollisionType
     , type_ : BodyType
     }
 
@@ -45,6 +46,7 @@ initialPlayer =
     , velocity = playerConfig.velocity
     , hp = playerConfig.hp
     , movement = playerConfig.movement
+    , screenCollision = IgnoreScreenCollision
     , type_ = Player
     }
 
@@ -54,12 +56,18 @@ type MovementType
     | SpringToMouse Float Float
 
 
+type ScreenCollisionType
+    = BounceWithingScreen Float
+    | IgnoreScreenCollision
+
+
 initBullet : MovementType -> Body
 initBullet movement =
     { position = Vec.vec1
     , velocity = Vec.vec1
     , hp = 1
     , movement = movement
+    , screenCollision = BounceWithingScreen 0.5
     , type_ = Bullet
     }
 
@@ -121,6 +129,53 @@ type alias Env =
 stepBody : Env -> Vec -> Body -> Body
 stepBody env playerPosition =
     stepMovement env playerPosition
+        >> stepScreenCollision env
+
+
+bounceWithinScreen : Screen -> Vec -> Float -> Vec -> Vec
+bounceWithinScreen screen position bounceFactor velocity =
+    let
+        bounceVelocityPart lo high positionPart velocityPart =
+            if
+                (positionPart < lo && velocityPart < 0)
+                    || (positionPart > high && velocityPart > 0)
+            then
+                negate velocityPart
+
+            else
+                velocityPart
+
+        ( x, y ) =
+            Vec.toTuple position
+
+        ( vx, vy ) =
+            Vec.toTuple velocity
+
+        newBouncedVelocity =
+            vec (bounceVelocityPart screen.left screen.right x vx)
+                (bounceVelocityPart screen.top screen.bottom y vy)
+    in
+    if velocity /= newBouncedVelocity then
+        newBouncedVelocity |> Vec.mapMagnitude ((*) bounceFactor)
+
+    else
+        newBouncedVelocity
+
+
+stepScreenCollision : Env -> Body -> Body
+stepScreenCollision env body =
+    case body.screenCollision of
+        BounceWithingScreen bounceFactor ->
+            { body
+                | velocity =
+                    bounceWithinScreen env.screen
+                        body.position
+                        bounceFactor
+                        body.velocity
+            }
+
+        IgnoreScreenCollision ->
+            body
 
 
 stepMovement : Env -> Vec -> Body -> Body
@@ -132,7 +187,7 @@ stepMovement { mousePosition } playerPosition model =
                     model.velocity
                         |> Vec.add
                             (Vec.fromTo model.position playerPosition
-                                |> Vec.mapMagnitude (\m -> 20 / m)
+                                |> Vec.mapMagnitude (\m -> g / m)
                             )
 
                 SpringToMouse k friction ->

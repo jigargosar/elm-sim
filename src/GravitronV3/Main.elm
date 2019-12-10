@@ -34,7 +34,7 @@ view { screen } =
         scaledShapes : List Shape
         scaledShapes =
             Range.init 1 0
-                |> Range.break 1200
+                |> Range.break 100
                 |> List.indexedMap
                     (\idx s ->
                         rect (screen.width * s) (screen.height * s)

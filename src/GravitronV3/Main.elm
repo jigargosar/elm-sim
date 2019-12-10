@@ -96,29 +96,38 @@ renderRectTransform w h t =
         ++ (" translate(" ++ f (-w / 2) ++ "," ++ f (-h / 2) ++ ")")
 
 
+andThenRotateBy : Float -> String -> String
+andThenRotateBy angle prefix =
+    if angle == 0 then
+        prefix
+
+    else
+        prefix ++ (" rotate(" ++ String.fromFloat angle ++ ")")
+
+
+renderTranslate : Float -> Float -> String
+renderTranslate x y =
+    "translate(" ++ String.fromFloat x ++ "," ++ String.fromFloat y ++ ")"
+
+
+andThenScaleBy : Float -> String -> String
+andThenScaleBy s prefix =
+    if s == 1 then
+        prefix
+
+    else
+        prefix ++ (" scale(" ++ String.fromFloat s ++ ")")
+
+
 renderTransform : Transform -> String
 renderTransform (Transform dx dy angle s) =
     let
         f =
             String.fromFloat
-
-        appendRotate prefix =
-            if angle == 0 then
-                prefix
-
-            else
-                prefix ++ (" rotate(" ++ f angle ++ ")")
-
-        appendScale prefix =
-            if s == 1 then
-                prefix
-
-            else
-                prefix ++ (" scale(" ++ f s ++ ")")
     in
-    ("translate(" ++ f dx ++ "," ++ f dy ++ ")")
-        |> appendRotate
-        |> appendScale
+    renderTranslate dx dy
+        |> andThenRotateBy angle
+        |> andThenScaleBy s
 
 
 type alias Model =

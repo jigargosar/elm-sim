@@ -5,9 +5,9 @@ module GravitronV3.Vec exposing
     , angle
     , apply2
     , clampMagnitude
-    , fromPt
     , fromRTheta
     , fromRec
+    , fromTo
     , fromToScaled
     , gravityFrom
     , len
@@ -91,14 +91,14 @@ subtract =
     map2 (flip (-))
 
 
-fromPt : Vec -> Vec -> Vec
-fromPt =
+fromTo : Vec -> Vec -> Vec
+fromTo =
     subtract
 
 
 springForceFrom : Vec -> Vec -> Float -> Vec
 springForceFrom a b k =
-    fromPt a b |> scaleBy k
+    fromTo a b |> scaleBy k
 
 
 apply : (Float -> Float -> a) -> Vec -> a
@@ -108,7 +108,7 @@ apply func (Vec x y) =
 
 lenFrom : Vec -> Vec -> Float
 lenFrom a b =
-    fromPt a b
+    fromTo a b
         |> len
 
 
@@ -137,7 +137,7 @@ gravityFrom : Vec -> Vec -> Float -> Vec
 gravityFrom from to mass =
     let
         gv =
-            fromPt from to
+            fromTo from to
     in
     fromRTheta (mass / len2 gv) (angle gv)
 
@@ -161,4 +161,4 @@ mapMagnitude func =
 
 fromToScaled : Vec -> Vec -> Float -> Vec
 fromToScaled from to factor =
-    fromPt from to |> scaleBy factor
+    fromTo from to |> scaleBy factor

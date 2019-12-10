@@ -8,7 +8,7 @@ import GravitronV3.Range as Range
 import GravitronV3.Screen as Screen exposing (Screen)
 import GravitronV3.Vec as Vec exposing (Vec)
 import Html exposing (Html)
-import List.Extra
+import PointFree as FP
 import Task
 import Time exposing (Posix)
 import TimeTravel.Browser as TimeTravel
@@ -76,9 +76,14 @@ type alias Game =
     { bodies : List Body }
 
 
-getPlayer : Game -> PlayerModel
+getPlayer : List Body -> PlayerModel
 getPlayer =
-    .bodies >> findMapWithDefault playerModelFromBody initialPlayer
+    findMapWithDefault playerModelFromBody initialPlayer
+
+
+getPlayerPosition : List Body -> Vec
+getPlayerPosition =
+    getPlayer >> .position
 
 
 playerModelFromBody : Body -> Maybe PlayerModel
@@ -103,28 +108,50 @@ initialGame =
     { bodies = [ initialPlayer |> Player, initBullet (GravitateToPlayer 20) |> Bullet ] }
 
 
-updateGame : Game -> Game
-updateGame game =
-    { game | bodies = mapBodiesWithPlayer stepBodies game }
+updateGame : Env -> Game -> Game
+updateGame env game =
+    { game | bodies = mapBodiesWithPlayerPosition (stepBody env) game.bodies }
 
 
-mapBodiesWithPlayer func { bodies } =
-    let
-        player : PlayerModel
-        player =
-            getPlayer { bodies = bodies }
-    in
-    List.map (func player) bodies
+mapBodiesWithPlayerPosition : (Vec -> Body -> Body) -> List Body -> List Body
+mapBodiesWithPlayerPosition func =
+    FP.with (getPlayerPosition >> func) List.map
 
 
-stepBodies : PlayerModel -> Body -> Body
-stepBodies playerModel body =
+type alias Env =
+    { mousePosition : Vec }
+
+
+stepBody : Env -> Vec -> Body -> Body
+stepBody env playerPosition body =
     case body of
-        Player _ ->
-            body
+        Player model ->
+            model |> stepMovement env playerPosition |> Player
 
-        Bullet _ ->
-            body
+        Bullet model ->
+            model |> stepMovement env playerPosition |> Player
+
+
+stepMovement { mousePosition } playerPosition model =
+    let
+        newVelocity =
+            case model.movement of
+                GravitateToPlayer g ->
+                    model.velocity
+                        |> Vec.add
+                            (Vec.fromTo model.position playerPosition
+                                |> Vec.mapMagnitude ((/) g)
+                            )
+
+                SpringToMouse k friction ->
+                    model.velocity
+                        |> Vec.add (Vec.fromToScaled playerPosition mousePosition k)
+                        |> Vec.scaleBy friction
+    in
+    { model
+        | position = Vec.add model.position newVelocity
+        , velocity = newVelocity
+    }
 
 
 viewGame : Screen -> Game -> Html msg
@@ -170,6 +197,7 @@ view { screen, game } =
 
 type alias Model =
     { screen : Screen
+    , mousePosition : Vec
     , clock : Clock
     , game : Game
     }
@@ -178,6 +206,7 @@ type alias Model =
 init : () -> ( Model, Cmd Msg )
 init _ =
     ( { screen = Screen.initial
+      , mousePosition = Vec.zero
       , clock = Clock.initial
       , game = initialGame
       }
@@ -195,7 +224,7 @@ update message model =
             save
                 { model
                     | clock = Clock.onAnimationFrame posix model.clock
-                    , game = updateGame model.game
+                    , game = updateGame { mousePosition = Vec.zero } model.game
                 }
 
 

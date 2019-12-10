@@ -24,12 +24,6 @@ type Msg
 view : Model -> Html Msg
 view { screen } =
     let
-        whiteRect =
-            fillRect "white" screen.width screen.height
-
-        blackRect =
-            fillRect "black" screen.width screen.height
-
         fullRect : Shape
         fullRect =
             rect screen.width screen.height

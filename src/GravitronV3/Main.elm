@@ -105,7 +105,16 @@ initialGame =
 
 updateGame : Game -> Game
 updateGame game =
-    game
+    { game | bodies = List.map stepBodies game.bodies }
+
+
+stepBodies body =
+    case body of
+        Player _ ->
+            body
+
+        Bullet _ ->
+            body
 
 
 viewGame : Screen -> Game -> Html msg

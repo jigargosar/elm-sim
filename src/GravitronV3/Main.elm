@@ -78,13 +78,13 @@ initialGravityBullet =
 
 initTurret : Body
 initTurret =
-    { position = Vec.zero
+    { position = vec -400 -400
     , velocity = Vec.zero
     , radius = 25
     , hp = 10
     , movement = Stationary
     , screenCollision = IgnoreScreenCollision
-    , type_ = Turret (Timer.start 0 (60 * 3))
+    , type_ = Turret (Timer.start 0 (60 * 1))
     }
 
 
@@ -152,14 +152,14 @@ handleCollisions =
 handleCollisionWith : Body -> Body -> Body
 handleCollisionWith otherBody body =
     if circleCircleCollision otherBody body then
-        resolveCollisionOf otherBody body
+        resolveCollisionWith otherBody body
 
     else
         body
 
 
-resolveCollisionOf : Body -> Body -> Body
-resolveCollisionOf otherBody body =
+resolveCollisionWith : Body -> Body -> Body
+resolveCollisionWith otherBody body =
     let
         ignore =
             body
@@ -191,7 +191,7 @@ resolveCollisionOf otherBody body =
                     ignore
 
                 Turret _ ->
-                    ignore
+                    kill
 
         Turret _ ->
             case otherBody.type_ of
@@ -231,15 +231,15 @@ stepGenerator env playerPosition body =
             if Timer.isDone env.clock timer then
                 { body | type_ = Turret (Timer.restart env.clock timer) }
                     :: [ initialGravityBullet
-                            |> placeBullet playerPosition body
+                            |> initBulletPositionAndVelocity playerPosition body
                        ]
 
             else
                 [ body ]
 
 
-placeBullet : Vec -> Body -> Body -> Body
-placeBullet toPosition fromBody body =
+initBulletPositionAndVelocity : Vec -> Body -> Body -> Body
+initBulletPositionAndVelocity toPosition fromBody body =
     let
         angle =
             Vec.fromTo fromBody.position toPosition
@@ -249,6 +249,7 @@ placeBullet toPosition fromBody body =
         | position =
             Vec.add fromBody.position
                 (Vec.fromRTheta (body.radius + fromBody.radius) angle)
+        , velocity = Vec.fromRTheta 3 angle
     }
 
 

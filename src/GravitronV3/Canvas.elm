@@ -1,4 +1,4 @@
-module GravitronV3.Canvas exposing (Shape, fillRect, rect, renderShapes, scale)
+module GravitronV3.Canvas exposing (Shape, fillRect, rect, renderShapes, scale, stroke, stroke2)
 
 import GravitronV3.Screen as Screen exposing (Screen)
 import GravitronV3.Transform as Transform exposing (Transform)
@@ -13,7 +13,8 @@ type Form
 
 type Brush
     = Fill String
-    | Stroke String Float
+    | Stroke String
+    | Stroke2 String Float
     | NoBrush
 
 
@@ -24,6 +25,16 @@ type Shape
 fillRect : String -> Float -> Float -> Shape
 fillRect color w h =
     rect w h |> fill color
+
+
+stroke : String -> Shape -> Shape
+stroke c =
+    setBrush (Stroke c)
+
+
+stroke2 : String -> Float -> Shape -> Shape
+stroke2 c s =
+    setBrush (Stroke2 c s)
 
 
 rect : Float -> Float -> Shape
@@ -74,6 +85,7 @@ renderShape (Shape form brush t) =
                 []
 
 
+renderBrush : Brush -> List (Attribute msg)
 renderBrush brush =
     case brush of
         NoBrush ->
@@ -82,5 +94,8 @@ renderBrush brush =
         Fill fc ->
             [ S.fill fc ]
 
-        Stroke sc sw ->
+        Stroke sc ->
+            [ S.stroke sc ]
+
+        Stroke2 sc sw ->
             [ S.stroke sc, S.strokeWidth <| String.fromFloat sw ]

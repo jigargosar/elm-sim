@@ -62,7 +62,10 @@ view { screen } =
            , blackRect |> scale 0.25
            ]
         -}
-        scaledShapes
+        [ scaledShapes
+            |> group
+            |> fill "transparent"
+        ]
 
 
 type alias Model =

@@ -170,33 +170,33 @@ resolveCollisionWith otherBody body =
         kill =
             { body | hp = 0 }
     in
-    case body.type_ of
+    case otherBody.type_ of
         Player ->
-            case otherBody.type_ of
+            case body.type_ of
                 Player ->
                     ignore
 
                 Bullet ->
-                    ignore
+                    kill
 
                 Turret _ ->
                     ignore
 
         Bullet ->
-            case otherBody.type_ of
+            case body.type_ of
                 Player ->
-                    kill
+                    ignore
 
                 Bullet ->
-                    ignore
+                    kill
 
                 Turret _ ->
-                    kill
+                    hit
 
         Turret _ ->
-            case otherBody.type_ of
+            case body.type_ of
                 Bullet ->
-                    ignore
+                    kill
 
                 Player ->
                     ignore
@@ -342,7 +342,7 @@ toShape body =
         Player ->
             circle body.radius
                 |> move (Vec.toTuple body.position)
-                |> fill "red"
+                |> fill "green"
 
         Turret _ ->
             circle body.radius

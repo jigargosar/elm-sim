@@ -34,24 +34,22 @@ view { screen } =
         fullRect =
             rect screen.width screen.height
 
-        scales : List Float
-        scales =
-            Range.init 1 0 |> Range.break 4
+        idxToColor idx =
+            if modBy 2 idx == 0 then
+                "white"
+
+            else
+                "black"
 
         scaledShapes : List Shape
         scaledShapes =
-            scales
+            Range.init 1 0
+                |> Range.break 6
                 |> List.indexedMap
                     (\idx s ->
                         fullRect
                             |> scale s
-                            |> stroke
-                                (if modBy 2 idx == 0 then
-                                    "white"
-
-                                 else
-                                    "black"
-                                )
+                            |> fill (idxToColor idx)
                     )
     in
     renderShapes screen

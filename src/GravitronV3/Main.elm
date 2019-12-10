@@ -63,13 +63,13 @@ initialPlayer =
     }
 
 
-initBullet : MovementType -> Body
-initBullet movement =
+initGravityBullet : Body
+initGravityBullet =
     { position = Vec.vec1
     , velocity = Vec.vec1
     , radius = 10
     , hp = 1
-    , movement = movement
+    , movement = GravitateToPlayer 20
     , screenCollision = BounceWithingScreen 0.5
     , type_ = Bullet
     }
@@ -108,7 +108,7 @@ initialGame : Game
 initialGame =
     { bodies =
         [ initialPlayer
-        , initBullet (GravitateToPlayer 20)
+        , initGravityBullet
         ]
     }
 

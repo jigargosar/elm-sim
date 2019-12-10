@@ -6,6 +6,7 @@ import GravitronV3.Canvas exposing (..)
 import GravitronV3.Clock as Clock exposing (Clock)
 import GravitronV3.Range as Range
 import GravitronV3.Screen as Screen exposing (Screen)
+import GravitronV3.Vec as Vec exposing (Vec)
 import Html exposing (Html)
 import Task
 import Time exposing (Posix)
@@ -17,13 +18,49 @@ import Update.Pipeline exposing (..)
 -- Game
 
 
+playerConfig =
+    { hp = 100
+    , lives = 3
+    , position = Vec.zero
+    , velocity = Vec.zero
+    , movement = SpringToMouse 1
+    }
+
+
+type alias PlayerModel =
+    { position : Vec, velocity : Vec, hp : Float, movement : MovementType }
+
+
+initPlayer : PlayerModel
+initPlayer =
+    { position = playerConfig.position
+    , velocity = playerConfig.velocity
+    , hp = playerConfig.hp
+    , movement = playerConfig.movement
+    }
+
+
+type MovementType
+    = GravitateToPlayer
+    | SpringToMouse Float
+
+
+type alias BulletModel =
+    { position : Vec, velocity : Vec, hp : Float, movement : MovementType }
+
+
+type Body
+    = Bullet BulletModel
+    | Player PlayerModel
+
+
 type alias Game =
-    {}
+    { bodies : List Body }
 
 
 initialGame : Game
 initialGame =
-    {}
+    { bodies = [ initPlayer ] }
 
 
 updateGame : Game -> Game

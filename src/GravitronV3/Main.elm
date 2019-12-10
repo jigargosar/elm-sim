@@ -184,7 +184,7 @@ resolveCollisionOf otherBody body =
         Bullet ->
             case otherBody.type_ of
                 Player ->
-                    ignore
+                    kill
 
                 Bullet ->
                     ignore

@@ -24,6 +24,7 @@ view : Model -> Html Msg
 view { screen } =
     renderShapes screen
         [ rect "#000" screen.width screen.height
+        , rect "#fff" (screen.width / 2) (screen.height / 2)
         ]
 
 

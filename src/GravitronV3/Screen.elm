@@ -29,10 +29,10 @@ toScreen : ( Float, Float ) -> Screen
 toScreen ( width, height ) =
     { width = width
     , height = height
-    , top = height / 2
+    , top = -height / 2
     , left = -width / 2
     , right = width / 2
-    , bottom = -height / 2
+    , bottom = height / 2
     }
 
 

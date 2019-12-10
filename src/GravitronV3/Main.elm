@@ -28,8 +28,14 @@ toPx attr value =
 -- Main
 
 
+pairedTo : b -> a -> ( a, b )
 pairedTo =
     flip Tuple.pair
+
+
+mapEach : (a -> x) -> ( a, a ) -> ( x, x )
+mapEach func =
+    Tuple.mapBoth func func
 
 
 type Msg
@@ -45,20 +51,6 @@ toScreen ( width, height ) =
     , right = width / 2
     , bottom = -height / 2
     }
-
-
-main : Program () { screen : Screen } Msg
-main =
-    Browser.element
-        { init =
-            \_ ->
-                ( { screen = toScreen ( 600, 600 ) }
-                , Task.perform GotViewport Dom.getViewport
-                )
-        , update = \_ -> pairedTo Cmd.none
-        , subscriptions = \_ -> Sub.none
-        , view = \_ -> view
-        }
 
 
 view =
@@ -81,3 +73,17 @@ view =
             ]
             []
         ]
+
+
+main : Program () { screen : Screen } Msg
+main =
+    Browser.element
+        { init =
+            \_ ->
+                ( { screen = toScreen ( 600, 600 ) }
+                , Task.perform GotViewport Dom.getViewport
+                )
+        , update = \_ -> pairedTo Cmd.none
+        , subscriptions = \_ -> Sub.none
+        , view = \_ -> view
+        }

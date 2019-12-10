@@ -3,6 +3,7 @@ module GravitronV3.Main exposing (main)
 import Browser
 import Browser.Events as E
 import GravitronV3.Canvas exposing (..)
+import GravitronV3.Clock as Clock exposing (Clock)
 import GravitronV3.Range as Range
 import GravitronV3.Screen as Screen exposing (Screen)
 import Html exposing (Html)
@@ -50,14 +51,14 @@ view { screen } =
 
 type alias Model =
     { screen : Screen
-    , animationClock : Posix
+    , clock : Clock
     }
 
 
 init : () -> ( Model, Cmd Msg )
 init _ =
     ( { screen = Screen.initial
-      , animationClock = Time.millisToPosix 0
+      , clock = Clock.initial
       }
     , Task.perform GotScreen Screen.get
     )
@@ -69,8 +70,8 @@ update message model =
         GotScreen screen ->
             save { model | screen = screen }
 
-        Tick animationClock ->
-            save { model | animationClock = animationClock }
+        Tick posix ->
+            save { model | clock = Clock.onAnimationFrame posix model.clock }
 
 
 subscriptions _ =

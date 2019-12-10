@@ -6,6 +6,7 @@ import Browser.Events as E
 import GravitronV3.Canvas exposing (..)
 import GravitronV3.Clock as Clock exposing (Clock)
 import GravitronV3.Screen as Screen exposing (Screen)
+import GravitronV3.Timer exposing (Timer)
 import GravitronV3.Vec as Vec exposing (Vec, vec)
 import Html exposing (Html)
 import Json.Decode as D
@@ -84,14 +85,14 @@ initTurret =
     , hp = 10
     , movement = Stationary
     , screenCollision = IgnoreScreenCollision
-    , type_ = Turret
+    , type_ = Turret (Clock.initial |> Clock.timer 3000)
     }
 
 
 type BodyType
     = Bullet
     | Player
-    | Turret
+    | Turret Timer
 
 
 type alias Game =
@@ -178,7 +179,7 @@ resolveCollisionOf otherBody body =
                 Bullet ->
                     ignore
 
-                Turret ->
+                Turret _ ->
                     ignore
 
         Bullet ->
@@ -189,10 +190,10 @@ resolveCollisionOf otherBody body =
                 Bullet ->
                     ignore
 
-                Turret ->
+                Turret _ ->
                     ignore
 
-        Turret ->
+        Turret _ ->
             case otherBody.type_ of
                 Bullet ->
                     ignore
@@ -200,7 +201,7 @@ resolveCollisionOf otherBody body =
                 Player ->
                     ignore
 
-                Turret ->
+                Turret _ ->
                     ignore
 
 
@@ -312,7 +313,7 @@ toShape body =
                 |> move (Vec.toTuple body.position)
                 |> fill "red"
 
-        Turret ->
+        Turret _ ->
             circle body.radius
                 |> move (Vec.toTuple body.position)
                 |> fill "tomato"

@@ -1,5 +1,6 @@
-module GravitronV3.Clock exposing (Clock, initial, onAnimationFrame)
+module GravitronV3.Clock exposing (Clock, initial, onAnimationFrame, timer)
 
+import GravitronV3.Timer as Timer
 import Time exposing (Posix)
 
 
@@ -15,3 +16,8 @@ initial =
 onAnimationFrame : Posix -> Clock -> Clock
 onAnimationFrame posix (Clock _) =
     Clock posix
+
+
+timer : Float -> Clock -> Timer.Timer
+timer duration (Clock posix) =
+    Timer.start (Time.posixToMillis posix |> toFloat) duration

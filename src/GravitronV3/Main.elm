@@ -5,13 +5,12 @@ import Browser
 import Browser.Events as E
 import GravitronV3.Canvas exposing (..)
 import GravitronV3.Clock as Clock exposing (Clock)
-import GravitronV3.Range as Range
 import GravitronV3.Screen as Screen exposing (Screen)
 import GravitronV3.Vec as Vec exposing (Vec, vec)
 import Html exposing (Html)
 import Json.Decode as D
 import List.Extra
-import PointFree as FP exposing (findMapWithDefault, findWithDefault)
+import PointFree as FP exposing (findWithDefault)
 import Task
 import Time exposing (Posix)
 import TimeTravel.Browser as TimeTravel
@@ -36,6 +35,7 @@ type alias Body =
 type MovementType
     = GravitateToPlayer Float
     | SpringToMouse Float Float
+    | Stationary
 
 
 type ScreenCollisionType
@@ -76,9 +76,22 @@ initialGravityBullet =
     }
 
 
+initTurret : Body
+initTurret =
+    { position = vec -100 -100
+    , velocity = Vec.zero
+    , radius = 25
+    , hp = 500
+    , movement = Stationary
+    , screenCollision = IgnoreScreenCollision
+    , type_ = Turret
+    }
+
+
 type BodyType
     = Bullet
     | Player
+    | Turret
 
 
 type alias Game =
@@ -108,7 +121,8 @@ getPlayerPosition =
 initialGame : Game
 initialGame =
     { bodies =
-        [ initialPlayer
+        [ initTurret
+        , initialPlayer
         , initialGravityBullet
         ]
     }
@@ -162,7 +176,10 @@ resolveCollisionOf body other =
                     ignore
 
                 Bullet ->
-                    hit
+                    ignore
+
+                Turret ->
+                    ignore
 
         Bullet ->
             case other.type_ of
@@ -171,6 +188,20 @@ resolveCollisionOf body other =
 
                 Bullet ->
                     kill
+
+                Turret ->
+                    ignore
+
+        Turret ->
+            case other.type_ of
+                Bullet ->
+                    ignore
+
+                Player ->
+                    ignore
+
+                Turret ->
+                    ignore
 
 
 mapBodiesWithPlayerPosition : (Vec -> Body -> Body) -> List Body -> List Body
@@ -252,6 +283,9 @@ stepMovement { mousePosition } playerPosition model =
                     model.velocity
                         |> Vec.add (Vec.fromToScaled playerPosition mousePosition k)
                         |> Vec.scaleBy friction
+
+                Stationary ->
+                    Vec.zero
     in
     { model
         | velocity = newVelocity
@@ -277,6 +311,11 @@ toShape body =
             circle body.radius
                 |> move (Vec.toTuple body.position)
                 |> fill "red"
+
+        Turret ->
+            circle body.radius
+                |> move (Vec.toTuple body.position)
+                |> fill "tomato"
 
 
 

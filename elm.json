@@ -25,7 +25,8 @@
             "ianmackenzie/elm-geometry-svg": "3.0.0",
             "ianmackenzie/elm-units": "2.2.0",
             "joakin/elm-canvas": "4.0.1",
-            "joakin/elm-grid": "1.0.1"
+            "joakin/elm-grid": "1.0.1",
+            "laserpants/elm-update-pipeline": "1.0.0"
         },
         "indirect": {
             "Orasund/pixelengine": "6.2.0",

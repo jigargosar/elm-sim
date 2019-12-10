@@ -1,4 +1,4 @@
-module GravitronV3.Screen exposing (Screen, fromViewport, initial)
+module GravitronV3.Screen exposing (Screen, fromViewport, initial, toSvg)
 
 import Browser.Dom as Dom
 import Html exposing (Html)

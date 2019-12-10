@@ -523,6 +523,7 @@ game :
     -> GameProgram memory
 game initialMemory updateMemory viewMemory =
     let
+        view : Game memory -> Html Msg
         view (Game memory computer) =
             render computer.screen (viewMemory computer memory)
 

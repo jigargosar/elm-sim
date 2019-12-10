@@ -42,6 +42,16 @@ appendBA =
     flip appendAB
 
 
+pairedTo : b -> a -> ( a, b )
+pairedTo =
+    flip Tuple.pair
+
+
+mapEach : (a -> x) -> ( a, a ) -> ( x, x )
+mapEach func =
+    Tuple.mapBoth func func
+
+
 subAB : number -> number -> number
 subAB =
     (-)

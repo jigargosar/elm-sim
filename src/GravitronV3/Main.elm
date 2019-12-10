@@ -24,6 +24,7 @@ import Update.Pipeline exposing (..)
 type alias Body =
     { position : Vec
     , velocity : Vec
+    , radius : Float
     , hp : Float
     , movement : MovementType
     , screenCollision : ScreenCollisionType
@@ -44,6 +45,7 @@ initialPlayer : Body
 initialPlayer =
     { position = playerConfig.position
     , velocity = playerConfig.velocity
+    , radius = 20
     , hp = playerConfig.hp
     , movement = playerConfig.movement
     , screenCollision = IgnoreScreenCollision
@@ -65,6 +67,7 @@ initBullet : MovementType -> Body
 initBullet movement =
     { position = Vec.vec1
     , velocity = Vec.vec1
+    , radius = 10
     , hp = 1
     , movement = movement
     , screenCollision = BounceWithingScreen 0.5

@@ -14,16 +14,25 @@ import Update.Pipeline exposing (..)
 
 
 
--- Main
+-- Game
 
 
-type Msg
-    = GotScreen Screen
-    | Tick Posix
+type alias Game =
+    {}
 
 
-view : Model -> Html Msg
-view { screen } =
+initialGame : Game
+initialGame =
+    {}
+
+
+updateGame : Game -> Game
+updateGame game =
+    game
+
+
+viewGame : Screen -> Game -> Html msg
+viewGame screen _ =
     let
         idxToColor idx =
             if modBy 2 idx == 0 then
@@ -49,25 +58,25 @@ view { screen } =
         ]
 
 
+
+-- Main
+
+
+type Msg
+    = GotScreen Screen
+    | Tick Posix
+
+
+view : Model -> Html Msg
+view { screen, game } =
+    viewGame screen game
+
+
 type alias Model =
     { screen : Screen
     , clock : Clock
     , game : Game
     }
-
-
-type alias Game =
-    {}
-
-
-initialGame : Game
-initialGame =
-    {}
-
-
-updateGame : Game -> Game
-updateGame game =
-    game
 
 
 init : () -> ( Model, Cmd Msg )

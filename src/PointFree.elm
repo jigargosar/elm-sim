@@ -88,3 +88,10 @@ subBA =
 mod : Int -> Int -> Int
 mod =
     flip modBy
+
+
+findMapWithDefault : (a -> Maybe b) -> b -> List a -> b
+findMapWithDefault func d =
+    List.filterMap func
+        >> List.head
+        >> Maybe.withDefault d

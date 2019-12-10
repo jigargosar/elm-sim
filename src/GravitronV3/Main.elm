@@ -9,7 +9,7 @@ import GravitronV3.Screen as Screen exposing (Screen)
 import GravitronV3.Vec as Vec exposing (Vec, vec)
 import Html exposing (Html)
 import Json.Decode as D
-import PointFree as FP
+import PointFree as FP exposing (findMapWithDefault)
 import Task
 import Time exposing (Posix)
 import TimeTravel.Browser as TimeTravel
@@ -104,13 +104,6 @@ playerModelFromBody body =
 
         _ ->
             Nothing
-
-
-findMapWithDefault : (a -> Maybe b) -> b -> List a -> b
-findMapWithDefault func d =
-    List.filterMap func
-        >> List.head
-        >> Maybe.withDefault d
 
 
 initialGame : Game

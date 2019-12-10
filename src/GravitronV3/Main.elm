@@ -166,33 +166,6 @@ toShape body =
                 |> fill "red"
 
 
-viewGame2 : Screen -> Game -> Html msg
-viewGame2 screen _ =
-    let
-        idxToColor idx =
-            if modBy 2 idx == 0 then
-                "white"
-
-            else
-                "black"
-
-        scaledShapes : List Shape
-        scaledShapes =
-            Range.init 1 0
-                |> Range.break 100
-                |> List.indexedMap
-                    (\idx s ->
-                        rect (screen.width * s) (screen.height * s)
-                            |> stroke (idxToColor idx |> always "black")
-                    )
-    in
-    renderShapes screen
-        [ scaledShapes
-            |> group
-            |> fill "transparent"
-        ]
-
-
 
 -- Main
 

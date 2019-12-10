@@ -116,13 +116,17 @@ subscriptions _ =
         ]
 
 
+
+--noinspection ElmUnusedSymbol
+
+
 timeTravelElement =
     TimeTravel.element Debug.toString Debug.toString TimeTravel.defaultConfig
 
 
 main =
-    timeTravelElement
-        --Browser.element
+    --timeTravelElement
+    Browser.element
         { init = init
         , update = update
         , subscriptions = subscriptions

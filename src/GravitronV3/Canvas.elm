@@ -1,4 +1,4 @@
-module GravitronV3.Canvas exposing (Shape, fillRect, rect, renderShapes, scale, stroke, stroke2)
+module GravitronV3.Canvas exposing (Shape, fill, fillRect, rect, renderShapes, scale, stroke, stroke2)
 
 import GravitronV3.Screen as Screen exposing (Screen)
 import GravitronV3.Transform as Transform exposing (Transform)

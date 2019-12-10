@@ -1,14 +1,11 @@
 module GravitronV3.Main exposing (main)
 
-import Basics.Extra exposing (flip)
 import Browser
 import Browser.Events as E
 import GravitronV3.Canvas exposing (..)
 import GravitronV3.Range as Range
 import GravitronV3.Screen as Screen exposing (Screen)
 import Html exposing (Html)
-import List.Extra
-import PointFree exposing (subBA)
 import Task
 import Time exposing (Posix)
 import TimeTravel.Browser as TimeTravel
@@ -33,17 +30,29 @@ view { screen } =
         blackRect =
             fillRect "black" screen.width screen.height
 
+        fullRect : Shape
+        fullRect =
+            rect screen.width screen.height
+
         scales : List Float
         scales =
-            Range.init 1 0 |> Range.break 500
-
-        shapes : List Shape
-        shapes =
-            [ blackRect, whiteRect ] |> List.repeat 500 |> List.concat
+            Range.init 1 0 |> Range.break 4
 
         scaledShapes : List Shape
         scaledShapes =
-            List.map2 scale scales shapes
+            scales
+                |> List.indexedMap
+                    (\idx s ->
+                        fullRect
+                            |> scale s
+                            |> stroke
+                                (if modBy 2 idx == 0 then
+                                    "white"
+
+                                 else
+                                    "black"
+                                )
+                    )
     in
     renderShapes screen
         {- [ blackRect |> scale 1

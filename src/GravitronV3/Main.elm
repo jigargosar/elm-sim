@@ -58,6 +58,15 @@ type alias BulletModel =
     }
 
 
+initBullet : MovementType -> BulletModel
+initBullet movement =
+    { position = Vec.zero
+    , velocity = Vec.zero
+    , hp = 1
+    , movement = movement
+    }
+
+
 type Body
     = Bullet BulletModel
     | Player PlayerModel
@@ -91,7 +100,7 @@ findMapWithDefault func d =
 
 initialGame : Game
 initialGame =
-    { bodies = [ initialPlayer |> Player ] }
+    { bodies = [ initialPlayer |> Player, initBullet (GravitateToPlayer 20) |> Bullet ] }
 
 
 updateGame : Game -> Game

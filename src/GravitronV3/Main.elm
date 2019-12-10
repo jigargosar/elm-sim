@@ -32,6 +32,16 @@ type alias Body =
     }
 
 
+type MovementType
+    = GravitateToPlayer Float
+    | SpringToMouse Float Float
+
+
+type ScreenCollisionType
+    = BounceWithingScreen Float
+    | IgnoreScreenCollision
+
+
 playerConfig =
     { hp = 100
     , lives = 3
@@ -51,16 +61,6 @@ initialPlayer =
     , screenCollision = IgnoreScreenCollision
     , type_ = Player
     }
-
-
-type MovementType
-    = GravitateToPlayer Float
-    | SpringToMouse Float Float
-
-
-type ScreenCollisionType
-    = BounceWithingScreen Float
-    | IgnoreScreenCollision
 
 
 initBullet : MovementType -> Body

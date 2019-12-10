@@ -145,7 +145,7 @@ circleCircleCollision c1 c2 =
 
 handleCollisions =
     List.Extra.select
-        >> List.map (uncurry (List.foldl handleCollisionOF))
+        >> List.map (\( body, others ) -> List.foldl handleCollisionOF body others)
 
 
 handleCollisionOF : Body -> Body -> Body

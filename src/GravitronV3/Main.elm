@@ -169,7 +169,27 @@ stepMovement { mousePosition } playerPosition model =
 
 
 viewGame : Screen -> Game -> Html msg
-viewGame screen _ =
+viewGame screen { bodies } =
+    renderShapes screen
+        (List.map toShape bodies)
+
+
+toShape : Body -> Shape
+toShape body =
+    case body of
+        Bullet bulletModel ->
+            rect 10 10
+                |> move (Vec.toTuple bulletModel.position)
+                |> fill "black"
+
+        Player playerModel ->
+            rect 10 10
+                |> move (Vec.toTuple playerModel.position)
+                |> fill "red"
+
+
+viewGame2 : Screen -> Game -> Html msg
+viewGame2 screen _ =
     let
         idxToColor idx =
             if modBy 2 idx == 0 then
@@ -239,7 +259,7 @@ update message model =
             let
                 env : Env
                 env =
-                    { mousePosition = Vec.zero
+                    { mousePosition = model.mousePosition
                     , screen = model.screen
                     }
             in
@@ -250,7 +270,14 @@ update message model =
                 }
 
         MouseMove pageX pageY ->
-            save { model | mousePosition = vec pageX pageY }
+            let
+                screen =
+                    model.screen
+            in
+            save
+                { model
+                    | mousePosition = vec (pageX + screen.left) (pageY + screen.top)
+                }
 
 
 subscriptions _ =

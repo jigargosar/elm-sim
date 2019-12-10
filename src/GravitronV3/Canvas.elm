@@ -1,4 +1,4 @@
-module GravitronV3.Canvas exposing (Shape, fill, fillRect, group, rect, renderShapes, scale, stroke, stroke2)
+module GravitronV3.Canvas exposing (Shape, fill, fillRect, group, move, rect, renderShapes, scale, stroke, stroke2)
 
 import GravitronV3.Screen as Screen exposing (Screen)
 import GravitronV3.Transform as Transform exposing (Transform)
@@ -71,6 +71,11 @@ mapTransform func (Shape f b t) =
 scale : Float -> Shape -> Shape
 scale =
     Transform.scale >> mapTransform
+
+
+move : ( Float, Float ) -> Shape -> Shape
+move ( dx, dy ) =
+    Transform.move dx dy |> mapTransform
 
 
 renderShapes : Screen -> List Shape -> Html msg

@@ -63,8 +63,8 @@ initialPlayer =
     }
 
 
-initGravityBullet : Body
-initGravityBullet =
+initialGravityBullet : Body
+initialGravityBullet =
     { position = Vec.vec1
     , velocity = Vec.vec1
     , radius = 10
@@ -108,7 +108,7 @@ initialGame : Game
 initialGame =
     { bodies =
         [ initialPlayer
-        , initGravityBullet
+        , initialGravityBullet
         ]
     }
 

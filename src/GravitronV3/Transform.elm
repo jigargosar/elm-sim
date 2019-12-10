@@ -1,4 +1,9 @@
-module GravitronV3.Transform exposing (Transform, initial, renderRectTransform, renderTransform)
+module GravitronV3.Transform exposing
+    ( Transform
+    , initial
+    , renderRectTransform
+    , renderTransform
+    )
 
 
 type Transform

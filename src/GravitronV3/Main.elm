@@ -214,12 +214,12 @@ toShape : Body -> Shape
 toShape body =
     case body.type_ of
         Bullet ->
-            rect 10 10
+            circle body.radius
                 |> move (Vec.toTuple body.position)
                 |> fill "black"
 
         Player ->
-            rect 10 10
+            circle body.radius
                 |> move (Vec.toTuple body.position)
                 |> fill "red"
 

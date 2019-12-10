@@ -1,4 +1,4 @@
-module GravitronV3.Canvas exposing (Shape, fill, fillRect, group, move, rect, renderShapes, scale, stroke, stroke2)
+module GravitronV3.Canvas exposing (Shape, circle, fill, fillRect, group, move, rect, renderShapes, scale, stroke, stroke2)
 
 import GravitronV3.Screen as Screen exposing (Screen)
 import GravitronV3.Transform as Transform exposing (Transform)
@@ -10,6 +10,7 @@ import Svg.Attributes as S exposing (..)
 type Form
     = Rect Float Float
     | Group (List Shape)
+    | Circle Float
 
 
 type Brush
@@ -41,6 +42,11 @@ stroke2 c s =
 rect : Float -> Float -> Shape
 rect width height =
     Shape (Rect width height) NoBrush Transform.initial
+
+
+circle : Float -> Shape
+circle =
+    Circle >> toShape
 
 
 group : List Shape -> Shape
@@ -106,6 +112,15 @@ renderShape (Shape form brush t) =
                     :: renderBrush brush
                 )
                 (List.map renderShape shapes)
+
+        Circle radius ->
+            Svg.rect
+                ([ r <| f radius
+                 , transform <| Transform.renderTransform t
+                 ]
+                    ++ renderBrush brush
+                )
+                []
 
 
 renderBrush : Brush -> List (Attribute msg)

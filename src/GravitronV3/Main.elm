@@ -168,23 +168,28 @@ updateGame env game =
         playerPosition =
             getPlayerPosition game.bodies
 
-        ( generatedBodies, ( activeBodies, passiveBodies ) ) =
+        updatedBodies =
             game.bodies
                 |> List.Extra.mapAccuml (generateBodies env playerPosition) []
-                |> Tuple.mapSecond (List.partition isBodyActive)
-
-        newActiveBodies =
-            activeBodies
-                |> List.map (stepBody env playerPosition)
-                |> handleCollisions
-    in
-    { game
-        | bodies =
-            generatedBodies
-                ++ newActiveBodies
-                ++ passiveBodies
+                |> (\( generatedBodies, existingBodies ) ->
+                        existingBodies
+                            |> stepActiveBodies env playerPosition
+                            |> (++) generatedBodies
+                   )
                 |> handleBodyStateTransitions env
-    }
+    in
+    { game | bodies = updatedBodies }
+
+
+stepActiveBodies : Env -> Vec -> List Body -> List Body
+stepActiveBodies env playerPosition =
+    List.partition isBodyActive
+        >> (\( activeBodies, passiveBodies ) ->
+                activeBodies
+                    |> List.map (stepActiveBody env playerPosition)
+                    |> handleCollisions
+                    |> (++) passiveBodies
+           )
 
 
 generateBodies : Env -> Vec -> List Body -> Body -> ( List Body, Body )
@@ -322,8 +327,8 @@ type alias Env =
     }
 
 
-stepBody : Env -> Vec -> Body -> Body
-stepBody env playerPosition body =
+stepActiveBody : Env -> Vec -> Body -> Body
+stepActiveBody env playerPosition body =
     case body.state of
         Active ->
             body

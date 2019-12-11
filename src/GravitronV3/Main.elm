@@ -1,6 +1,6 @@
 module GravitronV3.Main exposing (main)
 
-import Basics.Extra exposing (flip, uncurry)
+import Basics.Extra exposing (flip)
 import Browser
 import Browser.Events as E
 import GravitronV3.Canvas exposing (..)
@@ -18,6 +18,11 @@ import TimeTravel.Browser as TimeTravel
 import Update.Pipeline exposing (..)
 
 
+type OnStep
+    = NoOpOnStep
+    | FiresBullet Timer
+
+
 
 -- Game
 
@@ -26,6 +31,7 @@ type alias Body =
     { position : Vec
     , velocity : Vec
     , radius : Float
+    , onStep : OnStep
     , hp : Float
     , movement : MovementType
     , screenCollision : ScreenCollisionType
@@ -57,6 +63,7 @@ playerConfig =
 initialPlayer : Body
 initialPlayer =
     { position = playerConfig.position
+    , onStep = NoOpOnStep
 
     --, velocity = playerConfig.velocity
     , velocity = Vec.fromRTheta 4 0
@@ -77,6 +84,7 @@ initialGravityBullet =
     { position = vec -100 -100
     , velocity = vec 2 -1
     , radius = 10
+    , onStep = NoOpOnStep
     , hp = 1
     , movement = GravitateToPlayer 20
     , screenCollision = BounceWithingScreen 0.5
@@ -89,17 +97,18 @@ initTurret =
     { position = vec -220 -220
     , velocity = Vec.zero
     , radius = 25
+    , onStep = FiresBullet (Timer.start 0 (60 * 1))
     , hp = 10
     , movement = Stationary
     , screenCollision = IgnoreScreenCollision
-    , type_ = Turret (Timer.start 0 (60 * 1))
+    , type_ = Turret
     }
 
 
 type BodyType
     = Bullet
     | Player
-    | Turret Timer
+    | Turret
 
 
 type alias Game =
@@ -142,7 +151,7 @@ updateGame env game =
         | bodies =
             FP.with (getPlayerPosition >> stepBody env) List.map game.bodies
                 |> handleCollisions
-                |> FP.with (getPlayerPosition >> stepGenerator env) List.concatMap
+                |> FP.with (getPlayerPosition >> handleOnStep env) List.concatMap
                 |> List.filter (.hp >> flip (>) 0)
     }
 
@@ -187,7 +196,7 @@ resolveCollisionWith otherBody body =
                 Bullet ->
                     kill
 
-                Turret _ ->
+                Turret ->
                     ignore
 
         Bullet ->
@@ -198,10 +207,10 @@ resolveCollisionWith otherBody body =
                 Bullet ->
                     kill
 
-                Turret _ ->
+                Turret ->
                     hit
 
-        Turret _ ->
+        Turret ->
             case body.type_ of
                 Bullet ->
                     kill
@@ -209,7 +218,7 @@ resolveCollisionWith otherBody body =
                 Player ->
                     ignore
 
-                Turret _ ->
+                Turret ->
                     ignore
 
 
@@ -226,18 +235,15 @@ stepBody env playerPosition =
         >> stepScreenCollision env
 
 
-stepGenerator : Env -> Vec -> Body -> List Body
-stepGenerator env playerPosition body =
-    case body.type_ of
-        Bullet ->
+handleOnStep : Env -> Vec -> Body -> List Body
+handleOnStep env playerPosition body =
+    case body.onStep of
+        NoOpOnStep ->
             [ body ]
 
-        Player ->
-            [ body ]
-
-        Turret timer ->
+        FiresBullet timer ->
             if Timer.isDone env.clock timer then
-                { body | type_ = Turret (Timer.restart env.clock timer) }
+                { body | onStep = FiresBullet (Timer.restart env.clock timer) }
                     :: [ initialGravityBullet
                             |> initBulletPositionAndVelocity playerPosition body
                        ]
@@ -368,7 +374,7 @@ toShape body =
                 |> move (Vec.toTuple body.position)
                 |> fill "green"
 
-        Turret _ ->
+        Turret ->
             circle body.radius
                 |> move (Vec.toTuple body.position)
                 |> fill "tomato"
@@ -414,7 +420,7 @@ update message model =
         GotScreen screen ->
             save { model | screen = screen }
 
-        Tick posix ->
+        Tick _ ->
             let
                 env : Env
                 env =

@@ -1,6 +1,5 @@
 module GravitronV3.Main exposing (main)
 
-import Basics.Extra exposing (flip)
 import Browser
 import Browser.Events as E
 import GravitronV3.Canvas exposing (..)
@@ -181,7 +180,7 @@ handleBodyStateTransitions env =
 
                 Active ->
                     if body.hp <= 0 then
-                        Just { body | state = Dying (Timer.start 0 60) }
+                        Just { body | state = Dying (Timer.start env.clock 60) }
 
                     else
                         Just body

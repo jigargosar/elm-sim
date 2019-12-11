@@ -160,8 +160,32 @@ updateGame env game =
             FP.with (getPlayerPosition >> stepBody env) List.map game.bodies
                 |> handleCollisions
                 |> FP.with (getPlayerPosition >> handleOnStep env) List.concatMap
-                |> List.filter (.hp >> flip (>) 0)
+                |> handleBodyStateTransitions
     }
+
+
+handleBodyStateTransitions : List Body -> List Body
+handleBodyStateTransitions =
+    List.filterMap
+        (\body ->
+            case body.state of
+                Dying remainingTicks ->
+                    if remainingTicks <= 0 then
+                        Nothing
+
+                    else
+                        Just body
+
+                Spawning _ ->
+                    Just body
+
+                Active ->
+                    if body.hp <= 0 then
+                        Just { body | state = Dying 60 }
+
+                    else
+                        Just body
+        )
 
 
 circleCircleCollision : Body -> Body -> Bool

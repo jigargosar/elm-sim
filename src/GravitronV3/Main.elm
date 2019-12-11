@@ -176,7 +176,7 @@ updateGame env game =
                             |> stepActiveBodies env playerPosition
                             |> (++) generatedBodies
                    )
-                |> handleBodyStateTransitions env
+                |> List.filterMap (transitionBody env)
     in
     { game | bodies = updatedBodies }
 
@@ -217,32 +217,29 @@ generateBodies env playerPosition acc body =
                 noOp
 
 
-handleBodyStateTransitions : Env -> List Body -> List Body
-handleBodyStateTransitions env =
-    List.filterMap
-        (\body ->
-            case body.state of
-                Dying timer ->
-                    if Timer.isDone env.clock timer then
-                        Nothing
+transitionBody : Env -> Body -> Maybe Body
+transitionBody env body =
+    case body.state of
+        Dying timer ->
+            if Timer.isDone env.clock timer then
+                Nothing
 
-                    else
-                        Just body
+            else
+                Just body
 
-                Spawning timer ->
-                    if Timer.isDone env.clock timer then
-                        Just { body | state = Active }
+        Spawning timer ->
+            if Timer.isDone env.clock timer then
+                Just { body | state = Active }
 
-                    else
-                        Just body
+            else
+                Just body
 
-                Active ->
-                    if body.hp <= 0 then
-                        Just { body | state = Dying (Timer.start env.clock 60) }
+        Active ->
+            if body.hp <= 0 then
+                Just { body | state = Dying (Timer.start env.clock 60) }
 
-                    else
-                        Just body
-        )
+            else
+                Just body
 
 
 circleCircleCollision : Body -> Body -> Bool

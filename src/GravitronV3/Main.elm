@@ -37,7 +37,7 @@ type alias Body =
     , velocity : Vec
     , radius : Float
     , state : BodyState
-    , onGenerateBodies : OnStep
+    , generator : OnStep
     , hp : Float
     , movement : MovementType
     , screenCollision : ScreenCollisionType
@@ -72,7 +72,7 @@ initialPlayer =
     , velocity = Vec.fromRTheta 4 0
     , radius = 20
     , state = Spawning (Timer.start 0 60)
-    , onGenerateBodies = GenerateNone
+    , generator = GenerateNone
     , hp = playerConfig.maxHp
 
     -- , movement = SpringToMouse 0.2 0.5
@@ -90,7 +90,7 @@ initialGravityBullet =
     , velocity = vec 2 -1
     , radius = 10
     , state = Active
-    , onGenerateBodies = GenerateNone
+    , generator = GenerateNone
     , hp = 1
     , movement = GravitateToPlayer 20
     , screenCollision = BounceWithingScreen 0.5
@@ -104,7 +104,7 @@ initTurret =
     , velocity = Vec.zero
     , radius = 25
     , state = Spawning (Timer.start 0 60)
-    , onGenerateBodies = GenerateBullets (Timer.start 0 (60 * 1))
+    , generator = GenerateBullets (Timer.start 0 (60 * 1))
     , hp = 10
     , movement = Stationary
     , screenCollision = IgnoreScreenCollision
@@ -152,23 +152,59 @@ initialGame =
     }
 
 
+isBodyActive : Body -> Bool
+isBodyActive body =
+    case body.state of
+        Active ->
+            True
+
+        _ ->
+            False
+
+
 updateGame : Env -> Game -> Game
 updateGame env game =
     let
         playerPosition =
             getPlayerPosition game.bodies
 
-        foo =
+        ( generatedBodies, ( activeBodies, passiveBodies ) ) =
+            List.Extra.mapAccuml (generateBodies env playerPosition) [] game.bodies
+                |> Tuple.mapSecond (List.partition isBodyActive)
+
+        newBodies_ =
             game.bodies
                 |> List.map (stepBody env playerPosition)
                 |> handleCollisions
                 |> List.concatMap (handleGenerateBodies env playerPosition)
-    in
-    { game
-        | bodies =
-            foo
                 |> handleBodyStateTransitions env
-    }
+    in
+    { game | bodies = newBodies_ }
+
+
+generateBodies : Env -> Vec -> List Body -> Body -> ( List Body, Body )
+generateBodies env playerPosition acc body =
+    let
+        noOp =
+            ( acc, body )
+    in
+    case body.generator of
+        GenerateNone ->
+            noOp
+
+        GenerateBullets timer ->
+            if Timer.isDone env.clock timer then
+                ( (initialGravityBullet
+                    |> initBulletPositionAndVelocity playerPosition body
+                  )
+                    :: acc
+                , { body
+                    | generator = GenerateBullets (Timer.restart env.clock timer)
+                  }
+                )
+
+            else
+                noOp
 
 
 handleBodyStateTransitions : Env -> List Body -> List Body
@@ -295,13 +331,13 @@ stepBody env playerPosition body =
 
 handleGenerateBodies : Env -> Vec -> Body -> List Body
 handleGenerateBodies env playerPosition body =
-    case body.onGenerateBodies of
+    case body.generator of
         GenerateNone ->
             [ body ]
 
         GenerateBullets timer ->
             if Timer.isDone env.clock timer then
-                { body | onGenerateBodies = GenerateBullets (Timer.restart env.clock timer) }
+                { body | generator = GenerateBullets (Timer.restart env.clock timer) }
                     :: [ initialGravityBullet
                             |> initBulletPositionAndVelocity playerPosition body
                        ]

@@ -197,22 +197,22 @@ handleCollisions =
     List.Extra.select
         >> List.map
             (\( body, others ) ->
-                case body.state of
-                    Active ->
-                        List.foldl handleCollisionWith body others
-
-                    _ ->
-                        body
+                List.foldl handleCollisionWith body others
             )
 
 
 handleCollisionWith : Body -> Body -> Body
 handleCollisionWith otherBody body =
-    if circleCircleCollision otherBody body then
-        resolveCollisionWith otherBody body
+    case ( body.state, otherBody.state ) of
+        ( Active, Active ) ->
+            if circleCircleCollision otherBody body then
+                resolveCollisionWith otherBody body
 
-    else
-        body
+            else
+                body
+
+        _ ->
+            body
 
 
 resolveCollisionWith : Body -> Body -> Body

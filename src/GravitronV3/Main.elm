@@ -417,21 +417,23 @@ viewGame screen { bodies } =
 
 toShape : Body -> Shape
 toShape body =
-    case body.type_ of
-        Bullet ->
-            circle body.radius
-                |> move (Vec.toTuple body.position)
-                |> fill "black"
+    let
+        bodyShape : Shape
+        bodyShape =
+            case body.type_ of
+                Bullet ->
+                    circle body.radius
+                        |> fill "black"
 
-        Player ->
-            circle body.radius
-                |> move (Vec.toTuple body.position)
-                |> fill "green"
+                Player ->
+                    circle body.radius
+                        |> fill "green"
 
-        Turret ->
-            circle body.radius
-                |> move (Vec.toTuple body.position)
-                |> fill "tomato"
+                Turret ->
+                    circle body.radius
+                        |> fill "tomato"
+    in
+    bodyShape |> move (Vec.toTuple body.position)
 
 
 

@@ -1,4 +1,4 @@
-module GravitronV3.Canvas exposing (Shape, circle, fill, fillRect, group, move, rect, renderShapes, scale, stroke, stroke2)
+module GravitronV3.Canvas exposing (Shape, circle, fade, fill, fillRect, group, move, rect, renderShapes, scale, stroke, stroke2)
 
 import GravitronV3.Screen as Screen exposing (Screen)
 import GravitronV3.Transform as Transform exposing (Transform)
@@ -21,7 +21,7 @@ type Brush
 
 
 type Shape
-    = Shape Form Brush Transform
+    = Shape Form Brush Float Transform
 
 
 fillRect : String -> Float -> Float -> Shape
@@ -41,7 +41,7 @@ stroke2 c s =
 
 rect : Float -> Float -> Shape
 rect width height =
-    Shape (Rect width height) NoBrush Transform.initial
+    toShape (Rect width height)
 
 
 circle : Float -> Shape
@@ -56,7 +56,7 @@ group =
 
 toShape : Form -> Shape
 toShape form =
-    Shape form NoBrush Transform.initial
+    Shape form NoBrush 1 Transform.initial
 
 
 fill : String -> Shape -> Shape
@@ -65,18 +65,23 @@ fill =
 
 
 setBrush : Brush -> Shape -> Shape
-setBrush b (Shape f _ t) =
-    Shape f b t
+setBrush b (Shape f _ o t) =
+    Shape f b o t
 
 
 mapTransform : (Transform -> Transform) -> Shape -> Shape
-mapTransform func (Shape f b t) =
-    Shape f b (func t)
+mapTransform func (Shape f b o t) =
+    Shape f b o (func t)
 
 
 scale : Float -> Shape -> Shape
 scale =
     Transform.scale >> mapTransform
+
+
+fade : Float -> Shape -> Shape
+fade o (Shape f b _ t) =
+    Shape f b o t
 
 
 move : ( Float, Float ) -> Shape -> Shape
@@ -90,7 +95,7 @@ renderShapes screen shapes =
 
 
 renderShape : Shape -> Svg msg
-renderShape (Shape form brush t) =
+renderShape (Shape form brush alpha t) =
     let
         f =
             String.fromFloat
@@ -103,6 +108,7 @@ renderShape (Shape form brush t) =
                  , transform <| Transform.renderRectTransform w h t
                  ]
                     ++ renderBrush brush
+                    ++ renderAlpha alpha
                 )
                 []
 
@@ -110,6 +116,7 @@ renderShape (Shape form brush t) =
             Svg.g
                 (transform (Transform.renderTransform t)
                     :: renderBrush brush
+                    ++ renderAlpha alpha
                 )
                 (List.map renderShape shapes)
 
@@ -119,8 +126,18 @@ renderShape (Shape form brush t) =
                  , transform <| Transform.renderTransform t
                  ]
                     ++ renderBrush brush
+                    ++ renderAlpha alpha
                 )
                 []
+
+
+renderAlpha : Float -> List (Svg.Attribute msg)
+renderAlpha alpha =
+    if alpha == 1 then
+        []
+
+    else
+        [ opacity (String.fromFloat (clamp 0 1 alpha)) ]
 
 
 renderBrush : Brush -> List (Attribute msg)

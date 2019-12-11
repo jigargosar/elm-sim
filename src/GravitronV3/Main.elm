@@ -432,9 +432,17 @@ toShape clock body =
                     identity
 
                 Dying timer ->
-                    scale (1 + Timer.value clock timer)
+                    let
+                        value =
+                            Timer.value clock timer
+                    in
+                    scale (1 + value)
+
+        -->> fade (1 - value)
     in
-    bodyShape |> applyBodyStateTransform |> move (Vec.toTuple body.position)
+    bodyShape
+        |> applyBodyStateTransform
+        |> move (Vec.toTuple body.position)
 
 
 

@@ -175,8 +175,12 @@ handleBodyStateTransitions env =
                     else
                         Just body
 
-                Spawning _ ->
-                    Just body
+                Spawning timer ->
+                    if Timer.isDone env.clock timer then
+                        Just { body | state = Active }
+
+                    else
+                        Just body
 
                 Active ->
                     if body.hp <= 0 then
@@ -272,15 +276,12 @@ type alias Env =
 stepBody : Env -> Vec -> Body -> Body
 stepBody env playerPosition body =
     case body.state of
-        Spawning _ ->
-            body
-
         Active ->
             body
                 |> stepMovement env playerPosition
                 |> stepScreenCollision env
 
-        Dying _ ->
+        _ ->
             body
 
 

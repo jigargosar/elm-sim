@@ -185,7 +185,10 @@ stepBodies env playerPosition =
     List.partition isBodyActive
         >> (\( activeBodies, passiveBodies ) ->
                 activeBodies
-                    |> List.map (stepActiveBody env playerPosition)
+                    |> List.map
+                        (stepMovement env playerPosition
+                            >> stepScreenCollision env
+                        )
                     |> handleCollisions
                     |> (++) passiveBodies
                     |> List.filterMap (transitionBody env)
@@ -322,18 +325,6 @@ type alias Env =
     , screen : Screen
     , clock : Float
     }
-
-
-stepActiveBody : Env -> Vec -> Body -> Body
-stepActiveBody env playerPosition body =
-    case body.state of
-        Active ->
-            body
-                |> stepMovement env playerPosition
-                |> stepScreenCollision env
-
-        _ ->
-            body
 
 
 initBulletPositionAndVelocity : Vec -> Body -> Body -> Body

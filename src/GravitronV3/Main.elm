@@ -26,7 +26,7 @@ type OnStep
 type BodyState
     = Spawning Int
     | Active
-    | Dying
+    | Dying Int
 
 
 
@@ -90,7 +90,7 @@ initialGravityBullet =
     { position = vec -100 -100
     , velocity = vec 2 -1
     , radius = 10
-    , state = Spawning 60
+    , state = Active
     , onStep = NoOpOnStep
     , hp = 1
     , movement = GravitateToPlayer 20
@@ -238,9 +238,22 @@ type alias Env =
 
 
 stepBody : Env -> Vec -> Body -> Body
-stepBody env playerPosition =
-    stepMovement env playerPosition
-        >> stepScreenCollision env
+stepBody env playerPosition body =
+    case body.state of
+        Spawning remainingTicks ->
+            if remainingTicks <= 0 then
+                { body | state = Active }
+
+            else
+                { body | state = Spawning (remainingTicks - 1) }
+
+        Active ->
+            body
+                |> stepMovement env playerPosition
+                |> stepScreenCollision env
+
+        Dying remainingTicks ->
+            { body | state = Dying (remainingTicks - 1) }
 
 
 handleOnStep : Env -> Vec -> Body -> List Body

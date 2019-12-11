@@ -18,8 +18,8 @@ import Update.Pipeline exposing (..)
 
 
 type OnStep
-    = NoOpOnStep
-    | FireBulletOnStep Timer
+    = GenerateNone
+    | GenerateBullets Timer
 
 
 type BodyState
@@ -37,7 +37,7 @@ type alias Body =
     , velocity : Vec
     , radius : Float
     , state : BodyState
-    , onStep : OnStep
+    , onGenerateBodies : OnStep
     , hp : Float
     , movement : MovementType
     , screenCollision : ScreenCollisionType
@@ -72,7 +72,7 @@ initialPlayer =
     , velocity = Vec.fromRTheta 4 0
     , radius = 20
     , state = Spawning (Timer.start 0 60)
-    , onStep = NoOpOnStep
+    , onGenerateBodies = GenerateNone
     , hp = playerConfig.maxHp
 
     -- , movement = SpringToMouse 0.2 0.5
@@ -90,7 +90,7 @@ initialGravityBullet =
     , velocity = vec 2 -1
     , radius = 10
     , state = Active
-    , onStep = NoOpOnStep
+    , onGenerateBodies = GenerateNone
     , hp = 1
     , movement = GravitateToPlayer 20
     , screenCollision = BounceWithingScreen 0.5
@@ -104,7 +104,7 @@ initTurret =
     , velocity = Vec.zero
     , radius = 25
     , state = Spawning (Timer.start 0 60)
-    , onStep = FireBulletOnStep (Timer.start 0 (60 * 1))
+    , onGenerateBodies = GenerateBullets (Timer.start 0 (60 * 1))
     , hp = 10
     , movement = Stationary
     , screenCollision = IgnoreScreenCollision
@@ -154,11 +154,19 @@ initialGame =
 
 updateGame : Env -> Game -> Game
 updateGame env game =
+    let
+        playerPosition =
+            getPlayerPosition game.bodies
+
+        foo =
+            game.bodies
+                |> List.map (stepBody env playerPosition)
+                |> handleCollisions
+                |> List.concatMap (handleGenerateBodies env playerPosition)
+    in
     { game
         | bodies =
-            FP.with (getPlayerPosition >> stepBody env) List.map game.bodies
-                |> handleCollisions
-                |> FP.with (getPlayerPosition >> handleOnStep env) List.concatMap
+            foo
                 |> handleBodyStateTransitions env
     }
 
@@ -285,15 +293,15 @@ stepBody env playerPosition body =
             body
 
 
-handleOnStep : Env -> Vec -> Body -> List Body
-handleOnStep env playerPosition body =
-    case body.onStep of
-        NoOpOnStep ->
+handleGenerateBodies : Env -> Vec -> Body -> List Body
+handleGenerateBodies env playerPosition body =
+    case body.onGenerateBodies of
+        GenerateNone ->
             [ body ]
 
-        FireBulletOnStep timer ->
+        GenerateBullets timer ->
             if Timer.isDone env.clock timer then
-                { body | onStep = FireBulletOnStep (Timer.restart env.clock timer) }
+                { body | onGenerateBodies = GenerateBullets (Timer.restart env.clock timer) }
                     :: [ initialGravityBullet
                             |> initBulletPositionAndVelocity playerPosition body
                        ]
@@ -427,7 +435,12 @@ toShape clock body =
         applyBodyStateTransform =
             case body.state of
                 Spawning timer ->
-                    scale (Timer.value clock timer)
+                    let
+                        value =
+                            Timer.value clock timer
+                    in
+                    scale value
+                        >> fade value
 
                 Active ->
                     identity
@@ -438,6 +451,7 @@ toShape clock body =
                             Timer.value clock timer
                     in
                     scale (1 + value)
+                        >> fade (0.8 - value)
 
         -->> fade (1 - value)
     in

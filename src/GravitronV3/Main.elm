@@ -174,9 +174,9 @@ updateGame env game =
                 |> (\( generatedBodies, existingBodies ) ->
                         existingBodies
                             |> stepActiveBodies env playerPosition
+                            |> List.filterMap (transitionBody env)
                             |> (++) generatedBodies
                    )
-                |> List.filterMap (transitionBody env)
     in
     { game | bodies = updatedBodies }
 

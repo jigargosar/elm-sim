@@ -189,7 +189,11 @@ stepBodies env playerPosition =
                         (stepMovement env playerPosition
                             >> stepScreenCollision env
                         )
-                    |> handleCollisions
+                    |> List.Extra.select
+                    |> List.map
+                        (\( body, others ) ->
+                            List.foldl handleCollisionWith body others
+                        )
                     |> (++) passiveBodies
                     |> List.filterMap (transitionBody env)
            )

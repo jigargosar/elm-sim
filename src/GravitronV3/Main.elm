@@ -24,9 +24,9 @@ type OnStep
 
 
 type BodyState
-    = Spawning Int
+    = Spawning Float
     | Active
-    | Dying Int
+    | Dying Float
 
 
 
@@ -432,8 +432,28 @@ toShape body =
                 Turret ->
                     circle body.radius
                         |> fill "tomato"
+
+        transformBodyState : Shape -> Shape
+        transformBodyState =
+            case body.state of
+                Spawning remainingTicks ->
+                    let
+                        factor =
+                            1 - (remainingTicks / 60)
+                    in
+                    scale factor
+
+                Active ->
+                    identity
+
+                Dying remainingTicks ->
+                    let
+                        factor =
+                            1 - (remainingTicks / 60)
+                    in
+                    scale (1 + factor)
     in
-    bodyShape |> move (Vec.toTuple body.position)
+    bodyShape |> transformBodyState |> move (Vec.toTuple body.position)
 
 
 

@@ -173,22 +173,22 @@ updateGame env game =
                 |> List.Extra.mapAccuml (generateBodies env playerPosition) []
                 |> (\( generatedBodies, existingBodies ) ->
                         existingBodies
-                            |> stepActiveBodies env playerPosition
-                            |> List.filterMap (transitionBody env)
+                            |> stepBodies env playerPosition
                             |> (++) generatedBodies
                    )
     in
     { game | bodies = updatedBodies }
 
 
-stepActiveBodies : Env -> Vec -> List Body -> List Body
-stepActiveBodies env playerPosition =
+stepBodies : Env -> Vec -> List Body -> List Body
+stepBodies env playerPosition =
     List.partition isBodyActive
         >> (\( activeBodies, passiveBodies ) ->
                 activeBodies
                     |> List.map (stepActiveBody env playerPosition)
                     |> handleCollisions
                     |> (++) passiveBodies
+                    |> List.filterMap (transitionBody env)
            )
 
 

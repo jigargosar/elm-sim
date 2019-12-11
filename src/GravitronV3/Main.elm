@@ -37,6 +37,7 @@ type alias Body =
     { position : Vec
     , velocity : Vec
     , radius : Float
+    , state : BodyState
     , onStep : OnStep
     , hp : Float
     , movement : MovementType
@@ -67,11 +68,12 @@ playerConfig =
 initialPlayer : Body
 initialPlayer =
     { position = Vec.zero
-    , onStep = NoOpOnStep
 
     --, velocity = Vec.zero
     , velocity = Vec.fromRTheta 4 0
     , radius = 20
+    , state = Spawning
+    , onStep = NoOpOnStep
     , hp = playerConfig.maxHp
 
     -- , movement = SpringToMouse 0.2 0.5
@@ -88,6 +90,7 @@ initialGravityBullet =
     { position = vec -100 -100
     , velocity = vec 2 -1
     , radius = 10
+    , state = Spawning
     , onStep = NoOpOnStep
     , hp = 1
     , movement = GravitateToPlayer 20
@@ -101,6 +104,7 @@ initTurret =
     { position = vec -220 -220
     , velocity = Vec.zero
     , radius = 25
+    , state = Spawning
     , onStep = FireBulletOnStep (Timer.start 0 (60 * 1))
     , hp = 10
     , movement = Stationary

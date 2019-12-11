@@ -9,7 +9,7 @@ import GravitronV3.Vec as Vec exposing (Vec, vec)
 import Html exposing (Html)
 import Json.Decode as D
 import List.Extra
-import PointFree as FP exposing (findWithDefault)
+import PointFree exposing (findWithDefault)
 import Random exposing (Seed)
 import Task
 import Time exposing (Posix)
@@ -334,23 +334,6 @@ stepActiveBody env playerPosition body =
 
         _ ->
             body
-
-
-handleGenerateBodies : Env -> Vec -> Body -> List Body
-handleGenerateBodies env playerPosition body =
-    case body.generator of
-        GenerateNone ->
-            [ body ]
-
-        GenerateBullets timer ->
-            if Timer.isDone env.clock timer then
-                { body | generator = GenerateBullets (Timer.restart env.clock timer) }
-                    :: [ initialGravityBullet
-                            |> initBulletPositionAndVelocity playerPosition body
-                       ]
-
-            else
-                [ body ]
 
 
 initBulletPositionAndVelocity : Vec -> Body -> Body -> Body

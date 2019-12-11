@@ -53,7 +53,7 @@ type MovementType
 
 
 type ScreenCollisionType
-    = BounceWithingScreen Float
+    = BounceWithinScreen Float
     | IgnoreScreenCollision
 
 
@@ -79,7 +79,7 @@ initialPlayer =
     , movement = Wanderer (Random.initialSeed 1203)
 
     --, screenCollision = IgnoreScreenCollision
-    , screenCollision = BounceWithingScreen 1
+    , screenCollision = BounceWithinScreen 1
     , type_ = Player
     }
 
@@ -93,7 +93,7 @@ initialGravityBullet =
     , generator = GenerateNone
     , hp = 1
     , movement = GravitateToPlayer 20
-    , screenCollision = BounceWithingScreen 0.5
+    , screenCollision = BounceWithinScreen 0.5
     , type_ = Bullet
     }
 
@@ -379,7 +379,7 @@ bounceWithinScreen screen position bounceFactor velocity =
 stepScreenCollision : Env -> Body -> Body
 stepScreenCollision env body =
     case body.screenCollision of
-        BounceWithingScreen bounceFactor ->
+        BounceWithinScreen bounceFactor ->
             { body
                 | velocity =
                     bounceWithinScreen env.screen

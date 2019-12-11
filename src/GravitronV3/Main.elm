@@ -20,7 +20,7 @@ import Update.Pipeline exposing (..)
 
 type OnStep
     = NoOpOnStep
-    | FiresBullet Timer
+    | FireBulletOnStep Timer
 
 
 
@@ -95,7 +95,7 @@ initTurret =
     { position = vec -220 -220
     , velocity = Vec.zero
     , radius = 25
-    , onStep = FiresBullet (Timer.start 0 (60 * 1))
+    , onStep = FireBulletOnStep (Timer.start 0 (60 * 1))
     , hp = 10
     , movement = Stationary
     , screenCollision = IgnoreScreenCollision
@@ -239,9 +239,9 @@ handleOnStep env playerPosition body =
         NoOpOnStep ->
             [ body ]
 
-        FiresBullet timer ->
+        FireBulletOnStep timer ->
             if Timer.isDone env.clock timer then
-                { body | onStep = FiresBullet (Timer.restart env.clock timer) }
+                { body | onStep = FireBulletOnStep (Timer.restart env.clock timer) }
                     :: [ initialGravityBullet
                             |> initBulletPositionAndVelocity playerPosition body
                        ]

@@ -51,26 +51,24 @@ type ScreenCollisionType
     | IgnoreScreenCollision
 
 
+playerConfig : { maxHp : number, maxLives : number }
 playerConfig =
-    { hp = 100
-    , lives = 3
-    , position = Vec.zero
-    , velocity = Vec.zero
-    , movement = SpringToMouse 0.2 0.5
+    { maxHp = 100
+    , maxLives = 3
     }
 
 
 initialPlayer : Body
 initialPlayer =
-    { position = playerConfig.position
+    { position = Vec.zero
     , onStep = NoOpOnStep
 
-    --, velocity = playerConfig.velocity
+    --, velocity = Vec.zero
     , velocity = Vec.fromRTheta 4 0
     , radius = 20
-    , hp = playerConfig.hp
+    , hp = playerConfig.maxHp
 
-    -- , movement = playerConfig.movement
+    -- , movement = SpringToMouse 0.2 0.5
     , movement = Wanderer (Random.initialSeed 1203)
 
     --, screenCollision = IgnoreScreenCollision

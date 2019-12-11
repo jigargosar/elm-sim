@@ -24,7 +24,7 @@ type OnStep
 
 
 type BodyState
-    = Spawning
+    = Spawning Int
     | Active
     | Dying
 
@@ -72,7 +72,7 @@ initialPlayer =
     --, velocity = Vec.zero
     , velocity = Vec.fromRTheta 4 0
     , radius = 20
-    , state = Spawning
+    , state = Spawning 60
     , onStep = NoOpOnStep
     , hp = playerConfig.maxHp
 
@@ -90,7 +90,7 @@ initialGravityBullet =
     { position = vec -100 -100
     , velocity = vec 2 -1
     , radius = 10
-    , state = Spawning
+    , state = Spawning 60
     , onStep = NoOpOnStep
     , hp = 1
     , movement = GravitateToPlayer 20
@@ -104,7 +104,7 @@ initTurret =
     { position = vec -220 -220
     , velocity = Vec.zero
     , radius = 25
-    , state = Spawning
+    , state = Spawning 60
     , onStep = FireBulletOnStep (Timer.start 0 (60 * 1))
     , hp = 10
     , movement = Stationary

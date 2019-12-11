@@ -24,9 +24,9 @@ type OnStep
 
 
 type BodyState
-    = Spawning Float
+    = Spawning Timer
     | Active
-    | Dying Float
+    | Dying Timer
 
 
 
@@ -72,7 +72,7 @@ initialPlayer =
     --, velocity = Vec.zero
     , velocity = Vec.fromRTheta 4 0
     , radius = 20
-    , state = Spawning 60
+    , state = Spawning (Timer.start 0 60)
     , onStep = NoOpOnStep
     , hp = playerConfig.maxHp
 
@@ -104,7 +104,7 @@ initTurret =
     { position = vec -220 -220
     , velocity = Vec.zero
     , radius = 25
-    , state = Spawning 60
+    , state = Spawning (Timer.start 0 60)
     , onStep = FireBulletOnStep (Timer.start 0 (60 * 1))
     , hp = 10
     , movement = Stationary
@@ -160,17 +160,17 @@ updateGame env game =
             FP.with (getPlayerPosition >> stepBody env) List.map game.bodies
                 |> handleCollisions
                 |> FP.with (getPlayerPosition >> handleOnStep env) List.concatMap
-                |> handleBodyStateTransitions
+                |> handleBodyStateTransitions env
     }
 
 
-handleBodyStateTransitions : List Body -> List Body
-handleBodyStateTransitions =
+handleBodyStateTransitions : Env -> List Body -> List Body
+handleBodyStateTransitions env =
     List.filterMap
         (\body ->
             case body.state of
-                Dying remainingTicks ->
-                    if remainingTicks <= 0 then
+                Dying timer ->
+                    if Timer.isDone env.clock timer then
                         Nothing
 
                     else
@@ -181,7 +181,7 @@ handleBodyStateTransitions =
 
                 Active ->
                     if body.hp <= 0 then
-                        Just { body | state = Dying 60 }
+                        Just { body | state = Dying (Timer.start 0 60) }
 
                     else
                         Just body
@@ -273,20 +273,16 @@ type alias Env =
 stepBody : Env -> Vec -> Body -> Body
 stepBody env playerPosition body =
     case body.state of
-        Spawning remainingTicks ->
-            if remainingTicks <= 0 then
-                { body | state = Active }
-
-            else
-                { body | state = Spawning (remainingTicks - 1) }
+        Spawning _ ->
+            body
 
         Active ->
             body
                 |> stepMovement env playerPosition
                 |> stepScreenCollision env
 
-        Dying remainingTicks ->
-            { body | state = Dying (remainingTicks - 1) }
+        Dying _ ->
+            body
 
 
 handleOnStep : Env -> Vec -> Body -> List Body
@@ -409,14 +405,8 @@ stepMovement { mousePosition } playerPosition model =
     { newModel | position = Vec.add newModel.position newModel.velocity }
 
 
-viewGame : Screen -> Game -> Html msg
-viewGame screen { bodies } =
-    renderShapes screen
-        (List.map toShape bodies)
-
-
-toShape : Body -> Shape
-toShape body =
+toShape : Float -> Body -> Shape
+toShape clock body =
     let
         bodyShape : Shape
         bodyShape =
@@ -433,27 +423,19 @@ toShape body =
                     circle body.radius
                         |> fill "tomato"
 
-        transformBodyState : Shape -> Shape
-        transformBodyState =
+        applyBodyStateTransform : Shape -> Shape
+        applyBodyStateTransform =
             case body.state of
-                Spawning remainingTicks ->
-                    let
-                        factor =
-                            1 - (remainingTicks / 60)
-                    in
-                    scale factor
+                Spawning timer ->
+                    scale (Timer.value clock timer)
 
                 Active ->
                     identity
 
-                Dying remainingTicks ->
-                    let
-                        factor =
-                            1 - (remainingTicks / 60)
-                    in
-                    scale (1 + factor)
+                Dying timer ->
+                    scale (1 + Timer.value clock timer)
     in
-    bodyShape |> transformBodyState |> move (Vec.toTuple body.position)
+    bodyShape |> applyBodyStateTransform |> move (Vec.toTuple body.position)
 
 
 
@@ -467,8 +449,9 @@ type Msg
 
 
 view : Model -> Html Msg
-view { screen, game } =
-    viewGame screen game
+view { screen, clock, game } =
+    renderShapes screen
+        (List.map (toShape clock) game.bodies)
 
 
 type alias Model =
@@ -507,8 +490,8 @@ update message model =
             in
             save
                 { model
-                    | clock = model.clock + 1
-                    , game = updateGame env model.game
+                    | game = updateGame env model.game
+                    , clock = model.clock + 1
                 }
 
         MouseMove pageX pageY ->

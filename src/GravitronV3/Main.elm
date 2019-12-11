@@ -23,6 +23,12 @@ type OnStep
     | FireBulletOnStep Timer
 
 
+type BodyState
+    = Spawning
+    | Active
+    | Dying
+
+
 
 -- Game
 

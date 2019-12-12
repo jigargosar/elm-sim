@@ -139,6 +139,11 @@ initBullet =
     }
 
 
+viewBullet : Bullet -> Shape
+viewBullet { position, radius } =
+    viewFilledCircle "gray" radius position
+
+
 
 -- Turret
 
@@ -195,6 +200,7 @@ viewFilledCircle color radius position =
 type alias Game =
     { player : Player
     , turret : Turret
+    , bullets : List Bullet
     }
 
 
@@ -202,12 +208,21 @@ initialGame : Game
 initialGame =
     { player = initialPlayer
     , turret = initialTurret
+    , bullets = []
     }
 
 
 updateGame : Env -> Game -> Game
-updateGame env ({ player } as game) =
-    { game | player = updatePlayer env player }
+updateGame env game =
+    let
+        ( bullets, turret ) =
+            updateTurret env game.turret
+    in
+    { game
+        | player = updatePlayer env game.player
+        , turret = turret
+        , bullets = bullets ++ game.bullets
+    }
 
 
 viewGame : Game -> Shape
@@ -215,6 +230,8 @@ viewGame game =
     group
         [ viewPlayer game.player
         , viewTurret game.turret
+        , List.map viewBullet game.bullets
+            |> group
         ]
 
 

@@ -134,7 +134,7 @@ stepParticleBehaviours env =
                 _ ->
                     ( model, behaviour )
     in
-    (\model -> List.Extra.mapAccumr step model model.behaviours)
+    (\model -> List.Extra.mapAccuml step model model.behaviours)
         >> (\( model, behaviours ) -> { model | behaviours = behaviours })
 
 

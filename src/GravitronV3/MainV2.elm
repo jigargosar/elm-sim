@@ -20,6 +20,11 @@ import Update.Pipeline exposing (..)
 -- Helpers
 
 
+circleCircleCollision : { a | position : Vec, radius : Float } -> { b | position : Vec, radius : Float } -> Bool
+circleCircleCollision c1 c2 =
+    Vec.lenFrom c1.position c2.position < c1.radius + c2.radius
+
+
 translatePosByVel : { a | position : Vec, velocity : Vec } -> { a | position : Vec, velocity : Vec }
 translatePosByVel m =
     { m | position = Vec.add m.position m.velocity }
@@ -169,10 +174,6 @@ updateBullet env player =
     gravitateTo player
         >> bounceWithinScreen env 1
         >> translatePosByVel
-
-
-circleCircleCollision c1 c2 =
-    Vec.lenFrom c1.position c2.position < c1.radius + c2.radius
 
 
 updateBullets : Env -> Player -> List Bullet -> List Bullet

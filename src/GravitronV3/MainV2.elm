@@ -107,7 +107,7 @@ randomWalkerVelocity velocity =
 type Action
     = SetVelocity Vec
     | SetPosition Vec
-    | AddBullet Particle
+    | ProcessEvent Event
 
 
 stepParticleBehaviours : Env -> Particle -> Particle

@@ -22,7 +22,7 @@ initialPlayer =
     { position = Vec.zero
     , velocity = Vec.fromRTheta 4 0
     , radius = 20
-    , color = "green"
+    , viewType = SolidCircleView "green"
     }
 
 
@@ -64,13 +64,19 @@ type alias Particle a =
         | position : Vec
         , velocity : Vec
         , radius : Float
-        , color : String
+        , viewType : ViewType
     }
 
 
+type ViewType
+    = SolidCircleView String
+
+
 particleToShape : Particle a -> Shape
-particleToShape { radius, color } =
-    circle radius |> fill color
+particleToShape { radius, viewType } =
+    case viewType of
+        SolidCircleView color ->
+            circle radius |> fill color
 
 
 positionParticleShape : (Particle a -> Shape) -> Particle a -> Shape

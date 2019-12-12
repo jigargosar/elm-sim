@@ -10,7 +10,6 @@ import Html exposing (Html)
 import Json.Decode as D
 import List.Extra
 import Random exposing (Generator, Seed)
-import Random.Extra
 import Random.Float
 import Task
 import Time exposing (Posix)

@@ -1,5 +1,6 @@
 module GravitronV3.MainV2 exposing (main)
 
+import Basics.Extra exposing (flip)
 import Browser
 import Browser.Events as E
 import GravitronV3.Canvas exposing (..)
@@ -26,6 +27,16 @@ type alias Particle =
     , viewType : ViewType
     , behaviours : List Behaviour
     }
+
+
+setVelocity : Vec -> Particle -> Particle
+setVelocity velocity model =
+    { model | velocity = velocity }
+
+
+setVelocityIn : Particle -> Vec -> Particle
+setVelocityIn =
+    flip setVelocity
 
 
 
@@ -86,21 +97,6 @@ randomWalkerVelocity velocity =
             )
 
 
-randomlyChangeVelocityAngle velocity seed =
-    let
-        randomAngle =
-            Random.float -0.1 0.1
-
-        ( newAngleDiff, newSeed ) =
-            Random.step randomAngle seed
-    in
-    ( velocity
-        |> Vec.mapAngle ((+) newAngleDiff)
-        |> Vec.mapMagnitude (max 1)
-    , newSeed
-    )
-
-
 stepParticleBehaviours : Env -> Particle -> Particle
 stepParticleBehaviours env =
     let
@@ -108,21 +104,8 @@ stepParticleBehaviours env =
         step model behaviour =
             case behaviour of
                 RandomWalker seed ->
-                    let
-                        randomAngle =
-                            Random.float -0.1 0.1
-
-                        ( newAngleDiff, newSeed ) =
-                            Random.step randomAngle seed
-                    in
-                    ( { model
-                        | velocity =
-                            model.velocity
-                                |> Vec.mapAngle ((+) newAngleDiff)
-                                |> Vec.mapMagnitude (max 1)
-                      }
-                    , RandomWalker newSeed
-                    )
+                    Random.step (randomWalkerVelocity model.velocity) seed
+                        |> Tuple.mapBoth (setVelocityIn model) RandomWalker
 
                 ApplyVelocityToPosition ->
                     ( { model

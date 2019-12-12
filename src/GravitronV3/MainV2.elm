@@ -142,7 +142,11 @@ stepParticleBehaviours env =
 
 
 type Player
-    = Player { position : Vec, velocity : Vec, radius : Float }
+    = Player
+        { position : Vec
+        , velocity : Vec
+        , radius : Float
+        }
 
 
 initialPlayer : Player

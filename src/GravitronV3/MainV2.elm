@@ -25,11 +25,6 @@ translatePosByVel m =
     { m | position = Vec.add m.position m.velocity }
 
 
-translatePosByVelOfMagnitude : Vec -> { a | position : Vec, velocity : Vec } -> { a | position : Vec, velocity : Vec }
-translatePosByVelOfMagnitude v m =
-    { m | position = Vec.add m.position v }
-
-
 randomWalkerVelocity : Vec -> Generator Vec
 randomWalkerVelocity velocity =
     let

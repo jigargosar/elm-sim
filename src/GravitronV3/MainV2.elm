@@ -14,10 +14,7 @@ import Update.Pipeline exposing (..)
 
 
 type alias Player =
-    { position : Vec
-    , velocity : Vec
-    , radius : Float
-    }
+    Common {}
 
 
 initialPlayer : Player

@@ -141,7 +141,7 @@ initBullet =
 
 viewBullet : Bullet -> Shape
 viewBullet { position, radius } =
-    viewFilledCircle "black" radius position
+    viewFilledCircle "rgba(0,0,0,0.7)" radius position
 
 
 

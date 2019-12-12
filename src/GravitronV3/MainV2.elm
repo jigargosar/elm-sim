@@ -36,8 +36,38 @@ type Behaviour
     = SpringToMouse
     | RandomWalker Seed
     | GravitateToPlayer
-    | BounceOffScreen
+    | BounceWithinScreen Float
     | ApplyVelocityToPosition
+
+
+bounceWithinScreen : Screen -> Vec -> Float -> Vec -> Vec
+bounceWithinScreen screen position bounceFactor velocity =
+    let
+        bounceVelocityPart lo high positionPart velocityPart =
+            if
+                (positionPart < lo && velocityPart < 0)
+                    || (positionPart > high && velocityPart > 0)
+            then
+                negate velocityPart
+
+            else
+                velocityPart
+
+        ( x, y ) =
+            Vec.toTuple position
+
+        ( vx, vy ) =
+            Vec.toTuple velocity
+
+        newBouncedVelocity =
+            vec (bounceVelocityPart screen.left screen.right x vx)
+                (bounceVelocityPart screen.top screen.bottom y vy)
+    in
+    if velocity /= newBouncedVelocity then
+        newBouncedVelocity |> Vec.mapMagnitude ((*) bounceFactor)
+
+    else
+        newBouncedVelocity
 
 
 stepParticleBehaviours : Env -> Particle -> Particle
@@ -66,6 +96,17 @@ stepParticleBehaviours env =
                 ApplyVelocityToPosition ->
                     ( { model
                         | position = Vec.add model.position model.velocity
+                      }
+                    , behaviour
+                    )
+
+                BounceWithinScreen bounceFactor ->
+                    ( { model
+                        | velocity =
+                            bounceWithinScreen env.screen
+                                model.position
+                                bounceFactor
+                                model.velocity
                       }
                     , behaviour
                     )
@@ -115,7 +156,7 @@ initialPlayer =
     , behaviours =
         [ RandomWalker (Random.initialSeed 1203)
         , ApplyVelocityToPosition
-        , BounceOffScreen
+        , BounceWithinScreen 1
         ]
     }
 

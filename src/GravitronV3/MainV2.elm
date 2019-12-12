@@ -142,7 +142,7 @@ type alias Bullet =
 initBullet : Bullet
 initBullet =
     { position = Vec.zero
-    , velocity = Vec.zero
+    , velocity = Vec.fromRTheta 3 0
     , radius = 10
     }
 

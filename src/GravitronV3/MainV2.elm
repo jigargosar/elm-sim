@@ -61,6 +61,17 @@ viewGame game =
         ]
 
 
+type alias HasPos a =
+    { a
+        | position : Vec
+    }
+
+
+toShapeAtPosition : (HasPos a -> Shape) -> HasPos a -> Shape
+toShapeAtPosition toShapeFunc hasPosition =
+    toShapeFunc hasPosition |> move (Vec.toTuple hasPosition.position)
+
+
 
 --
 

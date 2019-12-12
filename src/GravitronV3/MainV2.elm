@@ -5,6 +5,7 @@ import Browser
 import Browser.Events as E
 import GravitronV3.Canvas exposing (..)
 import GravitronV3.Screen as Screen exposing (Screen)
+import GravitronV3.Timer as Timer exposing (Timer)
 import GravitronV3.Vec as Vec exposing (Vec, vec)
 import Html exposing (Html)
 import Json.Decode as D
@@ -50,6 +51,7 @@ type Behaviour
     | GravitateToPlayer
     | BounceWithinScreen Float
     | ApplyVelocityToPosition
+    | FireGravityBulletTowardsPlayer Timer
 
 
 bounceWithinScreen : Screen -> Vec -> Float -> Vec -> Vec
@@ -187,7 +189,7 @@ initialTurret =
     , radius = 25
     , viewType = SolidCircleView "red"
     , behaviours =
-        []
+        [ FireGravityBulletTowardsPlayer (Timer.start 0 60) ]
     }
 
 

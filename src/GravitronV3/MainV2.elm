@@ -217,6 +217,7 @@ viewGame : Game -> Shape
 viewGame game =
     group
         [ viewParticle game.player
+        , viewParticle game.turret
         ]
 
 

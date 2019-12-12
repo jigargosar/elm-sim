@@ -17,12 +17,11 @@ import Update.Pipeline exposing (..)
 -- Particle
 
 
-type alias Particle a =
-    { a
-        | position : Vec
-        , velocity : Vec
-        , radius : Float
-        , viewType : ViewType
+type alias Particle =
+    { position : Vec
+    , velocity : Vec
+    , radius : Float
+    , viewType : ViewType
     }
 
 
@@ -30,19 +29,19 @@ type ViewType
     = SolidCircleView String
 
 
-particleToShape : Particle a -> Shape
+particleToShape : Particle -> Shape
 particleToShape { radius, viewType } =
     case viewType of
         SolidCircleView color ->
             circle radius |> fill color
 
 
-positionParticleShape : (Particle a -> Shape) -> Particle a -> Shape
+positionParticleShape : (Particle -> Shape) -> Particle -> Shape
 positionParticleShape toShapeFunc particle =
     toShapeFunc particle |> move (Vec.toTuple particle.position)
 
 
-viewParticle : Particle a -> Shape
+viewParticle : Particle -> Shape
 viewParticle =
     positionParticleShape particleToShape
 
@@ -51,11 +50,7 @@ viewParticle =
 -- Player
 
 
-type alias Player =
-    Particle {}
-
-
-initialPlayer : Player
+initialPlayer : Particle
 initialPlayer =
     { position = Vec.zero
     , velocity = Vec.fromRTheta 4 0
@@ -64,7 +59,7 @@ initialPlayer =
     }
 
 
-viewPlayer : Player -> Shape
+viewPlayer : Particle -> Shape
 viewPlayer player =
     circle player.radius
         |> fill "green"
@@ -76,7 +71,7 @@ viewPlayer player =
 
 
 type alias Game =
-    { player : Player }
+    { player : Particle }
 
 
 initialGame : Game

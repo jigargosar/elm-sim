@@ -58,11 +58,23 @@ viewPlayer (Player { position, radius }) =
 -- Bullet
 
 
-type alias Bullet =
-    { position : Vec
-    , velocity : Vec
-    , radius : Float
-    }
+type Bullet
+    = Bullet
+        { position : Vec
+        , velocity : Vec
+        , radius : Float
+        , velocityBehaviour : VelocityBehaviour
+        }
+
+
+initBullet : Bullet
+initBullet =
+    Bullet
+        { position = Vec.zero
+        , velocity = Vec.zero
+        , radius = 10
+        , velocityBehaviour = VelocityBehaviour.initWanderAndBounceInScreen 0.5
+        }
 
 
 

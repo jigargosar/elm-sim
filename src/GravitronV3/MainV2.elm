@@ -83,10 +83,6 @@ bounceWithinScreen screen position bounceFactor velocity =
         newBouncedVelocity
 
 
-extrapolate start end pct =
-    (pct * (end - start)) + start
-
-
 randomWalkerVelocity : Vec -> Generator Vec
 randomWalkerVelocity velocity =
     let

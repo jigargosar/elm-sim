@@ -90,8 +90,11 @@ gravitateTo : { a | position : Vec } -> { b | position : Vec, velocity : Vec } -
 gravitateTo target m =
     { m
         | velocity =
-            Vec.fromTo m.position target.position
-                |> Vec.mapMagnitude (\mag -> 20 / mag)
+            m.velocity
+                |> Vec.add
+                    (Vec.fromTo m.position target.position
+                        |> Vec.mapMagnitude (\mag -> 20 / mag)
+                    )
     }
 
 
@@ -150,7 +153,7 @@ initBullet =
 updateBullet : Env -> { b | position : Vec } -> Bullet -> Bullet
 updateBullet env player =
     gravitateTo player
-        >> bounceWithinScreen env 0.5
+        >> bounceWithinScreen env 1
         >> translatePosByVel
 
 

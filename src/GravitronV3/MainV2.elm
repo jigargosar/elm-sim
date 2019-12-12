@@ -37,6 +37,20 @@ type Behaviour
     | BounceOffScreen
 
 
+stepParticle : Env -> Particle -> Particle
+stepParticle env =
+    let
+        step behaviour p =
+            case behaviour of
+                RandomWalker ->
+                    p
+
+                _ ->
+                    p
+    in
+    \p -> List.foldl step p p.behaviours
+
+
 
 -- Particle View
 

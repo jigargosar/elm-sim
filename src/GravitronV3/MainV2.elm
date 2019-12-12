@@ -92,7 +92,7 @@ randomWalkerVelocity velocity =
     let
         randomAngle : Generator Float
         randomAngle =
-            Random.Float.standardNormal |> Random.map (extrapolate -0.01 0.01)
+            Random.Float.standardNormal |> Random.map ((*) 0.005 >> turns)
     in
     randomAngle
         |> Random.map

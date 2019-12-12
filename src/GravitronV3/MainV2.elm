@@ -214,6 +214,7 @@ setVelAngleTo target src =
     }
 
 
+updateTurretHelp : Env -> Player -> Turret -> ( List Bullet, Turret )
 updateTurretHelp env p turret =
     if Timer.isDone env.clock turret.bulletTimer then
         ( [ initBullet

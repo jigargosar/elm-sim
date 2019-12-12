@@ -196,6 +196,20 @@ initialTurret =
         }
 
 
+updateTurretHelp env turret =
+    if Timer.isDone env.clock turret.bulletTimer then
+        { turret | bulletTimer = Timer.restart env.clock turret.bulletTimer }
+
+    else
+        turret
+
+
+updateTurret : Env -> Turret -> Turret
+updateTurret env (Turret turret) =
+    updateTurretHelp env turret
+        |> Turret
+
+
 viewTurret : Turret -> Shape
 viewTurret (Turret { position, radius }) =
     viewFilledCircle "red" radius position

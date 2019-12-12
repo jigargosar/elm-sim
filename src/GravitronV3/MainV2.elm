@@ -7,6 +7,7 @@ import GravitronV3.Canvas exposing (..)
 import GravitronV3.Screen as Screen exposing (Screen)
 import GravitronV3.Timer as Timer exposing (Timer)
 import GravitronV3.Vec as Vec exposing (Vec, vec)
+import GravitronV3.VelocityBehaviour as VelocityBehaviour exposing (VelocityBehaviour)
 import Html exposing (Html)
 import Json.Decode as D
 import List.Extra
@@ -147,7 +148,7 @@ type Player
         { position : Vec
         , velocity : Vec
         , radius : Float
-        , seed : Seed
+        , vb : VelocityBehaviour
         }
 
 
@@ -157,21 +158,20 @@ initialPlayer =
         { position = Vec.zero
         , velocity = Vec.fromRTheta 4 0
         , radius = 20
-        , seed = Random.initialSeed 1033
+        , vb = VelocityBehaviour.initWanderAndBounceInScreen 1
         }
 
 
 updatePlayerVelocity : Env -> Player -> Player
 updatePlayerVelocity env (Player player) =
     let
-        ( newVelocity, newSeed ) =
-            Random.step (randomWalkerVelocity player.velocity) player.seed
-                |> Tuple.mapFirst (bounceWithinScreen env.screen player.position 1)
+        ( newVelocity, newVB ) =
+            VelocityBehaviour.update env.screen player player.vb
     in
     Player
         { player
             | velocity = newVelocity
-            , seed = newSeed
+            , vb = newVB
         }
 
 

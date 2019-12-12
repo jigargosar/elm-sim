@@ -22,9 +22,9 @@ import Update.Pipeline exposing (..)
 -- Helpers
 
 
-applyVelocity : { a | position : Vec, velocity : Vec } -> Vec
+applyVelocity : { a | position : Vec, velocity : Vec } -> { a | position : Vec, velocity : Vec }
 applyVelocity m =
-    Vec.add m.position m.velocity
+    { m | velocity = Vec.add m.position m.velocity }
 
 
 randomWalkerVelocity : Vec -> Generator Vec
@@ -112,6 +112,7 @@ updatePlayer : Env -> Player -> Player
 updatePlayer env =
     stepRandomWalkerVelocity
         >> bounceWithinScreen env 1
+        >> applyVelocity
 
 
 viewPlayer : Player -> Shape

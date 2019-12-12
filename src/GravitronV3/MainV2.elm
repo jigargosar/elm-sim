@@ -169,17 +169,13 @@ setPosVelFromTo src target m =
     }
 
 
-updateBullet : Env -> Player -> Bullet -> Bullet
-updateBullet env player =
-    gravitateTo player
-        >> bounceWithinScreen env 1
-        >> translatePosByVel
-
-
 updateBullets : Env -> { a | player : Player, turret : Turret } -> List Bullet -> List Bullet
 updateBullets env ctx =
     List.map
-        (updateBullet env ctx.player)
+        (gravitateTo ctx.player
+            >> bounceWithinScreen env 1
+            >> translatePosByVel
+        )
         >> List.filterMap
             (\b ->
                 if circleCircleCollision b ctx.player then

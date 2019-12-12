@@ -9,10 +9,82 @@ import GravitronV3.Vec as Vec exposing (Vec, vec)
 import GravitronV3.VelocityBehaviour as VelocityBehaviour exposing (VelocityBehaviour)
 import Html exposing (Html)
 import Json.Decode as D
+import Random exposing (Generator, Seed)
+import Random.Float
 import Task
 import Time exposing (Posix)
 import TimeTravel.Browser as TimeTravel
+import Tuple exposing (mapFirst, mapSecond)
 import Update.Pipeline exposing (..)
+
+
+
+-- Helpers
+
+
+applyVelocity : { a | position : Vec, velocity : Vec } -> Vec
+applyVelocity m =
+    Vec.add m.position m.velocity
+
+
+randomWalkerVelocity : Vec -> Generator Vec
+randomWalkerVelocity velocity =
+    let
+        randomAngle : Generator Float
+        randomAngle =
+            Random.Float.standardNormal |> Random.map ((*) 0.005 >> turns)
+    in
+    randomAngle
+        |> Random.map
+            (\newAngleDiff ->
+                velocity
+                    |> Vec.mapAngle ((+) newAngleDiff)
+                    |> Vec.mapMagnitude (max 0.01)
+            )
+
+
+stepRandomWalkerVelocity : { a | velocity : Vec, seed : Seed } -> { a | velocity : Vec, seed : Seed }
+stepRandomWalkerVelocity m =
+    let
+        ( v, s ) =
+            Random.step (randomWalkerVelocity m.velocity) m.seed
+    in
+    { m | velocity = v, seed = s }
+
+
+bounceWithinScreenHelp : Screen -> Vec -> Float -> Vec -> Vec
+bounceWithinScreenHelp screen position bounceFactor velocity =
+    let
+        bounceVelocityPart lo high positionPart velocityPart =
+            if
+                (positionPart < lo && velocityPart < 0)
+                    || (positionPart > high && velocityPart > 0)
+            then
+                negate velocityPart
+
+            else
+                velocityPart
+
+        ( x, y ) =
+            Vec.toTuple position
+
+        ( vx, vy ) =
+            Vec.toTuple velocity
+
+        newBouncedVelocity =
+            vec (bounceVelocityPart screen.left screen.right x vx)
+                (bounceVelocityPart screen.top screen.bottom y vy)
+    in
+    if velocity /= newBouncedVelocity then
+        newBouncedVelocity |> Vec.mapMagnitude ((*) bounceFactor)
+
+    else
+        newBouncedVelocity
+
+
+bounceWithinScreen : { a | screen : Screen } -> Float -> { b | position : Vec, velocity : Vec } -> { b | position : Vec, velocity : Vec }
+bounceWithinScreen env factor m =
+    { m | velocity = bounceWithinScreenHelp env.screen m.position factor m.velocity }
 
 
 
@@ -23,7 +95,7 @@ type alias Player =
     { position : Vec
     , velocity : Vec
     , radius : Float
-    , velocityBehaviour : VelocityBehaviour
+    , seed : Seed
     }
 
 
@@ -32,13 +104,14 @@ initialPlayer =
     { position = Vec.zero
     , velocity = Vec.fromRTheta 4 0
     , radius = 20
-    , velocityBehaviour = VelocityBehaviour.initWanderAndBounceInScreen 1
+    , seed = Random.initialSeed 1234
     }
 
 
 updatePlayer : Env -> Player -> Player
-updatePlayer env player =
-    VelocityBehaviour.updateRecord env player
+updatePlayer env =
+    stepRandomWalkerVelocity
+        >> bounceWithinScreen env 1
 
 
 viewPlayer : Player -> Shape

@@ -14,7 +14,7 @@ import Update.Pipeline exposing (..)
 
 
 type alias Player =
-    Common {}
+    Particle {}
 
 
 initialPlayer : Player
@@ -22,6 +22,7 @@ initialPlayer =
     { position = Vec.zero
     , velocity = Vec.fromRTheta 4 0
     , radius = 20
+    , color = "green"
     }
 
 
@@ -58,17 +59,23 @@ viewGame game =
         ]
 
 
-type alias Common a =
+type alias Particle a =
     { a
         | position : Vec
         , velocity : Vec
         , radius : Float
+        , color : String
     }
 
 
-toShapeAtPosition : (Common a -> Shape) -> Common a -> Shape
-toShapeAtPosition toShapeFunc hasPosition =
-    toShapeFunc hasPosition |> move (Vec.toTuple hasPosition.position)
+toFilledCircle : Particle a -> Shape
+toFilledCircle { radius, color } =
+    circle radius |> fill color
+
+
+toShapeAtPosition : (Particle a -> Shape) -> Particle a -> Shape
+toShapeAtPosition toShapeFunc particle =
+    toShapeFunc particle |> move (Vec.toTuple particle.position)
 
 
 

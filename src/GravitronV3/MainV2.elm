@@ -11,7 +11,6 @@ import GravitronV3.VelocityBehaviour as VelocityBehaviour exposing (VelocityBeha
 import Html exposing (Html)
 import Json.Decode as D
 import List.Extra
-import PointFree exposing (stepRandomSeeded)
 import Random exposing (Generator, Seed)
 import Random.Float
 import Task
@@ -22,124 +21,6 @@ import Update.Pipeline exposing (..)
 
 
 -- Particle
-
-
-type alias Particle =
-    { position : Vec
-    , velocity : Vec
-    , radius : Float
-    , behaviours : List Behaviour
-    }
-
-
-setVelocity : Vec -> Particle -> Particle
-setVelocity velocity model =
-    { model | velocity = velocity }
-
-
-setVelocityIn : Particle -> Vec -> Particle
-setVelocityIn =
-    flip setVelocity
-
-
-
--- Particle Behaviour
-
-
-type Behaviour
-    = SpringToMouse
-    | RandomWalker Seed
-    | GravitateToPlayer
-    | BounceWithinScreen Float
-    | ApplyVelocityToPosition
-
-
-type Event
-    = GenerateGravityBulletFromSelfToPlayer
-
-
-bounceWithinScreen : Screen -> Vec -> Float -> Vec -> Vec
-bounceWithinScreen screen position bounceFactor velocity =
-    let
-        bounceVelocityPart lo high positionPart velocityPart =
-            if
-                (positionPart < lo && velocityPart < 0)
-                    || (positionPart > high && velocityPart > 0)
-            then
-                negate velocityPart
-
-            else
-                velocityPart
-
-        ( x, y ) =
-            Vec.toTuple position
-
-        ( vx, vy ) =
-            Vec.toTuple velocity
-
-        newBouncedVelocity =
-            vec (bounceVelocityPart screen.left screen.right x vx)
-                (bounceVelocityPart screen.top screen.bottom y vy)
-    in
-    if velocity /= newBouncedVelocity then
-        newBouncedVelocity |> Vec.mapMagnitude ((*) bounceFactor)
-
-    else
-        newBouncedVelocity
-
-
-randomWalkerVelocity : Vec -> Generator Vec
-randomWalkerVelocity velocity =
-    let
-        randomAngle : Generator Float
-        randomAngle =
-            Random.Float.standardNormal |> Random.map ((*) 0.005 >> turns)
-    in
-    randomAngle
-        |> Random.map
-            (\newAngleDiff ->
-                velocity
-                    |> Vec.mapAngle ((+) newAngleDiff)
-                    |> Vec.mapMagnitude (max 0.01)
-            )
-
-
-stepParticleBehaviours : Env -> Particle -> Particle
-stepParticleBehaviours env =
-    let
-        step : Particle -> Behaviour -> ( Particle, Behaviour )
-        step model behaviour =
-            case behaviour of
-                RandomWalker seed ->
-                    Random.step (randomWalkerVelocity model.velocity) seed
-                        |> Tuple.mapBoth (setVelocityIn model) RandomWalker
-
-                ApplyVelocityToPosition ->
-                    ( { model
-                        | position = Vec.add model.position model.velocity
-                      }
-                    , behaviour
-                    )
-
-                BounceWithinScreen bounceFactor ->
-                    ( { model
-                        | velocity =
-                            bounceWithinScreen env.screen
-                                model.position
-                                bounceFactor
-                                model.velocity
-                      }
-                    , behaviour
-                    )
-
-                _ ->
-                    ( model, behaviour )
-    in
-    (\model -> List.Extra.mapAccuml step model model.behaviours)
-        >> (\( model, behaviours ) -> { model | behaviours = behaviours })
-
-
-
 -- Player
 
 
@@ -174,6 +55,17 @@ viewPlayer (Player { position, radius }) =
 
 
 
+-- Bullet
+
+
+type alias Bullet =
+    { position : Vec
+    , velocity : Vec
+    , radius : Float
+    }
+
+
+
 -- Turret
 
 
@@ -198,16 +90,16 @@ initialTurret =
 
 updateTurretHelp env turret =
     if Timer.isDone env.clock turret.bulletTimer then
-        { turret | bulletTimer = Timer.restart env.clock turret.bulletTimer }
+        ( [], { turret | bulletTimer = Timer.restart env.clock turret.bulletTimer } )
 
     else
-        turret
+        ( [], turret )
 
 
-updateTurret : Env -> Turret -> Turret
+updateTurret : Env -> Turret -> ( List Bullet, Turret )
 updateTurret env (Turret turret) =
     updateTurretHelp env turret
-        |> Turret
+        |> Tuple.mapSecond Turret
 
 
 viewTurret : Turret -> Shape

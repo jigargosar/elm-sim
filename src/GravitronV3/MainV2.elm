@@ -177,16 +177,34 @@ initialPlayer =
 
 
 
+-- Turret
+
+
+initialTurret : Particle
+initialTurret =
+    { position = Vec.vec -100 -100
+    , velocity = Vec.zero
+    , radius = 25
+    , viewType = SolidCircleView "red"
+    , behaviours =
+        []
+    }
+
+
+
 -- Game
 
 
 type alias Game =
-    { player : Particle }
+    { player : Particle
+    , turret : Particle
+    }
 
 
 initialGame : Game
 initialGame =
     { player = initialPlayer
+    , turret = initialTurret
     }
 
 

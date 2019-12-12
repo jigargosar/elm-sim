@@ -68,13 +68,13 @@ type alias Particle a =
     }
 
 
-toFilledCircle : Particle a -> Shape
-toFilledCircle { radius, color } =
+particleToShape : Particle a -> Shape
+particleToShape { radius, color } =
     circle radius |> fill color
 
 
-toShapeAtPosition : (Particle a -> Shape) -> Particle a -> Shape
-toShapeAtPosition toShapeFunc particle =
+positionParticleShape : (Particle a -> Shape) -> Particle a -> Shape
+positionParticleShape toShapeFunc particle =
     toShapeFunc particle |> move (Vec.toTuple particle.position)
 
 

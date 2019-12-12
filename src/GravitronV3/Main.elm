@@ -254,15 +254,6 @@ circleCircleCollision c1 c2 =
     Vec.lenFrom c1.position c2.position < c1.radius + c2.radius
 
 
-handleCollisions : List Body -> List Body
-handleCollisions =
-    List.Extra.select
-        >> List.map
-            (\( body, others ) ->
-                List.foldl handleCollisionWith body others
-            )
-
-
 handleCollisionWith : Body -> Body -> Body
 handleCollisionWith otherBody body =
     case ( body.state, otherBody.state ) of

@@ -10,6 +10,7 @@ import GravitronV3.Vec as Vec exposing (Vec, vec)
 import Html exposing (Html)
 import Json.Decode as D
 import List.Extra
+import PointFree exposing (stepRandomSeeded)
 import Random exposing (Generator, Seed)
 import Random.Float
 import Task
@@ -146,6 +147,7 @@ type Player
         { position : Vec
         , velocity : Vec
         , radius : Float
+        , seed : Seed
         }
 
 
@@ -155,7 +157,37 @@ initialPlayer =
         { position = Vec.zero
         , velocity = Vec.fromRTheta 4 0
         , radius = 20
+        , seed = Random.initialSeed 1033
         }
+
+
+updatePlayerVelocity : Env -> Player -> Player
+updatePlayerVelocity env (Player player) =
+    let
+        ( newVelocity, newSeed ) =
+            Random.step (randomWalkerVelocity player.velocity) player.seed
+                |> Tuple.mapFirst (bounceWithinScreen env.screen player.position 1)
+    in
+    Player
+        { player
+            | velocity = newVelocity
+            , seed = newSeed
+        }
+
+
+updatePlayerPosition : Player -> Player
+updatePlayerPosition (Player player) =
+    Player
+        { player
+            | position = Vec.add player.position player.velocity
+        }
+
+
+updatePlayer : Env -> Player -> Player
+updatePlayer env model =
+    model
+        |> updatePlayerVelocity env
+        |> updatePlayerPosition
 
 
 viewPlayer : Player -> Shape

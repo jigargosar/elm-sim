@@ -2,6 +2,7 @@ module PointFree exposing (..)
 
 import Basics.Extra exposing (flip)
 import List.Extra
+import Random exposing (Generator, Seed)
 
 
 with : (a -> b) -> (b -> a -> c) -> a -> c
@@ -101,3 +102,9 @@ findMapWithDefault func d =
 findWithDefault : (b -> Bool) -> b -> List b -> b
 findWithDefault pred d =
     List.Extra.find pred >> Maybe.withDefault d
+
+
+stepRandomSeeded : Generator a -> { b | seed : Seed } -> ( a, { b | seed : Seed } )
+stepRandomSeeded random model =
+    Random.step random model.seed
+        |> Tuple.mapSecond (\seed -> { model | seed = seed })

@@ -182,7 +182,7 @@ initialPlayer =
 
 initialTurret : Particle
 initialTurret =
-    { position = Vec.vec -100 -100
+    { position = Vec.vec -150 -150
     , velocity = Vec.zero
     , radius = 25
     , viewType = SolidCircleView "red"

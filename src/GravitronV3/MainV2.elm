@@ -176,18 +176,28 @@ updateBullet env player =
         >> translatePosByVel
 
 
-updateBullets : Env -> { a | player : Player } -> List Bullet -> List Bullet
+updateBullets : Env -> { a | player : Player, turret : Turret } -> List Bullet -> List Bullet
 updateBullets env ctx =
-    List.filterMap
-        (updateBullet env ctx.player
-            >> (\b ->
-                    if circleCircleCollision b ctx.player then
-                        Nothing
+    List.map
+        (updateBullet env ctx.player)
+        >> List.filterMap
+            (\b ->
+                if circleCircleCollision b ctx.player then
+                    Nothing
 
-                    else
-                        Just b
-               )
-        )
+                else
+                    List.filterMap
+                        (\turret ->
+                            if circleCircleCollision b turret then
+                                Nothing
+
+                            else
+                                Just b
+                        )
+                        [ ctx.turret ]
+                        |> Just
+            )
+        >> List.concat
 
 
 viewBullet : Bullet -> Shape

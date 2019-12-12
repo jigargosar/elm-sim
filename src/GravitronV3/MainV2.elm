@@ -155,7 +155,8 @@ initBullet =
     }
 
 
-setBulletPosVelFromTo src target m =
+setPosVelFromTo : { a | position : Vec, radius : Float } -> { b | position : Vec } -> { c | radius : Float, position : Vec, velocity : Vec } -> { c | radius : Float, position : Vec, velocity : Vec }
+setPosVelFromTo src target m =
     let
         angle =
             Vec.fromTo src.position target.position
@@ -236,7 +237,7 @@ setVelAngleTo target src =
 updateTurret : Env -> Player -> Turret -> ( List Bullet, Turret )
 updateTurret env p turret =
     if Timer.isDone env.clock turret.bulletTimer then
-        ( [ initBullet |> setBulletPosVelFromTo turret p
+        ( [ initBullet |> setPosVelFromTo turret p
           ]
         , { turret | bulletTimer = Timer.restart env.clock turret.bulletTimer }
         )

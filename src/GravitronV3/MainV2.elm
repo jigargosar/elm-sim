@@ -147,6 +147,7 @@ initBullet =
     }
 
 
+updateBullet : Env -> { b | position : Vec } -> Bullet -> Bullet
 updateBullet env player =
     gravitateTo player
         >> bounceWithinScreen env 0.5

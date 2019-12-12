@@ -14,7 +14,6 @@ import Random.Float
 import Task
 import Time exposing (Posix)
 import TimeTravel.Browser as TimeTravel
-import Tuple exposing (mapFirst, mapSecond)
 import Update.Pipeline exposing (..)
 
 
@@ -148,23 +147,21 @@ initBullet =
 -- Turret
 
 
-type Turret
-    = Turret
-        { position : Vec
-        , velocity : Vec
-        , radius : Float
-        , bulletTimer : Timer
-        }
+type alias Turret =
+    { position : Vec
+    , velocity : Vec
+    , radius : Float
+    , bulletTimer : Timer
+    }
 
 
 initialTurret : Turret
 initialTurret =
-    Turret
-        { position = Vec.vec -150 -150
-        , velocity = Vec.zero
-        , radius = 25
-        , bulletTimer = Timer.start 0 60
-        }
+    { position = Vec.vec -150 -150
+    , velocity = Vec.zero
+    , radius = 25
+    , bulletTimer = Timer.start 0 60
+    }
 
 
 updateTurretHelp env turret =
@@ -176,13 +173,12 @@ updateTurretHelp env turret =
 
 
 updateTurret : Env -> Turret -> ( List Bullet, Turret )
-updateTurret env (Turret turret) =
+updateTurret env turret =
     updateTurretHelp env turret
-        |> Tuple.mapSecond Turret
 
 
 viewTurret : Turret -> Shape
-viewTurret (Turret { position, radius }) =
+viewTurret { position, radius } =
     viewFilledCircle "red" radius position
 
 

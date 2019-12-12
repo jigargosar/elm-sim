@@ -61,13 +61,15 @@ viewGame game =
         ]
 
 
-type alias HasPos a =
+type alias Common a =
     { a
         | position : Vec
+        , velocity : Vec
+        , radius : Float
     }
 
 
-toShapeAtPosition : (HasPos a -> Shape) -> HasPos a -> Shape
+toShapeAtPosition : (Common a -> Shape) -> Common a -> Shape
 toShapeAtPosition toShapeFunc hasPosition =
     toShapeFunc hasPosition |> move (Vec.toTuple hasPosition.position)
 

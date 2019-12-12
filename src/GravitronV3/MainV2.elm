@@ -26,7 +26,6 @@ type alias Particle =
     { position : Vec
     , velocity : Vec
     , radius : Float
-    , viewType : ViewType
     , behaviours : List Behaviour
     }
 
@@ -139,60 +138,63 @@ stepParticleBehaviours env =
 
 
 
--- Particle View
-
-
-type ViewType
-    = SolidCircleView String
-
-
-particleToShape : Particle -> Shape
-particleToShape { radius, viewType } =
-    case viewType of
-        SolidCircleView color ->
-            circle radius |> fill color
-
-
-positionParticleShape : (Particle -> Shape) -> Particle -> Shape
-positionParticleShape toShapeFunc particle =
-    toShapeFunc particle |> move (Vec.toTuple particle.position)
-
-
-viewParticle : Particle -> Shape
-viewParticle =
-    positionParticleShape particleToShape
-
-
-
 -- Player
 
 
-initialPlayer : Particle
+type Player
+    = Player { position : Vec, velocity : Vec, radius : Float }
+
+
+initialPlayer : Player
 initialPlayer =
-    { position = Vec.zero
-    , velocity = Vec.fromRTheta 4 0
-    , radius = 20
-    , viewType = SolidCircleView "green"
-    , behaviours =
-        [ RandomWalker (Random.initialSeed 1203)
-        , ApplyVelocityToPosition
-        , BounceWithinScreen 1
-        ]
-    }
+    Player
+        { position = Vec.zero
+        , velocity = Vec.fromRTheta 4 0
+        , radius = 20
+        }
+
+
+viewPlayer : Player -> Shape
+viewPlayer (Player { position, radius }) =
+    viewFilledCircle "green" radius position
 
 
 
 -- Turret
 
 
-initialTurret : Particle
+type Turret
+    = Turret
+        { position : Vec
+        , velocity : Vec
+        , radius : Float
+        , bulletTimer : Timer
+        }
+
+
+initialTurret : Turret
 initialTurret =
-    { position = Vec.vec -150 -150
-    , velocity = Vec.zero
-    , radius = 25
-    , viewType = SolidCircleView "red"
-    , behaviours = []
-    }
+    Turret
+        { position = Vec.vec -150 -150
+        , velocity = Vec.zero
+        , radius = 25
+        , bulletTimer = Timer.start 0 60
+        }
+
+
+viewTurret : Turret -> Shape
+viewTurret (Turret { position, radius }) =
+    viewFilledCircle "red" radius position
+
+
+
+-- ViewHelpers
+
+
+viewFilledCircle color radius position =
+    circle radius
+        |> fill color
+        |> move (Vec.toTuple position)
 
 
 
@@ -200,8 +202,8 @@ initialTurret =
 
 
 type alias Game =
-    { player : Particle
-    , turret : Particle
+    { player : Player
+    , turret : Turret
     }
 
 
@@ -214,14 +216,14 @@ initialGame =
 
 updateGame : Env -> Game -> Game
 updateGame env game =
-    { game | player = stepParticleBehaviours env game.player }
+    game
 
 
 viewGame : Game -> Shape
 viewGame game =
     group
-        [ viewParticle game.player
-        , viewParticle game.turret
+        [ viewPlayer game.player
+        , viewTurret game.turret
         ]
 
 

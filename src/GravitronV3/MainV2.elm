@@ -37,13 +37,14 @@ type Behaviour
     | RandomWalker Seed
     | GravitateToPlayer
     | BounceOffScreen
+    | ApplyVelocityToPosition
 
 
-stepParticle : Env -> Particle -> Particle
-stepParticle env =
+stepParticleBehaviours : Env -> Particle -> Particle
+stepParticleBehaviours env =
     let
-        stepBehaviour : Particle -> Behaviour -> ( Particle, Behaviour )
-        stepBehaviour model behaviour =
+        step : Particle -> Behaviour -> ( Particle, Behaviour )
+        step model behaviour =
             case behaviour of
                 RandomWalker seed ->
                     let
@@ -62,10 +63,17 @@ stepParticle env =
                     , RandomWalker newSeed
                     )
 
+                ApplyVelocityToPosition ->
+                    ( { model
+                        | position = Vec.add model.position model.velocity
+                      }
+                    , behaviour
+                    )
+
                 _ ->
                     ( model, behaviour )
     in
-    (\model -> List.Extra.mapAccumr stepBehaviour model model.behaviours)
+    (\model -> List.Extra.mapAccumr step model model.behaviours)
         >> (\( model, behaviours ) -> { model | behaviours = behaviours })
 
 
@@ -124,7 +132,7 @@ initialGame =
 
 updateGame : Env -> Game -> Game
 updateGame env game =
-    { game | player = stepParticle env game.player }
+    { game | player = stepParticleBehaviours env game.player }
 
 
 viewGame : Game -> Shape

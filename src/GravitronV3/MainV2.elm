@@ -86,6 +86,15 @@ bounceWithinScreen env factor m =
     { m | velocity = bounceWithinScreenHelp env.screen m.position factor m.velocity }
 
 
+gravitateTo : { a | position : Vec } -> { b | position : Vec, velocity : Vec } -> { b | position : Vec, velocity : Vec }
+gravitateTo target m =
+    { m
+        | velocity =
+            Vec.fromTo m.position target.position
+                |> Vec.mapMagnitude (\mag -> 20 / mag)
+    }
+
+
 
 -- Player
 
@@ -138,8 +147,8 @@ initBullet =
     }
 
 
-updateBullet env =
-    identity
+updateBullet env player =
+    gravitateTo player
         >> bounceWithinScreen env 0.5
         >> translatePosByVel
 
@@ -225,7 +234,7 @@ updateGame env game =
             updateTurret env game.turret
 
         bullets =
-            List.map (updateBullet env) game.bullets
+            List.map (updateBullet env game.player) game.bullets
     in
     { game
         | player = updatePlayer env game.player

@@ -83,19 +83,16 @@ bounceWithinScreen screen position bounceFactor velocity =
         newBouncedVelocity
 
 
+extrapolate start end pct =
+    (pct * (end - start)) + start
+
+
 randomWalkerVelocity : Vec -> Generator Vec
 randomWalkerVelocity velocity =
     let
         randomAngle : Generator Float
         randomAngle =
-            let
-                stdDev =
-                    0.02
-
-                mean =
-                    negate (stdDev / 2)
-            in
-            Random.Float.normal mean stdDev
+            Random.Float.standardNormal |> Random.map (extrapolate -0.01 0.01)
     in
     randomAngle
         |> Random.map

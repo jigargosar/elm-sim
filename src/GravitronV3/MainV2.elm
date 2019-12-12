@@ -166,7 +166,7 @@ updatePlayerVelocity : Env -> Player -> Player
 updatePlayerVelocity env (Player player) =
     let
         ( newVelocity, newVB ) =
-            VelocityBehaviour.update env.screen player player.velocityBehaviour
+            VelocityBehaviour.update env player player.velocityBehaviour
     in
     Player
         { player

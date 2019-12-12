@@ -11,6 +11,13 @@ import Random exposing (Generator, Seed)
 import Random.Float
 
 
+type alias Env =
+    { mousePosition : Vec
+    , screen : Screen
+    , clock : Float
+    }
+
+
 type VelocityBehaviour
     = Wander Seed
     | BounceInScreen Float
@@ -38,8 +45,8 @@ randomWalkerVelocity velocity =
             )
 
 
-update : Screen -> { a | position : Vec, velocity : Vec } -> VelocityBehaviour -> ( Vec, VelocityBehaviour )
-update screen { position, velocity } model =
+update : Env -> { a | position : Vec, velocity : Vec } -> VelocityBehaviour -> ( Vec, VelocityBehaviour )
+update { screen } { position, velocity } model =
     update2 screen position velocity model
 
 

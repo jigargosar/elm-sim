@@ -54,7 +54,10 @@ stepParticle env =
                             Random.step randomAngle seed
                     in
                     ( { model
-                        | velocity = Vec.mapAngle ((+) newAngleDiff) model.velocity
+                        | velocity =
+                            model.velocity
+                                |> Vec.mapAngle ((+) newAngleDiff)
+                                |> Vec.mapMagnitude (max 1)
                       }
                     , RandomWalker newSeed
                     )

@@ -124,23 +124,19 @@ viewPlayer { position, radius } =
 -- Bullet
 
 
-type Bullet
-    = Bullet
-        { position : Vec
-        , velocity : Vec
-        , radius : Float
-        , velocityBehaviour : VelocityBehaviour
-        }
+type alias Bullet =
+    { position : Vec
+    , velocity : Vec
+    , radius : Float
+    }
 
 
 initBullet : Bullet
 initBullet =
-    Bullet
-        { position = Vec.zero
-        , velocity = Vec.zero
-        , radius = 10
-        , velocityBehaviour = VelocityBehaviour.initWanderAndBounceInScreen 0.5
-        }
+    { position = Vec.zero
+    , velocity = Vec.zero
+    , radius = 10
+    }
 
 
 
@@ -166,7 +162,7 @@ initialTurret =
 
 updateTurretHelp env turret =
     if Timer.isDone env.clock turret.bulletTimer then
-        ( [], { turret | bulletTimer = Timer.restart env.clock turret.bulletTimer } )
+        ( [ initBullet ], { turret | bulletTimer = Timer.restart env.clock turret.bulletTimer } )
 
     else
         ( [], turret )

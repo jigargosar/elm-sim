@@ -169,30 +169,31 @@ setPosVelFromTo src target m =
     }
 
 
-updateBullets : Env -> { a | player : Player, turret : Turret } -> List Bullet -> List Bullet
-updateBullets env ctx =
-    List.map
-        (gravitateTo ctx.player
-            >> bounceWithinScreen env 1
-            >> translatePosByVel
-        )
-        >> List.filterMap
-            (\b ->
-                if circleCircleCollision b ctx.player then
+rejectOnCollisionWith ctx b =
+    if circleCircleCollision b ctx.player then
+        Nothing
+
+    else
+        List.filterMap
+            (\turret ->
+                if circleCircleCollision b turret then
                     Nothing
 
                 else
-                    List.filterMap
-                        (\turret ->
-                            if circleCircleCollision b turret then
-                                Nothing
-
-                            else
-                                Just b
-                        )
-                        [ ctx.turret ]
-                        |> Just
+                    Just b
             )
+            [ ctx.turret ]
+            |> Just
+
+
+updateBullets : Env -> { a | player : Player, turret : Turret } -> List Bullet -> List Bullet
+updateBullets env ctx =
+    List.filterMap
+        (gravitateTo ctx.player
+            >> bounceWithinScreen env 1
+            >> translatePosByVel
+            >> rejectOnCollisionWith ctx
+        )
         >> List.concat
 
 

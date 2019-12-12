@@ -120,8 +120,8 @@ initialGame =
 
 
 updateGame : Env -> Game -> Game
-updateGame _ game =
-    game
+updateGame env game =
+    { game | player = stepParticle env game.player }
 
 
 viewGame : Game -> Shape

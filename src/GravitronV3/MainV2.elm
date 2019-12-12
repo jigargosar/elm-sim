@@ -162,27 +162,6 @@ initialPlayer =
         }
 
 
-updatePlayerVelocity : Env -> Player -> Player
-updatePlayerVelocity env (Player player) =
-    let
-        ( newVelocity, newVB ) =
-            VelocityBehaviour.update env player player.velocityBehaviour
-    in
-    Player
-        { player
-            | velocity = newVelocity
-            , velocityBehaviour = newVB
-        }
-
-
-updatePlayerPosition : Player -> Player
-updatePlayerPosition (Player player) =
-    Player
-        { player
-            | position = Vec.add player.position player.velocity
-        }
-
-
 updatePlayer : Env -> Player -> Player
 updatePlayer env (Player player) =
     VelocityBehaviour.updateRecord env player

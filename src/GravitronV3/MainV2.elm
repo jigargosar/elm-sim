@@ -184,10 +184,9 @@ updatePlayerPosition (Player player) =
 
 
 updatePlayer : Env -> Player -> Player
-updatePlayer env model =
-    model
-        |> updatePlayerVelocity env
-        |> updatePlayerPosition
+updatePlayer env (Player player) =
+    VelocityBehaviour.updateRecord env player
+        |> Player
 
 
 viewPlayer : Player -> Shape

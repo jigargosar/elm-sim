@@ -2,6 +2,7 @@ module GravitronV3.VelocityBehaviour exposing
     ( VelocityBehaviour
     , initWanderAndBounceInScreen
     , update
+    , updateRecord
     )
 
 import GravitronV3.Screen exposing (Screen)
@@ -48,6 +49,23 @@ randomWalkerVelocity velocity =
 update : Env -> { a | position : Vec, velocity : Vec } -> VelocityBehaviour -> ( Vec, VelocityBehaviour )
 update { screen } { position, velocity } model =
     update2 screen position velocity model
+
+
+type alias Record a =
+    { a | position : Vec, velocity : Vec, velocityBehaviour : VelocityBehaviour }
+
+
+updateRecord : Env -> Record a -> Record a
+updateRecord env record =
+    let
+        ( newVelocity, newBehaviour ) =
+            update env record record.velocityBehaviour
+    in
+    { record
+        | velocity = newVelocity
+        , velocityBehaviour = newBehaviour
+        , position = Vec.add record.position record.velocity
+    }
 
 
 update2 : Screen -> Vec -> Vec -> VelocityBehaviour -> ( Vec, VelocityBehaviour )

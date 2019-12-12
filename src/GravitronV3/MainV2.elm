@@ -110,7 +110,6 @@ initialPlayer =
 updatePlayer : Env -> Player -> Player
 updatePlayer env =
     stepRandomWalkerVelocity
-        >> Debug.log "1"
         >> bounceWithinScreen env 1
         >> translatePosByVel
 
@@ -137,6 +136,12 @@ initBullet =
     , velocity = Vec.zero
     , radius = 10
     }
+
+
+updateBullet env =
+    identity
+        >> bounceWithinScreen env 0.5
+        >> translatePosByVel
 
 
 viewBullet : Bullet -> Shape
@@ -216,13 +221,16 @@ initialGame =
 updateGame : Env -> Game -> Game
 updateGame env game =
     let
-        ( bullets, turret ) =
+        ( genBullets, turret ) =
             updateTurret env game.turret
+
+        bullets =
+            List.map (updateBullet env) game.bullets
     in
     { game
         | player = updatePlayer env game.player
         , turret = turret
-        , bullets = bullets ++ game.bullets
+        , bullets = genBullets ++ bullets
     }
 
 

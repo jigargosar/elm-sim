@@ -176,12 +176,12 @@ updateBullet env player =
         >> translatePosByVel
 
 
-updateBullets : Env -> Player -> List Bullet -> List Bullet
-updateBullets env p =
+updateBullets : Env -> { a | player : Player } -> List Bullet -> List Bullet
+updateBullets env ctx =
     List.filterMap
-        (updateBullet env p
+        (updateBullet env ctx.player
             >> (\b ->
-                    if circleCircleCollision p b then
+                    if circleCircleCollision b ctx.player then
                         Nothing
 
                     else
@@ -270,7 +270,7 @@ updateGame env game =
             updateTurret env game.player game.turret
 
         bullets =
-            updateBullets env game.player game.bullets
+            updateBullets env game game.bullets
     in
     { game
         | player = updatePlayer env game.player

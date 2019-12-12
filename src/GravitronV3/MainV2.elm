@@ -13,6 +13,44 @@ import TimeTravel.Browser as TimeTravel
 import Update.Pipeline exposing (..)
 
 
+
+-- Particle
+
+
+type alias Particle a =
+    { a
+        | position : Vec
+        , velocity : Vec
+        , radius : Float
+        , viewType : ViewType
+    }
+
+
+type ViewType
+    = SolidCircleView String
+
+
+particleToShape : Particle a -> Shape
+particleToShape { radius, viewType } =
+    case viewType of
+        SolidCircleView color ->
+            circle radius |> fill color
+
+
+positionParticleShape : (Particle a -> Shape) -> Particle a -> Shape
+positionParticleShape toShapeFunc particle =
+    toShapeFunc particle |> move (Vec.toTuple particle.position)
+
+
+viewParticle : Particle a -> Shape
+viewParticle =
+    positionParticleShape particleToShape
+
+
+
+-- Player
+
+
 type alias Player =
     Particle {}
 
@@ -55,33 +93,8 @@ updateGame _ game =
 viewGame : Game -> Shape
 viewGame game =
     group
-        [ viewPlayer game.player
+        [ viewParticle game.player
         ]
-
-
-type alias Particle a =
-    { a
-        | position : Vec
-        , velocity : Vec
-        , radius : Float
-        , viewType : ViewType
-    }
-
-
-type ViewType
-    = SolidCircleView String
-
-
-particleToShape : Particle a -> Shape
-particleToShape { radius, viewType } =
-    case viewType of
-        SolidCircleView color ->
-            circle radius |> fill color
-
-
-positionParticleShape : (Particle a -> Shape) -> Particle a -> Shape
-positionParticleShape toShapeFunc particle =
-    toShapeFunc particle |> move (Vec.toTuple particle.position)
 
 
 

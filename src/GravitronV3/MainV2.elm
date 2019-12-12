@@ -169,7 +169,7 @@ setPosVelFromTo src target m =
     }
 
 
-rejectOnCollisionWith ctx b =
+rejectWhenIntersects ctx b =
     if circleCircleCollision b ctx.player then
         Nothing
 
@@ -192,7 +192,7 @@ updateBullets env ctx =
         (gravitateTo ctx.player
             >> bounceWithinScreen env 1
             >> translatePosByVel
-            >> rejectOnCollisionWith ctx
+            >> rejectWhenIntersects ctx
         )
         >> List.concat
 

@@ -22,7 +22,23 @@ type alias Particle =
     , velocity : Vec
     , radius : Float
     , viewType : ViewType
+    , behaviours : List Behaviour
     }
+
+
+
+-- Particle Behaviour
+
+
+type Behaviour
+    = SpringToMouse
+    | RandomWalker
+    | GravitateToPlayer
+    | BounceOffScreen
+
+
+
+-- Particle View
 
 
 type ViewType
@@ -56,6 +72,7 @@ initialPlayer =
     , velocity = Vec.fromRTheta 4 0
     , radius = 20
     , viewType = SolidCircleView "green"
+    , behaviours = [ RandomWalker, BounceOffScreen ]
     }
 
 

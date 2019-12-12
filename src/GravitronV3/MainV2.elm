@@ -8,7 +8,7 @@ import GravitronV3.Vec as Vec exposing (Vec, vec)
 import Html exposing (Html)
 import Json.Decode as D
 import List.Extra
-import Random exposing (Seed)
+import Random exposing (Generator, Seed)
 import Task
 import Time exposing (Posix)
 import TimeTravel.Browser as TimeTravel
@@ -68,6 +68,37 @@ bounceWithinScreen screen position bounceFactor velocity =
 
     else
         newBouncedVelocity
+
+
+randomWalkerVelocity : Vec -> Generator Vec
+randomWalkerVelocity velocity =
+    let
+        randomAngle : Generator Float
+        randomAngle =
+            Random.float -0.1 0.1
+    in
+    randomAngle
+        |> Random.map
+            (\newAngleDiff ->
+                velocity
+                    |> Vec.mapAngle ((+) newAngleDiff)
+                    |> Vec.mapMagnitude (max 1)
+            )
+
+
+randomlyChangeVelocityAngle velocity seed =
+    let
+        randomAngle =
+            Random.float -0.1 0.1
+
+        ( newAngleDiff, newSeed ) =
+            Random.step randomAngle seed
+    in
+    ( velocity
+        |> Vec.mapAngle ((+) newAngleDiff)
+        |> Vec.mapMagnitude (max 1)
+    , newSeed
+    )
 
 
 stepParticleBehaviours : Env -> Particle -> Particle

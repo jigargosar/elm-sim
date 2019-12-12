@@ -251,8 +251,8 @@ initialGame =
 
 
 updateGame : Env -> Game -> Game
-updateGame env game =
-    game
+updateGame env ({ player } as game) =
+    { game | player = updatePlayer env player }
 
 
 viewGame : Game -> Shape

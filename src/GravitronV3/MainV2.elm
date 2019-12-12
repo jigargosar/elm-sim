@@ -157,9 +157,22 @@ updateBullet env player =
         >> translatePosByVel
 
 
+circleCircleCollision c1 c2 =
+    Vec.lenFrom c1.position c2.position < c1.radius + c2.radius
+
+
 updateBullets : Env -> Player -> List Bullet -> List Bullet
-updateBullets env player =
-    List.map (updateBullet env player)
+updateBullets env p =
+    List.filterMap
+        (updateBullet env p
+            >> (\b ->
+                    if circleCircleCollision p b then
+                        Nothing
+
+                    else
+                        Just b
+               )
+        )
 
 
 viewBullet : Bullet -> Shape

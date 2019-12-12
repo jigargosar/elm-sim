@@ -42,8 +42,8 @@ type Behaviour
 stepParticle : Env -> Particle -> Particle
 stepParticle env =
     let
-        step : Particle -> Behaviour -> ( Particle, Behaviour )
-        step model behaviour =
+        stepBehaviour : Particle -> Behaviour -> ( Particle, Behaviour )
+        stepBehaviour model behaviour =
             case behaviour of
                 RandomWalker seed ->
                     let
@@ -65,7 +65,7 @@ stepParticle env =
                 _ ->
                     ( model, behaviour )
     in
-    (\model -> List.Extra.mapAccumr step model model.behaviours)
+    (\model -> List.Extra.mapAccumr stepBehaviour model model.behaviours)
         >> (\( model, behaviours ) -> { model | behaviours = behaviours })
 
 

@@ -59,13 +59,6 @@ initialPlayer =
     }
 
 
-viewPlayer : Particle -> Shape
-viewPlayer player =
-    circle player.radius
-        |> fill "green"
-        |> move (Vec.toTuple player.position)
-
-
 
 -- Game
 

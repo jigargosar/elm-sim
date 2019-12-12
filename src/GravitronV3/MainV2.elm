@@ -148,7 +148,7 @@ type Player
         { position : Vec
         , velocity : Vec
         , radius : Float
-        , vb : VelocityBehaviour
+        , velocityBehaviour : VelocityBehaviour
         }
 
 
@@ -158,7 +158,7 @@ initialPlayer =
         { position = Vec.zero
         , velocity = Vec.fromRTheta 4 0
         , radius = 20
-        , vb = VelocityBehaviour.initWanderAndBounceInScreen 1
+        , velocityBehaviour = VelocityBehaviour.initWanderAndBounceInScreen 1
         }
 
 
@@ -166,12 +166,12 @@ updatePlayerVelocity : Env -> Player -> Player
 updatePlayerVelocity env (Player player) =
     let
         ( newVelocity, newVB ) =
-            VelocityBehaviour.update env.screen player player.vb
+            VelocityBehaviour.update env.screen player player.velocityBehaviour
     in
     Player
         { player
             | velocity = newVelocity
-            , vb = newVB
+            , velocityBehaviour = newVB
         }
 
 

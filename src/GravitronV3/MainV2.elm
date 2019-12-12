@@ -10,6 +10,8 @@ import Html exposing (Html)
 import Json.Decode as D
 import List.Extra
 import Random exposing (Generator, Seed)
+import Random.Extra
+import Random.Float
 import Task
 import Time exposing (Posix)
 import TimeTravel.Browser as TimeTravel
@@ -86,14 +88,21 @@ randomWalkerVelocity velocity =
     let
         randomAngle : Generator Float
         randomAngle =
-            Random.float -0.1 0.1
+            let
+                stdDev =
+                    0.02
+
+                mean =
+                    negate (stdDev / 2)
+            in
+            Random.Float.normal mean stdDev
     in
     randomAngle
         |> Random.map
             (\newAngleDiff ->
                 velocity
                     |> Vec.mapAngle ((+) newAngleDiff)
-                    |> Vec.mapMagnitude (max 1)
+                    |> Vec.mapMagnitude (max 0.01)
             )
 
 

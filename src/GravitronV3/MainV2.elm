@@ -6,7 +6,6 @@ import GravitronV3.Canvas exposing (..)
 import GravitronV3.Screen as Screen exposing (Screen)
 import GravitronV3.Timer as Timer exposing (Timer)
 import GravitronV3.Vec as Vec exposing (Vec, vec)
-import GravitronV3.VelocityBehaviour as VelocityBehaviour exposing (VelocityBehaviour)
 import Html exposing (Html)
 import Json.Decode as D
 import Random exposing (Generator, Seed)
@@ -219,18 +218,6 @@ initialTurret =
     , velocity = Vec.zero
     , radius = 25
     , bulletTimer = Timer.start 0 60
-    }
-
-
-setVelAngleTo : { a | position : Vec } -> { b | position : Vec, velocity : Vec } -> { b | position : Vec, velocity : Vec }
-setVelAngleTo target src =
-    { src
-        | velocity =
-            Vec.mapAngle
-                (always
-                    (Vec.fromTo src.position target.position |> Vec.angle)
-                )
-                src.velocity
     }
 
 

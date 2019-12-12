@@ -150,11 +150,16 @@ initBullet =
     }
 
 
-updateBullet : Env -> { b | position : Vec } -> Bullet -> Bullet
+updateBullet : Env -> Player -> Bullet -> Bullet
 updateBullet env player =
     gravitateTo player
         >> bounceWithinScreen env 1
         >> translatePosByVel
+
+
+updateBullets : Env -> Player -> List Bullet -> List Bullet
+updateBullets env player =
+    List.map (updateBullet env player)
 
 
 viewBullet : Bullet -> Shape
@@ -238,7 +243,7 @@ updateGame env game =
             updateTurret env game.turret
 
         bullets =
-            List.map (updateBullet env game.player) game.bullets
+            updateBullets env game.player game.bullets
     in
     { game
         | player = updatePlayer env game.player

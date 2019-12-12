@@ -26,6 +26,11 @@ translatePosByVel m =
     { m | position = Vec.add m.position m.velocity }
 
 
+translatePosByVelOfMagnitude : Vec -> { a | position : Vec, velocity : Vec } -> { a | position : Vec, velocity : Vec }
+translatePosByVelOfMagnitude v m =
+    { m | position = Vec.add m.position v }
+
+
 randomWalkerVelocity : Vec -> Generator Vec
 randomWalkerVelocity velocity =
     let
@@ -150,6 +155,20 @@ initBullet =
     }
 
 
+setBulletPosVelFromTo src target m =
+    let
+        angle =
+            Vec.fromTo src.position target.position
+                |> Vec.angle
+    in
+    { m
+        | position =
+            Vec.add src.position
+                (Vec.fromRTheta (m.radius + src.radius) angle)
+        , velocity = Vec.fromRTheta 3 angle
+    }
+
+
 updateBullet : Env -> Player -> Bullet -> Bullet
 updateBullet env player =
     gravitateTo player
@@ -217,7 +236,7 @@ setVelAngleTo target src =
 updateTurret : Env -> Player -> Turret -> ( List Bullet, Turret )
 updateTurret env p turret =
     if Timer.isDone env.clock turret.bulletTimer then
-        ( [ initBullet |> setVelAngleTo p
+        ( [ initBullet |> setBulletPosVelFromTo turret p
           ]
         , { turret | bulletTimer = Timer.restart env.clock turret.bulletTimer }
         )

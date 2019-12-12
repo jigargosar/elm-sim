@@ -112,7 +112,11 @@ initialPlayer =
     , velocity = Vec.fromRTheta 4 0
     , radius = 20
     , viewType = SolidCircleView "green"
-    , behaviours = [ RandomWalker (Random.initialSeed 1203), BounceOffScreen ]
+    , behaviours =
+        [ RandomWalker (Random.initialSeed 1203)
+        , ApplyVelocityToPosition
+        , BounceOffScreen
+        ]
     }
 
 

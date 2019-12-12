@@ -7,6 +7,7 @@ import GravitronV3.Screen as Screen exposing (Screen)
 import GravitronV3.Vec as Vec exposing (Vec, vec)
 import Html exposing (Html)
 import Json.Decode as D
+import List.Extra
 import Random exposing (Seed)
 import Task
 import Time exposing (Posix)
@@ -41,15 +42,28 @@ type Behaviour
 stepParticle : Env -> Particle -> Particle
 stepParticle env =
     let
-        step behaviour p =
+        step : Particle -> Behaviour -> ( Particle, Behaviour )
+        step model behaviour =
             case behaviour of
                 RandomWalker seed ->
-                    p
+                    let
+                        randomAngle =
+                            Random.float -0.1 0.1
+
+                        ( newAngleDiff, newSeed ) =
+                            Random.step randomAngle seed
+                    in
+                    ( { model
+                        | velocity = Vec.mapAngle ((+) newAngleDiff) model.velocity
+                      }
+                    , RandomWalker newSeed
+                    )
 
                 _ ->
-                    p
+                    ( model, behaviour )
     in
-    \p -> List.foldl step p p.behaviours
+    (\model -> List.Extra.mapAccumr step model model.behaviours)
+        >> (\( model, behaviours ) -> { model | behaviours = behaviours })
 
 
 

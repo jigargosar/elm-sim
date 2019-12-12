@@ -1,6 +1,5 @@
 module GravitronV3.MainV2 exposing (main)
 
-import Basics.Extra exposing (flip)
 import Browser
 import Browser.Events as E
 import GravitronV3.Canvas exposing (..)
@@ -10,9 +9,6 @@ import GravitronV3.Vec as Vec exposing (Vec, vec)
 import GravitronV3.VelocityBehaviour as VelocityBehaviour exposing (VelocityBehaviour)
 import Html exposing (Html)
 import Json.Decode as D
-import List.Extra
-import Random exposing (Generator, Seed)
-import Random.Float
 import Task
 import Time exposing (Posix)
 import TimeTravel.Browser as TimeTravel
@@ -20,37 +16,33 @@ import Update.Pipeline exposing (..)
 
 
 
--- Particle
 -- Player
 
 
-type Player
-    = Player
-        { position : Vec
-        , velocity : Vec
-        , radius : Float
-        , velocityBehaviour : VelocityBehaviour
-        }
+type alias Player =
+    { position : Vec
+    , velocity : Vec
+    , radius : Float
+    , velocityBehaviour : VelocityBehaviour
+    }
 
 
 initialPlayer : Player
 initialPlayer =
-    Player
-        { position = Vec.zero
-        , velocity = Vec.fromRTheta 4 0
-        , radius = 20
-        , velocityBehaviour = VelocityBehaviour.initWanderAndBounceInScreen 1
-        }
+    { position = Vec.zero
+    , velocity = Vec.fromRTheta 4 0
+    , radius = 20
+    , velocityBehaviour = VelocityBehaviour.initWanderAndBounceInScreen 1
+    }
 
 
 updatePlayer : Env -> Player -> Player
-updatePlayer env (Player player) =
+updatePlayer env player =
     VelocityBehaviour.updateRecord env player
-        |> Player
 
 
 viewPlayer : Player -> Shape
-viewPlayer (Player { position, radius }) =
+viewPlayer { position, radius } =
     viewFilledCircle "green" radius position
 
 

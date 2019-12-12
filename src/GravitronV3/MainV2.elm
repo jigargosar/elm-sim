@@ -51,7 +51,11 @@ type Behaviour
     | GravitateToPlayer
     | BounceWithinScreen Float
     | ApplyVelocityToPosition
-    | FireGravityBulletTowardsPlayer Timer
+    | EmitOnTimer Event Timer
+
+
+type Event
+    = GenerateGravityBulletFromSelfToPlayer
 
 
 bounceWithinScreen : Screen -> Vec -> Float -> Vec -> Vec
@@ -100,6 +104,12 @@ randomWalkerVelocity velocity =
             )
 
 
+type Action
+    = SetVelocity Vec
+    | SetPosition Vec
+    | AddBullet Particle
+
+
 stepParticleBehaviours : Env -> Particle -> Particle
 stepParticleBehaviours env =
     let
@@ -127,6 +137,15 @@ stepParticleBehaviours env =
                       }
                     , behaviour
                     )
+
+                EmitOnTimer event timer ->
+                    if Timer.isDone env.clock timer then
+                        ( model
+                        , EmitOnTimer event (Timer.restart env.clock timer)
+                        )
+
+                    else
+                        ( model, behaviour )
 
                 _ ->
                     ( model, behaviour )
@@ -189,7 +208,7 @@ initialTurret =
     , radius = 25
     , viewType = SolidCircleView "red"
     , behaviours =
-        [ FireGravityBulletTowardsPlayer (Timer.start 0 60) ]
+        [ EmitOnTimer GenerateGravityBulletFromSelfToPlayer (Timer.start 0 60) ]
     }
 
 

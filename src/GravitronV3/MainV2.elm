@@ -202,17 +202,33 @@ initialTurret =
     }
 
 
-updateTurretHelp env turret =
+setVelAngleTo : { a | position : Vec } -> { b | position : Vec, velocity : Vec } -> { b | position : Vec, velocity : Vec }
+setVelAngleTo target src =
+    { src
+        | velocity =
+            Vec.mapAngle
+                (always
+                    (Vec.fromTo src.position target.position |> Vec.angle)
+                )
+                src.velocity
+    }
+
+
+updateTurretHelp env p turret =
     if Timer.isDone env.clock turret.bulletTimer then
-        ( [ initBullet ], { turret | bulletTimer = Timer.restart env.clock turret.bulletTimer } )
+        ( [ initBullet
+                |> setVelAngleTo p
+          ]
+        , { turret | bulletTimer = Timer.restart env.clock turret.bulletTimer }
+        )
 
     else
         ( [], turret )
 
 
-updateTurret : Env -> Turret -> ( List Bullet, Turret )
-updateTurret env turret =
-    updateTurretHelp env turret
+updateTurret : Env -> Player -> Turret -> ( List Bullet, Turret )
+updateTurret env p turret =
+    updateTurretHelp env p turret
 
 
 viewTurret : Turret -> Shape
@@ -253,7 +269,7 @@ updateGame : Env -> Game -> Game
 updateGame env game =
     let
         ( genBullets, turret ) =
-            updateTurret env game.turret
+            updateTurret env game.player game.turret
 
         bullets =
             updateBullets env game.player game.bullets

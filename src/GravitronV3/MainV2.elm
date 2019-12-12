@@ -7,6 +7,7 @@ import GravitronV3.Screen as Screen exposing (Screen)
 import GravitronV3.Vec as Vec exposing (Vec, vec)
 import Html exposing (Html)
 import Json.Decode as D
+import Random exposing (Seed)
 import Task
 import Time exposing (Posix)
 import TimeTravel.Browser as TimeTravel
@@ -32,7 +33,7 @@ type alias Particle =
 
 type Behaviour
     = SpringToMouse
-    | RandomWalker
+    | RandomWalker Seed
     | GravitateToPlayer
     | BounceOffScreen
 
@@ -42,7 +43,7 @@ stepParticle env =
     let
         step behaviour p =
             case behaviour of
-                RandomWalker ->
+                RandomWalker seed ->
                     p
 
                 _ ->
@@ -86,7 +87,7 @@ initialPlayer =
     , velocity = Vec.fromRTheta 4 0
     , radius = 20
     , viewType = SolidCircleView "green"
-    , behaviours = [ RandomWalker, BounceOffScreen ]
+    , behaviours = [ RandomWalker (Random.initialSeed 1203), BounceOffScreen ]
     }
 
 

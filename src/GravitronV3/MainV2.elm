@@ -419,14 +419,14 @@ viewWorld env game =
 
 type alias Game =
     { world : World
-    , stage : Int
+    , level : Int
     }
 
 
 initialGame : Game
 initialGame =
     { world = initialWorld
-    , stage = 0
+    , level = 0
     }
 
 
@@ -436,13 +436,13 @@ updateGame env game =
         world =
             stepWorld env game.world
 
-        isStageComplete =
+        isLevelComplete =
             world.turrets |> List.isEmpty
     in
-    if isStageComplete then
+    if isLevelComplete then
         { game
             | world = { world | turrets = initialWorld.turrets }
-            , stage = game.stage + 1
+            , level = game.level + 1
         }
 
     else

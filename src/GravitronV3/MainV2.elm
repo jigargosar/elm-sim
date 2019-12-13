@@ -426,6 +426,16 @@ viewWorld env game =
 -- Game
 
 
+turretPositions : List Point
+turretPositions =
+    let
+        dst =
+            150
+    in
+    [ ( -1, -1 ), ( 1, 1 ), ( 1, -1 ), ( -1, 1 ) ]
+        |> List.map (Tuple.mapBoth ((*) dst) ((*) dst) >> Pt.xy)
+
+
 turretsForLevel : Env -> Int -> List Turret
 turretsForLevel env level_ =
     let

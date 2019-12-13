@@ -4,7 +4,7 @@ import Browser
 import Browser.Events as E
 import GravitronV3.Canvas exposing (..)
 import GravitronV3.Point as Pt exposing (Point)
-import GravitronV3.RigidBody as RigidBody
+import GravitronV3.RigidBody as RigidBody exposing (RigidBody)
 import GravitronV3.Screen as Screen exposing (Screen)
 import GravitronV3.Timer as Timer exposing (Timer)
 import GravitronV3.Vec as Vec exposing (Vec, vec)
@@ -21,13 +21,6 @@ import Update.Pipeline exposing (..)
 
 
 -- mappers
-
-
-type alias RigidBody a =
-    { a
-        | position : Point
-        , velocity : Vec
-    }
 
 
 type alias Circular a =
@@ -61,8 +54,8 @@ doCircleOverlap c1 c2 =
         < (c1.radius + c2.radius)
 
 
-randomWalkerVelocity : Vec -> Generator Vec
-randomWalkerVelocity velocity =
+randomWalkerVelocityGen : Vec -> Generator Vec
+randomWalkerVelocityGen velocity =
     let
         randomAngle : Generator Float
         randomAngle =
@@ -79,7 +72,7 @@ randomWalkerVelocity velocity =
 
 stepRandomWalkerVelocity : Vec -> Seed -> ( Vec, Seed )
 stepRandomWalkerVelocity velocity seed =
-    Random.step (randomWalkerVelocity velocity) seed
+    Random.step (randomWalkerVelocityGen velocity) seed
 
 
 bounceWithinScreenHelp : Screen -> Vec -> Float -> Vec -> Vec

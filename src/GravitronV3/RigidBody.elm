@@ -27,14 +27,17 @@ type alias RigidBodyWithSeed a =
     RigidBody { a | seed : Seed }
 
 
-stepSeed : Generator (RigidBodyWithSeed a -> Vec) -> RigidBodyWithSeed a -> RigidBodyWithSeed a
+stepSeed : (RigidBodyWithSeed a -> Generator Vec) -> RigidBodyWithSeed a -> RigidBodyWithSeed a
 stepSeed gen model =
     let
-        ( func, newSeed ) =
-            Random.step gen model.seed
+        ( newVelocity, newSeed ) =
+            Random.step (gen model) model.seed
     in
-    { model | seed = newSeed }
-        |> step [ func ]
+    { model
+        | velocity = newVelocity
+        , seed = newSeed
+    }
+        |> stepPosition
 
 
 stepPosition : RigidBody a -> RigidBody a

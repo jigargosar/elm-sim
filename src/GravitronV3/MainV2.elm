@@ -1,5 +1,6 @@
 module GravitronV3.MainV2 exposing (main)
 
+import Basics.Extra exposing (uncurry)
 import Browser
 import Browser.Events as E
 import GravitronV3.Canvas exposing (..)
@@ -189,18 +190,14 @@ updateBullets : Env -> BulletCtx bc -> List Bullet -> ( List Explosion, List Bul
 updateBullets env ctx =
     List.Extra.select
         >> List.foldr
-            (\( bullet, otherBullets ) ( explosionAcc, bulletAcc ) ->
+            (\( bullet, otherBullets ) ->
                 if isBulletIntersecting ctx otherBullets bullet then
-                    ( bulletToExplosion env bullet
-                        :: explosionAcc
-                    , bulletAcc
-                    )
+                    Tuple.mapFirst
+                        ((::) (bulletToExplosion env bullet))
 
                 else
-                    ( explosionAcc
-                    , updateBullet env ctx bullet
-                        :: bulletAcc
-                    )
+                    Tuple.mapSecond
+                        ((::) (updateBullet env ctx bullet))
             )
             ( [], [] )
 

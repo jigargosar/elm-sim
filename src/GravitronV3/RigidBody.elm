@@ -79,4 +79,4 @@ doCircleOverlap : Circular a -> Circular b -> Bool
 doCircleOverlap c1 c2 =
     Vec.lenFrom (c1.position |> Pt.toTuple |> Vec.fromTuple)
         (c2.position |> Pt.toTuple |> Vec.fromTuple)
-        < (c1.radius + c2.radius)
+        < (c1.radius + c2.radius - 1)

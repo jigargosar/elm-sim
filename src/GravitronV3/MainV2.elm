@@ -257,7 +257,14 @@ initTurret clock point =
 
 
 type alias TurretResponse =
-    { bullets : List Bullet }
+    { bullets : List Bullet
+    , explosions : List Explosion
+    }
+
+
+emptyTurretResponse : TurretResponse
+emptyTurretResponse =
+    TurretResponse [] []
 
 
 type alias TurretCtx tc =
@@ -265,19 +272,6 @@ type alias TurretCtx tc =
         | player : Player
         , bullets : List Bullet
     }
-
-
-updateTurret : Env -> TurretCtx tc -> Turret -> ( TurretResponse, Turret )
-updateTurret env ctx turret =
-    if Timer.isDone env.clock turret.bulletTimer then
-        ( TurretResponse
-            [ initBullet |> setPosVelFromTo turret ctx.player
-            ]
-        , { turret | bulletTimer = Timer.restart env.clock turret.bulletTimer }
-        )
-
-    else
-        ( TurretResponse [], turret )
 
 
 accumTurretResponseInto :
@@ -298,23 +292,24 @@ isTurretIntersecting ctx turret =
 -- || RigidBody.doCircleOverlap turret ctx.player
 
 
+turretToExplosion : Env -> Turret -> Explosion
+turretToExplosion env turret =
+    newExplosion env.clock turret.position (viewTurretShape turret)
+
+
 updateTurrets : Env -> TurretCtx tc -> List Turret -> ( TurretResponse, List Turret )
 updateTurrets env ctx =
-    List.Extra.mapAccuml
-        (\resAcc ->
-            updateTurret env ctx
-                >> accumTurretResponseInto resAcc
-        )
-        (TurretResponse [])
-        >> Tuple.mapSecond (rejectWhen (isTurretIntersecting ctx))
-
-
-uts : Env -> TurretCtx tc -> List Turret -> ( TurretResponse, List Turret )
-uts env ctx =
     let
+        reducer : Turret -> ( TurretResponse, List Turret ) -> ( TurretResponse, List Turret )
         reducer turret ( res, turrets ) =
             if isTurretIntersecting ctx turret then
-                ( res, turrets )
+                ( { res
+                    | explosions =
+                        turretToExplosion env turret
+                            :: res.explosions
+                  }
+                , turrets
+                )
 
             else if Timer.isDone env.clock turret.bulletTimer then
                 ( { res
@@ -329,12 +324,22 @@ uts env ctx =
             else
                 ( res, turret :: turrets )
     in
-    List.foldr reducer ( TurretResponse [], [] )
+    List.foldr reducer ( emptyTurretResponse, [] )
 
 
 viewTurret : Turret -> Shape
-viewTurret { position, radius } =
-    viewFilledCircle "red" radius position
+viewTurret turret =
+    viewTurretShape turret
+        |> move (Pt.toTuple turret.position)
+
+
+viewTurretShape : Turret -> Shape
+viewTurretShape { radius } =
+    group
+        [ circle radius
+            |> fill "red"
+            |> fade 0.7
+        ]
 
 
 

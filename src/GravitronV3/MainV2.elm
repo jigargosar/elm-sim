@@ -3,6 +3,7 @@ module GravitronV3.MainV2 exposing (main)
 import Browser
 import Browser.Events as E
 import GravitronV3.Canvas exposing (..)
+import GravitronV3.Point as Pt exposing (Point)
 import GravitronV3.Screen as Screen exposing (Screen)
 import GravitronV3.Timer as Timer exposing (Timer)
 import GravitronV3.Vec as Vec exposing (Vec, vec)
@@ -19,33 +20,6 @@ import Update.Pipeline exposing (..)
 
 
 -- Point
-
-
-type Point
-    = Point Vec
-
-
-movePt : Vec -> Point -> Point
-movePt vec (Point pt) =
-    Point (Vec.add pt vec)
-
-
-vecFromTo : Point -> Point -> Vec
-vecFromTo (Point from) (Point to) =
-    Vec.fromTo from to
-
-
-pointAt : ( Float, Float ) -> Point
-pointAt ( x, y ) =
-    Point (Vec.vec x y)
-
-
-pointToTuple : Point -> ( Float, Float )
-pointToTuple (Point vec) =
-    Vec.toTuple vec
-
-
-
 -- mappers
 
 
@@ -92,14 +66,14 @@ mapVelocityAndSeed func model =
 
 doCircleOverlap : CircularBody a -> CircularBody b -> Bool
 doCircleOverlap c1 c2 =
-    Vec.lenFrom (c1.position |> pointToTuple |> Vec.fromTuple)
-        (c2.position |> pointToTuple |> Vec.fromTuple)
+    Vec.lenFrom (c1.position |> Pt.toTuple |> Vec.fromTuple)
+        (c2.position |> Pt.toTuple |> Vec.fromTuple)
         < (c1.radius + c2.radius)
 
 
 translatePosByVel : RigidBody a -> Point
 translatePosByVel model =
-    movePt model.velocity model.position
+    Pt.moveBy model.velocity model.position
 
 
 randomWalkerVelocity : Vec -> Generator Vec
@@ -155,14 +129,14 @@ bounceWithinScreenHelp screen position bounceFactor velocity =
 
 bounceWithinScreen : Env -> Float -> RigidBody a -> Vec
 bounceWithinScreen env factor m =
-    bounceWithinScreenHelp env.screen (m.position |> (pointToTuple >> Vec.fromTuple)) factor m.velocity
+    bounceWithinScreenHelp env.screen (m.position |> (Pt.toTuple >> Vec.fromTuple)) factor m.velocity
 
 
 gravitateTo : RigidBody target -> RigidBody model -> Vec
 gravitateTo target model =
     model.velocity
         |> Vec.add
-            (vecFromTo model.position target.position
+            (Pt.vecFromTo model.position target.position
                 |> Vec.mapMagnitude (\mag -> 20 / mag)
             )
 
@@ -179,7 +153,7 @@ type alias Player =
 
 initialPlayer : Player
 initialPlayer =
-    { position = pointAt ( 0, 0 )
+    { position = Pt.xy ( 0, 0 )
     , velocity = Vec.fromRTheta 4 0
     , radius = 20
     , seed = Random.initialSeed 1234
@@ -208,7 +182,7 @@ type alias Bullet =
 
 initBullet : Bullet
 initBullet =
-    { position = pointAt ( 0, 0 )
+    { position = Pt.xy ( 0, 0 )
     , velocity = Vec.fromRTheta 3 0
     , radius = 10
     }
@@ -222,12 +196,12 @@ setPosVelFromTo :
 setPosVelFromTo src target m =
     let
         angle =
-            vecFromTo src.position target.position
+            Pt.vecFromTo src.position target.position
                 |> Vec.angle
     in
     { m
         | position =
-            movePt (Vec.fromRTheta (m.radius + src.radius) angle)
+            Pt.moveBy (Vec.fromRTheta (m.radius + src.radius) angle)
                 src.position
         , velocity = Vec.fromRTheta 3 angle
     }
@@ -276,7 +250,7 @@ type alias Turret =
 
 initialTurret : Turret
 initialTurret =
-    { position = pointAt ( -150, -150 )
+    { position = Pt.xy ( -150, -150 )
     , velocity = Vec.zero
     , radius = 25
     , bulletTimer = Timer.start 0 60
@@ -307,7 +281,7 @@ viewTurret { position, radius } =
 viewFilledCircle color radius position =
     circle radius
         |> fill color
-        |> move (pointToTuple position)
+        |> move (Pt.toTuple position)
 
 
 

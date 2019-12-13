@@ -385,8 +385,8 @@ initialGame =
     }
 
 
-updateGameHelp : Env -> Game -> Game
-updateGameHelp env game =
+stepGame : Env -> Game -> Game
+stepGame env game =
     let
         ( turretResponse, turrets ) =
             updateTurrets env game game.turrets
@@ -408,7 +408,7 @@ updateGame : Env -> Game -> Game
 updateGame env model =
     let
         newModel =
-            updateGameHelp env model
+            stepGame env model
     in
     newModel
 

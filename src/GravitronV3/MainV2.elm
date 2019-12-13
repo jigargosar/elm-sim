@@ -196,15 +196,9 @@ type alias BulletResponse =
 updateBullets : Env -> BulletCtx bc -> List Bullet -> ( BulletResponse, List Bullet )
 updateBullets env ctx =
     let
-        addExplosion bullet =
+        addExplosion explosion =
             Tuple.mapFirst
-                (\res ->
-                    { res
-                        | explosions =
-                            bulletToExplosion env bullet
-                                :: res.explosions
-                    }
-                )
+                (\res -> { res | explosions = explosion :: res.explosions })
 
         reducer :
             ( Bullet, List Bullet )
@@ -212,7 +206,7 @@ updateBullets env ctx =
             -> ( BulletResponse, List Bullet )
         reducer ( bullet, otherBullets ) =
             if isBulletIntersecting ctx otherBullets bullet then
-                addExplosion bullet
+                addExplosion (bulletToExplosion env bullet)
 
             else
                 Tuple.mapSecond

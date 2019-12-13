@@ -430,7 +430,7 @@ turretsForLevel : Env -> Int -> List Turret
 turretsForLevel env level_ =
     let
         level =
-            modBy 2 level_
+            modBy 3 level_
     in
     case level of
         0 ->
@@ -441,6 +441,14 @@ turretsForLevel env level_ =
             , initTurret env (Pt.xy ( 150, 150 ))
 
             --, initTurret env (Pt.xy ( 150, -150 ))
+            -- , initTurret env (Pt.xy ( -150, 150 ))
+            ]
+
+        2 ->
+            [ initTurret env (Pt.xy ( -150, -150 ))
+            , initTurret env (Pt.xy ( 150, 150 ))
+            , initTurret env (Pt.xy ( 150, -150 ))
+
             -- , initTurret env (Pt.xy ( -150, 150 ))
             ]
 

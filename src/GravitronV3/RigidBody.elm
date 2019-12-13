@@ -33,10 +33,7 @@ stepSeed gen model =
         ( newVelocity, newSeed ) =
             Random.step (gen model) model.seed
     in
-    { model
-        | velocity = newVelocity
-        , seed = newSeed
-    }
+    { model | velocity = newVelocity, seed = newSeed }
         |> stepPosition
 
 

@@ -427,6 +427,7 @@ updateWorld env game =
         , explosions =
             updateExplosions env game.explosions
                 ++ bulletResponse.explosions
+                ++ turretResponse.explosions
     }
 
 

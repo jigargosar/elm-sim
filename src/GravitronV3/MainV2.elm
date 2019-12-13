@@ -90,8 +90,8 @@ mapVelocityAndSeed func model =
 -- Helpers
 
 
-circleCircleCollision : { a | position : Point, radius : Float } -> { b | position : Point, radius : Float } -> Bool
-circleCircleCollision c1 c2 =
+doCircleOverlap : CircularBody a -> CircularBody b -> Bool
+doCircleOverlap c1 c2 =
     Vec.lenFrom (c1.position |> pointToTuple |> Vec.fromTuple)
         (c2.position |> pointToTuple |> Vec.fromTuple)
         < (c1.radius + c2.radius)
@@ -240,7 +240,7 @@ setPosVelFromTo src target m =
 
 isBulletIntersecting : BulletCtx bc -> Bullet -> Bool
 isBulletIntersecting ctx b =
-    circleCircleCollision b ctx.player
+    doCircleOverlap b ctx.player
 
 
 

@@ -2,7 +2,7 @@ module GravitronV3.MainV2 exposing (main)
 
 import Browser
 import Browser.Events as E
-import GravitronV3.Canvas exposing (..)
+import GravitronV3.Canvas as Canvas exposing (..)
 import GravitronV3.Point as Pt exposing (Point)
 import GravitronV3.RigidBody as RigidBody exposing (CircularBody, RigidBody)
 import GravitronV3.Screen as Screen exposing (Screen)
@@ -118,6 +118,7 @@ respondWithEntity entity =
 
 
 
+-- View Helpers
 -- Player
 
 
@@ -144,11 +145,10 @@ updatePlayer env =
         ]
 
 
-viewPlayer : Player -> Shape
-viewPlayer { position, radius } =
-    circle radius
+playerToShape : Player -> Shape
+playerToShape player =
+    circle player.radius
         |> fill "green"
-        |> move (Pt.toTuple position)
 
 
 
@@ -210,7 +210,7 @@ updateBullet env ctx =
 
 bulletToExplosion : Env -> Bullet -> Explosion
 bulletToExplosion env bullet =
-    newExplosion env.clock bullet.position (viewBulletShape bullet)
+    newExplosion env.clock bullet.position (bulletToShape bullet)
 
 
 type alias BulletResponse =
@@ -236,14 +236,8 @@ updateBullets env ctx =
         >> List.foldr reducer ( BulletResponse [], [] )
 
 
-viewBullet : Bullet -> Shape
-viewBullet bullet =
-    viewBulletShape bullet
-        |> move (Pt.toTuple bullet.position)
-
-
-viewBulletShape : Bullet -> Shape
-viewBulletShape { radius } =
+bulletToShape : Bullet -> Shape
+bulletToShape { radius } =
     group
         [ circle radius
             |> fill "black"
@@ -301,7 +295,7 @@ isTurretIntersecting ctx turret =
 
 turretToExplosion : Env -> Turret -> Explosion
 turretToExplosion env turret =
-    newExplosion env.clock turret.position (viewTurretShape turret)
+    newExplosion env.clock turret.position (turretToShape turret)
 
 
 resetBulletTimer : Env -> Turret -> Turret
@@ -337,14 +331,8 @@ updateTurrets env ctx =
     List.foldr reducer ( emptyTurretResponse, [] )
 
 
-viewTurret : Turret -> Shape
-viewTurret turret =
-    viewTurretShape turret
-        |> move (Pt.toTuple turret.position)
-
-
-viewTurretShape : Turret -> Shape
-viewTurretShape { radius } =
+turretToShape : Turret -> Shape
+turretToShape { radius } =
     group
         [ circle radius
             |> fill "red"
@@ -376,8 +364,8 @@ updateExplosions env =
     rejectWhen (.timer >> Timer.isDone env.clock)
 
 
-viewExplosion : Env -> Explosion -> Shape
-viewExplosion env { position, timer, shape } =
+explosionToShape : Env -> Explosion -> Shape
+explosionToShape env { position, timer, shape } =
     let
         progress =
             Timer.value env.clock timer
@@ -385,7 +373,6 @@ viewExplosion env { position, timer, shape } =
     shape
         |> fade (1 - progress)
         |> scale (1 + progress)
-        |> move (Pt.toTuple position)
 
 
 
@@ -429,15 +416,32 @@ updateWorld env game =
     }
 
 
+
+--noinspection ElmUnusedSymbol
+
+
+move =
+    identity
+
+
+viewHelp toShapeFunc m =
+    toShapeFunc m
+        |> Canvas.move (Pt.toTuple m.position)
+
+
+viewAllHelp toShapeFunc =
+    List.map (viewHelp toShapeFunc)
+
+
 viewWorld : Env -> World -> Shape
 viewWorld env game =
     group
-        [ viewPlayer game.player
-        , List.map viewTurret game.turrets
+        [ viewHelp playerToShape game.player
+        , viewAllHelp turretToShape game.turrets
             |> group
-        , List.map viewBullet game.bullets
+        , viewAllHelp bulletToShape game.bullets
             |> group
-        , List.map (viewExplosion env) game.explosions
+        , viewAllHelp (explosionToShape env) game.explosions
             |> group
         ]
 

@@ -434,9 +434,10 @@ turretsForLevel env level =
 
         1 ->
             [ initTurret env (Pt.xy ( -150, -150 ))
-            , initTurret env (Pt.xy ( 150, -150 ))
-            , initTurret env (Pt.xy ( -150, 150 ))
             , initTurret env (Pt.xy ( 150, 150 ))
+
+            --, initTurret env (Pt.xy ( 150, -150 ))
+            -- , initTurret env (Pt.xy ( -150, 150 ))
             ]
 
         _ ->

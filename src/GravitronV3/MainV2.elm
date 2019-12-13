@@ -159,10 +159,11 @@ setPosVelFromTo src target m =
     }
 
 
-isBulletIntersecting : BulletCtx bc -> Bullet -> Bool
-isBulletIntersecting ctx b =
-    RigidBody.doCircleOverlap b ctx.player
-        || List.any (RigidBody.doCircleOverlap b) ctx.turrets
+isBulletIntersecting : BulletCtx bc -> List Bullet -> Bullet -> Bool
+isBulletIntersecting ctx otherBullets bullet =
+    RigidBody.doCircleOverlap bullet ctx.player
+        || List.any (RigidBody.doCircleOverlap bullet) ctx.turrets
+        || List.any (RigidBody.doCircleOverlap bullet) otherBullets
 
 
 type alias BulletCtx a =
@@ -172,20 +173,24 @@ type alias BulletCtx a =
     }
 
 
-updateBullet : Env -> BulletCtx bc -> ( Bullet, List Bullet ) -> Bullet
+updateBullet : Env -> BulletCtx bc -> ( Bullet, List Bullet ) -> Maybe Bullet
 updateBullet env ctx ( bullet, otherBullets ) =
-    bullet
-        |> RigidBody.step
-            [ gravitateTo ctx.player
-            , bounceWithinScreen env 0.5
-            ]
+    if isBulletIntersecting ctx otherBullets bullet then
+        Nothing
+
+    else
+        bullet
+            |> RigidBody.step
+                [ gravitateTo ctx.player
+                , bounceWithinScreen env 0.5
+                ]
+            |> Just
 
 
 updateBullets : Env -> BulletCtx bc -> List Bullet -> List Bullet
 updateBullets env ctx =
     List.Extra.select
-        >> List.map (updateBullet env ctx)
-        >> rejectWhen (isBulletIntersecting ctx)
+        >> List.filterMap (updateBullet env ctx)
 
 
 viewBullet : Bullet -> Shape

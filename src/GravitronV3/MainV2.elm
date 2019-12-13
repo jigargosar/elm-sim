@@ -96,12 +96,16 @@ gravitateTo target model =
 -- Response Helpers
 
 
-respondWithExplosion :
-    Explosion
-    -> ( { b | explosions : List Explosion }, c )
-    -> ( { b | explosions : List Explosion }, c )
-respondWithExplosion explosion =
-    Tuple.mapFirst (\res -> { res | explosions = explosion :: res.explosions })
+respondWithExplosionFrom env toShapeFunc model =
+    let
+        respondWithExplosion :
+            Explosion
+            -> ( { b | explosions : List Explosion }, c )
+            -> ( { b | explosions : List Explosion }, c )
+        respondWithExplosion explosion =
+            Tuple.mapFirst (\res -> { res | explosions = explosion :: res.explosions })
+    in
+    respondWithExplosion (explosionFrom env toShapeFunc model)
 
 
 respondWithBullet :
@@ -207,11 +211,6 @@ updateBullet env ctx =
         ]
 
 
-bulletToExplosion : Env -> Bullet -> Explosion
-bulletToExplosion env bullet =
-    explosionFrom env bulletToShape bullet
-
-
 type alias BulletResponse =
     { explosions : List Explosion
     }
@@ -226,7 +225,7 @@ updateBullets env ctx =
             -> ( BulletResponse, List Bullet )
         reducer ( bullet, otherBullets ) =
             if isBulletIntersecting ctx otherBullets bullet then
-                respondWithExplosion (bulletToExplosion env bullet)
+                respondWithExplosionFrom env bulletToShape bullet
 
             else
                 respondWithEntity (updateBullet env ctx bullet)
@@ -311,7 +310,7 @@ updateTurrets env ctx =
             -> ( TurretResponse, List Turret )
         reducer turret =
             if isTurretIntersecting ctx turret then
-                respondWithExplosion (explosionFrom env turretToShape turret)
+                respondWithExplosionFrom env turretToShape turret
 
             else if isBulletTimerDone env turret then
                 respondWithBullet

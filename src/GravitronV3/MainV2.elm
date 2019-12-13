@@ -49,19 +49,30 @@ pointToTuple (Point vec) =
 -- mappers
 
 
-type alias PosVel a =
+type alias RigidBody a =
     { a
         | position : Point
         , velocity : Vec
     }
 
 
-mapVelocityWithPosition : (PosVel a -> Vec) -> PosVel a -> PosVel a
+type alias Circle a =
+    { a
+        | position : Point
+        , radius : Float
+    }
+
+
+type alias CircleBody a =
+    RigidBody (Circle a)
+
+
+mapVelocityWithPosition : (RigidBody a -> Vec) -> RigidBody a -> RigidBody a
 mapVelocityWithPosition func model =
     { model | velocity = func model }
 
 
-mapPositionWithVelocity : (PosVel a -> Point) -> PosVel a -> PosVel a
+mapPositionWithVelocity : (RigidBody a -> Point) -> RigidBody a -> RigidBody a
 mapPositionWithVelocity func model =
     { model | position = func model }
 
@@ -86,7 +97,7 @@ circleCircleCollision c1 c2 =
         < (c1.radius + c2.radius)
 
 
-translatePosByVel : PosVel a -> Point
+translatePosByVel : RigidBody a -> Point
 translatePosByVel model =
     movePt model.velocity model.position
 
@@ -142,12 +153,12 @@ bounceWithinScreenHelp screen position bounceFactor velocity =
         newBouncedVelocity
 
 
-bounceWithinScreen : Env -> Float -> PosVel a -> Vec
+bounceWithinScreen : Env -> Float -> RigidBody a -> Vec
 bounceWithinScreen env factor m =
     bounceWithinScreenHelp env.screen (m.position |> (pointToTuple >> Vec.fromTuple)) factor m.velocity
 
 
-gravitateTo : PosVel target -> PosVel model -> Vec
+gravitateTo : RigidBody target -> RigidBody model -> Vec
 gravitateTo target model =
     model.velocity
         |> Vec.add

@@ -21,6 +21,46 @@ import Update.Pipeline exposing (..)
 
 
 
+-- Lifecycle
+
+
+type LifeCycle
+    = Spawning Timer
+    | Alive
+    | Dying Timer
+    | Dead
+
+
+initLifeCycle : Float -> LifeCycle
+initLifeCycle clock =
+    Spawning (Timer.start clock 120)
+
+
+stepLifeCycle : Float -> LifeCycle -> LifeCycle
+stepLifeCycle clock model =
+    case model of
+        Spawning timer ->
+            if Timer.isDone clock timer then
+                Alive
+
+            else
+                model
+
+        Alive ->
+            model
+
+        Dying timer ->
+            if Timer.isDone clock timer then
+                Dead
+
+            else
+                model
+
+        Dead ->
+            model
+
+
+
 -- Helpers
 
 

@@ -112,14 +112,6 @@ respondWithBullet bullet =
     Tuple.mapFirst (\res -> { res | bullets = bullet :: res.bullets })
 
 
-respondWithBullets :
-    List Bullet
-    -> ( { b | bullets : List Bullet }, c )
-    -> ( { b | bullets : List Bullet }, c )
-respondWithBullets bullets =
-    Tuple.mapFirst (\res -> { res | bullets = bullets ++ res.bullets })
-
-
 respondWithEntity : a -> ( b, List a ) -> ( b, List a )
 respondWithEntity entity =
     Tuple.mapSecond ((::) entity)

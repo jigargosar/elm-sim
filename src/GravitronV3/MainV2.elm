@@ -172,19 +172,17 @@ type alias BulletCtx a =
     }
 
 
-updateBullet : Env -> BulletCtx bc -> ( Bullet, List Bullet ) -> ( Bool, Bullet )
-updateBullet env ctx ( bullet, otherBullets ) =
-    if isBulletIntersecting ctx otherBullets bullet then
-        ( True, bullet )
+updateBullet : Env -> BulletCtx bc -> Bullet -> Bullet
+updateBullet env ctx =
+    RigidBody.step
+        [ gravitateTo ctx.player
+        , bounceWithinScreen env 0.5
+        ]
 
-    else
-        ( False
-        , bullet
-            |> RigidBody.step
-                [ gravitateTo ctx.player
-                , bounceWithinScreen env 0.5
-                ]
-        )
+
+bulletToExplosion : Env -> Bullet -> Explosion
+bulletToExplosion env bullet =
+    newExplosion env.clock bullet.position (viewBulletShape bullet)
 
 
 updateBullets : Env -> BulletCtx bc -> List Bullet -> ( List Explosion, List Bullet )
@@ -193,19 +191,14 @@ updateBullets env ctx =
         >> List.foldr
             (\( bullet, otherBullets ) ( explosionAcc, bulletAcc ) ->
                 if isBulletIntersecting ctx otherBullets bullet then
-                    ( newExplosion env.clock bullet.position (viewBulletShape bullet)
+                    ( bulletToExplosion env bullet
                         :: explosionAcc
                     , bulletAcc
                     )
 
                 else
                     ( explosionAcc
-                    , (bullet
-                        |> RigidBody.step
-                            [ gravitateTo ctx.player
-                            , bounceWithinScreen env 0.5
-                            ]
-                      )
+                    , updateBullet env ctx bullet
                         :: bulletAcc
                     )
             )

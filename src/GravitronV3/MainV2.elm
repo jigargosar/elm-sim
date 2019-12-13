@@ -326,7 +326,10 @@ isBulletTimerDone env turret =
 updateTurrets : Env -> TurretCtx tc -> List Turret -> ( TurretResponse, List Turret )
 updateTurrets env ctx =
     let
-        reducer : Turret -> ( TurretResponse, List Turret ) -> ( TurretResponse, List Turret )
+        reducer :
+            Turret
+            -> ( TurretResponse, List Turret )
+            -> ( TurretResponse, List Turret )
         reducer turret =
             if isTurretIntersecting ctx turret then
                 respondWithExplosion (turretToExplosion env turret)

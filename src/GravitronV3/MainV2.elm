@@ -230,8 +230,7 @@ updateBullets env ctx =
                 respondWithExplosion (bulletToExplosion env bullet)
 
             else
-                respondWithEntity
-                    (updateBullet env ctx bullet)
+                respondWithEntity (updateBullet env ctx bullet)
     in
     List.Extra.select
         >> List.foldr reducer ( BulletResponse [], [] )

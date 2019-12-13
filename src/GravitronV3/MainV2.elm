@@ -171,14 +171,17 @@ type alias BulletCtx a =
     }
 
 
+updateBullet : Env -> BulletCtx bc -> Bullet -> Bullet
+updateBullet env ctx =
+    RigidBody.step
+        [ gravitateTo ctx.player
+        , bounceWithinScreen env 0.5
+        ]
+
+
 updateBullets : Env -> BulletCtx bc -> List Bullet -> List Bullet
 updateBullets env ctx =
-    List.map
-        (RigidBody.step
-            [ gravitateTo ctx.player
-            , bounceWithinScreen env 0.5
-            ]
-        )
+    List.map (updateBullet env ctx)
         >> rejectWhen (isBulletIntersecting ctx)
 
 

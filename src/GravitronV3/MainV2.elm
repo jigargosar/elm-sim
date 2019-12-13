@@ -26,7 +26,7 @@ import Update.Pipeline exposing (..)
 
 type LifeCycleStage
     = Spawning Timer
-    | Alive
+    | Alive Int
     | Dying Timer
     | Dead
 
@@ -36,13 +36,17 @@ stepLifeCycleStage clock { maxHp, stage } =
     case stage of
         Spawning timer ->
             if Timer.isDone clock timer then
-                Alive
+                Alive maxHp
 
             else
                 stage
 
-        Alive ->
-            stage
+        Alive hp ->
+            if hp <= 0 then
+                Dying (Timer.start clock 120)
+
+            else
+                stage
 
         Dying timer ->
             if Timer.isDone clock timer then

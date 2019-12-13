@@ -372,8 +372,8 @@ type alias World =
     }
 
 
-initialWorld : List Turret -> World
-initialWorld turrets =
+initWorld : List Turret -> World
+initWorld turrets =
     { player = initialPlayer
     , turrets = turrets
     , bullets = []
@@ -449,7 +449,7 @@ initialGame =
         level =
             3
     in
-    { world = initialWorld (turretsForLevel 0 level)
+    { world = initWorld (turretsForLevel 0 level)
     , level = level
     }
 

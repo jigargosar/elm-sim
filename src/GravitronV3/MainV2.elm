@@ -59,6 +59,26 @@ stepLifeCycleStage clock { maxHp, stage } =
             stage
 
 
+isAlive : LifeCycle -> Bool
+isAlive (LifeCycle r) =
+    case r.stage of
+        Alive _ ->
+            True
+
+        _ ->
+            False
+
+
+isDead : LifeCycle -> Bool
+isDead (LifeCycle r) =
+    case r.stage of
+        Dead ->
+            True
+
+        _ ->
+            False
+
+
 type LifeCycle
     = LifeCycle LifeCycleRecord
 

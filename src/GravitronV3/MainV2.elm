@@ -21,85 +21,6 @@ import Update.Pipeline exposing (..)
 
 
 
--- Lifecycle
-
-
-type LifeCycleStage
-    = Spawning Timer
-    | Alive Int
-    | Dying Timer
-    | Dead
-
-
-stepLifeCycleStage : Float -> LifeCycleRecord -> LifeCycleStage
-stepLifeCycleStage clock { maxHp, stage } =
-    case stage of
-        Spawning timer ->
-            if Timer.isDone clock timer then
-                Alive maxHp
-
-            else
-                stage
-
-        Alive hp ->
-            if hp <= 0 then
-                Dying (Timer.start clock 120)
-
-            else
-                stage
-
-        Dying timer ->
-            if Timer.isDone clock timer then
-                Dead
-
-            else
-                stage
-
-        Dead ->
-            stage
-
-
-isAlive : LifeCycle -> Bool
-isAlive (LifeCycle r) =
-    case r.stage of
-        Alive _ ->
-            True
-
-        _ ->
-            False
-
-
-isDead : LifeCycle -> Bool
-isDead (LifeCycle r) =
-    case r.stage of
-        Dead ->
-            True
-
-        _ ->
-            False
-
-
-type LifeCycle
-    = LifeCycle LifeCycleRecord
-
-
-type alias LifeCycleRecord =
-    { maxHp : Int, stage : LifeCycleStage }
-
-
-initLifeCycle : Float -> Int -> LifeCycle
-initLifeCycle clock maxHp =
-    LifeCycleRecord maxHp (Spawning (Timer.start clock 120))
-        |> LifeCycle
-
-
-stepLifeCycle : Float -> LifeCycle -> LifeCycle
-stepLifeCycle clock (LifeCycle rec) =
-    { rec | stage = stepLifeCycleStage clock rec }
-        |> LifeCycle
-
-
-
 -- Helpers
 
 
@@ -251,17 +172,19 @@ type alias BulletCtx a =
     }
 
 
-updateBullet : Env -> BulletCtx bc -> Bullet -> Bullet
-updateBullet env ctx =
-    RigidBody.step
-        [ gravitateTo ctx.player
-        , bounceWithinScreen env 0.5
-        ]
+updateBullet : Env -> BulletCtx bc -> ( Bullet, List Bullet ) -> Bullet
+updateBullet env ctx ( bullet, otherBullets ) =
+    bullet
+        |> RigidBody.step
+            [ gravitateTo ctx.player
+            , bounceWithinScreen env 0.5
+            ]
 
 
 updateBullets : Env -> BulletCtx bc -> List Bullet -> List Bullet
 updateBullets env ctx =
-    List.map (updateBullet env ctx)
+    List.Extra.select
+        >> List.map (updateBullet env ctx)
         >> rejectWhen (isBulletIntersecting ctx)
 
 

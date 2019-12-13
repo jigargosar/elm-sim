@@ -256,6 +256,15 @@ initialTurret =
     }
 
 
+initTurret : Env -> Point -> Turret
+initTurret env point =
+    { position = point
+    , velocity = Vec.zero
+    , radius = 25
+    , bulletTimer = Timer.start env.clock 60
+    }
+
+
 type alias TurretResponse =
     { bullets : List Bullet }
 

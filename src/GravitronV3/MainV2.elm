@@ -34,15 +34,6 @@ type alias CircularBody a =
     RigidBody (Circular a)
 
 
-mapVelocityAndSeed : (b -> a -> ( b, a )) -> { c | velocity : b, seed : a } -> { c | velocity : b, seed : a }
-mapVelocityAndSeed func model =
-    let
-        ( velocity, seed ) =
-            func model.velocity model.seed
-    in
-    { model | velocity = velocity, seed = seed }
-
-
 
 -- Helpers
 
@@ -68,11 +59,6 @@ randomWalkerVelocityGen velocity =
                     |> Vec.mapAngle ((+) newAngleDiff)
                     |> Vec.mapMagnitude (max 0.01)
             )
-
-
-stepRandomWalkerVelocity : Vec -> Seed -> ( Vec, Seed )
-stepRandomWalkerVelocity velocity seed =
-    Random.step (randomWalkerVelocityGen velocity) seed
 
 
 bounceWithinScreenHelp : Screen -> Vec -> Float -> Vec -> Vec

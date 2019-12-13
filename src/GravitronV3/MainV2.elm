@@ -189,14 +189,17 @@ bulletToExplosion env bullet =
 updateBullets : Env -> BulletCtx bc -> List Bullet -> ( List Explosion, List Bullet )
 updateBullets env ctx =
     let
+        addExplosion bullet =
+            Tuple.mapFirst
+                ((::) (bulletToExplosion env bullet))
+
         reducer :
             ( Bullet, List Bullet )
             -> ( List Explosion, List Bullet )
             -> ( List Explosion, List Bullet )
         reducer ( bullet, otherBullets ) =
             if isBulletIntersecting ctx otherBullets bullet then
-                Tuple.mapFirst
-                    ((::) (bulletToExplosion env bullet))
+                addExplosion bullet
 
             else
                 Tuple.mapSecond

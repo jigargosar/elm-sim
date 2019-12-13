@@ -405,12 +405,12 @@ updateGameHelp env game =
 
 
 updateGame : Env -> Game -> Game
-updateGame env game =
+updateGame env model =
     let
-        newGame =
-            updateGameHelp env game
+        newModel =
+            updateGameHelp env model
     in
-    newGame
+    newModel
 
 
 viewGame : Env -> Game -> Shape

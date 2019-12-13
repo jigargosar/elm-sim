@@ -172,11 +172,9 @@ gravitateTo target model =
 
 
 type alias Player =
-    { position : Point
-    , velocity : Vec
-    , radius : Float
-    , seed : Seed
-    }
+    CircularBody
+        { seed : Seed
+        }
 
 
 initialPlayer : Player
@@ -205,10 +203,7 @@ viewPlayer { position, radius } =
 
 
 type alias Bullet =
-    { position : Point
-    , velocity : Vec
-    , radius : Float
-    }
+    CircularBody {}
 
 
 initBullet : Bullet
@@ -241,10 +236,7 @@ setPosVelFromTo src target m =
 isBulletIntersecting : BulletCtx bc -> Bullet -> Bool
 isBulletIntersecting ctx b =
     doCircleOverlap b ctx.player
-
-
-
--- || List.any (circleCircleCollision b) [ ctx.turret ]
+        || List.any (doCircleOverlap b) [ ctx.turret ]
 
 
 type alias BulletCtx a =

@@ -56,15 +56,15 @@ type alias RigidBody a =
     }
 
 
-type alias Circle a =
+type alias Circular a =
     { a
         | position : Point
         , radius : Float
     }
 
 
-type alias CircleBody a =
-    RigidBody (Circle a)
+type alias CircularBody a =
+    RigidBody (Circular a)
 
 
 mapVelocityWithPosition : (RigidBody a -> Vec) -> RigidBody a -> RigidBody a

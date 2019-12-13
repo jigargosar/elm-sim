@@ -276,15 +276,6 @@ type alias TurretCtx tc =
     }
 
 
-accumTurretResponseInto :
-    TurretResponse
-    -> ( TurretResponse, Turret )
-    -> ( TurretResponse, Turret )
-accumTurretResponseInto resAcc =
-    Tuple.mapFirst
-        (\{ bullets } -> { resAcc | bullets = resAcc.bullets ++ bullets })
-
-
 isTurretIntersecting : TurretCtx tc -> Turret -> Bool
 isTurretIntersecting ctx turret =
     List.any (RigidBody.doCircleOverlap turret) ctx.bullets
@@ -379,16 +370,6 @@ viewExplosion env { position, timer, shape } =
     shape
         |> fade (1 - progress)
         |> scale (1 + progress)
-        |> move (Pt.toTuple position)
-
-
-
--- ViewHelpers
-
-
-viewFilledCircle color radius position =
-    circle radius
-        |> fill color
         |> move (Pt.toTuple position)
 
 

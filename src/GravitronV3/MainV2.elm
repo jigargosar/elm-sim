@@ -212,16 +212,21 @@ initialTurret =
     }
 
 
-updateTurret : Env -> Player -> Turret -> ( List Bullet, Turret )
+type alias TurretResponse =
+    { bullets : List Bullet }
+
+
+updateTurret : Env -> Player -> Turret -> ( TurretResponse, Turret )
 updateTurret env p turret =
     if Timer.isDone env.clock turret.bulletTimer then
-        ( [ initBullet |> setPosVelFromTo turret p
-          ]
+        ( TurretResponse
+            [ initBullet |> setPosVelFromTo turret p
+            ]
         , { turret | bulletTimer = Timer.restart env.clock turret.bulletTimer }
         )
 
     else
-        ( [], turret )
+        ( TurretResponse [], turret )
 
 
 viewTurret : Turret -> Shape
@@ -261,7 +266,7 @@ initialGame =
 updateGame : Env -> Game -> Game
 updateGame env game =
     let
-        ( genBullets, turret ) =
+        ( turretResponse, turret ) =
             updateTurret env game.player game.turret
 
         bullets =
@@ -270,7 +275,7 @@ updateGame env game =
     { game
         | player = updatePlayer env game.player
         , turret = turret
-        , bullets = genBullets ++ bullets
+        , bullets = turretResponse.bullets ++ bullets
     }
 
 

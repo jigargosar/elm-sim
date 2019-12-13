@@ -432,9 +432,13 @@ turretsForLevel clock level_ =
     let
         level =
             modBy 4 level_
+
+        clockForIdx i =
+            clock - (60 / toFloat (level + 1) * toFloat (level - i))
     in
     List.take (level + 1) turretPositions
-        |> List.map (initTurret clock)
+        --|> List.map (initTurret clock)
+        |> List.indexedMap (\i -> initTurret (clockForIdx i))
 
 
 type alias Game =

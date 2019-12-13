@@ -309,6 +309,29 @@ updateTurrets env ctx =
         >> Tuple.mapSecond (rejectWhen (isTurretIntersecting ctx))
 
 
+uts : Env -> TurretCtx tc -> List Turret -> ( TurretResponse, List Turret )
+uts env ctx =
+    let
+        reducer turret ( res, turrets ) =
+            if isTurretIntersecting ctx turret then
+                ( res, turrets )
+
+            else if Timer.isDone env.clock turret.bulletTimer then
+                ( { res
+                    | bullets =
+                        (initBullet |> setPosVelFromTo turret ctx.player)
+                            :: res.bullets
+                  }
+                , { turret | bulletTimer = Timer.restart env.clock turret.bulletTimer }
+                    :: turrets
+                )
+
+            else
+                ( res, turret :: turrets )
+    in
+    List.foldr reducer ( TurretResponse [], [] )
+
+
 viewTurret : Turret -> Shape
 viewTurret { position, radius } =
     viewFilledCircle "red" radius position

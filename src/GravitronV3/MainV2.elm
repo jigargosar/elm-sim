@@ -118,7 +118,6 @@ respondWithEntity entity =
 
 
 
--- View Helpers
 -- Player
 
 
@@ -416,23 +415,6 @@ updateWorld env game =
     }
 
 
-
---noinspection ElmUnusedSymbol
-
-
-move =
-    identity
-
-
-viewHelp toShapeFunc m =
-    toShapeFunc m
-        |> Canvas.move (Pt.toTuple m.position)
-
-
-viewAllHelp toShapeFunc =
-    List.map (viewHelp toShapeFunc)
-
-
 viewWorld : Env -> World -> Shape
 viewWorld env game =
     group
@@ -444,6 +426,27 @@ viewWorld env game =
         , viewAllHelp (explosionToShape env) game.explosions
             |> group
         ]
+
+
+
+-- View Helpers
+
+
+viewHelp toShapeFunc m =
+    toShapeFunc m
+        |> Canvas.move (Pt.toTuple m.position)
+
+
+viewAllHelp toShapeFunc =
+    List.map (viewHelp toShapeFunc)
+
+
+
+--noinspection ElmUnusedSymbol
+
+
+move =
+    identity
 
 
 

@@ -417,6 +417,19 @@ viewWorld env game =
 -- Game
 
 
+turretsForLevel : Int -> List Turret
+turretsForLevel level =
+    case level of
+        0 ->
+            initialWorld.turrets
+
+        1 ->
+            initialWorld.turrets
+
+        _ ->
+            initialWorld.turrets
+
+
 type alias Game =
     { world : World
     , level : Int
@@ -440,8 +453,12 @@ updateGame env game =
             world.turrets |> List.isEmpty
     in
     if isLevelComplete then
+        let
+            nextLevel =
+                game.level + 1
+        in
         { game
-            | world = { world | turrets = initialWorld.turrets }
+            | world = { world | turrets = turretsForLevel nextLevel }
             , level = game.level + 1
         }
 

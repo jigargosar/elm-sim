@@ -1,7 +1,7 @@
-module GravitronV3.RigidBody exposing (RigidBody, step, stepWithSeed)
+module GravitronV3.RigidBody exposing (CircularBody, RigidBody, doCircleOverlap, step, stepWithSeed)
 
-import GravitronV3.Point as Point exposing (Point)
-import GravitronV3.Vec exposing (Vec)
+import GravitronV3.Point as Pt exposing (Point)
+import GravitronV3.Vec as Vec exposing (Vec)
 import Random exposing (Generator, Seed)
 
 
@@ -44,7 +44,7 @@ stepVelocityWithSeed funcList model =
 
 updatePosition : RigidBody a -> RigidBody a
 updatePosition model =
-    { model | position = Point.moveBy model.velocity model.position }
+    { model | position = Pt.moveBy model.velocity model.position }
 
 
 updateVelocity : (RigidBody a -> Vec) -> RigidBody a -> RigidBody a
@@ -62,3 +62,21 @@ updateVelocityWithSeed genFunc model =
             Random.step (genFunc model) model.seed
     in
     { model | velocity = newVelocity, seed = newSeed }
+
+
+type alias Circular a =
+    { a
+        | position : Point
+        , radius : Float
+    }
+
+
+type alias CircularBody a =
+    RigidBody (Circular a)
+
+
+doCircleOverlap : Circular a -> Circular b -> Bool
+doCircleOverlap c1 c2 =
+    Vec.lenFrom (c1.position |> Pt.toTuple |> Vec.fromTuple)
+        (c2.position |> Pt.toTuple |> Vec.fromTuple)
+        < (c1.radius + c2.radius)

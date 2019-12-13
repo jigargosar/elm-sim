@@ -4,7 +4,7 @@ import Browser
 import Browser.Events as E
 import GravitronV3.Canvas exposing (..)
 import GravitronV3.Point as Pt exposing (Point)
-import GravitronV3.RigidBody as RigidBody exposing (RigidBody)
+import GravitronV3.RigidBody as RigidBody exposing (CircularBody, RigidBody)
 import GravitronV3.Screen as Screen exposing (Screen)
 import GravitronV3.Timer as Timer exposing (Timer)
 import GravitronV3.Vec as Vec exposing (Vec, vec)
@@ -20,29 +20,7 @@ import Update.Pipeline exposing (..)
 
 
 
--- mappers
-
-
-type alias Circular a =
-    { a
-        | position : Point
-        , radius : Float
-    }
-
-
-type alias CircularBody a =
-    RigidBody (Circular a)
-
-
-
 -- Helpers
-
-
-doCircleOverlap : CircularBody a -> CircularBody b -> Bool
-doCircleOverlap c1 c2 =
-    Vec.lenFrom (c1.position |> Pt.toTuple |> Vec.fromTuple)
-        (c2.position |> Pt.toTuple |> Vec.fromTuple)
-        < (c1.radius + c2.radius)
 
 
 randomWalkerVelocityGenHelp : Vec -> Generator Vec
@@ -182,8 +160,8 @@ setPosVelFromTo src target m =
 
 isBulletIntersecting : BulletCtx bc -> Bullet -> Bool
 isBulletIntersecting ctx b =
-    doCircleOverlap b ctx.player
-        || List.any (doCircleOverlap b) [ ctx.turret ]
+    RigidBody.doCircleOverlap b ctx.player
+        || List.any (RigidBody.doCircleOverlap b) [ ctx.turret ]
 
 
 type alias BulletCtx a =

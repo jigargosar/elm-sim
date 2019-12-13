@@ -140,8 +140,10 @@ initialPlayer =
 
 updatePlayer : Env -> Player -> Player
 updatePlayer env =
-    RigidBody.step [ bounceWithinScreen env 1 ]
-        >> RigidBody.stepWithSeed (.velocity >> randomWalkerVelocityGen)
+    RigidBody.stepWithSeed
+        [ .velocity >> randomWalkerVelocityGen
+        , bounceWithinScreen env 1 >> Random.constant
+        ]
 
 
 viewPlayer : Player -> Shape

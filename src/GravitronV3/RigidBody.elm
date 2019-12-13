@@ -26,10 +26,12 @@ type alias RigidBodyWithSeed a =
     RigidBody { a | seed : Seed }
 
 
-stepWithSeed : (RigidBodyWithSeed a -> Generator Vec) -> RigidBodyWithSeed a -> RigidBodyWithSeed a
+stepWithSeed :
+    List (RigidBodyWithSeed a -> Generator Vec)
+    -> RigidBodyWithSeed a
+    -> RigidBodyWithSeed a
 stepWithSeed gen =
-    updateVelocityWithSeed gen
-        >> updatePosition
+    stepVelocityWithSeed gen >> updatePosition
 
 
 stepVelocityWithSeed :

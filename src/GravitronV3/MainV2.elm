@@ -17,6 +17,24 @@ import Update.Pipeline exposing (..)
 
 
 
+-- mappers
+
+
+mapVelocity : (b -> b) -> { a | velocity : b } -> { a | velocity : b }
+mapVelocity func model =
+    { model | velocity = func model.velocity }
+
+
+mapVelocityAndSeed : (b -> a -> ( b, a )) -> { c | velocity : b, seed : a } -> { c | velocity : b, seed : a }
+mapVelocityAndSeed func model =
+    let
+        ( velocity, seed ) =
+            func model.velocity model.seed
+    in
+    { model | velocity = velocity, seed = seed }
+
+
+
 -- Helpers
 
 

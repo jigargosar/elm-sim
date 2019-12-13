@@ -309,10 +309,6 @@ updateTurrets env ctx =
         (TurretResponse [])
 
 
-
--->> Tuple.mapSecond (rejectWhen (isTurretIntersecting ctx ))
-
-
 viewTurret : Turret -> Shape
 viewTurret { position, radius } =
     viewFilledCircle "red" radius position

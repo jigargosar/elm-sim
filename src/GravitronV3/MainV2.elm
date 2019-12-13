@@ -230,17 +230,18 @@ updateTurret env p turret =
         ( TurretResponse [], turret )
 
 
-mergeTurretResponseIn res =
+accumTurretResponseInto : TurretResponse -> ( TurretResponse, Turret ) -> ( TurretResponse, Turret )
+accumTurretResponseInto resAcc =
     Tuple.mapFirst
-        (\{ bullets } -> { res | bullets = res.bullets ++ bullets })
+        (\{ bullets } -> { resAcc | bullets = resAcc.bullets ++ bullets })
 
 
 updateTurrets : Env -> Player -> List Turret -> ( TurretResponse, List Turret )
 updateTurrets env player =
     List.Extra.mapAccuml
-        (\res ->
+        (\resAcc ->
             updateTurret env player
-                >> mergeTurretResponseIn res
+                >> accumTurretResponseInto resAcc
         )
         (TurretResponse [])
 

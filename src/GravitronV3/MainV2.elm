@@ -440,30 +440,10 @@ turretsForLevel : Env -> Int -> List Turret
 turretsForLevel env level_ =
     let
         level =
-            modBy 3 level_
+            modBy 4 level_
     in
-    case level of
-        0 ->
-            initialWorld.turrets
-
-        1 ->
-            [ initTurret env (Pt.xy ( -150, -150 ))
-            , initTurret env (Pt.xy ( 150, 150 ))
-
-            --, initTurret env (Pt.xy ( 150, -150 ))
-            -- , initTurret env (Pt.xy ( -150, 150 ))
-            ]
-
-        2 ->
-            [ initTurret env (Pt.xy ( -150, -150 ))
-            , initTurret env (Pt.xy ( 150, 150 ))
-            , initTurret env (Pt.xy ( 150, -150 ))
-
-            -- , initTurret env (Pt.xy ( -150, 150 ))
-            ]
-
-        _ ->
-            initialWorld.turrets
+    List.take (level + 1) turretPositions
+        |> List.map (initTurret env)
 
 
 type alias Game =

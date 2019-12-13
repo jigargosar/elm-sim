@@ -381,8 +381,8 @@ initWorld turrets =
     }
 
 
-stepWorld : Env -> World -> World
-stepWorld env game =
+updateWorld : Env -> World -> World
+updateWorld env game =
     let
         ( turretResponse, turrets ) =
             updateTurrets env game game.turrets
@@ -461,7 +461,7 @@ updateGame : Env -> Game -> Game
 updateGame env game =
     let
         world =
-            stepWorld env game.world
+            updateWorld env game.world
 
         isLevelComplete =
             world.turrets |> List.isEmpty

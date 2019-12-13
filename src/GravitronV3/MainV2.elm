@@ -313,6 +313,16 @@ turretToExplosion env turret =
     newExplosion env.clock turret.position (viewTurretShape turret)
 
 
+resetBulletTimer : Env -> Turret -> Turret
+resetBulletTimer env turret =
+    { turret | bulletTimer = Timer.restart env.clock turret.bulletTimer }
+
+
+isBulletTimerDone : Env -> Turret -> Bool
+isBulletTimerDone env turret =
+    Timer.isDone env.clock turret.bulletTimer
+
+
 updateTurrets : Env -> TurretCtx tc -> List Turret -> ( TurretResponse, List Turret )
 updateTurrets env ctx =
     let
@@ -321,11 +331,11 @@ updateTurrets env ctx =
             if isTurretIntersecting ctx turret then
                 respondWithExplosion (turretToExplosion env turret)
 
-            else if Timer.isDone env.clock turret.bulletTimer then
+            else if isBulletTimerDone env turret then
                 respondWithBullet
                     (initBullet |> setPosVelFromTo turret ctx.player)
                     >> respondWithEntity
-                        { turret | bulletTimer = Timer.restart env.clock turret.bulletTimer }
+                        (resetBulletTimer env turret)
 
             else
                 respondWithEntity turret

@@ -409,8 +409,15 @@ updateGame env model =
     let
         newModel =
             stepGame env model
+
+        isStageComplete =
+            newModel.turrets |> List.isEmpty
     in
-    newModel
+    if isStageComplete then
+        { newModel | turrets = initialGame.turrets }
+
+    else
+        newModel
 
 
 viewGame : Env -> Game -> Shape

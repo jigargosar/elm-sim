@@ -256,12 +256,12 @@ initialTurret =
     }
 
 
-initTurret : Env -> Point -> Turret
-initTurret env point =
+initTurret : Float -> Point -> Turret
+initTurret clock point =
     { position = point
     , velocity = Vec.zero
     , radius = 25
-    , bulletTimer = Timer.start env.clock 60
+    , bulletTimer = Timer.start clock 60
     }
 
 
@@ -381,10 +381,10 @@ type alias World =
     }
 
 
-initialWorld : World
-initialWorld =
+initialWorld : List Turret -> World
+initialWorld turrets =
     { player = initialPlayer
-    , turrets = [ initialTurret ]
+    , turrets = turrets
     , bullets = []
     , explosions = []
     }
@@ -436,14 +436,14 @@ turretPositions =
         |> List.map (Tuple.mapBoth ((*) dst) ((*) dst) >> Pt.xy)
 
 
-turretsForLevel : Env -> Int -> List Turret
-turretsForLevel env level_ =
+turretsForLevel : Float -> Int -> List Turret
+turretsForLevel clock level_ =
     let
         level =
             modBy 4 level_
     in
     List.take (level + 1) turretPositions
-        |> List.map (initTurret env)
+        |> List.map (initTurret clock)
 
 
 type alias Game =
@@ -454,8 +454,12 @@ type alias Game =
 
 initialGame : Game
 initialGame =
-    { world = initialWorld
-    , level = 0
+    let
+        level =
+            3
+    in
+    { world = initialWorld (turretsForLevel 0 level)
+    , level = level
     }
 
 
@@ -474,7 +478,7 @@ updateGame env game =
                 game.level + 1
         in
         { game
-            | world = { world | turrets = turretsForLevel env nextLevel }
+            | world = { world | turrets = turretsForLevel env.clock nextLevel }
             , level = game.level + 1
         }
 

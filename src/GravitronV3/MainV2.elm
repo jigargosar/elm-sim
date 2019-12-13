@@ -188,18 +188,22 @@ bulletToExplosion env bullet =
 
 updateBullets : Env -> BulletCtx bc -> List Bullet -> ( List Explosion, List Bullet )
 updateBullets env ctx =
-    List.Extra.select
-        >> List.foldr
-            (\( bullet, otherBullets ) ->
-                if isBulletIntersecting ctx otherBullets bullet then
-                    Tuple.mapFirst
-                        ((::) (bulletToExplosion env bullet))
+    let
+        reducer :
+            ( Bullet, List Bullet )
+            -> ( List Explosion, List Bullet )
+            -> ( List Explosion, List Bullet )
+        reducer ( bullet, otherBullets ) =
+            if isBulletIntersecting ctx otherBullets bullet then
+                Tuple.mapFirst
+                    ((::) (bulletToExplosion env bullet))
 
-                else
-                    Tuple.mapSecond
-                        ((::) (updateBullet env ctx bullet))
-            )
-            ( [], [] )
+            else
+                Tuple.mapSecond
+                    ((::) (updateBullet env ctx bullet))
+    in
+    List.Extra.select
+        >> List.foldr reducer ( [], [] )
 
 
 viewBullet : Bullet -> Shape

@@ -230,7 +230,10 @@ updateTurret env p turret =
         ( TurretResponse [], turret )
 
 
-accumTurretResponseInto : TurretResponse -> ( TurretResponse, Turret ) -> ( TurretResponse, Turret )
+accumTurretResponseInto :
+    TurretResponse
+    -> ( TurretResponse, Turret )
+    -> ( TurretResponse, Turret )
 accumTurretResponseInto resAcc =
     Tuple.mapFirst
         (\{ bullets } -> { resAcc | bullets = resAcc.bullets ++ bullets })

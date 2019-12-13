@@ -365,10 +365,10 @@ viewFilledCircle color radius position =
 
 
 
--- Game
+-- World
 
 
-type alias Game =
+type alias World =
     { player : Player
     , turrets : List Turret
     , bullets : List Bullet
@@ -376,8 +376,8 @@ type alias Game =
     }
 
 
-initialGame : Game
-initialGame =
+initialWorld : World
+initialWorld =
     { player = initialPlayer
     , turrets = [ initialTurret ]
     , bullets = []
@@ -385,8 +385,8 @@ initialGame =
     }
 
 
-stepGame : Env -> Game -> Game
-stepGame env game =
+stepWorld : Env -> World -> World
+stepWorld env game =
     let
         ( turretResponse, turrets ) =
             updateTurrets env game game.turrets
@@ -404,24 +404,8 @@ stepGame env game =
     }
 
 
-updateGame : Env -> Game -> Game
-updateGame env model =
-    let
-        newModel =
-            stepGame env model
-
-        isStageComplete =
-            newModel.turrets |> List.isEmpty
-    in
-    if isStageComplete then
-        { newModel | turrets = initialGame.turrets }
-
-    else
-        newModel
-
-
-viewGame : Env -> Game -> Shape
-viewGame env game =
+viewWorld : Env -> World -> Shape
+viewWorld env game =
     group
         [ viewPlayer game.player
         , List.map viewTurret game.turrets
@@ -430,6 +414,49 @@ viewGame env game =
             |> group
         , List.map (viewExplosion env) game.explosions
             |> group
+        ]
+
+
+
+-- Game
+
+
+type alias Game =
+    { world : World
+    , stage : Int
+    }
+
+
+initialGame : Game
+initialGame =
+    { world = initialWorld
+    , stage = 0
+    }
+
+
+updateGame : Env -> Game -> Game
+updateGame env game =
+    let
+        world =
+            stepWorld env game.world
+
+        isStageComplete =
+            world.turrets |> List.isEmpty
+    in
+    if isStageComplete then
+        { game
+            | world = { world | turrets = initialWorld.turrets }
+            , stage = game.stage + 1
+        }
+
+    else
+        { game | world = world }
+
+
+viewGame : Env -> Game -> Shape
+viewGame env game =
+    group
+        [ viewWorld env game.world
         ]
 
 

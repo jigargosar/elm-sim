@@ -108,3 +108,13 @@ stepRandomSeeded : Generator a -> { b | seed : Seed } -> ( a, { b | seed : Seed 
 stepRandomSeeded random model =
     Random.step random model.seed
         |> Tuple.mapSecond (\seed -> { model | seed = seed })
+
+
+rejectWhen : (a -> Bool) -> List a -> List a
+rejectWhen isNotOk =
+    keepWhen (isNotOk >> not)
+
+
+keepWhen : (a -> Bool) -> List a -> List a
+keepWhen =
+    List.filter

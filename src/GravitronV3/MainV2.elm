@@ -8,6 +8,7 @@ import GravitronV3.Timer as Timer exposing (Timer)
 import GravitronV3.Vec as Vec exposing (Vec, vec)
 import Html exposing (Html)
 import Json.Decode as D
+import PointFree exposing (rejectWhen)
 import Random exposing (Generator, Seed)
 import Random.Float
 import Task
@@ -20,9 +21,26 @@ import Update.Pipeline exposing (..)
 -- mappers
 
 
+setVelocity : a -> { b | velocity : a } -> { b | velocity : a }
+setVelocity velocity model =
+    { model | velocity = velocity }
+
+
 mapVelocity : (b -> b) -> { a | velocity : b } -> { a | velocity : b }
 mapVelocity func model =
     { model | velocity = func model.velocity }
+
+
+type alias PosVel a =
+    { a
+        | position : Vec
+        , velocity : Vec
+    }
+
+
+mapVelocityWithPosition : (PosVel a -> Vec) -> PosVel a -> PosVel a
+mapVelocityWithPosition func model =
+    { model | velocity = func model }
 
 
 mapVelocityAndSeed : (b -> a -> ( b, a )) -> { c | velocity : b, seed : a } -> { c | velocity : b, seed : a }
@@ -43,9 +61,9 @@ circleCircleCollision c1 c2 =
     Vec.lenFrom c1.position c2.position < c1.radius + c2.radius
 
 
-translatePosByVel : { a | position : Vec, velocity : Vec } -> { a | position : Vec, velocity : Vec }
-translatePosByVel m =
-    { m | position = Vec.add m.position m.velocity }
+translatePosByVel : PosVel a -> Vec
+translatePosByVel model =
+    Vec.add model.position model.velocity
 
 
 randomWalkerVelocity : Vec -> Generator Vec
@@ -64,13 +82,9 @@ randomWalkerVelocity velocity =
             )
 
 
-stepRandomWalkerVelocity : { a | velocity : Vec, seed : Seed } -> { a | velocity : Vec, seed : Seed }
-stepRandomWalkerVelocity m =
-    let
-        ( v, s ) =
-            Random.step (randomWalkerVelocity m.velocity) m.seed
-    in
-    { m | velocity = v, seed = s }
+stepRandomWalkerVelocity : Vec -> Seed -> ( Vec, Seed )
+stepRandomWalkerVelocity velocity seed =
+    Random.step (randomWalkerVelocity velocity) seed
 
 
 bounceWithinScreenHelp : Screen -> Vec -> Float -> Vec -> Vec
@@ -103,21 +117,18 @@ bounceWithinScreenHelp screen position bounceFactor velocity =
         newBouncedVelocity
 
 
-bounceWithinScreen : { a | screen : Screen } -> Float -> { b | position : Vec, velocity : Vec } -> { b | position : Vec, velocity : Vec }
+bounceWithinScreen : Env -> Float -> { b | position : Vec, velocity : Vec } -> Vec
 bounceWithinScreen env factor m =
-    { m | velocity = bounceWithinScreenHelp env.screen m.position factor m.velocity }
+    bounceWithinScreenHelp env.screen m.position factor m.velocity
 
 
-gravitateTo : { a | position : Vec } -> { b | position : Vec, velocity : Vec } -> { b | position : Vec, velocity : Vec }
-gravitateTo target m =
-    { m
-        | velocity =
-            m.velocity
-                |> Vec.add
-                    (Vec.fromTo m.position target.position
-                        |> Vec.mapMagnitude (\mag -> 20 / mag)
-                    )
-    }
+gravitateTo : PosVel target -> PosVel model -> Vec
+gravitateTo target model =
+    model.velocity
+        |> Vec.add
+            (Vec.fromTo model.position target.position
+                |> Vec.mapMagnitude (\mag -> 20 / mag)
+            )
 
 
 
@@ -143,9 +154,9 @@ initialPlayer =
 
 updatePlayer : Env -> Player -> Player
 updatePlayer env =
-    stepRandomWalkerVelocity
-        >> bounceWithinScreen env 1
-        >> translatePosByVel
+    mapVelocityAndSeed stepRandomWalkerVelocity
+        >> mapVelocityWithPosition (bounceWithinScreen env 1)
+        >> mapVelocityWithPosition translatePosByVel
 
 
 viewPlayer : Player -> Shape
@@ -187,32 +198,27 @@ setPosVelFromTo src target m =
     }
 
 
-rejectWhenIntersects ctx b =
-    if circleCircleCollision b ctx.player then
-        Nothing
-
-    else
-        List.filterMap
-            (\turret ->
-                if circleCircleCollision b turret then
-                    Nothing
-
-                else
-                    Just b
-            )
-            [ ctx.turret ]
-            |> Just
+isBulletIntersecting : BulletCtx bc -> Bullet -> Bool
+isBulletIntersecting ctx b =
+    circleCircleCollision b ctx.player
+        || List.any (circleCircleCollision b) [ ctx.turret ]
 
 
-updateBullets : Env -> { a | player : Player, turret : Turret } -> List Bullet -> List Bullet
+type alias BulletCtx a =
+    { a
+        | player : Player
+        , turret : Turret
+    }
+
+
+updateBullets : Env -> BulletCtx bc -> List Bullet -> List Bullet
 updateBullets env ctx =
-    List.filterMap
-        (gravitateTo ctx.player
-            >> bounceWithinScreen env 1
-            >> translatePosByVel
-            >> rejectWhenIntersects ctx
+    List.map
+        (mapVelocityWithPosition (gravitateTo ctx.player)
+            >> mapVelocityWithPosition (bounceWithinScreen env 0.5)
+            >> mapVelocityWithPosition translatePosByVel
         )
-        >> List.concat
+        >> rejectWhen (isBulletIntersecting ctx)
 
 
 viewBullet : Bullet -> Shape

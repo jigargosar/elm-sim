@@ -186,17 +186,28 @@ bulletToExplosion env bullet =
     newExplosion env.clock bullet.position (viewBulletShape bullet)
 
 
-updateBullets : Env -> BulletCtx bc -> List Bullet -> ( List Explosion, List Bullet )
+type alias BulletResponse =
+    { explosions : List Explosion
+    }
+
+
+updateBullets : Env -> BulletCtx bc -> List Bullet -> ( BulletResponse, List Bullet )
 updateBullets env ctx =
     let
         addExplosion bullet =
             Tuple.mapFirst
-                ((::) (bulletToExplosion env bullet))
+                (\res ->
+                    { res
+                        | explosions =
+                            bulletToExplosion env bullet
+                                :: res.explosions
+                    }
+                )
 
         reducer :
             ( Bullet, List Bullet )
-            -> ( List Explosion, List Bullet )
-            -> ( List Explosion, List Bullet )
+            -> ( BulletResponse, List Bullet )
+            -> ( BulletResponse, List Bullet )
         reducer ( bullet, otherBullets ) =
             if isBulletIntersecting ctx otherBullets bullet then
                 addExplosion bullet
@@ -206,7 +217,7 @@ updateBullets env ctx =
                     ((::) (updateBullet env ctx bullet))
     in
     List.Extra.select
-        >> List.foldr reducer ( [], [] )
+        >> List.foldr reducer ( BulletResponse [], [] )
 
 
 viewBullet : Bullet -> Shape
@@ -380,7 +391,7 @@ updateGame env game =
         ( turretResponse, turrets ) =
             updateTurrets env game game.turrets
 
-        ( bulletExplosions, bullets ) =
+        ( bulletResponse, bullets ) =
             updateBullets env game game.bullets
     in
     { game
@@ -389,7 +400,7 @@ updateGame env game =
         , bullets = turretResponse.bullets ++ bullets
         , explosions =
             updateExplosions env game.explosions
-                ++ bulletExplosions
+                ++ bulletResponse.explosions
     }
 
 

@@ -4,6 +4,7 @@ import Browser
 import Browser.Events as E
 import GravitronV3.Canvas exposing (..)
 import GravitronV3.Point as Pt exposing (Point)
+import GravitronV3.RigidBody as RigidBody
 import GravitronV3.Screen as Screen exposing (Screen)
 import GravitronV3.Timer as Timer exposing (Timer)
 import GravitronV3.Vec as Vec exposing (Vec, vec)
@@ -38,11 +39,6 @@ type alias Circular a =
 
 type alias CircularBody a =
     RigidBody (Circular a)
-
-
-mapVelocityWithPosition : (RigidBody a -> Vec) -> RigidBody a -> RigidBody a
-mapVelocityWithPosition func model =
-    { model | velocity = func model }
 
 
 mapPositionWithVelocity : (RigidBody a -> Point) -> RigidBody a -> RigidBody a
@@ -162,7 +158,7 @@ initialPlayer =
 updatePlayer : Env -> Player -> Player
 updatePlayer env =
     mapVelocityAndSeed stepRandomWalkerVelocity
-        >> mapVelocityWithPosition (bounceWithinScreen env 1)
+        >> RigidBody.updateVelocity (bounceWithinScreen env 1)
         >> mapPositionWithVelocity translatePosByVel
 
 
@@ -222,8 +218,8 @@ type alias BulletCtx a =
 updateBullets : Env -> BulletCtx bc -> List Bullet -> List Bullet
 updateBullets env ctx =
     List.map
-        (mapVelocityWithPosition (gravitateTo ctx.player)
-            >> mapVelocityWithPosition (bounceWithinScreen env 0.5)
+        (RigidBody.updateVelocity (gravitateTo ctx.player)
+            >> RigidBody.updateVelocity (bounceWithinScreen env 0.5)
             >> mapPositionWithVelocity translatePosByVel
         )
         >> rejectWhen (isBulletIntersecting ctx)

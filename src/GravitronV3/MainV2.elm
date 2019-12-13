@@ -218,8 +218,9 @@ type alias TurretResponse =
 
 
 type alias TurretCtx tc =
-    { player : Player
-    , bullets : List Bullet
+    { tc
+        | player : Player
+        , bullets : List Bullet
     }
 
 
@@ -245,11 +246,11 @@ accumTurretResponseInto resAcc =
         (\{ bullets } -> { resAcc | bullets = resAcc.bullets ++ bullets })
 
 
-updateTurrets : Env -> Player -> List Turret -> ( TurretResponse, List Turret )
-updateTurrets env player =
+updateTurrets : Env -> TurretCtx tc -> List Turret -> ( TurretResponse, List Turret )
+updateTurrets env ctx =
     List.Extra.mapAccuml
         (\resAcc ->
-            updateTurret env player
+            updateTurret env ctx
                 >> accumTurretResponseInto resAcc
         )
         (TurretResponse [])
@@ -293,7 +294,7 @@ updateGame : Env -> Game -> Game
 updateGame env game =
     let
         ( turretResponse, turrets ) =
-            updateTurrets env game.player game.turrets
+            updateTurrets env game game.turrets
 
         bullets =
             updateBullets env game game.bullets

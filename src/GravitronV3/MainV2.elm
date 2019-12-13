@@ -319,28 +319,16 @@ updateTurrets env ctx =
         reducer : Turret -> ( TurretResponse, List Turret ) -> ( TurretResponse, List Turret )
         reducer turret =
             if isTurretIntersecting ctx turret then
-                Tuple.mapFirst
-                    (\res ->
-                        { res
-                            | explosions =
-                                turretToExplosion env turret
-                                    :: res.explosions
-                        }
-                    )
+                respondWithExplosion (turretToExplosion env turret)
 
             else if Timer.isDone env.clock turret.bulletTimer then
-                Tuple.mapBoth
-                    (\res ->
-                        { res
-                            | bullets =
-                                (initBullet |> setPosVelFromTo turret ctx.player)
-                                    :: res.bullets
-                        }
-                    )
-                    ((::) { turret | bulletTimer = Timer.restart env.clock turret.bulletTimer })
+                respondWithBullet
+                    (initBullet |> setPosVelFromTo turret ctx.player)
+                    >> respondWithEntity
+                        { turret | bulletTimer = Timer.restart env.clock turret.bulletTimer }
 
             else
-                Tuple.mapSecond ((::) turret)
+                respondWithEntity turret
     in
     List.foldr reducer ( emptyTurretResponse, [] )
 

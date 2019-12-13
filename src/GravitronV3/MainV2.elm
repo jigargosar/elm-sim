@@ -322,6 +322,18 @@ updateExplosions env =
     rejectWhen (.timer >> Timer.isDone env.clock)
 
 
+viewExplosion : Env -> Explosion -> Shape
+viewExplosion env { position, timer, shape } =
+    let
+        progress =
+            Timer.value env.clock timer
+    in
+    shape
+        |> fade (1 - progress)
+        |> scale (1 + progress)
+        |> move (Pt.toTuple position)
+
+
 
 -- ViewHelpers
 
@@ -372,13 +384,15 @@ updateGame env game =
     }
 
 
-viewGame : Game -> Shape
-viewGame game =
+viewGame : Env -> Game -> Shape
+viewGame env game =
     group
         [ viewPlayer game.player
         , List.map viewTurret game.turrets
             |> group
         , List.map viewBullet game.bullets
+            |> group
+        , List.map (viewExplosion env) game.explosions
             |> group
         ]
 
@@ -394,9 +408,13 @@ type Msg
 
 
 view : Model -> Html Msg
-view { screen, clock, game } =
-    renderShapes screen
-        [ viewGame game ]
+view model =
+    let
+        env =
+            toEnv model
+    in
+    renderShapes env.screen
+        [ viewGame env model.game ]
 
 
 type alias Model =
@@ -425,6 +443,14 @@ init _ =
     )
 
 
+toEnv : Model -> Env
+toEnv model =
+    { mousePosition = model.mousePosition
+    , screen = model.screen
+    , clock = model.clock
+    }
+
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update message model =
     case message of
@@ -435,10 +461,7 @@ update message model =
             let
                 env : Env
                 env =
-                    { mousePosition = model.mousePosition
-                    , screen = model.screen
-                    , clock = model.clock
-                    }
+                    toEnv model
             in
             save
                 { model

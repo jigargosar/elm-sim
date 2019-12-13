@@ -10,6 +10,7 @@ import GravitronV3.Timer as Timer exposing (Timer)
 import GravitronV3.Vec as Vec exposing (Vec, vec)
 import Html exposing (Html)
 import Json.Decode as D
+import List.Extra
 import PointFree exposing (rejectWhen)
 import Random exposing (Generator, Seed)
 import Random.Float
@@ -161,13 +162,13 @@ setPosVelFromTo src target m =
 isBulletIntersecting : BulletCtx bc -> Bullet -> Bool
 isBulletIntersecting ctx b =
     RigidBody.doCircleOverlap b ctx.player
-        || List.any (RigidBody.doCircleOverlap b) [ ctx.turret ]
+        || List.any (RigidBody.doCircleOverlap b) ctx.turrets
 
 
 type alias BulletCtx a =
     { a
         | player : Player
-        , turret : Turret
+        , turrets : List Turret
     }
 
 
@@ -229,6 +230,17 @@ updateTurret env p turret =
         ( TurretResponse [], turret )
 
 
+updateTurrets : Env -> Player -> List Turret -> ( TurretResponse, List Turret )
+updateTurrets env player =
+    List.Extra.mapAccuml
+        (\res ->
+            updateTurret env player
+                >> Tuple.mapFirst
+                    (\{ bullets } -> { res | bullets = res.bullets ++ bullets })
+        )
+        (TurretResponse [])
+
+
 viewTurret : Turret -> Shape
 viewTurret { position, radius } =
     viewFilledCircle "red" radius position
@@ -250,7 +262,7 @@ viewFilledCircle color radius position =
 
 type alias Game =
     { player : Player
-    , turret : Turret
+    , turrets : List Turret
     , bullets : List Bullet
     }
 
@@ -258,7 +270,7 @@ type alias Game =
 initialGame : Game
 initialGame =
     { player = initialPlayer
-    , turret = initialTurret
+    , turrets = [ initialTurret ]
     , bullets = []
     }
 
@@ -266,15 +278,15 @@ initialGame =
 updateGame : Env -> Game -> Game
 updateGame env game =
     let
-        ( turretResponse, turret ) =
-            updateTurret env game.player game.turret
+        ( turretResponse, turrets ) =
+            updateTurrets env game.player game.turrets
 
         bullets =
             updateBullets env game game.bullets
     in
     { game
         | player = updatePlayer env game.player
-        , turret = turret
+        , turrets = turrets
         , bullets = turretResponse.bullets ++ bullets
     }
 
@@ -283,7 +295,8 @@ viewGame : Game -> Shape
 viewGame game =
     group
         [ viewPlayer game.player
-        , viewTurret game.turret
+        , List.map viewTurret game.turrets
+            |> group
         , List.map viewBullet game.bullets
             |> group
         ]

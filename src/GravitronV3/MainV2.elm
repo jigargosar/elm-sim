@@ -49,16 +49,6 @@ pointToTuple (Point vec) =
 -- mappers
 
 
-setVelocity : a -> { b | velocity : a } -> { b | velocity : a }
-setVelocity velocity model =
-    { model | velocity = velocity }
-
-
-mapVelocity : (b -> b) -> { a | velocity : b } -> { a | velocity : b }
-mapVelocity func model =
-    { model | velocity = func model.velocity }
-
-
 type alias PosVel a =
     { a
         | position : Point

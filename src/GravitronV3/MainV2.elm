@@ -193,24 +193,28 @@ type alias BulletResponse =
     }
 
 
+respondWithExplosion explosion =
+    Tuple.mapFirst (\res -> { res | explosions = explosion :: res.explosions })
+
+
+respondWithEntity entity =
+    Tuple.mapSecond ((::) entity)
+
+
 updateBullets : Env -> BulletCtx bc -> List Bullet -> ( BulletResponse, List Bullet )
 updateBullets env ctx =
     let
-        addExplosion explosion =
-            Tuple.mapFirst
-                (\res -> { res | explosions = explosion :: res.explosions })
-
         reducer :
             ( Bullet, List Bullet )
             -> ( BulletResponse, List Bullet )
             -> ( BulletResponse, List Bullet )
         reducer ( bullet, otherBullets ) =
             if isBulletIntersecting ctx otherBullets bullet then
-                addExplosion (bulletToExplosion env bullet)
+                respondWithExplosion (bulletToExplosion env bullet)
 
             else
-                Tuple.mapSecond
-                    ((::) (updateBullet env ctx bullet))
+                respondWithEntity
+                    (updateBullet env ctx bullet)
     in
     List.Extra.select
         >> List.foldr reducer ( BulletResponse [], [] )

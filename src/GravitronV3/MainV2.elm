@@ -397,7 +397,7 @@ updateGame env game =
     { game
         | player = updatePlayer env game.player
         , turrets = turrets
-        , bullets = turretResponse.bullets ++ bullets
+        , bullets = bullets ++ turretResponse.bullets
         , explosions =
             updateExplosions env game.explosions
                 ++ bulletResponse.explosions

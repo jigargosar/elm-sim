@@ -1,7 +1,8 @@
-module GravitronV3.RigidBody exposing (RigidBody, step)
+module GravitronV3.RigidBody exposing (RigidBody, step, stepSeed)
 
 import GravitronV3.Point as Point exposing (Point)
 import GravitronV3.Vec exposing (Vec)
+import Random exposing (Generator, Seed)
 
 
 type alias RigidBody a =
@@ -20,6 +21,20 @@ step : List (RigidBody a -> Vec) -> RigidBody a -> RigidBody a
 step funcList =
     stepVelocity funcList
         >> stepPosition
+
+
+type alias RigidBodyWithSeed a =
+    RigidBody { a | seed : Seed }
+
+
+stepSeed : Generator (RigidBodyWithSeed a -> Vec) -> RigidBodyWithSeed a -> RigidBodyWithSeed a
+stepSeed gen model =
+    let
+        ( func, newSeed ) =
+            Random.step gen model.seed
+    in
+    { model | seed = newSeed }
+        |> step [ func ]
 
 
 stepPosition : RigidBody a -> RigidBody a

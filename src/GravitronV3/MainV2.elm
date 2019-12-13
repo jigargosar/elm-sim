@@ -43,6 +43,11 @@ mapVelocityWithPosition func model =
     { model | velocity = func model }
 
 
+mapPositionWithVelocity : (PosVel a -> Vec) -> PosVel a -> PosVel a
+mapPositionWithVelocity func model =
+    { model | position = func model }
+
+
 mapVelocityAndSeed : (b -> a -> ( b, a )) -> { c | velocity : b, seed : a } -> { c | velocity : b, seed : a }
 mapVelocityAndSeed func model =
     let
@@ -156,7 +161,7 @@ updatePlayer : Env -> Player -> Player
 updatePlayer env =
     mapVelocityAndSeed stepRandomWalkerVelocity
         >> mapVelocityWithPosition (bounceWithinScreen env 1)
-        >> mapVelocityWithPosition translatePosByVel
+        >> mapPositionWithVelocity translatePosByVel
 
 
 viewPlayer : Player -> Shape
@@ -201,7 +206,10 @@ setPosVelFromTo src target m =
 isBulletIntersecting : BulletCtx bc -> Bullet -> Bool
 isBulletIntersecting ctx b =
     circleCircleCollision b ctx.player
-        || List.any (circleCircleCollision b) [ ctx.turret ]
+
+
+
+-- || List.any (circleCircleCollision b) [ ctx.turret ]
 
 
 type alias BulletCtx a =
@@ -215,8 +223,9 @@ updateBullets : Env -> BulletCtx bc -> List Bullet -> List Bullet
 updateBullets env ctx =
     List.map
         (mapVelocityWithPosition (gravitateTo ctx.player)
-            >> mapVelocityWithPosition (bounceWithinScreen env 0.5)
-            >> mapVelocityWithPosition translatePosByVel
+            >> Debug.log "g"
+            -->> mapVelocityWithPosition (bounceWithinScreen env 0.5)
+            >> mapPositionWithVelocity translatePosByVel
         )
         >> rejectWhen (isBulletIntersecting ctx)
 

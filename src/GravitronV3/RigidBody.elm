@@ -11,6 +11,11 @@ type alias RigidBody a =
     }
 
 
-stepVelocity : (RigidBody a -> Vec) -> RigidBody a -> RigidBody a
-stepVelocity func model =
+stepVelocity : List (RigidBody a -> Vec) -> RigidBody a -> RigidBody a
+stepVelocity funcLst model =
+    List.foldl updateVelocity model funcLst
+
+
+updateVelocity : (RigidBody a -> Vec) -> RigidBody a -> RigidBody a
+updateVelocity func model =
     { model | velocity = func model }

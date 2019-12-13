@@ -158,7 +158,7 @@ initialPlayer =
 updatePlayer : Env -> Player -> Player
 updatePlayer env =
     mapVelocityAndSeed stepRandomWalkerVelocity
-        >> RigidBody.stepVelocity (bounceWithinScreen env 1)
+        >> RigidBody.stepVelocity [ bounceWithinScreen env 1 ]
         >> mapPositionWithVelocity translatePosByVel
 
 
@@ -218,8 +218,10 @@ type alias BulletCtx a =
 updateBullets : Env -> BulletCtx bc -> List Bullet -> List Bullet
 updateBullets env ctx =
     List.map
-        (RigidBody.stepVelocity (gravitateTo ctx.player)
-            >> RigidBody.stepVelocity (bounceWithinScreen env 0.5)
+        (RigidBody.stepVelocity
+            [ gravitateTo ctx.player
+            , bounceWithinScreen env 0.5
+            ]
             >> mapPositionWithVelocity translatePosByVel
         )
         >> rejectWhen (isBulletIntersecting ctx)

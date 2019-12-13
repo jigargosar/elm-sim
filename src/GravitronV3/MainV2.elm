@@ -298,14 +298,13 @@ accumTurretResponseInto resAcc =
         (\{ bullets } -> { resAcc | bullets = resAcc.bullets ++ bullets })
 
 
+isTurretIntersecting : TurretCtx tc -> Turret -> Bool
+isTurretIntersecting ctx turret =
+    List.any (RigidBody.doCircleOverlap turret) ctx.bullets
 
-{-
-   isTurretIntersecting : TurretCtx tc -> Turret -> Bool
-   isTurretIntersecting ctx b =
-       RigidBody.doCircleOverlap b ctx.player
-           || List.any (RigidBody.doCircleOverlap b) ctx.bullets
 
--}
+
+-- || RigidBody.doCircleOverlap turret ctx.player
 
 
 updateTurrets : Env -> TurretCtx tc -> List Turret -> ( TurretResponse, List Turret )
@@ -316,6 +315,7 @@ updateTurrets env ctx =
                 >> accumTurretResponseInto resAcc
         )
         (TurretResponse [])
+        >> Tuple.mapSecond (rejectWhen (isTurretIntersecting ctx))
 
 
 viewTurret : Turret -> Shape

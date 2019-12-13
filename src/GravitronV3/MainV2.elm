@@ -61,8 +61,8 @@ randomWalkerVelocityGenHelp velocity =
             )
 
 
-randomWalkerVelocityGen : RigidBody a -> Generator Vec
-randomWalkerVelocityGen { velocity } =
+randomWalk : RigidBody a -> Generator Vec
+randomWalk { velocity } =
     randomWalkerVelocityGenHelp velocity
 
 
@@ -135,7 +135,7 @@ initialPlayer =
 updatePlayer : Env -> Player -> Player
 updatePlayer env =
     RigidBody.stepWithSeed
-        [ randomWalkerVelocityGen
+        [ randomWalk
         , bounceWithinScreen env 1 >> Random.constant
         ]
 

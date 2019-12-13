@@ -41,11 +41,6 @@ type alias CircularBody a =
     RigidBody (Circular a)
 
 
-mapPositionWithVelocity : (RigidBody a -> Point) -> RigidBody a -> RigidBody a
-mapPositionWithVelocity func model =
-    { model | position = func model }
-
-
 mapVelocityAndSeed : (b -> a -> ( b, a )) -> { c | velocity : b, seed : a } -> { c | velocity : b, seed : a }
 mapVelocityAndSeed func model =
     let
@@ -64,11 +59,6 @@ doCircleOverlap c1 c2 =
     Vec.lenFrom (c1.position |> Pt.toTuple |> Vec.fromTuple)
         (c2.position |> Pt.toTuple |> Vec.fromTuple)
         < (c1.radius + c2.radius)
-
-
-translatePosByVel : RigidBody a -> Point
-translatePosByVel model =
-    Pt.moveBy model.velocity model.position
 
 
 randomWalkerVelocity : Vec -> Generator Vec
@@ -158,8 +148,7 @@ initialPlayer =
 updatePlayer : Env -> Player -> Player
 updatePlayer env =
     mapVelocityAndSeed stepRandomWalkerVelocity
-        >> RigidBody.stepVelocity [ bounceWithinScreen env 1 ]
-        >> mapPositionWithVelocity translatePosByVel
+        >> RigidBody.step [ bounceWithinScreen env 1 ]
 
 
 viewPlayer : Player -> Shape
@@ -218,11 +207,10 @@ type alias BulletCtx a =
 updateBullets : Env -> BulletCtx bc -> List Bullet -> List Bullet
 updateBullets env ctx =
     List.map
-        (RigidBody.stepVelocity
+        (RigidBody.step
             [ gravitateTo ctx.player
             , bounceWithinScreen env 0.5
             ]
-            >> mapPositionWithVelocity translatePosByVel
         )
         >> rejectWhen (isBulletIntersecting ctx)
 

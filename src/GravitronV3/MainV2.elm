@@ -210,9 +210,11 @@ viewBullet bullet =
 
 viewBulletShape : Bullet -> Shape
 viewBulletShape { radius } =
-    circle radius
-        |> fill "black"
-        |> fade 0.7
+    group
+        [ circle radius
+            |> fill "black"
+            |> fade 0.7
+        ]
 
 
 

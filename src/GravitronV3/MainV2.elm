@@ -301,28 +301,30 @@ updateTurrets : Env -> TurretCtx tc -> List Turret -> ( TurretResponse, List Tur
 updateTurrets env ctx =
     let
         reducer : Turret -> ( TurretResponse, List Turret ) -> ( TurretResponse, List Turret )
-        reducer turret ( res, turrets ) =
+        reducer turret =
             if isTurretIntersecting ctx turret then
-                ( { res
-                    | explosions =
-                        turretToExplosion env turret
-                            :: res.explosions
-                  }
-                , turrets
-                )
+                Tuple.mapFirst
+                    (\res ->
+                        { res
+                            | explosions =
+                                turretToExplosion env turret
+                                    :: res.explosions
+                        }
+                    )
 
             else if Timer.isDone env.clock turret.bulletTimer then
-                ( { res
-                    | bullets =
-                        (initBullet |> setPosVelFromTo turret ctx.player)
-                            :: res.bullets
-                  }
-                , { turret | bulletTimer = Timer.restart env.clock turret.bulletTimer }
-                    :: turrets
-                )
+                Tuple.mapBoth
+                    (\res ->
+                        { res
+                            | bullets =
+                                (initBullet |> setPosVelFromTo turret ctx.player)
+                                    :: res.bullets
+                        }
+                    )
+                    ((::) { turret | bulletTimer = Timer.restart env.clock turret.bulletTimer })
 
             else
-                ( res, turret :: turrets )
+                Tuple.mapSecond ((::) turret)
     in
     List.foldr reducer ( emptyTurretResponse, [] )
 

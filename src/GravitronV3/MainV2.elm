@@ -385,8 +385,8 @@ initialGame =
     }
 
 
-updateGame : Env -> Game -> Game
-updateGame env game =
+updateGameHelp : Env -> Game -> Game
+updateGameHelp env game =
     let
         ( turretResponse, turrets ) =
             updateTurrets env game game.turrets
@@ -402,6 +402,15 @@ updateGame env game =
             updateExplosions env game.explosions
                 ++ bulletResponse.explosions
     }
+
+
+updateGame : Env -> Game -> Game
+updateGame env game =
+    let
+        newGame =
+            updateGameHelp env game
+    in
+    newGame
 
 
 viewGame : Env -> Game -> Shape

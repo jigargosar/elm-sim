@@ -153,7 +153,7 @@ type alias Player =
 
 initialPlayer : Player
 initialPlayer =
-    { position = Pt.xy ( 0, 0 )
+    { position = Pt.origin
     , velocity = Vec.fromRTheta 4 0
     , radius = 20
     , seed = Random.initialSeed 1234
@@ -182,7 +182,7 @@ type alias Bullet =
 
 initBullet : Bullet
 initBullet =
-    { position = Pt.xy ( 0, 0 )
+    { position = Pt.origin
     , velocity = Vec.fromRTheta 3 0
     , radius = 10
     }

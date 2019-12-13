@@ -1,4 +1,4 @@
-module GravitronV3.Point exposing (Point, moveBy, toTuple, vecFromTo, xy)
+module GravitronV3.Point exposing (Point, moveBy, origin, toTuple, vecFromTo, xy)
 
 import GravitronV3.Vec as Vec exposing (Vec)
 
@@ -20,6 +20,11 @@ vecFromTo (Point from) (Point to) =
 xy : ( Float, Float ) -> Point
 xy ( x, y ) =
     Point (Vec.vec x y)
+
+
+origin : Point
+origin =
+    xy ( 0, 0 )
 
 
 toTuple : Point -> ( Float, Float )

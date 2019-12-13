@@ -172,29 +172,56 @@ type alias BulletCtx a =
     }
 
 
-updateBullet : Env -> BulletCtx bc -> ( Bullet, List Bullet ) -> Maybe Bullet
+updateBullet : Env -> BulletCtx bc -> ( Bullet, List Bullet ) -> ( Bool, Bullet )
 updateBullet env ctx ( bullet, otherBullets ) =
     if isBulletIntersecting ctx otherBullets bullet then
-        Nothing
+        ( True, bullet )
 
     else
-        bullet
+        ( False
+        , bullet
             |> RigidBody.step
                 [ gravitateTo ctx.player
                 , bounceWithinScreen env 0.5
                 ]
-            |> Just
+        )
 
 
-updateBullets : Env -> BulletCtx bc -> List Bullet -> List Bullet
+updateBullets : Env -> BulletCtx bc -> List Bullet -> ( List Explosion, List Bullet )
 updateBullets env ctx =
     List.Extra.select
-        >> List.filterMap (updateBullet env ctx)
+        >> List.foldr
+            (\( bullet, otherBullets ) ( explosionAcc, bulletAcc ) ->
+                if isBulletIntersecting ctx otherBullets bullet then
+                    ( newExplosion env.clock bullet.position (viewBulletShape bullet)
+                        :: explosionAcc
+                    , bulletAcc
+                    )
+
+                else
+                    ( explosionAcc
+                    , (bullet
+                        |> RigidBody.step
+                            [ gravitateTo ctx.player
+                            , bounceWithinScreen env 0.5
+                            ]
+                      )
+                        :: bulletAcc
+                    )
+            )
+            ( [], [] )
 
 
 viewBullet : Bullet -> Shape
-viewBullet { position, radius } =
-    viewFilledCircle "black" radius position
+viewBullet bullet =
+    viewBulletShape bullet
+        |> move (Pt.toTuple bullet.position)
+
+
+viewBulletShape : Bullet -> Shape
+viewBulletShape { radius } =
+    circle radius
+        |> fill "black"
         |> fade 0.7
 
 
@@ -282,6 +309,25 @@ viewTurret { position, radius } =
 
 
 
+-- Explosion
+
+
+type alias Explosion =
+    { position : Point
+    , shape : Shape
+    , timer : Timer
+    }
+
+
+newExplosion : Float -> Point -> Shape -> Explosion
+newExplosion clock position shape =
+    { position = position
+    , shape = shape
+    , timer = Timer.start clock 120
+    }
+
+
+
 -- ViewHelpers
 
 
@@ -299,6 +345,7 @@ type alias Game =
     { player : Player
     , turrets : List Turret
     , bullets : List Bullet
+    , explosions : List Explosion
     }
 
 
@@ -307,6 +354,7 @@ initialGame =
     { player = initialPlayer
     , turrets = [ initialTurret ]
     , bullets = []
+    , explosions = []
     }
 
 
@@ -316,13 +364,16 @@ updateGame env game =
         ( turretResponse, turrets ) =
             updateTurrets env game game.turrets
 
-        bullets =
+        ( bulletExplosions, bullets ) =
             updateBullets env game game.bullets
     in
     { game
         | player = updatePlayer env game.player
         , turrets = turrets
         , bullets = turretResponse.bullets ++ bullets
+        , explosions =
+            game.explosions
+                ++ bulletExplosions
     }
 
 

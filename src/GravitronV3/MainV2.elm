@@ -121,7 +121,9 @@ updatePlayer env =
 
 viewPlayer : Player -> Shape
 viewPlayer { position, radius } =
-    viewFilledCircle "green" radius position
+    circle radius
+        |> fill "green"
+        |> move (Pt.toTuple position)
 
 
 

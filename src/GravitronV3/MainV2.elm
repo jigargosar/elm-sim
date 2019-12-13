@@ -247,15 +247,6 @@ type alias Turret =
     }
 
 
-initialTurret : Turret
-initialTurret =
-    { position = Pt.xy ( -150, -150 )
-    , velocity = Vec.zero
-    , radius = 25
-    , bulletTimer = Timer.start 0 60
-    }
-
-
 initTurret : Float -> Point -> Turret
 initTurret clock point =
     { position = point

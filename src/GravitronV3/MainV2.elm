@@ -427,7 +427,11 @@ viewWorld env game =
 
 
 turretsForLevel : Env -> Int -> List Turret
-turretsForLevel env level =
+turretsForLevel env level_ =
+    let
+        level =
+            modBy 2 level_
+    in
     case level of
         0 ->
             initialWorld.turrets

@@ -12,14 +12,14 @@ type alias RigidBody a =
     }
 
 
-stepVelocity : List (RigidBody a -> Vec) -> RigidBody a -> RigidBody a
-stepVelocity funcLst model =
-    List.foldl updateVelocity model funcLst
-
-
 step : List (RigidBody a -> Vec) -> RigidBody a -> RigidBody a
 step funcList =
     stepVelocity funcList >> updatePosition
+
+
+stepVelocity : List (RigidBody a -> Vec) -> RigidBody a -> RigidBody a
+stepVelocity funcLst model =
+    List.foldl updateVelocity model funcLst
 
 
 type alias RigidBodyWithSeed a =
@@ -30,6 +30,14 @@ stepWithSeed : (RigidBodyWithSeed a -> Generator Vec) -> RigidBodyWithSeed a -> 
 stepWithSeed gen =
     updateVelocityWithSeed gen
         >> updatePosition
+
+
+stepVelocityWithSeed :
+    List (RigidBodyWithSeed a -> Generator Vec)
+    -> RigidBodyWithSeed a
+    -> RigidBodyWithSeed a
+stepVelocityWithSeed funcList model =
+    List.foldl updateVelocityWithSeed model funcList
 
 
 updatePosition : RigidBody a -> RigidBody a

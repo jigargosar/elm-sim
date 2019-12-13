@@ -18,6 +18,34 @@ import Update.Pipeline exposing (..)
 
 
 
+-- Point
+
+
+type Point
+    = Point Vec
+
+
+movePt : Vec -> Point -> Point
+movePt vec (Point pt) =
+    Point (Vec.add pt vec)
+
+
+vecFromTo : Point -> Point -> Vec
+vecFromTo (Point from) (Point to) =
+    Vec.fromTo from to
+
+
+pointAt : ( Float, Float ) -> Point
+pointAt ( x, y ) =
+    Point (Vec.vec x y)
+
+
+pointToTuple : Point -> ( Float, Float )
+pointToTuple (Point vec) =
+    Vec.toTuple vec
+
+
+
 -- mappers
 
 
@@ -33,7 +61,7 @@ mapVelocity func model =
 
 type alias PosVel a =
     { a
-        | position : Vec
+        | position : Point
         , velocity : Vec
     }
 
@@ -43,7 +71,7 @@ mapVelocityWithPosition func model =
     { model | velocity = func model }
 
 
-mapPositionWithVelocity : (PosVel a -> Vec) -> PosVel a -> PosVel a
+mapPositionWithVelocity : (PosVel a -> Point) -> PosVel a -> PosVel a
 mapPositionWithVelocity func model =
     { model | position = func model }
 
@@ -61,14 +89,16 @@ mapVelocityAndSeed func model =
 -- Helpers
 
 
-circleCircleCollision : { a | position : Vec, radius : Float } -> { b | position : Vec, radius : Float } -> Bool
+circleCircleCollision : { a | position : Point, radius : Float } -> { b | position : Point, radius : Float } -> Bool
 circleCircleCollision c1 c2 =
-    Vec.lenFrom c1.position c2.position < c1.radius + c2.radius
+    Vec.lenFrom (c1.position |> pointToTuple |> Vec.fromTuple)
+        (c2.position |> pointToTuple |> Vec.fromTuple)
+        < (c1.radius + c2.radius)
 
 
-translatePosByVel : PosVel a -> Vec
+translatePosByVel : PosVel a -> Point
 translatePosByVel model =
-    Vec.add model.position model.velocity
+    movePt model.velocity model.position
 
 
 randomWalkerVelocity : Vec -> Generator Vec
@@ -122,16 +152,16 @@ bounceWithinScreenHelp screen position bounceFactor velocity =
         newBouncedVelocity
 
 
-bounceWithinScreen : Env -> Float -> { b | position : Vec, velocity : Vec } -> Vec
+bounceWithinScreen : Env -> Float -> PosVel a -> Vec
 bounceWithinScreen env factor m =
-    bounceWithinScreenHelp env.screen m.position factor m.velocity
+    bounceWithinScreenHelp env.screen (m.position |> (pointToTuple >> Vec.fromTuple)) factor m.velocity
 
 
 gravitateTo : PosVel target -> PosVel model -> Vec
 gravitateTo target model =
     model.velocity
         |> Vec.add
-            (Vec.fromTo model.position target.position
+            (vecFromTo model.position target.position
                 |> Vec.mapMagnitude (\mag -> 20 / mag)
             )
 
@@ -141,7 +171,7 @@ gravitateTo target model =
 
 
 type alias Player =
-    { position : Vec
+    { position : Point
     , velocity : Vec
     , radius : Float
     , seed : Seed
@@ -150,7 +180,7 @@ type alias Player =
 
 initialPlayer : Player
 initialPlayer =
-    { position = Vec.zero
+    { position = pointAt ( 0, 0 )
     , velocity = Vec.fromRTheta 4 0
     , radius = 20
     , seed = Random.initialSeed 1234
@@ -174,7 +204,7 @@ viewPlayer { position, radius } =
 
 
 type alias Bullet =
-    { position : Vec
+    { position : Point
     , velocity : Vec
     , radius : Float
     }
@@ -182,23 +212,27 @@ type alias Bullet =
 
 initBullet : Bullet
 initBullet =
-    { position = Vec.zero
+    { position = pointAt ( 0, 0 )
     , velocity = Vec.fromRTheta 3 0
     , radius = 10
     }
 
 
-setPosVelFromTo : { a | position : Vec, radius : Float } -> { b | position : Vec } -> { c | radius : Float, position : Vec, velocity : Vec } -> { c | radius : Float, position : Vec, velocity : Vec }
+setPosVelFromTo :
+    { a | position : Point, radius : Float }
+    -> { b | position : Point }
+    -> { c | radius : Float, position : Point, velocity : Vec }
+    -> { c | radius : Float, position : Point, velocity : Vec }
 setPosVelFromTo src target m =
     let
         angle =
-            Vec.fromTo src.position target.position
+            vecFromTo src.position target.position
                 |> Vec.angle
     in
     { m
         | position =
-            Vec.add src.position
-                (Vec.fromRTheta (m.radius + src.radius) angle)
+            movePt (Vec.fromRTheta (m.radius + src.radius) angle)
+                src.position
         , velocity = Vec.fromRTheta 3 angle
     }
 
@@ -223,8 +257,7 @@ updateBullets : Env -> BulletCtx bc -> List Bullet -> List Bullet
 updateBullets env ctx =
     List.map
         (mapVelocityWithPosition (gravitateTo ctx.player)
-            >> Debug.log "g"
-            -->> mapVelocityWithPosition (bounceWithinScreen env 0.5)
+            >> mapVelocityWithPosition (bounceWithinScreen env 0.5)
             >> mapPositionWithVelocity translatePosByVel
         )
         >> rejectWhen (isBulletIntersecting ctx)
@@ -241,7 +274,7 @@ viewBullet { position, radius } =
 
 
 type alias Turret =
-    { position : Vec
+    { position : Point
     , velocity : Vec
     , radius : Float
     , bulletTimer : Timer
@@ -250,7 +283,7 @@ type alias Turret =
 
 initialTurret : Turret
 initialTurret =
-    { position = Vec.vec -150 -150
+    { position = pointAt ( -150, -150 )
     , velocity = Vec.zero
     , radius = 25
     , bulletTimer = Timer.start 0 60
@@ -281,7 +314,7 @@ viewTurret { position, radius } =
 viewFilledCircle color radius position =
     circle radius
         |> fill color
-        |> move (Vec.toTuple position)
+        |> move (pointToTuple position)
 
 
 

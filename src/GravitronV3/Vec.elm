@@ -9,6 +9,7 @@ module GravitronV3.Vec exposing
     , fromRec
     , fromTo
     , fromToScaled
+    , fromTuple
     , gravityFrom
     , len
     , len2
@@ -36,6 +37,11 @@ type Vec
 toTuple : Vec -> ( Float, Float )
 toTuple =
     apply Tuple.pair
+
+
+fromTuple : ( Float, Float ) -> Vec
+fromTuple ( x, y ) =
+    vec x y
 
 
 map2 : (Float -> Float -> Float) -> Vec -> Vec -> Vec

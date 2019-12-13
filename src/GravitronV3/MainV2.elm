@@ -470,7 +470,7 @@ updateGame env game =
         in
         { game
             | world = { world | turrets = turretsForLevel env.clock nextLevel }
-            , level = game.level + 1
+            , level = nextLevel
         }
 
     else

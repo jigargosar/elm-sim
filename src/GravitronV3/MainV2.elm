@@ -93,6 +93,39 @@ gravitateTo target model =
 
 
 
+-- Response Helpers
+
+
+respondWithExplosion :
+    Explosion
+    -> ( { b | explosions : List Explosion }, c )
+    -> ( { b | explosions : List Explosion }, c )
+respondWithExplosion explosion =
+    Tuple.mapFirst (\res -> { res | explosions = explosion :: res.explosions })
+
+
+respondWithBullet :
+    Bullet
+    -> ( { b | bullets : List Bullet }, c )
+    -> ( { b | bullets : List Bullet }, c )
+respondWithBullet bullet =
+    Tuple.mapFirst (\res -> { res | bullets = bullet :: res.bullets })
+
+
+respondWithBullets :
+    List Bullet
+    -> ( { b | bullets : List Bullet }, c )
+    -> ( { b | bullets : List Bullet }, c )
+respondWithBullets bullets =
+    Tuple.mapFirst (\res -> { res | bullets = bullets ++ res.bullets })
+
+
+respondWithEntity : a -> ( b, List a ) -> ( b, List a )
+respondWithEntity entity =
+    Tuple.mapSecond ((::) entity)
+
+
+
 -- Player
 
 
@@ -191,19 +224,6 @@ bulletToExplosion env bullet =
 type alias BulletResponse =
     { explosions : List Explosion
     }
-
-
-respondWithExplosion :
-    Explosion
-    -> ( { b | explosions : List Explosion }, c )
-    -> ( { b | explosions : List Explosion }, c )
-respondWithExplosion explosion =
-    Tuple.mapFirst (\res -> { res | explosions = explosion :: res.explosions })
-
-
-respondWithEntity : a -> ( b, List a ) -> ( b, List a )
-respondWithEntity entity =
-    Tuple.mapSecond ((::) entity)
 
 
 updateBullets : Env -> BulletCtx bc -> List Bullet -> ( BulletResponse, List Bullet )

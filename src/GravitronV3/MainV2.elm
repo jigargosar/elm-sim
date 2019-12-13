@@ -24,40 +24,55 @@ import Update.Pipeline exposing (..)
 -- Lifecycle
 
 
-type LifeCycle
+type LifeCycleStage
     = Spawning Timer
     | Alive
     | Dying Timer
     | Dead
 
 
-initLifeCycle : Float -> LifeCycle
-initLifeCycle clock =
-    Spawning (Timer.start clock 120)
-
-
-stepLifeCycle : Float -> LifeCycle -> LifeCycle
-stepLifeCycle clock model =
-    case model of
+stepLifeCycleStage : Float -> LifeCycleRecord -> LifeCycleStage
+stepLifeCycleStage clock { maxHp, stage } =
+    case stage of
         Spawning timer ->
             if Timer.isDone clock timer then
                 Alive
 
             else
-                model
+                stage
 
         Alive ->
-            model
+            stage
 
         Dying timer ->
             if Timer.isDone clock timer then
                 Dead
 
             else
-                model
+                stage
 
         Dead ->
-            model
+            stage
+
+
+type LifeCycle
+    = LifeCycle LifeCycleRecord
+
+
+type alias LifeCycleRecord =
+    { maxHp : Int, stage : LifeCycleStage }
+
+
+initLifeCycle : Float -> Int -> LifeCycle
+initLifeCycle clock maxHp =
+    LifeCycleRecord maxHp (Spawning (Timer.start clock 120))
+        |> LifeCycle
+
+
+stepLifeCycle : Float -> LifeCycle -> LifeCycle
+stepLifeCycle clock (LifeCycle rec) =
+    { rec | stage = stepLifeCycleStage clock rec }
+        |> LifeCycle
 
 
 

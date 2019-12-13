@@ -193,10 +193,15 @@ type alias BulletResponse =
     }
 
 
+respondWithExplosion :
+    Explosion
+    -> ( { b | explosions : List Explosion }, c )
+    -> ( { b | explosions : List Explosion }, c )
 respondWithExplosion explosion =
     Tuple.mapFirst (\res -> { res | explosions = explosion :: res.explosions })
 
 
+respondWithEntity : a -> ( b, List a ) -> ( b, List a )
 respondWithEntity entity =
     Tuple.mapSecond ((::) entity)
 

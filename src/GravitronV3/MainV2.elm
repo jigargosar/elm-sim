@@ -1,6 +1,5 @@
 module GravitronV3.MainV2 exposing (main)
 
-import Basics.Extra exposing (uncurry)
 import Browser
 import Browser.Events as E
 import GravitronV3.Canvas exposing (..)

@@ -93,7 +93,10 @@ bounceWithinScreenHelp screen position bounceFactor velocity =
 
 bounceWithinScreen : Env -> Float -> RigidBody a -> Vec
 bounceWithinScreen env factor m =
-    bounceWithinScreenHelp env.screen (m.position |> (Pt.toTuple >> Vec.fromTuple)) factor m.velocity
+    bounceWithinScreenHelp env.screen
+        (m.position |> (Pt.toTuple >> Vec.fromTuple))
+        factor
+        m.velocity
 
 
 gravitateTo : RigidBody target -> RigidBody model -> Vec

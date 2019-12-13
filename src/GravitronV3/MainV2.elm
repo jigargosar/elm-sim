@@ -217,11 +217,17 @@ type alias TurretResponse =
     { bullets : List Bullet }
 
 
-updateTurret : Env -> Player -> Turret -> ( TurretResponse, Turret )
-updateTurret env p turret =
+type alias TurretCtx tc =
+    { player : Player
+    , bullets : List Bullet
+    }
+
+
+updateTurret : Env -> TurretCtx tc -> Turret -> ( TurretResponse, Turret )
+updateTurret env ctx turret =
     if Timer.isDone env.clock turret.bulletTimer then
         ( TurretResponse
-            [ initBullet |> setPosVelFromTo turret p
+            [ initBullet |> setPosVelFromTo turret ctx.player
             ]
         , { turret | bulletTimer = Timer.restart env.clock turret.bulletTimer }
         )

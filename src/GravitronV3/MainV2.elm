@@ -45,8 +45,8 @@ doCircleOverlap c1 c2 =
         < (c1.radius + c2.radius)
 
 
-randomWalkerVelocityGen : Vec -> Generator Vec
-randomWalkerVelocityGen velocity =
+randomWalkerVelocityGenHelp : Vec -> Generator Vec
+randomWalkerVelocityGenHelp velocity =
     let
         randomAngle : Generator Float
         randomAngle =
@@ -59,6 +59,11 @@ randomWalkerVelocityGen velocity =
                     |> Vec.mapAngle ((+) newAngleDiff)
                     |> Vec.mapMagnitude (max 0.01)
             )
+
+
+randomWalkerVelocityGen : RigidBody a -> Generator Vec
+randomWalkerVelocityGen { velocity } =
+    randomWalkerVelocityGenHelp velocity
 
 
 bounceWithinScreenHelp : Screen -> Vec -> Float -> Vec -> Vec
@@ -130,7 +135,7 @@ initialPlayer =
 updatePlayer : Env -> Player -> Player
 updatePlayer env =
     RigidBody.stepWithSeed
-        [ .velocity >> randomWalkerVelocityGen
+        [ randomWalkerVelocityGen
         , bounceWithinScreen env 1 >> Random.constant
         ]
 

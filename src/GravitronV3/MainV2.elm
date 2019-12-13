@@ -426,14 +426,18 @@ viewWorld env game =
 -- Game
 
 
-turretsForLevel : Int -> List Turret
-turretsForLevel level =
+turretsForLevel : Env -> Int -> List Turret
+turretsForLevel env level =
     case level of
         0 ->
             initialWorld.turrets
 
         1 ->
-            initialWorld.turrets
+            [ initTurret env (Pt.xy ( -150, -150 ))
+            , initTurret env (Pt.xy ( 150, -150 ))
+            , initTurret env (Pt.xy ( -150, 150 ))
+            , initTurret env (Pt.xy ( 150, 150 ))
+            ]
 
         _ ->
             initialWorld.turrets
@@ -467,7 +471,7 @@ updateGame env game =
                 game.level + 1
         in
         { game
-            | world = { world | turrets = turretsForLevel nextLevel }
+            | world = { world | turrets = turretsForLevel env nextLevel }
             , level = game.level + 1
         }
 

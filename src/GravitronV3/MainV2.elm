@@ -11,6 +11,7 @@ import GravitronV3.Vec as Vec exposing (Vec, vec)
 import Html exposing (Html)
 import Json.Decode as D
 import List.Extra
+import PointFree exposing (rejectWhen)
 import Random exposing (Generator, Seed)
 import Random.Float
 import Task
@@ -316,6 +317,11 @@ newExplosion clock position shape =
     }
 
 
+updateExplosions : Env -> List Explosion -> List Explosion
+updateExplosions env =
+    rejectWhen (.timer >> Timer.isDone env.clock)
+
+
 
 -- ViewHelpers
 
@@ -361,7 +367,7 @@ updateGame env game =
         , turrets = turrets
         , bullets = turretResponse.bullets ++ bullets
         , explosions =
-            game.explosions
+            updateExplosions env game.explosions
                 ++ bulletExplosions
     }
 

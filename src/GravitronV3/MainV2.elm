@@ -209,7 +209,7 @@ updateBullet env ctx =
 
 bulletToExplosion : Env -> Bullet -> Explosion
 bulletToExplosion env bullet =
-    newExplosion env.clock bullet.position (bulletToShape bullet)
+    initExplosion env.clock bullet.position (bulletToShape bullet)
 
 
 type alias BulletResponse =
@@ -294,7 +294,7 @@ isTurretIntersecting ctx turret =
 
 turretToExplosion : Env -> Turret -> Explosion
 turretToExplosion env turret =
-    newExplosion env.clock turret.position (turretToShape turret)
+    initExplosion env.clock turret.position (turretToShape turret)
 
 
 resetBulletTimer : Env -> Turret -> Turret
@@ -350,8 +350,8 @@ type alias Explosion =
     }
 
 
-newExplosion : Float -> Point -> Shape -> Explosion
-newExplosion clock position shape =
+initExplosion : Float -> Point -> Shape -> Explosion
+initExplosion clock position shape =
     { position = position
     , shape = shape
     , timer = Timer.start clock 120

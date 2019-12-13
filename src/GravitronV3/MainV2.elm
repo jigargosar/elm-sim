@@ -209,7 +209,7 @@ updateBullet env ctx =
 
 bulletToExplosion : Env -> Bullet -> Explosion
 bulletToExplosion env bullet =
-    initExplosion env.clock bullet.position (bulletToShape bullet)
+    explosionFrom env bulletToShape bullet
 
 
 type alias BulletResponse =
@@ -292,11 +292,6 @@ isTurretIntersecting ctx turret =
 -- || RigidBody.doCircleOverlap turret ctx.player
 
 
-turretToExplosion : Env -> Turret -> Explosion
-turretToExplosion env turret =
-    initExplosion env.clock turret.position (turretToShape turret)
-
-
 resetBulletTimer : Env -> Turret -> Turret
 resetBulletTimer env turret =
     { turret | bulletTimer = Timer.restart env.clock turret.bulletTimer }
@@ -316,7 +311,7 @@ updateTurrets env ctx =
             -> ( TurretResponse, List Turret )
         reducer turret =
             if isTurretIntersecting ctx turret then
-                respondWithExplosion (turretToExplosion env turret)
+                respondWithExplosion (explosionFrom env turretToShape turret)
 
             else if isBulletTimerDone env turret then
                 respondWithBullet
@@ -350,12 +345,23 @@ type alias Explosion =
     }
 
 
-initExplosion : Float -> Point -> Shape -> Explosion
-initExplosion clock position shape =
-    { position = position
-    , shape = shape
-    , timer = Timer.start clock 120
+explosionFrom : Env -> ({ a | position : Point } -> Shape) -> { a | position : Point } -> Explosion
+explosionFrom env func entity =
+    { position = entity.position
+    , shape = func entity
+    , timer = Timer.start env.clock 120
     }
+
+
+
+{-
+   initExplosion : Float -> Point -> Shape -> Explosion
+   initExplosion clock position shape =
+       { position = position
+       , shape = shape
+       , timer = Timer.start clock 120
+       }
+-}
 
 
 updateExplosions : Env -> List Explosion -> List Explosion

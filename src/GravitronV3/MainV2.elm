@@ -214,11 +214,6 @@ updateBullet env ctx =
         ]
 
 
-type alias BulletResponse =
-    { explosions : List Explosion
-    }
-
-
 updateBullets : Env -> BulletCtx bc -> List Bullet -> List Response
 updateBullets env ctx =
     let
@@ -351,17 +346,6 @@ explosionFrom env func entity =
     , shape = func entity
     , timer = Timer.start env.clock 120
     }
-
-
-
-{-
-   initExplosion : Float -> Point -> Shape -> Explosion
-   initExplosion clock position shape =
-       { position = position
-       , shape = shape
-       , timer = Timer.start clock 120
-       }
--}
 
 
 updateExplosions : Env -> List Explosion -> List Explosion

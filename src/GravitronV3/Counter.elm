@@ -1,4 +1,4 @@
-module GravitronV3.Counter exposing (Counter, init, step)
+module GravitronV3.Counter exposing (Counter, init, progress, step)
 
 
 type alias Counter =

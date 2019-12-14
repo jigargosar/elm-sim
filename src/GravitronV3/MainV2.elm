@@ -221,10 +221,6 @@ type alias TurretPlaceholder =
 
 initTurretPlaceholder : Float -> Turret -> TurretPlaceholder
 initTurretPlaceholder delay turret =
-    let
-        _ =
-            Debug.log "delay" delay
-    in
     TurretPlaceholder (Counter.initDelayedBy delay 120) turret.position turret
 
 

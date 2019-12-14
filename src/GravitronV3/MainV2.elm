@@ -541,18 +541,29 @@ turretPositions =
         |> List.map (Tuple.mapBoth ((*) dst) ((*) dst) >> Pt.xy)
 
 
-turretPlaceholdersForLevel : Int -> List TurretPlaceholder
-turretPlaceholdersForLevel level_ =
+getNextLevel ( major, minor ) =
+    if minor >= 4 then
+        ( major + 1 |> modBy maxLevels, 0 )
+
+    else
+        ( major, minor + 1 )
+
+
+turretPlaceholdersForLevel : ( Int, Int ) -> List TurretPlaceholder
+turretPlaceholdersForLevel ( major_, minor_ ) =
     let
-        level =
-            modBy 4 level_
+        major =
+            modBy 4 minor_
+
+        minor =
+            modBy maxLevels major_
     in
-    List.take (level + 1) turretPositions
+    List.take (major + 1) turretPositions
         |> List.map initTurret
         |> List.indexedMap
             (\i ->
                 initTurretPlaceholder
-                    (toFloat i / toFloat (level + 1))
+                    (toFloat i / toFloat (major + 1))
             )
 
 
@@ -587,9 +598,13 @@ levels =
     ]
 
 
+maxLevels =
+    List.length levels
+
+
 type alias Game =
     { world : World
-    , level : Int
+    , level : ( Int, Int )
     }
 
 
@@ -597,7 +612,7 @@ initialGame : Game
 initialGame =
     let
         level =
-            3
+            ( 1, 1 )
     in
     { world = initWorld (turretPlaceholdersForLevel level)
     , level = level
@@ -615,12 +630,30 @@ updateGame env game =
     in
     if isLevelComplete then
         let
-            nextLevel =
-                game.level + 1
+            newLevel =
+                getNextLevel game.level
+
+            majorChanged =
+                Tuple.first game.level /= Tuple.first newLevel
+
+            newTurretPlaceholders =
+                turretPlaceholdersForLevel newLevel
+
+            newWorld =
+                if majorChanged then
+                    { world
+                        | turretPlaceholders = newTurretPlaceholders
+                        , bullets = []
+                    }
+
+                else
+                    { world
+                        | turretPlaceholders = newTurretPlaceholders
+                    }
         in
         { game
-            | world = { world | turretPlaceholders = turretPlaceholdersForLevel nextLevel }
-            , level = nextLevel
+            | world = newWorld
+            , level = newLevel
         }
 
     else

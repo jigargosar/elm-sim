@@ -556,6 +556,37 @@ turretPlaceholdersForLevel level_ =
             )
 
 
+type TurretKind
+    = GravityShooter1
+    | GravityShooter2
+
+
+type alias LevelConfig =
+    List (List TurretKind)
+
+
+level1 : LevelConfig
+level1 =
+    [ [ GravityShooter1 ]
+    , [ GravityShooter1, GravityShooter1 ]
+    , [ GravityShooter1, GravityShooter2 ]
+    , [ GravityShooter2, GravityShooter2 ]
+    , [ GravityShooter2, GravityShooter2, GravityShooter2, GravityShooter2 ]
+    ]
+
+
+levels : List LevelConfig
+levels =
+    [ level1
+    , [ [ GravityShooter1 ]
+      , [ GravityShooter1, GravityShooter1 ]
+      , [ GravityShooter1, GravityShooter2 ]
+      , [ GravityShooter2, GravityShooter2 ]
+      , [ GravityShooter2, GravityShooter2, GravityShooter2, GravityShooter2 ]
+      ]
+    ]
+
+
 type alias Game =
     { world : World
     , level : Int

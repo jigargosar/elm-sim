@@ -305,13 +305,6 @@ isBulletTimerDone env turret =
     Timer.isDone env.clock turret.bulletTimer
 
 
-type Response
-    = AddExplosion Explosion
-    | AddBullet Bullet
-    | AddTurret Turret
-    | Batch (List Response)
-
-
 updateTurret : Env -> TurretCtx tc -> Turret -> Response
 updateTurret env ctx turret =
     if isTurretIntersecting ctx turret then
@@ -406,6 +399,13 @@ initWorld turrets =
     , bullets = []
     , explosions = []
     }
+
+
+type Response
+    = AddExplosion Explosion
+    | AddBullet Bullet
+    | AddTurret Turret
+    | Batch (List Response)
 
 
 flattenResponse : Response -> List Response -> List Response

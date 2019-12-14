@@ -315,6 +315,11 @@ hit hasHP =
     { hasHP | hp = decCurrentHP hasHP.hp }
 
 
+hpPct : HasHP a -> Float
+hpPct { hp } =
+    toFloat hp.current / toFloat hp.max
+
+
 when =
     PF.when
 

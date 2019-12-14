@@ -235,38 +235,38 @@ turretPlaceHolderToShape { counter, turret } =
         |> scale progress
 
 
-updateTurretPlaceHolder : Env -> TurretPlaceholder -> Response
-updateTurretPlaceHolder env model =
+updateTurretPlaceHolder : TurretPlaceholder -> Response
+updateTurretPlaceHolder model =
     let
         ( isDone, counter ) =
             Counter.step model.counter
     in
     if isDone then
-        AddTurret (model.turret |> resetBulletTimer env)
+        AddTurret model.turret
 
     else
         AddTurretPlaceholder { model | counter = counter }
 
 
-updateTurretPlaceHolders : Env -> List TurretPlaceholder -> List Response
-updateTurretPlaceHolders env =
-    List.map (updateTurretPlaceHolder env)
+updateTurretPlaceHolders : List TurretPlaceholder -> List Response
+updateTurretPlaceHolders =
+    List.map updateTurretPlaceHolder
 
 
 type alias Turret =
     { position : Point
     , velocity : Vec
     , radius : Float
-    , bulletTimer : Timer
+    , bulletTimer : Counter
     }
 
 
-initTurret : Float -> Point -> Turret
-initTurret clock point =
+initTurret : Point -> Turret
+initTurret point =
     { position = point
     , velocity = Vec.zero
     , radius = 25
-    , bulletTimer = Timer.start clock 60
+    , bulletTimer = Counter.init 60
     }
 
 
@@ -286,29 +286,27 @@ isTurretIntersecting ctx turret =
 -- || RigidBody.doCircleOverlap turret ctx.player
 
 
-resetBulletTimer : Env -> Turret -> Turret
-resetBulletTimer env turret =
-    { turret | bulletTimer = Timer.restart env.clock turret.bulletTimer }
-
-
-isBulletTimerDone : Env -> Turret -> Bool
-isBulletTimerDone env turret =
-    Timer.isDone env.clock turret.bulletTimer
-
-
 updateTurret : Env -> TurretCtx tc -> Turret -> Response
 updateTurret env ctx turret =
     if isTurretIntersecting ctx turret then
         AddExplosion (explosionFrom env turretToShape turret)
 
-    else if isBulletTimerDone env turret then
-        Batch
-            [ AddBullet (initBullet |> setPosVelFromTo turret ctx.player)
-            , AddTurret (resetBulletTimer env turret)
-            ]
-
     else
-        AddTurret turret
+        let
+            ( isDone, bulletTimer ) =
+                Counter.step turret.bulletTimer
+
+            addTurretResponse =
+                AddTurret { turret | bulletTimer = bulletTimer }
+        in
+        if isDone then
+            Batch
+                [ AddBullet (initBullet |> setPosVelFromTo turret ctx.player)
+                , addTurretResponse
+                ]
+
+        else
+            addTurretResponse
 
 
 updateTurrets : Env -> TurretCtx tc -> List Turret -> List Response
@@ -443,7 +441,7 @@ updateWorld env world =
     }
         |> foldResponses (updateTurrets env world world.turrets)
         |> foldResponses (updateBullets env world world.bullets)
-        |> foldResponses (updateTurretPlaceHolders env world.turretPlaceholders)
+        |> foldResponses (updateTurretPlaceHolders world.turretPlaceholders)
 
 
 viewWorld : Env -> World -> Shape
@@ -501,12 +499,9 @@ turretPlaceholdersForLevel clock level_ =
     let
         level =
             modBy 4 level_
-
-        clockForIdx i =
-            clock - (60 / toFloat (level + 1) * toFloat (level - i))
     in
     List.take (level + 1) turretPositions
-        |> List.indexedMap (\i -> initTurret (clockForIdx i))
+        |> List.map initTurret
         |> List.map (initTurretPlaceholder clock)
 
 

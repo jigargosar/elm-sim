@@ -359,7 +359,7 @@ explosionToShape env { position, timer, shape } =
     in
     shape
         |> fade (1 - progress)
-        |> scale (1 + progress)
+        |> scale (1 + (progress / 2))
 
 
 

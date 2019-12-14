@@ -31,18 +31,18 @@ initDelayedBy delayPct maxSteps_ =
 
 
 step : Counter -> ( Bool, Counter )
-step counter =
-    if counter.current + counter.delay >= counter.maxSteps then
-        ( True, { counter | current = 0 } )
+step ct =
+    if ct.current - ct.delay >= ct.maxSteps then
+        ( True, { ct | current = 0, delay = 0 } )
 
     else
-        ( False, { counter | current = counter.current + 1 } )
+        ( False, { ct | current = ct.current + 1 } )
 
 
 progress : Counter -> Float
 progress ct =
-    if ct.current + ct.delay <= 0 then
+    if ct.current - ct.delay <= 0 then
         0
 
     else
-        toFloat ct.current / toFloat ct.maxSteps
+        toFloat (ct.current - ct.delay) / toFloat ct.maxSteps

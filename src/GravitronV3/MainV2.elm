@@ -221,7 +221,11 @@ type alias TurretPlaceholder =
 
 initTurretPlaceholder : Float -> Turret -> TurretPlaceholder
 initTurretPlaceholder delay turret =
-    TurretPlaceholder (Counter.init 120) turret.position turret
+    let
+        _ =
+            Debug.log "delay" delay
+    in
+    TurretPlaceholder (Counter.initDelayedBy delay 120) turret.position turret
 
 
 turretPlaceHolderToShape : TurretPlaceholder -> Shape
@@ -494,15 +498,19 @@ turretPositions =
         |> List.map (Tuple.mapBoth ((*) dst) ((*) dst) >> Pt.xy)
 
 
-turretPlaceholdersForLevel : Float -> Int -> List TurretPlaceholder
-turretPlaceholdersForLevel clock level_ =
+turretPlaceholdersForLevel : Int -> List TurretPlaceholder
+turretPlaceholdersForLevel level_ =
     let
         level =
             modBy 4 level_
     in
     List.take (level + 1) turretPositions
         |> List.map initTurret
-        |> List.map (initTurretPlaceholder clock)
+        |> List.indexedMap
+            (\i ->
+                initTurretPlaceholder
+                    (toFloat (i + 1) / toFloat (level + 1))
+            )
 
 
 type alias Game =
@@ -517,7 +525,7 @@ initialGame =
         level =
             3
     in
-    { world = initWorld (turretPlaceholdersForLevel 0 level)
+    { world = initWorld (turretPlaceholdersForLevel level)
     , level = level
     }
 
@@ -537,7 +545,7 @@ updateGame env game =
                 game.level + 1
         in
         { game
-            | world = { world | turretPlaceholders = turretPlaceholdersForLevel env.clock nextLevel }
+            | world = { world | turretPlaceholders = turretPlaceholdersForLevel nextLevel }
             , level = nextLevel
         }
 

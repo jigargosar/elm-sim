@@ -452,8 +452,7 @@ updateWorld env world =
         | player = updatePlayer env world.player
         , bullets = []
         , turrets = []
-        , explosions =
-            updateExplosions env world.explosions
+        , explosions = updateExplosions env world.explosions
     }
         |> foldResponses turretResponses
         |> foldResponses bulletResponses

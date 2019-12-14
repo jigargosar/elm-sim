@@ -220,7 +220,7 @@ type alias TurretPlaceholder =
 
 
 initTurretPlaceholder : Float -> Turret -> TurretPlaceholder
-initTurretPlaceholder clock turret =
+initTurretPlaceholder delay turret =
     TurretPlaceholder (Counter.init 120) turret.position turret
 
 

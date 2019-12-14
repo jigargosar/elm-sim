@@ -509,7 +509,7 @@ turretPlaceholdersForLevel level_ =
         |> List.indexedMap
             (\i ->
                 initTurretPlaceholder
-                    (toFloat (i + 1) / toFloat (level + 1))
+                    (toFloat i / toFloat (level + 1))
             )
 
 

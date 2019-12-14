@@ -27,4 +27,4 @@ progress ct =
         0
 
     else
-        toFloat ct.maxSteps / toFloat ct.current
+        toFloat ct.current / toFloat ct.maxSteps

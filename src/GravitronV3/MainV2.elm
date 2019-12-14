@@ -211,6 +211,35 @@ bulletToShape { radius } =
 -- Turret
 
 
+type alias TurretPlaceholder =
+    { timer : Timer, turret : Turret }
+
+
+initTurretPlaceHolder : Float -> Turret -> TurretPlaceholder
+initTurretPlaceHolder clock =
+    TurretPlaceholder (Timer.start clock 120)
+
+
+turretPlaceHolderToShape : Env -> TurretPlaceholder -> Shape
+turretPlaceHolderToShape env { timer, turret } =
+    let
+        progress =
+            Timer.value env.clock timer
+    in
+    turretToShape turret
+        |> fade progress
+        |> scale progress
+
+
+updateTurretPlaceHolder : Env -> TurretPlaceholder -> Response
+updateTurretPlaceHolder env model =
+    if Timer.isDone env.clock model.timer then
+        AddTurret (model.turret |> resetBulletTimer env)
+
+    else
+        AddTurretPlaceholder model
+
+
 type alias Turret =
     { position : Point
     , velocity : Vec
@@ -324,6 +353,7 @@ explosionToShape env { position, timer, shape } =
 
 type alias World =
     { player : Player
+    , turretPlaceholders : List TurretPlaceholder
     , turrets : List Turret
     , bullets : List Bullet
     , explosions : List Explosion
@@ -333,6 +363,7 @@ type alias World =
 initWorld : List Turret -> World
 initWorld turrets =
     { player = initialPlayer
+    , turretPlaceholders = []
     , turrets = turrets
     , bullets = []
     , explosions = []
@@ -343,6 +374,7 @@ type Response
     = AddExplosion Explosion
     | AddBullet Bullet
     | AddTurret Turret
+    | AddTurretPlaceholder TurretPlaceholder
     | Batch (List Response)
 
 
@@ -370,6 +402,12 @@ foldResponse response world =
 
         Batch responses ->
             foldResponses responses world
+
+        AddTurretPlaceholder turretPlaceHolder ->
+            { world
+                | turretPlaceholders =
+                    turretPlaceHolder :: world.turretPlaceholders
+            }
 
 
 foldResponses : List Response -> World -> World

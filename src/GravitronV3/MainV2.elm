@@ -628,7 +628,7 @@ initialGame : Game
 initialGame =
     let
         level =
-            ( 1, 4 )
+            ( 0, 4 )
     in
     { world = initWorld (turretPlaceholdersForLevel level)
     , level = level

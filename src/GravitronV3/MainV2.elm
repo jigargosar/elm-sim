@@ -438,29 +438,37 @@ initWorld turrets =
     }
 
 
-foldResponse : Int -> Response -> World -> World
-foldResponse maxTries response world =
+flattenResponse : Response -> List Response -> List Response
+flattenResponse response acc =
+    case response of
+        Batch list ->
+            List.foldl flattenResponse acc list
+
+        _ ->
+            response :: acc
+
+
+foldResponseHelp : Response -> World -> World
+foldResponseHelp response world =
     case response of
         AddExplosion explosion ->
-            { world | explosions = explosion :: world.explosions }
+            -- { world | explosions = explosion :: world.explosions }
+            world
 
         AddBullet bullet ->
-            { world | bullets = bullet :: world.bullets }
+            -- { world | bullets = bullet :: world.bullets }
+            world
 
         AddTurret turret ->
             { world | turrets = turret :: world.turrets }
 
-        Batch responses ->
-            foldResponses maxTries responses world
+        Batch _ ->
+            Debug.todo "should never Happen"
 
 
-foldResponses : Int -> List Response -> World -> World
-foldResponses maxTries responses world =
-    if maxTries <= 0 then
-        world
-
-    else
-        List.foldl (foldResponse (maxTries - 1)) world responses
+foldResponses : List Response -> World -> World
+foldResponses responses world =
+    List.foldl foldResponseHelp world responses
 
 
 updateWorld : Env -> World -> World
@@ -470,8 +478,10 @@ updateWorld env world =
            ( turretResponse, turrets ) =
                updateTurrets env game game.turrets
         -}
+        turretResponseV2 : List Response
         turretResponseV2 =
-            updateTurretsV2 env world world.turrets
+            [ updateTurretsV2 env world world.turrets ]
+                |> List.foldl flattenResponse []
 
         ( bulletResponse, bullets ) =
             updateBullets env world world.bullets
@@ -479,11 +489,12 @@ updateWorld env world =
     { world
         | player = updatePlayer env world.player
         , bullets = bullets
+        , turrets = []
         , explosions =
             updateExplosions env world.explosions
                 ++ bulletResponse.explosions
     }
-        |> foldResponses 1 [ turretResponseV2 ]
+        |> foldResponses turretResponseV2
 
 
 viewWorld : Env -> World -> Shape

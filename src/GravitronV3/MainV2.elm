@@ -215,8 +215,8 @@ type alias TurretPlaceholder =
     { timer : Timer, turret : Turret }
 
 
-initTurretPlaceHolder : Float -> Turret -> TurretPlaceholder
-initTurretPlaceHolder clock =
+initTurretPlaceholder : Float -> Turret -> TurretPlaceholder
+initTurretPlaceholder clock =
     TurretPlaceholder (Timer.start clock 120)
 
 
@@ -238,6 +238,11 @@ updateTurretPlaceHolder env model =
 
     else
         AddTurretPlaceholder model
+
+
+updateTurretPlaceHolders : Env -> List TurretPlaceholder -> List Response
+updateTurretPlaceHolders env =
+    List.map (updateTurretPlaceHolder env)
 
 
 type alias Turret =
@@ -364,11 +369,11 @@ type alias World =
     }
 
 
-initWorld : List Turret -> World
-initWorld turrets =
+initWorld : List TurretPlaceholder -> World
+initWorld turretPlaceholders =
     { player = initialPlayer
-    , turretPlaceholders = []
-    , turrets = turrets
+    , turretPlaceholders = turretPlaceholders
+    , turrets = []
     , bullets = []
     , explosions = []
     }
@@ -423,12 +428,14 @@ updateWorld : Env -> World -> World
 updateWorld env world =
     { world
         | player = updatePlayer env world.player
-        , bullets = []
+        , turretPlaceholders = []
         , turrets = []
+        , bullets = []
         , explosions = updateExplosions env world.explosions
     }
         |> foldResponses (updateTurrets env world world.turrets)
         |> foldResponses (updateBullets env world world.bullets)
+        |> foldResponses (updateTurretPlaceHolders env world.turretPlaceholders)
 
 
 viewWorld : Env -> World -> Shape
@@ -479,8 +486,8 @@ turretPositions =
         |> List.map (Tuple.mapBoth ((*) dst) ((*) dst) >> Pt.xy)
 
 
-turretsForLevel : Float -> Int -> List Turret
-turretsForLevel clock level_ =
+turretPlaceholdersForLevel : Float -> Int -> List TurretPlaceholder
+turretPlaceholdersForLevel clock level_ =
     let
         level =
             modBy 4 level_
@@ -490,6 +497,7 @@ turretsForLevel clock level_ =
     in
     List.take (level + 1) turretPositions
         |> List.indexedMap (\i -> initTurret (clockForIdx i))
+        |> List.map (initTurretPlaceholder clock)
 
 
 type alias Game =
@@ -504,7 +512,7 @@ initialGame =
         level =
             3
     in
-    { world = initWorld (turretsForLevel 0 level)
+    { world = initWorld (turretPlaceholdersForLevel 0 level)
     , level = level
     }
 
@@ -516,7 +524,7 @@ updateGame env game =
             updateWorld env game.world
 
         isLevelComplete =
-            world.turrets |> List.isEmpty
+            List.isEmpty world.turrets && List.isEmpty world.turretPlaceholders
     in
     if isLevelComplete then
         let
@@ -524,7 +532,7 @@ updateGame env game =
                 game.level + 1
         in
         { game
-            | world = { world | turrets = turretsForLevel env.clock nextLevel }
+            | world = { world | turretPlaceholders = turretPlaceholdersForLevel env.clock nextLevel }
             , level = nextLevel
         }
 

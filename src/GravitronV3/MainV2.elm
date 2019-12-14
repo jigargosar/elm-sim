@@ -342,7 +342,7 @@ explosionFrom :
 explosionFrom env func entity =
     { position = entity.position
     , shape = func entity
-    , timer = Timer.start env.clock 120
+    , timer = Timer.start env.clock 60
     }
 
 

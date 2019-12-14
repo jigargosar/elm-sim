@@ -323,7 +323,11 @@ type alias Explosion =
     }
 
 
-explosionFrom : Env -> ({ a | position : Point } -> Shape) -> { a | position : Point } -> Explosion
+explosionFrom :
+    Env
+    -> ({ a | position : Point } -> Shape)
+    -> { a | position : Point }
+    -> Explosion
 explosionFrom env func entity =
     { position = entity.position
     , shape = func entity

@@ -93,38 +93,6 @@ gravitateTo target model =
 
 
 
--- Response Helpers
-
-
-respondWithExplosion :
-    Explosion
-    -> ( { b | explosions : List Explosion }, c )
-    -> ( { b | explosions : List Explosion }, c )
-respondWithExplosion explosion =
-    Tuple.mapFirst (\res -> { res | explosions = explosion :: res.explosions })
-
-
-respondWithExplosionFrom env toShapeFunc model =
-    respondWithExplosion (explosionFrom env toShapeFunc model)
-
-
-
-{-
-   respondWithBullet :
-       Bullet
-       -> ( { b | bullets : List Bullet }, c )
-       -> ( { b | bullets : List Bullet }, c )
-   respondWithBullet bullet =
-       Tuple.mapFirst (\res -> { res | bullets = bullet :: res.bullets })
--}
-
-
-respondWithEntity : a -> ( b, List a ) -> ( b, List a )
-respondWithEntity entity =
-    Tuple.mapSecond ((::) entity)
-
-
-
 -- Player
 
 

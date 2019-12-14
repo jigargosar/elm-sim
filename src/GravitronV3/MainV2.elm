@@ -228,20 +228,6 @@ initTurret clock point =
     }
 
 
-type alias TurretResponse =
-    { bullets : List Bullet
-    , explosions : List Explosion
-    }
-
-
-
-{-
-   emptyTurretResponse : TurretResponse
-   emptyTurretResponse =
-       TurretResponse [] []
--}
-
-
 type alias TurretCtx tc =
     { tc
         | player : Player

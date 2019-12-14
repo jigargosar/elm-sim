@@ -212,12 +212,15 @@ bulletToShape { radius } =
 
 
 type alias TurretPlaceholder =
-    { timer : Timer, turret : Turret }
+    { timer : Timer
+    , position : Point
+    , turret : Turret
+    }
 
 
 initTurretPlaceholder : Float -> Turret -> TurretPlaceholder
-initTurretPlaceholder clock =
-    TurretPlaceholder (Timer.start clock 120)
+initTurretPlaceholder clock turret =
+    TurretPlaceholder (Timer.start clock 120) turret.position turret
 
 
 turretPlaceHolderToShape : Env -> TurretPlaceholder -> Shape
@@ -441,9 +444,11 @@ updateWorld env world =
 viewWorld : Env -> World -> Shape
 viewWorld env game =
     group
-        [ viewHelp playerToShape game.player
+        [ viewAllHelp (turretPlaceHolderToShape env) game.turretPlaceholders
+            |> group
         , viewAllHelp turretToShape game.turrets
             |> group
+        , viewHelp playerToShape game.player
         , viewAllHelp bulletToShape game.bullets
             |> group
         , viewAllHelp (explosionToShape env) game.explosions

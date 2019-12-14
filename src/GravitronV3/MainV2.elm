@@ -569,31 +569,18 @@ getNextLevel ( major, minor ) =
 
 
 turretPlaceholdersForLevel : ( Int, Int ) -> List TurretPlaceholder
-turretPlaceholdersForLevel ( major_, minor_ ) =
+turretPlaceholdersForLevel ( major, minor ) =
     let
-        major =
-            modBy 4 minor_
-
-        minor =
-            modBy maxLevels major_
-
-        levelConfig : List TurretKind
-        levelConfig =
+        subLevelConfig : List TurretKind
+        subLevelConfig =
             levels
                 |> List.drop major
                 |> List.head
                 |> Maybe.andThen (List.drop minor >> List.head)
-                |> Maybe.withDefault [ GravityShooter1 ]
+                |> Maybe.withDefault []
+                |> Debug.log "subLevelConfig"
     in
-    {- List.take (major + 1) turretPositions
-       |> List.map initTurret
-       |> List.indexedMap
-           (\i ->
-               initTurretPlaceholder
-                   (toFloat i / toFloat (major + 1))
-           )
-    -}
-    List.map2 Tuple.pair turretPositions levelConfig
+    List.map2 Tuple.pair turretPositions subLevelConfig
         |> List.indexedMap
             (\i ->
                 initTurret
@@ -610,19 +597,14 @@ type alias LevelConfig =
     List (List TurretKind)
 
 
-level1 : LevelConfig
-level1 =
-    [ [ GravityShooter1 ]
-    , [ GravityShooter1, GravityShooter1 ]
-    , [ GravityShooter1, GravityShooter2 ]
-    , [ GravityShooter2, GravityShooter2 ]
-    , [ GravityShooter2, GravityShooter2, GravityShooter2, GravityShooter2 ]
-    ]
-
-
 levels : List LevelConfig
 levels =
-    [ level1
+    [ [ [ GravityShooter1 ]
+      , [ GravityShooter1, GravityShooter1 ]
+      , [ GravityShooter1, GravityShooter2 ]
+      , [ GravityShooter2, GravityShooter2 ]
+      , [ GravityShooter2, GravityShooter2, GravityShooter2, GravityShooter2 ]
+      ]
     , [ [ GravityShooter1 ]
       , [ GravityShooter1, GravityShooter1 ]
       , [ GravityShooter1, GravityShooter2 ]
@@ -646,7 +628,7 @@ initialGame : Game
 initialGame =
     let
         level =
-            ( 1, 1 )
+            ( 1, 4 )
     in
     { world = initWorld (turretPlaceholdersForLevel level)
     , level = level

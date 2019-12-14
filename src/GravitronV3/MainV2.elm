@@ -221,7 +221,7 @@ type alias TurretPlaceholder =
 
 initTurretPlaceholder : Float -> Turret -> TurretPlaceholder
 initTurretPlaceholder delay turret =
-    TurretPlaceholder (Counter.initDelayedBy delay 120) turret.position turret
+    TurretPlaceholder (Counter.initDelayedBy delay 60) turret.position turret
 
 
 turretPlaceHolderToShape : TurretPlaceholder -> Shape

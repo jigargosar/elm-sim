@@ -441,21 +441,14 @@ foldResponses responses world =
 
 updateWorld : Env -> World -> World
 updateWorld env world =
-    let
-        turretResponses =
-            updateTurrets env world world.turrets
-
-        bulletResponses =
-            updateBullets env world world.bullets
-    in
     { world
         | player = updatePlayer env world.player
         , bullets = []
         , turrets = []
         , explosions = updateExplosions env world.explosions
     }
-        |> foldResponses turretResponses
-        |> foldResponses bulletResponses
+        |> foldResponses (updateTurrets env world world.turrets)
+        |> foldResponses (updateBullets env world world.bullets)
 
 
 viewWorld : Env -> World -> Shape

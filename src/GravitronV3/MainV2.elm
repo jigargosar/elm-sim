@@ -12,7 +12,7 @@ import GravitronV3.Vec as Vec exposing (Vec, vec)
 import Html exposing (Html)
 import Json.Decode as D
 import List.Extra
-import PointFree as FP exposing (rejectWhen)
+import PointFree as PF exposing (rejectWhen)
 import Random exposing (Generator, Seed)
 import Random.Float
 import Task
@@ -316,7 +316,7 @@ hit hasHP =
 
 
 when =
-    FP.when
+    PF.when
 
 
 updateTurret : Env -> TurretCtx tc -> Turret -> Response

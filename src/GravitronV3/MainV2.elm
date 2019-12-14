@@ -357,13 +357,16 @@ updateTurrets env ctx =
 turretToShape : Turret -> Shape
 turretToShape { radius, hp } =
     let
-        hpRadius =
-            hpPct hp * radius
+        fullShape =
+            group
+                [ circle radius
+                    |> fill "red"
+                    |> fade 0.7
+                ]
     in
     group
-        [ circle radius
-            |> fill "red"
-            |> fade 0.7
+        [ fullShape |> fade 0.5
+        , fullShape |> fade 0.5 |> scale (hpPct hp)
         ]
 
 

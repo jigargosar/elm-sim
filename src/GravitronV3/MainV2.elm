@@ -315,8 +315,8 @@ hit hasHP =
     { hasHP | hp = decCurrentHP hasHP.hp }
 
 
-hpPct : HasHP a -> Float
-hpPct { hp } =
+hpPct : HP -> Float
+hpPct hp =
     toFloat hp.current / toFloat hp.max
 
 
@@ -355,7 +355,11 @@ updateTurrets env ctx =
 
 
 turretToShape : Turret -> Shape
-turretToShape { radius } =
+turretToShape { radius, hp } =
+    let
+        hpRadius =
+            hpPct hp * radius
+    in
     group
         [ circle radius
             |> fill "red"

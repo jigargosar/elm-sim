@@ -253,12 +253,22 @@ updateTurretPlaceHolders =
     List.map updateTurretPlaceHolder
 
 
+type alias HP =
+    { current : Int, max : Int }
+
+
 type alias Turret =
     { position : Point
     , velocity : Vec
     , radius : Float
     , bulletTimer : Counter
+    , hp : HP
     }
+
+
+initHP : Int -> HP
+initHP maxHP =
+    HP maxHP maxHP
 
 
 initTurret : Point -> Turret
@@ -267,6 +277,7 @@ initTurret point =
     , velocity = Vec.zero
     , radius = 25
     , bulletTimer = Counter.init 60
+    , hp = initHP 2
     }
 
 

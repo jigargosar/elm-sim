@@ -307,34 +307,6 @@ isBulletTimerDone env turret =
     Timer.isDone env.clock turret.bulletTimer
 
 
-
--- Update Turret V1
-{-
-   updateTurrets : Env -> TurretCtx tc -> List Turret -> ( TurretResponse, List Turret )
-   updateTurrets env ctx =
-       let
-           reducer :
-               Turret
-               -> ( TurretResponse, List Turret )
-               -> ( TurretResponse, List Turret )
-           reducer turret =
-               if isTurretIntersecting ctx turret then
-                   respondWithExplosionFrom env turretToShape turret
-
-               else if isBulletTimerDone env turret then
-                   respondWithBullet
-                       (initBullet |> setPosVelFromTo turret ctx.player)
-                       >> respondWithEntity
-                           (resetBulletTimer env turret)
-
-               else
-                   respondWithEntity turret
-       in
-       List.foldr reducer ( emptyTurretResponse, [] )
--}
--- Update Turret V2
-
-
 type Response
     = AddExplosion Explosion
     | AddBullet Bullet
@@ -342,8 +314,8 @@ type Response
     | Batch (List Response)
 
 
-updateTurretV2 : Env -> TurretCtx tc -> Turret -> Response
-updateTurretV2 env ctx turret =
+updateTurret : Env -> TurretCtx tc -> Turret -> Response
+updateTurret env ctx turret =
     if isTurretIntersecting ctx turret then
         AddExplosion (explosionFrom env turretToShape turret)
 
@@ -357,9 +329,9 @@ updateTurretV2 env ctx turret =
         AddTurret turret
 
 
-updateTurretsV2 : Env -> TurretCtx tc -> List Turret -> Response
-updateTurretsV2 env ctx =
-    List.map (updateTurretV2 env ctx) >> Batch
+updateTurrets : Env -> TurretCtx tc -> List Turret -> List Response
+updateTurrets env ctx =
+    List.map (updateTurret env ctx)
 
 
 turretToShape : Turret -> Shape
@@ -448,8 +420,8 @@ flattenResponse response acc =
             response :: acc
 
 
-foldResponseHelp : Response -> World -> World
-foldResponseHelp response world =
+foldResponse : Response -> World -> World
+foldResponse response world =
     case response of
         AddExplosion explosion ->
             { world | explosions = explosion :: world.explosions }
@@ -460,26 +432,20 @@ foldResponseHelp response world =
         AddTurret turret ->
             { world | turrets = turret :: world.turrets }
 
-        Batch _ ->
-            Debug.todo "should never Happen"
+        Batch responses ->
+            foldResponses responses world
 
 
 foldResponses : List Response -> World -> World
 foldResponses responses world =
-    List.foldl foldResponseHelp world responses
+    List.foldl foldResponse world responses
 
 
 updateWorld : Env -> World -> World
 updateWorld env world =
     let
-        {-
-           ( turretResponse, turrets ) =
-               updateTurrets env game game.turrets
-        -}
-        turretResponseV2 : List Response
-        turretResponseV2 =
-            [ updateTurretsV2 env world world.turrets ]
-                |> List.foldl flattenResponse []
+        turretResponses =
+            updateTurrets env world world.turrets
 
         ( bulletResponse, bullets ) =
             updateBullets env world world.bullets
@@ -492,7 +458,7 @@ updateWorld env world =
             updateExplosions env world.explosions
                 ++ bulletResponse.explosions
     }
-        |> foldResponses turretResponseV2
+        |> foldResponses turretResponses
 
 
 viewWorld : Env -> World -> Shape

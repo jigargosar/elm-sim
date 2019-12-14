@@ -452,12 +452,10 @@ foldResponseHelp : Response -> World -> World
 foldResponseHelp response world =
     case response of
         AddExplosion explosion ->
-            -- { world | explosions = explosion :: world.explosions }
-            world
+            { world | explosions = explosion :: world.explosions }
 
         AddBullet bullet ->
-            -- { world | bullets = bullet :: world.bullets }
-            world
+            { world | bullets = bullet :: world.bullets }
 
         AddTurret turret ->
             { world | turrets = turret :: world.turrets }

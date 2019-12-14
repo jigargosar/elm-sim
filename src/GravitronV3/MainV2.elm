@@ -219,22 +219,20 @@ type alias BulletResponse =
     }
 
 
-updateBullets : Env -> BulletCtx bc -> List Bullet -> ( BulletResponse, List Bullet )
+updateBullets : Env -> BulletCtx bc -> List Bullet -> List Response
 updateBullets env ctx =
     let
         reducer :
             ( Bullet, List Bullet )
-            -> ( BulletResponse, List Bullet )
-            -> ( BulletResponse, List Bullet )
+            -> Response
         reducer ( bullet, otherBullets ) =
             if isBulletIntersecting ctx otherBullets bullet then
-                respondWithExplosionFrom env bulletToShape bullet
+                AddExplosion (explosionFrom env bulletToShape bullet)
 
             else
-                respondWithEntity (updateBullet env ctx bullet)
+                AddBullet (updateBullet env ctx bullet)
     in
-    List.Extra.select
-        >> List.foldr reducer ( BulletResponse [], [] )
+    List.Extra.select >> List.map reducer
 
 
 bulletToShape : Bullet -> Shape
@@ -447,18 +445,18 @@ updateWorld env world =
         turretResponses =
             updateTurrets env world world.turrets
 
-        ( bulletResponse, bullets ) =
+        bulletResponses =
             updateBullets env world world.bullets
     in
     { world
         | player = updatePlayer env world.player
-        , bullets = bullets
+        , bullets = []
         , turrets = []
         , explosions =
             updateExplosions env world.explosions
-                ++ bulletResponse.explosions
     }
         |> foldResponses turretResponses
+        |> foldResponses bulletResponses
 
 
 viewWorld : Env -> World -> Shape

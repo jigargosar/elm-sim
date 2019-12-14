@@ -271,13 +271,22 @@ initHP maxHP =
     HP maxHP maxHP
 
 
-initTurret : Point -> Turret
-initTurret point =
+initTurret : ( Point, TurretKind ) -> Turret
+initTurret ( point, tk ) =
+    let
+        maxHP =
+            case tk of
+                GravityShooter1 ->
+                    1
+
+                GravityShooter2 ->
+                    2
+    in
     { position = point
     , velocity = Vec.zero
     , radius = 25
     , bulletTimer = Counter.init 60
-    , hp = initHP 2
+    , hp = initHP maxHP
     }
 
 
@@ -557,13 +566,28 @@ turretPlaceholdersForLevel ( major_, minor_ ) =
 
         minor =
             modBy maxLevels major_
+
+        levelConfig : List TurretKind
+        levelConfig =
+            levels
+                |> List.drop major
+                |> List.head
+                |> Maybe.andThen (List.drop minor >> List.head)
+                |> Maybe.withDefault [ GravityShooter1 ]
     in
-    List.take (major + 1) turretPositions
-        |> List.map initTurret
+    {- List.take (major + 1) turretPositions
+       |> List.map initTurret
+       |> List.indexedMap
+           (\i ->
+               initTurretPlaceholder
+                   (toFloat i / toFloat (major + 1))
+           )
+    -}
+    List.map2 Tuple.pair turretPositions levelConfig
         |> List.indexedMap
             (\i ->
-                initTurretPlaceholder
-                    (toFloat i / toFloat (major + 1))
+                initTurret
+                    >> initTurretPlaceholder (toFloat i / toFloat (minor + 1))
             )
 
 

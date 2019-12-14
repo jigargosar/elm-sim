@@ -108,12 +108,15 @@ respondWithExplosionFrom env toShapeFunc model =
     respondWithExplosion (explosionFrom env toShapeFunc model)
 
 
-respondWithBullet :
-    Bullet
-    -> ( { b | bullets : List Bullet }, c )
-    -> ( { b | bullets : List Bullet }, c )
-respondWithBullet bullet =
-    Tuple.mapFirst (\res -> { res | bullets = bullet :: res.bullets })
+
+{-
+   respondWithBullet :
+       Bullet
+       -> ( { b | bullets : List Bullet }, c )
+       -> ( { b | bullets : List Bullet }, c )
+   respondWithBullet bullet =
+       Tuple.mapFirst (\res -> { res | bullets = bullet :: res.bullets })
+-}
 
 
 respondWithEntity : a -> ( b, List a ) -> ( b, List a )
@@ -270,9 +273,12 @@ type alias TurretResponse =
     }
 
 
-emptyTurretResponse : TurretResponse
-emptyTurretResponse =
-    TurretResponse [] []
+
+{-
+   emptyTurretResponse : TurretResponse
+   emptyTurretResponse =
+       TurretResponse [] []
+-}
 
 
 type alias TurretCtx tc =
@@ -303,32 +309,29 @@ isBulletTimerDone env turret =
 
 
 -- Update Turret V1
+{-
+   updateTurrets : Env -> TurretCtx tc -> List Turret -> ( TurretResponse, List Turret )
+   updateTurrets env ctx =
+       let
+           reducer :
+               Turret
+               -> ( TurretResponse, List Turret )
+               -> ( TurretResponse, List Turret )
+           reducer turret =
+               if isTurretIntersecting ctx turret then
+                   respondWithExplosionFrom env turretToShape turret
 
+               else if isBulletTimerDone env turret then
+                   respondWithBullet
+                       (initBullet |> setPosVelFromTo turret ctx.player)
+                       >> respondWithEntity
+                           (resetBulletTimer env turret)
 
-updateTurrets : Env -> TurretCtx tc -> List Turret -> ( TurretResponse, List Turret )
-updateTurrets env ctx =
-    let
-        reducer :
-            Turret
-            -> ( TurretResponse, List Turret )
-            -> ( TurretResponse, List Turret )
-        reducer turret =
-            if isTurretIntersecting ctx turret then
-                respondWithExplosionFrom env turretToShape turret
-
-            else if isBulletTimerDone env turret then
-                respondWithBullet
-                    (initBullet |> setPosVelFromTo turret ctx.player)
-                    >> respondWithEntity
-                        (resetBulletTimer env turret)
-
-            else
-                respondWithEntity turret
-    in
-    List.foldr reducer ( emptyTurretResponse, [] )
-
-
-
+               else
+                   respondWithEntity turret
+       in
+       List.foldr reducer ( emptyTurretResponse, [] )
+-}
 -- Update Turret V2
 
 
@@ -437,22 +440,27 @@ initWorld turrets =
 
 foldResponse : Int -> Response -> World -> World
 foldResponse maxTries response world =
+    case response of
+        AddExplosion explosion ->
+            { world | explosions = explosion :: world.explosions }
+
+        AddBullet bullet ->
+            { world | bullets = bullet :: world.bullets }
+
+        AddTurret turret ->
+            { world | turrets = turret :: world.turrets }
+
+        Batch responses ->
+            foldResponses maxTries responses world
+
+
+foldResponses : Int -> List Response -> World -> World
+foldResponses maxTries responses world =
     if maxTries <= 0 then
         world
 
     else
-        case response of
-            AddExplosion explosion ->
-                { world | explosions = explosion :: world.explosions }
-
-            AddBullet bullet ->
-                { world | bullets = bullet :: world.bullets }
-
-            AddTurret turret ->
-                { world | turrets = turret :: world.turrets }
-
-            Batch responses ->
-                List.foldl (foldResponse (maxTries - 1)) world responses
+        List.foldl (foldResponse (maxTries - 1)) world responses
 
 
 updateWorld : Env -> World -> World
@@ -475,7 +483,7 @@ updateWorld env world =
             updateExplosions env world.explosions
                 ++ bulletResponse.explosions
     }
-        |> foldResponse 1 turretResponseV2
+        |> foldResponses 1 [ turretResponseV2 ]
 
 
 viewWorld : Env -> World -> Shape

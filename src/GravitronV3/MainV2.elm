@@ -263,6 +263,7 @@ type alias Turret =
     , radius : Float
     , bulletTimer : Counter
     , hp : HP
+    , kind : TurretKind
     }
 
 
@@ -272,10 +273,10 @@ initHP maxHP =
 
 
 initTurret : ( Point, TurretKind ) -> Turret
-initTurret ( point, tk ) =
+initTurret ( point, kind ) =
     let
         maxHP =
-            case tk of
+            case kind of
                 GravityShooter1 ->
                     1
 
@@ -287,6 +288,7 @@ initTurret ( point, tk ) =
     , radius = 25
     , bulletTimer = Counter.init 60
     , hp = initHP maxHP
+    , kind = kind
     }
 
 
@@ -364,12 +366,20 @@ updateTurrets env ctx =
 
 
 turretToShape : Turret -> Shape
-turretToShape { radius, hp } =
+turretToShape { radius, hp, kind } =
     let
+        color =
+            case kind of
+                GravityShooter1 ->
+                    "red"
+
+                GravityShooter2 ->
+                    "blue"
+
         fullShape =
             group
                 [ circle radius
-                    |> fill "red"
+                    |> fill color
                     |> fade 0.7
                 ]
     in

@@ -3,6 +3,7 @@ module GravitronV3.MainV2 exposing (main)
 import Browser
 import Browser.Events as E
 import GravitronV3.Canvas as Canvas exposing (..)
+import GravitronV3.Counter as Counter exposing (Counter)
 import GravitronV3.Point as Pt exposing (Point)
 import GravitronV3.RigidBody as RigidBody exposing (CircularBody, RigidBody)
 import GravitronV3.Screen as Screen exposing (Screen)
@@ -212,7 +213,7 @@ bulletToShape { radius } =
 
 
 type alias TurretPlaceholder =
-    { timer : Timer
+    { counter : Counter
     , position : Point
     , turret : Turret
     }
@@ -220,14 +221,14 @@ type alias TurretPlaceholder =
 
 initTurretPlaceholder : Float -> Turret -> TurretPlaceholder
 initTurretPlaceholder clock turret =
-    TurretPlaceholder (Timer.start clock 120) turret.position turret
+    TurretPlaceholder (Counter.init 120) turret.position turret
 
 
-turretPlaceHolderToShape : Env -> TurretPlaceholder -> Shape
-turretPlaceHolderToShape env { timer, turret } =
+turretPlaceHolderToShape : TurretPlaceholder -> Shape
+turretPlaceHolderToShape { counter, turret } =
     let
         progress =
-            Timer.value env.clock timer
+            Counter.progress counter
     in
     turretToShape turret
         |> fade progress
@@ -236,11 +237,15 @@ turretPlaceHolderToShape env { timer, turret } =
 
 updateTurretPlaceHolder : Env -> TurretPlaceholder -> Response
 updateTurretPlaceHolder env model =
-    if Timer.isDone env.clock model.timer then
+    let
+        ( isDone, counter ) =
+            Counter.step model.counter
+    in
+    if isDone then
         AddTurret (model.turret |> resetBulletTimer env)
 
     else
-        AddTurretPlaceholder model
+        AddTurretPlaceholder { model | counter = counter }
 
 
 updateTurretPlaceHolders : Env -> List TurretPlaceholder -> List Response
@@ -444,7 +449,7 @@ updateWorld env world =
 viewWorld : Env -> World -> Shape
 viewWorld env game =
     group
-        [ viewAllHelp (turretPlaceHolderToShape env) game.turretPlaceholders
+        [ viewAllHelp turretPlaceHolderToShape game.turretPlaceholders
             |> group
         , viewAllHelp turretToShape game.turrets
             |> group

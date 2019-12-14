@@ -12,7 +12,7 @@ import GravitronV3.Vec as Vec exposing (Vec, vec)
 import Html exposing (Html)
 import Json.Decode as D
 import List.Extra
-import PointFree exposing (rejectWhen)
+import PointFree as FP exposing (rejectWhen)
 import Random exposing (Generator, Seed)
 import Random.Float
 import Task
@@ -297,9 +297,31 @@ isTurretIntersecting ctx turret =
 -- || RigidBody.doCircleOverlap turret ctx.player
 
 
+type alias HasHP a =
+    { a | hp : HP }
+
+
+isDead : HasHP a -> Bool
+isDead { hp } =
+    hp.current <= 0
+
+
+hit : HasHP a -> HasHP a
+hit hasHP =
+    let
+        decCurrentHP hp =
+            { hp | current = max 0 (hp.current - 1) }
+    in
+    { hasHP | hp = decCurrentHP hasHP.hp }
+
+
+when =
+    FP.when
+
+
 updateTurret : Env -> TurretCtx tc -> Turret -> Response
 updateTurret env ctx turret =
-    if isTurretIntersecting ctx turret then
+    if isDead turret then
         AddExplosion (explosionFrom env turretToShape turret)
 
     else
@@ -308,7 +330,9 @@ updateTurret env ctx turret =
                 Counter.step turret.bulletTimer
 
             addTurretResponse =
-                AddTurret { turret | bulletTimer = bulletTimer }
+                { turret | bulletTimer = bulletTimer }
+                    |> when (isTurretIntersecting ctx) hit
+                    |> AddTurret
         in
         if isDone then
             Batch

@@ -397,29 +397,34 @@ breakTurn parts =
             |> List.map ((+) -1 >> toFloat >> (*) angleFrac)
 
 
+turretStepResponse : TurretCtx ct -> Turret -> Response
+turretStepResponse ctx turret =
+    let
+        ( isDone, bulletTimer ) =
+            Counter.step turret.bulletTimer
+
+        addTurretResponse =
+            { turret | bulletTimer = bulletTimer }
+                |> when (isTurretIntersecting ctx) hit
+                |> AddTurret
+    in
+    if isDone then
+        Batch
+            [ fireBulletOnTrigger ctx.player turret
+            , addTurretResponse
+            ]
+
+    else
+        addTurretResponse
+
+
 updateTurret : Env -> TurretCtx tc -> Turret -> Response
 updateTurret env ctx turret =
     if isDead turret then
         turretDeathResponse env turret
 
     else
-        let
-            ( isDone, bulletTimer ) =
-                Counter.step turret.bulletTimer
-
-            addTurretResponse =
-                { turret | bulletTimer = bulletTimer }
-                    |> when (isTurretIntersecting ctx) hit
-                    |> AddTurret
-        in
-        if isDone then
-            Batch
-                [ fireBulletOnTrigger ctx.player turret
-                , addTurretResponse
-                ]
-
-        else
-            addTurretResponse
+        turretStepResponse ctx turret
 
 
 updateTurrets : Env -> TurretCtx tc -> List Turret -> List Response

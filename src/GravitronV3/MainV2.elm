@@ -695,9 +695,6 @@ levels =
 
     -- test level
     , [ [ HomingShooter
-        , GravityShooterOnDeathShoot5
-        , TripleGravityShooter
-        , TripleGravityShooter
         ]
       , [ GravityShooter1, GravityShooter1 ]
       , [ GravityShooter1, GravityShooter2 ]

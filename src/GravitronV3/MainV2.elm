@@ -501,16 +501,16 @@ updateWorld env world =
 
 
 viewWorld : Env -> World -> Shape
-viewWorld env game =
+viewWorld env world =
     group
-        [ viewAllHelp turretPlaceHolderToShape game.turretPlaceholders
+        [ viewAllHelp turretPlaceHolderToShape world.turretPlaceholders
             |> group
-        , viewAllHelp turretToShape game.turrets
+        , viewAllHelp turretToShape world.turrets
             |> group
-        , viewHelp playerToShape game.player
-        , viewAllHelp bulletToShape game.bullets
+        , viewHelp playerToShape world.player
+        , viewAllHelp bulletToShape world.bullets
             |> group
-        , viewAllHelp (explosionToShape env) game.explosions
+        , viewAllHelp (explosionToShape env) world.explosions
             |> group
         ]
 

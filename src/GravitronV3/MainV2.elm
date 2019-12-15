@@ -426,7 +426,7 @@ turretKindToConfig kind =
                     ( HomingBullet, SingleBullet )
 
                 TimeBombShooter ->
-                    ( GravityBullet, SingleBullet )
+                    ( TimeBombBullet, SingleBullet )
     in
     { maxHP = maxHp
     , color = color

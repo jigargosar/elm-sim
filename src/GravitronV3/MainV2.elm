@@ -216,17 +216,17 @@ updateBullet screen ctx bullet =
 updateBullets : Screen -> BulletCtx a p t -> List Bullet -> List Response
 updateBullets screen ctx =
     let
-        reducer :
+        update_ :
             ( Bullet, List Bullet )
             -> Response
-        reducer ( bullet, otherBullets ) =
+        update_ ( bullet, otherBullets ) =
             if isBulletIntersecting ctx otherBullets bullet then
                 AddExplosion (explosionFrom bulletToShape bullet)
 
             else
                 AddBullet (updateBullet screen ctx bullet)
     in
-    List.Extra.select >> List.map reducer
+    List.Extra.select >> List.map update_
 
 
 bulletToShape : Bullet -> Shape

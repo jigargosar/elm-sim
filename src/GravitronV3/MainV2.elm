@@ -81,9 +81,9 @@ bounceWithinScreenHelp screen position bounceFactor velocity =
         newBouncedVelocity
 
 
-bounceWithinScreen : Env -> Float -> RigidBody a -> Vec
-bounceWithinScreen env factor m =
-    bounceWithinScreenHelp env.screen
+bounceWithinScreen : Screen -> Float -> RigidBody a -> Vec
+bounceWithinScreen screen factor m =
+    bounceWithinScreenHelp screen
         (m.position |> (Pt.toTuple >> Vec.fromTuple))
         factor
         m.velocity
@@ -129,11 +129,11 @@ initialPlayer =
     }
 
 
-updatePlayer : Env -> Player -> Player
-updatePlayer env =
+updatePlayer : Screen -> Player -> Player
+updatePlayer screen =
     RigidBody.stepWithSeed
         [ randomWalk
-        , bounceWithinScreen env 1 >> Random.constant
+        , bounceWithinScreen screen 1 >> Random.constant
         ]
 
 
@@ -199,8 +199,8 @@ type alias BulletCtx a p t =
     }
 
 
-updateBullet : Env -> BulletCtx a p t -> Bullet -> Bullet
-updateBullet env ctx bullet =
+updateBullet : Screen -> BulletCtx a p t -> Bullet -> Bullet
+updateBullet screen ctx bullet =
     RigidBody.step
         [ case bullet.motion of
             Gravity ->
@@ -208,13 +208,13 @@ updateBullet env ctx bullet =
 
             Homing ->
                 homingTo ctx.player
-        , bounceWithinScreen env 0.5
+        , bounceWithinScreen screen 0.5
         ]
         bullet
 
 
-updateBullets : Env -> BulletCtx a p t -> List Bullet -> List Response
-updateBullets env ctx =
+updateBullets : Screen -> BulletCtx a p t -> List Bullet -> List Response
+updateBullets screen ctx =
     let
         reducer :
             ( Bullet, List Bullet )
@@ -224,7 +224,7 @@ updateBullets env ctx =
                 AddExplosion (explosionFrom bulletToShape bullet)
 
             else
-                AddBullet (updateBullet env ctx bullet)
+                AddBullet (updateBullet screen ctx bullet)
     in
     List.Extra.select >> List.map reducer
 
@@ -646,15 +646,19 @@ foldResponses responses world =
 
 updateWorld : Env -> World -> World
 updateWorld env world =
+    let
+        { screen } =
+            env
+    in
     { world
-        | player = updatePlayer env world.player
+        | player = updatePlayer screen world.player
         , turretPlaceholders = []
         , turrets = []
         , bullets = []
         , explosions = []
     }
         |> foldResponses (updateTurrets world world.turrets)
-        |> foldResponses (updateBullets env world world.bullets)
+        |> foldResponses (updateBullets screen world world.bullets)
         |> foldResponses (updateTurretPlaceHolders world.turretPlaceholders)
         |> foldResponses (updateExplosions world.explosions)
 

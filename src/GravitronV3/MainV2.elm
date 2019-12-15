@@ -178,11 +178,17 @@ type alias BulletCtx a =
 
 
 updateBullet : Env -> BulletCtx bc -> Bullet -> Bullet
-updateBullet env ctx =
+updateBullet env ctx bullet =
     RigidBody.step
-        [ gravitateTo ctx.player
+        [ case bullet.kind of
+            Gravity ->
+                gravitateTo ctx.player
+
+            Homing ->
+                gravitateTo ctx.player
         , bounceWithinScreen env 0.5
         ]
+        bullet
 
 
 updateBullets : Env -> BulletCtx bc -> List Bullet -> List Response

@@ -554,6 +554,19 @@ type alias LevelId =
     ( Int, Int )
 
 
+type TurretKind
+    = GravityShooter1
+    | GravityShooter2
+
+
+type alias LevelConfig =
+    List SubLevelConfig
+
+
+type alias SubLevelConfig =
+    List TurretKind
+
+
 levels : List LevelConfig
 levels =
     [ [ [ GravityShooter1 ]
@@ -571,6 +584,7 @@ levels =
     ]
 
 
+maxLevels : Int
 maxLevels =
     List.length levels
 
@@ -582,6 +596,15 @@ nextLevelId ( major, minor ) =
 
     else
         ( major, minor + 1 )
+
+
+getSubLevelConfig : LevelId -> SubLevelConfig
+getSubLevelConfig ( major, minor ) =
+    levels
+        |> List.drop major
+        |> List.head
+        |> Maybe.andThen (List.drop minor >> List.head)
+        |> Maybe.withDefault []
 
 
 
@@ -598,7 +621,7 @@ turretPositions =
         |> List.map (Tuple.mapBoth ((*) dst) ((*) dst) >> Pt.xy)
 
 
-turretPlaceholdersForLevel : ( Int, Int ) -> List TurretPlaceholder
+turretPlaceholdersForLevel : LevelId -> List TurretPlaceholder
 turretPlaceholdersForLevel ( major, minor ) =
     let
         subLevelConfig : SubLevelConfig
@@ -615,19 +638,6 @@ turretPlaceholdersForLevel ( major, minor ) =
                 initTurret
                     >> initTurretPlaceholder (toFloat i / toFloat (minor + 1))
             )
-
-
-type TurretKind
-    = GravityShooter1
-    | GravityShooter2
-
-
-type alias LevelConfig =
-    List SubLevelConfig
-
-
-type alias SubLevelConfig =
-    List TurretKind
 
 
 type alias Game =

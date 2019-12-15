@@ -1,4 +1,4 @@
-module GravitronV3.Canvas exposing (Shape, circle, fade, fill, fillRect, group, move, rect, renderShapes, scale, stroke, stroke2)
+module GravitronV3.Canvas exposing (Shape, circle, fade, fill, fillRect, group, move, rect, renderShapes, rotate, scale, stroke, stroke2)
 
 import GravitronV3.Screen as Screen exposing (Screen)
 import GravitronV3.Transform as Transform exposing (Transform)
@@ -77,6 +77,11 @@ mapTransform func (Shape f b o t) =
 scale : Float -> Shape -> Shape
 scale =
     Transform.scale >> mapTransform
+
+
+rotate : Float -> Shape -> Shape
+rotate =
+    Transform.rotate >> mapTransform
 
 
 fade : Float -> Shape -> Shape

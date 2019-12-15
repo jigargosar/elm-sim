@@ -4,6 +4,7 @@ module GravitronV3.Transform exposing
     , move
     , renderRectTransform
     , renderTransform
+    , rotate
     , scale
     )
 
@@ -18,8 +19,13 @@ initial =
 
 
 scale : Float -> Transform -> Transform
-scale s (Transform x y a _) =
-    Transform x y a s
+scale ns (Transform x y a s) =
+    Transform x y a (s * ns)
+
+
+rotate : Float -> Transform -> Transform
+rotate da (Transform x y a s) =
+    Transform x y (a + da) s
 
 
 move : Float -> Float -> Transform -> Transform

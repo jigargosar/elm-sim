@@ -1,5 +1,6 @@
 module GravitronV3.MainV2 exposing (main)
 
+import Basics.Extra exposing (inDegrees)
 import Browser
 import Browser.Events as E
 import GravitronV3.Canvas as Canvas exposing (..)
@@ -225,9 +226,27 @@ updateBullets env ctx =
 
 
 bulletToShape : Bullet -> Shape
-bulletToShape { radius } =
+bulletToShape bullet =
+    let
+        { radius, kind, velocity } =
+            bullet
+
+        otherShape =
+            case kind of
+                Gravity ->
+                    group []
+
+                Homing ->
+                    group
+                        [ rect (radius * 3.5) 1
+                            |> rotate (Vec.angle velocity |> inDegrees)
+                        ]
+    in
     group
-        [ circle radius
+        [ group
+            [ circle radius
+            , otherShape
+            ]
             |> fill "black"
             |> fade 0.7
         ]

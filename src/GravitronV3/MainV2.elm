@@ -150,7 +150,6 @@ playerToShape player =
 type BulletKind
     = Gravity
     | Homing
-    | BlankBullet
 
 
 type alias Bullet =
@@ -217,9 +216,6 @@ updateBullets screen ctx =
 
                             Homing ->
                                 homingTo ctx.player
-
-                            BlankBullet ->
-                                gravitateTo ctx.player
                         , bounceWithinScreen screen 0.5
                         ]
                     |> AddBullet
@@ -243,9 +239,6 @@ bulletToShape bullet =
                         [ rect (radius * 3.5) 1
                             |> rotate (Vec.angle velocity |> inDegrees)
                         ]
-
-                BlankBullet ->
-                    group []
     in
     group
         [ group

@@ -185,21 +185,21 @@ initHomingBullet =
     initBullet Homing
 
 
-isBulletIntersecting : BulletCtx a p t -> List Bullet -> Bullet -> Bool
+isBulletIntersecting : BulletCtx bc -> List Bullet -> Bullet -> Bool
 isBulletIntersecting ctx otherBullets bullet =
     RigidBody.doCircleOverlap bullet ctx.player
         || List.any (RigidBody.doCircleOverlap bullet) ctx.turrets
         || List.any (RigidBody.doCircleOverlap bullet) otherBullets
 
 
-type alias BulletCtx a p t =
+type alias BulletCtx a =
     { a
-        | player : Circular p
-        , turrets : List (Circular t)
+        | player : Player
+        , turrets : List Turret
     }
 
 
-updateBullets : Screen -> BulletCtx a p t -> List Bullet -> List Response
+updateBullets : Screen -> BulletCtx bc -> List Bullet -> List Response
 updateBullets screen ctx =
     let
         update_ : ( Bullet, List Bullet ) -> Response

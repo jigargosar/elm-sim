@@ -135,7 +135,7 @@ type alias Bullet =
 
 
 initBullet : Circular a -> Float -> Bullet
-initBullet turret angle =
+initBullet gun angle =
     let
         radius =
             10
@@ -145,8 +145,8 @@ initBullet turret angle =
     in
     { position =
         Pt.moveBy
-            (Vec.fromRTheta (radius + turret.radius) angle)
-            turret.position
+            (Vec.fromRTheta (radius + gun.radius) angle)
+            gun.position
     , velocity = Vec.fromRTheta speed angle
     , radius = radius
     }

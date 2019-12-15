@@ -6,14 +6,18 @@ import Browser.Events as E
 import GravitronV3.Canvas as Canvas exposing (..)
 import GravitronV3.Counter as Counter exposing (Counter)
 import GravitronV3.Point as Pt exposing (Point)
-import GravitronV3.RigidBody as RigidBody exposing (Circular, CircularBody, RigidBody)
+import GravitronV3.RigidBody as RigidBody
+    exposing
+        ( Circular
+        , CircularBody
+        , RigidBody
+        )
 import GravitronV3.Screen as Screen exposing (Screen)
-import GravitronV3.Timer as Timer exposing (Timer)
 import GravitronV3.Vec as Vec exposing (Vec, vec)
 import Html exposing (Html)
 import Json.Decode as D
 import List.Extra
-import PointFree as PF exposing (rejectWhen)
+import PointFree as PF
 import Random exposing (Generator, Seed)
 import Random.Float
 import Task
@@ -217,7 +221,7 @@ updateBullets env ctx =
             -> Response
         reducer ( bullet, otherBullets ) =
             if isBulletIntersecting ctx otherBullets bullet then
-                AddExplosion (explosionFrom env bulletToShape bullet)
+                AddExplosion (explosionFrom bulletToShape bullet)
 
             else
                 AddBullet (updateBullet env ctx bullet)
@@ -418,11 +422,11 @@ fireBulletOnTrigger player turret =
             AddBullet (initHomingBullet turret angle)
 
 
-turretDeathResponse : Env -> Turret -> Response
-turretDeathResponse env turret =
+turretDeathResponse : Turret -> Response
+turretDeathResponse turret =
     let
         responseHelp bulletCt =
-            addTurretExplosionWithBullets env bulletCt turret
+            addTurretExplosionWithBullets bulletCt turret
     in
     case turret.kind of
         GravityShooter1 ->
@@ -441,11 +445,11 @@ turretDeathResponse env turret =
             responseHelp 0
 
 
-addTurretExplosionWithBullets : Env -> Int -> Turret -> Response
-addTurretExplosionWithBullets env bulletCt turret =
+addTurretExplosionWithBullets : Int -> Turret -> Response
+addTurretExplosionWithBullets bulletCt turret =
     breakTurn bulletCt
         |> List.map (initGravityBullet turret >> AddBullet)
-        |> (::) (AddExplosion (explosionFrom env turretToShape turret))
+        |> (::) (AddExplosion (explosionFrom turretToShape turret))
         |> Batch
 
 
@@ -484,18 +488,18 @@ turretStepResponse ctx turret =
         addTurretResponse
 
 
-updateTurret : Env -> TurretCtx tc -> Turret -> Response
-updateTurret env ctx turret =
+updateTurret : TurretCtx tc -> Turret -> Response
+updateTurret ctx turret =
     if isDead turret then
-        turretDeathResponse env turret
+        turretDeathResponse turret
 
     else
         turretStepResponse ctx turret
 
 
-updateTurrets : Env -> TurretCtx tc -> List Turret -> List Response
-updateTurrets env ctx =
-    List.map (updateTurret env ctx)
+updateTurrets : TurretCtx tc -> List Turret -> List Response
+updateTurrets ctx =
+    List.map (updateTurret ctx)
 
 
 turretToShape : Turret -> Shape
@@ -538,32 +542,44 @@ turretToShape { radius, hp, kind } =
 type alias Explosion =
     { position : Point
     , shape : Shape
-    , timer : Timer
+    , timer : Counter
     }
 
 
 explosionFrom :
-    Env
-    -> ({ a | position : Point } -> Shape)
+    ({ a | position : Point } -> Shape)
     -> { a | position : Point }
     -> Explosion
-explosionFrom env func entity =
+explosionFrom func entity =
     { position = entity.position
     , shape = func entity
-    , timer = Timer.start env.clock 60
+    , timer = Counter.init 60
     }
 
 
-updateExplosions : Env -> List Explosion -> List Explosion
-updateExplosions env =
-    rejectWhen (.timer >> Timer.isDone env.clock)
+updateExplosion : Explosion -> Response
+updateExplosion explosion =
+    let
+        ( done, timer ) =
+            Counter.step explosion.timer
+    in
+    if done then
+        Batch []
+
+    else
+        AddExplosion { explosion | timer = timer }
 
 
-explosionToShape : Env -> Explosion -> Shape
-explosionToShape env { position, timer, shape } =
+updateExplosions : List Explosion -> List Response
+updateExplosions =
+    List.map updateExplosion
+
+
+explosionToShape : Explosion -> Shape
+explosionToShape { position, timer, shape } =
     let
         progress =
-            Timer.value env.clock timer
+            Counter.progress timer
     in
     shape
         |> fade (1 - progress)
@@ -635,15 +651,16 @@ updateWorld env world =
         , turretPlaceholders = []
         , turrets = []
         , bullets = []
-        , explosions = updateExplosions env world.explosions
+        , explosions = []
     }
-        |> foldResponses (updateTurrets env world world.turrets)
+        |> foldResponses (updateTurrets world world.turrets)
         |> foldResponses (updateBullets env world world.bullets)
         |> foldResponses (updateTurretPlaceHolders world.turretPlaceholders)
+        |> foldResponses (updateExplosions world.explosions)
 
 
-viewWorld : Env -> World -> Shape
-viewWorld env world =
+viewWorld : World -> Shape
+viewWorld world =
     group
         [ viewAllHelp turretPlaceHolderToShape world.turretPlaceholders
             |> group
@@ -652,7 +669,7 @@ viewWorld env world =
         , viewHelp playerToShape world.player
         , viewAllHelp bulletToShape world.bullets
             |> group
-        , viewAllHelp (explosionToShape env) world.explosions
+        , viewAllHelp explosionToShape world.explosions
             |> group
         ]
 
@@ -836,10 +853,10 @@ updateGame env game =
         { game | world = world }
 
 
-viewGame : Env -> Game -> Shape
-viewGame env game =
+viewGame : Game -> Shape
+viewGame game =
     group
-        [ viewWorld env game.world
+        [ viewWorld game.world
         ]
 
 
@@ -855,12 +872,8 @@ type Msg
 
 view : Model -> Html Msg
 view model =
-    let
-        env =
-            toEnv model
-    in
-    renderShapes env.screen
-        [ viewGame env model.game ]
+    renderShapes model.screen
+        [ viewGame model.game ]
 
 
 type alias Model =

@@ -783,7 +783,8 @@ update message model =
             in
             save
                 { model
-                    | mousePosition = vec (pageX + screen.left) (pageY + screen.top)
+                    | mousePosition =
+                        vec (pageX + screen.left) (pageY + screen.top)
                 }
 
 

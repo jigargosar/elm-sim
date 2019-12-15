@@ -337,8 +337,21 @@ fireBullet player turret =
             Pt.vecFromTo turret.position player.position
                 |> Vec.angle
     in
-    Batch
-        [ AddBullet (initBullet turret angle) ]
+    case turret.kind of
+        GravityShooter1 ->
+            AddBullet (initBullet turret angle)
+
+        GravityShooter2 ->
+            AddBullet (initBullet turret angle)
+
+        TripleGravityShooter ->
+            let
+                angleSpread =
+                    turns (1 / 8)
+            in
+            [ angle - angleSpread, angle, angle + angleSpread ]
+                |> List.map (initBullet turret >> AddBullet)
+                |> Batch
 
 
 updateTurret : Env -> TurretCtx tc -> Turret -> Response

@@ -631,7 +631,7 @@ turretPlaceholdersForLevel levelId =
 
 type alias Game =
     { world : World
-    , level : ( Int, Int )
+    , level : LevelId
     }
 
 

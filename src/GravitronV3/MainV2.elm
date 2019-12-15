@@ -110,6 +110,20 @@ homingTo target model =
         |> Vec.mapMagnitude ((*) 0.98)
 
 
+splitTurnInto : Int -> List Float
+splitTurnInto parts =
+    if parts <= 0 then
+        []
+
+    else
+        let
+            angleFrac =
+                turns (1 / toFloat parts)
+        in
+        List.range 1 parts
+            |> List.map ((+) -1 >> toFloat >> (*) angleFrac)
+
+
 
 -- Player
 
@@ -514,20 +528,6 @@ turretDeathResponse player turret =
             , addBulletExplosion
             ]
                 |> Batch
-
-
-splitTurnInto : Int -> List Float
-splitTurnInto parts =
-    if parts <= 0 then
-        []
-
-    else
-        let
-            angleFrac =
-                turns (1 / toFloat parts)
-        in
-        List.range 1 parts
-            |> List.map ((+) -1 >> toFloat >> (*) angleFrac)
 
 
 turretStepResponse : TurretCtx ct -> Turret -> Response

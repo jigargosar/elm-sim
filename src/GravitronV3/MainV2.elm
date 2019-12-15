@@ -199,20 +199,6 @@ type alias BulletCtx a p t =
     }
 
 
-updateBullet : Screen -> BulletCtx a p t -> Bullet -> Bullet
-updateBullet screen ctx bullet =
-    RigidBody.step
-        [ case bullet.motion of
-            Gravity ->
-                gravitateTo ctx.player
-
-            Homing ->
-                homingTo ctx.player
-        , bounceWithinScreen screen 0.5
-        ]
-        bullet
-
-
 updateBullets : Screen -> BulletCtx a p t -> List Bullet -> List Response
 updateBullets screen ctx =
     let
@@ -221,10 +207,21 @@ updateBullets screen ctx =
             -> Response
         update_ ( bullet, otherBullets ) =
             if isBulletIntersecting ctx otherBullets bullet then
-                AddExplosion (explosionFrom bulletToShape bullet)
+                explosionFrom bulletToShape bullet
+                    |> AddExplosion
 
             else
-                AddBullet (updateBullet screen ctx bullet)
+                bullet
+                    |> RigidBody.step
+                        [ case bullet.motion of
+                            Gravity ->
+                                gravitateTo ctx.player
+
+                            Homing ->
+                                homingTo ctx.player
+                        , bounceWithinScreen screen 0.5
+                        ]
+                    |> AddBullet
     in
     List.Extra.select >> List.map update_
 

@@ -150,6 +150,7 @@ playerToShape player =
 type BulletMotion
     = Gravity
     | Homing
+    | GravityTimeBomb Counter
 
 
 type alias Bullet =
@@ -173,6 +174,11 @@ initBullet motion gun angle =
     , radius = radius
     , motion = motion
     }
+
+
+initGravityTimeBombBullet : Circular a -> Float -> Bullet
+initGravityTimeBombBullet =
+    initBullet (GravityTimeBomb (Counter.init (60 * 3)))
 
 
 initGravityBullet : Circular a -> Float -> Bullet
@@ -219,6 +225,9 @@ updateBullets screen ctx =
 
                             Homing ->
                                 homingTo ctx.player
+
+                            GravityTimeBomb _ ->
+                                gravitateTo ctx.player
                         , bounceWithinScreen screen 0.5
                         ]
                     |> AddBullet
@@ -242,6 +251,9 @@ bulletToShape bullet =
                         [ rect (radius * 3.5) 1
                             |> rotate (Vec.angle velocity |> inDegrees)
                         ]
+
+                GravityTimeBomb _ ->
+                    group []
     in
     group
         [ group
@@ -336,6 +348,9 @@ initTurret ( point, kind ) =
 
                 HomingShooter ->
                     4
+
+                TimeBombShooter ->
+                    3
     in
     { position = point
     , velocity = Vec.zero
@@ -418,6 +433,9 @@ fireBulletOnTrigger player turret =
         HomingShooter ->
             AddBullet (initHomingBullet turret angle)
 
+        TimeBombShooter ->
+            AddBullet (initGravityTimeBombBullet turret angle)
+
 
 turretDeathResponse : Turret -> Response
 turretDeathResponse turret =
@@ -439,6 +457,9 @@ turretDeathResponse turret =
             responseHelp 5
 
         HomingShooter ->
+            responseHelp 0
+
+        TimeBombShooter ->
             responseHelp 0
 
 
@@ -518,6 +539,9 @@ turretToShape { radius, hp, kind } =
 
                 HomingShooter ->
                     "orange"
+
+                TimeBombShooter ->
+                    "deeppink"
 
         fullShape =
             group
@@ -710,6 +734,7 @@ type TurretKind
     | TripleGravityShooter
     | GravityShooterOnDeathShoot5
     | HomingShooter
+    | TimeBombShooter
 
 
 type alias LevelConfig =
@@ -731,7 +756,7 @@ levels =
       ]
 
     -- test level
-    , [ [ HomingShooter
+    , [ [ TimeBombShooter
         ]
       , [ GravityShooter1, GravityShooter1 ]
       , [ GravityShooter1, GravityShooter2 ]

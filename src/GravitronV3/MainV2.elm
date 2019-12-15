@@ -134,22 +134,21 @@ type alias Bullet =
     CircularBody {}
 
 
-initialBullet : Bullet
-initialBullet =
-    { position = Pt.origin
-    , velocity = Vec.fromRTheta 3 0
-    , radius = 10
-    }
-
-
 initBullet : Circular a -> Float -> Bullet
 initBullet turret angle =
-    { initialBullet
-        | position =
-            Pt.moveBy
-                (Vec.fromRTheta (initialBullet.radius + turret.radius) angle)
-                turret.position
-        , velocity = Vec.fromRTheta 3 angle
+    let
+        radius =
+            10
+
+        speed =
+            3
+    in
+    { position =
+        Pt.moveBy
+            (Vec.fromRTheta (radius + turret.radius) angle)
+            turret.position
+    , velocity = Vec.fromRTheta speed angle
+    , radius = radius
     }
 
 

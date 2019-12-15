@@ -5,7 +5,7 @@ import Browser.Events as E
 import GravitronV3.Canvas as Canvas exposing (..)
 import GravitronV3.Counter as Counter exposing (Counter)
 import GravitronV3.Point as Pt exposing (Point)
-import GravitronV3.RigidBody as RigidBody exposing (CircularBody, RigidBody)
+import GravitronV3.RigidBody as RigidBody exposing (Circular, CircularBody, RigidBody)
 import GravitronV3.Screen as Screen exposing (Screen)
 import GravitronV3.Timer as Timer exposing (Timer)
 import GravitronV3.Vec as Vec exposing (Vec, vec)
@@ -142,7 +142,7 @@ initialBullet =
     }
 
 
-initBullet : Turret -> Float -> Bullet
+initBullet : Circular a -> Float -> Bullet
 initBullet turret angle =
     { initialBullet
         | position =

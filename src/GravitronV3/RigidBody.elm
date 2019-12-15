@@ -1,4 +1,4 @@
-module GravitronV3.RigidBody exposing (CircularBody, RigidBody, doCircleOverlap, step, stepWithSeed)
+module GravitronV3.RigidBody exposing (Circular, CircularBody, RigidBody, doCircleOverlap, step, stepWithSeed)
 
 import GravitronV3.Point as Pt exposing (Point)
 import GravitronV3.Vec as Vec exposing (Vec)

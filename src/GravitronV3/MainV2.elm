@@ -361,18 +361,22 @@ fireBulletOnTrigger player turret =
 
 turretDeathResponse : Env -> Turret -> Response
 turretDeathResponse env turret =
+    let
+        responseHelp bulletCt =
+            addTurretExplosionWithBullets env bulletCt turret
+    in
     case turret.kind of
         GravityShooter1 ->
-            addTurretExplosionWithBullets env 0 turret
+            responseHelp 0
 
         GravityShooter2 ->
-            addTurretExplosionWithBullets env 0 turret
+            responseHelp 0
 
         TripleGravityShooter ->
-            addTurretExplosionWithBullets env 0 turret
+            responseHelp 0
 
         GravityShooterOnDeathShoot5 ->
-            addTurretExplosionWithBullets env 5 turret
+            responseHelp 5
 
 
 addTurretExplosionWithBullets : Env -> Int -> Turret -> Response

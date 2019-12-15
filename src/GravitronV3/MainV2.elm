@@ -85,7 +85,7 @@ bounceWithinScreen env factor m =
         m.velocity
 
 
-gravitateTo : RigidBody target -> RigidBody model -> Vec
+gravitateTo : Circular target -> RigidBody model -> Vec
 gravitateTo target model =
     model.velocity
         |> Vec.add
@@ -94,7 +94,7 @@ gravitateTo target model =
             )
 
 
-homingTo : RigidBody target -> RigidBody model -> Vec
+homingTo : Circular target -> RigidBody model -> Vec
 homingTo target model =
     let
         homingVec =
@@ -181,21 +181,21 @@ initHomingBullet =
     initBullet Homing
 
 
-isBulletIntersecting : BulletCtx bc -> List Bullet -> Bullet -> Bool
+isBulletIntersecting : BulletCtx a p t -> List Bullet -> Bullet -> Bool
 isBulletIntersecting ctx otherBullets bullet =
     RigidBody.doCircleOverlap bullet ctx.player
         || List.any (RigidBody.doCircleOverlap bullet) ctx.turrets
         || List.any (RigidBody.doCircleOverlap bullet) otherBullets
 
 
-type alias BulletCtx a =
+type alias BulletCtx a p t =
     { a
-        | player : Player
-        , turrets : List Turret
+        | player : Circular p
+        , turrets : List (Circular t)
     }
 
 
-updateBullet : Env -> BulletCtx bc -> Bullet -> Bullet
+updateBullet : Env -> BulletCtx a p t -> Bullet -> Bullet
 updateBullet env ctx bullet =
     RigidBody.step
         [ case bullet.motion of
@@ -209,7 +209,7 @@ updateBullet env ctx bullet =
         bullet
 
 
-updateBullets : Env -> BulletCtx bc -> List Bullet -> List Response
+updateBullets : Env -> BulletCtx a p t -> List Bullet -> List Response
 updateBullets env ctx =
     let
         reducer :

@@ -233,11 +233,12 @@ isBulletDead bullet =
 updateBullets : Screen -> BulletCtx a p t -> List Bullet -> List Response
 updateBullets screen ctx =
     let
-        update_ :
-            ( Bullet, List Bullet )
-            -> Response
+        update_ : ( Bullet, List Bullet ) -> Response
         update_ ( bullet, otherBullets ) =
-            if isBulletIntersecting ctx otherBullets bullet || isBulletDead bullet then
+            if
+                isBulletIntersecting ctx otherBullets bullet
+                    || isBulletDead bullet
+            then
                 explosionFrom bulletToShape bullet
                     |> AddExplosion
 

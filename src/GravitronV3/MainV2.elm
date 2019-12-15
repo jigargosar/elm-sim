@@ -332,8 +332,8 @@ when =
     PF.when
 
 
-fireBullet : Player -> Turret -> Response
-fireBullet player turret =
+fireBulletOnTrigger : Player -> Turret -> Response
+fireBulletOnTrigger player turret =
     let
         angle =
             Pt.vecFromTo turret.position player.position
@@ -396,7 +396,7 @@ updateTurret env ctx turret =
         in
         if isDone then
             Batch
-                [ fireBullet ctx.player turret
+                [ fireBulletOnTrigger ctx.player turret
                 , addTurretResponse
                 ]
 

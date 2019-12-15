@@ -622,21 +622,20 @@ turretPositions =
 
 
 turretPlaceholdersForLevel : LevelId -> List TurretPlaceholder
-turretPlaceholdersForLevel ( major, minor ) =
+turretPlaceholdersForLevel levelId =
     let
         subLevelConfig : SubLevelConfig
         subLevelConfig =
-            levels
-                |> List.drop major
-                |> List.head
-                |> Maybe.andThen (List.drop minor >> List.head)
-                |> Maybe.withDefault []
+            getSubLevelConfig levelId
+
+        turretCount =
+            subLevelConfig |> List.length
     in
     List.map2 Tuple.pair turretPositions subLevelConfig
         |> List.indexedMap
             (\i ->
                 initTurret
-                    >> initTurretPlaceholder (toFloat i / toFloat (minor + 1))
+                    >> initTurretPlaceholder (toFloat i / toFloat turretCount)
             )
 
 

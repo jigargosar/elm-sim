@@ -594,7 +594,11 @@ type TurretKind
 
 
 type alias LevelConfig =
-    List (List TurretKind)
+    List SubLevelConfig
+
+
+type alias SubLevelConfig =
+    List TurretKind
 
 
 levels : List LevelConfig

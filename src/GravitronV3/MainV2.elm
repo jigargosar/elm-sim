@@ -180,11 +180,6 @@ initGravityBullet =
     initBullet Gravity
 
 
-initTimeBombBullet : Circular a -> Float -> Bullet
-initTimeBombBullet =
-    initBullet Gravity
-
-
 initHomingBullet : Circular a -> Float -> Bullet
 initHomingBullet =
     initBullet Homing
@@ -304,13 +299,25 @@ type alias HP =
     { current : Int, max : Int }
 
 
+type alias TurretConfig =
+    { maxHP : Int
+    , color : String
+    , revengeOnDeath : Bool
+    , bulletKind : BulletKind
+    , bulletCount : BulletCount
+    }
+
+
 type alias Turret =
     { position : Point
     , velocity : Vec
     , radius : Float
     , bulletTimer : Counter
     , hp : HP
-    , kind : TurretKind
+    , bulletKind : BulletKind
+    , bulletCount : BulletCount
+    , color : String
+    , revengeOnDeath : Bool
     }
 
 
@@ -319,10 +326,36 @@ initHP maxHP =
     HP maxHP maxHP
 
 
-initTurret : ( Point, TurretKind ) -> Turret
-initTurret ( point, kind ) =
+type BulletCount
+    = SingleBullet
+    | TripleBullets
+    | FiveBullets
+
+
+turretKindToConfig : TurretKind -> TurretConfig
+turretKindToConfig kind =
     let
-        maxHP =
+        color =
+            case kind of
+                GravityShooter1HP ->
+                    "red"
+
+                GravityShooter2HP ->
+                    "blue"
+
+                TripleGravityShooter ->
+                    "green"
+
+                GravityShooterOnDeathShoot5 ->
+                    "purple"
+
+                HomingShooter ->
+                    "orange"
+
+                TimeBombShooter ->
+                    "deeppink"
+
+        maxHp =
             case kind of
                 GravityShooter1HP ->
                     1
@@ -341,13 +374,50 @@ initTurret ( point, kind ) =
 
                 TimeBombShooter ->
                     3
+
+        ( bulletKind, bulletCount ) =
+            case kind of
+                GravityShooter1HP ->
+                    ( Gravity, SingleBullet )
+
+                GravityShooter2HP ->
+                    ( Gravity, SingleBullet )
+
+                TripleGravityShooter ->
+                    ( Gravity, TripleBullets )
+
+                GravityShooterOnDeathShoot5 ->
+                    ( Gravity, SingleBullet )
+
+                HomingShooter ->
+                    ( Homing, SingleBullet )
+
+                TimeBombShooter ->
+                    ( Gravity, SingleBullet )
+    in
+    { maxHP = maxHp
+    , color = color
+    , revengeOnDeath = kind == GravityShooterOnDeathShoot5
+    , bulletKind = bulletKind
+    , bulletCount = bulletCount
+    }
+
+
+initTurret : ( Point, TurretKind ) -> Turret
+initTurret ( point, kind ) =
+    let
+        config =
+            turretKindToConfig kind
     in
     { position = point
     , velocity = Vec.zero
     , radius = 25
     , bulletTimer = Counter.init 60
-    , hp = initHP maxHP
-    , kind = kind
+    , hp = initHP config.maxHP
+    , bulletKind = config.bulletKind
+    , bulletCount = config.bulletCount
+    , color = config.color
+    , revengeOnDeath = config.revengeOnDeath
     }
 
 
@@ -397,68 +467,53 @@ when =
 fireBulletOnTrigger : Player -> Turret -> Response
 fireBulletOnTrigger player turret =
     let
+        angleToBullet angle =
+            case turret.bulletKind of
+                Gravity ->
+                    AddBullet (initGravityBullet turret angle)
+
+                Homing ->
+                    AddBullet (initHomingBullet turret angle)
+    in
+    let
         angle =
             Pt.vecFromTo turret.position player.position
                 |> Vec.angle
     in
-    case turret.kind of
-        GravityShooter1HP ->
-            AddBullet (initGravityBullet turret angle)
+    case turret.bulletCount of
+        SingleBullet ->
+            angleToBullet angle
 
-        GravityShooter2HP ->
-            AddBullet (initGravityBullet turret angle)
-
-        TripleGravityShooter ->
+        TripleBullets ->
             let
                 angleSpread =
                     turns (1 / 8)
             in
             [ angle - angleSpread, angle, angle + angleSpread ]
-                |> List.map (initGravityBullet turret >> AddBullet)
+                |> List.map angleToBullet
                 |> Batch
 
-        GravityShooterOnDeathShoot5 ->
-            AddBullet (initGravityBullet turret angle)
-
-        HomingShooter ->
-            AddBullet (initHomingBullet turret angle)
-
-        TimeBombShooter ->
-            AddBullet (initTimeBombBullet turret angle)
+        FiveBullets ->
+            breakTurn 5
+                |> List.map angleToBullet
+                |> Batch
 
 
 turretDeathResponse : Turret -> Response
 turretDeathResponse turret =
     let
-        responseHelp bulletCt =
-            addTurretExplosionWithBullets bulletCt turret
+        addBulletExplosion =
+            AddExplosion (explosionFrom turretToShape turret)
     in
-    case turret.kind of
-        GravityShooter1HP ->
-            responseHelp 0
+    case turret.revengeOnDeath of
+        False ->
+            addBulletExplosion
 
-        GravityShooter2HP ->
-            responseHelp 0
-
-        TripleGravityShooter ->
-            responseHelp 0
-
-        GravityShooterOnDeathShoot5 ->
-            responseHelp 5
-
-        HomingShooter ->
-            responseHelp 0
-
-        TimeBombShooter ->
-            responseHelp 0
-
-
-addTurretExplosionWithBullets : Int -> Turret -> Response
-addTurretExplosionWithBullets bulletCt turret =
-    breakTurn bulletCt
-        |> List.map (initGravityBullet turret >> AddBullet)
-        |> (::) (AddExplosion (explosionFrom turretToShape turret))
-        |> Batch
+        True ->
+            breakTurn 5
+                |> List.map (initGravityBullet turret >> AddBullet)
+                |> (::) addBulletExplosion
+                |> Batch
 
 
 breakTurn : Int -> List Float
@@ -511,28 +566,8 @@ updateTurrets ctx =
 
 
 turretToShape : Turret -> Shape
-turretToShape { radius, hp, kind } =
+turretToShape { radius, hp, color } =
     let
-        color =
-            case kind of
-                GravityShooter1HP ->
-                    "red"
-
-                GravityShooter2HP ->
-                    "blue"
-
-                TripleGravityShooter ->
-                    "green"
-
-                GravityShooterOnDeathShoot5 ->
-                    "purple"
-
-                HomingShooter ->
-                    "orange"
-
-                TimeBombShooter ->
-                    "deeppink"
-
         fullShape =
             group
                 [ circle radius

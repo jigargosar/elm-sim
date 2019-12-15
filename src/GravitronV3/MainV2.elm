@@ -605,15 +605,11 @@ explosionFrom func entity =
 
 updateExplosion : Explosion -> Response
 updateExplosion explosion =
-    let
-        ( done, timer ) =
-            Counter.cycleStep explosion.timer
-    in
-    if done then
+    if Counter.isDone explosion.timer then
         Batch []
 
     else
-        AddExplosion { explosion | timer = timer }
+        AddExplosion { explosion | timer = Counter.step explosion.timer }
 
 
 updateExplosions : List Explosion -> List Response

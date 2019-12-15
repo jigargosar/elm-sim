@@ -481,13 +481,10 @@ when =
 fireWeaponFromTo : CircularBody a -> CircularBody b -> ( BulletKind, BulletCount ) -> Response
 fireWeaponFromTo src target ( bulletKind, bulletCount ) =
     let
-        angleToBullet angle =
-            case bulletKind of
-                Gravity ->
-                    AddBullet (initGravityBullet src angle)
-
-                Homing ->
-                    AddBullet (initHomingBullet src angle)
+        addBulletWithAngle : Float -> Response
+        addBulletWithAngle angle =
+            initBullet bulletKind src angle
+                |> AddBullet
     in
     let
         angle =
@@ -496,7 +493,7 @@ fireWeaponFromTo src target ( bulletKind, bulletCount ) =
     in
     case bulletCount of
         SingleBullet ->
-            angleToBullet angle
+            addBulletWithAngle angle
 
         TripleBullets ->
             let
@@ -504,12 +501,12 @@ fireWeaponFromTo src target ( bulletKind, bulletCount ) =
                     turns (1 / 8)
             in
             [ angle - angleSpread, angle, angle + angleSpread ]
-                |> List.map angleToBullet
+                |> List.map addBulletWithAngle
                 |> Batch
 
         FiveBullets ->
             splitTurnInto 5
-                |> List.map angleToBullet
+                |> List.map addBulletWithAngle
                 |> Batch
 
 

@@ -359,6 +359,7 @@ fireBullet player turret =
             AddBullet (initBullet turret angle)
 
 
+turretDeathResponse : Env -> Turret -> Response
 turretDeathResponse env turret =
     AddExplosion (explosionFrom env turretToShape turret)
 

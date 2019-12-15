@@ -1,7 +1,9 @@
 module GravitronV3.Counter exposing
     ( Counter
+    , cycleStep
     , init
     , initDelayedBy
+    , isDone
     , progress
     , step
     )
@@ -30,8 +32,8 @@ initDelayedBy delayPct maxSteps_ =
     { current = 0, maxSteps = maxSteps_, delay = delay }
 
 
-step : Counter -> ( Bool, Counter )
-step ct =
+cycleStep : Counter -> ( Bool, Counter )
+cycleStep ct =
     if ct.current - ct.delay >= ct.maxSteps then
         ( True, { ct | current = 0, delay = 0 } )
 
@@ -39,10 +41,23 @@ step ct =
         ( False, { ct | current = ct.current + 1 } )
 
 
+step : Counter -> Counter
+step ct =
+    { ct | current = ct.current + 1 |> clamp 0 ct.maxSteps }
+
+
+isDone : Counter -> Bool
+isDone ct =
+    progress ct == 1
+
+
 progress : Counter -> Float
 progress ct =
     if ct.current - ct.delay <= 0 then
         0
+
+    else if ct.current - ct.delay >= ct.maxSteps then
+        1
 
     else
         toFloat (ct.current - ct.delay) / toFloat ct.maxSteps

@@ -147,18 +147,18 @@ playerToShape player =
 -- Bullet
 
 
-type BulletMotion
+type BulletKind
     = Gravity
     | Homing
     | GravityTimeBomb Counter
 
 
 type alias Bullet =
-    CircularBody { motion : BulletMotion }
+    CircularBody { kind : BulletKind }
 
 
-initBullet : BulletMotion -> Circular a -> Float -> Bullet
-initBullet motion gun angle =
+initBullet : BulletKind -> Circular a -> Float -> Bullet
+initBullet kind gun angle =
     let
         radius =
             6
@@ -172,7 +172,7 @@ initBullet motion gun angle =
             gun.position
     , velocity = Vec.fromRTheta speed angle
     , radius = radius
-    , motion = motion
+    , kind = kind
     }
 
 
@@ -205,6 +205,19 @@ type alias BulletCtx a p t =
     }
 
 
+stepBulletCounter : Bullet -> Bullet
+stepBulletCounter bullet =
+    case bullet.kind of
+        Gravity ->
+            bullet
+
+        Homing ->
+            bullet
+
+        GravityTimeBomb counter ->
+            { bullet | kind = GravityTimeBomb (Counter.step counter) }
+
+
 updateBullets : Screen -> BulletCtx a p t -> List Bullet -> List Response
 updateBullets screen ctx =
     let
@@ -219,7 +232,7 @@ updateBullets screen ctx =
             else
                 bullet
                     |> RigidBody.step
-                        [ case bullet.motion of
+                        [ case bullet.kind of
                             Gravity ->
                                 gravitateTo ctx.player
 
@@ -230,6 +243,7 @@ updateBullets screen ctx =
                                 gravitateTo ctx.player
                         , bounceWithinScreen screen 0.5
                         ]
+                    |> stepBulletCounter
                     |> AddBullet
     in
     List.Extra.select >> List.map update_
@@ -238,11 +252,11 @@ updateBullets screen ctx =
 bulletToShape : Bullet -> Shape
 bulletToShape bullet =
     let
-        { radius, motion, velocity } =
+        { radius, kind, velocity } =
             bullet
 
         otherShape =
-            case motion of
+            case kind of
                 Gravity ->
                     group []
 
@@ -296,7 +310,7 @@ updateTurretPlaceHolder : TurretPlaceholder -> Response
 updateTurretPlaceHolder model =
     let
         ( isDone, counter ) =
-            Counter.step model.counter
+            Counter.cycleStep model.counter
     in
     if isDone then
         AddTurret model.turret
@@ -489,7 +503,7 @@ turretStepResponse : TurretCtx ct -> Turret -> Response
 turretStepResponse ctx turret =
     let
         ( isDone, bulletTimer ) =
-            Counter.step turret.bulletTimer
+            Counter.cycleStep turret.bulletTimer
 
         addTurretResponse =
             { turret | bulletTimer = bulletTimer }
@@ -582,7 +596,7 @@ updateExplosion : Explosion -> Response
 updateExplosion explosion =
     let
         ( done, timer ) =
-            Counter.step explosion.timer
+            Counter.cycleStep explosion.timer
     in
     if done then
         Batch []

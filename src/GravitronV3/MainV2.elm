@@ -313,6 +313,9 @@ initTurret ( point, kind ) =
 
                 GravityShooterOnDeathShoot5 ->
                     2
+
+                HomingShooter ->
+                    4
     in
     { position = point
     , velocity = Vec.zero
@@ -392,6 +395,9 @@ fireBulletOnTrigger player turret =
         GravityShooterOnDeathShoot5 ->
             AddBullet (initGravityBullet turret angle)
 
+        HomingShooter ->
+            AddBullet (initHomingBullet turret angle)
+
 
 turretDeathResponse : Env -> Turret -> Response
 turretDeathResponse env turret =
@@ -411,6 +417,9 @@ turretDeathResponse env turret =
 
         GravityShooterOnDeathShoot5 ->
             responseHelp 5
+
+        HomingShooter ->
+            responseHelp 0
 
 
 addTurretExplosionWithBullets : Env -> Int -> Turret -> Response
@@ -487,11 +496,14 @@ turretToShape { radius, hp, kind } =
                 GravityShooterOnDeathShoot5 ->
                     "purple"
 
+                HomingShooter ->
+                    "orange"
+
         fullShape =
             group
                 [ circle radius
                     |> fill color
-                    |> fade 0.7
+                    |> fade 0.9
                 ]
     in
     group
@@ -660,6 +672,7 @@ type TurretKind
     | GravityShooter2
     | TripleGravityShooter
     | GravityShooterOnDeathShoot5
+    | HomingShooter
 
 
 type alias LevelConfig =
@@ -681,7 +694,7 @@ levels =
       ]
 
     -- test level
-    , [ [ GravityShooterOnDeathShoot5
+    , [ [ HomingShooter
         , GravityShooterOnDeathShoot5
         , TripleGravityShooter
         , TripleGravityShooter

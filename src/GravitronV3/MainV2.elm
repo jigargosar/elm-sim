@@ -138,7 +138,7 @@ initBullet : Circular a -> Float -> Bullet
 initBullet gun angle =
     let
         radius =
-            10
+            6
 
         speed =
             3

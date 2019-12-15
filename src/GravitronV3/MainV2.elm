@@ -494,7 +494,7 @@ fireWeaponFromTo src target ( bulletKind, bulletCount ) =
                 |> Batch
 
         FiveBullets ->
-            breakTurn 5
+            splitTurnInto 5
                 |> List.map angleToBullet
                 |> Batch
 
@@ -516,8 +516,8 @@ turretDeathResponse player turret =
                 |> Batch
 
 
-breakTurn : Int -> List Float
-breakTurn parts =
+splitTurnInto : Int -> List Float
+splitTurnInto parts =
     if parts <= 0 then
         []
 

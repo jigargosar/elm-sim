@@ -230,6 +230,23 @@ isBulletDead bullet =
             Counter.isDone counter
 
 
+bulletDeathResponse : Bullet -> Response
+bulletDeathResponse bullet =
+    let
+        addBulletExplosion =
+            explosionFrom bulletToShape bullet |> AddExplosion
+    in
+    case bullet.kind of
+        Gravity ->
+            addBulletExplosion
+
+        Homing ->
+            addBulletExplosion
+
+        GravityTimeBomb _ ->
+            addBulletExplosion
+
+
 updateBullets : Screen -> BulletCtx a p t -> List Bullet -> List Response
 updateBullets screen ctx =
     let

@@ -359,10 +359,14 @@ fireBullet player turret =
             AddBullet (initBullet turret angle)
 
 
+turretDeathResponse env turret =
+    AddExplosion (explosionFrom env turretToShape turret)
+
+
 updateTurret : Env -> TurretCtx tc -> Turret -> Response
 updateTurret env ctx turret =
     if isDead turret then
-        AddExplosion (explosionFrom env turretToShape turret)
+        turretDeathResponse env turret
 
     else
         let

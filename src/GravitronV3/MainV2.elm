@@ -571,7 +571,7 @@ getNextLevel ( major, minor ) =
 turretPlaceholdersForLevel : ( Int, Int ) -> List TurretPlaceholder
 turretPlaceholdersForLevel ( major, minor ) =
     let
-        subLevelConfig : List TurretKind
+        subLevelConfig : SubLevelConfig
         subLevelConfig =
             levels
                 |> List.drop major

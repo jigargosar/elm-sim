@@ -276,6 +276,9 @@ initTurret ( point, kind ) =
 
                 TripleGravityShooter ->
                     3
+
+                GravityShooterOnDeathShoot5 ->
+                    2
     in
     { position = point
     , velocity = Vec.zero
@@ -352,6 +355,9 @@ fireBullet player turret =
                 |> List.map (initBullet turret >> AddBullet)
                 |> Batch
 
+        GravityShooterOnDeathShoot5 ->
+            AddBullet (initBullet turret angle)
+
 
 updateTurret : Env -> TurretCtx tc -> Turret -> Response
 updateTurret env ctx turret =
@@ -369,11 +375,6 @@ updateTurret env ctx turret =
                     |> AddTurret
         in
         if isDone then
-            let
-                angle =
-                    Pt.vecFromTo turret.position ctx.player.position
-                        |> Vec.angle
-            in
             Batch
                 [ fireBullet ctx.player turret
                 , addTurretResponse
@@ -401,6 +402,9 @@ turretToShape { radius, hp, kind } =
 
                 TripleGravityShooter ->
                     "green"
+
+                GravityShooterOnDeathShoot5 ->
+                    "purple"
 
         fullShape =
             group
@@ -574,6 +578,7 @@ type TurretKind
     = GravityShooter1
     | GravityShooter2
     | TripleGravityShooter
+    | GravityShooterOnDeathShoot5
 
 
 type alias LevelConfig =
@@ -595,7 +600,7 @@ levels =
       ]
 
     -- test level
-    , [ [ TripleGravityShooter, TripleGravityShooter ]
+    , [ [ GravityShooterOnDeathShoot5, TripleGravityShooter, TripleGravityShooter ]
       , [ GravityShooter1, GravityShooter1 ]
       , [ GravityShooter1, GravityShooter2 ]
       , [ GravityShooter2, GravityShooter2 ]

@@ -180,6 +180,11 @@ initGravityBullet =
     initBullet Gravity
 
 
+initTimeBombBullet : Circular a -> Float -> Bullet
+initTimeBombBullet =
+    initBullet Gravity
+
+
 initHomingBullet : Circular a -> Float -> Bullet
 initHomingBullet =
     initBullet Homing
@@ -419,7 +424,7 @@ fireBulletOnTrigger player turret =
             AddBullet (initHomingBullet turret angle)
 
         TimeBombShooter ->
-            AddBullet (initGravityBullet turret angle)
+            AddBullet (initTimeBombBullet turret angle)
 
 
 turretDeathResponse : Turret -> Response

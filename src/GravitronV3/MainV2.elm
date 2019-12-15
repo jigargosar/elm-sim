@@ -175,6 +175,11 @@ initGravityBullet =
     initBullet Gravity
 
 
+initHomingBullet : Circular a -> Float -> Bullet
+initHomingBullet =
+    initBullet Homing
+
+
 isBulletIntersecting : BulletCtx bc -> List Bullet -> Bullet -> Bool
 isBulletIntersecting ctx otherBullets bullet =
     RigidBody.doCircleOverlap bullet ctx.player

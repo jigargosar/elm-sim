@@ -603,13 +603,13 @@ levels =
       , [ GravityShooter1, GravityShooter1 ]
       , [ GravityShooter1, GravityShooter2 ]
       , [ GravityShooter2, GravityShooter2 ]
-      , [ GravityShooter2, GravityShooter2, GravityShooter2, GravityShooter2 ]
+      , List.repeat 4 GravityShooter2
       ]
     , [ [ GravityShooter1 ]
       , [ GravityShooter1, GravityShooter1 ]
       , [ GravityShooter1, GravityShooter2 ]
       , [ GravityShooter2, GravityShooter2 ]
-      , [ GravityShooter2, GravityShooter2, GravityShooter2, GravityShooter2 ]
+      , List.repeat 4 GravityShooter2
       ]
     ]
 

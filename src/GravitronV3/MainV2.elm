@@ -218,6 +218,18 @@ stepBulletCounter bullet =
             { bullet | kind = GravityTimeBomb (Counter.step counter) }
 
 
+isBulletDead bullet =
+    case bullet.kind of
+        Gravity ->
+            False
+
+        Homing ->
+            False
+
+        GravityTimeBomb counter ->
+            Counter.isDone counter
+
+
 updateBullets : Screen -> BulletCtx a p t -> List Bullet -> List Response
 updateBullets screen ctx =
     let
@@ -225,7 +237,7 @@ updateBullets screen ctx =
             ( Bullet, List Bullet )
             -> Response
         update_ ( bullet, otherBullets ) =
-            if isBulletIntersecting ctx otherBullets bullet then
+            if isBulletIntersecting ctx otherBullets bullet || isBulletDead bullet then
                 explosionFrom bulletToShape bullet
                     |> AddExplosion
 

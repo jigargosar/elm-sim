@@ -256,8 +256,7 @@ updateBullets screen ctx =
                 isBulletIntersecting ctx otherBullets bullet
                     || isBulletDead bullet
             then
-                explosionFrom bulletToShape bullet
-                    |> AddExplosion
+                bulletDeathResponse bullet
 
             else
                 bullet

@@ -578,7 +578,6 @@ turretPlaceholdersForLevel ( major, minor ) =
                 |> List.head
                 |> Maybe.andThen (List.drop minor >> List.head)
                 |> Maybe.withDefault []
-                |> Debug.log "subLevelConfig"
     in
     List.map2 Tuple.pair turretPositions subLevelConfig
         |> List.indexedMap

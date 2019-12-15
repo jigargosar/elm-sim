@@ -218,6 +218,11 @@ initBullet kind gun angle =
     }
 
 
+isFakeBullet : Bullet -> Bool
+isFakeBullet bullet =
+    bullet.timeBomb /= Nothing
+
+
 isBulletIntersecting : BulletCtx bc -> List Bullet -> Bullet -> Bool
 isBulletIntersecting ctx otherBullets bullet =
     RigidBody.doCircleOverlap bullet ctx.player

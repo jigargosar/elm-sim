@@ -503,11 +503,11 @@ turretToShape { radius, hp, kind } =
             group
                 [ circle radius
                     |> fill color
-                    |> fade 0.8
+                    |> fade 0.7
                 ]
     in
     group
-        [ fullShape |> fade 0.8
+        [ fullShape |> fade 0.9
         , fullShape |> scale (hpPct hp)
         ]
 

@@ -547,6 +547,44 @@ move =
 
 
 
+-- Levels
+
+
+type alias LevelId =
+    ( Int, Int )
+
+
+levels : List LevelConfig
+levels =
+    [ [ [ GravityShooter1 ]
+      , [ GravityShooter1, GravityShooter1 ]
+      , [ GravityShooter1, GravityShooter2 ]
+      , [ GravityShooter2, GravityShooter2 ]
+      , List.repeat 4 GravityShooter2
+      ]
+    , [ [ GravityShooter1 ]
+      , [ GravityShooter1, GravityShooter1 ]
+      , [ GravityShooter1, GravityShooter2 ]
+      , [ GravityShooter2, GravityShooter2 ]
+      , List.repeat 4 GravityShooter2
+      ]
+    ]
+
+
+maxLevels =
+    List.length levels
+
+
+nextLevelId : LevelId -> LevelId
+nextLevelId ( major, minor ) =
+    if minor >= 4 then
+        ( major + 1 |> modBy maxLevels, 0 )
+
+    else
+        ( major, minor + 1 )
+
+
+
 -- Game
 
 
@@ -558,14 +596,6 @@ turretPositions =
     in
     [ ( -1, -1 ), ( 1, 1 ), ( 1, -1 ), ( -1, 1 ) ]
         |> List.map (Tuple.mapBoth ((*) dst) ((*) dst) >> Pt.xy)
-
-
-getNextLevel ( major, minor ) =
-    if minor >= 4 then
-        ( major + 1 |> modBy maxLevels, 0 )
-
-    else
-        ( major, minor + 1 )
 
 
 turretPlaceholdersForLevel : ( Int, Int ) -> List TurretPlaceholder
@@ -600,27 +630,6 @@ type alias SubLevelConfig =
     List TurretKind
 
 
-levels : List LevelConfig
-levels =
-    [ [ [ GravityShooter1 ]
-      , [ GravityShooter1, GravityShooter1 ]
-      , [ GravityShooter1, GravityShooter2 ]
-      , [ GravityShooter2, GravityShooter2 ]
-      , List.repeat 4 GravityShooter2
-      ]
-    , [ [ GravityShooter1 ]
-      , [ GravityShooter1, GravityShooter1 ]
-      , [ GravityShooter1, GravityShooter2 ]
-      , [ GravityShooter2, GravityShooter2 ]
-      , List.repeat 4 GravityShooter2
-      ]
-    ]
-
-
-maxLevels =
-    List.length levels
-
-
 type alias Game =
     { world : World
     , level : ( Int, Int )
@@ -650,7 +659,7 @@ updateGame env game =
     if isLevelComplete then
         let
             newLevel =
-                getNextLevel game.level
+                nextLevelId game.level
 
             majorChanged =
                 Tuple.first game.level /= Tuple.first newLevel

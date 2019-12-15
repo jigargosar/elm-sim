@@ -324,10 +324,10 @@ initTurret ( point, kind ) =
     let
         maxHP =
             case kind of
-                GravityShooter1 ->
+                GravityShooter1HP ->
                     1
 
-                GravityShooter2 ->
+                GravityShooter2HP ->
                     2
 
                 TripleGravityShooter ->
@@ -402,10 +402,10 @@ fireBulletOnTrigger player turret =
                 |> Vec.angle
     in
     case turret.kind of
-        GravityShooter1 ->
+        GravityShooter1HP ->
             AddBullet (initGravityBullet turret angle)
 
-        GravityShooter2 ->
+        GravityShooter2HP ->
             AddBullet (initGravityBullet turret angle)
 
         TripleGravityShooter ->
@@ -434,10 +434,10 @@ turretDeathResponse turret =
             addTurretExplosionWithBullets bulletCt turret
     in
     case turret.kind of
-        GravityShooter1 ->
+        GravityShooter1HP ->
             responseHelp 0
 
-        GravityShooter2 ->
+        GravityShooter2HP ->
             responseHelp 0
 
         TripleGravityShooter ->
@@ -515,10 +515,10 @@ turretToShape { radius, hp, kind } =
     let
         color =
             case kind of
-                GravityShooter1 ->
+                GravityShooter1HP ->
                     "red"
 
-                GravityShooter2 ->
+                GravityShooter2HP ->
                     "blue"
 
                 TripleGravityShooter ->
@@ -719,8 +719,8 @@ type alias LevelId =
 
 
 type TurretKind
-    = GravityShooter1
-    | GravityShooter2
+    = GravityShooter1HP
+    | GravityShooter2HP
     | TripleGravityShooter
     | GravityShooterOnDeathShoot5
     | HomingShooter
@@ -738,20 +738,20 @@ type alias SubLevelConfig =
 levels : List LevelConfig
 levels =
     [ -- level 1
-      [ [ GravityShooter1 ]
-      , [ GravityShooter1, GravityShooter1 ]
-      , [ GravityShooter1, GravityShooter2 ]
-      , [ GravityShooter2, GravityShooter2 ]
-      , List.repeat 4 GravityShooter2
+      [ [ GravityShooter1HP ]
+      , [ GravityShooter1HP, GravityShooter1HP ]
+      , [ GravityShooter1HP, GravityShooter2HP ]
+      , [ GravityShooter2HP, GravityShooter2HP ]
+      , List.repeat 4 GravityShooter2HP
       ]
 
     -- test level
     , [ [ TimeBombShooter
         ]
-      , [ GravityShooter1, GravityShooter1 ]
-      , [ GravityShooter1, GravityShooter2 ]
-      , [ GravityShooter2, GravityShooter2 ]
-      , List.repeat 4 GravityShooter2
+      , [ GravityShooter1HP, GravityShooter1HP ]
+      , [ GravityShooter1HP, GravityShooter2HP ]
+      , [ GravityShooter2HP, GravityShooter2HP ]
+      , List.repeat 4 GravityShooter2HP
       ]
     ]
 

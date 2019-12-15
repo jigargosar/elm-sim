@@ -631,7 +631,7 @@ turretPlaceholdersForLevel levelId =
 
 type alias Game =
     { world : World
-    , level : LevelId
+    , levelId : LevelId
     }
 
 
@@ -642,7 +642,7 @@ initialGame =
             ( 0, 4 )
     in
     { world = initWorld (turretPlaceholdersForLevel level)
-    , level = level
+    , levelId = level
     }
 
 
@@ -658,10 +658,10 @@ updateGame env game =
     if isLevelComplete then
         let
             newLevel =
-                nextLevelId game.level
+                nextLevelId game.levelId
 
             majorChanged =
-                Tuple.first game.level /= Tuple.first newLevel
+                Tuple.first game.levelId /= Tuple.first newLevel
 
             newTurretPlaceholders =
                 turretPlaceholdersForLevel newLevel
@@ -680,7 +680,7 @@ updateGame env game =
         in
         { game
             | world = newWorld
-            , level = newLevel
+            , levelId = newLevel
         }
 
     else

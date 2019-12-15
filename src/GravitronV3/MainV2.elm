@@ -376,7 +376,18 @@ turretDeathResponse env turret =
             addExplosion
 
         GravityShooterOnDeathShoot5 ->
-            addExplosion
+            let
+                angleFrac =
+                    turns (1 / 5)
+
+                angles =
+                    List.range 0 4
+                        |> List.map (toFloat >> (*) angleFrac)
+            in
+            angles
+                |> List.map (initBullet turret >> AddBullet)
+                |> (::) addExplosion
+                |> Batch
 
 
 updateTurret : Env -> TurretCtx tc -> Turret -> Response
@@ -620,7 +631,11 @@ levels =
       ]
 
     -- test level
-    , [ [ GravityShooterOnDeathShoot5, TripleGravityShooter, TripleGravityShooter ]
+    , [ [ GravityShooterOnDeathShoot5
+        , GravityShooterOnDeathShoot5
+        , TripleGravityShooter
+        , TripleGravityShooter
+        ]
       , [ GravityShooter1, GravityShooter1 ]
       , [ GravityShooter1, GravityShooter2 ]
       , [ GravityShooter2, GravityShooter2 ]

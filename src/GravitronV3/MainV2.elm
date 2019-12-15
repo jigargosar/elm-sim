@@ -134,8 +134,8 @@ type alias Bullet =
     CircularBody {}
 
 
-initBullet : Bullet
-initBullet =
+initialBullet : Bullet
+initialBullet =
     { position = Pt.origin
     , velocity = Vec.fromRTheta 3 0
     , radius = 10
@@ -355,7 +355,7 @@ updateTurret env ctx turret =
         in
         if isDone then
             Batch
-                [ AddBullet (initBullet |> setPosVelFromTo turret ctx.player)
+                [ AddBullet (initialBullet |> setPosVelFromTo turret ctx.player)
                 , addTurretResponse
                 ]
 

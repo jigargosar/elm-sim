@@ -130,12 +130,17 @@ playerToShape player =
 -- Bullet
 
 
+type BulletKind
+    = Gravity
+    | Homing
+
+
 type alias Bullet =
-    CircularBody {}
+    CircularBody { kind : BulletKind }
 
 
-initBullet : Circular a -> Float -> Bullet
-initBullet gun angle =
+initGravityBullet : Circular a -> Float -> Bullet
+initGravityBullet gun angle =
     let
         radius =
             6
@@ -149,6 +154,7 @@ initBullet gun angle =
             gun.position
     , velocity = Vec.fromRTheta speed angle
     , radius = radius
+    , kind = Gravity
     }
 
 
@@ -341,10 +347,10 @@ fireBulletOnTrigger player turret =
     in
     case turret.kind of
         GravityShooter1 ->
-            AddBullet (initBullet turret angle)
+            AddBullet (initGravityBullet turret angle)
 
         GravityShooter2 ->
-            AddBullet (initBullet turret angle)
+            AddBullet (initGravityBullet turret angle)
 
         TripleGravityShooter ->
             let
@@ -352,11 +358,11 @@ fireBulletOnTrigger player turret =
                     turns (1 / 8)
             in
             [ angle - angleSpread, angle, angle + angleSpread ]
-                |> List.map (initBullet turret >> AddBullet)
+                |> List.map (initGravityBullet turret >> AddBullet)
                 |> Batch
 
         GravityShooterOnDeathShoot5 ->
-            AddBullet (initBullet turret angle)
+            AddBullet (initGravityBullet turret angle)
 
 
 turretDeathResponse : Env -> Turret -> Response
@@ -382,7 +388,7 @@ turretDeathResponse env turret =
 addTurretExplosionWithBullets : Env -> Int -> Turret -> Response
 addTurretExplosionWithBullets env bulletCt turret =
     breakTurn bulletCt
-        |> List.map (initBullet turret >> AddBullet)
+        |> List.map (initGravityBullet turret >> AddBullet)
         |> (::) (AddExplosion (explosionFrom env turretToShape turret))
         |> Batch
 

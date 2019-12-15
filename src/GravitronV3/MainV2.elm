@@ -162,17 +162,41 @@ playerToShape player =
 
 
 type BulletKind
+    = GravityBullet
+    | HomingBullet
+
+
+type BulletMotion
     = Gravity
     | Homing
 
 
 type alias Bullet =
-    CircularBody { kind : BulletKind }
+    CircularBody { motion : BulletMotion, timeBomb : Maybe Counter }
+
+
+type alias BulletConfig =
+    { motion : BulletMotion
+    , timeBomb : Maybe Counter
+    }
+
+
+bulletKindToConfig : BulletKind -> BulletConfig
+bulletKindToConfig kind =
+    case kind of
+        GravityBullet ->
+            { motion = Gravity, timeBomb = Nothing }
+
+        HomingBullet ->
+            { motion = Gravity, timeBomb = Nothing }
 
 
 initBullet : BulletKind -> Circular a -> Float -> Bullet
 initBullet kind gun angle =
     let
+        config =
+            bulletKindToConfig kind
+
         radius =
             6
 
@@ -185,18 +209,9 @@ initBullet kind gun angle =
             gun.position
     , velocity = Vec.fromRTheta speed angle
     , radius = radius
-    , kind = kind
+    , motion = config.motion
+    , timeBomb = config.timeBomb
     }
-
-
-initGravityBullet : Circular a -> Float -> Bullet
-initGravityBullet =
-    initBullet Gravity
-
-
-initHomingBullet : Circular a -> Float -> Bullet
-initHomingBullet =
-    initBullet Homing
 
 
 isBulletIntersecting : BulletCtx bc -> List Bullet -> Bullet -> Bool
@@ -224,7 +239,7 @@ updateBullets screen ctx =
             else
                 bullet
                     |> RigidBody.step
-                        [ case bullet.kind of
+                        [ case bullet.motion of
                             Gravity ->
                                 gravitateTo ctx.player
 
@@ -240,11 +255,11 @@ updateBullets screen ctx =
 bulletToShape : Bullet -> Shape
 bulletToShape bullet =
     let
-        { radius, kind, velocity } =
+        { radius, motion, velocity } =
             bullet
 
         otherShape =
-            case kind of
+            case motion of
                 Gravity ->
                     group []
 
@@ -392,22 +407,22 @@ turretKindToConfig kind =
         ( bulletKind, bulletCount ) =
             case kind of
                 GravityShooter1HP ->
-                    ( Gravity, SingleBullet )
+                    ( GravityBullet, SingleBullet )
 
                 GravityShooter2HP ->
-                    ( Gravity, SingleBullet )
+                    ( GravityBullet, SingleBullet )
 
                 TripleGravityShooter ->
-                    ( Gravity, TripleBullets )
+                    ( GravityBullet, TripleBullets )
 
                 GravityShooterOnDeathShoot5 ->
-                    ( Gravity, SingleBullet )
+                    ( GravityBullet, SingleBullet )
 
                 HomingShooter ->
-                    ( Homing, SingleBullet )
+                    ( HomingBullet, SingleBullet )
 
                 TimeBombShooter ->
-                    ( Gravity, SingleBullet )
+                    ( GravityBullet, SingleBullet )
     in
     { maxHP = maxHp
     , color = color
@@ -521,7 +536,7 @@ turretDeathResponse player turret =
             addBulletExplosion
 
         True ->
-            [ fireWeaponFromTo turret player ( Gravity, FiveBullets )
+            [ fireWeaponFromTo turret player ( GravityBullet, FiveBullets )
             , addBulletExplosion
             ]
                 |> Batch

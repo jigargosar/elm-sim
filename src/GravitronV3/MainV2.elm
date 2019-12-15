@@ -142,21 +142,13 @@ initialBullet =
     }
 
 
-setPosVelFromTo :
-    { a | position : Point, radius : Float }
-    -> { b | position : Point }
-    -> { c | radius : Float, position : Point, velocity : Vec }
-    -> { c | radius : Float, position : Point, velocity : Vec }
-setPosVelFromTo src target m =
-    let
-        angle =
-            Pt.vecFromTo src.position target.position
-                |> Vec.angle
-    in
-    { m
+initBullet : Turret -> Float -> Bullet
+initBullet turret angle =
+    { initialBullet
         | position =
-            Pt.moveBy (Vec.fromRTheta (m.radius + src.radius) angle)
-                src.position
+            Pt.moveBy
+                (Vec.fromRTheta (initialBullet.radius + turret.radius) angle)
+                turret.position
         , velocity = Vec.fromRTheta 3 angle
     }
 
@@ -354,8 +346,13 @@ updateTurret env ctx turret =
                     |> AddTurret
         in
         if isDone then
+            let
+                angle =
+                    Pt.vecFromTo turret.position ctx.player.position
+                        |> Vec.angle
+            in
             Batch
-                [ AddBullet (initialBullet |> setPosVelFromTo turret ctx.player)
+                [ AddBullet (initBullet turret angle)
                 , addTurretResponse
                 ]
 

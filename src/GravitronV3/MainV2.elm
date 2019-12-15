@@ -566,13 +566,16 @@ type alias SubLevelConfig =
 
 levels : List LevelConfig
 levels =
-    [ [ [ GravityShooter1 ]
+    [ -- level 1
+      [ [ GravityShooter1 ]
       , [ GravityShooter1, GravityShooter1 ]
       , [ GravityShooter1, GravityShooter2 ]
       , [ GravityShooter2, GravityShooter2 ]
       , List.repeat 4 GravityShooter2
       ]
-    , [ [ GravityShooter1 ]
+
+    -- test level
+    , [ [ TripleGravityShooter, TripleGravityShooter ]
       , [ GravityShooter1, GravityShooter1 ]
       , [ GravityShooter1, GravityShooter2 ]
       , [ GravityShooter2, GravityShooter2 ]
@@ -646,7 +649,7 @@ initialGame : Game
 initialGame =
     let
         level =
-            ( 0, 4 )
+            ( 1, 0 )
     in
     { world = initWorld (turretPlaceholdersForLevel level)
     , levelId = level

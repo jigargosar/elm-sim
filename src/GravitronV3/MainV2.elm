@@ -139,8 +139,8 @@ type alias Bullet =
     CircularBody { kind : BulletKind }
 
 
-initGravityBullet : Circular a -> Float -> Bullet
-initGravityBullet gun angle =
+initBullet : BulletKind -> Circular a -> Float -> Bullet
+initBullet kind gun angle =
     let
         radius =
             6
@@ -154,8 +154,13 @@ initGravityBullet gun angle =
             gun.position
     , velocity = Vec.fromRTheta speed angle
     , radius = radius
-    , kind = Gravity
+    , kind = kind
     }
+
+
+initGravityBullet : Circular a -> Float -> Bullet
+initGravityBullet =
+    initBullet Gravity
 
 
 isBulletIntersecting : BulletCtx bc -> List Bullet -> Bullet -> Bool

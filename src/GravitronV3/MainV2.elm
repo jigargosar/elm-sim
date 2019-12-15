@@ -466,21 +466,26 @@ when =
 
 fireBulletOnTrigger : Player -> Turret -> Response
 fireBulletOnTrigger player turret =
+    fireWeaponFromTo turret player ( turret.bulletKind, turret.bulletCount )
+
+
+fireWeaponFromTo : CircularBody a -> CircularBody b -> ( BulletKind, BulletCount ) -> Response
+fireWeaponFromTo src target ( bulletKind, bulletCount ) =
     let
         angleToBullet angle =
-            case turret.bulletKind of
+            case bulletKind of
                 Gravity ->
-                    AddBullet (initGravityBullet turret angle)
+                    AddBullet (initGravityBullet src angle)
 
                 Homing ->
-                    AddBullet (initHomingBullet turret angle)
+                    AddBullet (initHomingBullet src angle)
     in
     let
         angle =
-            Pt.vecFromTo turret.position player.position
+            Pt.vecFromTo src.position target.position
                 |> Vec.angle
     in
-    case turret.bulletCount of
+    case bulletCount of
         SingleBullet ->
             angleToBullet angle
 
@@ -499,8 +504,8 @@ fireBulletOnTrigger player turret =
                 |> Batch
 
 
-turretDeathResponse : Turret -> Response
-turretDeathResponse turret =
+turretDeathResponse : Player -> Turret -> Response
+turretDeathResponse player turret =
     let
         addBulletExplosion =
             AddExplosion (explosionFrom turretToShape turret)
@@ -510,9 +515,9 @@ turretDeathResponse turret =
             addBulletExplosion
 
         True ->
-            breakTurn 5
-                |> List.map (initGravityBullet turret >> AddBullet)
-                |> (::) addBulletExplosion
+            [ fireWeaponFromTo turret player ( Gravity, FiveBullets )
+            , addBulletExplosion
+            ]
                 |> Batch
 
 
@@ -554,7 +559,7 @@ turretStepResponse ctx turret =
 updateTurret : TurretCtx tc -> Turret -> Response
 updateTurret ctx turret =
     if isDead turret then
-        turretDeathResponse turret
+        turretDeathResponse ctx.player turret
 
     else
         turretStepResponse ctx turret

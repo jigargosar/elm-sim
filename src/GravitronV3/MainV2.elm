@@ -93,6 +93,18 @@ gravitateTo target model =
             )
 
 
+homingTo : RigidBody target -> RigidBody model -> Vec
+homingTo target model =
+    let
+        homingVec =
+            Pt.vecFromTo model.position target.position
+                |> Vec.mapMagnitude (always 0.3)
+    in
+    model.velocity
+        |> Vec.add homingVec
+        |> Vec.mapMagnitude ((*) 0.98)
+
+
 
 -- Player
 
@@ -185,7 +197,7 @@ updateBullet env ctx bullet =
                 gravitateTo ctx.player
 
             Homing ->
-                gravitateTo ctx.player
+                homingTo ctx.player
         , bounceWithinScreen env 0.5
         ]
         bullet

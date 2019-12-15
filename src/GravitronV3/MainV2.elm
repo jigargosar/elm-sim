@@ -141,7 +141,7 @@ initBullet gun angle =
             6
 
         speed =
-            3
+            2
     in
     { position =
         Pt.moveBy

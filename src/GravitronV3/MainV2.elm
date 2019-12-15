@@ -464,11 +464,6 @@ when =
     PF.when
 
 
-fireBulletOnTrigger : Player -> Turret -> Response
-fireBulletOnTrigger player turret =
-    fireWeaponFromTo turret player ( turret.bulletKind, turret.bulletCount )
-
-
 fireWeaponFromTo : CircularBody a -> CircularBody b -> ( BulletKind, BulletCount ) -> Response
 fireWeaponFromTo src target ( bulletKind, bulletCount ) =
     let
@@ -548,7 +543,7 @@ turretStepResponse ctx turret =
     in
     if isDone then
         Batch
-            [ fireBulletOnTrigger ctx.player turret
+            [ fireWeaponFromTo turret ctx.player ( turret.bulletKind, turret.bulletCount )
             , addTurretResponse
             ]
 

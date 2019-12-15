@@ -330,6 +330,17 @@ when =
     PF.when
 
 
+fireBullet : Player -> Turret -> Response
+fireBullet player turret =
+    let
+        angle =
+            Pt.vecFromTo turret.position player.position
+                |> Vec.angle
+    in
+    Batch
+        [ AddBullet (initBullet turret angle) ]
+
+
 updateTurret : Env -> TurretCtx tc -> Turret -> Response
 updateTurret env ctx turret =
     if isDead turret then
@@ -352,7 +363,7 @@ updateTurret env ctx turret =
                         |> Vec.angle
             in
             Batch
-                [ AddBullet (initBullet turret angle)
+                [ fireBullet ctx.player turret
                 , addTurretResponse
                 ]
 

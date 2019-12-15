@@ -791,7 +791,10 @@ subscriptions _ =
     Sub.batch
         [ Screen.onResize GotScreen
         , E.onAnimationFrame Tick
-        , E.onMouseMove (D.map2 MouseMove (D.field "pageX" D.float) (D.field "pageY" D.float))
+        , D.map2 MouseMove
+            (D.field "pageX" D.float)
+            (D.field "pageY" D.float)
+            |> E.onMouseMove
         ]
 
 

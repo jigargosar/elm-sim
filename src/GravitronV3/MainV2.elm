@@ -361,25 +361,26 @@ fireBulletOnTrigger player turret =
 
 turretDeathResponse : Env -> Turret -> Response
 turretDeathResponse env turret =
-    let
-        addExplosion =
-            AddExplosion (explosionFrom env turretToShape turret)
-    in
     case turret.kind of
         GravityShooter1 ->
-            addExplosion
+            addTurretExplosionWithBullets env 0 turret
 
         GravityShooter2 ->
-            addExplosion
+            addTurretExplosionWithBullets env 0 turret
 
         TripleGravityShooter ->
-            addExplosion
+            addTurretExplosionWithBullets env 0 turret
 
         GravityShooterOnDeathShoot5 ->
-            breakTurn 5
-                |> List.map (initBullet turret >> AddBullet)
-                |> (::) addExplosion
-                |> Batch
+            addTurretExplosionWithBullets env 5 turret
+
+
+addTurretExplosionWithBullets : Env -> Int -> Turret -> Response
+addTurretExplosionWithBullets env bulletCt turret =
+    breakTurn bulletCt
+        |> List.map (initBullet turret >> AddBullet)
+        |> (::) (AddExplosion (explosionFrom env turretToShape turret))
+        |> Batch
 
 
 breakTurn : Int -> List Float

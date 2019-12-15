@@ -150,7 +150,6 @@ playerToShape player =
 type BulletKind
     = Gravity
     | Homing
-    | GravityTimeBomb Counter
 
 
 type alias Bullet =
@@ -174,11 +173,6 @@ initBullet kind gun angle =
     , radius = radius
     , kind = kind
     }
-
-
-initGravityTimeBombBullet : Circular a -> Float -> Bullet
-initGravityTimeBombBullet =
-    initBullet (GravityTimeBomb (Counter.init (60 * 3)))
 
 
 initGravityBullet : Circular a -> Float -> Bullet
@@ -205,58 +199,13 @@ type alias BulletCtx a p t =
     }
 
 
-stepBulletCounter : Bullet -> Bullet
-stepBulletCounter bullet =
-    case bullet.kind of
-        Gravity ->
-            bullet
-
-        Homing ->
-            bullet
-
-        GravityTimeBomb counter ->
-            { bullet | kind = GravityTimeBomb (Counter.step counter) }
-
-
-isBulletDead bullet =
-    case bullet.kind of
-        Gravity ->
-            False
-
-        Homing ->
-            False
-
-        GravityTimeBomb counter ->
-            Counter.isDone counter
-
-
-bulletDeathResponse : Bullet -> Response
-bulletDeathResponse bullet =
-    let
-        addBulletExplosion =
-            explosionFrom bulletToShape bullet |> AddExplosion
-    in
-    case bullet.kind of
-        Gravity ->
-            addBulletExplosion
-
-        Homing ->
-            addBulletExplosion
-
-        GravityTimeBomb _ ->
-            addBulletExplosion
-
-
 updateBullets : Screen -> BulletCtx a p t -> List Bullet -> List Response
 updateBullets screen ctx =
     let
         update_ : ( Bullet, List Bullet ) -> Response
         update_ ( bullet, otherBullets ) =
-            if
-                isBulletIntersecting ctx otherBullets bullet
-                    || isBulletDead bullet
-            then
-                bulletDeathResponse bullet
+            if isBulletIntersecting ctx otherBullets bullet then
+                explosionFrom bulletToShape bullet |> AddExplosion
 
             else
                 bullet
@@ -267,12 +216,8 @@ updateBullets screen ctx =
 
                             Homing ->
                                 homingTo ctx.player
-
-                            GravityTimeBomb _ ->
-                                gravitateTo ctx.player
                         , bounceWithinScreen screen 0.5
                         ]
-                    |> stepBulletCounter
                     |> AddBullet
     in
     List.Extra.select >> List.map update_
@@ -294,9 +239,6 @@ bulletToShape bullet =
                         [ rect (radius * 3.5) 1
                             |> rotate (Vec.angle velocity |> inDegrees)
                         ]
-
-                GravityTimeBomb _ ->
-                    group []
     in
     group
         [ group
@@ -477,7 +419,7 @@ fireBulletOnTrigger player turret =
             AddBullet (initHomingBullet turret angle)
 
         TimeBombShooter ->
-            AddBullet (initGravityTimeBombBullet turret angle)
+            AddBullet (initGravityBullet turret angle)
 
 
 turretDeathResponse : Turret -> Response

@@ -143,17 +143,17 @@ playerToShape player =
 -- Bullet
 
 
-type BulletKind
+type BulletMotion
     = Gravity
     | Homing
 
 
 type alias Bullet =
-    CircularBody { kind : BulletKind }
+    CircularBody { motion : BulletMotion }
 
 
-initBullet : BulletKind -> Circular a -> Float -> Bullet
-initBullet kind gun angle =
+initBullet : BulletMotion -> Circular a -> Float -> Bullet
+initBullet motion gun angle =
     let
         radius =
             6
@@ -167,7 +167,7 @@ initBullet kind gun angle =
             gun.position
     , velocity = Vec.fromRTheta speed angle
     , radius = radius
-    , kind = kind
+    , motion = motion
     }
 
 
@@ -198,7 +198,7 @@ type alias BulletCtx a =
 updateBullet : Env -> BulletCtx bc -> Bullet -> Bullet
 updateBullet env ctx bullet =
     RigidBody.step
-        [ case bullet.kind of
+        [ case bullet.motion of
             Gravity ->
                 gravitateTo ctx.player
 
@@ -228,11 +228,11 @@ updateBullets env ctx =
 bulletToShape : Bullet -> Shape
 bulletToShape bullet =
     let
-        { radius, kind, velocity } =
+        { radius, motion, velocity } =
             bullet
 
         otherShape =
-            case kind of
+            case motion of
                 Gravity ->
                     group []
 

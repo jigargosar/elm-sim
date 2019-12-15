@@ -282,6 +282,9 @@ initTurret ( point, kind ) =
 
                 GravityShooter2 ->
                     2
+
+                TripleGravityShooter ->
+                    3
     in
     { position = point
     , velocity = Vec.zero
@@ -375,6 +378,9 @@ turretToShape { radius, hp, kind } =
 
                 GravityShooter2 ->
                     "blue"
+
+                TripleGravityShooter ->
+                    "green"
 
         fullShape =
             group
@@ -547,6 +553,7 @@ type alias LevelId =
 type TurretKind
     = GravityShooter1
     | GravityShooter2
+    | TripleGravityShooter
 
 
 type alias LevelConfig =

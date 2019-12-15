@@ -385,12 +385,16 @@ addTurretExplosionWithBullets env bulletCt turret =
 
 breakTurn : Int -> List Float
 breakTurn parts =
-    let
-        angleFrac =
-            turns (1 / toFloat parts)
-    in
-    List.range 1 parts
-        |> List.map ((+) -1 >> toFloat >> (*) angleFrac)
+    if parts <= 0 then
+        []
+
+    else
+        let
+            angleFrac =
+                turns (1 / toFloat parts)
+        in
+        List.range 1 parts
+            |> List.map ((+) -1 >> toFloat >> (*) angleFrac)
 
 
 updateTurret : Env -> TurretCtx tc -> Turret -> Response

@@ -459,16 +459,6 @@ type Response
     | Batch (List Response)
 
 
-flattenResponse : Response -> List Response -> List Response
-flattenResponse response acc =
-    case response of
-        Batch list ->
-            List.foldl flattenResponse acc list
-
-        _ ->
-            response :: acc
-
-
 foldResponse : Response -> World -> World
 foldResponse response world =
     case response of

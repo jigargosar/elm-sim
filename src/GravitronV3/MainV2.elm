@@ -361,7 +361,22 @@ fireBullet player turret =
 
 turretDeathResponse : Env -> Turret -> Response
 turretDeathResponse env turret =
-    AddExplosion (explosionFrom env turretToShape turret)
+    let
+        addExplosion =
+            AddExplosion (explosionFrom env turretToShape turret)
+    in
+    case turret.kind of
+        GravityShooter1 ->
+            addExplosion
+
+        GravityShooter2 ->
+            addExplosion
+
+        TripleGravityShooter ->
+            addExplosion
+
+        GravityShooterOnDeathShoot5 ->
+            addExplosion
 
 
 updateTurret : Env -> TurretCtx tc -> Turret -> Response

@@ -227,7 +227,8 @@ isBulletIntersecting : BulletCtx bc -> List Bullet -> Bullet -> Bool
 isBulletIntersecting ctx otherBullets bullet =
     RigidBody.doCircleOverlap bullet ctx.player
         || List.any (RigidBody.doCircleOverlap bullet) ctx.turrets
-        || List.any (RigidBody.doCircleOverlap bullet) otherBullets
+        || List.any (RigidBody.doCircleOverlap bullet)
+            (List.filter (isFakeBullet >> not) otherBullets)
 
 
 type alias BulletCtx a =
@@ -468,7 +469,9 @@ type alias TurretCtx tc =
 
 isTurretIntersecting : TurretCtx tc -> Turret -> Bool
 isTurretIntersecting ctx turret =
-    List.any (RigidBody.doCircleOverlap turret) ctx.bullets
+    ctx.bullets
+        |> List.filter (isFakeBullet >> not)
+        |> List.any (RigidBody.doCircleOverlap turret)
 
 
 

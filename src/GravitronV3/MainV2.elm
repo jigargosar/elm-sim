@@ -164,6 +164,7 @@ playerToShape player =
 type BulletKind
     = GravityBullet
     | HomingBullet
+    | TimeBombBullet
 
 
 type BulletMotion
@@ -189,6 +190,9 @@ bulletKindToConfig kind =
 
         HomingBullet ->
             { motion = Gravity, timeBomb = Nothing }
+
+        TimeBombBullet ->
+            { motion = Gravity, timeBomb = Just <| Counter.init (60 * 2) }
 
 
 initBullet : BulletKind -> Circular a -> Float -> Bullet

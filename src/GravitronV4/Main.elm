@@ -96,7 +96,8 @@ updateMemory { screen } ({ turrets, player } as mem) =
 
 
 ccc x y r x2 y2 r2 =
-    False
+    ((x2 - x) ^ 2 + (y2 - y) ^ 2)
+        < (r ^ 2 + r2 ^ 2)
 
 
 stepBulletCollision : Mem -> Mem

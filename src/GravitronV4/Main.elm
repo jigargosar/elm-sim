@@ -369,25 +369,21 @@ type Weapon
 stepFireTurretWeapon : Float -> Float -> Mem -> Mem
 stepFireTurretWeapon x y =
     let
-        addProjectile : Turret -> Float -> Mem -> Mem
-        addProjectile t angle mem =
-            case t.weapon of
-                BulletWeapon ->
-                    { mem | bullets = initBullet t.x t.y 3 angle :: mem.bullets }
-
-                TimeBombWeapon ->
-                    { mem | timeBombs = initTimeBomb t.x t.y 3 angle :: mem.timeBombs }
-
-        fireWeaponOnCounter t =
+        fireWeaponOnCounter t mem =
             if isDone t.ct then
                 let
                     angle =
                         angleFromTo t.x t.y x y
                 in
-                addProjectile t angle
+                case t.weapon of
+                    BulletWeapon ->
+                        { mem | bullets = initBullet t.x t.y 3 angle :: mem.bullets }
+
+                    TimeBombWeapon ->
+                        { mem | timeBombs = initTimeBomb t.x t.y 3 angle :: mem.timeBombs }
 
             else
-                identity
+                mem
     in
     \mem -> List.foldl fireWeaponOnCounter mem mem.turrets
 

@@ -150,6 +150,7 @@ initTurrets =
 updateMemory : Computer -> Mem -> Mem
 updateMemory { time, screen } ({ turrets, player } as mem) =
     mem
+        |> stepExplosions
         |> stepBlastsToExplosions
         |> stepExpiredTimeBombsToBlasts
         |> stepTimeBombCollision
@@ -237,6 +238,19 @@ stepBounceBulletInScreen scr mem =
     { mem | bullets = List.map bounce mem.bullets }
 
 
+stepExplosions : Mem -> Mem
+stepExplosions mem =
+    let
+        stepE e =
+            if isDone e.ct then
+                Nothing
+
+            else
+                Just { e | ct = stepCt e.ct }
+    in
+    { mem | explosions = List.filterMap stepE mem.explosions }
+
+
 stepBlastsToExplosions : Mem -> Mem
 stepBlastsToExplosions mem =
     let
@@ -244,7 +258,7 @@ stepBlastsToExplosions mem =
             initExplosion x y r red
     in
     { mem
-        | explosions = List.map toExplosion mem.blasts
+        | explosions = List.map toExplosion mem.blasts ++ mem.explosions
         , blasts = []
     }
 

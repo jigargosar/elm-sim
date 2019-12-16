@@ -84,8 +84,9 @@ initTurrets =
 
 
 updateMemory : Computer -> Mem -> Mem
-updateMemory { time } ({ turrets } as mem) =
+updateMemory { time } ({ turrets, player } as mem) =
     mem
+        |> stepBulletsVel player.x player.y
         |> stepBulletsPos
         |> stepFireTurretBullets
         |> stepTurretCounters
@@ -97,6 +98,22 @@ stepBulletsPos mem =
         stepBullet : Bullet -> Bullet
         stepBullet b =
             { b | x = b.x + b.vx, y = b.y + b.vy }
+    in
+    { mem | bullets = List.map stepBullet mem.bullets }
+
+
+stepBulletsVel : Number -> Number -> Mem -> Mem
+stepBulletsVel tx ty mem =
+    let
+        stepBullet : Bullet -> Bullet
+        stepBullet b =
+            let
+                ( dx, dy ) =
+                    ( tx - b.x, ty - b.y )
+                        |> toPolar
+                        |> Tuple.mapFirst (\m -> 20 / m)
+            in
+            { b | vx = b.vx + dx, vy = b.vy + dy }
     in
     { mem | bullets = List.map stepBullet mem.bullets }
 

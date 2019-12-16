@@ -228,6 +228,7 @@ viewBullets =
     let
         viewBullet { x, y } =
             circle black bRad
+                |> move x y
     in
     List.map viewBullet >> group
 

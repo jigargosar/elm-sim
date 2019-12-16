@@ -89,14 +89,24 @@ initTurrets =
 
 
 updateMemory : Computer -> Mem -> Mem
-updateMemory { screen } ({ turrets, player } as mem) =
+updateMemory { time, screen } ({ turrets, player } as mem) =
     mem
+        |> stepPlayerPosition time
         |> stepBulletCollision
         |> stepBulletsVel player.x player.y
         |> stepBulletsPos
         |> stepBounceBulletInScreen screen
         |> stepFireTurretBullets player.x player.y
         |> stepTurretCounters
+
+
+stepPlayerPosition : Time -> Mem -> Mem
+stepPlayerPosition time mem =
+    let
+        stepPlayerPosition_ p =
+            { p | x = wave -100 100 11 time, y = wave -300 300 5 time }
+    in
+    { mem | player = stepPlayerPosition_ mem.player }
 
 
 ccc : Number -> Number -> Number -> Number -> Number -> Number -> Bool

@@ -59,13 +59,18 @@ initBullet x y speed angle =
     Bullet x y vx vy
 
 
+type TimeBombState
+    = NotExploded
+    | Exploding
+    | Decaying
+
+
 type alias TimeBomb =
     { x : Number
     , y : Number
     , vx : Number
     , vy : Number
     , ct : Counter
-    , r : Float
     }
 
 
@@ -75,7 +80,7 @@ initTimeBomb x y speed angle =
         ( vx, vy ) =
             fromPolar ( speed, angle )
     in
-    TimeBomb x y vx vy (initCt (60 * 2)) bRad
+    TimeBomb x y vx vy (initCt (60 * 2))
 
 
 type alias Mem =
@@ -117,15 +122,15 @@ initTurrets =
 updateMemory : Computer -> Mem -> Mem
 updateMemory { time, screen } ({ turrets, player } as mem) =
     mem
+        |> stepTimeBombCollision
+        |> stepTimeBombsVel player.x player.y
+        |> stepTimeBombsPos
+        |> stepBounceTimeBombInScreen screen
         |> stepPlayerPosition time
         |> stepBulletCollision
         |> stepBulletsVel player.x player.y
         |> stepBulletsPos
         |> stepBounceBulletInScreen screen
-        |> stepTimeBombCollision
-        |> stepTimeBombsVel player.x player.y
-        |> stepTimeBombsPos
-        |> stepBounceTimeBombInScreen screen
         |> stepTimeBombCounters
         |> stepFireTurretWeapon player.x player.y
         |> stepTurretCounters

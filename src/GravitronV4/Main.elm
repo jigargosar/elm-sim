@@ -59,7 +59,7 @@ type alias Mem =
 
 initialMemory : Mem
 initialMemory =
-    { player = Player 0 0
+    { player = Player 0 180
     , turrets = initTurrets [ red, red, blue, orange ]
     , bullets = []
     }

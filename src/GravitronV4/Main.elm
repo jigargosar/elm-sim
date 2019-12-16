@@ -222,7 +222,7 @@ viewTurrets =
 
 bRad : Float
 bRad =
-    8
+    6
 
 
 viewBullets : List Bullet -> Shape
@@ -230,6 +230,7 @@ viewBullets =
     let
         viewBullet { x, y } =
             circle black bRad
+                |> fade 0.8
                 |> move x y
     in
     List.map viewBullet >> group

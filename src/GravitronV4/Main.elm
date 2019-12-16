@@ -80,6 +80,7 @@ type alias Mem =
     { player : Player
     , turrets : List Turret
     , bullets : List Bullet
+    , timeBombs : List TimeBomb
     }
 
 
@@ -88,6 +89,7 @@ initialMemory =
     { player = Player 0 0
     , turrets = initTurrets [ red, red, blue, orange ]
     , bullets = []
+    , timeBombs = []
     }
 
 
@@ -268,6 +270,18 @@ viewBullets =
                 |> move x y
     in
     List.map viewBullet >> group
+
+
+viewTimeBombs : List TimeBomb -> Shape
+viewTimeBombs =
+    let
+        viewTimeBomb : TimeBomb -> Shape
+        viewTimeBomb { x, y } =
+            circle black bRad
+                |> fade 0.8
+                |> move x y
+    in
+    List.map viewTimeBomb >> group
 
 
 main =

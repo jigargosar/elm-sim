@@ -23,11 +23,6 @@ isDone (Counter n mx) =
     n == mx - 1
 
 
-pct : Counter -> Float
-pct (Counter n mx) =
-    toFloat n / toFloat mx
-
-
 type alias Player =
     { x : Number
     , y : Number

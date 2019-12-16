@@ -38,6 +38,7 @@ type alias Turret =
     , x : Number
     , y : Number
     , color : Color
+    , weapon : Weapon
     }
 
 
@@ -87,13 +88,13 @@ type alias Mem =
 initialMemory : Mem
 initialMemory =
     { player = Player 0 0
-    , turrets = initTurrets [ red, red, blue, orange ]
+    , turrets = initTurrets [ ( red, BulletWeapon ), ( red, BulletWeapon ), ( blue, TimeBombWeapon ), ( orange, BulletWeapon ) ]
     , bullets = []
     , timeBombs = []
     }
 
 
-initTurrets : List Color -> List Turret
+initTurrets : List ( Color, Weapon ) -> List Turret
 initTurrets =
     let
         positions =
@@ -102,8 +103,8 @@ initTurrets =
         factor =
             150
 
-        initTurret ( x, y ) =
-            Turret (initCt 60) (x * factor) (y * factor)
+        initTurret ( x, y ) ( c, w ) =
+            Turret (initCt 60) (x * factor) (y * factor) c w
     in
     List.map2 initTurret positions
 
@@ -203,6 +204,11 @@ stepTurretCounters mem =
             { t | ct = stepCt t.ct }
     in
     { mem | turrets = List.map stepTurret mem.turrets }
+
+
+type Weapon
+    = BulletWeapon
+    | TimeBombWeapon
 
 
 stepFireTurretBullets : Float -> Float -> Mem -> Mem

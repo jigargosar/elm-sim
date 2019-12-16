@@ -121,7 +121,7 @@ updateMemory { time, screen } ({ turrets, player } as mem) =
         |> stepBulletsVel player.x player.y
         |> stepBulletsPos
         |> stepBounceBulletInScreen screen
-        |> stepFireTurretBullets player.x player.y
+        |> stepFireTurretWeapon player.x player.y
         |> stepTurretCounters
 
 
@@ -216,8 +216,8 @@ type Projectile
     | TimeBombProjectile TimeBomb
 
 
-stepFireTurretBullets : Float -> Float -> Mem -> Mem
-stepFireTurretBullets x y mem =
+stepFireTurretWeapon : Float -> Float -> Mem -> Mem
+stepFireTurretWeapon x y mem =
     let
         initProjectile : Turret -> Float -> Projectile
         initProjectile t angle =

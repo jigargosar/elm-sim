@@ -124,7 +124,11 @@ stepBulletCollision mem =
             else
                 Just b
     in
-    { mem | bullets = List.Extra.select mem.bullets |> List.filterMap bbLstC }
+    { mem
+        | bullets =
+            List.Extra.select mem.bullets
+                |> List.filterMap bbLstC
+    }
 
 
 stepBulletsPos : Mem -> Mem

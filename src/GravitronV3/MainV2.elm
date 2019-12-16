@@ -5,6 +5,7 @@ import Browser
 import Browser.Events as E
 import GravitronV3.Canvas as Canvas exposing (..)
 import GravitronV3.Counter as Counter exposing (Counter)
+import GravitronV3.Explosion as Explosion exposing (Explosion)
 import GravitronV3.Point as Pt exposing (Point)
 import GravitronV3.RigidBody as RigidBody
     exposing
@@ -244,7 +245,7 @@ updateBullets screen ctx =
         update_ : ( Bullet, List Bullet ) -> Response
         update_ ( bullet, otherBullets ) =
             if isBulletIntersecting ctx otherBullets bullet then
-                explosionFrom bulletToShape bullet |> AddExplosion
+                Explosion.explosionFrom bulletToShape bullet |> AddExplosion
 
             else
                 bullet
@@ -541,7 +542,7 @@ turretDeathResponse : Player -> Turret -> Response
 turretDeathResponse player turret =
     let
         addBulletExplosion =
-            AddExplosion (explosionFrom turretToShape turret)
+            AddExplosion (Explosion.explosionFrom turretToShape turret)
     in
     case turret.revengeOnDeath of
         False ->
@@ -603,53 +604,6 @@ turretToShape { radius, hp, color } =
         [ fullShape |> fade 0.9
         , fullShape |> scale (hpPct hp)
         ]
-
-
-
--- Explosion
-
-
-type alias Explosion =
-    { position : Point
-    , shape : Shape
-    , timer : Counter
-    }
-
-
-explosionFrom :
-    ({ a | position : Point } -> Shape)
-    -> { a | position : Point }
-    -> Explosion
-explosionFrom func entity =
-    { position = entity.position
-    , shape = func entity
-    , timer = Counter.init 60
-    }
-
-
-updateExplosion : Explosion -> Maybe Explosion
-updateExplosion explosion =
-    if Counter.isDone explosion.timer then
-        Nothing
-
-    else
-        Just { explosion | timer = Counter.step explosion.timer }
-
-
-updateExplosions : List Explosion -> List Explosion
-updateExplosions =
-    List.filterMap updateExplosion
-
-
-explosionToShape : Explosion -> Shape
-explosionToShape { position, timer, shape } =
-    let
-        progress =
-            Counter.progress timer
-    in
-    shape
-        |> fade (1 - progress)
-        |> scale (1 + (progress / 2))
 
 
 
@@ -727,7 +681,7 @@ updateWorld env world =
         |> foldResponses (updateBullets screen world world.bullets)
         |> foldResponses (updateTurretPlaceHolders world.turretPlaceholders)
         |> foldResponses
-            (updateExplosions world.explosions
+            (Explosion.updateExplosions world.explosions
                 |> List.map AddExplosion
             )
 
@@ -742,7 +696,7 @@ viewWorld world =
         , viewHelp playerToShape world.player
         , viewAllHelp bulletToShape world.bullets
             |> group
-        , viewAllHelp explosionToShape world.explosions
+        , viewAllHelp Explosion.explosionToShape world.explosions
             |> group
         ]
 

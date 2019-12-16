@@ -627,18 +627,18 @@ explosionFrom func entity =
     }
 
 
-updateExplosion : Explosion -> Response
+updateExplosion : Explosion -> Maybe Explosion
 updateExplosion explosion =
     if Counter.isDone explosion.timer then
-        Batch []
+        Nothing
 
     else
-        AddExplosion { explosion | timer = Counter.step explosion.timer }
+        Just { explosion | timer = Counter.step explosion.timer }
 
 
-updateExplosions : List Explosion -> List Response
+updateExplosions : List Explosion -> List Explosion
 updateExplosions =
-    List.map updateExplosion
+    List.filterMap updateExplosion
 
 
 explosionToShape : Explosion -> Shape
@@ -726,7 +726,10 @@ updateWorld env world =
         |> foldResponses (updateTurrets world world.turrets)
         |> foldResponses (updateBullets screen world world.bullets)
         |> foldResponses (updateTurretPlaceHolders world.turretPlaceholders)
-        |> foldResponses (updateExplosions world.explosions)
+        |> foldResponses
+            (updateExplosions world.explosions
+                |> List.map AddExplosion
+            )
 
 
 viewWorld : World -> Shape

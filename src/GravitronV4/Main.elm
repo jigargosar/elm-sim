@@ -59,12 +59,6 @@ initBullet x y speed angle =
     Bullet x y vx vy
 
 
-type TimeBombState
-    = NotExploded
-    | Exploding
-    | Decaying
-
-
 type alias TimeBomb =
     { x : Number
     , y : Number
@@ -83,11 +77,19 @@ initTimeBomb x y speed angle =
     TimeBomb x y vx vy (initCt (60 * 2))
 
 
+type alias Blast =
+    { x : Number
+    , y : Number
+    , r : Number
+    }
+
+
 type alias Mem =
     { player : Player
     , turrets : List Turret
     , bullets : List Bullet
     , timeBombs : List TimeBomb
+    , blasts : List Blast
     }
 
 
@@ -97,6 +99,7 @@ initialMemory =
     , turrets = initTurrets [ ( red, BulletWeapon ), ( red, BulletWeapon ), ( blue, TimeBombWeapon ), ( orange, BulletWeapon ) ]
     , bullets = []
     , timeBombs = []
+    , blasts = []
     }
 
 
@@ -213,7 +216,9 @@ stepExpiredTimeBombsToBlasts mem =
     let
         reducer tb acc =
             if isDone tb.ct then
-                acc
+                { acc
+                    | blasts = Blast tb.x tb.y timeBombBlastRad :: acc.blasts
+                }
 
             else
                 { acc | timeBombs = tb :: acc.timeBombs }

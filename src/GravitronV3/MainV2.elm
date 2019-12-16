@@ -90,27 +90,6 @@ bounceWithinScreen screen factor m =
         m.velocity
 
 
-gravitateTo : Circular target -> RigidBody model -> Vec
-gravitateTo target model =
-    model.velocity
-        |> Vec.add
-            (Pt.vecFromTo model.position target.position
-                |> Vec.mapMagnitude (\mag -> 20 / mag)
-            )
-
-
-homingTo : Circular target -> RigidBody model -> Vec
-homingTo target model =
-    let
-        homingVec =
-            Pt.vecFromTo model.position target.position
-                |> Vec.mapMagnitude (always 0.3)
-    in
-    model.velocity
-        |> Vec.add homingVec
-        |> Vec.mapMagnitude ((*) 0.98)
-
-
 splitTurnInto : Int -> List Float
 splitTurnInto parts =
     if parts <= 0 then
@@ -426,13 +405,12 @@ when =
     PF.when
 
 
-fireWeaponFromTo : CircularBody a -> CircularBody b -> ( BulletKind, BulletCount ) -> Response
+fireWeaponFromTo : CircularBody a -> CircularBody b -> ( BulletKind, BulletCount ) -> List Bullet
 fireWeaponFromTo src target ( bulletKind, bulletCount ) =
     let
-        addBulletWithAngle : Float -> Response
+        addBulletWithAngle : Float -> Bullet
         addBulletWithAngle angle =
             Bullet.initBullet bulletKind src angle
-                |> AddBullet
     in
     let
         angle =
@@ -441,7 +419,7 @@ fireWeaponFromTo src target ( bulletKind, bulletCount ) =
     in
     case bulletCount of
         SingleBullet ->
-            addBulletWithAngle angle
+            [ addBulletWithAngle angle ]
 
         TripleBullets ->
             let
@@ -450,32 +428,30 @@ fireWeaponFromTo src target ( bulletKind, bulletCount ) =
             in
             [ angle - angleSpread, angle, angle + angleSpread ]
                 |> List.map addBulletWithAngle
-                |> Batch
 
         FiveBullets ->
             splitTurnInto 5
                 |> List.map addBulletWithAngle
-                |> Batch
 
 
-turretDeathResponse : Player -> Turret -> Response
+turretDeathResponse : Player -> Turret -> ( TurretResponse, List Bullet )
 turretDeathResponse player turret =
     let
         addTurretExplosion =
-            AddExplosion (Explosion.explosionFrom turretToShape turret)
+            Explosion.explosionFrom turretToShape turret
+                |> TurretExplosion
     in
     case turret.revengeOnDeath of
         False ->
-            addTurretExplosion
+            ( addTurretExplosion, [] )
 
         True ->
-            [ fireWeaponFromTo turret player ( GravityBullet, FiveBullets )
-            , addTurretExplosion
-            ]
-                |> Batch
+            ( addTurretExplosion
+            , fireWeaponFromTo turret player ( GravityBullet, FiveBullets )
+            )
 
 
-turretStepResponse : TurretCtx ct -> Turret -> Response
+turretStepResponse : TurretCtx ct -> Turret -> ( TurretResponse, List Bullet )
 turretStepResponse ctx turret =
     let
         ( isDone, bulletTimer ) =
@@ -484,19 +460,23 @@ turretStepResponse ctx turret =
         addTurretResponse =
             { turret | bulletTimer = bulletTimer }
                 |> when (isTurretIntersecting ctx) hit
-                |> AddTurret
+                |> UpdateTurret
     in
     if isDone then
-        Batch
-            [ fireWeaponFromTo turret ctx.player ( turret.bulletKind, turret.bulletCount )
-            , addTurretResponse
-            ]
+        ( addTurretResponse
+        , fireWeaponFromTo turret ctx.player ( turret.bulletKind, turret.bulletCount )
+        )
 
     else
-        addTurretResponse
+        ( addTurretResponse, [] )
 
 
-updateTurret : TurretCtx tc -> Turret -> Response
+type TurretResponse
+    = UpdateTurret Turret
+    | TurretExplosion Explosion
+
+
+updateTurret : TurretCtx tc -> Turret -> ( TurretResponse, List Bullet )
 updateTurret ctx turret =
     if isDead turret then
         turretDeathResponse ctx.player turret
@@ -507,7 +487,20 @@ updateTurret ctx turret =
 
 updateTurrets : TurretCtx tc -> List Turret -> List Response
 updateTurrets ctx =
-    List.map (updateTurret ctx)
+    List.map
+        (updateTurret ctx
+            >> (\( tr, bLst ) ->
+                    (case tr of
+                        TurretExplosion e ->
+                            AddExplosion e
+
+                        UpdateTurret t ->
+                            AddTurret t
+                    )
+                        :: List.map AddBullet bLst
+               )
+            >> Batch
+        )
 
 
 turretToShape : Turret -> Shape

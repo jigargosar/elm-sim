@@ -304,7 +304,7 @@ initTurretPlaceholder : Float -> ( Point, TurretKind ) -> TurretPlaceholder
 initTurretPlaceholder delay ( position, kind ) =
     let
         turret =
-            initTurret ( position, kind )
+            initTurret ( position, turretKindToConfig kind )
     in
     TurretPlaceholder (Counter.initDelayedBy delay 60) position turret
 
@@ -446,12 +446,8 @@ turretKindToConfig kind =
     }
 
 
-initTurret : ( Point, TurretKind ) -> Turret
-initTurret ( point, kind ) =
-    let
-        config =
-            turretKindToConfig kind
-    in
+initTurret : ( Point, TurretConfig ) -> Turret
+initTurret ( point, config ) =
     { position = point
     , velocity = Vec.zero
     , radius = 25

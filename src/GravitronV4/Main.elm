@@ -233,10 +233,11 @@ stepFireTurretBullets x y mem =
 
 
 viewMemory : Computer -> Mem -> List Shape
-viewMemory _ { player, turrets, bullets } =
+viewMemory _ { player, turrets, bullets, timeBombs } =
     [ viewPlayer player
     , viewTurrets turrets
     , viewBullets bullets
+    , viewTimeBombs timeBombs
     ]
 
 

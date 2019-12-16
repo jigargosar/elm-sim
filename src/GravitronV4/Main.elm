@@ -51,7 +51,7 @@ updateMemory _ =
 initialMemory : Memory
 initialMemory =
     { player = Player 0 0
-    , turrets = initTurrets [ ( 1, 1 ) ]
+    , turrets = initTurrets [ ( -1, 1 ), ( 1, -1 ), ( 1, 1 ), ( -1, -1 ) ]
     }
 
 

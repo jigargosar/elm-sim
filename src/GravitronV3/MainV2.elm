@@ -162,6 +162,12 @@ playerToShape player =
 -- Bullet
 
 
+type BulletKind
+    = GravityBullet
+    | HomingBullet
+    | TimeBombBullet
+
+
 type BulletMotion
     = Gravity
     | Homing
@@ -233,25 +239,35 @@ type alias BulletCtx a =
     }
 
 
+bulletToExplosion : Bullet -> Explosion
+bulletToExplosion bullet =
+    Explosion.explosionFrom bulletToShape bullet
+
+
+stepBullet : Screen -> { target | position : Point, radius : Float } -> Bullet -> Bullet
+stepBullet screen target bullet =
+    bullet
+        |> RigidBody.step
+            [ case bullet.motion of
+                Gravity ->
+                    gravitateTo target
+
+                Homing ->
+                    homingTo target
+            , bounceWithinScreen screen 0.5
+            ]
+
+
 updateBullets : Screen -> BulletCtx bc -> List Bullet -> List Response
 updateBullets screen ctx =
     let
         update_ : ( Bullet, List Bullet ) -> Response
         update_ ( bullet, otherBullets ) =
             if isBulletIntersecting ctx otherBullets bullet then
-                Explosion.explosionFrom bulletToShape bullet |> AddExplosion
+                bulletToExplosion bullet |> AddExplosion
 
             else
-                bullet
-                    |> RigidBody.step
-                        [ case bullet.motion of
-                            Gravity ->
-                                gravitateTo ctx.player
-
-                            Homing ->
-                                homingTo ctx.player
-                        , bounceWithinScreen screen 0.5
-                        ]
+                stepBullet screen ctx.player bullet
                     |> AddBullet
     in
     List.Extra.select >> List.map update_
@@ -425,12 +441,6 @@ type BulletCount
     = SingleBullet
     | TripleBullets
     | FiveBullets
-
-
-type BulletKind
-    = GravityBullet
-    | HomingBullet
-    | TimeBombBullet
 
 
 type alias HP =

@@ -300,11 +300,11 @@ type alias TurretPlaceholder =
     }
 
 
-initTurretPlaceholder : Float -> ( Point, TurretKind ) -> TurretPlaceholder
-initTurretPlaceholder delay ( position, kind ) =
+initTurretPlaceholder : Float -> Point -> TurretConfig -> TurretPlaceholder
+initTurretPlaceholder delay position turretConfig =
     let
         turret =
-            initTurret ( position, turretKindToConfig kind )
+            initTurret position turretConfig
     in
     TurretPlaceholder (Counter.initDelayedBy delay 60) position turret
 
@@ -446,9 +446,9 @@ turretKindToConfig kind =
     }
 
 
-initTurret : ( Point, TurretConfig ) -> Turret
-initTurret ( point, config ) =
-    { position = point
+initTurret : Point -> TurretConfig -> Turret
+initTurret position config =
+    { position = position
     , velocity = Vec.zero
     , radius = 25
     , bulletTimer = Counter.init 60
@@ -860,8 +860,8 @@ turretPlaceholdersForLevel levelId =
     in
     List.map2 Tuple.pair turretPositions subLevelConfig
         |> List.indexedMap
-            (\i ->
-                initTurretPlaceholder (toFloat i / toFloat turretCount)
+            (\i ( position, turretKind ) ->
+                initTurretPlaceholder (toFloat i / toFloat turretCount) position (turretKindToConfig turretKind)
             )
 
 

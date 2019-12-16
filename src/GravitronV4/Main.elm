@@ -86,13 +86,13 @@ initTurrets =
 updateMemory : Computer -> Mem -> Mem
 updateMemory { time } ({ turrets } as mem) =
     mem
-        |> stepBullets
+        |> stepBulletsPos
         |> stepFireTurretBullets
         |> stepTurrets
 
 
-stepBullets : Mem -> Mem
-stepBullets mem =
+stepBulletsPos : Mem -> Mem
+stepBulletsPos mem =
     let
         stepBullet : Bullet -> Bullet
         stepBullet b =

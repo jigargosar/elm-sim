@@ -165,6 +165,10 @@ stepFireTurretBullets mem =
     }
 
 
+
+-- View
+
+
 viewMemory : Computer -> Mem -> List Shape
 viewMemory _ { player, turrets, bullets } =
     [ viewPlayer player

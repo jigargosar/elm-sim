@@ -84,10 +84,11 @@ initTurrets =
 
 
 updateMemory : Computer -> Mem -> Mem
-updateMemory { time } ({ turrets, player } as mem) =
+updateMemory { screen } ({ turrets, player } as mem) =
     mem
         |> stepBulletsVel player.x player.y
         |> stepBulletsPos
+        |> stepBounceBulletInScreen screen
         |> stepFireTurretBullets
         |> stepTurretCounters
 
@@ -117,6 +118,39 @@ stepBulletsVel tx ty mem =
             { b | vx = b.vx + dx, vy = b.vy + dy }
     in
     { mem | bullets = List.map stepBullet mem.bullets }
+
+
+stepBounceBulletInScreen : Screen -> Mem -> Mem
+stepBounceBulletInScreen scr mem =
+    let
+        bounce b =
+            let
+                vx =
+                    if (b.x < scr.left && b.vx < 0) || (b.x > scr.right && b.vx > 0) then
+                        negate b.vx
+
+                    else
+                        b.vx
+
+                vy =
+                    if (b.y < scr.bottom && b.vy < 0) || (b.y > scr.top && b.vy > 0) then
+                        negate b.vy
+
+                    else
+                        b.vy
+
+                ( nvx, nvy ) =
+                    if vx /= b.vx || vy /= b.vy then
+                        toPolar ( vx, vy )
+                            |> Tuple.mapFirst ((*) 0.5)
+                            |> fromPolar
+
+                    else
+                        ( vx, vy )
+            in
+            { b | vx = nvx, vy = nvy }
+    in
+    { mem | bullets = List.map bounce mem.bullets }
 
 
 stepTurretCounters : Mem -> Mem

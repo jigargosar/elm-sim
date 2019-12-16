@@ -169,7 +169,6 @@ updateMemory { time, screen } ({ turrets, player } as mem) =
         |> stepBounceBulletInScreen screen
         |> stepTimeBombCounters
         |> stepFireTurretWeapon player.x player.y
-        |> stepTurretCounters
 
 
 stepPlayerPosition : Time -> Mem -> Mem
@@ -356,16 +355,6 @@ stepTimeBombCounters mem =
     { mem | timeBombs = List.map stepTimeBomb mem.timeBombs }
 
 
-stepTurretCounters : Mem -> Mem
-stepTurretCounters mem =
-    let
-        stepTurret : Turret -> Turret
-        stepTurret t =
-            { t | ct = stepCt t.ct }
-    in
-    { mem | turrets = List.map stepTurret mem.turrets }
-
-
 stepFireTurretWeapon : Float -> Float -> Mem -> Mem
 stepFireTurretWeapon x y =
     let
@@ -384,8 +373,19 @@ stepFireTurretWeapon x y =
 
             else
                 mem
+
+        stepTurretCounters : Mem -> Mem
+        stepTurretCounters mem =
+            let
+                stepTurret : Turret -> Turret
+                stepTurret t =
+                    { t | ct = stepCt t.ct }
+            in
+            { mem | turrets = List.map stepTurret mem.turrets }
     in
-    \mem -> List.foldl fireWeaponOnCounter mem mem.turrets
+    \mem ->
+        List.foldl fireWeaponOnCounter mem mem.turrets
+            |> stepTurretCounters
 
 
 

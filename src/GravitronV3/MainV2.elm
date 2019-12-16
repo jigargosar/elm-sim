@@ -14,6 +14,7 @@ import GravitronV3.RigidBody as RigidBody
         , RigidBody
         )
 import GravitronV3.Screen as Screen exposing (Screen)
+import GravitronV3.Turret as Turret exposing (Turret, TurretKind(..))
 import GravitronV3.Vec as Vec exposing (Vec, vec)
 import Html exposing (Html)
 import Json.Decode as D
@@ -88,20 +89,6 @@ bounceWithinScreen screen factor m =
         (m.position |> (Pt.toTuple >> Vec.fromTuple))
         factor
         m.velocity
-
-
-splitTurnInto : Int -> List Float
-splitTurnInto parts =
-    if parts <= 0 then
-        []
-
-    else
-        let
-            angleFrac =
-                turns (1 / toFloat parts)
-        in
-        List.range 1 parts
-            |> List.map ((+) -1 >> toFloat >> (*) angleFrac)
 
 
 
@@ -183,11 +170,11 @@ type alias TurretPlaceholder =
     }
 
 
-initTurretPlaceholder : Float -> Point -> TurretConfig -> TurretPlaceholder
+initTurretPlaceholder : Float -> Point -> TurretKind -> TurretPlaceholder
 initTurretPlaceholder delay position turretConfig =
     let
         turret =
-            initTurret position turretConfig
+            Turret.initTurret position turretConfig
     in
     TurretPlaceholder (Counter.initDelayedBy delay 60) position turret
 
@@ -198,7 +185,7 @@ turretPlaceHolderToShape { counter, turret } =
         progress =
             Counter.progress counter
     in
-    turretToShape turret
+    Turret.turretToShape turret
         |> fade progress
         |> scale progress
 
@@ -219,235 +206,6 @@ updateTurretPlaceHolder model =
 updateTurretPlaceHolders : List TurretPlaceholder -> List Response
 updateTurretPlaceHolders =
     List.map updateTurretPlaceHolder
-
-
-
--- Turret Config
-
-
-type TurretKind
-    = GravityShooter1HP
-    | GravityShooter2HP
-    | TripleGravityShooter
-    | GravityShooterOnDeathShoot5
-    | HomingShooter
-    | TimeBombShooter
-
-
-turretKindToConfig : TurretKind -> TurretConfig
-turretKindToConfig kind =
-    let
-        color =
-            case kind of
-                GravityShooter1HP ->
-                    "red"
-
-                GravityShooter2HP ->
-                    "blue"
-
-                TripleGravityShooter ->
-                    "green"
-
-                GravityShooterOnDeathShoot5 ->
-                    "purple"
-
-                HomingShooter ->
-                    "orange"
-
-                TimeBombShooter ->
-                    "deeppink"
-
-        maxHp =
-            case kind of
-                GravityShooter1HP ->
-                    1
-
-                GravityShooter2HP ->
-                    2
-
-                TripleGravityShooter ->
-                    3
-
-                GravityShooterOnDeathShoot5 ->
-                    2
-
-                HomingShooter ->
-                    4
-
-                TimeBombShooter ->
-                    3
-
-        ( bulletKind, bulletCount ) =
-            case kind of
-                GravityShooter1HP ->
-                    ( GravityBullet, SingleBullet )
-
-                GravityShooter2HP ->
-                    ( GravityBullet, SingleBullet )
-
-                TripleGravityShooter ->
-                    ( GravityBullet, TripleBullets )
-
-                GravityShooterOnDeathShoot5 ->
-                    ( GravityBullet, SingleBullet )
-
-                HomingShooter ->
-                    ( HomingBullet, SingleBullet )
-
-                TimeBombShooter ->
-                    ( TimeBombBullet, SingleBullet )
-    in
-    { maxHP = maxHp
-    , color = color
-    , revengeOnDeath = kind == GravityShooterOnDeathShoot5
-    , bulletKind = bulletKind
-    , bulletCount = bulletCount
-    }
-
-
-type BulletCount
-    = SingleBullet
-    | TripleBullets
-    | FiveBullets
-
-
-type alias HP =
-    { current : Int, max : Int }
-
-
-type alias TurretConfig =
-    { maxHP : Int
-    , color : String
-    , revengeOnDeath : Bool
-    , bulletKind : BulletKind
-    , bulletCount : BulletCount
-    }
-
-
-
--- Turret
-
-
-type alias Turret =
-    { position : Point
-    , velocity : Vec
-    , radius : Float
-    , bulletTimer : Counter
-    , hp : HP
-    , bulletKind : BulletKind
-    , bulletCount : BulletCount
-    , color : String
-    , revengeOnDeath : Bool
-    }
-
-
-initHP : Int -> HP
-initHP maxHP =
-    HP maxHP maxHP
-
-
-initTurret : Point -> TurretConfig -> Turret
-initTurret position config =
-    { position = position
-    , velocity = Vec.zero
-    , radius = 25
-    , bulletTimer = Counter.init 60
-    , hp = initHP config.maxHP
-    , bulletKind = config.bulletKind
-    , bulletCount = config.bulletCount
-    , color = config.color
-    , revengeOnDeath = config.revengeOnDeath
-    }
-
-
-type alias HasHP a =
-    { a | hp : HP }
-
-
-isDead : HasHP a -> Bool
-isDead { hp } =
-    hp.current <= 0
-
-
-hit : HasHP a -> HasHP a
-hit hasHP =
-    let
-        decCurrentHP hp =
-            { hp | current = max 0 (hp.current - 1) }
-    in
-    { hasHP | hp = decCurrentHP hasHP.hp }
-
-
-hpPct : HP -> Float
-hpPct hp =
-    toFloat hp.current / toFloat hp.max
-
-
-when =
-    PF.when
-
-
-fireWeaponFromTo : CircularBody a -> Point -> ( BulletKind, BulletCount ) -> List Bullet
-fireWeaponFromTo src target ( bulletKind, bulletCount ) =
-    let
-        addBulletWithAngle : Float -> Bullet
-        addBulletWithAngle angle =
-            Bullet.initBullet bulletKind src angle
-    in
-    let
-        angle =
-            Pt.vecFromTo src.position target
-                |> Vec.angle
-    in
-    case bulletCount of
-        SingleBullet ->
-            [ addBulletWithAngle angle ]
-
-        TripleBullets ->
-            let
-                angleSpread =
-                    turns (1 / 8)
-            in
-            [ angle - angleSpread, angle, angle + angleSpread ]
-                |> List.map addBulletWithAngle
-
-        FiveBullets ->
-            splitTurnInto 5
-                |> List.map addBulletWithAngle
-
-
-turretDeathResponse : Point -> Turret -> ( Explosion, List Bullet )
-turretDeathResponse target turret =
-    let
-        addTurretExplosion =
-            Explosion.explosionFrom turretToShape turret
-    in
-    case turret.revengeOnDeath of
-        False ->
-            ( addTurretExplosion, [] )
-
-        True ->
-            ( addTurretExplosion
-            , fireWeaponFromTo turret target ( GravityBullet, FiveBullets )
-            )
-
-
-turretStepResponse : Point -> Turret -> ( Turret, List Bullet )
-turretStepResponse target turret =
-    let
-        ( isDone, bulletTimer ) =
-            Counter.cycleStep turret.bulletTimer
-
-        addTurretResponse =
-            { turret | bulletTimer = bulletTimer }
-    in
-    if isDone then
-        ( addTurretResponse
-        , fireWeaponFromTo turret target ( turret.bulletKind, turret.bulletCount )
-        )
-
-    else
-        ( addTurretResponse, [] )
 
 
 type alias TurretCtx tc =
@@ -473,14 +231,18 @@ updateTurret ctx turret =
     let
         targetPosition =
             ctx.player.position
+
+        when =
+            PF.when
     in
-    (if isDead turret then
-        turretDeathResponse targetPosition turret
+    (if Turret.isDead turret then
+        Turret.turretDeathResponse targetPosition turret
             |> Tuple.mapFirst AddExplosion
 
      else
-        turretStepResponse targetPosition turret
-            |> Tuple.mapFirst (when (isTurretIntersecting ctx) hit >> AddTurret)
+        Turret.turretStepResponse targetPosition turret
+            |> Tuple.mapFirst
+                (when (isTurretIntersecting ctx) Turret.hit >> AddTurret)
     )
         |> Tuple.mapSecond (List.map AddBullet)
         |> (\( r, rLst ) -> Batch (r :: rLst))
@@ -489,22 +251,6 @@ updateTurret ctx turret =
 updateTurrets : TurretCtx tc -> List Turret -> List Response
 updateTurrets ctx =
     List.map (updateTurret ctx)
-
-
-turretToShape : Turret -> Shape
-turretToShape { radius, hp, color } =
-    let
-        fullShape =
-            group
-                [ circle radius
-                    |> fill color
-                    |> fade 0.7
-                ]
-    in
-    group
-        [ fullShape |> fade 0.9
-        , fullShape |> scale (hpPct hp)
-        ]
 
 
 
@@ -592,7 +338,7 @@ viewWorld world =
     group
         [ viewAllHelp turretPlaceHolderToShape world.turretPlaceholders
             |> group
-        , viewAllHelp turretToShape world.turrets
+        , viewAllHelp Turret.turretToShape world.turrets
             |> group
         , viewHelp playerToShape world.player
         , viewAllHelp Bullet.bulletToShape world.bullets
@@ -709,7 +455,7 @@ turretPlaceholdersForLevel levelId =
     List.map2 Tuple.pair turretPositions subLevelConfig
         |> List.indexedMap
             (\i ( position, turretKind ) ->
-                initTurretPlaceholder (toFloat i / toFloat turretCount) position (turretKindToConfig turretKind)
+                initTurretPlaceholder (toFloat i / toFloat turretCount) position turretKind
             )
 
 

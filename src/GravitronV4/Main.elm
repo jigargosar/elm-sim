@@ -112,6 +112,7 @@ stepBulletsVel tx ty mem =
                     ( tx - b.x, ty - b.y )
                         |> toPolar
                         |> Tuple.mapFirst (\m -> 20 / m)
+                        |> fromPolar
             in
             { b | vx = b.vx + dx, vy = b.vy + dy }
     in
@@ -178,7 +179,8 @@ viewBullets : List Bullet -> Shape
 viewBullets =
     let
         viewBullet { x, y } =
-            circle black 10
+            circle black 8
+                |> fade 0.8
                 |> move x y
     in
     List.map viewBullet >> group

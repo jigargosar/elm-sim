@@ -56,27 +56,31 @@ type alias Mem =
     }
 
 
-viewMemory : Computer -> Mem -> List Shape
-viewMemory _ { player, turrets } =
-    [ viewPlayer player
-    , viewTurrets turrets
-    ]
+initialMemory : Mem
+initialMemory =
+    { player = Player 0 0
+    , turrets = initTurrets [ red, red, blue, orange ]
+    , bullets = []
+    }
 
 
-viewPlayer : Player -> Shape
-viewPlayer { x, y } =
-    circle green 20
-        |> move x y
-
-
-viewTurrets : List Turret -> Shape
-viewTurrets =
+initTurrets : List Color -> List Turret
+initTurrets =
     let
-        viewTurret { x, y, color } =
-            circle color 25
-                |> move x y
+        positions =
+            [ ( -1, 1 ), ( 1, -1 ), ( 1, 1 ), ( -1, -1 ) ]
+
+        factor =
+            150
+
+        initTurret ( x, y ) =
+            Turret (initCt 60) (x * factor) (y * factor)
     in
-    List.map viewTurret >> group
+    List.map2 initTurret positions
+
+
+
+--  Update
 
 
 updateMemory : Computer -> Mem -> Mem
@@ -88,12 +92,12 @@ updateMemory { time } ({ turrets } as mem) =
 
 stepTurrets : Mem -> Mem
 stepTurrets mem =
+    let
+        stepTurret : Turret -> Turret
+        stepTurret t =
+            { t | ct = stepCt t.ct }
+    in
     { mem | turrets = List.map stepTurret mem.turrets }
-
-
-stepTurret : Turret -> Turret
-stepTurret t =
-    { t | ct = stepCt t.ct }
 
 
 stepFireTurretBullets : Mem -> Mem
@@ -118,27 +122,27 @@ stepFireTurretBullets mem =
     }
 
 
-initialMemory : Mem
-initialMemory =
-    { player = Player 0 0
-    , turrets = initTurrets [ red, red, blue, orange ]
-    , bullets = []
-    }
+viewMemory : Computer -> Mem -> List Shape
+viewMemory _ { player, turrets } =
+    [ viewPlayer player
+    , viewTurrets turrets
+    ]
 
 
-initTurrets : List Color -> List Turret
-initTurrets =
+viewPlayer : Player -> Shape
+viewPlayer { x, y } =
+    circle green 20
+        |> move x y
+
+
+viewTurrets : List Turret -> Shape
+viewTurrets =
     let
-        positions =
-            [ ( -1, 1 ), ( 1, -1 ), ( 1, 1 ), ( -1, -1 ) ]
-
-        factor =
-            150
-
-        initTurret ( x, y ) =
-            Turret (initCt 60) (x * factor) (y * factor)
+        viewTurret { x, y, color } =
+            circle color 25
+                |> move x y
     in
-    List.map2 initTurret positions
+    List.map viewTurret >> group
 
 
 main =

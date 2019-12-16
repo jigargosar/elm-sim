@@ -120,6 +120,38 @@ stepBulletsVel tx ty mem =
     { mem | bullets = List.map stepBullet mem.bullets }
 
 
+bounceInScreen : Screen -> Float -> Float -> Float -> Float -> ( Float, Float )
+bounceInScreen scr x y vx vy =
+    let
+        nvx =
+            if
+                (x < scr.left && vx < 0)
+                    || (x > scr.right && vx > 0)
+            then
+                negate vx
+
+            else
+                vx
+
+        nvy =
+            if
+                (y < scr.bottom && vy < 0)
+                    || (y > scr.top && vy > 0)
+            then
+                negate vy
+
+            else
+                vy
+    in
+    if nvx /= vx || nvy /= vy then
+        toPolar ( nvx, nvy )
+            |> Tuple.mapFirst ((*) 0.5)
+            |> fromPolar
+
+    else
+        ( nvx, nvy )
+
+
 stepBounceBulletInScreen : Screen -> Mem -> Mem
 stepBounceBulletInScreen scr mem =
     let

@@ -65,6 +65,7 @@ type alias TimeBomb =
     , vx : Number
     , vy : Number
     , ct : Counter
+    , r : Float
     }
 
 
@@ -74,7 +75,7 @@ initTimeBomb x y speed angle =
         ( vx, vy ) =
             fromPolar ( speed, angle )
     in
-    TimeBomb x y vx vy (initCt (60 * 2))
+    TimeBomb x y vx vy (initCt (60 * 2)) bRad
 
 
 type alias Mem =

@@ -162,12 +162,6 @@ playerToShape player =
 -- Bullet
 
 
-type BulletKind
-    = GravityBullet
-    | HomingBullet
-    | TimeBombBullet
-
-
 type BulletMotion
     = Gravity
     | Homing
@@ -291,89 +285,16 @@ bulletToShape bullet =
 
 
 
--- Turret
+-- Turret Config
 
 
-type alias TurretPlaceholder =
-    { counter : Counter
-    , position : Point
-    , turret : Turret
-    }
-
-
-initTurretPlaceholder : Float -> Point -> TurretConfig -> TurretPlaceholder
-initTurretPlaceholder delay position turretConfig =
-    let
-        turret =
-            initTurret position turretConfig
-    in
-    TurretPlaceholder (Counter.initDelayedBy delay 60) position turret
-
-
-turretPlaceHolderToShape : TurretPlaceholder -> Shape
-turretPlaceHolderToShape { counter, turret } =
-    let
-        progress =
-            Counter.progress counter
-    in
-    turretToShape turret
-        |> fade progress
-        |> scale progress
-
-
-updateTurretPlaceHolder : TurretPlaceholder -> Response
-updateTurretPlaceHolder model =
-    let
-        ( isDone, counter ) =
-            Counter.cycleStep model.counter
-    in
-    if isDone then
-        AddTurret model.turret
-
-    else
-        AddTurretPlaceholder { model | counter = counter }
-
-
-updateTurretPlaceHolders : List TurretPlaceholder -> List Response
-updateTurretPlaceHolders =
-    List.map updateTurretPlaceHolder
-
-
-type alias HP =
-    { current : Int, max : Int }
-
-
-type alias TurretConfig =
-    { maxHP : Int
-    , color : String
-    , revengeOnDeath : Bool
-    , bulletKind : BulletKind
-    , bulletCount : BulletCount
-    }
-
-
-type alias Turret =
-    { position : Point
-    , velocity : Vec
-    , radius : Float
-    , bulletTimer : Counter
-    , hp : HP
-    , bulletKind : BulletKind
-    , bulletCount : BulletCount
-    , color : String
-    , revengeOnDeath : Bool
-    }
-
-
-initHP : Int -> HP
-initHP maxHP =
-    HP maxHP maxHP
-
-
-type BulletCount
-    = SingleBullet
-    | TripleBullets
-    | FiveBullets
+type TurretKind
+    = GravityShooter1HP
+    | GravityShooter2HP
+    | TripleGravityShooter
+    | GravityShooterOnDeathShoot5
+    | HomingShooter
+    | TimeBombShooter
 
 
 turretKindToConfig : TurretKind -> TurretConfig
@@ -445,6 +366,102 @@ turretKindToConfig kind =
     , bulletKind = bulletKind
     , bulletCount = bulletCount
     }
+
+
+
+-- Turret Placeholder
+
+
+type alias TurretPlaceholder =
+    { counter : Counter
+    , position : Point
+    , turret : Turret
+    }
+
+
+initTurretPlaceholder : Float -> Point -> TurretConfig -> TurretPlaceholder
+initTurretPlaceholder delay position turretConfig =
+    let
+        turret =
+            initTurret position turretConfig
+    in
+    TurretPlaceholder (Counter.initDelayedBy delay 60) position turret
+
+
+turretPlaceHolderToShape : TurretPlaceholder -> Shape
+turretPlaceHolderToShape { counter, turret } =
+    let
+        progress =
+            Counter.progress counter
+    in
+    turretToShape turret
+        |> fade progress
+        |> scale progress
+
+
+updateTurretPlaceHolder : TurretPlaceholder -> Response
+updateTurretPlaceHolder model =
+    let
+        ( isDone, counter ) =
+            Counter.cycleStep model.counter
+    in
+    if isDone then
+        AddTurret model.turret
+
+    else
+        AddTurretPlaceholder { model | counter = counter }
+
+
+updateTurretPlaceHolders : List TurretPlaceholder -> List Response
+updateTurretPlaceHolders =
+    List.map updateTurretPlaceHolder
+
+
+
+-- Turret
+
+
+type BulletCount
+    = SingleBullet
+    | TripleBullets
+    | FiveBullets
+
+
+type BulletKind
+    = GravityBullet
+    | HomingBullet
+    | TimeBombBullet
+
+
+type alias HP =
+    { current : Int, max : Int }
+
+
+type alias TurretConfig =
+    { maxHP : Int
+    , color : String
+    , revengeOnDeath : Bool
+    , bulletKind : BulletKind
+    , bulletCount : BulletCount
+    }
+
+
+type alias Turret =
+    { position : Point
+    , velocity : Vec
+    , radius : Float
+    , bulletTimer : Counter
+    , hp : HP
+    , bulletKind : BulletKind
+    , bulletCount : BulletCount
+    , color : String
+    , revengeOnDeath : Bool
+    }
+
+
+initHP : Int -> HP
+initHP maxHP =
+    HP maxHP maxHP
 
 
 initTurret : Point -> TurretConfig -> Turret
@@ -727,15 +744,6 @@ move =
 
 type alias LevelId =
     ( Int, Int )
-
-
-type TurretKind
-    = GravityShooter1HP
-    | GravityShooter2HP
-    | TripleGravityShooter
-    | GravityShooterOnDeathShoot5
-    | HomingShooter
-    | TimeBombShooter
 
 
 type alias LevelConfig =

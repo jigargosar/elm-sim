@@ -23,6 +23,15 @@ isDone (Counter n mx) =
     n == mx - 1
 
 
+ctProgress : Counter -> Float
+ctProgress (Counter n mx) =
+    if n == 0 then
+        0
+
+    else
+        toFloat n / toFloat mx
+
+
 
 -- Model
 
@@ -392,11 +401,12 @@ stepFireTurretWeapon x y mem =
 
 
 viewMemory : Computer -> Mem -> List Shape
-viewMemory _ { player, turrets, bullets, timeBombs } =
+viewMemory _ { player, turrets, bullets, timeBombs, explosions } =
     [ viewPlayer player
     , viewTurrets turrets
     , viewBullets bullets
     , viewTimeBombs timeBombs
+    , viewExplosions explosions
     ]
 
 
@@ -450,6 +460,23 @@ viewTimeBombs =
                 |> move x y
     in
     List.map viewTimeBomb >> group
+
+
+viewExplosions : List Explosion -> Shape
+viewExplosions =
+    let
+        viewExplosion : Explosion -> Shape
+        viewExplosion { ct, x, y, r, color } =
+            let
+                progress =
+                    ctProgress ct
+            in
+            circle color r
+                |> fade (1 - progress)
+                |> scale (1 + (progress / 2))
+                |> move x y
+    in
+    List.map viewExplosion >> group
 
 
 main =

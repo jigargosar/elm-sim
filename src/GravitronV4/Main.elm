@@ -126,14 +126,20 @@ stepBounceBulletInScreen scr mem =
         bounce b =
             let
                 vx =
-                    if (b.x < scr.left && b.vx < 0) || (b.x > scr.right && b.vx > 0) then
+                    if
+                        (b.x < scr.left && b.vx < 0)
+                            || (b.x > scr.right && b.vx > 0)
+                    then
                         negate b.vx
 
                     else
                         b.vx
 
                 vy =
-                    if (b.y < scr.bottom && b.vy < 0) || (b.y > scr.top && b.vy > 0) then
+                    if
+                        (b.y < scr.bottom && b.vy < 0)
+                            || (b.y > scr.top && b.vy > 0)
+                    then
                         negate b.vy
 
                     else

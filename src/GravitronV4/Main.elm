@@ -287,26 +287,23 @@ blastFromTimeBomb tb =
 
 
 stepTimeBombCollision : Mem -> Mem
-stepTimeBombCollision mem =
+stepTimeBombCollision =
     let
         bbc : TimeBomb -> TimeBomb -> Bool
         bbc b ob =
             ccc b.x b.y bRad ob.x ob.y bRad
 
-        bbLstC : ( TimeBomb, List TimeBomb ) -> Maybe TimeBomb
-        bbLstC ( b, bLst ) =
-            if List.any (bbc b) bLst then
-                Nothing
+        selfC ( tb, tbList ) mem =
+            if List.any (bbc tb) tbList then
+                { mem | blasts = blastFromTimeBomb tb :: mem.blasts }
 
             else
-                Just b
+                { mem | timeBombs = tb :: mem.timeBombs }
     in
-    { mem
-        | timeBombs =
-            mem.timeBombs
-                |> List.Extra.select
-                |> List.filterMap bbLstC
-    }
+    \mem ->
+        mem.timeBombs
+            |> List.Extra.select
+            |> List.foldl selfC { mem | timeBombs = [] }
 
 
 stepTimeBombsPos : Mem -> Mem

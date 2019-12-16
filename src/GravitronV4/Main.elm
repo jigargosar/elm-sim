@@ -45,6 +45,15 @@ type alias Bullet =
     }
 
 
+initBullet : Number -> Number -> Number -> Number -> Bullet
+initBullet x y speed angle =
+    let
+        ( vx, vy ) =
+            fromPolar ( speed, angle )
+    in
+    Bullet x y vx vy
+
+
 type alias Mem =
     { player : Player
     , turrets : List Turret
@@ -86,7 +95,7 @@ updateMemory { screen } ({ turrets, player } as mem) =
         |> stepBulletsVel player.x player.y
         |> stepBulletsPos
         |> stepBounceBulletInScreen screen
-        |> stepFireTurretBullets
+        |> stepFireTurretBullets player.x player.y
         |> stepTurretCounters
 
 
@@ -164,16 +173,16 @@ stepTurretCounters mem =
     { mem | turrets = List.map stepTurret mem.turrets }
 
 
-stepFireTurretBullets : Mem -> Mem
-stepFireTurretBullets mem =
+stepFireTurretBullets : Float -> Float -> Mem -> Mem
+stepFireTurretBullets x y mem =
     let
-        initBullet : Number -> Number -> Bullet
-        initBullet x y =
-            Bullet x y 1 1
-
         fireBulletOnCounter t =
             if isDone t.ct then
-                (::) (initBullet t.x t.y)
+                let
+                    angle =
+                        atan2 ((t.y - y) ^ 2) (t.x - x)
+                in
+                (::) (initBullet t.x t.y 1 angle)
 
             else
                 identity

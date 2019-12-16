@@ -74,7 +74,7 @@ initTimeBomb x y speed angle =
         ( vx, vy ) =
             fromPolar ( speed, angle )
     in
-    TimeBomb x y vx vy (initCt (60 * 3))
+    TimeBomb x y vx vy (initCt (60 * 2))
 
 
 type alias Mem =
@@ -218,7 +218,9 @@ stepTimeBombCollision mem =
     in
     { mem
         | timeBombs =
-            List.Extra.select mem.timeBombs
+            mem.timeBombs
+                |> List.filter (.ct >> isDone >> not)
+                |> List.Extra.select
                 |> List.filterMap bbLstC
     }
 

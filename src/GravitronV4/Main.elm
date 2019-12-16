@@ -184,7 +184,7 @@ stepFireTurretBullets x y mem =
             if isDone t.ct then
                 let
                     angle =
-                        atan2 (y - t.y) (x - t.x)
+                        angleFromTo t.x t.y x y
                 in
                 (::) (initBullet t.x t.y 3 angle)
 
@@ -295,3 +295,8 @@ ccc : Number -> Number -> Number -> Number -> Number -> Number -> Bool
 ccc x y r x2 y2 r2 =
     ((x2 - x) ^ 2 + (y2 - y) ^ 2)
         < (r ^ 2 + r2 ^ 2)
+
+
+angleFromTo : Float -> Float -> Float -> Float -> Float
+angleFromTo x y x2 y2 =
+    atan2 (y2 - y) (x2 - x)

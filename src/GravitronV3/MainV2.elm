@@ -1,8 +1,8 @@
 module GravitronV3.MainV2 exposing (main)
 
-import Basics.Extra exposing (inDegrees)
 import Browser
 import Browser.Events as E
+import GravitronV3.Bullet as Bullet exposing (Bullet, BulletKind(..))
 import GravitronV3.Canvas as Canvas exposing (..)
 import GravitronV3.Counter as Counter exposing (Counter)
 import GravitronV3.Explosion as Explosion exposing (Explosion)
@@ -162,74 +162,12 @@ playerToShape player =
 -- Bullet
 
 
-type BulletKind
-    = GravityBullet
-    | HomingBullet
-    | TimeBombBullet
-
-
-type BulletMotion
-    = Gravity
-    | Homing
-
-
-type alias Bullet =
-    CircularBody { motion : BulletMotion, timeBomb : Maybe Counter }
-
-
-type alias BulletConfig =
-    { motion : BulletMotion
-    , timeBomb : Maybe Counter
-    }
-
-
-bulletKindToConfig : BulletKind -> BulletConfig
-bulletKindToConfig kind =
-    case kind of
-        GravityBullet ->
-            { motion = Gravity, timeBomb = Nothing }
-
-        HomingBullet ->
-            { motion = Gravity, timeBomb = Nothing }
-
-        TimeBombBullet ->
-            { motion = Gravity, timeBomb = Just <| Counter.init (60 * 2) }
-
-
-initBullet : BulletKind -> Circular a -> Float -> Bullet
-initBullet kind gun angle =
-    let
-        config =
-            bulletKindToConfig kind
-
-        radius =
-            6
-
-        speed =
-            2
-    in
-    { position =
-        Pt.moveBy
-            (Vec.fromRTheta (radius + gun.radius) angle)
-            gun.position
-    , velocity = Vec.fromRTheta speed angle
-    , radius = radius
-    , motion = config.motion
-    , timeBomb = config.timeBomb
-    }
-
-
-isFakeBullet : Bullet -> Bool
-isFakeBullet bullet =
-    bullet.timeBomb /= Nothing
-
-
 isBulletIntersecting : BulletCtx bc -> List Bullet -> Bullet -> Bool
 isBulletIntersecting ctx otherBullets bullet =
     RigidBody.doCircleOverlap bullet ctx.player
         || List.any (RigidBody.doCircleOverlap bullet) ctx.turrets
         || List.any (RigidBody.doCircleOverlap bullet)
-            (List.filter (isFakeBullet >> not) otherBullets)
+            (List.filter (Bullet.isFakeBullet >> not) otherBullets)
 
 
 type alias BulletCtx a =
@@ -239,65 +177,19 @@ type alias BulletCtx a =
     }
 
 
-bulletToExplosion : Bullet -> Explosion
-bulletToExplosion bullet =
-    Explosion.explosionFrom bulletToShape bullet
-
-
-stepBullet : Screen -> { target | position : Point, radius : Float } -> Bullet -> Bullet
-stepBullet screen target bullet =
-    bullet
-        |> RigidBody.step
-            [ case bullet.motion of
-                Gravity ->
-                    gravitateTo target
-
-                Homing ->
-                    homingTo target
-            , bounceWithinScreen screen 0.5
-            ]
-
-
 updateBullets : Screen -> BulletCtx bc -> List Bullet -> List Response
 updateBullets screen ctx =
     let
         update_ : ( Bullet, List Bullet ) -> Response
         update_ ( bullet, otherBullets ) =
             if isBulletIntersecting ctx otherBullets bullet then
-                bulletToExplosion bullet |> AddExplosion
+                Bullet.bulletToExplosion bullet |> AddExplosion
 
             else
-                stepBullet screen ctx.player bullet
+                Bullet.stepBullet screen ctx.player bullet
                     |> AddBullet
     in
     List.Extra.select >> List.map update_
-
-
-bulletToShape : Bullet -> Shape
-bulletToShape bullet =
-    let
-        { radius, motion, velocity } =
-            bullet
-
-        otherShape =
-            case motion of
-                Gravity ->
-                    group []
-
-                Homing ->
-                    group
-                        [ rect (radius * 3.5) 1
-                            |> rotate (Vec.angle velocity |> inDegrees)
-                        ]
-    in
-    group
-        [ group
-            [ circle radius
-            , otherShape
-            ]
-            |> fill "black"
-            |> fade 0.7
-        ]
 
 
 
@@ -498,7 +390,7 @@ type alias TurretCtx tc =
 isTurretIntersecting : TurretCtx tc -> Turret -> Bool
 isTurretIntersecting ctx turret =
     ctx.bullets
-        |> List.filter (isFakeBullet >> not)
+        |> List.filter (Bullet.isFakeBullet >> not)
         |> List.any (RigidBody.doCircleOverlap turret)
 
 
@@ -538,7 +430,7 @@ fireWeaponFromTo src target ( bulletKind, bulletCount ) =
     let
         addBulletWithAngle : Float -> Response
         addBulletWithAngle angle =
-            initBullet bulletKind src angle
+            Bullet.initBullet bulletKind src angle
                 |> AddBullet
     in
     let
@@ -721,7 +613,7 @@ viewWorld world =
         , viewAllHelp turretToShape world.turrets
             |> group
         , viewHelp playerToShape world.player
-        , viewAllHelp bulletToShape world.bullets
+        , viewAllHelp Bullet.bulletToShape world.bullets
             |> group
         , Explosion.viewAll world.explosions
         ]

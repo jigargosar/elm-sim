@@ -28,6 +28,7 @@ type alias Memory =
     { player : Player
     , turrets : List Turret
     , bullets : List Bullet
+    , clock : Int
     }
 
 
@@ -54,8 +55,11 @@ viewTurrets =
     List.map viewTurret >> group
 
 
-updateMemory _ =
-    identity
+updateMemory : Computer -> Memory -> Memory
+updateMemory { time } ({ turrets, clock } as mem) =
+    { mem
+        | clock = clock + 1
+    }
 
 
 initialMemory : Memory
@@ -63,6 +67,7 @@ initialMemory =
     { player = Player 0 0
     , turrets = initTurrets [ red, red, blue, orange ]
     , bullets = []
+    , clock = 0
     }
 
 

@@ -95,6 +95,7 @@ updateMemory { screen } ({ turrets, player } as mem) =
         |> stepTurretCounters
 
 
+ccc : Number -> Number -> Number -> Number -> Number -> Number -> Bool
 ccc x y r x2 y2 r2 =
     ((x2 - x) ^ 2 + (y2 - y) ^ 2)
         < (r ^ 2 + r2 ^ 2)

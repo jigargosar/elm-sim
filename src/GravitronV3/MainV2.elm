@@ -14,6 +14,7 @@ import GravitronV3.RigidBody as RigidBody
         , RigidBody
         )
 import GravitronV3.Screen as Screen exposing (Screen)
+import GravitronV3.Tag as Tag
 import GravitronV3.Turret as Turret exposing (Turret, TurretKind(..))
 import GravitronV3.Vec as Vec exposing (Vec, vec)
 import Html exposing (Html)
@@ -99,6 +100,11 @@ type alias Player =
     CircularBody
         { seed : Seed
         }
+
+
+playerToTaggedCircle : Player -> Tag.TaggedCircle
+playerToTaggedCircle =
+    Tag.circular Tag.Player
 
 
 initialPlayer : Player

@@ -4,6 +4,7 @@ module GravitronV3.Turret exposing
     , hit
     , initTurret
     , isDead
+    , toTaggedCircle
     , turretDeathResponse
     , turretStepResponse
     , turretToShape
@@ -20,6 +21,7 @@ import GravitronV3.RigidBody
         , CircularBody
         , RigidBody
         )
+import GravitronV3.Tag as Tag
 import GravitronV3.Vec as Vec exposing (Vec)
 import PointFree as PF
 
@@ -142,6 +144,11 @@ type alias Turret =
     , color : String
     , revengeOnDeath : Bool
     }
+
+
+toTaggedCircle : Bullet -> Tag.TaggedCircle
+toTaggedCircle =
+    Tag.circular Tag.Turret
 
 
 initHP : Int -> HP

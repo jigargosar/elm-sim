@@ -1,4 +1,4 @@
-module GravitronV3.Bullet exposing (Bullet, BulletKind(..), bulletToShape, initBullet, isFakeBullet, stepBullet)
+module GravitronV3.Bullet exposing (Bullet, BulletKind(..), bulletToShape, initBullet, isFakeBullet, stepBullet, toTaggedCircle)
 
 import Basics.Extra exposing (inDegrees)
 import GravitronV3.Canvas exposing (..)
@@ -12,6 +12,7 @@ import GravitronV3.RigidBody as RigidBody
         , RigidBody
         )
 import GravitronV3.Screen exposing (Screen)
+import GravitronV3.Tag as Tag
 import GravitronV3.Vec as Vec exposing (Vec)
 
 
@@ -75,6 +76,11 @@ initBullet kind gun angle =
 isFakeBullet : Bullet -> Bool
 isFakeBullet bullet =
     bullet.timeBomb /= Nothing
+
+
+toTaggedCircle : Bullet -> Tag.TaggedCircle
+toTaggedCircle =
+    Tag.circular Tag.Bullet
 
 
 stepBullet : Screen -> { target | position : Point, radius : Float } -> Bullet -> Bullet

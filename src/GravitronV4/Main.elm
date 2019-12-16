@@ -1,5 +1,6 @@
 module GravitronV4.Main exposing (main)
 
+import List.Extra
 import Playground exposing (..)
 
 
@@ -86,11 +87,21 @@ initTurrets =
 updateMemory : Computer -> Mem -> Mem
 updateMemory { screen } ({ turrets, player } as mem) =
     mem
+        |> stepBulletCollision
         |> stepBulletsVel player.x player.y
         |> stepBulletsPos
         |> stepBounceBulletInScreen screen
         |> stepFireTurretBullets
         |> stepTurretCounters
+
+
+stepBulletCollision : Mem -> Mem
+stepBulletCollision mem =
+    let
+        bbc ( b, ob ) =
+            b
+    in
+    { mem | bullets = List.Extra.select mem.bullets |> List.map bbc }
 
 
 stepBulletsPos : Mem -> Mem

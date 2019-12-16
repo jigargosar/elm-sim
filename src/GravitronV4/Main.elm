@@ -12,6 +12,7 @@ type alias Player =
 type alias Turret =
     { x : Number
     , y : Number
+    , color : Color
     }
 
 
@@ -37,8 +38,8 @@ viewPlayer { x, y } =
 viewTurrets : List Turret -> Shape
 viewTurrets =
     let
-        viewTurret { x, y } =
-            circle red 25
+        viewTurret { x, y, color } =
+            circle color 25
                 |> move x y
     in
     List.map viewTurret >> group
@@ -51,11 +52,11 @@ updateMemory _ =
 initialMemory : Memory
 initialMemory =
     { player = Player 0 0
-    , turrets = initTurrets
+    , turrets = initTurrets [ red, red, blue, orange ]
     }
 
 
-initTurrets : List Turret
+initTurrets : List Color -> List Turret
 initTurrets =
     let
         positions =
@@ -67,7 +68,7 @@ initTurrets =
         initTurret ( x, y ) =
             Turret (x * factor) (y * factor)
     in
-    List.map initTurret positions
+    List.map2 initTurret positions
 
 
 main =

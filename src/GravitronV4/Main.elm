@@ -273,13 +273,21 @@ viewBullets =
     List.map viewBullet >> group
 
 
+timeBombBlastRad =
+    bRad * 10
+
+
 viewTimeBombs : List TimeBomb -> Shape
 viewTimeBombs =
     let
         viewTimeBomb : TimeBomb -> Shape
         viewTimeBomb { x, y } =
-            circle black bRad
-                |> fade 0.8
+            group
+                [ circle red bRad
+                    |> fade 0.8
+                , circle red timeBombBlastRad
+                    |> fade 0.1
+                ]
                 |> move x y
     in
     List.map viewTimeBomb >> group

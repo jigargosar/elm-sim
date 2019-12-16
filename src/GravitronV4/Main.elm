@@ -167,7 +167,6 @@ updateMemory { time, screen } ({ turrets, player } as mem) =
         |> stepBulletsVel player.x player.y
         |> stepBulletsPos
         |> stepBounceBulletInScreen screen
-        |> stepTimeBombCounters
         |> stepFireTurretWeapon player.x player.y
 
 
@@ -277,7 +276,7 @@ stepExpiredTimeBombsToBlasts mem =
                 }
 
             else
-                { acc | timeBombs = tb :: acc.timeBombs }
+                { acc | timeBombs = { tb | ct = stepCt tb.ct } :: acc.timeBombs }
     in
     List.foldl reducer { mem | timeBombs = [] } mem.timeBombs
 
@@ -343,16 +342,6 @@ stepBounceTimeBombInScreen scr mem =
             { b | vx = nvx, vy = nvy }
     in
     { mem | timeBombs = List.map bounce mem.timeBombs }
-
-
-stepTimeBombCounters : Mem -> Mem
-stepTimeBombCounters mem =
-    let
-        stepTimeBomb : TimeBomb -> TimeBomb
-        stepTimeBomb t =
-            { t | ct = stepCt t.ct }
-    in
-    { mem | timeBombs = List.map stepTimeBomb mem.timeBombs }
 
 
 stepFireTurretWeapon : Float -> Float -> Mem -> Mem

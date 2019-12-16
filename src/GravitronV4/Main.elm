@@ -51,20 +51,23 @@ updateMemory _ =
 initialMemory : Memory
 initialMemory =
     { player = Player 0 0
-    , turrets = initTurrets [ ( -1, 1 ), ( 1, -1 ), ( 1, 1 ), ( -1, -1 ) ]
+    , turrets = initTurrets
     }
 
 
-initTurrets : List ( Number, Number ) -> List Turret
+initTurrets : List Turret
 initTurrets =
     let
+        positions =
+            [ ( -1, 1 ), ( 1, -1 ), ( 1, 1 ), ( -1, -1 ) ]
+
         factor =
             150
 
         initTurret ( x, y ) =
             Turret (x * factor) (y * factor)
     in
-    List.map initTurret
+    List.map initTurret positions
 
 
 main =

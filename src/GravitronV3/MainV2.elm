@@ -387,7 +387,7 @@ when =
     PF.when
 
 
-fireWeaponFromTo : CircularBody a -> CircularBody b -> ( BulletKind, BulletCount ) -> List Bullet
+fireWeaponFromTo : CircularBody a -> Point -> ( BulletKind, BulletCount ) -> List Bullet
 fireWeaponFromTo src target ( bulletKind, bulletCount ) =
     let
         addBulletWithAngle : Float -> Bullet
@@ -396,7 +396,7 @@ fireWeaponFromTo src target ( bulletKind, bulletCount ) =
     in
     let
         angle =
-            Pt.vecFromTo src.position target.position
+            Pt.vecFromTo src.position target
                 |> Vec.angle
     in
     case bulletCount of
@@ -416,7 +416,7 @@ fireWeaponFromTo src target ( bulletKind, bulletCount ) =
                 |> List.map addBulletWithAngle
 
 
-turretDeathResponse : CircularBody p -> Turret -> ( Explosion, List Bullet )
+turretDeathResponse : Point -> Turret -> ( Explosion, List Bullet )
 turretDeathResponse target turret =
     let
         addTurretExplosion =
@@ -432,7 +432,7 @@ turretDeathResponse target turret =
             )
 
 
-turretStepResponse : CircularBody p -> Turret -> ( Turret, List Bullet )
+turretStepResponse : Point -> Turret -> ( Turret, List Bullet )
 turretStepResponse target turret =
     let
         ( isDone, bulletTimer ) =
@@ -470,12 +470,16 @@ isTurretIntersecting ctx turret =
 
 updateTurret : TurretCtx tc -> Turret -> Response
 updateTurret ctx turret =
+    let
+        targetPosition =
+            ctx.player.position
+    in
     (if isDead turret then
-        turretDeathResponse ctx.player turret
+        turretDeathResponse targetPosition turret
             |> Tuple.mapFirst AddExplosion
 
      else
-        turretStepResponse ctx.player turret
+        turretStepResponse targetPosition turret
             |> Tuple.mapFirst (when (isTurretIntersecting ctx) hit >> AddTurret)
     )
         |> Tuple.mapSecond (List.map AddBullet)

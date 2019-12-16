@@ -63,7 +63,7 @@ type alias Mem =
 
 initialMemory : Mem
 initialMemory =
-    { player = Player 0 180
+    { player = Player 0 0
     , turrets = initTurrets [ red, red, blue, orange ]
     , bullets = []
     }
@@ -180,7 +180,7 @@ stepFireTurretBullets x y mem =
             if isDone t.ct then
                 let
                     angle =
-                        atan2 ((t.y - y) ^ 2) (t.x - x)
+                        atan2 (y - t.y) (x - t.x)
                 in
                 (::) (initBullet t.x t.y 1 angle)
 

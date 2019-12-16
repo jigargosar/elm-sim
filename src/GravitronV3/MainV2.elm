@@ -541,16 +541,16 @@ fireWeaponFromTo src target ( bulletKind, bulletCount ) =
 turretDeathResponse : Player -> Turret -> Response
 turretDeathResponse player turret =
     let
-        addBulletExplosion =
+        addTurretExplosion =
             AddExplosion (Explosion.explosionFrom turretToShape turret)
     in
     case turret.revengeOnDeath of
         False ->
-            addBulletExplosion
+            addTurretExplosion
 
         True ->
             [ fireWeaponFromTo turret player ( GravityBullet, FiveBullets )
-            , addBulletExplosion
+            , addTurretExplosion
             ]
                 |> Batch
 

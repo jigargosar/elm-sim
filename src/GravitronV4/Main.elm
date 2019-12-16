@@ -180,25 +180,30 @@ stepPlayerPosition time mem =
 
 
 stepBulletCollision : Mem -> Mem
-stepBulletCollision mem =
+stepBulletCollision =
     let
         bbc : Bullet -> Bullet -> Bool
         bbc b ob =
             ccc b.x b.y bRad ob.x ob.y bRad
 
-        bbLstC : ( Bullet, List Bullet ) -> Maybe Bullet
-        bbLstC ( b, bLst ) =
-            if List.any (bbc b) bLst then
-                Nothing
+        bblC : Bullet -> Blast -> Bool
+        bblC b bl =
+            ccc b.x b.y bRad bl.x bl.y bl.r
+
+        bbLstC : ( Bullet, List Bullet ) -> Mem -> Mem
+        bbLstC ( b, bLst ) mem =
+            if
+                List.any (bbc b) bLst
+                    || List.any (bblC b) mem.blasts
+            then
+                { mem | explosions = initExplosion b.x b.y bRad black :: mem.explosions }
 
             else
-                Just b
+                { mem | bullets = b :: mem.bullets }
     in
-    { mem
-        | bullets =
-            List.Extra.select mem.bullets
-                |> List.filterMap bbLstC
-    }
+    \mem ->
+        List.Extra.select mem.bullets
+            |> List.foldl bbLstC { mem | bullets = [] }
 
 
 stepBulletsPos : Mem -> Mem

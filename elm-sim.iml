@@ -10,6 +10,7 @@
       <excludeFolder url="file://$MODULE_DIR$/elm-stuff" />
       <excludeFolder url="file://$MODULE_DIR$/src/Gravitron" />
       <excludeFolder url="file://$MODULE_DIR$/src/GravitronV2" />
+      <excludeFolder url="file://$MODULE_DIR$/src/GravitronV3" />
       <excludePattern pattern="elm-stuff" />
     </content>
     <orderEntry type="inheritedJdk" />

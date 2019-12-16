@@ -3,6 +3,30 @@ module GravitronV4.Main exposing (main)
 import Playground exposing (..)
 
 
+type Counter
+    = Counter Int Int
+
+
+initCt : Int -> Counter
+initCt =
+    Counter 0 << max 1
+
+
+stepCt : Counter -> Counter
+stepCt (Counter n mx) =
+    Counter (n + 1 |> modBy mx) mx
+
+
+isDone : Counter -> Bool
+isDone (Counter n mx) =
+    n == mx - 1
+
+
+pct : Counter -> Float
+pct (Counter n mx) =
+    toFloat n / toFloat mx
+
+
 type alias Player =
     { x : Number
     , y : Number

@@ -88,7 +88,7 @@ updateMemory { time } ({ turrets } as mem) =
     mem
         |> stepBulletsPos
         |> stepFireTurretBullets
-        |> stepTurrets
+        |> stepTurretCounters
 
 
 stepBulletsPos : Mem -> Mem
@@ -101,8 +101,8 @@ stepBulletsPos mem =
     { mem | bullets = List.map stepBullet mem.bullets }
 
 
-stepTurrets : Mem -> Mem
-stepTurrets mem =
+stepTurretCounters : Mem -> Mem
+stepTurretCounters mem =
     let
         stepTurret : Turret -> Turret
         stepTurret t =

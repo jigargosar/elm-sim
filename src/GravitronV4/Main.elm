@@ -86,8 +86,19 @@ initTurrets =
 updateMemory : Computer -> Mem -> Mem
 updateMemory { time } ({ turrets } as mem) =
     mem
+        |> stepBullets
         |> stepFireTurretBullets
         |> stepTurrets
+
+
+stepBullets : Mem -> Mem
+stepBullets mem =
+    let
+        stepBullet : Bullet -> Bullet
+        stepBullet b =
+            { b | x = b.x + b.vx, y = b.y + b.vy }
+    in
+    { mem | bullets = List.map stepBullet mem.bullets }
 
 
 stepTurrets : Mem -> Mem
@@ -123,9 +134,10 @@ stepFireTurretBullets mem =
 
 
 viewMemory : Computer -> Mem -> List Shape
-viewMemory _ { player, turrets } =
+viewMemory _ { player, turrets, bullets } =
     [ viewPlayer player
     , viewTurrets turrets
+    , viewBullets bullets
     ]
 
 
@@ -143,6 +155,16 @@ viewTurrets =
                 |> move x y
     in
     List.map viewTurret >> group
+
+
+viewBullets : List Bullet -> Shape
+viewBullets =
+    let
+        viewBullet { x, y } =
+            circle black 10
+                |> move x y
+    in
+    List.map viewBullet >> group
 
 
 main =

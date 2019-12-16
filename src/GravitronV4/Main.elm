@@ -366,22 +366,17 @@ type Weapon
     | TimeBombWeapon
 
 
-type Projectile
-    = BulletProjectile Bullet
-    | TimeBombProjectile TimeBomb
-
-
 stepFireTurretWeapon : Float -> Float -> Mem -> Mem
-stepFireTurretWeapon x y mem =
+stepFireTurretWeapon x y =
     let
-        initProjectile : Turret -> Float -> Projectile
-        initProjectile t angle =
+        addProjectile : Turret -> Float -> Mem -> Mem
+        addProjectile t angle mem =
             case t.weapon of
                 BulletWeapon ->
-                    BulletProjectile (initBullet t.x t.y 3 angle)
+                    { mem | bullets = initBullet t.x t.y 3 angle :: mem.bullets }
 
                 TimeBombWeapon ->
-                    TimeBombProjectile (initTimeBomb t.x t.y 3 angle)
+                    { mem | timeBombs = initTimeBomb t.x t.y 3 angle :: mem.timeBombs }
 
         fireWeaponOnCounter t =
             if isDone t.ct then
@@ -389,25 +384,12 @@ stepFireTurretWeapon x y mem =
                     angle =
                         angleFromTo t.x t.y x y
                 in
-                (::) (initProjectile t angle)
+                addProjectile t angle
 
             else
                 identity
-
-        projectiles : List Projectile
-        projectiles =
-            List.foldl fireWeaponOnCounter [] mem.turrets
-
-        addProjectile : Projectile -> Mem -> Mem
-        addProjectile p m =
-            case p of
-                BulletProjectile b ->
-                    { m | bullets = b :: m.bullets }
-
-                TimeBombProjectile timeBomb ->
-                    { m | timeBombs = timeBomb :: m.timeBombs }
     in
-    List.foldl addProjectile mem projectiles
+    \mem -> List.foldl fireWeaponOnCounter mem mem.turrets
 
 
 

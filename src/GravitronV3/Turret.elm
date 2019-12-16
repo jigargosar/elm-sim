@@ -146,7 +146,7 @@ type alias Turret =
     }
 
 
-toTaggedCircle : Bullet -> Tag.TaggedCircle
+toTaggedCircle : Turret -> Tag.TaggedCircle
 toTaggedCircle =
     Tag.circular Tag.Turret
 

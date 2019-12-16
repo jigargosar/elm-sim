@@ -218,17 +218,10 @@ updateTurretPlaceHolders =
 -- Turret
 
 
-type alias TurretCtx tc =
-    { tc
-        | player : Player
-        , bullets : List Bullet
-    }
-
-
-isTurretIntersecting : TurretCtx tc -> Turret -> Bool
+isTurretIntersecting : UpdateCtx -> Turret -> Bool
 isTurretIntersecting ctx turret =
-    ctx.bullets
-        |> List.filter (Bullet.isFakeBullet >> not)
+    ctx.others
+        |> List.filter (.tag >> (==) Tag.Bullet)
         |> List.any (RigidBody.doCircleOverlap turret)
 
 
@@ -236,7 +229,7 @@ isTurretIntersecting ctx turret =
 -- || RigidBody.doCircleOverlap turret ctx.player
 
 
-updateTurret : TurretCtx tc -> Turret -> Response
+updateTurret : UpdateCtx -> Turret -> Response
 updateTurret ctx turret =
     let
         targetPosition =
@@ -258,7 +251,7 @@ updateTurret ctx turret =
         |> (\( r, rLst ) -> Batch (r :: rLst))
 
 
-updateTurrets : TurretCtx tc -> List Turret -> List Response
+updateTurrets : UpdateCtx -> List Turret -> List Response
 updateTurrets ctx =
     List.map (updateTurret ctx)
 
@@ -321,11 +314,35 @@ foldResponses responses world =
     List.foldl foldResponse world responses
 
 
+type alias UpdateCtx =
+    { player : Tag.TaggedCircle
+    , others : List Tag.TaggedCircle
+    }
+
+
+toUpdateCtx : World -> UpdateCtx
+toUpdateCtx { player, bullets, turrets } =
+    let
+        p : Tag.TaggedCircle
+        p =
+            playerToTaggedCircle player
+    in
+    { player = p
+    , others =
+        [ p ]
+            ++ List.map Bullet.toTaggedCircle bullets
+            ++ List.map Turret.toTaggedCircle turrets
+    }
+
+
 updateWorld : Env -> World -> World
 updateWorld env world =
     let
         { screen } =
             env
+
+        ctx =
+            toUpdateCtx world
     in
     { world
         | player = updatePlayer screen world.player
@@ -334,7 +351,7 @@ updateWorld env world =
         , bullets = []
         , explosions = []
     }
-        |> foldResponses (updateTurrets world world.turrets)
+        |> foldResponses (updateTurrets ctx world.turrets)
         |> foldResponses (updateBullets screen world world.bullets)
         |> foldResponses (updateTurretPlaceHolders world.turretPlaceholders)
         |> foldResponses

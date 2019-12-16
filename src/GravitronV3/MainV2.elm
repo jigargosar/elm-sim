@@ -14,7 +14,6 @@ import GravitronV3.RigidBody as RigidBody
         , RigidBody
         )
 import GravitronV3.Screen as Screen exposing (Screen)
-import GravitronV3.Tag as Tag
 import GravitronV3.Turret as Turret exposing (Turret, TurretKind(..))
 import GravitronV3.Vec as Vec exposing (Vec, vec)
 import Html exposing (Html)
@@ -100,11 +99,6 @@ type alias Player =
     CircularBody
         { seed : Seed
         }
-
-
-playerToTaggedCircle : Player -> Tag.TaggedCircle
-playerToTaggedCircle =
-    Tag.circular Tag.Player
 
 
 initialPlayer : Player
@@ -218,10 +212,17 @@ updateTurretPlaceHolders =
 -- Turret
 
 
-isTurretIntersecting : UpdateCtx -> Turret -> Bool
+type alias TurretCtx tc =
+    { tc
+        | player : Player
+        , bullets : List Bullet
+    }
+
+
+isTurretIntersecting : TurretCtx tc -> Turret -> Bool
 isTurretIntersecting ctx turret =
-    ctx.others
-        |> List.filter (.tag >> (==) Tag.Bullet)
+    ctx.bullets
+        |> List.filter (Bullet.isFakeBullet >> not)
         |> List.any (RigidBody.doCircleOverlap turret)
 
 
@@ -229,7 +230,7 @@ isTurretIntersecting ctx turret =
 -- || RigidBody.doCircleOverlap turret ctx.player
 
 
-updateTurret : UpdateCtx -> Turret -> Response
+updateTurret : TurretCtx tc -> Turret -> Response
 updateTurret ctx turret =
     let
         targetPosition =
@@ -251,7 +252,7 @@ updateTurret ctx turret =
         |> (\( r, rLst ) -> Batch (r :: rLst))
 
 
-updateTurrets : UpdateCtx -> List Turret -> List Response
+updateTurrets : TurretCtx tc -> List Turret -> List Response
 updateTurrets ctx =
     List.map (updateTurret ctx)
 
@@ -314,35 +315,11 @@ foldResponses responses world =
     List.foldl foldResponse world responses
 
 
-type alias UpdateCtx =
-    { player : Tag.TaggedCircle
-    , others : List Tag.TaggedCircle
-    }
-
-
-toUpdateCtx : World -> UpdateCtx
-toUpdateCtx { player, bullets, turrets } =
-    let
-        p : Tag.TaggedCircle
-        p =
-            playerToTaggedCircle player
-    in
-    { player = p
-    , others =
-        [ p ]
-            ++ List.map Bullet.toTaggedCircle bullets
-            ++ List.map Turret.toTaggedCircle turrets
-    }
-
-
 updateWorld : Env -> World -> World
 updateWorld env world =
     let
         { screen } =
             env
-
-        ctx =
-            toUpdateCtx world
     in
     { world
         | player = updatePlayer screen world.player
@@ -351,7 +328,7 @@ updateWorld env world =
         , bullets = []
         , explosions = []
     }
-        |> foldResponses (updateTurrets ctx world.turrets)
+        |> foldResponses (updateTurrets world world.turrets)
         |> foldResponses (updateBullets screen world world.bullets)
         |> foldResponses (updateTurretPlaceHolders world.turretPlaceholders)
         |> foldResponses

@@ -360,24 +360,6 @@ initTurret position config =
     }
 
 
-type alias TurretCtx tc =
-    { tc
-        | player : Player
-        , bullets : List Bullet
-    }
-
-
-isTurretIntersecting : TurretCtx tc -> Turret -> Bool
-isTurretIntersecting ctx turret =
-    ctx.bullets
-        |> List.filter (Bullet.isFakeBullet >> not)
-        |> List.any (RigidBody.doCircleOverlap turret)
-
-
-
--- || RigidBody.doCircleOverlap turret ctx.player
-
-
 type alias HasHP a =
     { a | hp : HP }
 
@@ -434,12 +416,11 @@ fireWeaponFromTo src target ( bulletKind, bulletCount ) =
                 |> List.map addBulletWithAngle
 
 
-turretDeathResponse : Player -> Turret -> ( TurretResponse, List Bullet )
-turretDeathResponse player turret =
+turretDeathResponse : CircularBody p -> Turret -> ( Explosion, List Bullet )
+turretDeathResponse target turret =
     let
         addTurretExplosion =
             Explosion.explosionFrom turretToShape turret
-                |> TurretExplosion
     in
     case turret.revengeOnDeath of
         False ->
@@ -447,60 +428,63 @@ turretDeathResponse player turret =
 
         True ->
             ( addTurretExplosion
-            , fireWeaponFromTo turret player ( GravityBullet, FiveBullets )
+            , fireWeaponFromTo turret target ( GravityBullet, FiveBullets )
             )
 
 
-turretStepResponse : TurretCtx ct -> Turret -> ( TurretResponse, List Bullet )
-turretStepResponse ctx turret =
+turretStepResponse : CircularBody p -> Turret -> ( Turret, List Bullet )
+turretStepResponse target turret =
     let
         ( isDone, bulletTimer ) =
             Counter.cycleStep turret.bulletTimer
 
         addTurretResponse =
             { turret | bulletTimer = bulletTimer }
-                |> when (isTurretIntersecting ctx) hit
-                |> UpdateTurret
     in
     if isDone then
         ( addTurretResponse
-        , fireWeaponFromTo turret ctx.player ( turret.bulletKind, turret.bulletCount )
+        , fireWeaponFromTo turret target ( turret.bulletKind, turret.bulletCount )
         )
 
     else
         ( addTurretResponse, [] )
 
 
-type TurretResponse
-    = UpdateTurret Turret
-    | TurretExplosion Explosion
+type alias TurretCtx tc =
+    { tc
+        | player : Player
+        , bullets : List Bullet
+    }
 
 
-updateTurret : TurretCtx tc -> Turret -> ( TurretResponse, List Bullet )
+isTurretIntersecting : TurretCtx tc -> Turret -> Bool
+isTurretIntersecting ctx turret =
+    ctx.bullets
+        |> List.filter (Bullet.isFakeBullet >> not)
+        |> List.any (RigidBody.doCircleOverlap turret)
+
+
+
+-- || RigidBody.doCircleOverlap turret ctx.player
+
+
+updateTurret : TurretCtx tc -> Turret -> Response
 updateTurret ctx turret =
-    if isDead turret then
+    (if isDead turret then
         turretDeathResponse ctx.player turret
+            |> Tuple.mapFirst AddExplosion
 
-    else
-        turretStepResponse ctx turret
+     else
+        turretStepResponse ctx.player turret
+            |> Tuple.mapFirst (when (isTurretIntersecting ctx) hit >> AddTurret)
+    )
+        |> Tuple.mapSecond (List.map AddBullet)
+        |> (\( r, rLst ) -> Batch (r :: rLst))
 
 
 updateTurrets : TurretCtx tc -> List Turret -> List Response
 updateTurrets ctx =
-    List.map
-        (updateTurret ctx
-            >> (\( tr, bLst ) ->
-                    (case tr of
-                        TurretExplosion e ->
-                            AddExplosion e
-
-                        UpdateTurret t ->
-                            AddTurret t
-                    )
-                        :: List.map AddBullet bLst
-               )
-            >> Batch
-        )
+    List.map (updateTurret ctx)
 
 
 turretToShape : Turret -> Shape

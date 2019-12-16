@@ -110,7 +110,12 @@ stepFireTurretBullets mem =
             else
                 identity
     in
-    { mem | bullets = mem.bullets ++ List.foldl fireBulletOnCounter [] mem.turrets }
+    { mem
+        | bullets =
+            mem.bullets
+                ++ List.foldl fireBulletOnCounter [] mem.turrets
+                |> List.take 500
+    }
 
 
 initialMemory : Mem

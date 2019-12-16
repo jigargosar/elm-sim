@@ -51,6 +51,26 @@ type alias Turret =
     }
 
 
+type Weapon
+    = BulletWeapon
+    | TimeBombWeapon
+
+
+initTurrets : List ( Color, Weapon ) -> List Turret
+initTurrets =
+    let
+        positions =
+            [ ( -1, 1 ), ( 1, -1 ), ( 1, 1 ), ( -1, -1 ) ]
+
+        factor =
+            150
+
+        initTurret ( x, y ) ( c, w ) =
+            Turret (initCt 60) (x * factor) (y * factor) c w
+    in
+    List.map2 initTurret positions
+
+
 type alias Bullet =
     { x : Number
     , y : Number
@@ -126,21 +146,6 @@ initialMemory =
     , blasts = []
     , explosions = []
     }
-
-
-initTurrets : List ( Color, Weapon ) -> List Turret
-initTurrets =
-    let
-        positions =
-            [ ( -1, 1 ), ( 1, -1 ), ( 1, 1 ), ( -1, -1 ) ]
-
-        factor =
-            150
-
-        initTurret ( x, y ) ( c, w ) =
-            Turret (initCt 60) (x * factor) (y * factor) c w
-    in
-    List.map2 initTurret positions
 
 
 
@@ -359,11 +364,6 @@ stepTurretCounters mem =
             { t | ct = stepCt t.ct }
     in
     { mem | turrets = List.map stepTurret mem.turrets }
-
-
-type Weapon
-    = BulletWeapon
-    | TimeBombWeapon
 
 
 stepFireTurretWeapon : Float -> Float -> Mem -> Mem

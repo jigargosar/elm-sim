@@ -23,6 +23,10 @@ isDone (Counter n mx) =
     n == mx - 1
 
 
+
+-- Model
+
+
 type alias Player =
     { x : Number
     , y : Number
@@ -52,6 +56,24 @@ initBullet x y speed angle =
             fromPolar ( speed, angle )
     in
     Bullet x y vx vy
+
+
+type alias TimeBomb =
+    { x : Number
+    , y : Number
+    , vx : Number
+    , vy : Number
+    , ct : Counter
+    }
+
+
+initTimeBomb : Number -> Number -> Number -> Number -> TimeBomb
+initTimeBomb x y speed angle =
+    let
+        ( vx, vy ) =
+            fromPolar ( speed, angle )
+    in
+    TimeBomb x y vx vy (initCt (60 * 3))
 
 
 type alias Mem =

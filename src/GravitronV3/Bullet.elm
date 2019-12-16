@@ -1,4 +1,4 @@
-module GravitronV3.Bullet exposing (Bullet, BulletKind(..), bulletToExplosion, bulletToShape, initBullet, isFakeBullet, stepBullet)
+module GravitronV3.Bullet exposing (Bullet, BulletKind(..), bulletToShape, initBullet, isFakeBullet, stepBullet)
 
 import Basics.Extra exposing (inDegrees)
 import GravitronV3.Canvas exposing (..)
@@ -75,11 +75,6 @@ initBullet kind gun angle =
 isFakeBullet : Bullet -> Bool
 isFakeBullet bullet =
     bullet.timeBomb /= Nothing
-
-
-bulletToExplosion : Bullet -> Explosion
-bulletToExplosion bullet =
-    Explosion.explosionFrom bulletToShape bullet
 
 
 stepBullet : Screen -> { target | position : Point, radius : Float } -> Bullet -> Bullet

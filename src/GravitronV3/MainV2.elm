@@ -183,7 +183,8 @@ updateBullets screen ctx =
         update_ : ( Bullet, List Bullet ) -> Response
         update_ ( bullet, otherBullets ) =
             if isBulletIntersecting ctx otherBullets bullet then
-                Bullet.bulletToExplosion bullet |> AddExplosion
+                Explosion.explosionFrom Bullet.bulletToShape bullet
+                    |> AddExplosion
 
             else
                 Bullet.stepBullet screen ctx.player bullet

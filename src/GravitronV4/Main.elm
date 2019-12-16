@@ -182,7 +182,7 @@ stepFireTurretBullets x y mem =
                     angle =
                         atan2 (y - t.y) (x - t.x)
                 in
-                (::) (initBullet t.x t.y 1 angle)
+                (::) (initBullet t.x t.y 3 angle)
 
             else
                 identity

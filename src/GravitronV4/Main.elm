@@ -16,9 +16,18 @@ type alias Turret =
     }
 
 
+type alias Bullet =
+    { x : Number
+    , y : Number
+    , vx : Number
+    , vy : Number
+    }
+
+
 type alias Memory =
     { player : Player
     , turrets : List Turret
+    , bullets : List Bullet
     }
 
 
@@ -53,6 +62,7 @@ initialMemory : Memory
 initialMemory =
     { player = Player 0 0
     , turrets = initTurrets [ red, red, blue, orange ]
+    , bullets = []
     }
 
 

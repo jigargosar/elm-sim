@@ -95,13 +95,26 @@ updateMemory { screen } ({ turrets, player } as mem) =
         |> stepTurretCounters
 
 
+ccc x y r x2 y2 r2 =
+    False
+
+
 stepBulletCollision : Mem -> Mem
 stepBulletCollision mem =
     let
-        bbc ( b, ob ) =
-            b
+        bbc : Bullet -> Bullet -> Bool
+        bbc b ob =
+            ccc b.x b.y bRad ob.x ob.y bRad
+
+        bbLstC : ( Bullet, List Bullet ) -> Maybe Bullet
+        bbLstC ( b, bLst ) =
+            if List.any (bbc b) bLst then
+                Nothing
+
+            else
+                Just b
     in
-    { mem | bullets = List.Extra.select mem.bullets |> List.map bbc }
+    { mem | bullets = List.Extra.select mem.bullets |> List.filterMap bbLstC }
 
 
 stepBulletsPos : Mem -> Mem
@@ -204,13 +217,15 @@ viewTurrets =
     List.map viewTurret >> group
 
 
+bRad =
+    8
+
+
 viewBullets : List Bullet -> Shape
 viewBullets =
     let
         viewBullet { x, y } =
-            circle black 8
-                |> fade 0.8
-                |> move x y
+            circle black bRad
     in
     List.map viewBullet >> group
 

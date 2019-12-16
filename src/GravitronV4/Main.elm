@@ -84,12 +84,27 @@ type alias Blast =
     }
 
 
+type alias Explosion =
+    { ct : Counter
+    , x : Number
+    , y : Number
+    , r : Number
+    , color : Color
+    }
+
+
+initExplosion : Number -> Number -> Number -> Color -> Explosion
+initExplosion =
+    Explosion (initCt 60)
+
+
 type alias Mem =
     { player : Player
     , turrets : List Turret
     , bullets : List Bullet
     , timeBombs : List TimeBomb
     , blasts : List Blast
+    , explosions : List Explosion
     }
 
 
@@ -100,6 +115,7 @@ initialMemory =
     , bullets = []
     , timeBombs = []
     , blasts = []
+    , explosions = []
     }
 
 
@@ -124,7 +140,8 @@ initTurrets =
 
 updateMemory : Computer -> Mem -> Mem
 updateMemory { time, screen } ({ turrets, player } as mem) =
-    { mem | blasts = [] }
+    mem
+        |> stepBlastsToExplosions
         |> stepExpiredTimeBombsToBlasts
         |> stepTimeBombCollision
         |> stepTimeBombsVel player.x player.y
@@ -209,6 +226,18 @@ stepBounceBulletInScreen scr mem =
             { b | vx = nvx, vy = nvy }
     in
     { mem | bullets = List.map bounce mem.bullets }
+
+
+stepBlastsToExplosions : Mem -> Mem
+stepBlastsToExplosions mem =
+    let
+        toExplosion { x, y, r } =
+            initExplosion x y r red
+    in
+    { mem
+        | explosions = List.map toExplosion mem.blasts
+        , blasts = []
+    }
 
 
 stepExpiredTimeBombsToBlasts : Mem -> Mem

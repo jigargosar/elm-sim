@@ -302,6 +302,8 @@ stepTimeBombCollisionToBlasts =
         tbBulletC tb b =
             ccc tb.x tb.y bRad b.x b.y bRad
 
+        -- Note: we are not checking for collision with generated blasts
+        -- Perhaps later we can add it. Chain Reaction Of Bombs
         handleCollision ( tb, otherTBList ) mem =
             if
                 List.any (tbTBC tb) otherTBList

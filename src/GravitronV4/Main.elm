@@ -186,7 +186,7 @@ stepFireTurretBullets mem =
             (List.foldl fireBulletOnCounter [] mem.turrets
                 ++ mem.bullets
             )
-                |> List.take 500
+                |> List.take 20
     }
 
 

@@ -34,7 +34,8 @@ type alias Player =
 
 
 type alias Turret =
-    { x : Number
+    { ct : Counter
+    , x : Number
     , y : Number
     , color : Color
     }
@@ -48,15 +49,14 @@ type alias Bullet =
     }
 
 
-type alias Memory =
+type alias Mem =
     { player : Player
     , turrets : List Turret
     , bullets : List Bullet
-    , clock : Int
     }
 
 
-viewMemory : Computer -> Memory -> List Shape
+viewMemory : Computer -> Mem -> List Shape
 viewMemory _ { player, turrets } =
     [ viewPlayer player
     , viewTurrets turrets
@@ -79,19 +79,45 @@ viewTurrets =
     List.map viewTurret >> group
 
 
-updateMemory : Computer -> Memory -> Memory
-updateMemory { time } ({ turrets, clock } as mem) =
-    { mem
-        | clock = clock + 1
-    }
+updateMemory : Computer -> Mem -> Mem
+updateMemory { time } ({ turrets } as mem) =
+    mem
+        |> stepFireTurretBullets
+        |> stepTurrets
 
 
-initialMemory : Memory
+stepTurrets : Mem -> Mem
+stepTurrets mem =
+    { mem | turrets = List.map stepTurret mem.turrets }
+
+
+stepTurret : Turret -> Turret
+stepTurret t =
+    { t | ct = stepCt t.ct }
+
+
+stepFireTurretBullets : Mem -> Mem
+stepFireTurretBullets mem =
+    let
+        initBullet : Number -> Number -> Bullet
+        initBullet x y =
+            Bullet x y 1 1
+
+        fireBulletOnCounter t =
+            if isDone t.ct then
+                (::) (initBullet t.x t.y)
+
+            else
+                identity
+    in
+    { mem | bullets = mem.bullets ++ List.foldl fireBulletOnCounter [] mem.turrets }
+
+
+initialMemory : Mem
 initialMemory =
     { player = Player 0 0
     , turrets = initTurrets [ red, red, blue, orange ]
     , bullets = []
-    , clock = 0
     }
 
 
@@ -105,7 +131,7 @@ initTurrets =
             150
 
         initTurret ( x, y ) =
-            Turret (x * factor) (y * factor)
+            Turret (initCt 60) (x * factor) (y * factor)
     in
     List.map2 initTurret positions
 

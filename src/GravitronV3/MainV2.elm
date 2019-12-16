@@ -173,6 +173,55 @@ updateBullets screen ctx =
 
 
 
+-- Turret Placeholder
+
+
+type alias TurretPlaceholder =
+    { counter : Counter
+    , position : Point
+    , turret : Turret
+    }
+
+
+initTurretPlaceholder : Float -> Point -> TurretConfig -> TurretPlaceholder
+initTurretPlaceholder delay position turretConfig =
+    let
+        turret =
+            initTurret position turretConfig
+    in
+    TurretPlaceholder (Counter.initDelayedBy delay 60) position turret
+
+
+turretPlaceHolderToShape : TurretPlaceholder -> Shape
+turretPlaceHolderToShape { counter, turret } =
+    let
+        progress =
+            Counter.progress counter
+    in
+    turretToShape turret
+        |> fade progress
+        |> scale progress
+
+
+updateTurretPlaceHolder : TurretPlaceholder -> Response
+updateTurretPlaceHolder model =
+    let
+        ( isDone, counter ) =
+            Counter.cycleStep model.counter
+    in
+    if isDone then
+        AddTurret model.turret
+
+    else
+        AddTurretPlaceholder { model | counter = counter }
+
+
+updateTurretPlaceHolders : List TurretPlaceholder -> List Response
+updateTurretPlaceHolders =
+    List.map updateTurretPlaceHolder
+
+
+
 -- Turret Config
 
 
@@ -256,59 +305,6 @@ turretKindToConfig kind =
     }
 
 
-
--- Turret Placeholder
-
-
-type alias TurretPlaceholder =
-    { counter : Counter
-    , position : Point
-    , turret : Turret
-    }
-
-
-initTurretPlaceholder : Float -> Point -> TurretConfig -> TurretPlaceholder
-initTurretPlaceholder delay position turretConfig =
-    let
-        turret =
-            initTurret position turretConfig
-    in
-    TurretPlaceholder (Counter.initDelayedBy delay 60) position turret
-
-
-turretPlaceHolderToShape : TurretPlaceholder -> Shape
-turretPlaceHolderToShape { counter, turret } =
-    let
-        progress =
-            Counter.progress counter
-    in
-    turretToShape turret
-        |> fade progress
-        |> scale progress
-
-
-updateTurretPlaceHolder : TurretPlaceholder -> Response
-updateTurretPlaceHolder model =
-    let
-        ( isDone, counter ) =
-            Counter.cycleStep model.counter
-    in
-    if isDone then
-        AddTurret model.turret
-
-    else
-        AddTurretPlaceholder { model | counter = counter }
-
-
-updateTurretPlaceHolders : List TurretPlaceholder -> List Response
-updateTurretPlaceHolders =
-    List.map updateTurretPlaceHolder
-
-
-
--- Turret
-
-
 type BulletCount
     = SingleBullet
     | TripleBullets
@@ -326,6 +322,10 @@ type alias TurretConfig =
     , bulletKind : BulletKind
     , bulletCount : BulletCount
     }
+
+
+
+-- Turret
 
 
 type alias Turret =

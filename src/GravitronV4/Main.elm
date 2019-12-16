@@ -293,8 +293,11 @@ stepTimeBombCollision =
         bbc b ob =
             ccc b.x b.y bRad ob.x ob.y bRad
 
+        tbBulletC tb b =
+            ccc tb.x tb.y bRad b.x b.y bRad
+
         selfC ( tb, tbList ) mem =
-            if List.any (bbc tb) tbList then
+            if List.any (bbc tb) tbList || List.any (tbBulletC tb) mem.bullets then
                 { mem | blasts = blastFromTimeBomb tb :: mem.blasts }
 
             else

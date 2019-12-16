@@ -124,7 +124,7 @@ initTurrets =
 
 updateMemory : Computer -> Mem -> Mem
 updateMemory { time, screen } ({ turrets, player } as mem) =
-    mem
+    { mem | blasts = [] }
         |> stepExpiredTimeBombsToBlasts
         |> stepTimeBombCollision
         |> stepTimeBombsVel player.x player.y

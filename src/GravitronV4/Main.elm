@@ -218,6 +218,7 @@ viewTurrets =
     List.map viewTurret >> group
 
 
+bRad : Float
 bRad =
     8
 

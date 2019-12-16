@@ -272,13 +272,18 @@ stepExpiredTimeBombsToBlasts mem =
         reducer tb acc =
             if isDone tb.ct then
                 { acc
-                    | blasts = Blast tb.x tb.y timeBombBlastRad :: acc.blasts
+                    | blasts = blastFromTimeBomb tb :: acc.blasts
                 }
 
             else
                 { acc | timeBombs = { tb | ct = stepCt tb.ct } :: acc.timeBombs }
     in
     List.foldl reducer { mem | timeBombs = [] } mem.timeBombs
+
+
+blastFromTimeBomb : TimeBomb -> Blast
+blastFromTimeBomb tb =
+    Blast tb.x tb.y timeBombBlastRad
 
 
 stepTimeBombCollision : Mem -> Mem

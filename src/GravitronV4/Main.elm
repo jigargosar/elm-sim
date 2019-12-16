@@ -486,8 +486,8 @@ viewExplosions =
                     ctProgress ct
             in
             circle color r
-                |> fade (1 - progress)
-                |> scale (1 + (progress / 2))
+                |> fade (0.8 - (progress * 0.8))
+                |> scale (1 + (progress / 4))
                 |> move x y
     in
     List.map viewExplosion >> group

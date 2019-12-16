@@ -122,6 +122,7 @@ initTurrets =
 updateMemory : Computer -> Mem -> Mem
 updateMemory { time, screen } ({ turrets, player } as mem) =
     mem
+        |> stepExpiredTimeBombsToBlasts
         |> stepTimeBombCollision
         |> stepTimeBombsVel player.x player.y
         |> stepTimeBombsPos
@@ -207,6 +208,19 @@ stepBounceBulletInScreen scr mem =
     { mem | bullets = List.map bounce mem.bullets }
 
 
+stepExpiredTimeBombsToBlasts : Mem -> Mem
+stepExpiredTimeBombsToBlasts mem =
+    let
+        reducer tb acc =
+            if isDone tb.ct then
+                acc
+
+            else
+                { acc | timeBombs = tb :: acc.timeBombs }
+    in
+    List.foldl reducer { mem | timeBombs = [] } mem.timeBombs
+
+
 stepTimeBombCollision : Mem -> Mem
 stepTimeBombCollision mem =
     let
@@ -225,7 +239,6 @@ stepTimeBombCollision mem =
     { mem
         | timeBombs =
             mem.timeBombs
-                |> List.filter (.ct >> isDone >> not)
                 |> List.Extra.select
                 |> List.filterMap bbLstC
     }

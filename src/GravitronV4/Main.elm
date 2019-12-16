@@ -159,11 +159,11 @@ updateMemory { time, screen } ({ turrets, player } as mem) =
         |> stepBlastsToExplosions
         |> stepExpiredTimeBombsToBlasts
         |> stepTimeBombCollision
+        |> stepBulletCollision
         |> stepTimeBombsVel player.x player.y
         |> stepTimeBombsPos
         |> stepBounceTimeBombInScreen screen
         |> stepPlayerPosition time
-        |> stepBulletCollision
         |> stepBulletsVel player.x player.y
         |> stepBulletsPos
         |> stepBounceBulletInScreen screen

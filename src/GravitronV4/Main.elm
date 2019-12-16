@@ -109,12 +109,6 @@ stepPlayerPosition time mem =
     { mem | player = stepPlayerPosition_ mem.player }
 
 
-ccc : Number -> Number -> Number -> Number -> Number -> Number -> Bool
-ccc x y r x2 y2 r2 =
-    ((x2 - x) ^ 2 + (y2 - y) ^ 2)
-        < (r ^ 2 + r2 ^ 2)
-
-
 stepBulletCollision : Mem -> Mem
 stepBulletCollision mem =
     let
@@ -295,3 +289,9 @@ bounceInScreen bounceFriction scr x y vx vy =
 
     else
         ( nvx, nvy )
+
+
+ccc : Number -> Number -> Number -> Number -> Number -> Number -> Bool
+ccc x y r x2 y2 r2 =
+    ((x2 - x) ^ 2 + (y2 - y) ^ 2)
+        < (r ^ 2 + r2 ^ 2)

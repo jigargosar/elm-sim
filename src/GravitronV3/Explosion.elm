@@ -1,15 +1,19 @@
-module GravitronV3.Explosion exposing (Explosion, explosionFrom, explosionToShape, updateExplosions)
+module GravitronV3.Explosion exposing (Explosion, explosionFrom, updateExplosions, viewAll)
 
-import GravitronV3.Canvas exposing (..)
+import GravitronV3.Canvas as Canvas exposing (..)
 import GravitronV3.Counter as Counter exposing (Counter)
-import GravitronV3.Point exposing (Point)
+import GravitronV3.Point as Point exposing (Point)
 
 
 
 -- Explosion
 
 
-type alias Explosion =
+type Explosion
+    = Explosion Record
+
+
+type alias Record =
     { position : Point
     , shape : Shape
     , timer : Counter
@@ -25,15 +29,16 @@ explosionFrom func entity =
     , shape = func entity
     , timer = Counter.init 60
     }
+        |> Explosion
 
 
 updateExplosion : Explosion -> Maybe Explosion
-updateExplosion explosion =
-    if Counter.isDone explosion.timer then
+updateExplosion (Explosion rec) =
+    if Counter.isDone rec.timer then
         Nothing
 
     else
-        Just { explosion | timer = Counter.step explosion.timer }
+        Just (Explosion { rec | timer = Counter.step rec.timer })
 
 
 updateExplosions : List Explosion -> List Explosion
@@ -41,8 +46,8 @@ updateExplosions =
     List.filterMap updateExplosion
 
 
-explosionToShape : Explosion -> Shape
-explosionToShape { position, timer, shape } =
+toShape : Explosion -> Shape
+toShape (Explosion { position, timer, shape }) =
     let
         progress =
             Counter.progress timer
@@ -50,3 +55,14 @@ explosionToShape { position, timer, shape } =
     shape
         |> fade (1 - progress)
         |> scale (1 + (progress / 2))
+
+
+view : Explosion -> Shape
+view ((Explosion { position }) as explosion) =
+    toShape explosion
+        |> Canvas.move (Point.toTuple position)
+
+
+viewAll : List Explosion -> Shape
+viewAll =
+    List.map view >> group

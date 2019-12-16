@@ -696,8 +696,7 @@ viewWorld world =
         , viewHelp playerToShape world.player
         , viewAllHelp bulletToShape world.bullets
             |> group
-        , viewAllHelp Explosion.explosionToShape world.explosions
-            |> group
+        , Explosion.viewAll world.explosions
         ]
 
 

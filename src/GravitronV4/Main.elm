@@ -121,6 +121,11 @@ updateMemory { time, screen } ({ turrets, player } as mem) =
         |> stepBulletsVel player.x player.y
         |> stepBulletsPos
         |> stepBounceBulletInScreen screen
+        |> stepTimeBombCollision
+        |> stepTimeBombsVel player.x player.y
+        |> stepTimeBombsPos
+        |> stepBounceTimeBombInScreen screen
+        |> stepTimeBombCounters
         |> stepFireTurretWeapon player.x player.y
         |> stepTurretCounters
 
@@ -194,6 +199,78 @@ stepBounceBulletInScreen scr mem =
             { b | vx = nvx, vy = nvy }
     in
     { mem | bullets = List.map bounce mem.bullets }
+
+
+stepTimeBombCollision : Mem -> Mem
+stepTimeBombCollision mem =
+    let
+        bbc : TimeBomb -> TimeBomb -> Bool
+        bbc b ob =
+            ccc b.x b.y bRad ob.x ob.y bRad
+
+        bbLstC : ( TimeBomb, List TimeBomb ) -> Maybe TimeBomb
+        bbLstC ( b, bLst ) =
+            if List.any (bbc b) bLst then
+                Nothing
+
+            else
+                Just b
+    in
+    { mem
+        | timeBombs =
+            List.Extra.select mem.timeBombs
+                |> List.filterMap bbLstC
+    }
+
+
+stepTimeBombsPos : Mem -> Mem
+stepTimeBombsPos mem =
+    let
+        stepTimeBomb : TimeBomb -> TimeBomb
+        stepTimeBomb b =
+            { b | x = b.x + b.vx, y = b.y + b.vy }
+    in
+    { mem | timeBombs = List.map stepTimeBomb mem.timeBombs }
+
+
+stepTimeBombsVel : Number -> Number -> Mem -> Mem
+stepTimeBombsVel tx ty mem =
+    let
+        stepTimeBomb : TimeBomb -> TimeBomb
+        stepTimeBomb b =
+            let
+                ( dx, dy ) =
+                    ( tx - b.x, ty - b.y )
+                        |> toPolar
+                        |> Tuple.mapFirst (\m -> 20 / m)
+                        |> fromPolar
+            in
+            { b | vx = b.vx + dx, vy = b.vy + dy }
+    in
+    { mem | timeBombs = List.map stepTimeBomb mem.timeBombs }
+
+
+stepBounceTimeBombInScreen : Screen -> Mem -> Mem
+stepBounceTimeBombInScreen scr mem =
+    let
+        bounce ({ x, y, vx, vy } as b) =
+            let
+                ( nvx, nvy ) =
+                    bounceInScreen 0.5 scr x y vx vy
+            in
+            { b | vx = nvx, vy = nvy }
+    in
+    { mem | timeBombs = List.map bounce mem.timeBombs }
+
+
+stepTimeBombCounters : Mem -> Mem
+stepTimeBombCounters mem =
+    let
+        stepTimeBomb : TimeBomb -> TimeBomb
+        stepTimeBomb t =
+            { t | ct = stepCt t.ct }
+    in
+    { mem | timeBombs = List.map stepTimeBomb mem.timeBombs }
 
 
 stepTurretCounters : Mem -> Mem

@@ -121,6 +121,11 @@ decHPBy hits (HP mx n) =
     HP mx (clamp 0 mx (n - hits))
 
 
+isDead : HP -> Bool
+isDead (HP _ n) =
+    n <= 0
+
+
 initTurrets : List TurretConfig -> List Turret
 initTurrets =
     let
@@ -563,8 +568,8 @@ stepBlasts =
 stepTurrets : { a | tx : Float, ty : Float } -> List Turret -> List Res
 stepTurrets { tx, ty } =
     let
-        fireWeaponOnCounter : Turret -> Res
-        fireWeaponOnCounter t =
+        stepAlive : Turret -> Res
+        stepAlive t =
             [ if isDone t.ct then
                 let
                     angle =
@@ -582,8 +587,20 @@ stepTurrets { tx, ty } =
             , AddTurret { t | ct = stepCt t.ct }
             ]
                 |> Batch
+
+        stepDead : Turret -> Res
+        stepDead t =
+            stepAlive t
+
+        step : Turret -> Res
+        step t =
+            if isDead t.hp then
+                stepDead t
+
+            else
+                stepAlive t
     in
-    List.map fireWeaponOnCounter
+    List.map stepAlive
 
 
 

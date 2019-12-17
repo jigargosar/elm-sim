@@ -208,23 +208,57 @@ isDamaging target src =
         && dcc target src
 
 
+type Res
+    = AddExplosion Explosion
+    | AddBlast Blast
+    | NoRes
+    | Batch (List Res)
+
+
+foldRes : List Res -> Mem -> Mem
+foldRes resList =
+    let
+        reducer : Res -> Mem -> Mem
+        reducer res ({ explosions, blasts } as mem) =
+            case res of
+                AddExplosion explosion ->
+                    { mem | explosions = explosion :: explosions }
+
+                AddBlast blast ->
+                    { mem | blasts = blast :: blasts }
+
+                NoRes ->
+                    mem
+
+                Batch lst ->
+                    foldRes lst mem
+    in
+    \mem -> List.foldl reducer mem resList
+
+
 updateMemory : Computer -> Mem -> Mem
-updateMemory { time, screen } ({ turrets, player, explosions } as mem) =
+updateMemory { time, screen } ({ turrets, player, explosions, blasts } as mem) =
     { mem
         | player = updatePlayer time player
-        , explosions = stepExplosions explosions
+        , explosions = []
+        , blasts = []
     }
-        |> stepBlastsToExplosions
-        |> stepExpiredTimeBombsToBlasts
-        |> stepTimeBombCollisionToBlasts
-        |> stepBulletCollision
-        |> stepTimeBombsVel player.x player.y
-        |> stepTimeBombsPos
-        |> stepBounceTimeBombInScreen screen
-        |> stepBulletsVel player.x player.y
-        |> stepBulletsPos
-        |> stepBounceBulletInScreen screen
-        |> stepFireTurretWeapon player.x player.y
+        |> foldRes (stepBlasts blasts)
+        |> foldRes (stepExplosions explosions)
+
+
+
+{- |> stepExpiredTimeBombsToBlasts
+   |> stepTimeBombCollisionToBlasts
+   |> stepBulletCollision
+   |> stepTimeBombsVel player.x player.y
+   |> stepTimeBombsPos
+   |> stepBounceTimeBombInScreen screen
+   |> stepBulletsVel player.x player.y
+   |> stepBulletsPos
+   |> stepBounceBulletInScreen screen
+   |> stepFireTurretWeapon player.x player.y
+-}
 
 
 updatePlayer : Time -> Player -> Player
@@ -293,29 +327,26 @@ stepBounceBulletInScreen scr mem =
     { mem | bullets = List.map bounce mem.bullets }
 
 
-stepExplosions : List Explosion -> List Explosion
+stepExplosions : List Explosion -> List Res
 stepExplosions =
     let
         stepE e =
             if isDone e.ct then
-                Nothing
+                NoRes
 
             else
-                Just { e | ct = stepCt e.ct }
+                AddExplosion { e | ct = stepCt e.ct }
     in
-    List.filterMap stepE
+    List.map stepE
 
 
-stepBlastsToExplosions : Mem -> Mem
-stepBlastsToExplosions mem =
+stepBlasts : List Blast -> List Res
+stepBlasts =
     let
         toExplosion { x, y, r } =
             initExplosion x y r red
     in
-    { mem
-        | explosions = List.map toExplosion mem.blasts ++ mem.explosions
-        , blasts = []
-    }
+    List.map (toExplosion >> AddExplosion)
 
 
 stepExpiredTimeBombsToBlasts : Mem -> Mem

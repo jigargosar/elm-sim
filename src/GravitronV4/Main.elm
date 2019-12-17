@@ -438,7 +438,7 @@ updatePlayer scr mouse time =
                 ( dx, dy ) =
                     ( wave -100 100 11 time, wave -300 300 21 time )
                         |> toPolar
-                        |> Tuple.mapFirst ((*) 0.001)
+                        |> Tuple.mapFirst ((*) 0.0005)
                         |> fromPolar
             in
             { p | vx = vx + dx, vy = vy + dy }

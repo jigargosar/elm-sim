@@ -431,7 +431,11 @@ nextLevel mem =
 
 updatePlayer : Mouse -> Time -> Player -> Player
 updatePlayer mouse time p =
-    { p | x = wave -100 100 11 time, y = wave -300 300 5 time }
+    if mouse.down then
+        p
+
+    else
+        { p | x = wave -100 100 11 time, y = wave -300 300 5 time }
 
 
 stepTimeBombs :

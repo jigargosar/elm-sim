@@ -334,8 +334,8 @@ type Res
     | Batch (List Res)
 
 
-foldReverseResponses : List Res -> Mem -> Mem
-foldReverseResponses =
+emptyThenAddRes : List Res -> Mem -> Mem
+emptyThenAddRes =
     let
         reducer : Res -> Mem -> Mem
         reducer res mem =
@@ -400,8 +400,18 @@ foldReverseResponses =
                 , blasts = List.reverse mem.blasts
                 , explosions = List.reverse mem.explosions
             }
+
+        emptyLists : Mem -> Mem
+        emptyLists mem =
+            { mem
+                | turrets = []
+                , bullets = []
+                , timeBombs = []
+                , blasts = []
+                , explosions = []
+            }
     in
-    \lst -> foldHelp lst >> reverseLists
+    \resList -> emptyLists >> foldHelp resList >> reverseLists
 
 
 updateMemory : Computer -> Mem -> Mem
@@ -440,7 +450,7 @@ updateMemory { time, screen, mouse } mem =
         , bullets = []
         , timeBombs = []
     }
-        |> foldReverseResponses allResponses
+        |> emptyThenAddRes allResponses
         |> nextLevel
 
 

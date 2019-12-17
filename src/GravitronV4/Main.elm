@@ -185,7 +185,10 @@ initialMemory =
 type Tag
     = TagTimeBomb
     | TagBullet
-    | TagBlast
+
+
+type alias DamageCircle =
+    { x : Number, y : Number, r : Number }
 
 
 blastCanDamage : Tag -> Bool
@@ -340,10 +343,6 @@ stepExpiredTimeBombsToBlasts mem =
 blastFromTimeBomb : TimeBomb -> Blast
 blastFromTimeBomb tb =
     Blast tb.x tb.y timeBombBlastRadius
-
-
-type alias DamageCircle =
-    { x : Number, y : Number, r : Number }
 
 
 stepTimeBombCollisionToBlasts : Mem -> Mem

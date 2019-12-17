@@ -332,16 +332,6 @@ type Res
     | Batch (List Res)
 
 
-newExplosion : Number -> Number -> Number -> Color -> Res
-newExplosion =
-    NewExplosion
-
-
-newBlast : Number -> Number -> Number -> Res
-newBlast =
-    NewBlast
-
-
 foldRes : List Res -> Mem -> Mem
 foldRes resList =
     let
@@ -491,8 +481,8 @@ stepTimeBombs { scr, tx, ty, allDamageCircles } =
         stepDead : TimeBomb -> Res
         stepDead { x, y, r, blastR } =
             Batch
-                [ newExplosion x y r red
-                , newBlast x y blastR
+                [ NewExplosion x y r red
+                , NewBlast x y blastR
                 ]
 
         step : TimeBomb -> Res
@@ -551,7 +541,7 @@ stepBullets { scr, tx, ty, allDamageCircles } =
 
         stepDead : Bullet -> Res
         stepDead { x, y, r } =
-            newExplosion x y r black
+            NewExplosion x y r black
 
         step : Bullet -> Res
         step bullet =
@@ -585,7 +575,7 @@ stepBlasts : List Blast -> List Res
 stepBlasts =
     let
         toExplosion { x, y, r } =
-            newExplosion x y r red
+            NewExplosion x y r red
     in
     List.map toExplosion
 

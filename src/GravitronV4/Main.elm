@@ -339,46 +339,6 @@ stepBullets scr tx ty =
     List.map step
 
 
-stepBulletsPos : Mem -> Mem
-stepBulletsPos mem =
-    let
-        stepPos : Bullet -> Bullet
-        stepPos b =
-            { b | x = b.x + b.vx, y = b.y + b.vy }
-    in
-    { mem | bullets = List.map stepPos mem.bullets }
-
-
-stepBulletsVel : Number -> Number -> Mem -> Mem
-stepBulletsVel tx ty mem =
-    let
-        stepBullet : Bullet -> Bullet
-        stepBullet b =
-            let
-                ( dx, dy ) =
-                    ( tx - b.x, ty - b.y )
-                        |> toPolar
-                        |> Tuple.mapFirst (\m -> 20 / m)
-                        |> fromPolar
-            in
-            { b | vx = b.vx + dx, vy = b.vy + dy }
-    in
-    { mem | bullets = List.map stepBullet mem.bullets }
-
-
-stepBounceBulletInScreen : Screen -> Mem -> Mem
-stepBounceBulletInScreen scr mem =
-    let
-        bounce ({ x, y, vx, vy } as b) =
-            let
-                ( nvx, nvy ) =
-                    bounceInScreen 0.5 scr x y vx vy
-            in
-            { b | vx = nvx, vy = nvy }
-    in
-    { mem | bullets = List.map bounce mem.bullets }
-
-
 stepExplosions : List Explosion -> List Res
 stepExplosions =
     let

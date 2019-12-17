@@ -210,7 +210,7 @@ isDamaging target src =
 
 updateMemory : Computer -> Mem -> Mem
 updateMemory { time, screen } ({ turrets, player } as mem) =
-    { mem | player = stepPlayerPosition time player }
+    { mem | player = updatePlayer time player }
         |> stepExplosions
         |> stepBlastsToExplosions
         |> stepExpiredTimeBombsToBlasts
@@ -225,8 +225,8 @@ updateMemory { time, screen } ({ turrets, player } as mem) =
         |> stepFireTurretWeapon player.x player.y
 
 
-stepPlayerPosition : Time -> Player -> Player
-stepPlayerPosition time p =
+updatePlayer : Time -> Player -> Player
+updatePlayer time p =
     { p | x = wave -100 100 11 time, y = wave -300 300 5 time }
 
 

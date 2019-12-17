@@ -284,6 +284,7 @@ updateMemory { time, screen } mem =
             { scr = screen
             , tx = player.x
             , ty = player.y
+            , player = playerToDamageCircle player
             , blasts = List.map blastToDamageCircle blasts
             , bullets = List.map bulletToDamageCircle bullets
             }
@@ -348,12 +349,13 @@ stepTimeBombs :
         | scr : Screen
         , tx : Float
         , ty : Float
+        , player : DamageCircle
         , blasts : List DamageCircle
         , bullets : List DamageCircle
     }
     -> List TimeBomb
     -> List Res
-stepTimeBombs { scr, tx, ty, blasts, bullets } =
+stepTimeBombs { scr, tx, ty, player, blasts, bullets } =
     let
         updateVel : TimeBomb -> TimeBomb
         updateVel b =
@@ -401,7 +403,8 @@ stepTimeBombs { scr, tx, ty, blasts, bullets } =
             if
                 isDone timeBomb.ct
                     || List.any (isDamaging (timeBombToDamageCircle timeBomb))
-                        (List.map timeBombToDamageCircle otherTimeBombs
+                        (player
+                            :: List.map timeBombToDamageCircle otherTimeBombs
                             ++ blasts
                             ++ bullets
                         )
@@ -415,10 +418,16 @@ stepTimeBombs { scr, tx, ty, blasts, bullets } =
 
 
 stepBullets :
-    { a | scr : Screen, tx : Float, ty : Float, blasts : List DamageCircle }
+    { a
+        | scr : Screen
+        , tx : Float
+        , ty : Float
+        , player : DamageCircle
+        , blasts : List DamageCircle
+    }
     -> List Bullet
     -> List Res
-stepBullets { scr, tx, ty, blasts } =
+stepBullets { scr, tx, ty, player, blasts } =
     let
         updateVel : Bullet -> Bullet
         updateVel b =
@@ -454,7 +463,8 @@ stepBullets { scr, tx, ty, blasts } =
         step ( bullet, otherBullets ) =
             if
                 List.any (isDamaging (bulletToDamageCircle bullet))
-                    (List.map bulletToDamageCircle otherBullets
+                    (player
+                        :: List.map bulletToDamageCircle otherBullets
                         ++ blasts
                     )
             then

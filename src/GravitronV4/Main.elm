@@ -256,7 +256,7 @@ foldRes resList =
 updateMemory : Computer -> Mem -> Mem
 updateMemory { time, screen } mem =
     let
-        { turrets, player, explosions, blasts, bullets } =
+        { turrets, player, explosions, blasts, bullets, timeBombs } =
             mem
 
         env =
@@ -264,6 +264,7 @@ updateMemory { time, screen } mem =
             , tx = player.x
             , ty = player.y
             , blasts = List.map blastToDamageCircle blasts
+            , bullets = List.map bulletToDamageCircle bullets
             }
     in
     { mem
@@ -278,6 +279,7 @@ updateMemory { time, screen } mem =
         |> foldRes (stepExplosions explosions)
         |> foldRes (stepTurrets env turrets)
         |> foldRes (stepBullets env bullets)
+        |> foldRes (stepTimeBombs env timeBombs)
 
 
 
@@ -320,10 +322,18 @@ stepBulletCollision =
             |> List.foldl handleCollision { mem | bullets = [] }
 
 
-
-{- stepTimeBombs: List TimeBomb -> List Res
-   stepTimeBombs  =
--}
+stepTimeBombs :
+    { a
+        | scr : Screen
+        , tx : Float
+        , ty : Float
+        , blasts : List DamageCircle
+        , bullets : List DamageCircle
+    }
+    -> List TimeBomb
+    -> List Res
+stepTimeBombs { scr, tx, ty, blasts, bullets } =
+    always []
 
 
 stepBullets :

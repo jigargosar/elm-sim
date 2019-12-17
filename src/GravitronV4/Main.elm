@@ -138,6 +138,11 @@ type alias Blast =
     }
 
 
+initBlast : Number -> Number -> Number -> Blast
+initBlast x y r =
+    Blast x y r
+
+
 blastToDamageCircle : Blast -> DamageCircle
 blastToDamageCircle { x, y, r } =
     DamageCircle x y r TagBlast [ TagTimeBomb, TagBullet ]
@@ -221,6 +226,11 @@ type Res
 newExplosion : Number -> Number -> Number -> Color -> Res
 newExplosion x y r c =
     initExplosion x y r c |> AddExplosion
+
+
+newBlast : Number -> Number -> Number -> Res
+newBlast x y r =
+    initBlast x y r |> AddBlast
 
 
 foldRes : List Res -> Mem -> Mem
@@ -333,7 +343,64 @@ stepTimeBombs :
     -> List TimeBomb
     -> List Res
 stepTimeBombs { scr, tx, ty, blasts, bullets } =
-    always []
+    let
+        updateVel : TimeBomb -> TimeBomb
+        updateVel b =
+            let
+                ( dx, dy ) =
+                    ( tx - b.x, ty - b.y )
+                        |> toPolar
+                        |> Tuple.mapFirst (\m -> 20 / m)
+                        |> fromPolar
+            in
+            { b | vx = b.vx + dx, vy = b.vy + dy }
+
+        updatePos : TimeBomb -> TimeBomb
+        updatePos b =
+            { b | x = b.x + b.vx, y = b.y + b.vy }
+
+        bounce : TimeBomb -> TimeBomb
+        bounce ({ x, y, vx, vy } as b) =
+            let
+                ( nvx, nvy ) =
+                    bounceInScreen 0.5 scr x y vx vy
+            in
+            { b | vx = nvx, vy = nvy }
+
+        updateBombClock : TimeBomb -> TimeBomb
+        updateBombClock b =
+            { b | ct = stepCt b.ct }
+
+        stepAlive : TimeBomb -> Res
+        stepAlive =
+            updateVel
+                >> updatePos
+                >> bounce
+                >> updateBombClock
+                >> AddTimeBomb
+
+        stepDead { x, y } =
+            Batch
+                [ newExplosion x y timeBombRadius red
+                , newBlast x y timeBombBlastRadius
+                ]
+
+        step : ( TimeBomb, List TimeBomb ) -> Res
+        step ( timeBomb, otherTimeBombs ) =
+            if
+                isDone timeBomb.ct
+                    || List.any (isDamaging (timeBombToDamageCircle timeBomb))
+                        (List.map timeBombToDamageCircle otherTimeBombs
+                            ++ blasts
+                            ++ bullets
+                        )
+            then
+                stepDead timeBomb
+
+            else
+                stepAlive timeBomb
+    in
+    List.Extra.select >> List.map step
 
 
 stepBullets :

@@ -338,7 +338,11 @@ foldReverseResponses : List Res -> Mem -> Mem
 foldReverseResponses =
     let
         reducer : Res -> Mem -> Mem
-        reducer res ({ nextId, explosions, blasts, turrets, bullets, timeBombs } as mem) =
+        reducer res mem =
+            let
+                { nextId, explosions, blasts, turrets, bullets, timeBombs } =
+                    mem
+            in
             case res of
                 AddExplosion explosion ->
                     { mem | explosions = explosion :: explosions }
@@ -387,8 +391,8 @@ foldReverseResponses =
         foldHelp resList mem =
             List.foldl reducer mem resList
 
-        reverseRes : Mem -> Mem
-        reverseRes mem =
+        reverseLists : Mem -> Mem
+        reverseLists mem =
             { mem
                 | turrets = List.reverse mem.turrets
                 , bullets = List.reverse mem.bullets
@@ -397,7 +401,7 @@ foldReverseResponses =
                 , explosions = List.reverse mem.explosions
             }
     in
-    \lst -> foldHelp lst >> reverseRes
+    \lst -> foldHelp lst >> reverseLists
 
 
 updateMemory : Computer -> Mem -> Mem

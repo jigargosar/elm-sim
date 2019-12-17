@@ -331,6 +331,7 @@ stepBullets scr tx ty =
         updatePos b =
             { b | x = b.x + b.vx, y = b.y + b.vy }
 
+        bounce : Bullet -> Bullet
         bounce ({ x, y, vx, vy } as b) =
             let
                 ( nvx, nvy ) =

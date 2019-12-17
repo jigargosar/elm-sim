@@ -334,8 +334,8 @@ type Res
     | Batch (List Res)
 
 
-foldRes : List Res -> Mem -> Mem
-foldRes resList =
+foldReverseResponses : List Res -> Mem -> Mem
+foldReverseResponses =
     let
         reducer : Res -> Mem -> Mem
         reducer res ({ nextId, explosions, blasts, turrets, bullets, timeBombs } as mem) =
@@ -381,20 +381,23 @@ foldRes resList =
                     mem
 
                 Batch lst ->
-                    foldRes lst mem
+                    foldHelp lst mem
+
+        foldHelp : List Res -> Mem -> Mem
+        foldHelp resList mem =
+            List.foldl reducer mem resList
+
+        reverseRes : Mem -> Mem
+        reverseRes mem =
+            { mem
+                | turrets = List.reverse mem.turrets
+                , bullets = List.reverse mem.bullets
+                , timeBombs = List.reverse mem.timeBombs
+                , blasts = List.reverse mem.blasts
+                , explosions = List.reverse mem.explosions
+            }
     in
-    \mem -> List.foldl reducer mem resList
-
-
-reverseRes : Mem -> Mem
-reverseRes mem =
-    { mem
-        | turrets = List.reverse mem.turrets
-        , bullets = List.reverse mem.bullets
-        , timeBombs = List.reverse mem.timeBombs
-        , blasts = List.reverse mem.blasts
-        , explosions = List.reverse mem.explosions
-    }
+    \lst -> foldHelp lst >> reverseRes
 
 
 updateMemory : Computer -> Mem -> Mem
@@ -414,6 +417,16 @@ updateMemory { time, screen, mouse } mem =
                     ++ List.map bulletToDamageCircle bullets
                     ++ List.map turretToDamageCircle turrets
             }
+
+        allResponses : List Res
+        allResponses =
+            [ stepBlasts blasts
+            , stepExplosions explosions
+            , stepTurrets env turrets
+            , stepBullets env bullets
+            , stepTimeBombs env timeBombs
+            ]
+                |> List.map Batch
     in
     { mem
         | player = updatePlayer screen mouse time player
@@ -423,12 +436,7 @@ updateMemory { time, screen, mouse } mem =
         , bullets = []
         , timeBombs = []
     }
-        |> foldRes (stepBlasts blasts)
-        |> foldRes (stepExplosions explosions)
-        |> foldRes (stepTurrets env turrets)
-        |> foldRes (stepBullets env bullets)
-        |> foldRes (stepTimeBombs env timeBombs)
-        |> reverseRes
+        |> foldReverseResponses allResponses
         |> nextLevel
 
 

@@ -97,7 +97,11 @@ type Weapon
     | TimeBombWeapon
 
 
-initTurrets : List ( Id, Color, Weapon ) -> List Turret
+type TurretConfig
+    = TurretConfig Id Color Weapon Int
+
+
+initTurrets : List TurretConfig -> List Turret
 initTurrets =
     let
         positions =
@@ -106,7 +110,7 @@ initTurrets =
         factor =
             150
 
-        initTurret ( x, y ) ( id, c, w ) =
+        initTurret ( x, y ) (TurretConfig id c w maxHP) =
             Turret id (initCt 160) (x * factor) (y * factor) c w
     in
     List.map2 initTurret positions
@@ -210,10 +214,10 @@ initialMemory =
     , player = initPlayer 0 0
     , turrets =
         initTurrets
-            [ ( TurretId 0, red, BulletWeapon )
-            , ( TurretId 1, red, BulletWeapon )
-            , ( TurretId 2, blue, TimeBombWeapon )
-            , ( TurretId 3, orange, BulletWeapon )
+            [ TurretConfig (TurretId 0) red BulletWeapon 1
+            , TurretConfig (TurretId 1) red BulletWeapon 1
+            , TurretConfig (TurretId 2) blue TimeBombWeapon 1
+            , TurretConfig (TurretId 3) orange BulletWeapon 1
             ]
     , bullets = []
     , timeBombs = []

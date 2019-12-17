@@ -376,9 +376,12 @@ emptyThenAddRes =
                     }
 
                 NewExplosion x y r c ->
-                    reducer
-                        (AddExplosion (initExplosion (ExplosionId nextId) x y r c))
-                        { mem | nextId = nextId + 1 }
+                    { mem
+                        | nextId = nextId + 1
+                        , explosions =
+                            initExplosion (ExplosionId nextId) x y r c
+                                :: explosions
+                    }
 
                 NewBlast x y r ->
                     reducer

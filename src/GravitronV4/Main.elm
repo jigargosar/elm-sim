@@ -32,6 +32,34 @@ ctProgress (Counter n mx) =
 
 
 
+-- HP
+
+
+type HP
+    = HP Int Int
+
+
+initHP : Int -> HP
+initHP mx =
+    HP (max 0 mx) (max 0 mx)
+
+
+decHPBy : Int -> HP -> HP
+decHPBy hits (HP mx n) =
+    HP mx (clamp 0 mx (n - hits))
+
+
+remainingHP : HP -> Int
+remainingHP (HP _ n) =
+    n
+
+
+isDead : HP -> Bool
+isDead (HP _ n) =
+    n <= 0
+
+
+
 -- Model
 
 
@@ -95,30 +123,6 @@ type Weapon
 
 type TurretConfig
     = TurretConfig Id Color Weapon Int
-
-
-type HP
-    = HP Int Int
-
-
-initHP : Int -> HP
-initHP mx =
-    HP (max 0 mx) (max 0 mx)
-
-
-decHPBy : Int -> HP -> HP
-decHPBy hits (HP mx n) =
-    HP mx (clamp 0 mx (n - hits))
-
-
-remainingHP : HP -> Int
-remainingHP (HP _ n) =
-    n
-
-
-isDead : HP -> Bool
-isDead (HP _ n) =
-    n <= 0
 
 
 initTurrets : List TurretConfig -> List Turret

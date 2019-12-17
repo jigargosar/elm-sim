@@ -42,6 +42,11 @@ type alias Player =
     }
 
 
+playerRadius : Float
+playerRadius =
+    20
+
+
 type alias Turret =
     { ct : Counter
     , x : Number
@@ -84,11 +89,6 @@ bulletRadius =
     6
 
 
-bulletToDamageCircle : Bullet -> DamageCircle
-bulletToDamageCircle { x, y } =
-    DamageCircle x y bulletRadius TagBullet [ TagTimeBomb, TagBullet ]
-
-
 initBullet : Number -> Number -> Number -> Number -> Bullet
 initBullet x y speed angle =
     let
@@ -105,11 +105,6 @@ type alias TimeBomb =
     , vy : Number
     , ct : Counter
     }
-
-
-timeBombToDamageCircle : TimeBomb -> DamageCircle
-timeBombToDamageCircle { x, y } =
-    DamageCircle x y timeBombRadius TagTimeBomb [ TagTimeBomb ]
 
 
 initTimeBomb : Number -> Number -> Number -> Number -> TimeBomb
@@ -141,11 +136,6 @@ type alias Blast =
 initBlast : Number -> Number -> Number -> Blast
 initBlast x y r =
     Blast x y r
-
-
-blastToDamageCircle : Blast -> DamageCircle
-blastToDamageCircle { x, y, r } =
-    DamageCircle x y r TagBlast [ TagTimeBomb, TagBullet ]
 
 
 type alias Explosion =
@@ -191,6 +181,27 @@ type Tag
     = TagTimeBomb
     | TagBullet
     | TagBlast
+    | TagPlayer
+
+
+playerToDamageCircle : Player -> DamageCircle
+playerToDamageCircle { x, y } =
+    DamageCircle x y playerRadius TagPlayer [ TagBullet, TagTimeBomb ]
+
+
+blastToDamageCircle : Blast -> DamageCircle
+blastToDamageCircle { x, y, r } =
+    DamageCircle x y r TagBlast [ TagTimeBomb, TagBullet ]
+
+
+bulletToDamageCircle : Bullet -> DamageCircle
+bulletToDamageCircle { x, y } =
+    DamageCircle x y bulletRadius TagBullet [ TagTimeBomb, TagBullet ]
+
+
+timeBombToDamageCircle : TimeBomb -> DamageCircle
+timeBombToDamageCircle { x, y } =
+    DamageCircle x y timeBombRadius TagTimeBomb [ TagTimeBomb ]
 
 
 type alias DamageCircle =
@@ -607,7 +618,7 @@ viewMemory _ { player, turrets, bullets, timeBombs, explosions } =
 
 viewPlayer : Player -> Shape
 viewPlayer { x, y } =
-    circle green 20
+    circle green playerRadius
         |> move x y
 
 

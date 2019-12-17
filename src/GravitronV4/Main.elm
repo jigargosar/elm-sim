@@ -216,8 +216,8 @@ initialMemory =
         initTurrets
             [ TurretConfig (TurretId 0) red BulletWeapon 1
             , TurretConfig (TurretId 1) red BulletWeapon 1
-            , TurretConfig (TurretId 2) blue TimeBombWeapon 1
-            , TurretConfig (TurretId 3) orange BulletWeapon 1
+            , TurretConfig (TurretId 2) blue TimeBombWeapon 2
+            , TurretConfig (TurretId 3) orange BulletWeapon 3
             ]
     , bullets = []
     , timeBombs = []

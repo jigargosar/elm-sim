@@ -36,10 +36,23 @@ ctProgress (Counter n mx) =
 -- Model
 
 
+type Id
+    = PlayerId
+    | BulletId Int
+    | TurretId Int
+    | TimeBombId Int
+
+
 type alias Player =
-    { x : Number
+    { id : Id
+    , x : Number
     , y : Number
     }
+
+
+initPlayer : Number -> Number -> Player
+initPlayer =
+    Player PlayerId
 
 
 playerRadius : Float
@@ -48,7 +61,8 @@ playerRadius =
 
 
 type alias Turret =
-    { ct : Counter
+    { id : Id
+    , ct : Counter
     , x : Number
     , y : Number
     , color : Color
@@ -61,7 +75,7 @@ type Weapon
     | TimeBombWeapon
 
 
-initTurrets : List ( Color, Weapon ) -> List Turret
+initTurrets : List ( Id, Color, Weapon ) -> List Turret
 initTurrets =
     let
         positions =
@@ -70,8 +84,8 @@ initTurrets =
         factor =
             150
 
-        initTurret ( x, y ) ( c, w ) =
-            Turret (initCt 160) (x * factor) (y * factor) c w
+        initTurret ( x, y ) ( id, c, w ) =
+            Turret id (initCt 160) (x * factor) (y * factor) c w
     in
     List.map2 initTurret positions
 
@@ -164,8 +178,14 @@ type alias Mem =
 
 initialMemory : Mem
 initialMemory =
-    { player = Player 0 0
-    , turrets = initTurrets [ ( red, BulletWeapon ), ( red, BulletWeapon ), ( blue, TimeBombWeapon ), ( orange, BulletWeapon ) ]
+    { player = initPlayer 0 0
+    , turrets =
+        initTurrets
+            [ ( TurretId 0, red, BulletWeapon )
+            , ( TurretId 1, red, BulletWeapon )
+            , ( TurretId 2, blue, TimeBombWeapon )
+            , ( TurretId 3, orange, BulletWeapon )
+            ]
     , bullets = []
     , timeBombs = []
     , blasts = []

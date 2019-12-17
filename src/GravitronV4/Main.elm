@@ -249,7 +249,11 @@ foldRes resList =
 
 
 updateMemory : Computer -> Mem -> Mem
-updateMemory { time, screen } ({ turrets, player, explosions, blasts } as mem) =
+updateMemory { time, screen } mem =
+    let
+        { turrets, player, explosions, blasts, bullets } =
+            mem
+    in
     { mem
         | player = updatePlayer time player
         , explosions = []
@@ -261,6 +265,7 @@ updateMemory { time, screen } ({ turrets, player, explosions, blasts } as mem) =
         |> foldRes (stepBlasts blasts)
         |> foldRes (stepExplosions explosions)
         |> foldRes (stepTurrets player.x player.y turrets)
+        |> foldRes (stepBullets screen player.x player.y bullets)
 
 
 
@@ -303,14 +308,45 @@ stepBulletCollision =
             |> List.foldl handleCollision { mem | bullets = [] }
 
 
+stepBullets : Screen -> Float -> Float -> List Bullet -> List Res
+stepBullets scr tx ty =
+    let
+        updateVel : Bullet -> Bullet
+        updateVel b =
+            let
+                ( dx, dy ) =
+                    ( tx - b.x, ty - b.y )
+                        |> toPolar
+                        |> Tuple.mapFirst (\m -> 20 / m)
+                        |> fromPolar
+            in
+            { b | vx = b.vx + dx, vy = b.vy + dy }
+
+        updatePos : Bullet -> Bullet
+        updatePos b =
+            { b | x = b.x + b.vx, y = b.y + b.vy }
+
+        bounce ({ x, y, vx, vy } as b) =
+            let
+                ( nvx, nvy ) =
+                    bounceInScreen 0.5 scr x y vx vy
+            in
+            { b | vx = nvx, vy = nvy }
+
+        step =
+            updateVel >> updatePos >> bounce >> AddBullet
+    in
+    List.map step
+
+
 stepBulletsPos : Mem -> Mem
 stepBulletsPos mem =
     let
-        stepBullet : Bullet -> Bullet
-        stepBullet b =
+        stepPos : Bullet -> Bullet
+        stepPos b =
             { b | x = b.x + b.vx, y = b.y + b.vy }
     in
-    { mem | bullets = List.map stepBullet mem.bullets }
+    { mem | bullets = List.map stepPos mem.bullets }
 
 
 stepBulletsVel : Number -> Number -> Mem -> Mem

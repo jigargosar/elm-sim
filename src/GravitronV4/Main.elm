@@ -41,6 +41,8 @@ type Id
     | BulletId Int
     | TurretId Int
     | TimeBombId Int
+    | ExplosionId Int
+    | BlastId Int
 
 
 type alias Player =
@@ -91,7 +93,8 @@ initTurrets =
 
 
 type alias Bullet =
-    { x : Number
+    { id : Id
+    , x : Number
     , y : Number
     , vx : Number
     , vy : Number
@@ -103,17 +106,18 @@ bulletRadius =
     6
 
 
-initBullet : Number -> Number -> Number -> Number -> Bullet
-initBullet x y speed angle =
+initBullet : Id -> Number -> Number -> Number -> Number -> Bullet
+initBullet id x y speed angle =
     let
         ( vx, vy ) =
             fromPolar ( speed, angle )
     in
-    Bullet x y vx vy
+    Bullet id x y vx vy
 
 
 type alias TimeBomb =
-    { x : Number
+    { id : Id
+    , x : Number
     , y : Number
     , vx : Number
     , vy : Number
@@ -121,13 +125,13 @@ type alias TimeBomb =
     }
 
 
-initTimeBomb : Number -> Number -> Number -> Number -> TimeBomb
-initTimeBomb x y speed angle =
+initTimeBomb : Id -> Number -> Number -> Number -> Number -> TimeBomb
+initTimeBomb id x y speed angle =
     let
         ( vx, vy ) =
             fromPolar ( speed, angle )
     in
-    TimeBomb x y vx vy (initCt (60 * 2))
+    TimeBomb id x y vx vy (initCt (60 * 2))
 
 
 timeBombRadius : Float
@@ -141,19 +145,21 @@ timeBombBlastRadius =
 
 
 type alias Blast =
-    { x : Number
+    { id : Id
+    , x : Number
     , y : Number
     , r : Number
     }
 
 
-initBlast : Number -> Number -> Number -> Blast
-initBlast x y r =
-    Blast x y r
+initBlast : Id -> Number -> Number -> Number -> Blast
+initBlast id x y r =
+    Blast id x y r
 
 
 type alias Explosion =
-    { ct : Counter
+    { id : Id
+    , ct : Counter
     , x : Number
     , y : Number
     , r : Number
@@ -161,13 +167,14 @@ type alias Explosion =
     }
 
 
-initExplosion : Number -> Number -> Number -> Color -> Explosion
-initExplosion =
-    Explosion (initCt 60)
+initExplosion : Id -> Number -> Number -> Number -> Color -> Explosion
+initExplosion id =
+    Explosion id (initCt 60)
 
 
 type alias Mem =
-    { player : Player
+    { nextId : Int
+    , player : Player
     , turrets : List Turret
     , bullets : List Bullet
     , timeBombs : List TimeBomb
@@ -178,7 +185,8 @@ type alias Mem =
 
 initialMemory : Mem
 initialMemory =
-    { player = initPlayer 0 0
+    { nextId = 100
+    , player = initPlayer 0 0
     , turrets =
         initTurrets
             [ ( TurretId 0, red, BulletWeapon )
@@ -246,29 +254,33 @@ isDamaging target src =
 
 type Res
     = AddExplosion Explosion
+    | NewExplosion Number Number Number Color
     | AddBlast Blast
+    | NewBlast Number Number Number
     | AddTurret Turret
     | AddBullet Bullet
+    | NewBullet Number Number Number Number
     | AddTimeBomb TimeBomb
+    | NewTimeBomb Number Number Number Number
     | NoRes
     | Batch (List Res)
 
 
 newExplosion : Number -> Number -> Number -> Color -> Res
-newExplosion x y r c =
-    initExplosion x y r c |> AddExplosion
+newExplosion =
+    NewExplosion
 
 
 newBlast : Number -> Number -> Number -> Res
-newBlast x y r =
-    initBlast x y r |> AddBlast
+newBlast =
+    NewBlast
 
 
 foldRes : List Res -> Mem -> Mem
 foldRes resList =
     let
         reducer : Res -> Mem -> Mem
-        reducer res ({ explosions, blasts, turrets, bullets, timeBombs } as mem) =
+        reducer res ({ nextId, explosions, blasts, turrets, bullets, timeBombs } as mem) =
             case res of
                 AddExplosion explosion ->
                     { mem | explosions = explosion :: explosions }
@@ -284,6 +296,26 @@ foldRes resList =
 
                 AddTimeBomb timeBomb ->
                     { mem | timeBombs = timeBomb :: timeBombs }
+
+                NewBullet x y speed angle ->
+                    reducer
+                        (AddBullet (initBullet (BulletId nextId) x y speed angle))
+                        { mem | nextId = nextId + 1 }
+
+                NewTimeBomb x y speed angle ->
+                    reducer
+                        (AddTimeBomb (initTimeBomb (TimeBombId nextId) x y speed angle))
+                        { mem | nextId = nextId + 1 }
+
+                NewExplosion x y r c ->
+                    reducer
+                        (AddExplosion (initExplosion (ExplosionId nextId) x y r c))
+                        { mem | nextId = nextId + 1 }
+
+                NewBlast x y r ->
+                    reducer
+                        (AddBlast (initBlast (BlastId nextId) x y r))
+                        { mem | nextId = nextId + 1 }
 
                 NoRes ->
                     mem
@@ -341,27 +373,6 @@ updateMemory { time, screen } mem =
 updatePlayer : Time -> Player -> Player
 updatePlayer time p =
     { p | x = wave -100 100 11 time, y = wave -300 300 5 time }
-
-
-stepBulletCollision : Mem -> Mem
-stepBulletCollision =
-    let
-        handleCollision : ( Bullet, List Bullet ) -> Mem -> Mem
-        handleCollision ( b, bLst ) mem =
-            let
-                otherDC =
-                    List.map blastToDamageCircle mem.blasts
-                        ++ List.map bulletToDamageCircle bLst
-            in
-            if List.any (isDamaging (bulletToDamageCircle b)) otherDC then
-                { mem | explosions = initExplosion b.x b.y bulletRadius black :: mem.explosions }
-
-            else
-                { mem | bullets = b :: mem.bullets }
-    in
-    \mem ->
-        List.Extra.select mem.bullets
-            |> List.foldl handleCollision { mem | bullets = [] }
 
 
 stepTimeBombs :
@@ -518,95 +529,6 @@ stepBlasts =
     List.map toExplosion
 
 
-stepExpiredTimeBombsToBlasts : Mem -> Mem
-stepExpiredTimeBombsToBlasts mem =
-    let
-        reducer tb acc =
-            if isDone tb.ct then
-                { acc
-                    | blasts = blastFromTimeBomb tb :: acc.blasts
-                }
-
-            else
-                { acc | timeBombs = { tb | ct = stepCt tb.ct } :: acc.timeBombs }
-    in
-    List.foldl reducer { mem | timeBombs = [] } mem.timeBombs
-
-
-blastFromTimeBomb : TimeBomb -> Blast
-blastFromTimeBomb tb =
-    Blast tb.x tb.y timeBombBlastRadius
-
-
-stepTimeBombCollisionToBlasts : Mem -> Mem
-stepTimeBombCollisionToBlasts =
-    let
-        tbTBC : TimeBomb -> TimeBomb -> Bool
-        tbTBC b ob =
-            ccc b.x b.y bulletRadius ob.x ob.y bulletRadius
-
-        tbBulletC : TimeBomb -> Bullet -> Bool
-        tbBulletC tb b =
-            ccc tb.x tb.y bulletRadius b.x b.y bulletRadius
-
-        -- Note: we are not checking for collision with generated blasts
-        -- Perhaps later we can add it. Chain Reaction Of Bombs
-        handleCollision ( tb, otherTBList ) mem =
-            if
-                List.any (tbTBC tb) otherTBList
-                    || List.any (tbBulletC tb) mem.bullets
-            then
-                { mem | blasts = blastFromTimeBomb tb :: mem.blasts }
-
-            else
-                { mem | timeBombs = tb :: mem.timeBombs }
-    in
-    \mem ->
-        mem.timeBombs
-            |> List.Extra.select
-            |> List.foldl handleCollision { mem | timeBombs = [] }
-
-
-stepTimeBombsPos : Mem -> Mem
-stepTimeBombsPos mem =
-    let
-        stepTimeBomb : TimeBomb -> TimeBomb
-        stepTimeBomb b =
-            { b | x = b.x + b.vx, y = b.y + b.vy }
-    in
-    { mem | timeBombs = List.map stepTimeBomb mem.timeBombs }
-
-
-stepTimeBombsVel : Number -> Number -> Mem -> Mem
-stepTimeBombsVel tx ty mem =
-    let
-        stepTimeBomb : TimeBomb -> TimeBomb
-        stepTimeBomb b =
-            let
-                ( dx, dy ) =
-                    ( tx - b.x, ty - b.y )
-                        |> toPolar
-                        |> Tuple.mapFirst (\m -> 20 / m)
-                        |> fromPolar
-            in
-            { b | vx = b.vx + dx, vy = b.vy + dy }
-    in
-    { mem | timeBombs = List.map stepTimeBomb mem.timeBombs }
-
-
-stepBounceTimeBombInScreen : Screen -> Mem -> Mem
-stepBounceTimeBombInScreen scr mem =
-    let
-        bounce ({ x, y, vx, vy } as b) =
-            let
-                ( nvx, nvy ) =
-                    bounceInScreen 0.5 scr x y vx vy
-            in
-            { b | vx = nvx, vy = nvy }
-    in
-    { mem | timeBombs = List.map bounce mem.timeBombs }
-
-
 stepTurrets : { a | tx : Float, ty : Float } -> List Turret -> List Res
 stepTurrets { tx, ty } =
     let
@@ -618,10 +540,10 @@ stepTurrets { tx, ty } =
                 in
                 case t.weapon of
                     BulletWeapon ->
-                        AddBullet (initBullet t.x t.y 3 angle)
+                        NewBullet t.x t.y 3 angle
 
                     TimeBombWeapon ->
-                        AddTimeBomb (initTimeBomb t.x t.y 3 angle)
+                        NewTimeBomb t.x t.y 3 angle
 
               else
                 NoRes

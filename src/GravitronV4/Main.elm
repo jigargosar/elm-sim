@@ -603,7 +603,9 @@ stepTurrets { tx, ty, allDamageCircles } =
                 NoRes
             , let
                 hits =
-                    List.filter (isDamaging (turretToDamageCircle t)) allDamageCircles
+                    List.filter
+                        (isDamaging (turretToDamageCircle t))
+                        allDamageCircles
                         |> List.length
               in
               AddTurret { t | ct = stepCt t.ct, hp = decHPBy hits hp }

@@ -36,6 +36,21 @@ ctProgress (Counter n mx) =
 -- Model
 
 
+initialBulletRadius : Float
+initialBulletRadius =
+    6
+
+
+initialTimeBombRadius : Float
+initialTimeBombRadius =
+    initialBulletRadius
+
+
+initialTimeBombBlastRadius : Float
+initialTimeBombBlastRadius =
+    initialTimeBombRadius * 20
+
+
 type Id
     = PlayerId
     | BulletId Int
@@ -49,17 +64,17 @@ type alias Player =
     { id : Id
     , x : Number
     , y : Number
+    , r : Number
     }
 
 
 initPlayer : Number -> Number -> Player
-initPlayer =
-    Player PlayerId
-
-
-playerRadius : Float
-playerRadius =
-    20
+initPlayer x y =
+    let
+        initialPlayerRadius =
+            20
+    in
+    Player PlayerId x y initialPlayerRadius
 
 
 type alias Turret =
@@ -101,32 +116,30 @@ type alias Bullet =
     { id : Id
     , x : Number
     , y : Number
+    , r : Number
     , vx : Number
     , vy : Number
     }
 
 
-bulletRadius : Float
-bulletRadius =
-    6
-
-
 initBullet : Id -> Number -> Number -> Number -> Number -> Number -> Bullet
-initBullet id x y r speed angle =
+initBullet id x y offset speed angle =
     let
         ( vx, vy ) =
             fromPolar ( speed, angle )
 
         ( dx, dy ) =
-            fromPolar ( r + bulletRadius + 1, angle )
+            fromPolar ( offset + initialBulletRadius + 1, angle )
     in
-    Bullet id (x + dx) (y + dy) vx vy
+    Bullet id (x + dx) (y + dy) initialBulletRadius vx vy
 
 
 type alias TimeBomb =
     { id : Id
     , x : Number
     , y : Number
+    , r : Number
+    , blastR : Number
     , vx : Number
     , vy : Number
     , ct : Counter
@@ -134,25 +147,22 @@ type alias TimeBomb =
 
 
 initTimeBomb : Id -> Number -> Number -> Number -> Number -> Number -> TimeBomb
-initTimeBomb id x y r speed angle =
+initTimeBomb id x y offset speed angle =
     let
         ( vx, vy ) =
             fromPolar ( speed, angle )
 
         ( dx, dy ) =
-            fromPolar ( r + timeBombRadius + 1, angle )
+            fromPolar ( offset + initialTimeBombRadius + 1, angle )
     in
-    TimeBomb id (x + dx) (y + dy) vx vy (initCt (60 * 2))
-
-
-timeBombRadius : Float
-timeBombRadius =
-    bulletRadius
-
-
-timeBombBlastRadius : Float
-timeBombBlastRadius =
-    bulletRadius * 20
+    TimeBomb id
+        (x + dx)
+        (y + dy)
+        initialTimeBombRadius
+        initialTimeBombBlastRadius
+        vx
+        vy
+        (initCt (60 * 2))
 
 
 type alias Blast =
@@ -224,8 +234,8 @@ type Tag
 
 
 playerToDamageCircle : Player -> DamageCircle
-playerToDamageCircle { id, x, y } =
-    DamageCircle id x y playerRadius TagPlayer [ TagBullet, TagTimeBomb ]
+playerToDamageCircle { id, x, y, r } =
+    DamageCircle id x y r TagPlayer [ TagBullet, TagTimeBomb ]
 
 
 blastToDamageCircle : Blast -> DamageCircle
@@ -234,13 +244,13 @@ blastToDamageCircle { id, x, y, r } =
 
 
 bulletToDamageCircle : Bullet -> DamageCircle
-bulletToDamageCircle { id, x, y } =
-    DamageCircle id x y bulletRadius TagBullet [ TagTimeBomb, TagBullet ]
+bulletToDamageCircle { id, x, y, r } =
+    DamageCircle id x y r TagBullet [ TagTimeBomb, TagBullet ]
 
 
 timeBombToDamageCircle : TimeBomb -> DamageCircle
-timeBombToDamageCircle { id, x, y } =
-    DamageCircle id x y timeBombRadius TagTimeBomb [ TagTimeBomb ]
+timeBombToDamageCircle { id, x, y, r } =
+    DamageCircle id x y r TagTimeBomb [ TagTimeBomb ]
 
 
 type alias DamageCircle =
@@ -443,10 +453,11 @@ stepTimeBombs { scr, tx, ty, player, blasts, bullets } =
                 >> updateBombClock
                 >> AddTimeBomb
 
-        stepDead { x, y } =
+        stepDead : TimeBomb -> Res
+        stepDead { x, y, r, blastR } =
             Batch
-                [ newExplosion x y timeBombRadius red
-                , newBlast x y timeBombBlastRadius
+                [ newExplosion x y r red
+                , newBlast x y blastR
                 ]
 
         step : ( TimeBomb, List TimeBomb ) -> Res
@@ -506,8 +517,9 @@ stepBullets { scr, tx, ty, allDamageCircles } =
         stepAlive =
             updateVel >> updatePos >> bounce >> AddBullet
 
-        stepDead { x, y } =
-            newExplosion x y bulletRadius black
+        stepDead : Bullet -> Res
+        stepDead { x, y, r } =
+            newExplosion x y r black
 
         step : Bullet -> Res
         step bullet =
@@ -583,8 +595,8 @@ viewMemory _ { player, turrets, bullets, timeBombs, explosions } =
 
 
 viewPlayer : Player -> Shape
-viewPlayer { x, y } =
-    circle green playerRadius
+viewPlayer { x, y, r } =
+    circle green r
         |> move x y
 
 
@@ -601,8 +613,8 @@ viewTurrets =
 viewBullets : List Bullet -> Shape
 viewBullets =
     let
-        viewBullet { x, y } =
-            circle black bulletRadius
+        viewBullet { x, y, r } =
+            circle black r
                 |> fade 0.8
                 |> move x y
     in
@@ -613,11 +625,11 @@ viewTimeBombs : List TimeBomb -> Shape
 viewTimeBombs =
     let
         viewTimeBomb : TimeBomb -> Shape
-        viewTimeBomb { x, y } =
+        viewTimeBomb { x, y, r, blastR } =
             group
-                [ circle red bulletRadius
+                [ circle red r
                     |> fade 0.8
-                , circle red timeBombBlastRadius
+                , circle red blastR
                     |> fade 0.1
                 ]
                 |> move x y

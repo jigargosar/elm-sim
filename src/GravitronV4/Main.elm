@@ -259,8 +259,12 @@ updateMemory { time, screen } mem =
         { turrets, player, explosions, blasts, bullets } =
             mem
 
-        damageCircles =
-            { blasts = List.map blastToDamageCircle blasts }
+        env =
+            { scr = screen
+            , tx = player.x
+            , ty = player.y
+            , blasts = List.map blastToDamageCircle blasts
+            }
     in
     { mem
         | player = updatePlayer time player
@@ -272,8 +276,8 @@ updateMemory { time, screen } mem =
     }
         |> foldRes (stepBlasts blasts)
         |> foldRes (stepExplosions explosions)
-        |> foldRes (stepTurrets player.x player.y turrets)
-        |> foldRes (stepBullets screen player.x player.y damageCircles bullets)
+        |> foldRes (stepTurrets env turrets)
+        |> foldRes (stepBullets env bullets)
 
 
 
@@ -316,14 +320,17 @@ stepBulletCollision =
             |> List.foldl handleCollision { mem | bullets = [] }
 
 
+
+{- stepTimeBombs: List TimeBomb -> List Res
+   stepTimeBombs  =
+-}
+
+
 stepBullets :
-    Screen
-    -> Float
-    -> Float
-    -> { a | blasts : List DamageCircle }
+    { a | scr : Screen, tx : Float, ty : Float, blasts : List DamageCircle }
     -> List Bullet
     -> List Res
-stepBullets scr tx ty ctx =
+stepBullets { scr, tx, ty, blasts } =
     let
         updateVel : Bullet -> Bullet
         updateVel b =
@@ -360,7 +367,7 @@ stepBullets scr tx ty ctx =
             if
                 List.any (isDamaging (bulletToDamageCircle bullet))
                     (List.map bulletToDamageCircle otherBullets
-                        ++ ctx.blasts
+                        ++ blasts
                     )
             then
                 stepDead bullet
@@ -482,14 +489,14 @@ stepBounceTimeBombInScreen scr mem =
     { mem | timeBombs = List.map bounce mem.timeBombs }
 
 
-stepTurrets : Float -> Float -> List Turret -> List Res
-stepTurrets x y =
+stepTurrets : { a | tx : Float, ty : Float } -> List Turret -> List Res
+stepTurrets { tx, ty } =
     let
         fireWeaponOnCounter t =
             [ if isDone t.ct then
                 let
                     angle =
-                        angleFromTo t.x t.y x y
+                        angleFromTo t.x t.y tx ty
                 in
                 case t.weapon of
                     BulletWeapon ->

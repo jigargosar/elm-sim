@@ -421,6 +421,16 @@ updateMemory { time, screen } mem =
         |> foldRes (stepTurrets env turrets)
         |> foldRes (stepBullets env bullets)
         |> foldRes (stepTimeBombs env timeBombs)
+        |> nextLevel
+
+
+nextLevel : Mem -> Mem
+nextLevel mem =
+    if List.isEmpty mem.turrets then
+        initialMemory
+
+    else
+        mem
 
 
 updatePlayer : Time -> Player -> Player

@@ -218,6 +218,11 @@ type Res
     | Batch (List Res)
 
 
+newExplosion : Number -> Number -> Number -> Color -> Res
+newExplosion x y r c =
+    initExplosion x y r c |> AddExplosion
+
+
 foldRes : List Res -> Mem -> Mem
 foldRes resList =
     let
@@ -338,7 +343,7 @@ stepBullets scr tx ty =
             updateVel >> updatePos >> bounce >> AddBullet
 
         stepDead { x, y } =
-            initExplosion x y bulletRadius black |> AddExplosion
+            newExplosion x y bulletRadius black
 
         step : ( Bullet, List Bullet ) -> Res
         step ( bullet, otherBullets ) =
@@ -371,9 +376,9 @@ stepBlasts : List Blast -> List Res
 stepBlasts =
     let
         toExplosion { x, y, r } =
-            initExplosion x y r red
+            newExplosion x y r red
     in
-    List.map (toExplosion >> AddExplosion)
+    List.map toExplosion
 
 
 stepExpiredTimeBombsToBlasts : Mem -> Mem

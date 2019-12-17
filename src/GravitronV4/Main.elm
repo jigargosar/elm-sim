@@ -1,6 +1,5 @@
 module GravitronV4.Main exposing (main)
 
-import List.Extra
 import Playground exposing (..)
 
 
@@ -82,15 +81,11 @@ type alias Turret =
     , ct : Counter
     , x : Number
     , y : Number
+    , r : Number
     , color : Color
     , weapon : Weapon
     , hp : HP
     }
-
-
-turretRadius : Number
-turretRadius =
-    25
 
 
 type Weapon
@@ -135,8 +130,12 @@ initTurrets =
         factor =
             150
 
+        turretRadius : Number
+        turretRadius =
+            25
+
         initTurret ( x, y ) (TurretConfig id c w maxHP) =
-            Turret id (initCt 160) (x * factor) (y * factor) c w (initHP maxHP)
+            Turret id (initCt 160) (x * factor) (y * factor) turretRadius c w (initHP maxHP)
     in
     List.map2 initTurret positions
 
@@ -260,6 +259,7 @@ type Tag
     | TagBullet
     | TagBlast
     | TagPlayer
+    | TagTurret
 
 
 playerToDamageCircle : Player -> DamageCircle
@@ -267,14 +267,24 @@ playerToDamageCircle { id, x, y, r } =
     DamageCircle id x y r TagPlayer [ TagBullet, TagTimeBomb ]
 
 
+dcFromRec : { a | id : Id, x : Number, y : Number, r : Number } -> Tag -> List Tag -> DamageCircle
+dcFromRec { id, x, y, r } tag canDamage =
+    DamageCircle id x y r tag canDamage
+
+
+turretToDamageCircle : Turret -> DamageCircle
+turretToDamageCircle turret =
+    dcFromRec turret TagTurret [ TagBullet, TagTimeBomb ]
+
+
 blastToDamageCircle : Blast -> DamageCircle
 blastToDamageCircle { id, x, y, r } =
-    DamageCircle id x y r TagBlast [ TagTimeBomb, TagBullet ]
+    DamageCircle id x y r TagBlast [ TagTimeBomb, TagBullet, TagTurret ]
 
 
 bulletToDamageCircle : Bullet -> DamageCircle
 bulletToDamageCircle { id, x, y, r } =
-    DamageCircle id x y r TagBullet [ TagTimeBomb, TagBullet ]
+    DamageCircle id x y r TagBullet [ TagTimeBomb, TagBullet, TagTurret ]
 
 
 timeBombToDamageCircle : TimeBomb -> DamageCircle
@@ -565,11 +575,18 @@ stepBlasts =
     List.map toExplosion
 
 
-stepTurrets : { a | tx : Float, ty : Float } -> List Turret -> List Res
-stepTurrets { tx, ty } =
+stepTurrets :
+    { a
+        | tx : Float
+        , ty : Float
+        , allDamageCircles : List DamageCircle
+    }
+    -> List Turret
+    -> List Res
+stepTurrets { tx, ty, allDamageCircles } =
     let
         stepAlive : Turret -> Res
-        stepAlive t =
+        stepAlive ({ x, y, r, hp } as t) =
             [ if isDone t.ct then
                 let
                     angle =
@@ -577,20 +594,25 @@ stepTurrets { tx, ty } =
                 in
                 case t.weapon of
                     BulletWeapon ->
-                        NewBullet t.x t.y turretRadius 3 angle
+                        NewBullet x y r 3 angle
 
                     TimeBombWeapon ->
-                        NewTimeBomb t.x t.y turretRadius 3 angle
+                        NewTimeBomb x y r 3 angle
 
               else
                 NoRes
-            , AddTurret { t | ct = stepCt t.ct }
+            , let
+                hits =
+                    List.filter (isDamaging (turretToDamageCircle t)) allDamageCircles
+                        |> List.length
+              in
+              AddTurret { t | ct = stepCt t.ct, hp = decHPBy hits hp }
             ]
                 |> Batch
 
         stepDead : Turret -> Res
-        stepDead t =
-            stepAlive t
+        stepDead { x, y, r, color } =
+            NewExplosion x y r color
 
         step : Turret -> Res
         step t =
@@ -600,7 +622,7 @@ stepTurrets { tx, ty } =
             else
                 stepAlive t
     in
-    List.map stepAlive
+    List.map step
 
 
 
@@ -626,8 +648,8 @@ viewPlayer { x, y, r } =
 viewTurrets : List Turret -> Shape
 viewTurrets =
     let
-        viewTurret { x, y, color } =
-            circle color turretRadius
+        viewTurret { x, y, r, color } =
+            circle color r
                 |> move x y
     in
     List.map viewTurret >> group

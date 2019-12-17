@@ -213,27 +213,28 @@ type Tag
 
 
 playerToDamageCircle : Player -> DamageCircle
-playerToDamageCircle { x, y } =
-    DamageCircle x y playerRadius TagPlayer [ TagBullet, TagTimeBomb ]
+playerToDamageCircle { id, x, y } =
+    DamageCircle id x y playerRadius TagPlayer [ TagBullet, TagTimeBomb ]
 
 
 blastToDamageCircle : Blast -> DamageCircle
-blastToDamageCircle { x, y, r } =
-    DamageCircle x y r TagBlast [ TagTimeBomb, TagBullet ]
+blastToDamageCircle { id, x, y, r } =
+    DamageCircle id x y r TagBlast [ TagTimeBomb, TagBullet ]
 
 
 bulletToDamageCircle : Bullet -> DamageCircle
-bulletToDamageCircle { x, y } =
-    DamageCircle x y bulletRadius TagBullet [ TagTimeBomb, TagBullet ]
+bulletToDamageCircle { id, x, y } =
+    DamageCircle id x y bulletRadius TagBullet [ TagTimeBomb, TagBullet ]
 
 
 timeBombToDamageCircle : TimeBomb -> DamageCircle
-timeBombToDamageCircle { x, y } =
-    DamageCircle x y timeBombRadius TagTimeBomb [ TagTimeBomb ]
+timeBombToDamageCircle { id, x, y } =
+    DamageCircle id x y timeBombRadius TagTimeBomb [ TagTimeBomb ]
 
 
 type alias DamageCircle =
-    { x : Number
+    { id : Id
+    , x : Number
     , y : Number
     , r : Number
     , tag : Tag

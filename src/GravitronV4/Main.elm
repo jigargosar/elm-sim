@@ -141,7 +141,7 @@ timeBombRadius =
 
 timeBombBlastRadius : Float
 timeBombBlastRadius =
-    bulletRadius * 10
+    bulletRadius * 20
 
 
 type alias Blast =
@@ -249,9 +249,9 @@ isDamaging target src =
         dcc a b =
             ccc a.x a.y a.r b.x b.y b.r
     in
-    (target.id /= src.id)
-        && List.member target.tag src.canDamage
+    List.member target.tag src.canDamage
         && dcc target src
+        && (target.id /= src.id)
 
 
 type Res
@@ -341,6 +341,11 @@ updateMemory { time, screen } mem =
             , player = playerToDamageCircle player
             , blasts = List.map blastToDamageCircle blasts
             , bullets = List.map bulletToDamageCircle bullets
+            , allDamageCircles =
+                playerToDamageCircle player
+                    :: List.map blastToDamageCircle blasts
+                    ++ List.map timeBombToDamageCircle timeBombs
+                    ++ List.map bulletToDamageCircle bullets
             }
     in
     { mem
@@ -455,12 +460,11 @@ stepBullets :
         | scr : Screen
         , tx : Float
         , ty : Float
-        , player : DamageCircle
-        , blasts : List DamageCircle
+        , allDamageCircles : List DamageCircle
     }
     -> List Bullet
     -> List Res
-stepBullets { scr, tx, ty, player, blasts } =
+stepBullets { scr, tx, ty, allDamageCircles } =
     let
         updateVel : Bullet -> Bullet
         updateVel b =
@@ -492,21 +496,15 @@ stepBullets { scr, tx, ty, player, blasts } =
         stepDead { x, y } =
             newExplosion x y bulletRadius black
 
-        step : ( Bullet, List Bullet ) -> Res
-        step ( bullet, otherBullets ) =
-            if
-                List.any (isDamaging (bulletToDamageCircle bullet))
-                    (player
-                        :: List.map bulletToDamageCircle otherBullets
-                        ++ blasts
-                    )
-            then
+        step : Bullet -> Res
+        step bullet =
+            if List.any (isDamaging (bulletToDamageCircle bullet)) allDamageCircles then
                 stepDead bullet
 
             else
                 stepAlive bullet
     in
-    List.Extra.select >> List.map step
+    List.map step
 
 
 stepExplosions : List Explosion -> List Res

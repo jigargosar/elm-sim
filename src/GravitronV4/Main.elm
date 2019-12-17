@@ -66,7 +66,7 @@ initTurrets =
             150
 
         initTurret ( x, y ) ( c, w ) =
-            Turret (initCt 60) (x * factor) (y * factor) c w
+            Turret (initCt 160) (x * factor) (y * factor) c w
     in
     List.map2 initTurret positions
 
@@ -338,10 +338,25 @@ stepBullets scr tx ty =
             in
             { b | vx = nvx, vy = nvy }
 
-        step =
+        stepAlive : Bullet -> Res
+        stepAlive =
             updateVel >> updatePos >> bounce >> AddBullet
+
+        stepDead { x, y } =
+            initExplosion x y bulletRadius black |> AddExplosion
+
+        step : ( Bullet, List Bullet ) -> Res
+        step ( b, obList ) =
+            if
+                List.any (isDamaging (bulletToDamageCircle b))
+                    (List.map bulletToDamageCircle obList)
+            then
+                stepDead b
+
+            else
+                stepAlive b
     in
-    List.map step
+    List.Extra.select >> List.map step
 
 
 stepExplosions : List Explosion -> List Res

@@ -386,20 +386,6 @@ updateMemory { time, screen } mem =
         |> foldRes (stepTimeBombs env timeBombs)
 
 
-
-{- |> stepExpiredTimeBombsToBlasts
-   |> stepTimeBombCollisionToBlasts
-   |> stepBulletCollision
-   |> stepTimeBombsVel player.x player.y
-   |> stepTimeBombsPos
-   |> stepBounceTimeBombInScreen screen
-   |> stepBulletsVel player.x player.y
-   |> stepBulletsPos
-   |> stepBounceBulletInScreen screen
-   |> stepFireTurretWeapon player.x player.y
--}
-
-
 updatePlayer : Time -> Player -> Player
 updatePlayer time p =
     { p | x = wave -100 100 11 time, y = wave -300 300 5 time }

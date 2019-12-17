@@ -235,12 +235,26 @@ stepBulletCollision =
         bulletBlastC b bl =
             ccc b.x b.y bulletRadius bl.x bl.y bl.r
 
+        isDamaging : DamageCircle -> DamageCircle -> Bool
+        isDamaging target src =
+            let
+                dcc : DamageCircle -> DamageCircle -> Bool
+                dcc a b =
+                    ccc a.x a.y a.r b.x b.y b.r
+            in
+            List.member target.tag src.canDamage
+                && dcc target src
+
         handleCollision : ( Bullet, List Bullet ) -> Mem -> Mem
         handleCollision ( b, bLst ) mem =
-            if
-                List.any (bulletBulletC b) bLst
-                    || List.any (bulletBlastC b) mem.blasts
-            then
+            let
+                bulletDC =
+                    bulletToDamageCircle b
+
+                otherDC =
+                    List.map blastToDamageCircle mem.blasts
+            in
+            if List.any (isDamaging bulletDC) otherDC then
                 { mem | explosions = initExplosion b.x b.y bulletRadius black :: mem.explosions }
 
             else

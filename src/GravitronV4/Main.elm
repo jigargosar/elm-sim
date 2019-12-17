@@ -86,7 +86,7 @@ bulletRadius =
 
 bulletToDamageCircle : Bullet -> DamageCircle
 bulletToDamageCircle { x, y } =
-    DamageCircle x y bulletRadius
+    DamageCircle x y bulletRadius TagBullet [ TagTimeBomb, TagBullet ]
 
 
 initBullet : Number -> Number -> Number -> Number -> Bullet
@@ -109,7 +109,7 @@ type alias TimeBomb =
 
 timeBombToDamageCircle : TimeBomb -> DamageCircle
 timeBombToDamageCircle { x, y } =
-    DamageCircle x y timeBombRadius
+    DamageCircle x y timeBombRadius TagTimeBomb [ TagTimeBomb ]
 
 
 initTimeBomb : Number -> Number -> Number -> Number -> TimeBomb
@@ -140,7 +140,7 @@ type alias Blast =
 
 blastToDamageCircle : Blast -> DamageCircle
 blastToDamageCircle { x, y, r } =
-    DamageCircle x y r
+    DamageCircle x y r TagBlast [ TagTimeBomb, TagBullet ]
 
 
 type alias Explosion =
@@ -185,25 +185,16 @@ initialMemory =
 type Tag
     = TagTimeBomb
     | TagBullet
+    | TagBlast
 
 
 type alias DamageCircle =
-    { x : Number, y : Number, r : Number }
-
-
-blastCanDamage : Tag -> Bool
-blastCanDamage tag =
-    List.member tag [ TagTimeBomb, TagBullet ]
-
-
-timeBombCanDamage : Tag -> Bool
-timeBombCanDamage tag =
-    List.member tag [ TagTimeBomb ]
-
-
-bulletCanDamage : Tag -> Bool
-bulletCanDamage tag =
-    List.member tag [ TagTimeBomb, TagBullet ]
+    { x : Number
+    , y : Number
+    , r : Number
+    , tag : Tag
+    , canDamage : List Tag
+    }
 
 
 updateMemory : Computer -> Mem -> Mem

@@ -258,6 +258,9 @@ updateMemory { time, screen } mem =
     let
         { turrets, player, explosions, blasts, bullets } =
             mem
+
+        damageCircles =
+            { blasts = List.map blastToDamageCircle blasts }
     in
     { mem
         | player = updatePlayer time player
@@ -270,7 +273,7 @@ updateMemory { time, screen } mem =
         |> foldRes (stepBlasts blasts)
         |> foldRes (stepExplosions explosions)
         |> foldRes (stepTurrets player.x player.y turrets)
-        |> foldRes (stepBullets screen player.x player.y bullets)
+        |> foldRes (stepBullets screen player.x player.y damageCircles bullets)
 
 
 
@@ -313,8 +316,14 @@ stepBulletCollision =
             |> List.foldl handleCollision { mem | bullets = [] }
 
 
-stepBullets : Screen -> Float -> Float -> List Bullet -> List Res
-stepBullets scr tx ty =
+stepBullets :
+    Screen
+    -> Float
+    -> Float
+    -> { a | blasts : List DamageCircle }
+    -> List Bullet
+    -> List Res
+stepBullets scr tx ty ctx =
     let
         updateVel : Bullet -> Bullet
         updateVel b =
@@ -350,7 +359,9 @@ stepBullets scr tx ty =
         step ( bullet, otherBullets ) =
             if
                 List.any (isDamaging (bulletToDamageCircle bullet))
-                    (List.map bulletToDamageCircle otherBullets)
+                    (List.map bulletToDamageCircle otherBullets
+                        ++ ctx.blasts
+                    )
             then
                 stepDead bullet
 

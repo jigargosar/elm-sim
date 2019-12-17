@@ -144,14 +144,14 @@ initTurrets =
         turretRadius =
             25
 
-        initTurret ( x, y ) (TurretConfig id c w maxHP) =
+        initTurret ( x, y ) (TurretConfig id color wep maxHP) =
             Turret id
                 (initCt 160)
                 (x * factor)
                 (y * factor)
                 turretRadius
-                c
-                w
+                color
+                wep
                 (initHP maxHP)
     in
     List.map2 initTurret positions

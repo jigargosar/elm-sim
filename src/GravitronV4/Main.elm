@@ -386,6 +386,17 @@ foldRes resList =
     \mem -> List.foldl reducer mem resList
 
 
+reverseRes : Mem -> Mem
+reverseRes mem =
+    { mem
+        | turrets = List.reverse mem.turrets
+        , bullets = List.reverse mem.bullets
+        , timeBombs = List.reverse mem.timeBombs
+        , blasts = List.reverse mem.blasts
+        , explosions = List.reverse mem.explosions
+    }
+
+
 updateMemory : Computer -> Mem -> Mem
 updateMemory { time, screen, mouse } mem =
     let
@@ -417,6 +428,7 @@ updateMemory { time, screen, mouse } mem =
         |> foldRes (stepTurrets env turrets)
         |> foldRes (stepBullets env bullets)
         |> foldRes (stepTimeBombs env timeBombs)
+        |> reverseRes
         |> nextLevel
 
 

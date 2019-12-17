@@ -209,9 +209,11 @@ isDamaging target src =
 
 
 updateMemory : Computer -> Mem -> Mem
-updateMemory { time, screen } ({ turrets, player } as mem) =
-    { mem | player = updatePlayer time player }
-        |> stepExplosions
+updateMemory { time, screen } ({ turrets, player, explosions } as mem) =
+    { mem
+        | player = updatePlayer time player
+        , explosions = stepExplosions explosions
+    }
         |> stepBlastsToExplosions
         |> stepExpiredTimeBombsToBlasts
         |> stepTimeBombCollisionToBlasts
@@ -291,8 +293,8 @@ stepBounceBulletInScreen scr mem =
     { mem | bullets = List.map bounce mem.bullets }
 
 
-stepExplosions : Mem -> Mem
-stepExplosions mem =
+stepExplosions : List Explosion -> List Explosion
+stepExplosions =
     let
         stepE e =
             if isDone e.ct then
@@ -301,7 +303,7 @@ stepExplosions mem =
             else
                 Just { e | ct = stepCt e.ct }
     in
-    { mem | explosions = List.filterMap stepE mem.explosions }
+    List.filterMap stepE
 
 
 stepBlastsToExplosions : Mem -> Mem

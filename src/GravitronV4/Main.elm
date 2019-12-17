@@ -334,6 +334,11 @@ type Res
     | Batch (List Res)
 
 
+withNewId : (Int -> Mem -> Mem) -> Mem -> Mem
+withNewId func mem =
+    func mem.nextId { mem | nextId = mem.nextId + 1 }
+
+
 emptyThenAddRes : List Res -> Mem -> Mem
 emptyThenAddRes =
     let
@@ -362,53 +367,49 @@ emptyThenAddRes =
             { mem | nextId = mem.nextId + 1 }
 
         reducer : Res -> Mem -> Mem
-        reducer res mem =
-            let
-                nextId =
-                    mem.nextId
-            in
+        reducer res =
             case res of
                 AddExplosion explosion ->
-                    addExplosion explosion mem
+                    addExplosion explosion
 
                 AddBlast blast ->
-                    addBlast blast mem
+                    addBlast blast
 
                 AddTurret turret ->
-                    addTurret turret mem
+                    addTurret turret
 
                 AddBullet bullet ->
-                    addBullet bullet mem
+                    addBullet bullet
 
                 AddTimeBomb timeBomb ->
-                    addTimeBomb timeBomb mem
+                    addTimeBomb timeBomb
 
                 NewBullet x y r speed angle ->
-                    mem
-                        |> addBullet (initBullet (BulletId nextId) x y r speed angle)
-                        |> incId
+                    withNewId
+                        (\id ->
+                            addBullet (initBullet (BulletId id) x y r speed angle)
+                        )
 
                 NewTimeBomb x y r speed angle ->
-                    mem
-                        |> addTimeBomb
-                            (initTimeBomb (TimeBombId nextId) x y r speed angle)
-                        |> incId
+                    withNewId
+                        (\nextId ->
+                            addTimeBomb
+                                (initTimeBomb (TimeBombId nextId) x y r speed angle)
+                        )
 
                 NewExplosion x y r c ->
-                    mem
-                        |> addExplosion (initExplosion (ExplosionId nextId) x y r c)
-                        |> incId
+                    withNewId
+                        (\nextId -> addExplosion (initExplosion (ExplosionId nextId) x y r c))
 
                 NewBlast x y r ->
-                    mem
-                        |> addBlast (initBlast (BlastId nextId) x y r)
-                        |> incId
+                    withNewId
+                        (\nextId -> addBlast (initBlast (BlastId nextId) x y r))
 
                 NoRes ->
-                    mem
+                    identity
 
                 Batch lst ->
-                    foldHelp lst mem
+                    foldHelp lst
 
         foldHelp : List Res -> Mem -> Mem
         foldHelp resList mem =

@@ -454,9 +454,17 @@ updatePlayer scr mouse time =
                     bounceInScreen 1 scr x y vx vy
             in
             { b | vx = nvx, vy = nvy }
+
+        springToMouse : Player -> Player
+        springToMouse ({ x, y, vx, vy } as p) =
+            let
+                ( dx, dy ) =
+                    ( (mouse.x - x) * 0.2, (mouse.y - y) * 0.2 )
+            in
+            { p | vx = (vx + dx) * 0.5, vy = (vy + dy) * 0.5 }
     in
     if mouse.down then
-        identity
+        springToMouse >> updatePos
 
     else
         updateRandomVel >> updatePos >> bounce

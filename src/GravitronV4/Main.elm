@@ -334,9 +334,9 @@ type Res
     | Batch (List Res)
 
 
-withNewId : (Int -> Mem -> Mem) -> Mem -> Mem
-withNewId func mem =
-    func mem.nextId { mem | nextId = mem.nextId + 1 }
+withNewId : (Int -> Id) -> (Id -> Mem -> Mem) -> Mem -> Mem
+withNewId toId func mem =
+    func (toId mem.nextId) { mem | nextId = mem.nextId + 1 }
 
 
 emptyThenAddRes : List Res -> Mem -> Mem
@@ -385,25 +385,24 @@ emptyThenAddRes =
                     addTimeBomb timeBomb
 
                 NewBullet x y r speed angle ->
-                    withNewId
+                    withNewId BulletId
                         (\id ->
-                            addBullet (initBullet (BulletId id) x y r speed angle)
+                            addBullet (initBullet id x y r speed angle)
                         )
 
                 NewTimeBomb x y r speed angle ->
-                    withNewId
-                        (\nextId ->
-                            addTimeBomb
-                                (initTimeBomb (TimeBombId nextId) x y r speed angle)
+                    withNewId TimeBombId
+                        (\id ->
+                            addTimeBomb (initTimeBomb id x y r speed angle)
                         )
 
                 NewExplosion x y r c ->
-                    withNewId
-                        (\nextId -> addExplosion (initExplosion (ExplosionId nextId) x y r c))
+                    withNewId ExplosionId
+                        (\id -> addExplosion (initExplosion id x y r c))
 
                 NewBlast x y r ->
-                    withNewId
-                        (\nextId -> addBlast (initBlast (BlastId nextId) x y r))
+                    withNewId BlastId
+                        (\id -> addBlast (initBlast id x y r))
 
                 NoRes ->
                     identity

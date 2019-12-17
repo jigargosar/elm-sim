@@ -152,6 +152,37 @@ initialMemory =
 --  Update
 
 
+type Tag
+    = TagTimeBomb
+    | TagBullet
+    | TagBlast
+
+
+blastCanDamage : Tag -> Bool
+blastCanDamage tag =
+    List.member tag [ TagTimeBomb, TagBullet ]
+
+
+blastToDamageCircle : Blast -> DamageCircle
+blastToDamageCircle { x, y, r } =
+    DamageCircle x y r
+
+
+timeBombCanDamage : Tag -> Bool
+timeBombCanDamage tag =
+    List.member tag [ TagTimeBomb ]
+
+
+timeBombToDamageCircle : TimeBomb -> DamageCircle
+timeBombToDamageCircle { x, y } =
+    DamageCircle x y bRad
+
+
+bulletCanDamage : Tag -> Bool
+bulletCanDamage tag =
+    List.member tag [ TagTimeBomb, TagBullet ]
+
+
 updateMemory : Computer -> Mem -> Mem
 updateMemory { time, screen } ({ turrets, player } as mem) =
     mem
@@ -289,6 +320,10 @@ stepExpiredTimeBombsToBlasts mem =
 blastFromTimeBomb : TimeBomb -> Blast
 blastFromTimeBomb tb =
     Blast tb.x tb.y timeBombBlastRad
+
+
+type alias DamageCircle =
+    { x : Number, y : Number, r : Number }
 
 
 stepTimeBombCollisionToBlasts : Mem -> Mem

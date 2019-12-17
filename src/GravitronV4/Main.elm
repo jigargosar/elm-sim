@@ -361,9 +361,6 @@ updateMemory { time, screen } mem =
             { scr = screen
             , tx = player.x
             , ty = player.y
-            , player = playerToDamageCircle player
-            , blasts = List.map blastToDamageCircle blasts
-            , bullets = List.map bulletToDamageCircle bullets
             , allDamageCircles =
                 playerToDamageCircle player
                     :: List.map blastToDamageCircle blasts
@@ -396,13 +393,11 @@ stepTimeBombs :
         | scr : Screen
         , tx : Float
         , ty : Float
-        , player : DamageCircle
-        , blasts : List DamageCircle
-        , bullets : List DamageCircle
+        , allDamageCircles : List DamageCircle
     }
     -> List TimeBomb
     -> List Res
-stepTimeBombs { scr, tx, ty, player, blasts, bullets } =
+stepTimeBombs { scr, tx, ty, allDamageCircles } =
     let
         updateVel : TimeBomb -> TimeBomb
         updateVel b =
@@ -446,23 +441,20 @@ stepTimeBombs { scr, tx, ty, player, blasts, bullets } =
                 , newBlast x y blastR
                 ]
 
-        step : ( TimeBomb, List TimeBomb ) -> Res
-        step ( timeBomb, otherTimeBombs ) =
+        step : TimeBomb -> Res
+        step timeBomb =
             if
                 isDone timeBomb.ct
-                    || List.any (isDamaging (timeBombToDamageCircle timeBomb))
-                        (player
-                            :: List.map timeBombToDamageCircle otherTimeBombs
-                            ++ blasts
-                            ++ bullets
-                        )
+                    || List.any
+                        (isDamaging (timeBombToDamageCircle timeBomb))
+                        allDamageCircles
             then
                 stepDead timeBomb
 
             else
                 stepAlive timeBomb
     in
-    List.Extra.select >> List.map step
+    List.map step
 
 
 stepBullets :
@@ -509,7 +501,11 @@ stepBullets { scr, tx, ty, allDamageCircles } =
 
         step : Bullet -> Res
         step bullet =
-            if List.any (isDamaging (bulletToDamageCircle bullet)) allDamageCircles then
+            if
+                List.any
+                    (isDamaging (bulletToDamageCircle bullet))
+                    allDamageCircles
+            then
                 stepDead bullet
 
             else

@@ -432,8 +432,8 @@ nextLevel mem =
 updatePlayer : Screen -> Mouse -> Time -> Player -> Player
 updatePlayer scr mouse time =
     let
-        updateVel : Player -> Player
-        updateVel ({ vx, vy } as p) =
+        updateRandomVel : Player -> Player
+        updateRandomVel ({ vx, vy } as p) =
             let
                 ( dx, dy ) =
                     ( wave -100 100 11 time, wave -300 300 21 time )
@@ -459,7 +459,7 @@ updatePlayer scr mouse time =
         identity
 
     else
-        updateVel >> updatePos >> bounce
+        updateRandomVel >> updatePos >> bounce
 
 
 stepTimeBombs :

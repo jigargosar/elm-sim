@@ -197,6 +197,17 @@ type alias DamageCircle =
     }
 
 
+isDamaging : DamageCircle -> DamageCircle -> Bool
+isDamaging target src =
+    let
+        dcc : DamageCircle -> DamageCircle -> Bool
+        dcc a b =
+            ccc a.x a.y a.r b.x b.y b.r
+    in
+    List.member target.tag src.canDamage
+        && dcc target src
+
+
 updateMemory : Computer -> Mem -> Mem
 updateMemory { time, screen } ({ turrets, player } as mem) =
     mem
@@ -227,24 +238,6 @@ stepPlayerPosition time mem =
 stepBulletCollision : Mem -> Mem
 stepBulletCollision =
     let
-        bulletBulletC : Bullet -> Bullet -> Bool
-        bulletBulletC b ob =
-            ccc b.x b.y bulletRadius ob.x ob.y bulletRadius
-
-        bulletBlastC : Bullet -> Blast -> Bool
-        bulletBlastC b bl =
-            ccc b.x b.y bulletRadius bl.x bl.y bl.r
-
-        isDamaging : DamageCircle -> DamageCircle -> Bool
-        isDamaging target src =
-            let
-                dcc : DamageCircle -> DamageCircle -> Bool
-                dcc a b =
-                    ccc a.x a.y a.r b.x b.y b.r
-            in
-            List.member target.tag src.canDamage
-                && dcc target src
-
         handleCollision : ( Bullet, List Bullet ) -> Mem -> Mem
         handleCollision ( b, bLst ) mem =
             let
@@ -253,6 +246,7 @@ stepBulletCollision =
 
                 otherDC =
                     List.map blastToDamageCircle mem.blasts
+                        ++ List.map bulletToDamageCircle bLst
             in
             if List.any (isDamaging bulletDC) otherDC then
                 { mem | explosions = initExplosion b.x b.y bulletRadius black :: mem.explosions }

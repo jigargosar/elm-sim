@@ -79,6 +79,16 @@ type alias Bullet =
     }
 
 
+bulletRadius : Float
+bulletRadius =
+    6
+
+
+bulletToDamageCircle : Bullet -> DamageCircle
+bulletToDamageCircle { x, y } =
+    DamageCircle x y bulletRadius
+
+
 initBullet : Number -> Number -> Number -> Number -> Bullet
 initBullet x y speed angle =
     let
@@ -97,6 +107,11 @@ type alias TimeBomb =
     }
 
 
+timeBombToDamageCircle : TimeBomb -> DamageCircle
+timeBombToDamageCircle { x, y } =
+    DamageCircle x y timeBombRadius
+
+
 initTimeBomb : Number -> Number -> Number -> Number -> TimeBomb
 initTimeBomb x y speed angle =
     let
@@ -106,11 +121,26 @@ initTimeBomb x y speed angle =
     TimeBomb x y vx vy (initCt (60 * 2))
 
 
+timeBombRadius : Float
+timeBombRadius =
+    bulletRadius
+
+
+timeBombBlastRadius : Float
+timeBombBlastRadius =
+    bulletRadius * 10
+
+
 type alias Blast =
     { x : Number
     , y : Number
     , r : Number
     }
+
+
+blastToDamageCircle : Blast -> DamageCircle
+blastToDamageCircle { x, y, r } =
+    DamageCircle x y r
 
 
 type alias Explosion =
@@ -163,19 +193,9 @@ blastCanDamage tag =
     List.member tag [ TagTimeBomb, TagBullet ]
 
 
-blastToDamageCircle : Blast -> DamageCircle
-blastToDamageCircle { x, y, r } =
-    DamageCircle x y r
-
-
 timeBombCanDamage : Tag -> Bool
 timeBombCanDamage tag =
     List.member tag [ TagTimeBomb ]
-
-
-timeBombToDamageCircle : TimeBomb -> DamageCircle
-timeBombToDamageCircle { x, y } =
-    DamageCircle x y bRad
 
 
 bulletCanDamage : Tag -> Bool
@@ -215,11 +235,11 @@ stepBulletCollision =
     let
         bulletBulletC : Bullet -> Bullet -> Bool
         bulletBulletC b ob =
-            ccc b.x b.y bRad ob.x ob.y bRad
+            ccc b.x b.y bulletRadius ob.x ob.y bulletRadius
 
         bulletBlastC : Bullet -> Blast -> Bool
         bulletBlastC b bl =
-            ccc b.x b.y bRad bl.x bl.y bl.r
+            ccc b.x b.y bulletRadius bl.x bl.y bl.r
 
         handleCollision : ( Bullet, List Bullet ) -> Mem -> Mem
         handleCollision ( b, bLst ) mem =
@@ -227,7 +247,7 @@ stepBulletCollision =
                 List.any (bulletBulletC b) bLst
                     || List.any (bulletBlastC b) mem.blasts
             then
-                { mem | explosions = initExplosion b.x b.y bRad black :: mem.explosions }
+                { mem | explosions = initExplosion b.x b.y bulletRadius black :: mem.explosions }
 
             else
                 { mem | bullets = b :: mem.bullets }
@@ -319,7 +339,7 @@ stepExpiredTimeBombsToBlasts mem =
 
 blastFromTimeBomb : TimeBomb -> Blast
 blastFromTimeBomb tb =
-    Blast tb.x tb.y timeBombBlastRad
+    Blast tb.x tb.y timeBombBlastRadius
 
 
 type alias DamageCircle =
@@ -331,11 +351,11 @@ stepTimeBombCollisionToBlasts =
     let
         tbTBC : TimeBomb -> TimeBomb -> Bool
         tbTBC b ob =
-            ccc b.x b.y bRad ob.x ob.y bRad
+            ccc b.x b.y bulletRadius ob.x ob.y bulletRadius
 
         tbBulletC : TimeBomb -> Bullet -> Bool
         tbBulletC tb b =
-            ccc tb.x tb.y bRad b.x b.y bRad
+            ccc tb.x tb.y bulletRadius b.x b.y bulletRadius
 
         -- Note: we are not checking for collision with generated blasts
         -- Perhaps later we can add it. Chain Reaction Of Bombs
@@ -458,24 +478,15 @@ viewTurrets =
     List.map viewTurret >> group
 
 
-bRad : Float
-bRad =
-    6
-
-
 viewBullets : List Bullet -> Shape
 viewBullets =
     let
         viewBullet { x, y } =
-            circle black bRad
+            circle black bulletRadius
                 |> fade 0.8
                 |> move x y
     in
     List.map viewBullet >> group
-
-
-timeBombBlastRad =
-    bRad * 10
 
 
 viewTimeBombs : List TimeBomb -> Shape
@@ -484,9 +495,9 @@ viewTimeBombs =
         viewTimeBomb : TimeBomb -> Shape
         viewTimeBomb { x, y } =
             group
-                [ circle red bRad
+                [ circle red bulletRadius
                     |> fade 0.8
-                , circle red timeBombBlastRad
+                , circle red timeBombBlastRadius
                     |> fade 0.1
                 ]
                 |> move x y

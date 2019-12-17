@@ -72,6 +72,11 @@ type alias Turret =
     }
 
 
+turretRadius : Number
+turretRadius =
+    25
+
+
 type Weapon
     = BulletWeapon
     | TimeBombWeapon
@@ -125,13 +130,16 @@ type alias TimeBomb =
     }
 
 
-initTimeBomb : Id -> Number -> Number -> Number -> Number -> TimeBomb
-initTimeBomb id x y speed angle =
+initTimeBomb : Id -> Number -> Number -> Number -> Number -> Number -> TimeBomb
+initTimeBomb id x y r speed angle =
     let
         ( vx, vy ) =
             fromPolar ( speed, angle )
+
+        ( dx, dy ) =
+            fromPolar ( r + timeBombRadius + 1, angle )
     in
-    TimeBomb id x y vx vy (initCt (60 * 2))
+    TimeBomb id (x + dx) (y + dy) vx vy (initCt (60 * 2))
 
 
 timeBombRadius : Float
@@ -263,7 +271,7 @@ type Res
     | AddBullet Bullet
     | NewBullet Number Number Number Number
     | AddTimeBomb TimeBomb
-    | NewTimeBomb Number Number Number Number
+    | NewTimeBomb Number Number Number Number Number
     | NoRes
     | Batch (List Res)
 
@@ -304,9 +312,11 @@ foldRes resList =
                         (AddBullet (initBullet (BulletId nextId) x y speed angle))
                         { mem | nextId = nextId + 1 }
 
-                NewTimeBomb x y speed angle ->
+                NewTimeBomb x y r speed angle ->
                     reducer
-                        (AddTimeBomb (initTimeBomb (TimeBombId nextId) x y speed angle))
+                        (AddTimeBomb
+                            (initTimeBomb (TimeBombId nextId) x y r speed angle)
+                        )
                         { mem | nextId = nextId + 1 }
 
                 NewExplosion x y r c ->
@@ -532,18 +542,28 @@ stepBlasts =
 stepTurrets : { a | tx : Float, ty : Float } -> List Turret -> List Res
 stepTurrets { tx, ty } =
     let
+        fireWeaponOnCounter : Turret -> Res
         fireWeaponOnCounter t =
             [ if isDone t.ct then
                 let
                     angle =
                         angleFromTo t.x t.y tx ty
+
+                    posFromProjectileRadiusTheta projectileRadius theta =
+                        fromPolar ( turretRadius + projectileRadius + 1, angle )
+                            |> (\( ox, oy ) -> ( t.x + ox, t.y + oy ))
                 in
                 case t.weapon of
                     BulletWeapon ->
-                        NewBullet t.x t.y 3 angle
+                        let
+                            ( nx, ny ) =
+                                fromPolar ( turretRadius + bulletRadius + 1, angle )
+                                    |> (\( ox, oy ) -> ( t.x + ox, t.y + oy ))
+                        in
+                        NewBullet nx ny 0.1 angle
 
                     TimeBombWeapon ->
-                        NewTimeBomb t.x t.y 3 angle
+                        NewTimeBomb t.x t.y turretRadius 3 angle
 
               else
                 NoRes
@@ -578,7 +598,7 @@ viewTurrets : List Turret -> Shape
 viewTurrets =
     let
         viewTurret { x, y, color } =
-            circle color 25
+            circle color turretRadius
                 |> move x y
     in
     List.map viewTurret >> group

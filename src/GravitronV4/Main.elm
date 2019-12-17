@@ -405,7 +405,7 @@ updateMemory { time, screen, mouse } mem =
             }
     in
     { mem
-        | player = updatePlayer mouse time player
+        | player = updatePlayer screen mouse time player
         , explosions = []
         , blasts = []
         , turrets = []
@@ -429,13 +429,37 @@ nextLevel mem =
         mem
 
 
-updatePlayer : Mouse -> Time -> Player -> Player
-updatePlayer mouse time p =
+updatePlayer : Screen -> Mouse -> Time -> Player -> Player
+updatePlayer scr mouse time =
+    let
+        updateVel : Player -> Player
+        updateVel ({ vx, vy } as p) =
+            let
+                ( dx, dy ) =
+                    ( wave -100 100 11 time, wave -300 300 21 time )
+                        |> toPolar
+                        |> Tuple.mapFirst ((*) 0.001)
+                        |> fromPolar
+            in
+            { p | vx = vx + dx, vy = vy + dy }
+
+        updatePos : Player -> Player
+        updatePos ({ x, y, vx, vy } as p) =
+            { p | x = x + vx, y = y + vy }
+
+        bounce : Player -> Player
+        bounce ({ x, y, vx, vy } as b) =
+            let
+                ( nvx, nvy ) =
+                    bounceInScreen 1 scr x y vx vy
+            in
+            { b | vx = nvx, vy = nvy }
+    in
     if mouse.down then
-        p
+        identity
 
     else
-        { p | x = wave -100 100 11 time, y = wave -300 300 5 time }
+        updateVel >> updatePos >> bounce
 
 
 stepTimeBombs :

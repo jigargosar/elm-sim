@@ -106,14 +106,14 @@ initHP mx =
     HP (max 0 mx) (max 0 mx)
 
 
-decHP : HP -> HP
-decHP =
-    decHPBy 1
-
-
 decHPBy : Int -> HP -> HP
 decHPBy hits (HP mx n) =
     HP mx (clamp 0 mx (n - hits))
+
+
+remainingHP : HP -> Int
+remainingHP (HP _ n) =
+    n
 
 
 isDead : HP -> Bool
@@ -405,6 +405,7 @@ updateMemory { time, screen } mem =
                     :: List.map blastToDamageCircle blasts
                     ++ List.map timeBombToDamageCircle timeBombs
                     ++ List.map bulletToDamageCircle bullets
+                    ++ List.map turretToDamageCircle turrets
             }
     in
     { mem
@@ -650,8 +651,11 @@ viewPlayer { x, y, r } =
 viewTurrets : List Turret -> Shape
 viewTurrets =
     let
-        viewTurret { x, y, r, color } =
-            circle color r
+        viewTurret { x, y, r, color, hp } =
+            group
+                [ circle color r
+                , words black (String.fromInt (remainingHP hp))
+                ]
                 |> move x y
     in
     List.map viewTurret >> group

@@ -364,8 +364,8 @@ emptyThenAddRes =
         reducer : Res -> Mem -> Mem
         reducer res mem =
             let
-                { nextId, blasts, turrets, bullets, timeBombs } =
-                    mem
+                nextId =
+                    mem.nextId
             in
             case res of
                 AddExplosion explosion ->

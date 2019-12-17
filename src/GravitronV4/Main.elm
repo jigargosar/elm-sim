@@ -423,7 +423,7 @@ updateMemory { time, screen, mouse } mem =
 nextLevel : Mem -> Mem
 nextLevel mem =
     if List.isEmpty mem.turrets then
-        initialMemory
+        { mem | turrets = initialMemory.turrets }
 
     else
         mem

@@ -369,19 +369,19 @@ emptyThenAddRes =
 
                 NewBullet x y r speed angle ->
                     { mem
-                        | nextId = nextId + 1
-                        , bullets =
+                        | bullets =
                             initBullet (BulletId nextId) x y r speed angle
                                 :: bullets
                     }
+                        |> incId
 
                 NewTimeBomb x y r speed angle ->
                     { mem
-                        | nextId = nextId + 1
-                        , timeBombs =
+                        | timeBombs =
                             initTimeBomb (TimeBombId nextId) x y r speed angle
                                 :: timeBombs
                     }
+                        |> incId
 
                 NewExplosion x y r c ->
                     addExplosion (initExplosion (ExplosionId nextId) x y r c)
@@ -390,9 +390,9 @@ emptyThenAddRes =
 
                 NewBlast x y r ->
                     { mem
-                        | nextId = nextId + 1
-                        , blasts = initBlast (BlastId nextId) x y r :: blasts
+                        | blasts = initBlast (BlastId nextId) x y r :: blasts
                     }
+                        |> incId
 
                 NoRes ->
                     mem

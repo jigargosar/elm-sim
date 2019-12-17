@@ -345,6 +345,18 @@ emptyThenAddRes =
         addBlast blast mem =
             { mem | blasts = blast :: mem.blasts }
 
+        addTurret : Turret -> Mem -> Mem
+        addTurret turret mem =
+            { mem | turrets = turret :: mem.turrets }
+
+        addBullet : Bullet -> Mem -> Mem
+        addBullet bullet mem =
+            { mem | bullets = bullet :: mem.bullets }
+
+        addTimeBomb : TimeBomb -> Mem -> Mem
+        addTimeBomb timeBomb mem =
+            { mem | timeBombs = timeBomb :: mem.timeBombs }
+
         incId : Mem -> Mem
         incId mem =
             { mem | nextId = mem.nextId + 1 }
@@ -363,28 +375,23 @@ emptyThenAddRes =
                     addBlast blast mem
 
                 AddTurret turret ->
-                    { mem | turrets = turret :: turrets }
+                    addTurret turret mem
 
                 AddBullet bullet ->
-                    { mem | bullets = bullet :: bullets }
+                    addBullet bullet mem
 
                 AddTimeBomb timeBomb ->
-                    { mem | timeBombs = timeBomb :: timeBombs }
+                    addTimeBomb timeBomb mem
 
                 NewBullet x y r speed angle ->
-                    { mem
-                        | bullets =
-                            initBullet (BulletId nextId) x y r speed angle
-                                :: bullets
-                    }
+                    mem
+                        |> addBullet (initBullet (BulletId nextId) x y r speed angle)
                         |> incId
 
                 NewTimeBomb x y r speed angle ->
-                    { mem
-                        | timeBombs =
-                            initTimeBomb (TimeBombId nextId) x y r speed angle
-                                :: timeBombs
-                    }
+                    mem
+                        |> addTimeBomb
+                            (initTimeBomb (TimeBombId nextId) x y r speed angle)
                         |> incId
 
                 NewExplosion x y r c ->

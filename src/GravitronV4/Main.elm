@@ -339,8 +339,8 @@ withNewId toId func mem =
     func (toId mem.nextId) { mem | nextId = mem.nextId + 1 }
 
 
-emptyListThenAddResponses : List Res -> Mem -> Mem
-emptyListThenAddResponses =
+emptyListsThenAddResponses : List Res -> Mem -> Mem
+emptyListsThenAddResponses =
     let
         addExplosion : Explosion -> Mem -> Mem
         addExplosion explosion mem =
@@ -468,7 +468,7 @@ updateMemory { time, screen, mouse } mem =
     { mem
         | player = updatePlayer screen mouse time player
     }
-        |> emptyListThenAddResponses allResponses
+        |> emptyListsThenAddResponses allResponses
         |> nextLevel
 
 

@@ -337,15 +337,23 @@ type Res
 emptyThenAddRes : List Res -> Mem -> Mem
 emptyThenAddRes =
     let
+        addExplosion : Explosion -> Mem -> Mem
+        addExplosion explosion mem =
+            { mem | explosions = explosion :: mem.explosions }
+
+        incId : Mem -> Mem
+        incId mem =
+            { mem | nextId = mem.nextId + 1 }
+
         reducer : Res -> Mem -> Mem
         reducer res mem =
             let
-                { nextId, explosions, blasts, turrets, bullets, timeBombs } =
+                { nextId, blasts, turrets, bullets, timeBombs } =
                     mem
             in
             case res of
                 AddExplosion explosion ->
-                    { mem | explosions = explosion :: explosions }
+                    addExplosion explosion mem
 
                 AddBlast blast ->
                     { mem | blasts = blast :: blasts }
@@ -376,12 +384,9 @@ emptyThenAddRes =
                     }
 
                 NewExplosion x y r c ->
-                    { mem
-                        | nextId = nextId + 1
-                        , explosions =
-                            initExplosion (ExplosionId nextId) x y r c
-                                :: explosions
-                    }
+                    addExplosion (initExplosion (ExplosionId nextId) x y r c)
+                        mem
+                        |> incId
 
                 NewBlast x y r ->
                     { mem

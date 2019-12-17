@@ -346,15 +346,15 @@ stepBullets scr tx ty =
             initExplosion x y bulletRadius black |> AddExplosion
 
         step : ( Bullet, List Bullet ) -> Res
-        step ( b, obList ) =
+        step ( bullet, otherBullets ) =
             if
-                List.any (isDamaging (bulletToDamageCircle b))
-                    (List.map bulletToDamageCircle obList)
+                List.any (isDamaging (bulletToDamageCircle bullet))
+                    (List.map bulletToDamageCircle otherBullets)
             then
-                stepDead b
+                stepDead bullet
 
             else
-                stepAlive b
+                stepAlive bullet
     in
     List.Extra.select >> List.map step
 

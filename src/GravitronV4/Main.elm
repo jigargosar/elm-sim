@@ -385,7 +385,7 @@ foldRes resList =
 
 
 updateMemory : Computer -> Mem -> Mem
-updateMemory { time, screen } mem =
+updateMemory { time, screen, mouse } mem =
     let
         { turrets, player, explosions, blasts, bullets, timeBombs } =
             mem
@@ -403,7 +403,7 @@ updateMemory { time, screen } mem =
             }
     in
     { mem
-        | player = updatePlayer time player
+        | player = updatePlayer mouse time player
         , explosions = []
         , blasts = []
         , turrets = []
@@ -427,8 +427,8 @@ nextLevel mem =
         mem
 
 
-updatePlayer : Time -> Player -> Player
-updatePlayer time p =
+updatePlayer : Mouse -> Time -> Player -> Player
+updatePlayer mouse time p =
     { p | x = wave -100 100 11 time, y = wave -300 300 5 time }
 
 

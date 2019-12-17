@@ -249,7 +249,8 @@ isDamaging target src =
         dcc a b =
             ccc a.x a.y a.r b.x b.y b.r
     in
-    List.member target.tag src.canDamage
+    (target.id /= src.id)
+        && List.member target.tag src.canDamage
         && dcc target src
 
 

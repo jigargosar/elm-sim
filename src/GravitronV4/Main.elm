@@ -92,6 +92,8 @@ type alias Player =
     , x : Number
     , y : Number
     , r : Number
+    , vx : Number
+    , vy : Number
     }
 
 
@@ -101,7 +103,7 @@ initPlayer x y =
         initialPlayerRadius =
             20
     in
-    Player PlayerId x y initialPlayerRadius
+    Player PlayerId x y initialPlayerRadius 0 0
 
 
 type alias Turret =

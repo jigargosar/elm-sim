@@ -84,6 +84,7 @@ type alias Turret =
     , y : Number
     , color : Color
     , weapon : Weapon
+    , hp : HP
     }
 
 
@@ -101,6 +102,25 @@ type TurretConfig
     = TurretConfig Id Color Weapon Int
 
 
+type HP
+    = HP Int Int
+
+
+initHP : Int -> HP
+initHP mx =
+    HP (max 0 mx) (max 0 mx)
+
+
+decHP : HP -> HP
+decHP =
+    decHPBy 1
+
+
+decHPBy : Int -> HP -> HP
+decHPBy hits (HP mx n) =
+    HP mx (clamp 0 mx (n - hits))
+
+
 initTurrets : List TurretConfig -> List Turret
 initTurrets =
     let
@@ -111,7 +131,7 @@ initTurrets =
             150
 
         initTurret ( x, y ) (TurretConfig id c w maxHP) =
-            Turret id (initCt 160) (x * factor) (y * factor) c w
+            Turret id (initCt 160) (x * factor) (y * factor) c w (initHP maxHP)
     in
     List.map2 initTurret positions
 

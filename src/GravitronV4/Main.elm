@@ -360,16 +360,20 @@ emptyThenAddRes =
                     { mem | timeBombs = timeBomb :: timeBombs }
 
                 NewBullet x y r speed angle ->
-                    reducer
-                        (AddBullet (initBullet (BulletId nextId) x y r speed angle))
-                        { mem | nextId = nextId + 1 }
+                    { mem
+                        | nextId = nextId + 1
+                        , bullets =
+                            initBullet (BulletId nextId) x y r speed angle
+                                :: bullets
+                    }
 
                 NewTimeBomb x y r speed angle ->
-                    reducer
-                        (AddTimeBomb
-                            (initTimeBomb (TimeBombId nextId) x y r speed angle)
-                        )
-                        { mem | nextId = nextId + 1 }
+                    { mem
+                        | nextId = nextId + 1
+                        , timeBombs =
+                            initTimeBomb (TimeBombId nextId) x y r speed angle
+                                :: timeBombs
+                    }
 
                 NewExplosion x y r c ->
                     reducer

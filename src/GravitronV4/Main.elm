@@ -241,14 +241,11 @@ stepBulletCollision =
         handleCollision : ( Bullet, List Bullet ) -> Mem -> Mem
         handleCollision ( b, bLst ) mem =
             let
-                bulletDC =
-                    bulletToDamageCircle b
-
                 otherDC =
                     List.map blastToDamageCircle mem.blasts
                         ++ List.map bulletToDamageCircle bLst
             in
-            if List.any (isDamaging bulletDC) otherDC then
+            if List.any (isDamaging (bulletToDamageCircle b)) otherDC then
                 { mem | explosions = initExplosion b.x b.y bulletRadius black :: mem.explosions }
 
             else

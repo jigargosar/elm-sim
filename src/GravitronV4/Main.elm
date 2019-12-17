@@ -341,6 +341,10 @@ emptyThenAddRes =
         addExplosion explosion mem =
             { mem | explosions = explosion :: mem.explosions }
 
+        addBlast : Blast -> Mem -> Mem
+        addBlast blast mem =
+            { mem | blasts = blast :: mem.blasts }
+
         incId : Mem -> Mem
         incId mem =
             { mem | nextId = mem.nextId + 1 }
@@ -356,7 +360,7 @@ emptyThenAddRes =
                     addExplosion explosion mem
 
                 AddBlast blast ->
-                    { mem | blasts = blast :: blasts }
+                    addBlast blast mem
 
                 AddTurret turret ->
                     { mem | turrets = turret :: turrets }
@@ -384,14 +388,13 @@ emptyThenAddRes =
                         |> incId
 
                 NewExplosion x y r c ->
-                    addExplosion (initExplosion (ExplosionId nextId) x y r c)
-                        mem
+                    mem
+                        |> addExplosion (initExplosion (ExplosionId nextId) x y r c)
                         |> incId
 
                 NewBlast x y r ->
-                    { mem
-                        | blasts = initBlast (BlastId nextId) x y r :: blasts
-                    }
+                    mem
+                        |> addBlast (initBlast (BlastId nextId) x y r)
                         |> incId
 
                 NoRes ->

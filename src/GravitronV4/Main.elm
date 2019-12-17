@@ -443,6 +443,15 @@ stepTimeBombs { scr, tx, ty, allDamageCircles } =
 
         step : TimeBomb -> Res
         step timeBomb =
+            let
+                dc =
+                    List.filter
+                        (isDamaging (timeBombToDamageCircle timeBomb))
+                        allDamageCircles
+
+                intersectionCount =
+                    List.length dc
+            in
             if
                 isDone timeBomb.ct
                     || List.any

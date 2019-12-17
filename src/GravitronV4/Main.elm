@@ -384,9 +384,10 @@ emptyThenAddRes =
                     }
 
                 NewBlast x y r ->
-                    reducer
-                        (AddBlast (initBlast (BlastId nextId) x y r))
-                        { mem | nextId = nextId + 1 }
+                    { mem
+                        | nextId = nextId + 1
+                        , blasts = initBlast (BlastId nextId) x y r :: blasts
+                    }
 
                 NoRes ->
                     mem

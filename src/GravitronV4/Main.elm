@@ -266,10 +266,10 @@ updateMemory { time, screen } mem =
         |> foldRes (stepExplosions explosions)
         |> foldRes (stepTurrets player.x player.y turrets)
         |> foldRes (stepBullets screen player.x player.y bullets)
-        |> takeBullets 200
+        |> limitBullets 200
 
 
-takeBullets ct mem =
+limitBullets ct mem =
     { mem | bullets = mem.bullets |> List.take ct }
 
 

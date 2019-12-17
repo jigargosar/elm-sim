@@ -111,13 +111,16 @@ bulletRadius =
     6
 
 
-initBullet : Id -> Number -> Number -> Number -> Number -> Bullet
-initBullet id x y speed angle =
+initBullet : Id -> Number -> Number -> Number -> Number -> Number -> Bullet
+initBullet id x y r speed angle =
     let
         ( vx, vy ) =
             fromPolar ( speed, angle )
+
+        ( dx, dy ) =
+            fromPolar ( r + bulletRadius + 1, angle )
     in
-    Bullet id x y vx vy
+    Bullet id (x + dx) (y + dy) vx vy
 
 
 type alias TimeBomb =
@@ -269,7 +272,7 @@ type Res
     | NewBlast Number Number Number
     | AddTurret Turret
     | AddBullet Bullet
-    | NewBullet Number Number Number Number
+    | NewBullet Number Number Number Number Number
     | AddTimeBomb TimeBomb
     | NewTimeBomb Number Number Number Number Number
     | NoRes
@@ -307,9 +310,9 @@ foldRes resList =
                 AddTimeBomb timeBomb ->
                     { mem | timeBombs = timeBomb :: timeBombs }
 
-                NewBullet x y speed angle ->
+                NewBullet x y r speed angle ->
                     reducer
-                        (AddBullet (initBullet (BulletId nextId) x y speed angle))
+                        (AddBullet (initBullet (BulletId nextId) x y r speed angle))
                         { mem | nextId = nextId + 1 }
 
                 NewTimeBomb x y r speed angle ->
@@ -548,19 +551,10 @@ stepTurrets { tx, ty } =
                 let
                     angle =
                         angleFromTo t.x t.y tx ty
-
-                    posFromProjectileRadiusTheta projectileRadius theta =
-                        fromPolar ( turretRadius + projectileRadius + 1, angle )
-                            |> (\( ox, oy ) -> ( t.x + ox, t.y + oy ))
                 in
                 case t.weapon of
                     BulletWeapon ->
-                        let
-                            ( nx, ny ) =
-                                fromPolar ( turretRadius + bulletRadius + 1, angle )
-                                    |> (\( ox, oy ) -> ( t.x + ox, t.y + oy ))
-                        in
-                        NewBullet nx ny 0.1 angle
+                        NewBullet t.x t.y turretRadius 3 angle
 
                     TimeBombWeapon ->
                         NewTimeBomb t.x t.y turretRadius 3 angle

@@ -211,6 +211,9 @@ isDamaging target src =
 type Res
     = AddExplosion Explosion
     | AddBlast Blast
+    | AddTurret Turret
+    | AddBullet Bullet
+    | AddTimeBomb TimeBomb
     | NoRes
     | Batch (List Res)
 
@@ -219,13 +222,22 @@ foldRes : List Res -> Mem -> Mem
 foldRes resList =
     let
         reducer : Res -> Mem -> Mem
-        reducer res ({ explosions, blasts } as mem) =
+        reducer res ({ explosions, blasts, turrets, bullets, timeBombs } as mem) =
             case res of
                 AddExplosion explosion ->
                     { mem | explosions = explosion :: explosions }
 
                 AddBlast blast ->
                     { mem | blasts = blast :: blasts }
+
+                AddTurret turret ->
+                    { mem | turrets = turret :: turrets }
+
+                AddBullet bullet ->
+                    { mem | bullets = bullet :: bullets }
+
+                AddTimeBomb timeBomb ->
+                    { mem | timeBombs = timeBomb :: timeBombs }
 
                 NoRes ->
                     mem
@@ -242,9 +254,13 @@ updateMemory { time, screen } ({ turrets, player, explosions, blasts } as mem) =
         | player = updatePlayer time player
         , explosions = []
         , blasts = []
+        , turrets = []
+        , bullets = []
+        , timeBombs = []
     }
         |> foldRes (stepBlasts blasts)
         |> foldRes (stepExplosions explosions)
+        |> foldRes (stepTurrets player.x player.y turrets)
 
 
 
@@ -438,37 +454,29 @@ stepBounceTimeBombInScreen scr mem =
     { mem | timeBombs = List.map bounce mem.timeBombs }
 
 
-stepFireTurretWeapon : Float -> Float -> Mem -> Mem
-stepFireTurretWeapon x y =
+stepTurrets : Float -> Float -> List Turret -> List Res
+stepTurrets x y =
     let
-        fireWeaponOnCounter t mem =
-            if isDone t.ct then
+        fireWeaponOnCounter t =
+            [ if isDone t.ct then
                 let
                     angle =
                         angleFromTo t.x t.y x y
                 in
                 case t.weapon of
                     BulletWeapon ->
-                        { mem | bullets = initBullet t.x t.y 3 angle :: mem.bullets }
+                        AddBullet (initBullet t.x t.y 3 angle)
 
                     TimeBombWeapon ->
-                        { mem | timeBombs = initTimeBomb t.x t.y 3 angle :: mem.timeBombs }
+                        AddTimeBomb (initTimeBomb t.x t.y 3 angle)
 
-            else
-                mem
-
-        stepTurretCounters : Mem -> Mem
-        stepTurretCounters mem =
-            let
-                stepTurret : Turret -> Turret
-                stepTurret t =
-                    { t | ct = stepCt t.ct }
-            in
-            { mem | turrets = List.map stepTurret mem.turrets }
+              else
+                NoRes
+            , AddTurret { t | ct = stepCt t.ct }
+            ]
+                |> Batch
     in
-    \mem ->
-        List.foldl fireWeaponOnCounter mem mem.turrets
-            |> stepTurretCounters
+    List.map fireWeaponOnCounter
 
 
 

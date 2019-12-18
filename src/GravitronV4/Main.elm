@@ -373,10 +373,6 @@ emptyListsThenAddResponses =
         addTimeBomb timeBomb mem =
             { mem | timeBombs = timeBomb :: mem.timeBombs }
 
-        incId : Mem -> Mem
-        incId mem =
-            { mem | nextId = mem.nextId + 1 }
-
         reducer : Res -> Mem -> Mem
         reducer res =
             case res of

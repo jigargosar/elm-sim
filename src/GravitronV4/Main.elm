@@ -191,8 +191,8 @@ type alias TimeBomb =
     }
 
 
-initTimeBomb : Id -> Number -> Number -> Number -> Number -> Number -> TimeBomb
-initTimeBomb id x y offset speed angle =
+initTimeBomb : Number -> Number -> Number -> Number -> Number -> Id -> TimeBomb
+initTimeBomb x y offset speed angle id =
     let
         ( vx, vy ) =
             fromPolar ( speed, angle )
@@ -440,9 +440,7 @@ emptyListsThenAddResponses =
 
                 NewTimeBomb x y r speed angle ->
                     withNewId TimeBombId
-                        (\id ->
-                            addTimeBomb (initTimeBomb id x y r speed angle)
-                        )
+                        (initTimeBomb x y r speed angle >> addTimeBomb)
 
                 NewExplosion x y r c ->
                     withNewId ExplosionId

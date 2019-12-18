@@ -510,7 +510,7 @@ nextLevel mem =
 
 
 updatePlayer : Screen -> Mouse -> Time -> Player -> Player
-updatePlayer scr mouse time =
+updatePlayer screen mouse time =
     let
         randomVel : Player -> Player
         randomVel ({ vx, vy } as p) =
@@ -527,14 +527,6 @@ updatePlayer scr mouse time =
         posByVel ({ x, y, vx, vy } as p) =
             { p | x = x + vx, y = y + vy }
 
-        bounceVel : Player -> Player
-        bounceVel ({ x, y, vx, vy } as b) =
-            let
-                ( nvx, nvy ) =
-                    bounceVelInScreenBy 1 scr x y vx vy
-            in
-            { b | vx = nvx, vy = nvy }
-
         springToMouse : Player -> Player
         springToMouse ({ x, y, vx, vy } as p) =
             let
@@ -547,7 +539,15 @@ updatePlayer scr mouse time =
         springToMouse >> posByVel
 
     else
-        randomVel >> bounceVel >> posByVel
+        randomVel >> bounceVel 1 screen >> posByVel
+
+
+bounceVel bounceFactor screen ({ x, y, vx, vy } as b) =
+    let
+        ( nvx, nvy ) =
+            newBounceVelInScreen bounceFactor screen x y vx vy
+    in
+    { b | vx = nvx, vy = nvy }
 
 
 stepTimeBombs :
@@ -580,7 +580,7 @@ stepTimeBombs { screen, tx, ty, taggedCircles } =
         bounce ({ x, y, vx, vy } as b) =
             let
                 ( nvx, nvy ) =
-                    bounceVelInScreenBy 0.5 screen x y vx vy
+                    newBounceVelInScreen 0.5 screen x y vx vy
             in
             { b | vx = nvx, vy = nvy }
 
@@ -649,7 +649,7 @@ stepBullets { screen, tx, ty, taggedCircles } =
         updateVelBounceInScreen bounceFactor ({ x, y, vx, vy } as b) =
             let
                 ( nvx, nvy ) =
-                    bounceVelInScreenBy bounceFactor screen x y vx vy
+                    newBounceVelInScreen bounceFactor screen x y vx vy
             in
             { b | vx = nvx, vy = nvy }
 
@@ -831,7 +831,7 @@ main =
 -- Geom Helpers
 
 
-bounceVelInScreenBy :
+newBounceVelInScreen :
     Float
     -> Screen
     -> Float
@@ -839,7 +839,7 @@ bounceVelInScreenBy :
     -> Float
     -> Float
     -> ( Float, Float )
-bounceVelInScreenBy bounceFriction scr x y vx vy =
+newBounceVelInScreen bounceFriction scr x y vx vy =
     let
         nvx =
             if

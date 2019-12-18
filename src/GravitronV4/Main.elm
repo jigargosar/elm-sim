@@ -308,14 +308,14 @@ tagsWhichCanCauseDamageTo targetTag =
 
 
 
--- TaggedCircle
+-- Entity with common props
 
 
-type TaggedCircle
-    = TaggedCircle TaggedCircleRec
+type Entity
+    = Entity EntityRec
 
 
-type alias TaggedCircleRec =
+type alias EntityRec =
     { id : Id
     , tag : Tag
     , x : Number
@@ -324,22 +324,22 @@ type alias TaggedCircleRec =
     }
 
 
-toTaggedCircle : { a | id : Id, tag : Tag, x : Number, y : Number, r : Number } -> TaggedCircle
+toTaggedCircle : { a | id : Id, tag : Tag, x : Number, y : Number, r : Number } -> Entity
 toTaggedCircle { id, tag, x, y, r } =
-    TaggedCircleRec id tag x y r
-        |> TaggedCircle
+    EntityRec id tag x y r
+        |> Entity
 
 
-canCauseDamageTo : TaggedCircleRec -> TaggedCircleRec -> Bool
+canCauseDamageTo : EntityRec -> EntityRec -> Bool
 canCauseDamageTo target src =
     List.member src.tag (tagsWhichCanCauseDamageTo target.tag)
         && (src.id /= target.id)
 
 
-isCausingDamageTo : TaggedCircle -> TaggedCircle -> Bool
-isCausingDamageTo (TaggedCircle target) (TaggedCircle src) =
+isCausingDamageTo : Entity -> Entity -> Bool
+isCausingDamageTo (Entity target) (Entity src) =
     let
-        areIntersecting : TaggedCircleRec -> TaggedCircleRec -> Bool
+        areIntersecting : EntityRec -> EntityRec -> Bool
         areIntersecting a b =
             ccc a.x a.y a.r b.x b.y b.r
     in
@@ -348,14 +348,14 @@ isCausingDamageTo (TaggedCircle target) (TaggedCircle src) =
 
 anyCausingDamageTo :
     { a | id : Id, tag : Tag, x : Number, y : Number, r : Number }
-    -> List TaggedCircle
+    -> List Entity
     -> Bool
 anyCausingDamageTo target =
     List.any (isCausingDamageTo (toTaggedCircle target))
 
 
 isDamagedByAnyOf :
-    List TaggedCircle
+    List Entity
     -> { a | id : Id, tag : Tag, x : Number, y : Number, r : Number }
     -> Bool
 isDamagedByAnyOf =
@@ -364,7 +364,7 @@ isDamagedByAnyOf =
 
 countHitsTo :
     { a | id : Id, tag : Tag, x : Number, y : Number, r : Number }
-    -> List TaggedCircle
+    -> List Entity
     -> Int
 countHitsTo target =
     List.filter (isCausingDamageTo (toTaggedCircle target)) >> List.length
@@ -489,12 +489,12 @@ updateMemory { time, screen, mouse } mem =
         { turrets, player, explosions, blasts, bullets, timeBombs } =
             mem
 
-        env : { screen : Screen, tx : Number, ty : Number, taggedCircles : List TaggedCircle }
+        env : { screen : Screen, tx : Number, ty : Number, entityList : List Entity }
         env =
             { screen = screen
             , tx = player.x
             , ty = player.y
-            , taggedCircles =
+            , entityList =
                 toTaggedCircle player
                     :: List.map toTaggedCircle blasts
                     ++ List.map toTaggedCircle timeBombs
@@ -554,11 +554,11 @@ stepTimeBombs :
         | screen : Screen
         , tx : Float
         , ty : Float
-        , taggedCircles : List TaggedCircle
+        , entityList : List Entity
     }
     -> List TimeBomb
     -> List Res
-stepTimeBombs { screen, tx, ty, taggedCircles } =
+stepTimeBombs { screen, tx, ty, entityList } =
     let
         tick : TimeBomb -> TimeBomb
         tick b =
@@ -581,7 +581,7 @@ stepTimeBombs { screen, tx, ty, taggedCircles } =
 
         step : TimeBomb -> Res
         step =
-            ifElse (anyPass [ .ct >> isDone, isDamagedByAnyOf taggedCircles ])
+            ifElse (anyPass [ .ct >> isDone, isDamagedByAnyOf entityList ])
                 stepDead
                 stepAlive
     in
@@ -593,11 +593,11 @@ stepBullets :
         | screen : Screen
         , tx : Float
         , ty : Float
-        , taggedCircles : List TaggedCircle
+        , entityList : List Entity
     }
     -> List Bullet
     -> List Res
-stepBullets { screen, tx, ty, taggedCircles } =
+stepBullets { screen, tx, ty, entityList } =
     let
         stepAlive : Bullet -> Res
         stepAlive =
@@ -609,7 +609,7 @@ stepBullets { screen, tx, ty, taggedCircles } =
 
         step : Bullet -> Res
         step =
-            ifElse (isDamagedByAnyOf taggedCircles)
+            ifElse (isDamagedByAnyOf entityList)
                 stepDead
                 stepAlive
     in
@@ -642,11 +642,11 @@ stepTurrets :
     { a
         | tx : Float
         , ty : Float
-        , taggedCircles : List TaggedCircle
+        , entityList : List Entity
     }
     -> List Turret
     -> List Res
-stepTurrets { tx, ty, taggedCircles } =
+stepTurrets { tx, ty, entityList } =
     let
         fireWeapon { x, y, r, weapon } =
             let
@@ -682,7 +682,7 @@ stepTurrets { tx, ty, taggedCircles } =
         stepHP t =
             let
                 hits =
-                    countHitsTo t taggedCircles
+                    countHitsTo t entityList
             in
             { t | hp = decHPBy hits t.hp }
 

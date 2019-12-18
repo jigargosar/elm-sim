@@ -218,8 +218,8 @@ type alias Blast =
     }
 
 
-initBlast : Id -> Number -> Number -> Number -> Blast
-initBlast id x y r =
+initBlast : Number -> Number -> Number -> Id -> Blast
+initBlast x y r id =
     Blast id x y r
 
 
@@ -233,9 +233,9 @@ type alias Explosion =
     }
 
 
-initExplosion : Id -> Number -> Number -> Number -> Color -> Explosion
-initExplosion id =
-    Explosion id (initCt 60)
+initExplosion : Number -> Number -> Number -> Color -> Id -> Explosion
+initExplosion x y r c id =
+    Explosion id (initCt 60) x y r c
 
 
 type alias Mem =
@@ -444,11 +444,11 @@ emptyListsThenAddResponses =
 
                 NewExplosion x y r c ->
                     withNewId ExplosionId
-                        (\id -> addExplosion (initExplosion id x y r c))
+                        (initExplosion x y r c >> addExplosion)
 
                 NewBlast x y r ->
                     withNewId BlastId
-                        (\id -> addBlast (initBlast id x y r))
+                        (initBlast x y r >> addBlast)
 
                 NoRes ->
                     identity

@@ -298,12 +298,12 @@ toTag e =
             TagTurret
 
 
-toTaggedCircle : Entity -> TaggedCircle
-toTaggedCircle e =
+toAnimal : Entity -> Animal
+toAnimal e =
     let
-        initHelp : { a | id : Id, x : Number, y : Number, r : Number } -> TaggedCircle
+        initHelp : { a | id : Id, x : Number, y : Number, r : Number } -> Animal
         initHelp { id, x, y, r } =
-            TaggedCircle id x y r (toTag e)
+            Animal id x y r (toTag e)
     in
     case e of
         ETimeBomb rec ->
@@ -330,7 +330,7 @@ type Tag
     | TagTurret
 
 
-type alias TaggedCircle =
+type alias Animal =
     { id : Id
     , x : Number
     , y : Number
@@ -339,8 +339,8 @@ type alias TaggedCircle =
     }
 
 
-predatorsOf : Tag -> List Tag
-predatorsOf prey =
+predatorTagsOf : Tag -> List Tag
+predatorTagsOf prey =
     case prey of
         TagTimeBomb ->
             [ TagTimeBomb, TagBullet, TagBlast, TagPlayer, TagTurret ]
@@ -378,6 +378,27 @@ isDamaging target src =
     List.member target.tag src.canDamage
         && dcc target src
         && (target.id /= src.id)
+
+
+isPredatorOf prey predator =
+    List.member predator.tag (predatorTagsOf prey.tag)
+        && (prey.id /= predator.id)
+
+
+isPredatorDamaging : Animal -> Animal -> Bool
+isPredatorDamaging prey predator =
+    let
+        dcc : Animal -> Animal -> Bool
+        dcc a b =
+            ccc a.x a.y a.r b.x b.y b.r
+
+        predatorTags : List Tag
+        predatorTags =
+            predatorTagsOf prey.tag
+    in
+    List.member predator.tag predatorTags
+        && dcc prey predator
+        && (prey.id /= predator.id)
 
 
 playerToDamageCircle : Player -> DamageCircle
@@ -533,6 +554,12 @@ updateMemory { time, screen, mouse } mem =
             { scr = screen
             , tx = player.x
             , ty = player.y
+            , entityList =
+                EPlayer player
+                    :: List.map EBlast blasts
+                    ++ List.map ETimeBomb timeBombs
+                    ++ List.map EBullet bullets
+                    ++ List.map ETurret turrets
             , allDamageCircles =
                 playerToDamageCircle player
                     :: List.map blastToDamageCircle blasts
@@ -760,11 +787,11 @@ stepTurrets :
     { a
         | tx : Float
         , ty : Float
-        , allDamageCircles : List DamageCircle
+        , entityList : List Entity
     }
     -> List Turret
     -> List Res
-stepTurrets { tx, ty, allDamageCircles } =
+stepTurrets { tx, ty, entityList } =
     let
         aliveResponse : Turret -> Res
         aliveResponse ({ x, y, r, hp } as t) =
@@ -790,13 +817,18 @@ stepTurrets { tx, ty, allDamageCircles } =
         deathResponse { x, y, r, color } =
             NewExplosion x y r color
 
+        predators : List Animal
+        predators =
+            List.map toAnimal entityList
+
         stepCollision : Turret -> Turret
         stepCollision ({ hp } as t) =
             let
+                prey =
+                    ETurret t |> toAnimal
+
                 hits =
-                    List.filter
-                        (isDamaging (turretToDamageCircle t))
-                        allDamageCircles
+                    List.filter (isPredatorDamaging prey) predators
                         |> List.length
             in
             { t | hp = decHPBy hits hp }

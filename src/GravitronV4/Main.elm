@@ -311,7 +311,11 @@ tagsWhichCanCauseDamageTo targetTag =
 -- TaggedCircle
 
 
-type alias TaggedCircle =
+type TaggedCircle
+    = TaggedCircle TaggedCircleRec
+
+
+type alias TaggedCircleRec =
     { id : Id
     , tag : Tag
     , x : Number
@@ -322,19 +326,20 @@ type alias TaggedCircle =
 
 toTaggedCircle : { a | id : Id, tag : Tag, x : Number, y : Number, r : Number } -> TaggedCircle
 toTaggedCircle { id, tag, x, y, r } =
-    TaggedCircle id tag x y r
+    TaggedCircleRec id tag x y r
+        |> TaggedCircle
 
 
-canCauseDamageTo : TaggedCircle -> TaggedCircle -> Bool
+canCauseDamageTo : TaggedCircleRec -> TaggedCircleRec -> Bool
 canCauseDamageTo target src =
     List.member src.tag (tagsWhichCanCauseDamageTo target.tag)
         && (src.id /= target.id)
 
 
 isCausingDamageTo : TaggedCircle -> TaggedCircle -> Bool
-isCausingDamageTo target src =
+isCausingDamageTo (TaggedCircle target) (TaggedCircle src) =
     let
-        areIntersecting : TaggedCircle -> TaggedCircle -> Bool
+        areIntersecting : TaggedCircleRec -> TaggedCircleRec -> Bool
         areIntersecting a b =
             ccc a.x a.y a.r b.x b.y b.r
     in
@@ -574,13 +579,9 @@ stepTimeBombs { screen, tx, ty, taggedCircles } =
                 , NewBlast x y blastR
                 ]
 
-        isDead : TimeBomb -> Bool
-        isDead tb =
-            isDone tb.ct || isDamagedByAnyOf taggedCircles (toTaggedCircle tb)
-
         step : TimeBomb -> Res
         step =
-            ifElse (anyPass [ .ct >> isDone, toTaggedCircle >> isDamagedByAnyOf taggedCircles ])
+            ifElse (anyPass [ .ct >> isDone, isDamagedByAnyOf taggedCircles ])
                 stepDead
                 stepAlive
     in
@@ -608,7 +609,7 @@ stepBullets { screen, tx, ty, taggedCircles } =
 
         step : Bullet -> Res
         step =
-            ifElse (toTaggedCircle >> isDamagedByAnyOf taggedCircles)
+            ifElse (isDamagedByAnyOf taggedCircles)
                 stepDead
                 stepAlive
     in
@@ -678,12 +679,12 @@ stepTurrets { tx, ty, taggedCircles } =
             NewExplosion x y r color
 
         stepHP : Turret -> Turret
-        stepHP ({ hp } as t) =
+        stepHP t =
             let
                 hits =
-                    countHitsTo (toTaggedCircle t) taggedCircles
+                    countHitsTo t taggedCircles
             in
-            { t | hp = decHPBy hits hp }
+            { t | hp = decHPBy hits t.hp }
 
         step : Turret -> Res
         step =

@@ -275,12 +275,7 @@ initialMemory =
 
 
 
---  Update
-
-
-toTaggedCircle : { a | id : Id, tag : Tag, x : Number, y : Number, r : Number } -> TaggedCircle
-toTaggedCircle { id, tag, x, y, r } =
-    TaggedCircle id tag x y r
+-- Tags
 
 
 type Tag
@@ -289,15 +284,6 @@ type Tag
     | TagBlast
     | TagPlayer
     | TagTurret
-
-
-type alias TaggedCircle =
-    { id : Id
-    , tag : Tag
-    , x : Number
-    , y : Number
-    , r : Number
-    }
 
 
 tagsWhichCanCauseDamageTo : Tag -> List Tag
@@ -319,6 +305,24 @@ tagsWhichCanCauseDamageTo targetTag =
             [ TagBullet, TagBlast ]
 
 
+
+-- TaggedCircle
+
+
+type alias TaggedCircle =
+    { id : Id
+    , tag : Tag
+    , x : Number
+    , y : Number
+    , r : Number
+    }
+
+
+toTaggedCircle : { a | id : Id, tag : Tag, x : Number, y : Number, r : Number } -> TaggedCircle
+toTaggedCircle { id, tag, x, y, r } =
+    TaggedCircle id tag x y r
+
+
 canCauseDamageTo : TaggedCircle -> TaggedCircle -> Bool
 canCauseDamageTo target src =
     List.member src.tag (tagsWhichCanCauseDamageTo target.tag)
@@ -333,6 +337,10 @@ isCausingDamageTo target src =
             ccc a.x a.y a.r b.x b.y b.r
     in
     canCauseDamageTo target src && areIntersecting target src
+
+
+
+--  Update
 
 
 type Res
@@ -354,8 +362,8 @@ withNewId toId func mem =
     func (toId mem.nextId) { mem | nextId = mem.nextId + 1 }
 
 
-emptyListsThenAddResponses : List Res -> Mem -> Mem
-emptyListsThenAddResponses =
+emptyListsThenProcessResponses : List Res -> Mem -> Mem
+emptyListsThenProcessResponses =
     let
         addExplosion : Explosion -> Mem -> Mem
         addExplosion explosion mem =
@@ -475,7 +483,7 @@ updateMemory { time, screen, mouse } mem =
     { mem
         | player = updatePlayer screen mouse time player
     }
-        |> emptyListsThenAddResponses allResponses
+        |> emptyListsThenProcessResponses allResponses
         |> nextLevel
 
 

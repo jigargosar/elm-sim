@@ -438,9 +438,9 @@ emptyListsThenAddResponses =
                     withNewId BulletId
                         (initBullet x y r speed angle >> addBullet)
 
-                NewTimeBomb x y r speed angle ->
+                NewTimeBomb x y offset speed angle ->
                     withNewId TimeBombId
-                        (initTimeBomb x y r speed angle >> addTimeBomb)
+                        (initTimeBomb x y offset speed angle >> addTimeBomb)
 
                 NewExplosion x y r c ->
                     withNewId ExplosionId

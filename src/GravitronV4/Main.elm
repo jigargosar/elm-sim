@@ -351,6 +351,11 @@ isDamagedByAnyOf =
     flip anyCausingDamageTo
 
 
+countHitsTo : TaggedCircle -> List TaggedCircle -> Int
+countHitsTo target =
+    List.filter (isCausingDamageTo target) >> List.length
+
+
 
 --  Update
 
@@ -667,8 +672,7 @@ stepTurrets { tx, ty, taggedCircles } =
         stepCollision ({ hp } as t) =
             let
                 hits =
-                    List.filter (isCausingDamageTo (toTaggedCircle t)) taggedCircles
-                        |> List.length
+                    countHitsTo (toTaggedCircle t) taggedCircles
             in
             { t | hp = decHPBy hits hp }
 

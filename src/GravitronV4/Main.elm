@@ -121,7 +121,7 @@ type alias Turret =
     , r : Number
     , color : Color
     , weapon : Weapon
-    , ct : Counter
+    , triggerCt : Counter
     , hp : HP
     }
 
@@ -634,8 +634,8 @@ stepTurrets :
 stepTurrets { tx, ty, taggedCircles } =
     let
         aliveResponse : Turret -> Res
-        aliveResponse ({ x, y, r, weapon, hp } as t) =
-            [ if isDone t.ct then
+        aliveResponse ({ x, y, r, weapon, triggerCt, hp } as t) =
+            [ if isDone triggerCt then
                 let
                     angle =
                         angleFromTo x y tx ty
@@ -652,7 +652,7 @@ stepTurrets { tx, ty, taggedCircles } =
 
               else
                 NoRes
-            , AddTurret { t | ct = stepCt t.ct }
+            , AddTurret { t | triggerCt = stepCt triggerCt }
             ]
                 |> Batch
 

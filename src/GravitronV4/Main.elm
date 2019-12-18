@@ -298,12 +298,12 @@ toTag e =
             TagTurret
 
 
-toAnimal : Entity -> Animal
+toAnimal : Entity -> TaggedCircle
 toAnimal e =
     let
-        initHelp : { a | id : Id, x : Number, y : Number, r : Number } -> Animal
+        initHelp : { a | id : Id, x : Number, y : Number, r : Number } -> TaggedCircle
         initHelp { id, x, y, r } =
-            Animal id x y r (toTag e)
+            TaggedCircle id x y r (toTag e)
     in
     case e of
         ETimeBomb rec ->
@@ -330,7 +330,7 @@ type Tag
     | TagTurret
 
 
-type alias Animal =
+type alias TaggedCircle =
     { id : Id
     , x : Number
     , y : Number
@@ -340,8 +340,8 @@ type alias Animal =
 
 
 tagsWhichCanCauseDamageTo : Tag -> List Tag
-tagsWhichCanCauseDamageTo damageReceiverTag =
-    case damageReceiverTag of
+tagsWhichCanCauseDamageTo targetTag =
+    case targetTag of
         TagTimeBomb ->
             [ TagTimeBomb, TagBullet, TagBlast, TagPlayer, TagTurret ]
 
@@ -356,6 +356,22 @@ tagsWhichCanCauseDamageTo damageReceiverTag =
 
         TagTurret ->
             [ TagBullet, TagBlast ]
+
+
+canCauseDamageTo : TaggedCircle -> TaggedCircle -> Bool
+canCauseDamageTo prey predator =
+    List.member predator.tag (tagsWhichCanCauseDamageTo prey.tag)
+        && (prey.id /= predator.id)
+
+
+isCausingDamageTo : TaggedCircle -> TaggedCircle -> Bool
+isCausingDamageTo target src =
+    let
+        areIntersecting : TaggedCircle -> TaggedCircle -> Bool
+        areIntersecting a b =
+            ccc a.x a.y a.r b.x b.y b.r
+    in
+    canCauseDamageTo target src && areIntersecting target src
 
 
 type alias DamageCircle =
@@ -378,23 +394,6 @@ isDamaging target src =
     List.member target.tag src.canDamage
         && dcc target src
         && (target.id /= src.id)
-
-
-isPredatorOf : Animal -> Animal -> Bool
-isPredatorOf prey predator =
-    List.member predator.tag (tagsWhichCanCauseDamageTo prey.tag)
-        && (prey.id /= predator.id)
-
-
-isPredatorDamaging : Animal -> Animal -> Bool
-isPredatorDamaging prey predator =
-    let
-        animalIntersecting : Animal -> Animal -> Bool
-        animalIntersecting a b =
-            ccc a.x a.y a.r b.x b.y b.r
-    in
-    isPredatorOf prey predator
-        && animalIntersecting prey predator
 
 
 playerToDamageCircle : Player -> DamageCircle
@@ -784,7 +783,7 @@ stepTurrets :
     { a
         | tx : Float
         , ty : Float
-        , animals : List Animal
+        , animals : List TaggedCircle
     }
     -> List Turret
     -> List Res
@@ -821,7 +820,7 @@ stepTurrets { tx, ty, animals } =
                     ETurret t |> toAnimal
 
                 hits =
-                    List.filter (isPredatorDamaging prey) animals
+                    List.filter (isCausingDamageTo prey) animals
                         |> List.length
             in
             { t | hp = decHPBy hits hp }

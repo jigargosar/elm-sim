@@ -507,7 +507,7 @@ updateMemory { time, screen, mouse } mem =
             [ List.map stepBlast blasts
             , List.map stepExplosion explosions
             , List.map (stepTurret env) turrets
-            , stepBullets env bullets
+            , List.map (stepBullet env) bullets
             , stepTimeBombs env timeBombs
             ]
                 |> List.map Batch
@@ -602,32 +602,31 @@ stepTimeBombs { screen, tx, ty, entityList } =
     List.map step
 
 
-stepBullets :
+stepBullet :
     { a
         | screen : Screen
         , tx : Float
         , ty : Float
         , entityList : List Entity
     }
-    -> List Bullet
-    -> List Res
-stepBullets { screen, tx, ty, entityList } =
+    -> Bullet
+    -> Res
+stepBullet { screen, tx, ty, entityList } =
     let
         stepAlive : Bullet -> Res
         stepAlive =
-            gravitateVel tx ty >> bounceVel 0.5 screen >> addVelToPos >> AddBullet
+            gravitateVel tx ty
+                >> bounceVel 0.5 screen
+                >> addVelToPos
+                >> AddBullet
 
         stepDead : Bullet -> Res
         stepDead { x, y, r } =
             NewExplosion x y r black
-
-        step : Bullet -> Res
-        step =
-            ifElse (isDamagedByAnyOf entityList)
-                stepDead
-                stepAlive
     in
-    List.map step
+    ifElse (isDamagedByAnyOf entityList)
+        stepDead
+        stepAlive
 
 
 stepTurret :

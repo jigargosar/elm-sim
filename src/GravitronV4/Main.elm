@@ -194,7 +194,7 @@ type alias TimeBomb =
     , blastR : Number
     , vx : Number
     , vy : Number
-    , ct : Counter
+    , bombTimer : Counter
     }
 
 
@@ -579,26 +579,26 @@ stepTimeBomb { screen, tx, ty, entityList } =
     let
         tick : TimeBomb -> TimeBomb
         tick b =
-            { b | ct = stepCt b.ct }
+            { b | bombTimer = stepCt b.bombTimer }
 
-        stepAlive : TimeBomb -> Res
-        stepAlive =
+        aliveResponse : TimeBomb -> Res
+        aliveResponse =
             gravitateVelTo tx ty
                 >> bounceVel 0.5 screen
                 >> addVelToPos
                 >> tick
                 >> AddTimeBomb
 
-        stepDead : TimeBomb -> Res
-        stepDead { x, y, r, blastR } =
+        deathResponse : TimeBomb -> Res
+        deathResponse { x, y, r, blastR } =
             Batch
                 [ NewExplosion x y r red
                 , NewBlast x y blastR
                 ]
     in
-    ifElse (anyPass [ .ct >> isDone, isDamagedByAnyOf entityList ])
-        stepDead
-        stepAlive
+    ifElse (anyPass [ .bombTimer >> isDone, isDamagedByAnyOf entityList ])
+        deathResponse
+        aliveResponse
 
 
 stepBullet :

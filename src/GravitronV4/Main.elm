@@ -639,13 +639,16 @@ stepTurrets { tx, ty, taggedCircles } =
                 let
                     angle =
                         angleFromTo t.x t.y tx ty
+
+                    speed =
+                        3
                 in
                 case weapon of
                     BulletWeapon ->
-                        NewBullet x y r 3 angle
+                        NewBullet x y r speed angle
 
                     TimeBombWeapon ->
-                        NewTimeBomb x y r 3 angle
+                        NewTimeBomb x y r speed angle
 
               else
                 NoRes

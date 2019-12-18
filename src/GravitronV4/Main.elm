@@ -523,10 +523,6 @@ updatePlayer screen mouse time =
             in
             { p | vx = vx + dx, vy = vy + dy }
 
-        posByVel : Player -> Player
-        posByVel ({ x, y, vx, vy } as p) =
-            { p | x = x + vx, y = y + vy }
-
         springToMouse : Player -> Player
         springToMouse ({ x, y, vx, vy } as p) =
             let
@@ -536,10 +532,10 @@ updatePlayer screen mouse time =
             { p | vx = (vx + dx) * 0.5, vy = (vy + dy) * 0.5 }
     in
     if mouse.down then
-        springToMouse >> posByVel
+        springToMouse >> addVelToPos
 
     else
-        randomVel >> bounceVel 1 screen >> posByVel
+        randomVel >> bounceVel 1 screen >> addVelToPos
 
 
 stepTimeBombs :
@@ -553,39 +549,16 @@ stepTimeBombs :
     -> List Res
 stepTimeBombs { screen, tx, ty, taggedCircles } =
     let
-        updateVel : TimeBomb -> TimeBomb
-        updateVel b =
-            let
-                ( dx, dy ) =
-                    ( tx - b.x, ty - b.y )
-                        |> toPolar
-                        |> Tuple.mapFirst (\m -> 20 / m)
-                        |> fromPolar
-            in
-            { b | vx = b.vx + dx, vy = b.vy + dy }
-
-        updatePos : TimeBomb -> TimeBomb
-        updatePos b =
-            { b | x = b.x + b.vx, y = b.y + b.vy }
-
-        bounce : TimeBomb -> TimeBomb
-        bounce ({ x, y, vx, vy } as b) =
-            let
-                ( nvx, nvy ) =
-                    newBounceVelInScreen 0.5 screen x y vx vy
-            in
-            { b | vx = nvx, vy = nvy }
-
-        updateBombClock : TimeBomb -> TimeBomb
-        updateBombClock b =
+        tick : TimeBomb -> TimeBomb
+        tick b =
             { b | ct = stepCt b.ct }
 
         stepAlive : TimeBomb -> Res
         stepAlive =
-            updateVel
-                >> updatePos
-                >> bounce
-                >> updateBombClock
+            gravitateVel tx ty
+                >> bounceVel 0.5 screen
+                >> addVelToPos
+                >> tick
                 >> AddTimeBomb
 
         stepDead : TimeBomb -> Res
@@ -622,13 +595,9 @@ stepBullets :
     -> List Res
 stepBullets { screen, tx, ty, taggedCircles } =
     let
-        updatePos : Bullet -> Bullet
-        updatePos b =
-            { b | x = b.x + b.vx, y = b.y + b.vy }
-
         stepAlive : Bullet -> Res
         stepAlive =
-            gravitateVel tx ty >> bounceVel 0.5 screen >> updatePos >> AddBullet
+            gravitateVel tx ty >> bounceVel 0.5 screen >> addVelToPos >> AddBullet
 
         stepDead : Bullet -> Res
         stepDead { x, y, r } =
@@ -802,6 +771,11 @@ main =
 
 
 -- Geom Helpers
+
+
+addVelToPos : { a | x : number, vx : number, y : number, vy : number } -> { a | x : number, vx : number, y : number, vy : number }
+addVelToPos b =
+    { b | x = b.x + b.vx, y = b.y + b.vy }
 
 
 gravitateVel :

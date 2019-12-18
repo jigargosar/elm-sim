@@ -687,8 +687,8 @@ stepTurrets :
     -> List Res
 stepTurrets { tx, ty, allDamageCircles } =
     let
-        stepAlive : Turret -> Res
-        stepAlive ({ x, y, r, hp } as t) =
+        aliveResponse : Turret -> Res
+        aliveResponse ({ x, y, r, hp } as t) =
             [ if isDone t.ct then
                 let
                     angle =
@@ -707,8 +707,8 @@ stepTurrets { tx, ty, allDamageCircles } =
             ]
                 |> Batch
 
-        stepDead : Turret -> Res
-        stepDead { x, y, r, color } =
+        deathResponse : Turret -> Res
+        deathResponse { x, y, r, color } =
             NewExplosion x y r color
 
         stepCollision : Turret -> Turret
@@ -725,10 +725,10 @@ stepTurrets { tx, ty, allDamageCircles } =
         step : Turret -> Res
         step t =
             if isDead t.hp then
-                stepDead t
+                deathResponse t
 
             else
-                stepAlive t
+                aliveResponse t
     in
     List.map (stepCollision >> step)
 

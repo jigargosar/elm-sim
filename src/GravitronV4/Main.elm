@@ -550,12 +550,13 @@ updateMemory { time, screen, mouse } mem =
             { scr = screen
             , tx = player.x
             , ty = player.y
-            , entityList =
+            , animals =
                 EPlayer player
                     :: List.map EBlast blasts
                     ++ List.map ETimeBomb timeBombs
                     ++ List.map EBullet bullets
                     ++ List.map ETurret turrets
+                    |> List.map toAnimal
             , allDamageCircles =
                 playerToDamageCircle player
                     :: List.map blastToDamageCircle blasts
@@ -783,11 +784,11 @@ stepTurrets :
     { a
         | tx : Float
         , ty : Float
-        , entityList : List Entity
+        , animals : List Animal
     }
     -> List Turret
     -> List Res
-stepTurrets { tx, ty, entityList } =
+stepTurrets { tx, ty, animals } =
     let
         aliveResponse : Turret -> Res
         aliveResponse ({ x, y, r, hp } as t) =
@@ -813,10 +814,6 @@ stepTurrets { tx, ty, entityList } =
         deathResponse { x, y, r, color } =
             NewExplosion x y r color
 
-        predators : List Animal
-        predators =
-            List.map toAnimal entityList
-
         stepCollision : Turret -> Turret
         stepCollision ({ hp } as t) =
             let
@@ -824,7 +821,7 @@ stepTurrets { tx, ty, entityList } =
                     ETurret t |> toAnimal
 
                 hits =
-                    List.filter (isPredatorDamaging prey) predators
+                    List.filter (isPredatorDamaging prey) animals
                         |> List.length
             in
             { t | hp = decHPBy hits hp }

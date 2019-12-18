@@ -288,25 +288,6 @@ type Tag
     | TagTurret
 
 
-tagsWhichCanCauseDamageTo : Tag -> List Tag
-tagsWhichCanCauseDamageTo targetTag =
-    case targetTag of
-        TagTimeBomb ->
-            [ TagTimeBomb, TagBullet, TagBlast, TagPlayer, TagTurret ]
-
-        TagBullet ->
-            [ TagBullet, TagBlast, TagPlayer, TagTurret ]
-
-        TagBlast ->
-            []
-
-        TagPlayer ->
-            []
-
-        TagTurret ->
-            [ TagBullet, TagBlast ]
-
-
 
 -- Entity with common props
 
@@ -328,6 +309,29 @@ toTaggedCircle : { a | id : Id, tag : Tag, x : Number, y : Number, r : Number } 
 toTaggedCircle { id, tag, x, y, r } =
     EntityRec id tag x y r
         |> Entity
+
+
+
+-- DamageModel
+
+
+tagsWhichCanCauseDamageTo : Tag -> List Tag
+tagsWhichCanCauseDamageTo targetTag =
+    case targetTag of
+        TagTimeBomb ->
+            [ TagTimeBomb, TagBullet, TagBlast, TagPlayer, TagTurret ]
+
+        TagBullet ->
+            [ TagBullet, TagBlast, TagPlayer, TagTurret ]
+
+        TagBlast ->
+            []
+
+        TagPlayer ->
+            []
+
+        TagTurret ->
+            [ TagBullet, TagBlast ]
 
 
 canCauseDamageTo : EntityRec -> EntityRec -> Bool

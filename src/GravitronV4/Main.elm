@@ -506,7 +506,7 @@ updateMemory { time, screen, mouse } mem =
         allResponses =
             [ List.map stepBlast blasts
             , List.map stepExplosion explosions
-            , stepTurrets env turrets
+            , List.map (stepTurret env) turrets
             , stepBullets env bullets
             , stepTimeBombs env timeBombs
             ]
@@ -630,15 +630,15 @@ stepBullets { screen, tx, ty, entityList } =
     List.map step
 
 
-stepTurrets :
+stepTurret :
     { a
         | tx : Float
         , ty : Float
         , entityList : List Entity
     }
-    -> List Turret
-    -> List Res
-stepTurrets { tx, ty, entityList } =
+    -> Turret
+    -> Res
+stepTurret { tx, ty, entityList } =
     let
         fireWeapon { x, y, r, weapon } =
             let
@@ -677,15 +677,11 @@ stepTurrets { tx, ty, entityList } =
                     countHitsTo t entityList
             in
             { t | hp = decHPBy hits t.hp }
-
-        step : Turret -> Res
-        step =
-            stepHP
-                >> ifElse (.hp >> noHPLeft)
-                    deathResponse
-                    aliveResponse
     in
-    List.map step
+    stepHP
+        >> ifElse (.hp >> noHPLeft)
+            deathResponse
+            aliveResponse
 
 
 

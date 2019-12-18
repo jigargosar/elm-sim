@@ -703,20 +703,24 @@ stepTurrets { tx, ty, allDamageCircles } =
 
               else
                 NoRes
-            , let
-                hits =
-                    List.filter
-                        (isDamaging (turretToDamageCircle t))
-                        allDamageCircles
-                        |> List.length
-              in
-              AddTurret { t | ct = stepCt t.ct, hp = decHPBy hits hp }
+            , AddTurret { t | ct = stepCt t.ct }
             ]
                 |> Batch
 
         stepDead : Turret -> Res
         stepDead { x, y, r, color } =
             NewExplosion x y r color
+
+        stepCollision : Turret -> Turret
+        stepCollision ({ hp } as t) =
+            let
+                hits =
+                    List.filter
+                        (isDamaging (turretToDamageCircle t))
+                        allDamageCircles
+                        |> List.length
+            in
+            { t | hp = decHPBy hits hp }
 
         step : Turret -> Res
         step t =
@@ -726,7 +730,7 @@ stepTurrets { tx, ty, allDamageCircles } =
             else
                 stepAlive t
     in
-    List.map step
+    List.map (stepCollision >> step)
 
 
 

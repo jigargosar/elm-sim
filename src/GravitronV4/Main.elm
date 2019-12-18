@@ -542,14 +542,6 @@ updatePlayer screen mouse time =
         randomVel >> bounceVel 1 screen >> posByVel
 
 
-bounceVel bounceFactor screen ({ x, y, vx, vy } as b) =
-    let
-        ( nvx, nvy ) =
-            newBounceVelInScreen bounceFactor screen x y vx vy
-    in
-    { b | vx = nvx, vy = nvy }
-
-
 stepTimeBombs :
     { a
         | screen : Screen
@@ -630,32 +622,13 @@ stepBullets :
     -> List Res
 stepBullets { screen, tx, ty, taggedCircles } =
     let
-        updateVelGravitateTo : Bullet -> Bullet
-        updateVelGravitateTo b =
-            let
-                ( dx, dy ) =
-                    ( tx - b.x, ty - b.y )
-                        |> toPolar
-                        |> Tuple.mapFirst (\m -> 20 / m)
-                        |> fromPolar
-            in
-            { b | vx = b.vx + dx, vy = b.vy + dy }
-
         updatePos : Bullet -> Bullet
         updatePos b =
             { b | x = b.x + b.vx, y = b.y + b.vy }
 
-        updateVelBounceInScreen : Float -> Bullet -> Bullet
-        updateVelBounceInScreen bounceFactor ({ x, y, vx, vy } as b) =
-            let
-                ( nvx, nvy ) =
-                    newBounceVelInScreen bounceFactor screen x y vx vy
-            in
-            { b | vx = nvx, vy = nvy }
-
         stepAlive : Bullet -> Res
         stepAlive =
-            updateVelGravitateTo >> updateVelBounceInScreen 0.5 >> updatePos >> AddBullet
+            gravitateVel tx ty >> bounceVel 0.5 screen >> updatePos >> AddBullet
 
         stepDead : Bullet -> Res
         stepDead { x, y, r } =
@@ -829,6 +802,31 @@ main =
 
 
 -- Geom Helpers
+
+
+gravitateVel :
+    Float
+    -> Float
+    -> { a | x : Float, y : Float, vx : Float, vy : Float }
+    -> { a | x : Float, y : Float, vx : Float, vy : Float }
+gravitateVel tx ty b =
+    let
+        ( dx, dy ) =
+            ( tx - b.x, ty - b.y )
+                |> toPolar
+                |> Tuple.mapFirst (\m -> 20 / m)
+                |> fromPolar
+    in
+    { b | vx = b.vx + dx, vy = b.vy + dy }
+
+
+bounceVel : Float -> Screen -> { a | x : Float, y : Float, vx : Float, vy : Float } -> { a | x : Float, y : Float, vx : Float, vy : Float }
+bounceVel bounceFactor screen ({ x, y, vx, vy } as b) =
+    let
+        ( nvx, nvy ) =
+            newBounceVelInScreen bounceFactor screen x y vx vy
+    in
+    { b | vx = nvx, vy = nvy }
 
 
 newBounceVelInScreen :

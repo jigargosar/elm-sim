@@ -167,8 +167,8 @@ type alias Bullet =
     }
 
 
-initBullet : Id -> Number -> Number -> Number -> Number -> Number -> Bullet
-initBullet id x y offset speed angle =
+initBullet : Number -> Number -> Number -> Number -> Number -> Id -> Bullet
+initBullet x y offset speed angle id =
     let
         ( vx, vy ) =
             fromPolar ( speed, angle )
@@ -436,9 +436,7 @@ emptyListsThenAddResponses =
 
                 NewBullet x y r speed angle ->
                     withNewId BulletId
-                        (\id ->
-                            addBullet (initBullet id x y r speed angle)
-                        )
+                        (initBullet x y r speed angle >> addBullet)
 
                 NewTimeBomb x y r speed angle ->
                     withNewId TimeBombId

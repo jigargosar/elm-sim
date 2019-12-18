@@ -634,13 +634,13 @@ stepTurrets :
 stepTurrets { tx, ty, taggedCircles } =
     let
         aliveResponse : Turret -> Res
-        aliveResponse ({ x, y, r, hp } as t) =
+        aliveResponse ({ x, y, r, weapon, hp } as t) =
             [ if isDone t.ct then
                 let
                     angle =
                         angleFromTo t.x t.y tx ty
                 in
-                case t.weapon of
+                case weapon of
                     BulletWeapon ->
                         NewBullet x y r 3 angle
 

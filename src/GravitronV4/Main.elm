@@ -502,15 +502,18 @@ updateMemory { time, screen, mouse } mem =
                     ++ List.map toTaggedCircle turrets
             }
 
+        mapBatch : (a -> Res) -> List a -> Res
+        mapBatch func lst =
+            Batch (List.map func lst)
+
         allResponses : List Res
         allResponses =
-            [ List.map stepBlast blasts
-            , List.map stepExplosion explosions
-            , List.map (stepTurret env) turrets
-            , List.map (stepBullet env) bullets
-            , stepTimeBombs env timeBombs
+            [ mapBatch stepBlast blasts
+            , mapBatch stepExplosion explosions
+            , mapBatch (stepTurret env) turrets
+            , mapBatch (stepBullet env) bullets
+            , mapBatch (stepTimeBomb env) timeBombs
             ]
-                |> List.map Batch
     in
     { mem
         | player = updatePlayer screen mouse time player
@@ -563,16 +566,16 @@ updatePlayer screen mouse time =
         randomVel >> bounceVel 1 screen >> addVelToPos
 
 
-stepTimeBombs :
+stepTimeBomb :
     { a
         | screen : Screen
         , tx : Float
         , ty : Float
         , entityList : List Entity
     }
-    -> List TimeBomb
-    -> List Res
-stepTimeBombs { screen, tx, ty, entityList } =
+    -> TimeBomb
+    -> Res
+stepTimeBomb { screen, tx, ty, entityList } =
     let
         tick : TimeBomb -> TimeBomb
         tick b =
@@ -592,14 +595,10 @@ stepTimeBombs { screen, tx, ty, entityList } =
                 [ NewExplosion x y r red
                 , NewBlast x y blastR
                 ]
-
-        step : TimeBomb -> Res
-        step =
-            ifElse (anyPass [ .ct >> isDone, isDamagedByAnyOf entityList ])
-                stepDead
-                stepAlive
     in
-    List.map step
+    ifElse (anyPass [ .ct >> isDone, isDamagedByAnyOf entityList ])
+        stepDead
+        stepAlive
 
 
 stepBullet :

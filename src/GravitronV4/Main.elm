@@ -693,7 +693,7 @@ stepTurrets { tx, ty, taggedCircles } =
                     deathResponse
                     aliveResponse
     in
-    List.map (stepHP >> step)
+    List.map step
 
 
 

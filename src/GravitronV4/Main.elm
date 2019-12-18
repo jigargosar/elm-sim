@@ -339,9 +339,9 @@ type alias Animal =
     }
 
 
-predatorTagsOf : Tag -> List Tag
-predatorTagsOf prey =
-    case prey of
+tagsWhichCanCauseDamageTo : Tag -> List Tag
+tagsWhichCanCauseDamageTo damageReceiverTag =
+    case damageReceiverTag of
         TagTimeBomb ->
             [ TagTimeBomb, TagBullet, TagBlast, TagPlayer, TagTurret ]
 
@@ -382,7 +382,7 @@ isDamaging target src =
 
 isPredatorOf : Animal -> Animal -> Bool
 isPredatorOf prey predator =
-    List.member predator.tag (predatorTagsOf prey.tag)
+    List.member predator.tag (tagsWhichCanCauseDamageTo prey.tag)
         && (prey.id /= predator.id)
 
 

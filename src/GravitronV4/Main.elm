@@ -560,18 +560,15 @@ stepTimeBombs { screen, tx, ty, taggedCircles } =
                 , NewBlast x y blastR
                 ]
 
-        step : TimeBomb -> Res
-        step timeBomb =
-            if
-                isDone timeBomb.ct
-                    || List.any
-                        (isCausingDamageTo (toTaggedCircle timeBomb))
-                        taggedCircles
-            then
-                stepDead timeBomb
+        isDead_ : TimeBomb -> Bool
+        isDead_ tb =
+            isDone tb.ct || isDamagedByAnyOf taggedCircles (toTaggedCircle tb)
 
-            else
-                stepAlive timeBomb
+        step : TimeBomb -> Res
+        step =
+            ifElse isDead_
+                stepDead
+                stepAlive
     in
     List.map step
 

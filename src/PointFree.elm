@@ -118,3 +118,12 @@ rejectWhen isNotOk =
 keepWhen : (a -> Bool) -> List a -> List a
 keepWhen =
     List.filter
+
+
+ifElse : (d -> Bool) -> (d -> a) -> (d -> a) -> d -> a
+ifElse pred true false val =
+    if pred val then
+        true val
+
+    else
+        false val

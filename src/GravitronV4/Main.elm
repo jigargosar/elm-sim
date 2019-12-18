@@ -1,6 +1,8 @@
 module GravitronV4.Main exposing (main)
 
+import Basics.Extra exposing (flip)
 import Playground exposing (..)
+import PointFree exposing (ifElse)
 
 
 
@@ -344,6 +346,11 @@ anyCausingDamageTo target =
     List.any (isCausingDamageTo target)
 
 
+isDamagedByAnyOf : List TaggedCircle -> TaggedCircle -> Bool
+isDamagedByAnyOf =
+    flip anyCausingDamageTo
+
+
 
 --  Update
 
@@ -654,12 +661,10 @@ stepBullets { scr, tx, ty, taggedCircles } =
             NewExplosion x y r black
 
         step : Bullet -> Res
-        step bullet =
-            if anyCausingDamageTo (toTaggedCircle bullet) taggedCircles then
-                stepDead bullet
-
-            else
-                stepAlive bullet
+        step =
+            ifElse (toTaggedCircle >> isDamagedByAnyOf taggedCircles)
+                stepDead
+                stepAlive
     in
     List.map step
 

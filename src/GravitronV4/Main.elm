@@ -2,7 +2,7 @@ module GravitronV4.Main exposing (main)
 
 import Basics.Extra exposing (flip)
 import Playground exposing (..)
-import PointFree exposing (ifElse)
+import PointFree exposing (anyPass, ifElse)
 
 
 
@@ -341,19 +341,28 @@ isCausingDamageTo target src =
     canCauseDamageTo target src && areIntersecting target src
 
 
-anyCausingDamageTo : TaggedCircle -> List TaggedCircle -> Bool
+anyCausingDamageTo :
+    { a | id : Id, tag : Tag, x : Number, y : Number, r : Number }
+    -> List TaggedCircle
+    -> Bool
 anyCausingDamageTo target =
-    List.any (isCausingDamageTo target)
+    List.any (isCausingDamageTo (toTaggedCircle target))
 
 
-isDamagedByAnyOf : List TaggedCircle -> TaggedCircle -> Bool
+isDamagedByAnyOf :
+    List TaggedCircle
+    -> { a | id : Id, tag : Tag, x : Number, y : Number, r : Number }
+    -> Bool
 isDamagedByAnyOf =
     flip anyCausingDamageTo
 
 
-countHitsTo : TaggedCircle -> List TaggedCircle -> Int
+countHitsTo :
+    { a | id : Id, tag : Tag, x : Number, y : Number, r : Number }
+    -> List TaggedCircle
+    -> Int
 countHitsTo target =
-    List.filter (isCausingDamageTo target) >> List.length
+    List.filter (isCausingDamageTo (toTaggedCircle target)) >> List.length
 
 
 
@@ -571,7 +580,7 @@ stepTimeBombs { screen, tx, ty, taggedCircles } =
 
         step : TimeBomb -> Res
         step =
-            ifElse isDead
+            ifElse (anyPass [ .ct >> isDone, toTaggedCircle >> isDamagedByAnyOf taggedCircles ])
                 stepDead
                 stepAlive
     in

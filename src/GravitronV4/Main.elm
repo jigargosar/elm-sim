@@ -389,12 +389,12 @@ isPredatorOf prey predator =
 isPredatorDamaging : Animal -> Animal -> Bool
 isPredatorDamaging prey predator =
     let
-        cc : Animal -> Animal -> Bool
-        cc a b =
+        animalIntersecting : Animal -> Animal -> Bool
+        animalIntersecting a b =
             ccc a.x a.y a.r b.x b.y b.r
     in
     isPredatorOf prey predator
-        && cc prey predator
+        && animalIntersecting prey predator
 
 
 playerToDamageCircle : Player -> DamageCircle

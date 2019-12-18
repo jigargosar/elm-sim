@@ -470,8 +470,9 @@ updateMemory { time, screen, mouse } mem =
         { turrets, player, explosions, blasts, bullets, timeBombs } =
             mem
 
+        env : { screen : Screen, tx : Number, ty : Number, taggedCircles : List TaggedCircle }
         env =
-            { scr = screen
+            { screen = screen
             , tx = player.x
             , ty = player.y
             , taggedCircles =
@@ -530,7 +531,7 @@ updatePlayer scr mouse time =
         bounce ({ x, y, vx, vy } as b) =
             let
                 ( nvx, nvy ) =
-                    bounceInScreen 1 scr x y vx vy
+                    bounceVelInScreenBy 1 scr x y vx vy
             in
             { b | vx = nvx, vy = nvy }
 
@@ -551,14 +552,14 @@ updatePlayer scr mouse time =
 
 stepTimeBombs :
     { a
-        | scr : Screen
+        | screen : Screen
         , tx : Float
         , ty : Float
         , taggedCircles : List TaggedCircle
     }
     -> List TimeBomb
     -> List Res
-stepTimeBombs { scr, tx, ty, taggedCircles } =
+stepTimeBombs { screen, tx, ty, taggedCircles } =
     let
         updateVel : TimeBomb -> TimeBomb
         updateVel b =
@@ -579,7 +580,7 @@ stepTimeBombs { scr, tx, ty, taggedCircles } =
         bounce ({ x, y, vx, vy } as b) =
             let
                 ( nvx, nvy ) =
-                    bounceInScreen 0.5 scr x y vx vy
+                    bounceVelInScreenBy 0.5 screen x y vx vy
             in
             { b | vx = nvx, vy = nvy }
 
@@ -620,17 +621,17 @@ stepTimeBombs { scr, tx, ty, taggedCircles } =
 
 stepBullets :
     { a
-        | scr : Screen
+        | screen : Screen
         , tx : Float
         , ty : Float
         , taggedCircles : List TaggedCircle
     }
     -> List Bullet
     -> List Res
-stepBullets { scr, tx, ty, taggedCircles } =
+stepBullets { screen, tx, ty, taggedCircles } =
     let
-        updateVel : Bullet -> Bullet
-        updateVel b =
+        updateVelGravitateTo : Bullet -> Bullet
+        updateVelGravitateTo b =
             let
                 ( dx, dy ) =
                     ( tx - b.x, ty - b.y )
@@ -644,17 +645,17 @@ stepBullets { scr, tx, ty, taggedCircles } =
         updatePos b =
             { b | x = b.x + b.vx, y = b.y + b.vy }
 
-        bounceVel : Bullet -> Bullet
-        bounceVel ({ x, y, vx, vy } as b) =
+        updateVelBounceInScreen : Float -> Bullet -> Bullet
+        updateVelBounceInScreen bounceFactor ({ x, y, vx, vy } as b) =
             let
                 ( nvx, nvy ) =
-                    bounceInScreen 0.5 scr x y vx vy
+                    bounceVelInScreenBy bounceFactor screen x y vx vy
             in
             { b | vx = nvx, vy = nvy }
 
         stepAlive : Bullet -> Res
         stepAlive =
-            updateVel >> bounceVel >> updatePos >> AddBullet
+            updateVelGravitateTo >> updateVelBounceInScreen 0.5 >> updatePos >> AddBullet
 
         stepDead : Bullet -> Res
         stepDead { x, y, r } =
@@ -830,7 +831,7 @@ main =
 -- Geom Helpers
 
 
-bounceInScreen :
+bounceVelInScreenBy :
     Float
     -> Screen
     -> Float
@@ -838,7 +839,7 @@ bounceInScreen :
     -> Float
     -> Float
     -> ( Float, Float )
-bounceInScreen bounceFriction scr x y vx vy =
+bounceVelInScreenBy bounceFriction scr x y vx vy =
     let
         nvx =
             if

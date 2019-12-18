@@ -298,8 +298,8 @@ toTag e =
             TagTurret
 
 
-toAnimal : Entity -> TaggedCircle
-toAnimal e =
+toTaggedCircle : Entity -> TaggedCircle
+toTaggedCircle e =
     let
         initHelp : { a | id : Id, x : Number, y : Number, r : Number } -> TaggedCircle
         initHelp { id, x, y, r } =
@@ -555,7 +555,7 @@ updateMemory { time, screen, mouse } mem =
                     ++ List.map ETimeBomb timeBombs
                     ++ List.map EBullet bullets
                     ++ List.map ETurret turrets
-                    |> List.map toAnimal
+                    |> List.map toTaggedCircle
             , allDamageCircles =
                 playerToDamageCircle player
                     :: List.map blastToDamageCircle blasts
@@ -817,7 +817,7 @@ stepTurrets { tx, ty, animals } =
         stepCollision ({ hp } as t) =
             let
                 prey =
-                    ETurret t |> toAnimal
+                    ETurret t |> toTaggedCircle
 
                 hits =
                     List.filter (isCausingDamageTo prey) animals

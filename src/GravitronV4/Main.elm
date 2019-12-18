@@ -604,14 +604,14 @@ stepBullets { screen, tx, ty, taggedCircles } =
 stepExplosions : List Explosion -> List Res
 stepExplosions =
     let
-        stepE e =
+        step e =
             if isDone e.ct then
                 NoRes
 
             else
                 AddExplosion { e | ct = stepCt e.ct }
     in
-    List.map stepE
+    List.map step
 
 
 stepBlasts : List Blast -> List Res

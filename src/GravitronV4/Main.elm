@@ -633,22 +633,25 @@ stepTurrets :
     -> List Res
 stepTurrets { tx, ty, taggedCircles } =
     let
+        fireWeapon { x, y, r, weapon } =
+            let
+                angle =
+                    angleFromTo x y tx ty
+
+                speed =
+                    3
+            in
+            case weapon of
+                BulletWeapon ->
+                    NewBullet x y r speed angle
+
+                TimeBombWeapon ->
+                    NewTimeBomb x y r speed angle
+
         aliveResponse : Turret -> Res
         aliveResponse ({ x, y, r, weapon, triggerCt, hp } as t) =
             [ if isDone triggerCt then
-                let
-                    angle =
-                        angleFromTo x y tx ty
-
-                    speed =
-                        3
-                in
-                case weapon of
-                    BulletWeapon ->
-                        NewBullet x y r speed angle
-
-                    TimeBombWeapon ->
-                        NewTimeBomb x y r speed angle
+                fireWeapon t
 
               else
                 NoRes

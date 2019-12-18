@@ -640,6 +640,7 @@ stepTurret :
     -> Res
 stepTurret { tx, ty, entityList } =
     let
+        fireWeapon : Turret -> Res
         fireWeapon { x, y, r, weapon } =
             let
                 angle =

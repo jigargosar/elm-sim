@@ -380,6 +380,7 @@ isDamaging target src =
         && (target.id /= src.id)
 
 
+isPredatorOf : Animal -> Animal -> Bool
 isPredatorOf prey predator =
     List.member predator.tag (predatorTagsOf prey.tag)
         && (prey.id /= predator.id)
@@ -388,17 +389,12 @@ isPredatorOf prey predator =
 isPredatorDamaging : Animal -> Animal -> Bool
 isPredatorDamaging prey predator =
     let
-        dcc : Animal -> Animal -> Bool
-        dcc a b =
+        cc : Animal -> Animal -> Bool
+        cc a b =
             ccc a.x a.y a.r b.x b.y b.r
-
-        predatorTags : List Tag
-        predatorTags =
-            predatorTagsOf prey.tag
     in
-    List.member predator.tag predatorTags
-        && dcc prey predator
-        && (prey.id /= predator.id)
+    isPredatorOf prey predator
+        && cc prey predator
 
 
 playerToDamageCircle : Player -> DamageCircle

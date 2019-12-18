@@ -583,7 +583,7 @@ stepTimeBomb { screen, tx, ty, entityList } =
 
         stepAlive : TimeBomb -> Res
         stepAlive =
-            gravitateVel tx ty
+            gravitateVelTo tx ty
                 >> bounceVel 0.5 screen
                 >> addVelToPos
                 >> tick
@@ -614,7 +614,7 @@ stepBullet { screen, tx, ty, entityList } =
     let
         stepAlive : Bullet -> Res
         stepAlive =
-            gravitateVel tx ty
+            gravitateVelTo tx ty
                 >> bounceVel 0.5 screen
                 >> addVelToPos
                 >> AddBullet
@@ -788,12 +788,12 @@ addVelToPos b =
     { b | x = b.x + b.vx, y = b.y + b.vy }
 
 
-gravitateVel :
+gravitateVelTo :
     Float
     -> Float
     -> { a | x : Float, y : Float, vx : Float, vy : Float }
     -> { a | x : Float, y : Float, vx : Float, vy : Float }
-gravitateVel tx ty b =
+gravitateVelTo tx ty b =
     let
         ( dx, dy ) =
             ( tx - b.x, ty - b.y )

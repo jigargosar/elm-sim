@@ -279,6 +279,28 @@ type Tag
     | TagTurret
 
 
+type alias DamageCircle =
+    { id : Id
+    , x : Number
+    , y : Number
+    , r : Number
+    , tag : Tag
+    , canDamage : List Tag
+    }
+
+
+isDamaging : DamageCircle -> DamageCircle -> Bool
+isDamaging target src =
+    let
+        dcc : DamageCircle -> DamageCircle -> Bool
+        dcc a b =
+            ccc a.x a.y a.r b.x b.y b.r
+    in
+    List.member target.tag src.canDamage
+        && dcc target src
+        && (target.id /= src.id)
+
+
 playerToDamageCircle : Player -> DamageCircle
 playerToDamageCircle { id, x, y, r } =
     DamageCircle id x y r TagPlayer [ TagBullet, TagTimeBomb ]
@@ -307,28 +329,6 @@ bulletToDamageCircle { id, x, y, r } =
 timeBombToDamageCircle : TimeBomb -> DamageCircle
 timeBombToDamageCircle { id, x, y, r } =
     DamageCircle id x y r TagTimeBomb [ TagTimeBomb ]
-
-
-type alias DamageCircle =
-    { id : Id
-    , x : Number
-    , y : Number
-    , r : Number
-    , tag : Tag
-    , canDamage : List Tag
-    }
-
-
-isDamaging : DamageCircle -> DamageCircle -> Bool
-isDamaging target src =
-    let
-        dcc : DamageCircle -> DamageCircle -> Bool
-        dcc a b =
-            ccc a.x a.y a.r b.x b.y b.r
-    in
-    List.member target.tag src.canDamage
-        && dcc target src
-        && (target.id /= src.id)
 
 
 type Res

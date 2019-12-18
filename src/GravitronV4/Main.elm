@@ -181,6 +181,7 @@ initBullet x y offset speed angle id =
 
 type alias TimeBomb =
     { id : Id
+    , tag : Tag
     , x : Number
     , y : Number
     , r : Number
@@ -201,6 +202,7 @@ initTimeBomb x y offset speed angle id =
             fromPolar ( offset + initialTimeBombRadius + 1, angle )
     in
     TimeBomb id
+        TagTimeBomb
         (x + dx)
         (y + dy)
         initialTimeBombRadius
@@ -282,8 +284,8 @@ type Entity
 toTag : Entity -> Tag
 toTag e =
     case e of
-        ETimeBomb _ ->
-            TagTimeBomb
+        ETimeBomb rec ->
+            rec.tag
 
         EBullet _ ->
             TagBullet

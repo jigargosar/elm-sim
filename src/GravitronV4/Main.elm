@@ -374,58 +374,6 @@ isCausingDamageTo target src =
     canCauseDamageTo target src && areIntersecting target src
 
 
-type alias DamageCircle =
-    { id : Id
-    , x : Number
-    , y : Number
-    , r : Number
-    , tag : Tag
-    , canDamage : List Tag
-    }
-
-
-isDamaging : DamageCircle -> DamageCircle -> Bool
-isDamaging target src =
-    let
-        dcc : DamageCircle -> DamageCircle -> Bool
-        dcc a b =
-            ccc a.x a.y a.r b.x b.y b.r
-    in
-    List.member target.tag src.canDamage
-        && dcc target src
-        && (target.id /= src.id)
-
-
-playerToDamageCircle : Player -> DamageCircle
-playerToDamageCircle { id, x, y, r } =
-    DamageCircle id x y r TagPlayer [ TagBullet, TagTimeBomb ]
-
-
-dcFromRec : { a | id : Id, x : Number, y : Number, r : Number } -> Tag -> List Tag -> DamageCircle
-dcFromRec { id, x, y, r } tag canDamage =
-    DamageCircle id x y r tag canDamage
-
-
-turretToDamageCircle : Turret -> DamageCircle
-turretToDamageCircle turret =
-    dcFromRec turret TagTurret [ TagBullet, TagTimeBomb ]
-
-
-blastToDamageCircle : Blast -> DamageCircle
-blastToDamageCircle { id, x, y, r } =
-    DamageCircle id x y r TagBlast [ TagTimeBomb, TagBullet, TagTurret ]
-
-
-bulletToDamageCircle : Bullet -> DamageCircle
-bulletToDamageCircle { id, x, y, r } =
-    DamageCircle id x y r TagBullet [ TagTimeBomb, TagBullet, TagTurret ]
-
-
-timeBombToDamageCircle : TimeBomb -> DamageCircle
-timeBombToDamageCircle { id, x, y, r } =
-    DamageCircle id x y r TagTimeBomb [ TagTimeBomb ]
-
-
 type Res
     = AddExplosion Explosion
     | NewExplosion Number Number Number Color
@@ -549,19 +497,13 @@ updateMemory { time, screen, mouse } mem =
             { scr = screen
             , tx = player.x
             , ty = player.y
-            , animals =
+            , taggedCircles =
                 EPlayer player
                     :: List.map EBlast blasts
                     ++ List.map ETimeBomb timeBombs
                     ++ List.map EBullet bullets
                     ++ List.map ETurret turrets
                     |> List.map toTaggedCircle
-            , allDamageCircles =
-                playerToDamageCircle player
-                    :: List.map blastToDamageCircle blasts
-                    ++ List.map timeBombToDamageCircle timeBombs
-                    ++ List.map bulletToDamageCircle bullets
-                    ++ List.map turretToDamageCircle turrets
             }
 
         allResponses : List Res
@@ -636,11 +578,11 @@ stepTimeBombs :
         | scr : Screen
         , tx : Float
         , ty : Float
-        , allDamageCircles : List DamageCircle
+        , taggedCircles : List TaggedCircle
     }
     -> List TimeBomb
     -> List Res
-stepTimeBombs { scr, tx, ty, allDamageCircles } =
+stepTimeBombs { scr, tx, ty, taggedCircles } =
     let
         updateVel : TimeBomb -> TimeBomb
         updateVel b =
@@ -689,8 +631,8 @@ stepTimeBombs { scr, tx, ty, allDamageCircles } =
             if
                 isDone timeBomb.ct
                     || List.any
-                        (isDamaging (timeBombToDamageCircle timeBomb))
-                        allDamageCircles
+                        (isCausingDamageTo (ETimeBomb timeBomb |> toTaggedCircle))
+                        taggedCircles
             then
                 stepDead timeBomb
 
@@ -705,11 +647,11 @@ stepBullets :
         | scr : Screen
         , tx : Float
         , ty : Float
-        , allDamageCircles : List DamageCircle
+        , taggedCircles : List TaggedCircle
     }
     -> List Bullet
     -> List Res
-stepBullets { scr, tx, ty, allDamageCircles } =
+stepBullets { scr, tx, ty, taggedCircles } =
     let
         updateVel : Bullet -> Bullet
         updateVel b =
@@ -746,8 +688,8 @@ stepBullets { scr, tx, ty, allDamageCircles } =
         step bullet =
             if
                 List.any
-                    (isDamaging (bulletToDamageCircle bullet))
-                    allDamageCircles
+                    (isCausingDamageTo (EBullet bullet |> toTaggedCircle))
+                    taggedCircles
             then
                 stepDead bullet
 
@@ -783,11 +725,11 @@ stepTurrets :
     { a
         | tx : Float
         , ty : Float
-        , animals : List TaggedCircle
+        , taggedCircles : List TaggedCircle
     }
     -> List Turret
     -> List Res
-stepTurrets { tx, ty, animals } =
+stepTurrets { tx, ty, taggedCircles } =
     let
         aliveResponse : Turret -> Res
         aliveResponse ({ x, y, r, hp } as t) =
@@ -816,11 +758,11 @@ stepTurrets { tx, ty, animals } =
         stepCollision : Turret -> Turret
         stepCollision ({ hp } as t) =
             let
-                prey =
+                target =
                     ETurret t |> toTaggedCircle
 
                 hits =
-                    List.filter (isCausingDamageTo prey) animals
+                    List.filter (isCausingDamageTo target) taggedCircles
                         |> List.length
             in
             { t | hp = decHPBy hits hp }

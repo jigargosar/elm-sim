@@ -359,9 +359,9 @@ tagsWhichCanCauseDamageTo targetTag =
 
 
 canCauseDamageTo : TaggedCircle -> TaggedCircle -> Bool
-canCauseDamageTo prey predator =
-    List.member predator.tag (tagsWhichCanCauseDamageTo prey.tag)
-        && (prey.id /= predator.id)
+canCauseDamageTo target src =
+    List.member src.tag (tagsWhichCanCauseDamageTo target.tag)
+        && (src.id /= target.id)
 
 
 isCausingDamageTo : TaggedCircle -> TaggedCircle -> Bool

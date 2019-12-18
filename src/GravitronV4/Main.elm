@@ -93,6 +93,7 @@ type Id
 
 type alias Player =
     { id : Id
+    , tag : Tag
     , x : Number
     , y : Number
     , r : Number
@@ -107,17 +108,18 @@ initPlayer x y =
         initialPlayerRadius =
             20
     in
-    Player PlayerId x y initialPlayerRadius 0 0
+    Player PlayerId TagPlayer x y initialPlayerRadius 0 0
 
 
 type alias Turret =
     { id : Id
-    , ct : Counter
+    , tag : Tag
     , x : Number
     , y : Number
     , r : Number
     , color : Color
     , weapon : Weapon
+    , ct : Counter
     , hp : HP
     }
 
@@ -146,12 +148,13 @@ initTurrets =
 
         initTurret ( x, y ) (TurretConfig id color wep maxHP) =
             Turret id
-                (initCt 160)
+                TagTurret
                 (x * factor)
                 (y * factor)
                 turretRadius
                 color
                 wep
+                (initCt 160)
                 (initHP maxHP)
     in
     List.map2 initTurret positions
@@ -159,6 +162,7 @@ initTurrets =
 
 type alias Bullet =
     { id : Id
+    , tag : Tag
     , x : Number
     , y : Number
     , r : Number
@@ -176,7 +180,7 @@ initBullet x y offset speed angle id =
         ( dx, dy ) =
             fromPolar ( offset + initialBulletRadius + 1, angle )
     in
-    Bullet id (x + dx) (y + dy) initialBulletRadius vx vy
+    Bullet id TagBullet (x + dx) (y + dy) initialBulletRadius vx vy
 
 
 type alias TimeBomb =
@@ -214,6 +218,7 @@ initTimeBomb x y offset speed angle id =
 
 type alias Blast =
     { id : Id
+    , tag : Tag
     , x : Number
     , y : Number
     , r : Number
@@ -222,7 +227,7 @@ type alias Blast =
 
 initBlast : Number -> Number -> Number -> Id -> Blast
 initBlast x y r id =
-    Blast id x y r
+    Blast id TagBlast x y r
 
 
 type alias Explosion =
@@ -273,55 +278,9 @@ initialMemory =
 --  Update
 
 
-type Entity
-    = ETimeBomb TimeBomb
-    | EBullet Bullet
-    | EBlast Blast
-    | EPlayer Player
-    | ETurret Turret
-
-
-toTag : Entity -> Tag
-toTag e =
-    case e of
-        ETimeBomb rec ->
-            rec.tag
-
-        EBullet _ ->
-            TagBullet
-
-        EBlast _ ->
-            TagBlast
-
-        EPlayer _ ->
-            TagPlayer
-
-        ETurret _ ->
-            TagTurret
-
-
-toTaggedCircle : Entity -> TaggedCircle
-toTaggedCircle e =
-    let
-        initHelp : { a | id : Id, x : Number, y : Number, r : Number } -> TaggedCircle
-        initHelp { id, x, y, r } =
-            TaggedCircle id x y r (toTag e)
-    in
-    case e of
-        ETimeBomb rec ->
-            initHelp rec
-
-        EBullet rec ->
-            initHelp rec
-
-        EBlast rec ->
-            initHelp rec
-
-        EPlayer rec ->
-            initHelp rec
-
-        ETurret rec ->
-            initHelp rec
+toTaggedCircle : { a | id : Id, tag : Tag, x : Number, y : Number, r : Number } -> TaggedCircle
+toTaggedCircle { id, tag, x, y, r } =
+    TaggedCircle id tag x y r
 
 
 type Tag
@@ -334,10 +293,10 @@ type Tag
 
 type alias TaggedCircle =
     { id : Id
+    , tag : Tag
     , x : Number
     , y : Number
     , r : Number
-    , tag : Tag
     }
 
 
@@ -496,12 +455,11 @@ updateMemory { time, screen, mouse } mem =
             , tx = player.x
             , ty = player.y
             , taggedCircles =
-                EPlayer player
-                    :: List.map EBlast blasts
-                    ++ List.map ETimeBomb timeBombs
-                    ++ List.map EBullet bullets
-                    ++ List.map ETurret turrets
-                    |> List.map toTaggedCircle
+                toTaggedCircle player
+                    :: List.map toTaggedCircle blasts
+                    ++ List.map toTaggedCircle timeBombs
+                    ++ List.map toTaggedCircle bullets
+                    ++ List.map toTaggedCircle turrets
             }
 
         allResponses : List Res
@@ -629,7 +587,7 @@ stepTimeBombs { scr, tx, ty, taggedCircles } =
             if
                 isDone timeBomb.ct
                     || List.any
-                        (isCausingDamageTo (ETimeBomb timeBomb |> toTaggedCircle))
+                        (isCausingDamageTo (toTaggedCircle timeBomb))
                         taggedCircles
             then
                 stepDead timeBomb
@@ -686,7 +644,7 @@ stepBullets { scr, tx, ty, taggedCircles } =
         step bullet =
             if
                 List.any
-                    (isCausingDamageTo (EBullet bullet |> toTaggedCircle))
+                    (isCausingDamageTo (toTaggedCircle bullet))
                     taggedCircles
             then
                 stepDead bullet
@@ -756,11 +714,8 @@ stepTurrets { tx, ty, taggedCircles } =
         stepCollision : Turret -> Turret
         stepCollision ({ hp } as t) =
             let
-                target =
-                    ETurret t |> toTaggedCircle
-
                 hits =
-                    List.filter (isCausingDamageTo target) taggedCircles
+                    List.filter (isCausingDamageTo (toTaggedCircle t)) taggedCircles
                         |> List.length
             in
             { t | hp = decHPBy hits hp }

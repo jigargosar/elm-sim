@@ -288,8 +288,8 @@ type alias TaggedCircle =
     }
 
 
-canReceiveDamageFrom src =
-    case src of
+canReceiveDamageFrom srcTag =
+    case srcTag of
         TagTimeBomb ->
             [ TagTimeBomb, TagBullet, TagBlast, TagPlayer, TagTurret ]
 

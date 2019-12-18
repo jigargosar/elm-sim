@@ -127,3 +127,8 @@ ifElse pred true false val =
 
     else
         false val
+
+
+anyPass : List (b -> Bool) -> b -> Bool
+anyPass fnList val =
+    List.any ((|>) val) fnList

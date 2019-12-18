@@ -60,8 +60,8 @@ remainingHP (HP _ n) =
     n
 
 
-isDead : HP -> Bool
-isDead (HP _ n) =
+noHPLeft : HP -> Bool
+noHPLeft (HP _ n) =
     n <= 0
 
 
@@ -668,8 +668,8 @@ stepTurrets { tx, ty, taggedCircles } =
         deathResponse { x, y, r, color } =
             NewExplosion x y r color
 
-        stepCollision : Turret -> Turret
-        stepCollision ({ hp } as t) =
+        stepHP : Turret -> Turret
+        stepHP ({ hp } as t) =
             let
                 hits =
                     countHitsTo (toTaggedCircle t) taggedCircles
@@ -678,12 +678,12 @@ stepTurrets { tx, ty, taggedCircles } =
 
         step : Turret -> Res
         step =
-            stepCollision
-                >> ifElse (.hp >> isDead)
+            stepHP
+                >> ifElse (.hp >> noHPLeft)
                     deathResponse
                     aliveResponse
     in
-    List.map (stepCollision >> step)
+    List.map (stepHP >> step)
 
 
 

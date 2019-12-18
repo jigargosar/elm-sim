@@ -677,12 +677,11 @@ stepTurrets { tx, ty, taggedCircles } =
             { t | hp = decHPBy hits hp }
 
         step : Turret -> Res
-        step t =
-            if isDead t.hp then
-                deathResponse t
-
-            else
-                aliveResponse t
+        step =
+            stepCollision
+                >> ifElse (.hp >> isDead)
+                    deathResponse
+                    aliveResponse
     in
     List.map (stepCollision >> step)
 

@@ -301,8 +301,9 @@ toTag e =
 toTaggedCircle : Entity -> TaggedCircle
 toTaggedCircle e =
     let
-        initHelp rec =
-            taggedCircleFromRecord rec (toTag e)
+        initHelp : { a | id : Id, x : Number, y : Number, r : Number } -> TaggedCircle
+        initHelp { id, x, y, r } =
+            TaggedCircle id x y r (toTag e)
     in
     case e of
         ETimeBomb rec ->
@@ -319,11 +320,6 @@ toTaggedCircle e =
 
         ETurret rec ->
             initHelp rec
-
-
-taggedCircleFromRecord : { a | id : Id, x : Number, y : Number, r : Number } -> Tag -> TaggedCircle
-taggedCircleFromRecord { id, x, y, r } tag =
-    TaggedCircle id x y r tag
 
 
 type Tag

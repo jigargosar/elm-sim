@@ -638,7 +638,7 @@ stepTurrets { tx, ty, taggedCircles } =
             [ if isDone t.ct then
                 let
                     angle =
-                        angleFromTo t.x t.y tx ty
+                        angleFromTo x y tx ty
 
                     speed =
                         3

@@ -638,8 +638,8 @@ stepTurret :
     -> Res
 stepTurret { tx, ty, entityList } =
     let
-        fireWeapon : Turret -> Res
-        fireWeapon { x, y, r, weapon } =
+        fireWeaponResponse : Turret -> Res
+        fireWeaponResponse { x, y, r, weapon } =
             let
                 angle =
                     angleFromTo x y tx ty
@@ -657,7 +657,7 @@ stepTurret { tx, ty, entityList } =
         aliveResponse : Turret -> Res
         aliveResponse ({ x, y, r, weapon, triggerCt, hp } as t) =
             [ if isDone triggerCt then
-                fireWeapon t
+                fireWeaponResponse t
 
               else
                 NoRes

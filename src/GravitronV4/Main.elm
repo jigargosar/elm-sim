@@ -522,17 +522,9 @@ updatePlayer screen mouse time =
                         |> fromPolar
             in
             { p | vx = vx + dx, vy = vy + dy }
-
-        springToMouse : Player -> Player
-        springToMouse ({ x, y, vx, vy } as p) =
-            let
-                ( dx, dy ) =
-                    ( (mouse.x - x) * 0.2, (mouse.y - y) * 0.2 )
-            in
-            { p | vx = (vx + dx) * 0.5, vy = (vy + dy) * 0.5 }
     in
     if mouse.down then
-        springToMouse >> addVelToPos
+        springToMouse mouse >> addVelToPos
 
     else
         randomVel >> bounceVel 1 screen >> addVelToPos
@@ -771,6 +763,21 @@ main =
 
 
 -- Geom Helpers
+
+
+springToMouse : { a | x : Float, y : Float } -> { b | x : Float, y : Float, vx : Float, vy : Float } -> { b | x : Float, y : Float, vx : Float, vy : Float }
+springToMouse mouse ({ x, y, vx, vy } as p) =
+    let
+        k =
+            0.2
+
+        f =
+            0.5
+
+        ( dx, dy ) =
+            ( (mouse.x - x) * k, (mouse.y - y) * k )
+    in
+    { p | vx = (vx + dx) * f, vy = (vy + dy) * f }
 
 
 addVelToPos : { a | x : number, vx : number, y : number, vy : number } -> { a | x : number, vx : number, y : number, vy : number }

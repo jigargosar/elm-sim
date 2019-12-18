@@ -271,6 +271,61 @@ initialMemory =
 --  Update
 
 
+type Entity
+    = ETimeBomb TimeBomb
+    | EBullet Bullet
+    | EBlast Blast
+    | EPlayer Player
+    | ETurret Turret
+
+
+toTag : Entity -> Tag
+toTag e =
+    case e of
+        ETimeBomb _ ->
+            TagTimeBomb
+
+        EBullet _ ->
+            TagBullet
+
+        EBlast _ ->
+            TagBlast
+
+        EPlayer _ ->
+            TagPlayer
+
+        ETurret _ ->
+            TagTurret
+
+
+toTaggedCircle : Entity -> TaggedCircle
+toTaggedCircle e =
+    let
+        initHelp rec =
+            taggedCircleFromRecord rec (toTag e)
+    in
+    case e of
+        ETimeBomb rec ->
+            initHelp rec
+
+        EBullet rec ->
+            initHelp rec
+
+        EBlast rec ->
+            initHelp rec
+
+        EPlayer rec ->
+            initHelp rec
+
+        ETurret rec ->
+            initHelp rec
+
+
+taggedCircleFromRecord : { a | id : Id, x : Number, y : Number, r : Number } -> Tag -> TaggedCircle
+taggedCircleFromRecord { id, x, y, r } tag =
+    TaggedCircle id x y r tag
+
+
 type Tag
     = TagTimeBomb
     | TagBullet

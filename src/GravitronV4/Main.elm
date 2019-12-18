@@ -288,6 +288,24 @@ type alias TaggedCircle =
     }
 
 
+canReceiveDamageFrom src =
+    case src of
+        TagTimeBomb ->
+            [ TagTimeBomb, TagBullet, TagBlast, TagPlayer, TagTurret ]
+
+        TagBullet ->
+            [ TagBullet, TagBlast, TagPlayer, TagTurret ]
+
+        TagBlast ->
+            []
+
+        TagPlayer ->
+            []
+
+        TagTurret ->
+            [ TagBullet, TagBlast ]
+
+
 type alias DamageCircle =
     { id : Id
     , x : Number

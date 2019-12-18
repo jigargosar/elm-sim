@@ -644,8 +644,8 @@ stepBullets { scr, tx, ty, taggedCircles } =
         updatePos b =
             { b | x = b.x + b.vx, y = b.y + b.vy }
 
-        bounce : Bullet -> Bullet
-        bounce ({ x, y, vx, vy } as b) =
+        bounceVel : Bullet -> Bullet
+        bounceVel ({ x, y, vx, vy } as b) =
             let
                 ( nvx, nvy ) =
                     bounceInScreen 0.5 scr x y vx vy
@@ -654,7 +654,7 @@ stepBullets { scr, tx, ty, taggedCircles } =
 
         stepAlive : Bullet -> Res
         stepAlive =
-            updateVel >> updatePos >> bounce >> AddBullet
+            updateVel >> bounceVel >> updatePos >> AddBullet
 
         stepDead : Bullet -> Res
         stepDead { x, y, r } =

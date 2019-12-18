@@ -339,8 +339,8 @@ type alias TaggedCircle =
     }
 
 
-canReceiveDamageFrom : Tag -> List Tag
-canReceiveDamageFrom srcTag =
+receivesDamageFrom : Tag -> List Tag
+receivesDamageFrom srcTag =
     case srcTag of
         TagTimeBomb ->
             [ TagTimeBomb, TagBullet, TagBlast, TagPlayer, TagTurret ]

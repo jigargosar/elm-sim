@@ -279,6 +279,15 @@ type Tag
     | TagTurret
 
 
+type alias TaggedCircle =
+    { id : Id
+    , x : Number
+    , y : Number
+    , r : Number
+    , tag : Tag
+    }
+
+
 type alias DamageCircle =
     { id : Id
     , x : Number

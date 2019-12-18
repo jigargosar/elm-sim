@@ -612,20 +612,20 @@ stepBullet :
     -> Res
 stepBullet { screen, tx, ty, entityList } =
     let
-        stepAlive : Bullet -> Res
-        stepAlive =
+        aliveResponse : Bullet -> Res
+        aliveResponse =
             gravitateVelTo tx ty
                 >> bounceVel 0.5 screen
                 >> addVelToPos
                 >> AddBullet
 
-        stepDead : Bullet -> Res
-        stepDead { x, y, r } =
+        deathResponse : Bullet -> Res
+        deathResponse { x, y, r } =
             NewExplosion x y r black
     in
     ifElse (isDamagedByAnyOf entityList)
-        stepDead
-        stepAlive
+        deathResponse
+        aliveResponse
 
 
 stepTurret :

@@ -504,8 +504,8 @@ updateMemory { time, screen, mouse } mem =
 
         allResponses : List Res
         allResponses =
-            [ stepBlasts blasts
-            , stepExplosions explosions
+            [ List.map stepBlast blasts
+            , List.map stepExplosion explosions
             , stepTurrets env turrets
             , stepBullets env bullets
             , stepTimeBombs env timeBombs
@@ -526,6 +526,20 @@ nextLevel mem =
 
     else
         mem
+
+
+stepBlast : Blast -> Res
+stepBlast { x, y, r } =
+    NewExplosion x y r red
+
+
+stepExplosion : Explosion -> Res
+stepExplosion e =
+    if isDone e.ct then
+        NoRes
+
+    else
+        AddExplosion { e | ct = stepCt e.ct }
 
 
 updatePlayer : Screen -> Mouse -> Time -> Player -> Player
@@ -614,28 +628,6 @@ stepBullets { screen, tx, ty, entityList } =
                 stepAlive
     in
     List.map step
-
-
-stepExplosions : List Explosion -> List Res
-stepExplosions =
-    let
-        step e =
-            if isDone e.ct then
-                NoRes
-
-            else
-                AddExplosion { e | ct = stepCt e.ct }
-    in
-    List.map step
-
-
-stepBlasts : List Blast -> List Res
-stepBlasts =
-    let
-        toExplosion { x, y, r } =
-            NewExplosion x y r red
-    in
-    List.map toExplosion
 
 
 stepTurrets :

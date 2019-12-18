@@ -339,6 +339,11 @@ isCausingDamageTo target src =
     canCauseDamageTo target src && areIntersecting target src
 
 
+anyCausingDamageTo : TaggedCircle -> List TaggedCircle -> Bool
+anyCausingDamageTo target =
+    List.any (isCausingDamageTo target)
+
+
 
 --  Update
 
@@ -650,11 +655,7 @@ stepBullets { scr, tx, ty, taggedCircles } =
 
         step : Bullet -> Res
         step bullet =
-            if
-                List.any
-                    (isCausingDamageTo (toTaggedCircle bullet))
-                    taggedCircles
-            then
+            if anyCausingDamageTo (toTaggedCircle bullet) taggedCircles then
                 stepDead bullet
 
             else

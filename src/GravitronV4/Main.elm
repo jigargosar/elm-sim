@@ -565,13 +565,13 @@ stepTimeBombs { screen, tx, ty, taggedCircles } =
                 , NewBlast x y blastR
                 ]
 
-        isDead_ : TimeBomb -> Bool
-        isDead_ tb =
+        isDead : TimeBomb -> Bool
+        isDead tb =
             isDone tb.ct || isDamagedByAnyOf taggedCircles (toTaggedCircle tb)
 
         step : TimeBomb -> Res
         step =
-            ifElse isDead_
+            ifElse isDead
                 stepDead
                 stepAlive
     in

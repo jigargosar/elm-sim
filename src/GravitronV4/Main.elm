@@ -512,8 +512,8 @@ nextLevel mem =
 updatePlayer : Screen -> Mouse -> Time -> Player -> Player
 updatePlayer scr mouse time =
     let
-        updateRandomVel : Player -> Player
-        updateRandomVel ({ vx, vy } as p) =
+        randomVel : Player -> Player
+        randomVel ({ vx, vy } as p) =
             let
                 ( dx, dy ) =
                     ( wave -100 100 11 time, wave -300 300 21 time )
@@ -523,12 +523,12 @@ updatePlayer scr mouse time =
             in
             { p | vx = vx + dx, vy = vy + dy }
 
-        updatePos : Player -> Player
-        updatePos ({ x, y, vx, vy } as p) =
+        posByVel : Player -> Player
+        posByVel ({ x, y, vx, vy } as p) =
             { p | x = x + vx, y = y + vy }
 
-        bounce : Player -> Player
-        bounce ({ x, y, vx, vy } as b) =
+        bounceVel : Player -> Player
+        bounceVel ({ x, y, vx, vy } as b) =
             let
                 ( nvx, nvy ) =
                     bounceVelInScreenBy 1 scr x y vx vy
@@ -544,10 +544,10 @@ updatePlayer scr mouse time =
             { p | vx = (vx + dx) * 0.5, vy = (vy + dy) * 0.5 }
     in
     if mouse.down then
-        springToMouse >> updatePos
+        springToMouse >> posByVel
 
     else
-        updateRandomVel >> updatePos >> bounce
+        randomVel >> bounceVel >> posByVel
 
 
 stepTimeBombs :

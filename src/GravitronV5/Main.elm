@@ -1,5 +1,6 @@
 module GravitronV5.Main exposing (main)
 
+import List.Extra
 import Playground exposing (..)
 
 
@@ -165,21 +166,22 @@ updateActor : Computer -> Actor -> Actor
 updateActor computer actor =
     case actor of
         Player data ->
-            List.foldl (applyBehaviour computer) data data.behaviours
+            List.Extra.mapAccuml (applyBehaviour computer) data data.behaviours
+                |> (\( newData, newBehaviours ) -> { newData | behaviours = newBehaviours })
                 |> Player
 
 
-applyBehaviour : Computer -> Behaviour -> Data -> Data
-applyBehaviour { time, screen } behaviour =
+applyBehaviour : Computer -> Data -> Behaviour -> ( Data, Behaviour )
+applyBehaviour { time, screen } data behaviour =
     case behaviour of
         RandomWalker ->
-            updateVelocityRandomWalker time
+            ( updateVelocityRandomWalker time data, behaviour )
 
         BounceInScreen bounceFactor ->
-            bounceVel bounceFactor screen
+            ( bounceVel bounceFactor screen data, behaviour )
 
         MoveByVel ->
-            moveByVel
+            ( moveByVel data, behaviour )
 
 
 

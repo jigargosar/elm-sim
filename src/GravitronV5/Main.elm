@@ -96,11 +96,11 @@ viewPrimaryTag d tag =
     case tag of
         Player ->
             Maybe.map2 circle (getPrimaryColor d) (getRadius d)
-                |> Maybe.andThen (moveByPosition d)
+                |> Maybe.andThen (moveShapeByPosition d)
 
 
-moveByPosition : List Data -> Shape -> Maybe Shape
-moveByPosition d s =
+moveShapeByPosition : List Data -> Shape -> Maybe Shape
+moveShapeByPosition d s =
     getPosition d |> Maybe.map (\( x, y ) -> move x y s)
 
 

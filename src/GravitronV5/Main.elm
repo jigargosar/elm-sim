@@ -2,6 +2,7 @@ module GravitronV5.Main exposing (main)
 
 import Basics.Extra exposing (flip)
 import GravitronV5.Id as Id exposing (Id)
+import GravitronV5.Tag as Tag exposing (Tag)
 import Playground exposing (..)
 import PointFree exposing (anyPass, ifElse)
 
@@ -102,7 +103,7 @@ initPlayer x y =
         initialPlayerRadius =
             20
     in
-    Player Id.Player TagPlayer x y initialPlayerRadius 0 0
+    Player Id.Player Tag.TagPlayer x y initialPlayerRadius 0 0
 
 
 type alias Turret =
@@ -142,7 +143,7 @@ initTurrets =
 
         initTurret ( x, y ) (TurretConfig id color wep maxHP) =
             Turret id
-                TagTurret
+                Tag.TagTurret
                 (x * factor)
                 (y * factor)
                 turretRadius
@@ -174,7 +175,7 @@ initBullet x y offset speed angle id =
         ( dx, dy ) =
             fromPolar ( offset + initialBulletRadius + 1, angle )
     in
-    Bullet id TagBullet (x + dx) (y + dy) initialBulletRadius vx vy
+    Bullet id Tag.TagBullet (x + dx) (y + dy) initialBulletRadius vx vy
 
 
 type alias TimeBomb =
@@ -200,7 +201,7 @@ initTimeBomb x y offset speed angle id =
             fromPolar ( offset + initialTimeBombRadius + 1, angle )
     in
     TimeBomb id
-        TagTimeBomb
+        Tag.TagTimeBomb
         (x + dx)
         (y + dy)
         initialTimeBombRadius
@@ -221,7 +222,7 @@ type alias Blast =
 
 initBlast : Number -> Number -> Number -> Id -> Blast
 initBlast x y r id =
-    Blast id TagBlast x y r
+    Blast id Tag.TagBlast x y r
 
 
 type alias Explosion =
@@ -270,17 +271,6 @@ initialMemory =
 
 
 -- Tags
-
-
-type Tag
-    = TagTimeBomb
-    | TagBullet
-    | TagBlast
-    | TagPlayer
-    | TagTurret
-
-
-
 -- Entity with common props
 
 
@@ -310,20 +300,20 @@ toTaggedCircle { id, tag, x, y, r } =
 tagsWhichCanCauseDamageTo : Tag -> List Tag
 tagsWhichCanCauseDamageTo targetTag =
     case targetTag of
-        TagTimeBomb ->
-            [ TagTimeBomb, TagBullet, TagBlast, TagPlayer, TagTurret ]
+        Tag.TagTimeBomb ->
+            [ Tag.TagTimeBomb, Tag.TagBullet, Tag.TagBlast, Tag.TagPlayer, Tag.TagTurret ]
 
-        TagBullet ->
-            [ TagBullet, TagBlast, TagPlayer, TagTurret ]
+        Tag.TagBullet ->
+            [ Tag.TagBullet, Tag.TagBlast, Tag.TagPlayer, Tag.TagTurret ]
 
-        TagBlast ->
+        Tag.TagBlast ->
             []
 
-        TagPlayer ->
+        Tag.TagPlayer ->
             []
 
-        TagTurret ->
-            [ TagBullet, TagBlast ]
+        Tag.TagTurret ->
+            [ Tag.TagBullet, Tag.TagBlast ]
 
 
 canCauseDamageTo : EntityRec -> EntityRec -> Bool

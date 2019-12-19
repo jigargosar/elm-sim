@@ -1,4 +1,4 @@
-module GravitronV5.Timer exposing (Timer, cycle, done, fromMax, progress)
+module GravitronV5.Timer exposing (Timer, done, fromMax, progress, step)
 
 
 type Timer
@@ -10,8 +10,8 @@ fromMax =
     Timer 0 << max 1
 
 
-cycle : Timer -> Timer
-cycle (Timer n mx) =
+step : Timer -> Timer
+step (Timer n mx) =
     Timer (n + 1 |> modBy mx) mx
 
 

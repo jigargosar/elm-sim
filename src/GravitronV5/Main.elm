@@ -432,7 +432,7 @@ stepExplosion e =
         NoRes
 
     else
-        AddExplosion { e | ct = Timer.cycle e.ct }
+        AddExplosion { e | ct = Timer.step e.ct }
 
 
 stepTimeBomb :
@@ -448,7 +448,7 @@ stepTimeBomb { screen, tx, ty, entityList } =
     let
         tick : TimeBomb -> TimeBomb
         tick b =
-            { b | bombTimer = Timer.cycle b.bombTimer }
+            { b | bombTimer = Timer.step b.bombTimer }
 
         aliveResponse : TimeBomb -> Res
         aliveResponse =
@@ -530,7 +530,7 @@ stepTurret { tx, ty, entityList } =
 
               else
                 NoRes
-            , AddTurret { t | triggerCt = Timer.cycle triggerCt }
+            , AddTurret { t | triggerCt = Timer.step triggerCt }
             ]
                 |> Batch
 

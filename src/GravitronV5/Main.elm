@@ -39,6 +39,60 @@ updateVelocityRandomWalker time data =
     { data | vel = Velocity (vx + wave -f f 7 time) (vy + wave -f f 5 time) }
 
 
+newBounceVelInScreen :
+    Float
+    -> Screen
+    -> Float
+    -> Float
+    -> Float
+    -> Float
+    -> ( Float, Float )
+newBounceVelInScreen bounceFriction scr x y vx vy =
+    let
+        nvx =
+            if
+                (x < scr.left && vx < 0)
+                    || (x > scr.right && vx > 0)
+            then
+                negate vx
+
+            else
+                vx
+
+        nvy =
+            if
+                (y < scr.bottom && vy < 0)
+                    || (y > scr.top && vy > 0)
+            then
+                negate vy
+
+            else
+                vy
+    in
+    if nvx /= vx || nvy /= vy then
+        toPolar ( nvx, nvy )
+            |> Tuple.mapFirst ((*) bounceFriction)
+            |> fromPolar
+
+    else
+        ( nvx, nvy )
+
+
+bounceVel : Float -> Screen -> { a | pos : Point, vel : Velocity } -> { a | pos : Point, vel : Velocity }
+bounceVel bounceFactor screen b =
+    let
+        (Point x y) =
+            b.pos
+
+        (Velocity vx vy) =
+            b.vel
+
+        ( nvx, nvy ) =
+            newBounceVelInScreen bounceFactor screen x y vx vy
+    in
+    { b | vel = Velocity nvx nvy }
+
+
 
 -- Actor
 
@@ -49,6 +103,7 @@ type Actor
 
 type Movement
     = RandomWalker
+    | BounceInScreen Float
 
 
 type Behaviour
@@ -111,7 +166,7 @@ updateActor computer actor =
 
 
 applyBehaviour : Computer -> Behaviour -> Data -> Data
-applyBehaviour { time } behaviour data =
+applyBehaviour { time, screen } behaviour data =
     case behaviour of
         Movement mv ->
             let
@@ -119,6 +174,9 @@ applyBehaviour { time } behaviour data =
                     case mv of
                         RandomWalker ->
                             updateVelocityRandomWalker time
+
+                        BounceInScreen bounceFactor ->
+                            bounceVel bounceFactor screen
             in
             data |> updateVelocity >> moveByVel
 

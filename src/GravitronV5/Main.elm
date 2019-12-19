@@ -66,14 +66,14 @@ initTurrets =
         turretRadius =
             25
 
-        initTurret ( x, y ) (TurretConfig id color wep maxHP) =
+        initTurret ( x, y ) (TurretConfig id color weapon maxHP) =
             Turret id
                 Tag.TagTurret
                 (x * factor)
                 (y * factor)
                 turretRadius
                 color
-                wep
+                weapon
                 (Timer.forTicks 160)
                 (HP.withMax maxHP)
     in

@@ -57,8 +57,40 @@ updateMemory { time, screen, mouse } mem =
 
 
 viewMemory : Computer -> Mem -> List Shape
-viewMemory _ _ =
-    []
+viewMemory _ { actors } =
+    List.filterMap viewActor actors
+
+
+viewActor : Actor -> Maybe Shape
+viewActor actor =
+    case actor of
+        Actor _ d _ ->
+            getPrimaryTag d
+                |> Maybe.map (viewActorWithTag d)
+
+
+viewActorWithTag actor tag =
+    case tag of
+        Player ->
+            circle blue 200
+
+
+getPrimaryTag : List Data -> Maybe Tag
+getPrimaryTag =
+    let
+        toTag : Data -> Maybe Tag -> Maybe Tag
+        toTag d answer =
+            case ( answer, d ) of
+                ( Just _, _ ) ->
+                    answer
+
+                ( Nothing, PrimaryTag tag ) ->
+                    Just tag
+
+                _ ->
+                    answer
+    in
+    List.foldl toTag Nothing
 
 
 main =

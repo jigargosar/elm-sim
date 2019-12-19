@@ -1,27 +1,27 @@
-module GravitronV5.Counter exposing (Counter, ctProgress, initCt, isDone, stepCt)
+module GravitronV5.Counter exposing (Counter, cycle, done, fromMax, progress)
 
 
 type Counter
     = Counter Int Int
 
 
-initCt : Int -> Counter
-initCt =
+fromMax : Int -> Counter
+fromMax =
     Counter 0 << max 1
 
 
-stepCt : Counter -> Counter
-stepCt (Counter n mx) =
+cycle : Counter -> Counter
+cycle (Counter n mx) =
     Counter (n + 1 |> modBy mx) mx
 
 
-isDone : Counter -> Bool
-isDone (Counter n mx) =
+done : Counter -> Bool
+done (Counter n mx) =
     n == mx - 1
 
 
-ctProgress : Counter -> Float
-ctProgress (Counter n mx) =
+progress : Counter -> Float
+progress (Counter n mx) =
     if n == 0 then
         0
 

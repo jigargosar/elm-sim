@@ -74,7 +74,7 @@ initTurrets =
                 turretRadius
                 color
                 wep
-                (Counter.initCt 160)
+                (Counter.fromMax 160)
                 (HP.fromMax maxHP)
     in
     List.map2 initTurret positions
@@ -133,7 +133,7 @@ initTimeBomb x y offset speed angle id =
         initialTimeBombBlastRadius
         vx
         vy
-        (Counter.initCt (60 * 2))
+        (Counter.fromMax (60 * 2))
 
 
 type alias Blast =
@@ -162,7 +162,7 @@ type alias Explosion =
 
 initExplosion : Number -> Number -> Number -> Color -> Id -> Explosion
 initExplosion x y r c id =
-    Explosion id (Counter.initCt 60) x y r c
+    Explosion id (Counter.fromMax 60) x y r c
 
 
 type alias Mem =
@@ -428,11 +428,11 @@ stepBlast { x, y, r } =
 
 stepExplosion : Explosion -> Res
 stepExplosion e =
-    if Counter.isDone e.ct then
+    if Counter.done e.ct then
         NoRes
 
     else
-        AddExplosion { e | ct = Counter.stepCt e.ct }
+        AddExplosion { e | ct = Counter.cycle e.ct }
 
 
 stepTimeBomb :
@@ -448,7 +448,7 @@ stepTimeBomb { screen, tx, ty, entityList } =
     let
         tick : TimeBomb -> TimeBomb
         tick b =
-            { b | bombTimer = Counter.stepCt b.bombTimer }
+            { b | bombTimer = Counter.cycle b.bombTimer }
 
         aliveResponse : TimeBomb -> Res
         aliveResponse =
@@ -465,7 +465,7 @@ stepTimeBomb { screen, tx, ty, entityList } =
                 , NewBlast x y blastR
                 ]
     in
-    ifElse (anyPass [ .bombTimer >> Counter.isDone, isDamagedByAnyOf entityList ])
+    ifElse (anyPass [ .bombTimer >> Counter.done, isDamagedByAnyOf entityList ])
         deathResponse
         aliveResponse
 
@@ -525,12 +525,12 @@ stepTurret { tx, ty, entityList } =
 
         aliveResponse : Turret -> Res
         aliveResponse ({ x, y, r, weapon, triggerCt, hp } as t) =
-            [ if Counter.isDone triggerCt then
+            [ if Counter.done triggerCt then
                 fireWeaponResponse t
 
               else
                 NoRes
-            , AddTurret { t | triggerCt = Counter.stepCt triggerCt }
+            , AddTurret { t | triggerCt = Counter.cycle triggerCt }
             ]
                 |> Batch
 
@@ -613,7 +613,7 @@ viewExplosions =
         viewExplosion { ct, x, y, r, color } =
             let
                 progress =
-                    Counter.ctProgress ct
+                    Counter.progress ct
             in
             circle color r
                 |> fade (0.7 - (progress * 0.7))

@@ -73,7 +73,7 @@ viewPrimaryTag : List Data -> Tag -> Maybe Shape
 viewPrimaryTag d tag =
     case tag of
         Player ->
-            Maybe.map2 circle (Just black) (Just 100)
+            Maybe.map2 circle (getPrimaryColor d) (Just 100)
 
 
 getPrimaryTag : List Data -> Maybe Tag
@@ -92,6 +92,23 @@ getPrimaryTag =
                     answer
     in
     List.foldl toTag Nothing
+
+
+getPrimaryColor : List Data -> Maybe Color
+getPrimaryColor =
+    let
+        toPrimaryColor d answer =
+            case ( answer, d ) of
+                ( Just _, _ ) ->
+                    answer
+
+                ( Nothing, PrimaryColour color ) ->
+                    Just color
+
+                _ ->
+                    answer
+    in
+    List.foldl toPrimaryColor Nothing
 
 
 main =

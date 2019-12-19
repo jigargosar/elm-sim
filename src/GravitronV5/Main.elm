@@ -251,7 +251,6 @@ initialMemory =
 
 
 
--- Tags
 -- Entity with common props
 
 

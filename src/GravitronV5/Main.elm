@@ -2,7 +2,7 @@ module GravitronV5.Main exposing (main)
 
 import Basics.Extra exposing (flip)
 import GravitronV5.Id as Id exposing (Id)
-import GravitronV5.Player exposing (Player)
+import GravitronV5.Player as Player exposing (Player)
 import GravitronV5.Tag as Tag exposing (Tag)
 import Playground exposing (..)
 import PointFree exposing (anyPass, ifElse)
@@ -85,15 +85,6 @@ initialTimeBombRadius =
 initialTimeBombBlastRadius : Float
 initialTimeBombBlastRadius =
     initialTimeBombRadius * 20
-
-
-initPlayer : Number -> Number -> Player
-initPlayer x y =
-    let
-        initialPlayerRadius =
-            20
-    in
-    Player Id.Player Tag.TagPlayer x y initialPlayerRadius 0 0
 
 
 type alias Turret =
@@ -244,7 +235,7 @@ type alias Mem =
 initialMemory : Mem
 initialMemory =
     { nextId = 100
-    , player = initPlayer 0 0
+    , player = Player.init 0 0
     , turrets =
         initTurrets
             [ TurretConfig (Id.Turret 0) red BulletWeapon 1

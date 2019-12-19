@@ -34,15 +34,23 @@ type Tag
     = PlayerTag
 
 
-type alias Mem =
-    { actors : List Actor
-    , nextId : Int
-    }
+
+-- Player
 
 
 initialPlayer : Actor
 initialPlayer =
     Player (Data PlayerTag (Point 0 0) (Velocity 0 0))
+
+
+
+-- Memory
+
+
+type alias Mem =
+    { actors : List Actor
+    , nextId : Int
+    }
 
 
 initialMemory : Mem

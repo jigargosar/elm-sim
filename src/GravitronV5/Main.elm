@@ -2,6 +2,7 @@ module GravitronV5.Main exposing (main)
 
 import Basics.Extra exposing (flip)
 import GravitronV5.Body as TaggedCircle exposing (Body)
+import GravitronV5.Counter as Counter exposing (Counter)
 import GravitronV5.Geom as Geom
 import GravitronV5.HP as HP exposing (HP)
 import GravitronV5.Id as Id exposing (Id)
@@ -9,38 +10,6 @@ import GravitronV5.Player as Player exposing (Player)
 import GravitronV5.Tag as Tag exposing (Tag)
 import Playground exposing (..)
 import PointFree exposing (anyPass, ifElse)
-
-
-
--- Counter
-
-
-type Counter
-    = Counter Int Int
-
-
-initCt : Int -> Counter
-initCt =
-    Counter 0 << max 1
-
-
-stepCt : Counter -> Counter
-stepCt (Counter n mx) =
-    Counter (n + 1 |> modBy mx) mx
-
-
-isDone : Counter -> Bool
-isDone (Counter n mx) =
-    n == mx - 1
-
-
-ctProgress : Counter -> Float
-ctProgress (Counter n mx) =
-    if n == 0 then
-        0
-
-    else
-        toFloat n / toFloat mx
 
 
 
@@ -105,7 +74,7 @@ initTurrets =
                 turretRadius
                 color
                 wep
-                (initCt 160)
+                (Counter.initCt 160)
                 (HP.fromMax maxHP)
     in
     List.map2 initTurret positions
@@ -164,7 +133,7 @@ initTimeBomb x y offset speed angle id =
         initialTimeBombBlastRadius
         vx
         vy
-        (initCt (60 * 2))
+        (Counter.initCt (60 * 2))
 
 
 type alias Blast =
@@ -193,7 +162,7 @@ type alias Explosion =
 
 initExplosion : Number -> Number -> Number -> Color -> Id -> Explosion
 initExplosion x y r c id =
-    Explosion id (initCt 60) x y r c
+    Explosion id (Counter.initCt 60) x y r c
 
 
 type alias Mem =
@@ -459,11 +428,11 @@ stepBlast { x, y, r } =
 
 stepExplosion : Explosion -> Res
 stepExplosion e =
-    if isDone e.ct then
+    if Counter.isDone e.ct then
         NoRes
 
     else
-        AddExplosion { e | ct = stepCt e.ct }
+        AddExplosion { e | ct = Counter.stepCt e.ct }
 
 
 stepTimeBomb :
@@ -479,7 +448,7 @@ stepTimeBomb { screen, tx, ty, entityList } =
     let
         tick : TimeBomb -> TimeBomb
         tick b =
-            { b | bombTimer = stepCt b.bombTimer }
+            { b | bombTimer = Counter.stepCt b.bombTimer }
 
         aliveResponse : TimeBomb -> Res
         aliveResponse =
@@ -496,7 +465,7 @@ stepTimeBomb { screen, tx, ty, entityList } =
                 , NewBlast x y blastR
                 ]
     in
-    ifElse (anyPass [ .bombTimer >> isDone, isDamagedByAnyOf entityList ])
+    ifElse (anyPass [ .bombTimer >> Counter.isDone, isDamagedByAnyOf entityList ])
         deathResponse
         aliveResponse
 
@@ -556,12 +525,12 @@ stepTurret { tx, ty, entityList } =
 
         aliveResponse : Turret -> Res
         aliveResponse ({ x, y, r, weapon, triggerCt, hp } as t) =
-            [ if isDone triggerCt then
+            [ if Counter.isDone triggerCt then
                 fireWeaponResponse t
 
               else
                 NoRes
-            , AddTurret { t | triggerCt = stepCt triggerCt }
+            , AddTurret { t | triggerCt = Counter.stepCt triggerCt }
             ]
                 |> Batch
 
@@ -644,7 +613,7 @@ viewExplosions =
         viewExplosion { ct, x, y, r, color } =
             let
                 progress =
-                    ctProgress ct
+                    Counter.ctProgress ct
             in
             circle color r
                 |> fade (0.7 - (progress * 0.7))

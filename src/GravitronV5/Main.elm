@@ -1,6 +1,6 @@
 module GravitronV5.Main exposing (main)
 
-import Basics.Extra exposing (flip)
+import Basics.Extra exposing (flip, uncurry)
 import GravitronV5.Body as TaggedCircle exposing (Body)
 import GravitronV5.Geom as Geom
 import GravitronV5.HP as HP exposing (HP)
@@ -32,8 +32,8 @@ initialTimeBombBlastRadius =
     initialTimeBombRadius * 20
 
 
-initTurrets : List Turret.TurretConfig -> List Turret
-initTurrets =
+initTurretOrigins : List Turret -> List Turret
+initTurretOrigins =
     let
         positions =
             [ ( -1, 1 ), ( 1, -1 ), ( 1, 1 ), ( -1, -1 ) ]
@@ -42,7 +42,7 @@ initTurrets =
         factor =
             150
     in
-    List.map2 Turret.initAt positions
+    List.map2 (uncurry Turret.setOrigin) positions
 
 
 type alias Bullet =
@@ -146,11 +146,11 @@ initialMemory =
     { nextId = 100
     , player = Player.init 0 0
     , turrets =
-        initTurrets
-            [ Turret.TurretConfig (Id.Turret 0) red Turret.BulletWeapon 1
-            , Turret.TurretConfig (Id.Turret 1) red Turret.BulletWeapon 1
-            , Turret.TurretConfig (Id.Turret 2) blue Turret.TimeBombWeapon 2
-            , Turret.TurretConfig (Id.Turret 3) orange Turret.BulletWeapon 3
+        initTurretOrigins
+            [ Turret.init (Id.Turret 0) red Turret.BulletWeapon 1
+            , Turret.init (Id.Turret 1) red Turret.BulletWeapon 1
+            , Turret.init (Id.Turret 2) blue Turret.TimeBombWeapon 2
+            , Turret.init (Id.Turret 3) orange Turret.BulletWeapon 3
             ]
     , bullets = []
     , timeBombs = []

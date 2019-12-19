@@ -1,4 +1,4 @@
-module GravitronV5.Turret exposing (Turret, TurretConfig(..), Weapon(..), init, initAt)
+module GravitronV5.Turret exposing (Turret, Weapon(..), init, setOrigin)
 
 import GravitronV5.HP as HP exposing (HP)
 import GravitronV5.Id exposing (Id)
@@ -25,26 +25,9 @@ type Weapon
     | TimeBombWeapon
 
 
-type TurretConfig
-    = TurretConfig Id Color Weapon Int
-
-
 turretRadius : Number
 turretRadius =
     25
-
-
-initAt : ( Number, Number ) -> TurretConfig -> Turret
-initAt ( x, y ) (TurretConfig id color weapon maxHP) =
-    Turret id
-        Tag.TagTurret
-        x
-        y
-        turretRadius
-        color
-        weapon
-        (Timer.forTicks 160)
-        (HP.withMax maxHP)
 
 
 init : Id -> Color -> Weapon -> Int -> Turret
@@ -58,3 +41,8 @@ init id color weapon maxHP =
         weapon
         (Timer.forTicks 160)
         (HP.withMax maxHP)
+
+
+setOrigin : Number -> Number -> Turret -> Turret
+setOrigin x y turret =
+    { turret | x = x, y = y }

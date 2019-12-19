@@ -524,24 +524,11 @@ stepTurret { tx, ty, entityList } =
 viewMemory : Computer -> Mem -> List Shape
 viewMemory _ { player, turrets, bullets, timeBombs, explosions } =
     [ Player.view player
-    , viewTurrets turrets
+    , Turret.viewAll turrets
     , viewBullets bullets
     , viewTimeBombs timeBombs
     , viewExplosions explosions
     ]
-
-
-viewTurrets : List Turret -> Shape
-viewTurrets =
-    let
-        viewTurret { x, y, r, color, hp } =
-            group
-                [ circle color r
-                , words black (String.fromInt (HP.remaining hp))
-                ]
-                |> move x y
-    in
-    List.map viewTurret >> group
 
 
 viewBullets : List Bullet -> Shape

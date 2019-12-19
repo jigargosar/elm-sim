@@ -1,4 +1,4 @@
-module GravitronV5.Turret exposing (Turret, Weapon(..), init, setOrigin)
+module GravitronV5.Turret exposing (Turret, Weapon(..), init, setOrigin, viewAll)
 
 import GravitronV5.HP as HP exposing (HP)
 import GravitronV5.Id exposing (Id)
@@ -46,3 +46,16 @@ init id color weapon maxHP =
 setOrigin : Number -> Number -> Turret -> Turret
 setOrigin x y turret =
     { turret | x = x, y = y }
+
+
+viewAll : List Turret -> Shape
+viewAll =
+    let
+        viewTurret { x, y, r, color, hp } =
+            group
+                [ circle color r
+                , words black (String.fromInt (HP.remaining hp))
+                ]
+                |> move x y
+    in
+    List.map viewTurret >> group

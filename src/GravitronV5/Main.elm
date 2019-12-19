@@ -34,7 +34,7 @@ updateVelocityRandomWalker time data =
             data.vel
 
         f =
-            0.01
+            0.07
     in
     { data | vel = Velocity (vx + wave -f f 7 time) (vy + wave -f f 5 time) }
 

@@ -2,6 +2,7 @@ module GravitronV5.Main exposing (main)
 
 import Basics.Extra exposing (flip)
 import GravitronV5.Id as Id exposing (Id)
+import GravitronV5.Player exposing (Player)
 import GravitronV5.Tag as Tag exposing (Tag)
 import Playground exposing (..)
 import PointFree exposing (anyPass, ifElse)
@@ -84,17 +85,6 @@ initialTimeBombRadius =
 initialTimeBombBlastRadius : Float
 initialTimeBombBlastRadius =
     initialTimeBombRadius * 20
-
-
-type alias Player =
-    { id : Id
-    , tag : Tag
-    , x : Number
-    , y : Number
-    , r : Number
-    , vx : Number
-    , vy : Number
-    }
 
 
 initPlayer : Number -> Number -> Player

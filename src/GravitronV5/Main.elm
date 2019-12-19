@@ -73,14 +73,13 @@ viewPrimaryTag : List Data -> Tag -> Maybe Shape
 viewPrimaryTag d tag =
     case tag of
         Player ->
-            Maybe.map2 circle (getPrimaryColor d) (Just 100)
+            Maybe.map2 circle (getPrimaryColor d) (getRadius d)
 
 
 getPrimaryTag : List Data -> Maybe Tag
 getPrimaryTag =
     let
-        toTag : Data -> Maybe Tag -> Maybe Tag
-        toTag d answer =
+        reducer d answer =
             case ( answer, d ) of
                 ( Just _, _ ) ->
                     answer
@@ -91,13 +90,13 @@ getPrimaryTag =
                 _ ->
                     answer
     in
-    List.foldl toTag Nothing
+    List.foldl reducer Nothing
 
 
 getPrimaryColor : List Data -> Maybe Color
 getPrimaryColor =
     let
-        toPrimaryColor d answer =
+        reducer d answer =
             case ( answer, d ) of
                 ( Just _, _ ) ->
                     answer
@@ -108,7 +107,24 @@ getPrimaryColor =
                 _ ->
                     answer
     in
-    List.foldl toPrimaryColor Nothing
+    List.foldl reducer Nothing
+
+
+getRadius : List Data -> Maybe Number
+getRadius =
+    let
+        reducer d answer =
+            case ( answer, d ) of
+                ( Just _, _ ) ->
+                    answer
+
+                ( Nothing, Radius value ) ->
+                    Just value
+
+                _ ->
+                    answer
+    in
+    List.foldl reducer Nothing
 
 
 main =

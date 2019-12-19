@@ -42,7 +42,7 @@ initTurrets =
         factor =
             150
     in
-    List.map2 Turret.initTurret positions
+    List.map2 Turret.initAt positions
 
 
 type alias Bullet =

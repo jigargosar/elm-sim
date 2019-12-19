@@ -102,7 +102,7 @@ initPlayer x y =
         initialPlayerRadius =
             20
     in
-    Player Id.PlayerId TagPlayer x y initialPlayerRadius 0 0
+    Player Id.Player TagPlayer x y initialPlayerRadius 0 0
 
 
 type alias Turret =
@@ -256,10 +256,10 @@ initialMemory =
     , player = initPlayer 0 0
     , turrets =
         initTurrets
-            [ TurretConfig (Id.TurretId 0) red BulletWeapon 1
-            , TurretConfig (Id.TurretId 1) red BulletWeapon 1
-            , TurretConfig (Id.TurretId 2) blue TimeBombWeapon 2
-            , TurretConfig (Id.TurretId 3) orange BulletWeapon 3
+            [ TurretConfig (Id.Turret 0) red BulletWeapon 1
+            , TurretConfig (Id.Turret 1) red BulletWeapon 1
+            , TurretConfig (Id.Turret 2) blue TimeBombWeapon 2
+            , TurretConfig (Id.Turret 3) orange BulletWeapon 3
             ]
     , bullets = []
     , timeBombs = []
@@ -431,19 +431,19 @@ emptyListsThenProcessResponses =
                     addTimeBomb timeBomb
 
                 NewBullet x y r speed angle ->
-                    withNewId Id.BulletId
+                    withNewId Id.Bullet
                         (initBullet x y r speed angle >> addBullet)
 
                 NewTimeBomb x y offset speed angle ->
-                    withNewId Id.TimeBombId
+                    withNewId Id.TimeBomb
                         (initTimeBomb x y offset speed angle >> addTimeBomb)
 
                 NewExplosion x y r c ->
-                    withNewId Id.ExplosionId
+                    withNewId Id.Explosion
                         (initExplosion x y r c >> addExplosion)
 
                 NewBlast x y r ->
-                    withNewId Id.BlastId
+                    withNewId Id.Blast
                         (initBlast x y r >> addBlast)
 
                 NoRes ->

@@ -1,6 +1,7 @@
 module GravitronV5.Main exposing (main)
 
 import Basics.Extra exposing (flip)
+import GravitronV5.Id as Id exposing (Id)
 import Playground exposing (..)
 import PointFree exposing (anyPass, ifElse)
 
@@ -84,15 +85,6 @@ initialTimeBombBlastRadius =
     initialTimeBombRadius * 20
 
 
-type Id
-    = PlayerId
-    | BulletId Int
-    | TurretId Int
-    | TimeBombId Int
-    | ExplosionId Int
-    | BlastId Int
-
-
 type alias Player =
     { id : Id
     , tag : Tag
@@ -110,7 +102,7 @@ initPlayer x y =
         initialPlayerRadius =
             20
     in
-    Player PlayerId TagPlayer x y initialPlayerRadius 0 0
+    Player Id.PlayerId TagPlayer x y initialPlayerRadius 0 0
 
 
 type alias Turret =
@@ -264,10 +256,10 @@ initialMemory =
     , player = initPlayer 0 0
     , turrets =
         initTurrets
-            [ TurretConfig (TurretId 0) red BulletWeapon 1
-            , TurretConfig (TurretId 1) red BulletWeapon 1
-            , TurretConfig (TurretId 2) blue TimeBombWeapon 2
-            , TurretConfig (TurretId 3) orange BulletWeapon 3
+            [ TurretConfig (Id.TurretId 0) red BulletWeapon 1
+            , TurretConfig (Id.TurretId 1) red BulletWeapon 1
+            , TurretConfig (Id.TurretId 2) blue TimeBombWeapon 2
+            , TurretConfig (Id.TurretId 3) orange BulletWeapon 3
             ]
     , bullets = []
     , timeBombs = []
@@ -439,19 +431,19 @@ emptyListsThenProcessResponses =
                     addTimeBomb timeBomb
 
                 NewBullet x y r speed angle ->
-                    withNewId BulletId
+                    withNewId Id.BulletId
                         (initBullet x y r speed angle >> addBullet)
 
                 NewTimeBomb x y offset speed angle ->
-                    withNewId TimeBombId
+                    withNewId Id.TimeBombId
                         (initTimeBomb x y offset speed angle >> addTimeBomb)
 
                 NewExplosion x y r c ->
-                    withNewId ExplosionId
+                    withNewId Id.ExplosionId
                         (initExplosion x y r c >> addExplosion)
 
                 NewBlast x y r ->
-                    withNewId BlastId
+                    withNewId Id.BlastId
                         (initBlast x y r >> addBlast)
 
                 NoRes ->

@@ -72,8 +72,28 @@ updateMemory { time, screen, mouse } mem =
 updateActor : Actor -> Actor
 updateActor actor =
     case actor of
-        Player ({ pos } as data) ->
-            actor
+        Player data ->
+            updatePlayer data
+                |> Player
+
+
+updatePlayer : Data -> Data
+updatePlayer data =
+    let
+        updateVel d =
+            { d | vel = Velocity -1 1 }
+
+        moveByVel d =
+            let
+                (Point x y) =
+                    d.pos
+
+                (Velocity vx vy) =
+                    d.vel
+            in
+            { d | pos = Point (x + vx) (y + vy) }
+    in
+    data |> (updateVel >> moveByVel)
 
 
 

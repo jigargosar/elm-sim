@@ -1,25 +1,25 @@
-module GravitronV5.HP exposing (HP, decHPBy, initHP, noHPLeft, remainingHP)
+module GravitronV5.HP exposing (HP, fromMax, noneLeft, remaining, remove)
 
 
 type HP
     = HP Int Int
 
 
-initHP : Int -> HP
-initHP mx =
+fromMax : Int -> HP
+fromMax mx =
     HP (max 0 mx) (max 0 mx)
 
 
-decHPBy : Int -> HP -> HP
-decHPBy hits (HP mx n) =
+remove : Int -> HP -> HP
+remove hits (HP mx n) =
     HP mx (clamp 0 mx (n - hits))
 
 
-remainingHP : HP -> Int
-remainingHP (HP _ n) =
+remaining : HP -> Int
+remaining (HP _ n) =
     n
 
 
-noHPLeft : HP -> Bool
-noHPLeft (HP _ n) =
+noneLeft : HP -> Bool
+noneLeft (HP _ n) =
     n <= 0

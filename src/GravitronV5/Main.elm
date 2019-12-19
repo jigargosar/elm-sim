@@ -106,7 +106,7 @@ initTurrets =
                 color
                 wep
                 (initCt 160)
-                (HP.initHP maxHP)
+                (HP.fromMax maxHP)
     in
     List.map2 initTurret positions
 
@@ -575,10 +575,10 @@ stepTurret { tx, ty, entityList } =
                 hits =
                     countHitsTo t entityList
             in
-            { t | hp = HP.decHPBy hits t.hp }
+            { t | hp = HP.remove hits t.hp }
     in
     stepHP
-        >> ifElse (.hp >> HP.noHPLeft)
+        >> ifElse (.hp >> HP.noneLeft)
             deathResponse
             aliveResponse
 
@@ -603,7 +603,7 @@ viewTurrets =
         viewTurret { x, y, r, color, hp } =
             group
                 [ circle color r
-                , words black (String.fromInt (HP.remainingHP hp))
+                , words black (String.fromInt (HP.remaining hp))
                 ]
                 |> move x y
     in

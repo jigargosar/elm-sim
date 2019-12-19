@@ -3,6 +3,22 @@ module GravitronV5.Main exposing (main)
 import Playground exposing (..)
 
 
+
+-- Geom
+
+
+type Point
+    = Point Number Number
+
+
+type Velocity
+    = Velocity Number Number
+
+
+
+-- Actor
+
+
 type Actor
     = Player Data
 
@@ -10,15 +26,12 @@ type Actor
 type alias Data =
     { tag : Tag
     , pos : Point
+    , vel : Velocity
     }
 
 
 type Tag
     = PlayerTag
-
-
-type Point
-    = Point Number Number
 
 
 type alias Mem =
@@ -29,7 +42,7 @@ type alias Mem =
 
 initialPlayer : Actor
 initialPlayer =
-    Player (Data PlayerTag (Point 0 0))
+    Player (Data PlayerTag (Point 0 0) (Velocity 0 0))
 
 
 initialMemory : Mem
@@ -37,6 +50,10 @@ initialMemory =
     { actors = [ initialPlayer ]
     , nextId = 100
     }
+
+
+
+-- Update
 
 
 updateMemory : Computer -> Mem -> Mem
@@ -49,6 +66,10 @@ updateActor actor =
     case actor of
         Player ({ pos } as data) ->
             actor
+
+
+
+-- View
 
 
 viewMemory : Computer -> Mem -> List Shape
@@ -67,6 +88,10 @@ viewActor actor =
 move : Point -> Shape -> Shape
 move (Point x y) =
     Playground.move x y
+
+
+
+-- Main
 
 
 main =

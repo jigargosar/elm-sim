@@ -27,6 +27,18 @@ moveByVel data =
     { data | pos = Point (x + vx) (y + vy) }
 
 
+updateVelocityRandomWalker : Time -> { a | vel : Velocity } -> { a | vel : Velocity }
+updateVelocityRandomWalker time data =
+    let
+        (Velocity vx vy) =
+            data.vel
+
+        f =
+            0.01
+    in
+    { data | vel = Velocity (vx + wave -f f 7 time) (vy + wave -f f 5 time) }
+
+
 
 -- Actor
 
@@ -91,18 +103,7 @@ updateActor { time } actor =
 
 updatePlayer : Time -> Data -> Data
 updatePlayer time data =
-    let
-        updateVel d =
-            let
-                (Velocity vx vy) =
-                    d.vel
-
-                f =
-                    0.01
-            in
-            { d | vel = Velocity (vx + wave -f f 7 time) (vy + wave -f f 5 time) }
-    in
-    data |> (updateVel >> moveByVel)
+    data |> (updateVelocityRandomWalker time >> moveByVel)
 
 
 

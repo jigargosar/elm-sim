@@ -39,7 +39,7 @@ type alias Turret =
     , r : Number
     , color : Color
     , weapon : Weapon
-    , triggerCt : Timer
+    , trigger : Timer
     , hp : HP
     }
 
@@ -524,13 +524,13 @@ stepTurret { tx, ty, entityList } =
                     NewTimeBomb x y r speed angle
 
         aliveResponse : Turret -> Res
-        aliveResponse ({ x, y, r, weapon, triggerCt, hp } as t) =
-            [ if Timer.done triggerCt then
+        aliveResponse ({ x, y, r, weapon, trigger, hp } as t) =
+            [ if Timer.done trigger then
                 fireWeaponResponse t
 
               else
                 NoRes
-            , AddTurret { t | triggerCt = Timer.ticks triggerCt }
+            , AddTurret { t | trigger = Timer.ticks trigger }
             ]
                 |> Batch
 

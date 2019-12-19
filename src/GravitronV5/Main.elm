@@ -66,13 +66,14 @@ viewActor actor =
     case actor of
         Actor _ d _ ->
             getPrimaryTag d
-                |> Maybe.map (viewActorWithTag d)
+                |> Maybe.andThen (viewPrimaryTag d)
 
 
-viewActorWithTag actor tag =
+viewPrimaryTag : List Data -> Tag -> Maybe Shape
+viewPrimaryTag d tag =
     case tag of
         Player ->
-            circle blue 200
+            Maybe.map2 circle (Just black) (Just 100)
 
 
 getPrimaryTag : List Data -> Maybe Tag

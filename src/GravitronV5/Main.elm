@@ -93,7 +93,14 @@ updatePlayer : Time -> Data -> Data
 updatePlayer time data =
     let
         updateVel d =
-            { d | vel = Velocity (wave -2 2 3 time) (wave -1 1 5 time) }
+            let
+                (Velocity vx vy) =
+                    d.vel
+
+                f =
+                    0.01
+            in
+            { d | vel = Velocity (vx + wave -f f 7 time) (vy + wave -f f 5 time) }
     in
     data |> (updateVel >> moveByVel)
 

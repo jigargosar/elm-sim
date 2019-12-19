@@ -47,10 +47,19 @@ type Actor
     = Player Data
 
 
+type Movement
+    = RandomWalker
+
+
+type Behaviour
+    = Movement Movement
+
+
 type alias Data =
     { tag : Tag
     , pos : Point
     , vel : Velocity
+    , behaviours : List Behaviour
     }
 
 
@@ -64,7 +73,7 @@ type Tag
 
 initialPlayer : Actor
 initialPlayer =
-    Player (Data PlayerTag (Point 0 0) (Velocity 0 0))
+    Player (Data PlayerTag (Point 0 0) (Velocity 0 0) [ Movement RandomWalker ])
 
 
 

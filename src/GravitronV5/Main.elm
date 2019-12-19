@@ -3,6 +3,7 @@ module GravitronV5.Main exposing (main)
 import Basics.Extra exposing (flip)
 import GravitronV5.Body as TaggedCircle exposing (Body)
 import GravitronV5.Geom as Geom
+import GravitronV5.HP as HP exposing (HP)
 import GravitronV5.Id as Id exposing (Id)
 import GravitronV5.Player as Player exposing (Player)
 import GravitronV5.Tag as Tag exposing (Tag)
@@ -40,34 +41,6 @@ ctProgress (Counter n mx) =
 
     else
         toFloat n / toFloat mx
-
-
-
--- HP
-
-
-type HP
-    = HP Int Int
-
-
-initHP : Int -> HP
-initHP mx =
-    HP (max 0 mx) (max 0 mx)
-
-
-decHPBy : Int -> HP -> HP
-decHPBy hits (HP mx n) =
-    HP mx (clamp 0 mx (n - hits))
-
-
-remainingHP : HP -> Int
-remainingHP (HP _ n) =
-    n
-
-
-noHPLeft : HP -> Bool
-noHPLeft (HP _ n) =
-    n <= 0
 
 
 
@@ -133,7 +106,7 @@ initTurrets =
                 color
                 wep
                 (initCt 160)
-                (initHP maxHP)
+                (HP.initHP maxHP)
     in
     List.map2 initTurret positions
 
@@ -602,10 +575,10 @@ stepTurret { tx, ty, entityList } =
                 hits =
                     countHitsTo t entityList
             in
-            { t | hp = decHPBy hits t.hp }
+            { t | hp = HP.decHPBy hits t.hp }
     in
     stepHP
-        >> ifElse (.hp >> noHPLeft)
+        >> ifElse (.hp >> HP.noHPLeft)
             deathResponse
             aliveResponse
 
@@ -630,7 +603,7 @@ viewTurrets =
         viewTurret { x, y, r, color, hp } =
             group
                 [ circle color r
-                , words black (String.fromInt (remainingHP hp))
+                , words black (String.fromInt (HP.remainingHP hp))
                 ]
                 |> move x y
     in

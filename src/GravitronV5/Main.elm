@@ -1,11 +1,11 @@
 module GravitronV5.Main exposing (main)
 
 import Basics.Extra exposing (flip)
+import GravitronV5.Body as TaggedCircle exposing (Body)
 import GravitronV5.Geom as Geom
 import GravitronV5.Id as Id exposing (Id)
 import GravitronV5.Player as Player exposing (Player)
 import GravitronV5.Tag as Tag exposing (Tag)
-import GravitronV5.TaggedCircle as TaggedCircle exposing (TaggedCircle)
 import Playground exposing (..)
 import PointFree exposing (anyPass, ifElse)
 
@@ -275,16 +275,16 @@ tagsWhichCanCauseDamageTo targetTag =
             [ Tag.TagBullet, Tag.TagBlast ]
 
 
-canCauseDamageTo : TaggedCircle -> TaggedCircle -> Bool
+canCauseDamageTo : Body -> Body -> Bool
 canCauseDamageTo target src =
     List.member src.tag (tagsWhichCanCauseDamageTo target.tag)
         && (src.id /= target.id)
 
 
-isCausingDamageTo : TaggedCircle -> TaggedCircle -> Bool
+isCausingDamageTo : Body -> Body -> Bool
 isCausingDamageTo target src =
     let
-        areIntersecting : TaggedCircle -> TaggedCircle -> Bool
+        areIntersecting : Body -> Body -> Bool
         areIntersecting a b =
             Geom.ccc a.x a.y a.r b.x b.y b.r
     in
@@ -293,14 +293,14 @@ isCausingDamageTo target src =
 
 anyCausingDamageTo :
     { a | id : Id, tag : Tag, x : Number, y : Number, r : Number }
-    -> List TaggedCircle
+    -> List Body
     -> Bool
 anyCausingDamageTo target =
-    List.any (isCausingDamageTo (TaggedCircle.toTaggedCircle target))
+    List.any (isCausingDamageTo (TaggedCircle.toBody target))
 
 
 isDamagedByAnyOf :
-    List TaggedCircle
+    List Body
     -> { a | id : Id, tag : Tag, x : Number, y : Number, r : Number }
     -> Bool
 isDamagedByAnyOf =
@@ -309,10 +309,10 @@ isDamagedByAnyOf =
 
 countHitsTo :
     { a | id : Id, tag : Tag, x : Number, y : Number, r : Number }
-    -> List TaggedCircle
+    -> List Body
     -> Int
 countHitsTo target =
-    List.filter (isCausingDamageTo (TaggedCircle.toTaggedCircle target)) >> List.length
+    List.filter (isCausingDamageTo (TaggedCircle.toBody target)) >> List.length
 
 
 
@@ -435,19 +435,19 @@ updateMemory { time, screen, mouse } mem =
             mem
 
         playerCommon =
-            Player.toTaggedCircle player
+            Player.toBody player
 
-        env : { screen : Screen, tx : Number, ty : Number, entityList : List TaggedCircle }
+        env : { screen : Screen, tx : Number, ty : Number, entityList : List Body }
         env =
             { screen = screen
             , tx = playerCommon.x
             , ty = playerCommon.y
             , entityList =
-                Player.toTaggedCircle player
-                    :: List.map TaggedCircle.toTaggedCircle blasts
-                    ++ List.map TaggedCircle.toTaggedCircle timeBombs
-                    ++ List.map TaggedCircle.toTaggedCircle bullets
-                    ++ List.map TaggedCircle.toTaggedCircle turrets
+                Player.toBody player
+                    :: List.map TaggedCircle.toBody blasts
+                    ++ List.map TaggedCircle.toBody timeBombs
+                    ++ List.map TaggedCircle.toBody bullets
+                    ++ List.map TaggedCircle.toBody turrets
             }
 
         mapBatch : (a -> Res) -> List a -> Res
@@ -498,7 +498,7 @@ stepTimeBomb :
         | screen : Screen
         , tx : Float
         , ty : Float
-        , entityList : List TaggedCircle
+        , entityList : List Body
     }
     -> TimeBomb
     -> Res
@@ -533,7 +533,7 @@ stepBullet :
         | screen : Screen
         , tx : Float
         , ty : Float
-        , entityList : List TaggedCircle
+        , entityList : List Body
     }
     -> Bullet
     -> Res
@@ -559,7 +559,7 @@ stepTurret :
     { a
         | tx : Float
         , ty : Float
-        , entityList : List TaggedCircle
+        , entityList : List Body
     }
     -> Turret
     -> Res

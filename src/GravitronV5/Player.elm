@@ -1,9 +1,9 @@
-module GravitronV5.Player exposing (Player, init, toTaggedCircle, updatePlayer, view)
+module GravitronV5.Player exposing (Player, init, toBody, updatePlayer, view)
 
+import GravitronV5.Body as TaggedCircle exposing (Body)
 import GravitronV5.Geom as Geom
 import GravitronV5.Id as Id exposing (Id)
 import GravitronV5.Tag as Tag exposing (Tag)
-import GravitronV5.TaggedCircle as TaggedCircle exposing (TaggedCircle)
 import Playground exposing (..)
 
 
@@ -32,9 +32,9 @@ init x y =
         |> Player
 
 
-toTaggedCircle : Player -> TaggedCircle
-toTaggedCircle =
-    unwrap >> TaggedCircle.toTaggedCircle
+toBody : Player -> Body
+toBody =
+    unwrap >> TaggedCircle.toBody
 
 
 updatePlayer : Screen -> Mouse -> Time -> Player -> Player

@@ -3,30 +3,22 @@ module GravitronV5.Main exposing (main)
 import Playground exposing (..)
 
 
-type Id
-    = Id ActorId Int
+type Actor
+    = Player Data
 
 
-type ActorId
-    = Player
+type alias Data =
+    { kind : Tag
+    , pos : Point
+    }
 
 
-type Behaviour
-    = BounceOffScreen Number
-    | RandomWalker
-    | MoveByVelocity
+type Tag
+    = PlayerTag
 
 
 type Point
     = Point Number Number
-
-
-type alias Data =
-    { pos : Point }
-
-
-type Actor
-    = Actor Id Data (List Behaviour)
 
 
 type alias Mem =
@@ -35,15 +27,14 @@ type alias Mem =
     }
 
 
-initialPlayer id =
-    Actor id
-        (Data (Point 0 0))
-        [ RandomWalker, BounceOffScreen 1, MoveByVelocity ]
+initialPlayer : Actor
+initialPlayer =
+    Player (Data PlayerTag (Point 0 0))
 
 
 initialMemory : Mem
 initialMemory =
-    { actors = [ initialPlayer (Id Player 0) ]
+    { actors = [ initialPlayer ]
     , nextId = 100
     }
 
@@ -54,8 +45,10 @@ updateMemory { time, screen, mouse } mem =
 
 
 updateActor : Actor -> Actor
-updateActor =
-    identity
+updateActor actor =
+    case actor of
+        Player ({ pos } as data) ->
+            actor
 
 
 viewMemory : Computer -> Mem -> List Shape
@@ -64,11 +57,11 @@ viewMemory _ { actors } =
 
 
 viewActor : Actor -> Shape
-viewActor (Actor (Id tag _) data _) =
-    case tag of
-        Player ->
+viewActor actor =
+    case actor of
+        Player { pos } ->
             circle green 100
-                |> move data.pos
+                |> move pos
 
 
 move : Point -> Shape -> Shape

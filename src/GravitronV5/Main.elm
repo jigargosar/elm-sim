@@ -110,6 +110,7 @@ type Behaviour
 type alias Data =
     { tag : Tag
     , pos : Point
+    , r : Number
     , vel : Velocity
     , behaviours : List Behaviour
     }
@@ -128,6 +129,7 @@ initialPlayer =
     Player
         (Data PlayerTag
             (Point 0 0)
+            20
             (Velocity 0 0)
             [ RandomWalker, BounceInScreen 1, MoveByVel ]
         )

@@ -275,16 +275,16 @@ tagsWhichCanCauseDamageTo targetTag =
             [ Tag.TagBullet, Tag.TagBlast ]
 
 
-canCauseDamageTo : TaggedCircle.Record -> TaggedCircle.Record -> Bool
+canCauseDamageTo : TaggedCircle -> TaggedCircle -> Bool
 canCauseDamageTo target src =
     List.member src.tag (tagsWhichCanCauseDamageTo target.tag)
         && (src.id /= target.id)
 
 
 isCausingDamageTo : TaggedCircle -> TaggedCircle -> Bool
-isCausingDamageTo (TaggedCircle.TaggedCircle target) (TaggedCircle.TaggedCircle src) =
+isCausingDamageTo target src =
     let
-        areIntersecting : TaggedCircle.Record -> TaggedCircle.Record -> Bool
+        areIntersecting : TaggedCircle -> TaggedCircle -> Bool
         areIntersecting a b =
             Geom.ccc a.x a.y a.r b.x b.y b.r
     in
@@ -434,14 +434,14 @@ updateMemory { time, screen, mouse } mem =
         { turrets, player, explosions, blasts, bullets, timeBombs } =
             mem
 
-        ( tx, ty ) =
-            Player.origin player
+        playerCommon =
+            Player.toTaggedCircle player
 
         env : { screen : Screen, tx : Number, ty : Number, entityList : List TaggedCircle }
         env =
             { screen = screen
-            , tx = tx
-            , ty = ty
+            , tx = playerCommon.x
+            , ty = playerCommon.y
             , entityList =
                 Player.toTaggedCircle player
                     :: List.map TaggedCircle.toTaggedCircle blasts

@@ -1,4 +1,4 @@
-module GravitronV5.Player exposing (Player, init, origin, toTaggedCircle, updatePlayer, view)
+module GravitronV5.Player exposing (Player, init, toTaggedCircle, updatePlayer, view)
 
 import GravitronV5.Geom as Geom
 import GravitronV5.Id as Id exposing (Id)
@@ -30,11 +30,6 @@ init x y =
     in
     Model Id.Player Tag.TagPlayer x y initialPlayerRadius 0 0
         |> Player
-
-
-origin : Player -> ( Number, Number )
-origin (Player { x, y }) =
-    ( x, y )
 
 
 toTaggedCircle : Player -> TaggedCircle

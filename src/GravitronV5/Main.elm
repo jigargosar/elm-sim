@@ -1,9 +1,11 @@
 module GravitronV5.Main exposing (main)
 
 import Basics.Extra exposing (flip)
+import GravitronV5.Geom as Geom
 import GravitronV5.Id as Id exposing (Id)
 import GravitronV5.Player as Player exposing (Player)
 import GravitronV5.Tag as Tag exposing (Tag)
+import GravitronV5.TaggedCircle as TaggedCircle exposing (TaggedCircle)
 import Playground exposing (..)
 import PointFree exposing (anyPass, ifElse)
 
@@ -251,29 +253,6 @@ initialMemory =
 
 
 
--- Entity with common props
-
-
-type Entity
-    = Entity EntityRec
-
-
-type alias EntityRec =
-    { id : Id
-    , tag : Tag
-    , x : Number
-    , y : Number
-    , r : Number
-    }
-
-
-toTaggedCircle : { a | id : Id, tag : Tag, x : Number, y : Number, r : Number } -> Entity
-toTaggedCircle { id, tag, x, y, r } =
-    EntityRec id tag x y r
-        |> Entity
-
-
-
 -- DamageModel
 
 
@@ -296,32 +275,32 @@ tagsWhichCanCauseDamageTo targetTag =
             [ Tag.TagBullet, Tag.TagBlast ]
 
 
-canCauseDamageTo : EntityRec -> EntityRec -> Bool
+canCauseDamageTo : TaggedCircle.Record -> TaggedCircle.Record -> Bool
 canCauseDamageTo target src =
     List.member src.tag (tagsWhichCanCauseDamageTo target.tag)
         && (src.id /= target.id)
 
 
-isCausingDamageTo : Entity -> Entity -> Bool
-isCausingDamageTo (Entity target) (Entity src) =
+isCausingDamageTo : TaggedCircle -> TaggedCircle -> Bool
+isCausingDamageTo (TaggedCircle.TaggedCircle target) (TaggedCircle.TaggedCircle src) =
     let
-        areIntersecting : EntityRec -> EntityRec -> Bool
+        areIntersecting : TaggedCircle.Record -> TaggedCircle.Record -> Bool
         areIntersecting a b =
-            ccc a.x a.y a.r b.x b.y b.r
+            Geom.ccc a.x a.y a.r b.x b.y b.r
     in
     canCauseDamageTo target src && areIntersecting target src
 
 
 anyCausingDamageTo :
     { a | id : Id, tag : Tag, x : Number, y : Number, r : Number }
-    -> List Entity
+    -> List TaggedCircle
     -> Bool
 anyCausingDamageTo target =
-    List.any (isCausingDamageTo (toTaggedCircle target))
+    List.any (isCausingDamageTo (TaggedCircle.toTaggedCircle target))
 
 
 isDamagedByAnyOf :
-    List Entity
+    List TaggedCircle
     -> { a | id : Id, tag : Tag, x : Number, y : Number, r : Number }
     -> Bool
 isDamagedByAnyOf =
@@ -330,10 +309,10 @@ isDamagedByAnyOf =
 
 countHitsTo :
     { a | id : Id, tag : Tag, x : Number, y : Number, r : Number }
-    -> List Entity
+    -> List TaggedCircle
     -> Int
 countHitsTo target =
-    List.filter (isCausingDamageTo (toTaggedCircle target)) >> List.length
+    List.filter (isCausingDamageTo (TaggedCircle.toTaggedCircle target)) >> List.length
 
 
 
@@ -455,17 +434,20 @@ updateMemory { time, screen, mouse } mem =
         { turrets, player, explosions, blasts, bullets, timeBombs } =
             mem
 
-        env : { screen : Screen, tx : Number, ty : Number, entityList : List Entity }
+        ( tx, ty ) =
+            Player.origin player
+
+        env : { screen : Screen, tx : Number, ty : Number, entityList : List TaggedCircle }
         env =
             { screen = screen
-            , tx = player.x
-            , ty = player.y
+            , tx = tx
+            , ty = ty
             , entityList =
-                toTaggedCircle player
-                    :: List.map toTaggedCircle blasts
-                    ++ List.map toTaggedCircle timeBombs
-                    ++ List.map toTaggedCircle bullets
-                    ++ List.map toTaggedCircle turrets
+                Player.toTaggedCircle player
+                    :: List.map TaggedCircle.toTaggedCircle blasts
+                    ++ List.map TaggedCircle.toTaggedCircle timeBombs
+                    ++ List.map TaggedCircle.toTaggedCircle bullets
+                    ++ List.map TaggedCircle.toTaggedCircle turrets
             }
 
         mapBatch : (a -> Res) -> List a -> Res
@@ -482,7 +464,7 @@ updateMemory { time, screen, mouse } mem =
             ]
     in
     { mem
-        | player = updatePlayer screen mouse time player
+        | player = Player.updatePlayer screen mouse time player
     }
         |> emptyListsThenProcessResponses allResponses
         |> nextLevel
@@ -511,33 +493,12 @@ stepExplosion e =
         AddExplosion { e | ct = stepCt e.ct }
 
 
-updatePlayer : Screen -> Mouse -> Time -> Player -> Player
-updatePlayer screen mouse time =
-    let
-        randomVel : Player -> Player
-        randomVel ({ vx, vy } as p) =
-            let
-                ( dx, dy ) =
-                    ( wave -100 100 11 time, wave -300 300 21 time )
-                        |> toPolar
-                        |> Tuple.mapFirst ((*) 0.0005)
-                        |> fromPolar
-            in
-            { p | vx = vx + dx, vy = vy + dy }
-    in
-    if mouse.down then
-        springToMouse mouse >> addVelToPos
-
-    else
-        randomVel >> bounceVel 1 screen >> addVelToPos
-
-
 stepTimeBomb :
     { a
         | screen : Screen
         , tx : Float
         , ty : Float
-        , entityList : List Entity
+        , entityList : List TaggedCircle
     }
     -> TimeBomb
     -> Res
@@ -549,9 +510,9 @@ stepTimeBomb { screen, tx, ty, entityList } =
 
         aliveResponse : TimeBomb -> Res
         aliveResponse =
-            gravitateVelTo tx ty
-                >> bounceVel 0.5 screen
-                >> addVelToPos
+            Geom.gravitateVelTo tx ty
+                >> Geom.bounceVel 0.5 screen
+                >> Geom.addVelToPos
                 >> tick
                 >> AddTimeBomb
 
@@ -572,7 +533,7 @@ stepBullet :
         | screen : Screen
         , tx : Float
         , ty : Float
-        , entityList : List Entity
+        , entityList : List TaggedCircle
     }
     -> Bullet
     -> Res
@@ -580,9 +541,9 @@ stepBullet { screen, tx, ty, entityList } =
     let
         aliveResponse : Bullet -> Res
         aliveResponse =
-            gravitateVelTo tx ty
-                >> bounceVel 0.5 screen
-                >> addVelToPos
+            Geom.gravitateVelTo tx ty
+                >> Geom.bounceVel 0.5 screen
+                >> Geom.addVelToPos
                 >> AddBullet
 
         deathResponse : Bullet -> Res
@@ -598,7 +559,7 @@ stepTurret :
     { a
         | tx : Float
         , ty : Float
-        , entityList : List Entity
+        , entityList : List TaggedCircle
     }
     -> Turret
     -> Res
@@ -608,7 +569,7 @@ stepTurret { tx, ty, entityList } =
         fireWeaponResponse { x, y, r, weapon } =
             let
                 angle =
-                    angleFromTo x y tx ty
+                    Geom.angleFromTo x y tx ty
 
                 speed =
                     3
@@ -655,18 +616,12 @@ stepTurret { tx, ty, entityList } =
 
 viewMemory : Computer -> Mem -> List Shape
 viewMemory _ { player, turrets, bullets, timeBombs, explosions } =
-    [ viewPlayer player
+    [ Player.view player
     , viewTurrets turrets
     , viewBullets bullets
     , viewTimeBombs timeBombs
     , viewExplosions explosions
     ]
-
-
-viewPlayer : Player -> Shape
-viewPlayer { x, y, r } =
-    circle green r
-        |> move x y
 
 
 viewTurrets : List Turret -> Shape
@@ -732,98 +687,3 @@ main =
 
 
 -- Geom Helpers
-
-
-springToMouse : { a | x : Float, y : Float } -> { b | x : Float, y : Float, vx : Float, vy : Float } -> { b | x : Float, y : Float, vx : Float, vy : Float }
-springToMouse mouse ({ x, y, vx, vy } as p) =
-    let
-        k =
-            0.2
-
-        f =
-            0.5
-
-        ( dx, dy ) =
-            ( (mouse.x - x) * k, (mouse.y - y) * k )
-    in
-    { p | vx = (vx + dx) * f, vy = (vy + dy) * f }
-
-
-addVelToPos : { a | x : number, vx : number, y : number, vy : number } -> { a | x : number, vx : number, y : number, vy : number }
-addVelToPos b =
-    { b | x = b.x + b.vx, y = b.y + b.vy }
-
-
-gravitateVelTo :
-    Float
-    -> Float
-    -> { a | x : Float, y : Float, vx : Float, vy : Float }
-    -> { a | x : Float, y : Float, vx : Float, vy : Float }
-gravitateVelTo tx ty b =
-    let
-        ( dx, dy ) =
-            ( tx - b.x, ty - b.y )
-                |> toPolar
-                |> Tuple.mapFirst (\m -> 20 / m)
-                |> fromPolar
-    in
-    { b | vx = b.vx + dx, vy = b.vy + dy }
-
-
-bounceVel : Float -> Screen -> { a | x : Float, y : Float, vx : Float, vy : Float } -> { a | x : Float, y : Float, vx : Float, vy : Float }
-bounceVel bounceFactor screen ({ x, y, vx, vy } as b) =
-    let
-        ( nvx, nvy ) =
-            newBounceVelInScreen bounceFactor screen x y vx vy
-    in
-    { b | vx = nvx, vy = nvy }
-
-
-newBounceVelInScreen :
-    Float
-    -> Screen
-    -> Float
-    -> Float
-    -> Float
-    -> Float
-    -> ( Float, Float )
-newBounceVelInScreen bounceFriction scr x y vx vy =
-    let
-        nvx =
-            if
-                (x < scr.left && vx < 0)
-                    || (x > scr.right && vx > 0)
-            then
-                negate vx
-
-            else
-                vx
-
-        nvy =
-            if
-                (y < scr.bottom && vy < 0)
-                    || (y > scr.top && vy > 0)
-            then
-                negate vy
-
-            else
-                vy
-    in
-    if nvx /= vx || nvy /= vy then
-        toPolar ( nvx, nvy )
-            |> Tuple.mapFirst ((*) bounceFriction)
-            |> fromPolar
-
-    else
-        ( nvx, nvy )
-
-
-ccc : Number -> Number -> Number -> Number -> Number -> Number -> Bool
-ccc x y r x2 y2 r2 =
-    ((x2 - x) ^ 2 + (y2 - y) ^ 2)
-        < (r ^ 2 + r2 ^ 2)
-
-
-angleFromTo : Float -> Float -> Float -> Float -> Float
-angleFromTo x y x2 y2 =
-    atan2 (y2 - y) (x2 - x)

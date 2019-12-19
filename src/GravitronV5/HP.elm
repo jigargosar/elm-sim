@@ -1,12 +1,12 @@
-module GravitronV5.HP exposing (HP, fromMax, noneLeft, remaining, remove)
+module GravitronV5.HP exposing (HP, noneLeft, remaining, remove, withMax)
 
 
 type HP
     = HP Int Int
 
 
-fromMax : Int -> HP
-fromMax mx =
+withMax : Int -> HP
+withMax mx =
     HP (max 0 mx) (max 0 mx)
 
 

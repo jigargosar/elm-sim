@@ -75,7 +75,7 @@ initTurrets =
                 color
                 wep
                 (Timer.forTicks 160)
-                (HP.fromMax maxHP)
+                (HP.withMax maxHP)
     in
     List.map2 initTurret positions
 

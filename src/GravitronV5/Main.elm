@@ -15,6 +15,18 @@ type Velocity
     = Velocity Number Number
 
 
+moveByVel : { a | pos : Point, vel : Velocity } -> { a | pos : Point, vel : Velocity }
+moveByVel data =
+    let
+        (Point x y) =
+            data.pos
+
+        (Velocity vx vy) =
+            data.vel
+    in
+    { data | pos = Point (x + vx) (y + vy) }
+
+
 
 -- Actor
 
@@ -81,21 +93,7 @@ updatePlayer : Time -> Data -> Data
 updatePlayer time data =
     let
         updateVel d =
-            let
-                (Velocity vx vy) =
-                    d.vel
-            in
             { d | vel = Velocity (wave -2 2 3 time) (wave -1 1 5 time) }
-
-        moveByVel d =
-            let
-                (Point x y) =
-                    d.pos
-
-                (Velocity vx vy) =
-                    d.vel
-            in
-            { d | pos = Point (x + vx) (y + vy) }
     in
     data |> (updateVel >> moveByVel)
 

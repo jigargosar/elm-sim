@@ -65,23 +65,27 @@ initialMemory =
 
 
 updateMemory : Computer -> Mem -> Mem
-updateMemory { time, screen, mouse } mem =
-    { mem | actors = List.map updateActor mem.actors }
+updateMemory computer mem =
+    { mem | actors = List.map (updateActor computer) mem.actors }
 
 
-updateActor : Actor -> Actor
-updateActor actor =
+updateActor : Computer -> Actor -> Actor
+updateActor { time } actor =
     case actor of
         Player data ->
-            updatePlayer data
+            updatePlayer time data
                 |> Player
 
 
-updatePlayer : Data -> Data
-updatePlayer data =
+updatePlayer : Time -> Data -> Data
+updatePlayer time data =
     let
         updateVel d =
-            { d | vel = Velocity -1 1 }
+            let
+                (Velocity vx vy) =
+                    d.vel
+            in
+            { d | vel = Velocity (wave -2 2 3 time) (wave -1 1 5 time) }
 
         moveByVel d =
             let

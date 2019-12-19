@@ -8,6 +8,7 @@ import GravitronV5.Id as Id exposing (Id)
 import GravitronV5.Player as Player exposing (Player)
 import GravitronV5.Tag as Tag exposing (Tag)
 import GravitronV5.Timer as Timer exposing (Timer)
+import GravitronV5.Turret as Turret exposing (Turret)
 import Playground exposing (..)
 import PointFree exposing (anyPass, ifElse)
 
@@ -31,53 +32,17 @@ initialTimeBombBlastRadius =
     initialTimeBombRadius * 20
 
 
-type alias Turret =
-    { id : Id
-    , tag : Tag
-    , x : Number
-    , y : Number
-    , r : Number
-    , color : Color
-    , weapon : Weapon
-    , trigger : Timer
-    , hp : HP
-    }
-
-
-type Weapon
-    = BulletWeapon
-    | TimeBombWeapon
-
-
-type TurretConfig
-    = TurretConfig Id Color Weapon Int
-
-
-initTurrets : List TurretConfig -> List Turret
+initTurrets : List Turret.TurretConfig -> List Turret
 initTurrets =
     let
         positions =
             [ ( -1, 1 ), ( 1, -1 ), ( 1, 1 ), ( -1, -1 ) ]
+                |> List.map (Tuple.mapBoth ((*) factor) ((*) factor))
 
         factor =
             150
-
-        turretRadius : Number
-        turretRadius =
-            25
-
-        initTurret ( x, y ) (TurretConfig id color weapon maxHP) =
-            Turret id
-                Tag.TagTurret
-                (x * factor)
-                (y * factor)
-                turretRadius
-                color
-                weapon
-                (Timer.forTicks 160)
-                (HP.withMax maxHP)
     in
-    List.map2 initTurret positions
+    List.map2 Turret.initTurret positions
 
 
 type alias Bullet =
@@ -182,10 +147,10 @@ initialMemory =
     , player = Player.init 0 0
     , turrets =
         initTurrets
-            [ TurretConfig (Id.Turret 0) red BulletWeapon 1
-            , TurretConfig (Id.Turret 1) red BulletWeapon 1
-            , TurretConfig (Id.Turret 2) blue TimeBombWeapon 2
-            , TurretConfig (Id.Turret 3) orange BulletWeapon 3
+            [ Turret.TurretConfig (Id.Turret 0) red Turret.BulletWeapon 1
+            , Turret.TurretConfig (Id.Turret 1) red Turret.BulletWeapon 1
+            , Turret.TurretConfig (Id.Turret 2) blue Turret.TimeBombWeapon 2
+            , Turret.TurretConfig (Id.Turret 3) orange Turret.BulletWeapon 3
             ]
     , bullets = []
     , timeBombs = []
@@ -517,10 +482,10 @@ stepTurret { tx, ty, entityList } =
                     3
             in
             case weapon of
-                BulletWeapon ->
+                Turret.BulletWeapon ->
                     NewBullet x y r speed angle
 
-                TimeBombWeapon ->
+                Turret.TimeBombWeapon ->
                     NewTimeBomb x y r speed angle
 
         aliveResponse : Turret -> Res

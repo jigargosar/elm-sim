@@ -8,7 +8,7 @@ type Actor
 
 
 type alias Data =
-    { kind : Tag
+    { tag : Tag
     , pos : Point
     }
 

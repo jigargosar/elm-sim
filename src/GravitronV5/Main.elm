@@ -74,7 +74,7 @@ initTurrets =
                 turretRadius
                 color
                 wep
-                (Timer.fromMax 160)
+                (Timer.forTicks 160)
                 (HP.fromMax maxHP)
     in
     List.map2 initTurret positions
@@ -133,7 +133,7 @@ initTimeBomb x y offset speed angle id =
         initialTimeBombBlastRadius
         vx
         vy
-        (Timer.fromMax (60 * 2))
+        (Timer.forTicks (60 * 2))
 
 
 type alias Blast =
@@ -162,7 +162,7 @@ type alias Explosion =
 
 initExplosion : Number -> Number -> Number -> Color -> Id -> Explosion
 initExplosion x y r c id =
-    Explosion id (Timer.fromMax 60) x y r c
+    Explosion id (Timer.forTicks 60) x y r c
 
 
 type alias Mem =
@@ -432,7 +432,7 @@ stepExplosion e =
         NoRes
 
     else
-        AddExplosion { e | ct = Timer.step e.ct }
+        AddExplosion { e | ct = Timer.ticks e.ct }
 
 
 stepTimeBomb :
@@ -448,7 +448,7 @@ stepTimeBomb { screen, tx, ty, entityList } =
     let
         tick : TimeBomb -> TimeBomb
         tick b =
-            { b | bombTimer = Timer.step b.bombTimer }
+            { b | bombTimer = Timer.ticks b.bombTimer }
 
         aliveResponse : TimeBomb -> Res
         aliveResponse =
@@ -530,7 +530,7 @@ stepTurret { tx, ty, entityList } =
 
               else
                 NoRes
-            , AddTurret { t | triggerCt = Timer.step triggerCt }
+            , AddTurret { t | triggerCt = Timer.ticks triggerCt }
             ]
                 |> Batch
 

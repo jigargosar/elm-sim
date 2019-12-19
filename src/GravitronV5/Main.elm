@@ -101,13 +101,10 @@ type Actor
     = Player Data
 
 
-type Movement
+type Behaviour
     = RandomWalker
     | BounceInScreen Float
-
-
-type Behaviour
-    = Movement Movement
+    | MoveByVel
 
 
 type alias Data =
@@ -128,7 +125,12 @@ type Tag
 
 initialPlayer : Actor
 initialPlayer =
-    Player (Data PlayerTag (Point 0 0) (Velocity 0 0) [ Movement RandomWalker ])
+    Player
+        (Data PlayerTag
+            (Point 0 0)
+            (Velocity 0 0)
+            [ RandomWalker, BounceInScreen 1, MoveByVel ]
+        )
 
 
 
@@ -166,19 +168,16 @@ updateActor computer actor =
 
 
 applyBehaviour : Computer -> Behaviour -> Data -> Data
-applyBehaviour { time, screen } behaviour data =
+applyBehaviour { time, screen } behaviour =
     case behaviour of
-        Movement mv ->
-            let
-                updateVelocity =
-                    case mv of
-                        RandomWalker ->
-                            updateVelocityRandomWalker time
+        RandomWalker ->
+            updateVelocityRandomWalker time
 
-                        BounceInScreen bounceFactor ->
-                            bounceVel bounceFactor screen
-            in
-            data |> updateVelocity >> moveByVel
+        BounceInScreen bounceFactor ->
+            bounceVel bounceFactor screen
+
+        MoveByVel ->
+            moveByVel
 
 
 

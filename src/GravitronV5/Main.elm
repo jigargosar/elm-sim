@@ -103,16 +103,24 @@ updateMemory computer mem =
 
 
 updateActor : Computer -> Actor -> Actor
-updateActor { time } actor =
+updateActor computer actor =
     case actor of
         Player data ->
-            updatePlayer time data
+            List.foldl (applyBehaviour computer) data data.behaviours
                 |> Player
 
 
-updatePlayer : Time -> Data -> Data
-updatePlayer time data =
-    data |> (updateVelocityRandomWalker time >> moveByVel)
+applyBehaviour : Computer -> Behaviour -> Data -> Data
+applyBehaviour { time } behaviour data =
+    case behaviour of
+        Movement mv ->
+            let
+                updateVelocity =
+                    case mv of
+                        RandomWalker ->
+                            updateVelocityRandomWalker time
+            in
+            data |> updateVelocity >> moveByVel
 
 
 

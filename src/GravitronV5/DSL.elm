@@ -53,6 +53,10 @@ hasGravitateToBehaviour =
     Debug.todo "impl"
 
 
+receivesCollisionDamageFrom =
+    Debug.todo "impl"
+
+
 hasBounceInScreenBehaviour bounceFriction =
     Debug.todo "impl"
 
@@ -64,6 +68,7 @@ entityList =
     , entityNamed Turret
         |> firesBulletEvery 60
         |> hasHP
+        |> receivesCollisionDamageFrom [ Bullet ]
     , entityNamed Bullet
         |> hasGravitateToBehaviour Player
         |> hasBounceInScreenBehaviour 0.5

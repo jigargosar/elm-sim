@@ -71,6 +71,10 @@ hasBounceInScreenBehaviour bounceFriction =
     Debug.todo "impl"
 
 
+isKilledOnNextUpdate =
+    Debug.todo "impl"
+
+
 entityList : List Entity
 entityList =
     [ singletonEntityNamed Player
@@ -87,4 +91,6 @@ entityList =
         |> hasGravitateToSingletonBehaviour Player
         |> isKilledBy [ Bullet, Turret, TimeBomb ]
         |> onDeathSpawnsBombBlast
+    , entityNamed BombBlast
+        |> isKilledOnNextUpdate
     ]

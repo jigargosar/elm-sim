@@ -12,12 +12,50 @@ type EntityName
     | BombBlast
 
 
+toString : EntityName -> String
+toString name =
+    case name of
+        Player ->
+            "PLAYER"
+
+        Turret ->
+            "TURRET"
+
+        Bullet ->
+            "BULLET"
+
+        TimeBomb ->
+            "TIME_BOMB"
+
+        BombBlast ->
+            "BOMB_BLAST"
+
+
 type alias Entity =
     {}
 
 
 type SingletonDict
     = SingletonDict (Dict String Entity)
+
+
+getSingleton : EntityName -> SingletonDict -> Entity
+getSingleton name (SingletonDict dict) =
+    case Dict.get (toString name) dict of
+        Just entity ->
+            entity
+
+        Nothing ->
+            initialEntity name
+
+
+initialEntity : EntityName -> Entity
+initialEntity name =
+    let
+        config =
+            configOf name
+    in
+    Entity
 
 
 type alias EntityConfig =

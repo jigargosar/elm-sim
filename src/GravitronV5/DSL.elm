@@ -20,27 +20,6 @@ type SingletonDict
     = SingletonDict (Dict String Entity)
 
 
-type UUID
-    = UUID Int
-
-
-type MoveBehaviour
-    = MoveBehaviour
-
-
-type Health
-    = Health
-
-
-type WeaponConfig
-    = NoWeapon
-    | FiresEvery
-
-
-type DeathBehaviour
-    = DeathBehaviour
-
-
 type alias EntityConfig =
     { name : EntityName
     , isSingleton : Bool
@@ -82,6 +61,27 @@ configOf name =
         BombBlast ->
             entityNamed BombBlast
                 |> isKilledOnNextUpdate
+
+
+type UUID
+    = UUID Int
+
+
+type MoveBehaviour
+    = MoveBehaviour
+
+
+type Health
+    = Health
+
+
+type WeaponConfig
+    = NoWeapon
+    | FiresEvery
+
+
+type DeathBehaviour
+    = DeathBehaviour
 
 
 entityNamed =

@@ -42,6 +42,7 @@ type alias Entity =
     , r : Number
     , color : Color
     , moveBehaviour : MoveBehaviour
+    , bounceInScreen : Maybe Number
     , weapon : Weapon
     , vx : Number
     , vy : Number
@@ -99,7 +100,7 @@ setSingleton entity (SingletonDict dict) =
 
 
 entityFromIdConfig : UUID -> EntityConfig -> Entity
-entityFromIdConfig id { name, x, y, r, vx, vy, color, moveBehaviour, weaponConfig } =
+entityFromIdConfig id { name, x, y, r, vx, vy, color, moveBehaviour, bounceInScreen, weaponConfig } =
     { id = id
     , name = name
     , x = x
@@ -107,6 +108,7 @@ entityFromIdConfig id { name, x, y, r, vx, vy, color, moveBehaviour, weaponConfi
     , r = r
     , color = color
     , moveBehaviour = moveBehaviour
+    , bounceInScreen = bounceInScreen
     , vx = vx
     , vy = vy
     , weapon = Maybe.map weaponFromConfig weaponConfig |> Maybe.withDefault NoWeapon
@@ -377,6 +379,7 @@ addNewFromConfigs =
 updateEntity : Computer -> SingletonDict -> Entity -> ( List EntityConfig, Entity )
 updateEntity computer singletons e =
     stepMovement computer singletons e
+        |> stepBounceInScreen computer.screen
         |> stepPosition
         |> stepWeapon singletons
 
@@ -442,6 +445,16 @@ stepMovement { time } singletons e =
                     getSingleton targetName singletons
             in
             Geom.gravitateVelTo player.x player.y e
+
+
+stepBounceInScreen : Screen -> Entity -> Entity
+stepBounceInScreen screen e =
+    case e.bounceInScreen of
+        Just bounceFactor ->
+            Geom.bounceVel bounceFactor screen e
+
+        Nothing ->
+            e
 
 
 stepPosition : Entity -> Entity

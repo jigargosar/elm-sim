@@ -66,17 +66,6 @@ entityList =
     ]
 
 
-type alias CommonProps =
-    { uuid : UUID
-    , x : Number
-    , y : Number
-    , r : Number
-    , vx : Number
-    , vy : Number
-    , color : Color
-    }
-
-
 entityNamed =
     Debug.todo "impl"
 

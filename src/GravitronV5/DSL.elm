@@ -328,6 +328,12 @@ initialMemory =
     }
 
 
+type Response
+    = NewEntity EntityConfig
+    | UpdateEntity Entity
+    | RemoveEntity Entity
+
+
 updateMemory : Computer -> Mem -> Mem
 updateMemory computer mem =
     let

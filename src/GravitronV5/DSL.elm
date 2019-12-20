@@ -155,41 +155,44 @@ entityNamed name =
     }
 
 
+singletonEntityNamed : EntityName -> EntityConfig
 singletonEntityNamed =
-    Debug.todo "impl"
+    entityNamed >> (\c -> { c | isSingleton = True })
 
 
+hasRandomWalkerBehaviour : EntityConfig -> EntityConfig
 hasRandomWalkerBehaviour =
-    Debug.todo "impl"
+    identity
 
 
-firesWeaponEvery =
-    Debug.todo "impl"
+firesWeaponEvery : Int -> EntityConfig -> EntityConfig
+firesWeaponEvery _ =
+    identity
 
 
 hasHP =
-    Debug.todo "impl"
+    identity
 
 
-hasGravitateToSingletonBehaviour =
-    Debug.todo "impl"
+hasGravitateToSingletonBehaviour _ =
+    identity
 
 
-receivesCollisionDamageFrom =
-    Debug.todo "impl"
+receivesCollisionDamageFrom _ =
+    identity
 
 
-isKilledOnCollisionWith =
-    Debug.todo "impl"
+isKilledOnCollisionWith _ =
+    identity
 
 
 onDeathSpawnsBombBlast =
-    Debug.todo "impl"
+    identity
 
 
-hasBounceInScreenBehaviour bounceFriction =
-    Debug.todo "impl"
+hasBounceInScreenBehaviour _ =
+    identity
 
 
 isKilledOnNextUpdate =
-    Debug.todo "impl"
+    identity

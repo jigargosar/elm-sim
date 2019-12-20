@@ -1,5 +1,6 @@
 module GravitronV5.DSL exposing (..)
 
+import Dict exposing (Dict)
 import Playground exposing (..)
 
 
@@ -9,6 +10,14 @@ type EntityName
     | Bullet
     | TimeBomb
     | BombBlast
+
+
+type alias Entity =
+    {}
+
+
+type SingletonDict
+    = SingletonDict (Dict String Entity)
 
 
 type UUID
@@ -44,26 +53,35 @@ type alias EntityConfig =
     }
 
 
-entityList : List EntityConfig
-entityList =
-    [ singletonEntityNamed Player
-        |> hasRandomWalkerBehaviour
-        |> hasBounceInScreenBehaviour 1
-    , entityNamed Turret
-        |> firesWeaponEvery 60
-        |> hasHP
-        |> receivesCollisionDamageFrom [ Bullet, BombBlast ]
-    , entityNamed Bullet
-        |> hasGravitateToSingletonBehaviour Player
-        |> hasBounceInScreenBehaviour 0.5
-        |> isKilledOnCollisionWith [ Bullet, BombBlast, Turret ]
-    , entityNamed TimeBomb
-        |> hasGravitateToSingletonBehaviour Player
-        |> isKilledOnCollisionWith [ Bullet, BombBlast, Turret, TimeBomb ]
-        |> onDeathSpawnsBombBlast
-    , entityNamed BombBlast
-        |> isKilledOnNextUpdate
-    ]
+configOf : EntityName -> EntityConfig
+configOf name =
+    case name of
+        Player ->
+            singletonEntityNamed Player
+                |> hasRandomWalkerBehaviour
+                |> hasBounceInScreenBehaviour 1
+
+        Turret ->
+            entityNamed Turret
+                |> firesWeaponEvery 60
+                |> hasHP
+                |> receivesCollisionDamageFrom [ Bullet, BombBlast ]
+
+        Bullet ->
+            entityNamed Bullet
+                |> hasGravitateToSingletonBehaviour Player
+                |> hasBounceInScreenBehaviour 0.5
+                |> isKilledOnCollisionWith [ Bullet, BombBlast, Turret ]
+
+        TimeBomb ->
+            entityNamed TimeBomb
+                |> hasGravitateToSingletonBehaviour Player
+                |> isKilledOnCollisionWith [ Bullet, BombBlast, Turret, TimeBomb ]
+                |> onDeathSpawnsBombBlast
+
+        BombBlast ->
+            entityNamed BombBlast
+                |> isKilledOnNextUpdate
 
 
 entityNamed =

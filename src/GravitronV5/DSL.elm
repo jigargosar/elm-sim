@@ -49,14 +49,6 @@ hasHP =
     Debug.todo "impl"
 
 
-type Do
-    = MoveRandomWalker
-
-
-type BulletKind
-    = GravityBullet
-
-
 entityList : List Entity
 entityList =
     [ singletonEntityNamed Player

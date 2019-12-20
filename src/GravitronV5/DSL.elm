@@ -139,8 +139,20 @@ type DeathBehaviour
     = DeathBehaviour
 
 
-entityNamed =
-    Debug.todo "impl"
+entityNamed : EntityName -> EntityConfig
+entityNamed name =
+    { name = name
+    , x = 0
+    , y = 0
+    , r = 10
+    , isSingleton = False
+    , moveBehaviour = MoveBehaviour
+    , bounceInScreen = False
+    , health = Health
+    , receivesDamageFrom = []
+    , weaponConfig = NoWeapon
+    , onDeath = DeathBehaviour
+    }
 
 
 singletonEntityNamed =

@@ -216,8 +216,18 @@ updateMemory _ =
     identity
 
 
-viewMemory _ _ =
-    []
+viewMemory : Computer -> Mem -> List Shape
+viewMemory _ m =
+    let
+        (SingletonDict sDict) =
+            m.singletons
+    in
+    List.map viewEntity (Dict.values sDict)
+
+
+viewEntity entity =
+    circle red 100
+        |> move -100 100
 
 
 main =

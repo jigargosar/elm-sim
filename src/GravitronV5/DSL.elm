@@ -56,6 +56,11 @@ getSingleton name (SingletonDict dict) =
             initialSingleton name
 
 
+setSingleton : Entity -> SingletonDict -> SingletonDict
+setSingleton entity (SingletonDict dict) =
+    SingletonDict (Dict.insert (toString entity.name) entity dict)
+
+
 initialSingleton : EntityName -> Entity
 initialSingleton =
     let

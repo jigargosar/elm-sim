@@ -285,7 +285,10 @@ initialMemory =
 
 updateMemory : Computer -> Mem -> Mem
 updateMemory computer mem =
-    { mem | singletons = mapSingletons (updateEntity computer) mem.singletons }
+    { mem
+        | singletons = mapSingletons (updateEntity computer) mem.singletons
+        , entityList = List.map (updateEntity computer) mem.entityList
+    }
 
 
 updateEntity : Computer -> Entity -> Entity
@@ -326,7 +329,10 @@ viewMemory _ m =
         (SingletonDict sDict) =
             m.singletons
     in
-    List.map viewEntity (Dict.values sDict)
+    [ List.map viewEntity (Dict.values sDict)
+    , List.map viewEntity m.entityList
+    ]
+        |> List.map group
 
 
 viewEntity : Entity -> Shape

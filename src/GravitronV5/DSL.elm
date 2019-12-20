@@ -4,20 +4,18 @@ import Playground exposing (..)
 import Random
 
 
-type Name
-    = NamePlayer
-    | NameTurret
-    | NameBullet
+type EntityType
+    = Player
+    | Turret
+    | Bullet
 
 
 type UUID
     = UUID Int
 
 
-randomUUID : Random.Generator UUID
-randomUUID =
-    Random.int 100 Random.maxInt
-        |> Random.map UUID
+type Entity
+    = Entity
 
 
 type alias CommonProps =
@@ -31,11 +29,40 @@ type alias CommonProps =
     }
 
 
-commonPropGenerator : Random.Generator CommonProps
-commonPropGenerator =
-    let
-        initCommonProps : UUID -> CommonProps
-        initCommonProps uuid =
-            { uuid = uuid, x = 0, y = 0, r = 0, vx = 0, vy = 0, color = blue }
-    in
-    randomUUID |> Random.map initCommonProps
+entityNamed =
+    Debug.todo "impl"
+
+
+singletonEntityNamed =
+    Debug.todo "impl"
+
+
+hasRandomWalkerBehaviour =
+    Debug.todo "impl"
+
+
+firesBulletEvery =
+    Debug.todo "impl"
+
+
+hasHP =
+    Debug.todo "impl"
+
+
+type Do
+    = MoveRandomWalker
+
+
+type BulletKind
+    = GravityBullet
+
+
+entityList : List Entity
+entityList =
+    [ singletonEntityNamed Player
+        |> hasRandomWalkerBehaviour
+    , entityNamed Turret
+        |> firesBulletEvery 60
+        |> hasHP
+    , entityNamed Bullet
+    ]

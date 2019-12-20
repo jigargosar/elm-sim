@@ -369,7 +369,7 @@ stepResponses =
                     mem
 
                 Batch responses ->
-                    stepAll mem responses
+                    List.foldr stepOne mem responses
 
                 NewEntity entityConfig ->
                     { mem
@@ -383,12 +383,8 @@ stepResponses =
 
                     else
                         { mem | entityList = entity :: entityList }
-
-        stepAll : Mem -> List Response -> Mem
-        stepAll =
-            List.foldr stepOne
     in
-    (\mem -> { mem | entityList = [] }) >> stepAll
+    (\mem -> { mem | entityList = [] }) >> List.foldr stepOne
 
 
 stepEntity : Computer -> SingletonDict -> Entity -> Response

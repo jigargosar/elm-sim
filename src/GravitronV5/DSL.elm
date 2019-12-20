@@ -282,8 +282,9 @@ receivesCollisionDamageFrom l c =
     { c | receivesDamageFrom = l }
 
 
-isKilledOnCollisionWith _ =
-    identity
+isKilledOnCollisionWith : List EntityName -> EntityConfig -> EntityConfig
+isKilledOnCollisionWith =
+    receivesCollisionDamageFrom
 
 
 onDeathSpawnsBombBlast =

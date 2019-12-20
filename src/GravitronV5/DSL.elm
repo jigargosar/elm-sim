@@ -332,6 +332,8 @@ type Response
     = NewEntity EntityConfig
     | UpdateEntity Entity
     | RemoveEntity Entity
+    | NoResponse
+    | Batch (List Response)
 
 
 updateMemory : Computer -> Mem -> Mem
@@ -340,37 +342,38 @@ updateMemory computer mem =
         { singletons, entityList } =
             mem
 
-        updateHelp : Entity -> ( List EntityConfig, Entity )
-        updateHelp =
-            updateEntity computer singletons
-
-        ( newConfigs1, newSingletonList ) =
-            List.Extra.mapAccuml
-                (\acc e ->
-                    updateHelp e
-                        |> Tuple.mapFirst ((++) acc)
-                )
-                []
-                (singletonsValues singletons)
-
-        ( newConfigs2, newEntityList ) =
-            List.Extra.mapAccuml
-                (\acc e ->
-                    updateHelp e
-                        |> Tuple.mapFirst ((++) acc)
-                )
-                []
-                entityList
-
-        newConfigs : List EntityConfig
-        newConfigs =
-            [ newConfigs1, newConfigs2 ] |> List.concat
+        stepBatch : List Entity -> Response
+        stepBatch =
+            List.map (stepEntity computer singletons) >> Batch
     in
-    { mem
-        | singletons = singletonsFromList newSingletonList
-        , entityList = newEntityList
-    }
-        |> addNewFromConfigs newConfigs
+    [ stepBatch (singletonsValues singletons)
+    , stepBatch entityList
+    ]
+        |> stepResponses mem
+
+
+stepResponse : Response -> Mem -> Mem
+stepResponse response mem =
+    case response of
+        NoResponse ->
+            mem
+
+        Batch responses ->
+            stepResponses mem responses
+
+        NewEntity entityConfig ->
+            mem
+
+        UpdateEntity entity ->
+            mem
+
+        RemoveEntity entity ->
+            mem
+
+
+stepResponses : Mem -> List Response -> Mem
+stepResponses =
+    List.foldl stepResponse
 
 
 addNewFromConfigs : List EntityConfig -> Mem -> Mem
@@ -382,19 +385,19 @@ addNewFromConfigs =
     \newConfigs mem -> List.foldl addNew mem newConfigs
 
 
-updateEntity : Computer -> SingletonDict -> Entity -> ( List EntityConfig, Entity )
-updateEntity computer singletons e =
-    stepMovement computer singletons e
-        |> stepBounceInScreen computer.screen
-        |> stepPosition
+stepEntity : Computer -> SingletonDict -> Entity -> Response
+stepEntity computer singletons e =
+    updateMovement computer singletons e
+        |> updateBounceInScreen computer.screen
+        |> updatePosition
         |> stepWeapon singletons
 
 
-stepWeapon : SingletonDict -> Entity -> ( List EntityConfig, Entity )
+stepWeapon : SingletonDict -> Entity -> Response
 stepWeapon singletons e =
     case e.weapon of
         NoWeapon ->
-            ( [], e )
+            UpdateEntity e
 
         Weapon elapsed ({ every, name, towards } as weaponConfig) ->
             if elapsed >= every then
@@ -422,14 +425,14 @@ stepWeapon singletons e =
                             |> uncurry movePos (fromPolar ( offset, angle ))
                             |> uncurry setVel (fromPolar ( speed, angle ))
                 in
-                ( [ newProjectileConfig ], { e | weapon = Weapon 0 weaponConfig } )
+                Batch [ NewEntity newProjectileConfig, UpdateEntity { e | weapon = Weapon 0 weaponConfig } ]
 
             else
-                ( [], { e | weapon = Weapon (elapsed + 1) weaponConfig } )
+                UpdateEntity { e | weapon = Weapon (elapsed + 1) weaponConfig }
 
 
-stepMovement : Computer -> SingletonDict -> Entity -> Entity
-stepMovement { time, screen } singletons e =
+updateMovement : Computer -> SingletonDict -> Entity -> Entity
+updateMovement { time, screen } singletons e =
     case e.moveBehaviour of
         NoMovement ->
             e
@@ -446,8 +449,8 @@ stepMovement { time, screen } singletons e =
             Geom.gravitateVelTo player.x player.y e
 
 
-stepBounceInScreen : Screen -> Entity -> Entity
-stepBounceInScreen screen e =
+updateBounceInScreen : Screen -> Entity -> Entity
+updateBounceInScreen screen e =
     case e.bounceInScreen of
         Just bounceFactor ->
             Geom.bounceVel bounceFactor screen e
@@ -456,8 +459,8 @@ stepBounceInScreen screen e =
             e
 
 
-stepPosition : Entity -> Entity
-stepPosition e =
+updatePosition : Entity -> Entity
+updatePosition e =
     let
         { x, y, vx, vy } =
             e

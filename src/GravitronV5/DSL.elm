@@ -126,8 +126,8 @@ initSingleton name =
     entityFromIdConfig (SingletonID name) config
 
 
-initEntity : UUID -> EntityName -> Entity
-initEntity id name =
+initEntityWithIdName : UUID -> EntityName -> Entity
+initEntityWithIdName id name =
     let
         config =
             configOf name
@@ -299,6 +299,7 @@ type Memory
 type alias Mem =
     { singletons : SingletonDict
     , entityList : List Entity
+    , nextId : Int
     }
 
 
@@ -309,12 +310,13 @@ initialMemory =
             [ ( -150, 150 ) ]
                 |> List.map
                     (\( x, y ) ->
-                        initEntity (UUID 1) Turret
+                        initEntityWithIdName (UUID 1) Turret
                             |> setPos x y
                     )
     in
     { singletons = initSingletons [ Player ]
     , entityList = turrets
+    , nextId = 100
     }
 
 
@@ -324,42 +326,56 @@ updateMemory computer mem =
         { singletons, entityList } =
             mem
 
-        updateHelp : Entity -> ( List Entity, Entity )
+        updateHelp : Entity -> ( List EntityConfig, Entity )
         updateHelp =
             updateEntity computer singletons
 
-        ( newEntities1, newSingletonList ) =
+        ( newConfigs1, newSingletonList ) =
             List.Extra.mapAccuml
                 (\acc e ->
                     updateHelp e
-                        |> Tuple.mapFirst (flip (::) acc)
+                        |> Tuple.mapFirst ((++) acc)
                 )
                 []
                 (singletonsValues singletons)
 
-        ( newEntities2, newEntityList ) =
+        ( newConfigs2, newEntityList ) =
             List.Extra.mapAccuml
                 (\acc e ->
                     updateHelp e
-                        |> Tuple.mapFirst (flip (::) acc)
+                        |> Tuple.mapFirst ((++) acc)
                 )
                 []
                 entityList
+
+        newConfigs : List EntityConfig
+        newConfigs =
+            [ newConfigs1, newConfigs2 ] |> List.concat
     in
     { mem
         | singletons = singletonsFromList newSingletonList
-        , entityList = List.concat newEntities1 ++ List.concat newEntities2 ++ newEntityList
+        , entityList = newEntityList
     }
+        |> addNewFromConfigs newConfigs
 
 
-updateEntity : Computer -> SingletonDict -> Entity -> ( List Entity, Entity )
+addNewFromConfigs : List EntityConfig -> Mem -> Mem
+addNewFromConfigs =
+    let
+        addNew c mem =
+            { mem | entityList = entityFromIdConfig (UUID mem.nextId) c :: mem.entityList }
+    in
+    \newConfigs mem -> List.foldl addNew mem newConfigs
+
+
+updateEntity : Computer -> SingletonDict -> Entity -> ( List EntityConfig, Entity )
 updateEntity computer singletons e =
     stepMovement computer e
         |> stepPosition
         |> stepWeapon singletons
 
 
-stepWeapon : SingletonDict -> Entity -> ( List Entity, Entity )
+stepWeapon : SingletonDict -> Entity -> ( List EntityConfig, Entity )
 stepWeapon singletons e =
     case e.weapon of
         NoWeapon ->
@@ -391,7 +407,7 @@ stepWeapon singletons e =
                             |> uncurry movePos (fromPolar ( offset, angle ))
                             |> uncurry setVel (fromPolar ( speed, angle ))
                 in
-                ( [], { e | weapon = Weapon 0 weaponConfig } )
+                ( [ newProjectileConfig ], { e | weapon = Weapon 0 weaponConfig } )
 
             else
                 ( [], { e | weapon = Weapon (elapsed + 1) weaponConfig } )

@@ -174,7 +174,7 @@ configOf name =
                 |> withRadius 25
                 |> withColor red
                 |> firesWeaponEvery 60
-                |> hasHP
+                |> withMaxHP
 
         --|> receivesCollisionDamageFrom [ Bullet, BombBlast ]
         Bullet ->
@@ -268,7 +268,7 @@ firesWeaponEvery every c =
     { c | weaponConfig = Just { every = every, name = Bullet, towards = Player } }
 
 
-hasHP =
+withMaxHP =
     identity
 
 

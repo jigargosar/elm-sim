@@ -102,7 +102,8 @@ configOf name =
 
 
 type UUID
-    = UUID Int
+    = SingletonID EntityName
+    | UUID Int
 
 
 type MoveBehaviour

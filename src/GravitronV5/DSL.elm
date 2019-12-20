@@ -9,6 +9,7 @@ type EntityType
     | Turret
     | Bullet
     | TimeBomb
+    | BombBlast
 
 
 type UUID
@@ -50,7 +51,7 @@ hasHP =
     Debug.todo "impl"
 
 
-hasGravitateToBehaviour =
+hasGravitateToSingletonBehaviour =
     Debug.todo "impl"
 
 
@@ -59,6 +60,10 @@ receivesCollisionDamageFrom =
 
 
 isKilledBy =
+    Debug.todo "impl"
+
+
+onDeathSpawnsBombBlast =
     Debug.todo "impl"
 
 
@@ -75,7 +80,11 @@ entityList =
         |> hasHP
         |> receivesCollisionDamageFrom [ Bullet ]
     , entityNamed Bullet
-        |> hasGravitateToBehaviour Player
+        |> hasGravitateToSingletonBehaviour Player
         |> hasBounceInScreenBehaviour 0.5
         |> isKilledBy [ Bullet, Turret ]
+    , entityNamed TimeBomb
+        |> hasGravitateToSingletonBehaviour Player
+        |> isKilledBy [ Bullet, Turret, TimeBomb ]
+        |> onDeathSpawnsBombBlast
     ]

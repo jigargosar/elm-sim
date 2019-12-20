@@ -32,7 +32,7 @@ toString name =
 
 
 type alias Entity =
-    {}
+    { id : UUID }
 
 
 type SingletonDict
@@ -46,16 +46,16 @@ getSingleton name (SingletonDict dict) =
             entity
 
         Nothing ->
-            initialEntity name
+            initialSingleton name
 
 
-initialEntity : EntityName -> Entity
-initialEntity name =
+initialSingleton : EntityName -> Entity
+initialSingleton name =
     let
         config =
             configOf name
     in
-    Entity
+    Entity (SingletonID name)
 
 
 type alias EntityConfig =

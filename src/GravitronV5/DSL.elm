@@ -388,7 +388,7 @@ stepResponses =
         stepAll =
             List.foldr stepOne
     in
-    stepAll
+    (\mem -> { mem | entityList = [] }) >> stepAll
 
 
 stepEntity : Computer -> SingletonDict -> Entity -> Response

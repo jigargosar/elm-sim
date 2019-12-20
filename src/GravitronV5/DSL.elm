@@ -146,7 +146,7 @@ type alias EntityConfig =
     , color : Color
     , isSingleton : Bool
     , moveBehaviour : MoveBehaviour
-    , bounceInScreen : Bool
+    , bounceInScreen : Maybe Number
     , health : Health
     , receivesDamageFrom : List EntityName
     , weaponConfig : Maybe WeaponConfig
@@ -230,7 +230,7 @@ entityNamed name =
     , color = blue
     , isSingleton = False
     , moveBehaviour = NoMovement
-    , bounceInScreen = False
+    , bounceInScreen = Nothing
     , health = Health
     , receivesDamageFrom = []
     , weaponConfig = Nothing
@@ -285,8 +285,8 @@ onDeathSpawnsBombBlast =
 
 
 hasBounceInScreenBehaviour : Number -> EntityConfig -> EntityConfig
-hasBounceInScreenBehaviour bf =
-    identity
+hasBounceInScreenBehaviour bf e =
+    { e | bounceInScreen = Just bf }
 
 
 isKilledOnNextUpdate =

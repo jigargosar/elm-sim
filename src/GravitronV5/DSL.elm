@@ -133,7 +133,8 @@ type UUID
 
 
 type MoveBehaviour
-    = MoveBehaviour
+    = NoMovement
+    | RandomWalker
 
 
 type Health
@@ -157,7 +158,7 @@ entityNamed name =
     , r = 10
     , color = blue
     , isSingleton = False
-    , moveBehaviour = MoveBehaviour
+    , moveBehaviour = NoMovement
     , bounceInScreen = False
     , health = Health
     , receivesDamageFrom = []
@@ -182,8 +183,8 @@ withColor color c =
 
 
 hasRandomWalkerBehaviour : EntityConfig -> EntityConfig
-hasRandomWalkerBehaviour =
-    identity
+hasRandomWalkerBehaviour c =
+    { c | moveBehaviour = RandomWalker }
 
 
 firesWeaponEvery : Int -> EntityConfig -> EntityConfig

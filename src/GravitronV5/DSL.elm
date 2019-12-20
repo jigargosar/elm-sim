@@ -139,7 +139,7 @@ configOf name =
 
         Turret ->
             entityNamed Turret
-                |> withRadius 22
+                |> withRadius 25
                 |> withColor red
                 |> firesWeaponEvery 60
                 |> hasHP

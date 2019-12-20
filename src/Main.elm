@@ -1,6 +1,6 @@
 module Main exposing (main)
 
-import GravitronV5.Main as Main
+import GravitronV5.DSL as Main
 
 
 main =

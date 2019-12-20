@@ -1,4 +1,4 @@
-module GravitronV5.DSL exposing (..)
+module GravitronV5.DSL exposing (main)
 
 import Dict exposing (Dict)
 import Playground exposing (..)
@@ -196,3 +196,29 @@ hasBounceInScreenBehaviour _ =
 
 isKilledOnNextUpdate =
     identity
+
+
+
+-- Game
+
+
+type alias Mem =
+    { singletons : SingletonDict }
+
+
+initialMemory : Mem
+initialMemory =
+    { singletons = SingletonDict Dict.empty }
+
+
+updateMemory : Computer -> Mem -> Mem
+updateMemory _ =
+    identity
+
+
+viewMemory _ _ =
+    []
+
+
+main =
+    game viewMemory updateMemory initialMemory

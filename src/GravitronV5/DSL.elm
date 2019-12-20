@@ -1,7 +1,8 @@
 module GravitronV5.DSL exposing (main)
 
-import Basics.Extra exposing (uncurry)
+import Basics.Extra exposing (flip, uncurry)
 import Dict exposing (Dict)
+import List.Extra
 import Playground exposing (..)
 
 
@@ -71,6 +72,11 @@ initSingletons names =
         |> List.foldl setSingleton (SingletonDict Dict.empty)
 
 
+singletonsFromList : List Entity -> SingletonDict
+singletonsFromList =
+    List.foldl setSingleton (SingletonDict Dict.empty)
+
+
 getSingleton : EntityName -> SingletonDict -> Entity
 getSingleton name (SingletonDict dict) =
     case Dict.get (toString name) dict of
@@ -81,9 +87,9 @@ getSingleton name (SingletonDict dict) =
             initSingleton name
 
 
-mapSingletons : (Entity -> Entity) -> SingletonDict -> SingletonDict
-mapSingletons func (SingletonDict dict) =
-    Dict.map (\_ -> func) dict |> SingletonDict
+singletonsValues : SingletonDict -> List Entity
+singletonsValues (SingletonDict dict) =
+    Dict.values dict
 
 
 setSingleton : Entity -> SingletonDict -> SingletonDict
@@ -318,27 +324,46 @@ updateMemory computer mem =
         { singletons, entityList } =
             mem
 
+        updateHelp : Entity -> ( List Entity, Entity )
         updateHelp =
             updateEntity computer singletons
+
+        ( newEntities1, newSingletonList ) =
+            List.Extra.mapAccuml
+                (\acc e ->
+                    updateHelp e
+                        |> Tuple.mapFirst (flip (::) acc)
+                )
+                []
+                (singletonsValues singletons)
+
+        ( newEntities2, newEntityList ) =
+            List.Extra.mapAccuml
+                (\acc e ->
+                    updateHelp e
+                        |> Tuple.mapFirst (flip (::) acc)
+                )
+                []
+                (singletonsValues singletons)
     in
     { mem
-        | singletons = mapSingletons updateHelp singletons
-        , entityList = List.map updateHelp entityList
+        | singletons = singletonsFromList newSingletonList
+        , entityList = List.concat newEntities1 ++ List.concat newEntities2 ++ newEntityList
     }
 
 
-updateEntity : Computer -> SingletonDict -> Entity -> Entity
+updateEntity : Computer -> SingletonDict -> Entity -> ( List Entity, Entity )
 updateEntity computer singletons e =
     stepMovement computer e
         |> stepPosition
         |> stepWeapon singletons
 
 
-stepWeapon : SingletonDict -> Entity -> Entity
+stepWeapon : SingletonDict -> Entity -> ( List Entity, Entity )
 stepWeapon singletons e =
     case e.weapon of
         NoWeapon ->
-            e
+            ( [], e )
 
         Weapon elapsed ({ every, name, towards } as weaponConfig) ->
             if elapsed >= every then
@@ -366,10 +391,10 @@ stepWeapon singletons e =
                             |> uncurry movePos (fromPolar ( offset, angle ))
                             |> uncurry setVel (fromPolar ( speed, angle ))
                 in
-                { e | weapon = Weapon 0 weaponConfig }
+                ( [], { e | weapon = Weapon 0 weaponConfig } )
 
             else
-                { e | weapon = Weapon (elapsed + 1) weaponConfig }
+                ( [], { e | weapon = Weapon (elapsed + 1) weaponConfig } )
 
 
 stepMovement : Computer -> Entity -> Entity

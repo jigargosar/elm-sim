@@ -311,6 +311,10 @@ type alias Mem =
     }
 
 
+singletonNames =
+    [ Player ]
+
+
 initialMemory : Mem
 initialMemory =
     let
@@ -322,7 +326,7 @@ initialMemory =
                             |> setPos x y
                     )
     in
-    { singletons = initSingletons [ Player ]
+    { singletons = initSingletons singletonNames
     , entityList = turrets
     , nextId = 100
     }
@@ -330,8 +334,7 @@ initialMemory =
 
 type Response
     = NewEntity EntityConfig
-    | UpdateEntity Entity
-    | RemoveEntity Entity
+    | AddEntity Entity
     | NoResponse
     | Batch (List Response)
 
@@ -352,37 +355,40 @@ updateMemory computer mem =
         |> stepResponses mem
 
 
-stepResponse : Response -> Mem -> Mem
-stepResponse response mem =
-    case response of
-        NoResponse ->
-            mem
-
-        Batch responses ->
-            stepResponses mem responses
-
-        NewEntity entityConfig ->
-            mem
-
-        UpdateEntity entity ->
-            mem
-
-        RemoveEntity entity ->
-            mem
-
-
 stepResponses : Mem -> List Response -> Mem
 stepResponses =
-    List.foldl stepResponse
-
-
-addNewFromConfigs : List EntityConfig -> Mem -> Mem
-addNewFromConfigs =
     let
-        addNew c mem =
-            { mem | entityList = entityFromIdConfig (UUID mem.nextId) c :: mem.entityList }
+        stepOne : Response -> Mem -> Mem
+        stepOne response mem =
+            let
+                { singletons, entityList, nextId } =
+                    mem
+            in
+            case response of
+                NoResponse ->
+                    mem
+
+                Batch responses ->
+                    stepAll mem responses
+
+                NewEntity entityConfig ->
+                    { mem
+                        | entityList = entityFromIdConfig (UUID nextId) entityConfig :: entityList
+                        , nextId = nextId + 1
+                    }
+
+                AddEntity entity ->
+                    if List.member entity.name singletonNames then
+                        { mem | singletons = setSingleton entity singletons }
+
+                    else
+                        { mem | entityList = entity :: entityList }
+
+        stepAll : Mem -> List Response -> Mem
+        stepAll =
+            List.foldr stepOne
     in
-    \newConfigs mem -> List.foldl addNew mem newConfigs
+    stepAll
 
 
 stepEntity : Computer -> SingletonDict -> Entity -> Response
@@ -397,7 +403,7 @@ stepWeapon : SingletonDict -> Entity -> Response
 stepWeapon singletons e =
     case e.weapon of
         NoWeapon ->
-            UpdateEntity e
+            AddEntity e
 
         Weapon elapsed ({ every, name, towards } as weaponConfig) ->
             if elapsed >= every then
@@ -425,10 +431,10 @@ stepWeapon singletons e =
                             |> uncurry movePos (fromPolar ( offset, angle ))
                             |> uncurry setVel (fromPolar ( speed, angle ))
                 in
-                Batch [ NewEntity newProjectileConfig, UpdateEntity { e | weapon = Weapon 0 weaponConfig } ]
+                Batch [ NewEntity newProjectileConfig, AddEntity { e | weapon = Weapon 0 weaponConfig } ]
 
             else
-                UpdateEntity { e | weapon = Weapon (elapsed + 1) weaponConfig }
+                AddEntity { e | weapon = Weapon (elapsed + 1) weaponConfig }
 
 
 updateMovement : Computer -> SingletonDict -> Entity -> Entity

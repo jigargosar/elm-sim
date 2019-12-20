@@ -143,7 +143,6 @@ type Health
 
 type WeaponConfig
     = NoWeapon
-    | FiresEvery
 
 
 type DeathBehaviour

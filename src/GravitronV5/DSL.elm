@@ -344,7 +344,7 @@ updateMemory computer mem =
                         |> Tuple.mapFirst (flip (::) acc)
                 )
                 []
-                (singletonsValues singletons)
+                entityList
     in
     { mem
         | singletons = singletonsFromList newSingletonList

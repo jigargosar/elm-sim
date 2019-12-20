@@ -238,6 +238,11 @@ isKilledOnNextUpdate =
 -- Game
 
 
+type Memory
+    = Init
+    | Memory Mem
+
+
 type alias Mem =
     { singletons : SingletonDict
     , entityList : List Entity
@@ -304,4 +309,23 @@ viewEntity { x, y, r, color } =
 
 
 main =
-    game viewMemory updateMemory initialMemory
+    let
+        view_ : Computer -> Memory -> List Shape
+        view_ c m =
+            case m of
+                Init ->
+                    []
+
+                Memory mem ->
+                    viewMemory c mem
+
+        update_ : Computer -> Memory -> Memory
+        update_ c m =
+            case m of
+                Init ->
+                    Memory initialMemory
+
+                Memory mem ->
+                    Memory (updateMemory c mem)
+    in
+    game view_ update_ Init

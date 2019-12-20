@@ -175,13 +175,13 @@ configOf name =
             entityNamed Bullet
                 |> withRadius 8
                 |> withColor darkGray
-                |> hasGravitateToSingletonBehaviour Player
+                |> withGravitateToSingleton Player
                 |> hasBounceInScreenBehaviour 0.5
                 |> isKilledOnCollisionWith [ Bullet, BombBlast, Turret ]
 
         TimeBomb ->
             entityNamed TimeBomb
-                |> hasGravitateToSingletonBehaviour Player
+                |> withGravitateToSingleton Player
                 |> isKilledOnCollisionWith [ Bullet, BombBlast, Turret, TimeBomb ]
                 |> onDeathSpawnsBombBlast
 
@@ -198,6 +198,7 @@ type UUID
 type MoveBehaviour
     = NoMovement
     | RandomWalker
+    | GravitateTo EntityName
 
 
 type Health
@@ -265,7 +266,7 @@ hasHP =
     identity
 
 
-hasGravitateToSingletonBehaviour _ =
+withGravitateToSingleton _ =
     identity
 
 
@@ -372,7 +373,7 @@ addNewFromConfigs =
 
 updateEntity : Computer -> SingletonDict -> Entity -> ( List EntityConfig, Entity )
 updateEntity computer singletons e =
-    stepMovement computer e
+    stepMovement computer singletons e
         |> stepPosition
         |> stepWeapon singletons
 
@@ -415,8 +416,8 @@ stepWeapon singletons e =
                 ( [], { e | weapon = Weapon (elapsed + 1) weaponConfig } )
 
 
-stepMovement : Computer -> Entity -> Entity
-stepMovement { time } e =
+stepMovement : Computer -> SingletonDict -> Entity -> Entity
+stepMovement { time } singletons e =
     case e.moveBehaviour of
         NoMovement ->
             e
@@ -429,7 +430,10 @@ stepMovement { time } e =
                 dy =
                     400
             in
-            { e | x = zigzag -dx dx 1.92 time, y = wave -dy dy 2.11 time }
+            setPos (zigzag -dx dx 1.92 time) (wave -dy dy 2.11 time) e
+
+        GravitateTo target ->
+            e
 
 
 stepPosition : Entity -> Entity

@@ -217,7 +217,10 @@ type alias Mem =
 
 initialMemory : Mem
 initialMemory =
-    { singletons = SingletonDict Dict.empty }
+    { singletons =
+        SingletonDict Dict.empty
+            |> setSingleton (initialSingleton Player)
+    }
 
 
 updateMemory : Computer -> Mem -> Mem

@@ -56,6 +56,11 @@ getSingleton name (SingletonDict dict) =
             initialSingleton name
 
 
+mapSingletons : (Entity -> Entity) -> SingletonDict -> SingletonDict
+mapSingletons func (SingletonDict dict) =
+    Dict.map (\_ -> func) dict |> SingletonDict
+
+
 setSingleton : Entity -> SingletonDict -> SingletonDict
 setSingleton entity (SingletonDict dict) =
     SingletonDict (Dict.insert (toString entity.name) entity dict)
@@ -236,7 +241,11 @@ initialMemory =
 
 
 updateMemory : Computer -> Mem -> Mem
-updateMemory _ =
+updateMemory _ mem =
+    { mem | singletons = mapSingletons updateEntity mem.singletons }
+
+
+updateEntity =
     identity
 
 

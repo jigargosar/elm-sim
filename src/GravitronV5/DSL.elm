@@ -239,12 +239,15 @@ isKilledOnNextUpdate =
 
 
 type alias Mem =
-    { singletons : SingletonDict }
+    { singletons : SingletonDict
+    , entityList : List Entity
+    }
 
 
 initialMemory : Mem
 initialMemory =
     { singletons = initSingletons [ Player ]
+    , entityList = []
     }
 
 

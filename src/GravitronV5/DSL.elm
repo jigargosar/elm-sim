@@ -139,6 +139,8 @@ configOf name =
 
         Turret ->
             entityNamed Turret
+                |> withRadius 22
+                |> withColor red
                 |> firesWeaponEvery 60
                 |> hasHP
                 |> receivesCollisionDamageFrom [ Bullet, BombBlast ]

@@ -334,7 +334,7 @@ initialMemory =
 
 type Response
     = NewEntity EntityConfig
-    | AddEntity Entity
+    | UpdateEntity Entity
     | NoResponse
     | Batch (List Response)
 
@@ -377,7 +377,7 @@ stepResponses =
                         , nextId = nextId + 1
                     }
 
-                AddEntity entity ->
+                UpdateEntity entity ->
                     if List.member entity.name singletonNames then
                         { mem | singletons = setSingleton entity singletons }
 
@@ -399,7 +399,7 @@ stepWeapon : SingletonDict -> Entity -> Response
 stepWeapon singletons e =
     case e.weapon of
         NoWeapon ->
-            AddEntity e
+            UpdateEntity e
 
         Weapon elapsed ({ every, name, towards } as weaponConfig) ->
             if elapsed >= every then
@@ -427,10 +427,10 @@ stepWeapon singletons e =
                             |> uncurry movePos (fromPolar ( offset, angle ))
                             |> uncurry setVel (fromPolar ( speed, angle ))
                 in
-                Batch [ NewEntity newProjectileConfig, AddEntity { e | weapon = Weapon 0 weaponConfig } ]
+                Batch [ NewEntity newProjectileConfig, UpdateEntity { e | weapon = Weapon 0 weaponConfig } ]
 
             else
-                AddEntity { e | weapon = Weapon (elapsed + 1) weaponConfig }
+                UpdateEntity { e | weapon = Weapon (elapsed + 1) weaponConfig }
 
 
 updateMovement : Computer -> SingletonDict -> Entity -> Entity

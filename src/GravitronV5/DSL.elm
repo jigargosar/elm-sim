@@ -3,7 +3,6 @@ module GravitronV5.DSL exposing (main)
 import Basics.Extra exposing (uncurry)
 import Dict exposing (Dict)
 import GravitronV5.Geom as Geom
-import List.Extra
 import Playground exposing (..)
 
 
@@ -46,6 +45,7 @@ type alias Entity =
     , weapon : Weapon
     , vx : Number
     , vy : Number
+    , receivesDamageFrom : List EntityName
     }
 
 
@@ -74,11 +74,6 @@ initSingletons names =
         |> List.foldl setSingleton (SingletonDict Dict.empty)
 
 
-singletonsFromList : List Entity -> SingletonDict
-singletonsFromList =
-    List.foldl setSingleton (SingletonDict Dict.empty)
-
-
 getSingleton : EntityName -> SingletonDict -> Entity
 getSingleton name (SingletonDict dict) =
     case Dict.get (toString name) dict of
@@ -100,7 +95,14 @@ setSingleton entity (SingletonDict dict) =
 
 
 entityFromIdConfig : UUID -> EntityConfig -> Entity
-entityFromIdConfig id { name, x, y, r, vx, vy, color, moveBehaviour, bounceInScreen, weaponConfig } =
+entityFromIdConfig id config =
+    let
+        { name, x, y, r, vx, vy, color } =
+            config
+
+        { moveBehaviour, bounceInScreen, weaponConfig, receivesDamageFrom } =
+            config
+    in
     { id = id
     , name = name
     , x = x
@@ -112,6 +114,7 @@ entityFromIdConfig id { name, x, y, r, vx, vy, color, moveBehaviour, bounceInScr
     , vx = vx
     , vy = vy
     , weapon = Maybe.map weaponFromConfig weaponConfig |> Maybe.withDefault NoWeapon
+    , receivesDamageFrom = receivesDamageFrom
     }
 
 
@@ -274,8 +277,9 @@ withGravitateToSingleton target c =
     { c | moveBehaviour = GravitateTo target }
 
 
-receivesCollisionDamageFrom _ =
-    identity
+receivesCollisionDamageFrom : List EntityName -> EntityConfig -> EntityConfig
+receivesCollisionDamageFrom l c =
+    { c | receivesDamageFrom = l }
 
 
 isKilledOnCollisionWith _ =
@@ -345,11 +349,17 @@ updateMemory computer mem =
         { singletons, entityList } =
             mem
 
+        singletonList =
+            singletonsValues singletons
+
+        allEntities =
+            singletonList ++ entityList
+
         stepBatch : List Entity -> Response
         stepBatch =
-            List.map (stepEntity computer singletons) >> Batch
+            List.map (stepEntity computer singletons allEntities) >> Batch
     in
-    [ stepBatch (singletonsValues singletons)
+    [ stepBatch singletonList
     , stepBatch entityList
     ]
         |> stepResponses mem
@@ -387,12 +397,33 @@ stepResponses =
     (\mem -> { mem | entityList = [] }) >> List.foldr stepOne
 
 
-stepEntity : Computer -> SingletonDict -> Entity -> Response
-stepEntity computer singletons e =
-    updateMovement computer singletons e
-        |> updateBounceInScreen computer.screen
-        |> updatePosition
-        |> stepWeapon singletons
+stepEntity : Computer -> SingletonDict -> List Entity -> Entity -> Response
+stepEntity computer singletons others =
+    let
+        stepAlive e =
+            updateMovement computer singletons e
+                |> updateBounceInScreen computer.screen
+                |> updatePosition
+                |> stepWeapon singletons
+    in
+    \e ->
+        if isCollidingWithAny e others then
+            NoResponse
+
+        else
+            stepAlive e
+
+
+isCollidingWithAny : Entity -> List Entity -> Bool
+isCollidingWithAny entity =
+    let
+        isColliding other =
+            List.member other.name entity.receivesDamageFrom
+                && entity.id
+                /= other.id
+                && Geom.ccc entity.x entity.y entity.r other.x other.y other.r
+    in
+    List.any isColliding
 
 
 stepWeapon : SingletonDict -> Entity -> Response

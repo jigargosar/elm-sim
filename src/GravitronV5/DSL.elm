@@ -5,9 +5,9 @@ import Random
 
 
 type Name
-    = Player
-    | Turret
-    | Bullet
+    = NamePlayer
+    | NameTurret
+    | NameBullet
 
 
 type UUID

@@ -423,7 +423,7 @@ stepWeapon singletons e =
 
 
 stepMovement : Computer -> SingletonDict -> Entity -> Entity
-stepMovement { time } singletons e =
+stepMovement { time, screen } singletons e =
     case e.moveBehaviour of
         NoMovement ->
             e
@@ -431,12 +431,12 @@ stepMovement { time } singletons e =
         RandomWalker ->
             let
                 dx =
-                    220
+                    240
 
                 dy =
                     400
             in
-            setPos (zigzag -dx dx 1.92 time) (wave -dy dy 2.11 time) e
+            setPos (wave screen.left screen.right 6 time) (wave screen.top screen.bottom 8 time) e
 
         GravitateTo targetName ->
             let

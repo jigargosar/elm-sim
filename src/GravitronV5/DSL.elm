@@ -267,8 +267,9 @@ hasHP =
     identity
 
 
-withGravitateToSingleton _ =
-    identity
+withGravitateToSingleton : EntityName -> EntityConfig -> EntityConfig
+withGravitateToSingleton target c =
+    { c | moveBehaviour = GravitateTo target }
 
 
 receivesCollisionDamageFrom _ =

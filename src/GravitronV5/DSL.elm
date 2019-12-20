@@ -46,6 +46,12 @@ type SingletonDict
     = SingletonDict (Dict String Entity)
 
 
+initSingletons : List EntityName -> SingletonDict
+initSingletons names =
+    List.map initialSingleton names
+        |> List.foldl setSingleton (SingletonDict Dict.empty)
+
+
 getSingleton : EntityName -> SingletonDict -> Entity
 getSingleton name (SingletonDict dict) =
     case Dict.get (toString name) dict of
@@ -234,9 +240,7 @@ type alias Mem =
 
 initialMemory : Mem
 initialMemory =
-    { singletons =
-        SingletonDict Dict.empty
-            |> setSingleton (initialSingleton Player)
+    { singletons = initSingletons [ Player ]
     }
 
 

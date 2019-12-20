@@ -245,12 +245,30 @@ initialMemory =
 
 
 updateMemory : Computer -> Mem -> Mem
-updateMemory _ mem =
-    { mem | singletons = mapSingletons updateEntity mem.singletons }
+updateMemory computer mem =
+    { mem | singletons = mapSingletons (updateEntity computer) mem.singletons }
 
 
-updateEntity =
-    identity
+updateEntity : Computer -> Entity -> Entity
+updateEntity computer e =
+    updateMovement computer e
+
+
+updateMovement : Computer -> Entity -> Entity
+updateMovement { time } e =
+    case e.moveBehaviour of
+        NoMovement ->
+            e
+
+        RandomWalker ->
+            let
+                dx =
+                    220
+
+                dy =
+                    400
+            in
+            { e | x = zigzag -dx dx 1.92 time, y = wave -dy dy 2.11 time }
 
 
 viewMemory : Computer -> Mem -> List Shape

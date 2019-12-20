@@ -49,6 +49,14 @@ hasHP =
     Debug.todo "impl"
 
 
+hasGravitateToBehaviour =
+    Debug.todo "impl"
+
+
+hasBounceInScreenBehaviour bounceFriction =
+    Debug.todo "impl"
+
+
 entityList : List Entity
 entityList =
     [ singletonEntityNamed Player
@@ -57,4 +65,6 @@ entityList =
         |> firesBulletEvery 60
         |> hasHP
     , entityNamed Bullet
+        |> hasGravitateToBehaviour Player
+        |> hasBounceInScreenBehaviour 0.5
     ]

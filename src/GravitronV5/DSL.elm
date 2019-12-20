@@ -433,6 +433,11 @@ stepMovement { time } singletons e =
             setPos (zigzag -dx dx 1.92 time) (wave -dy dy 2.11 time) e
 
         GravitateTo target ->
+            let
+                player : Entity
+                player =
+                    getSingleton Player singletons
+            in
             e
 
 

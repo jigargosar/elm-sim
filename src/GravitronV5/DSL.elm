@@ -1,6 +1,6 @@
 module GravitronV5.DSL exposing (main)
 
-import Basics.Extra exposing (flip, uncurry)
+import Basics.Extra exposing (uncurry)
 import Dict exposing (Dict)
 import GravitronV5.Geom as Geom
 import List.Extra

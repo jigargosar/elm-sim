@@ -175,20 +175,20 @@ configOf name =
                 |> withColor red
                 |> firesWeaponEvery 60
                 |> hasHP
-                |> receivesCollisionDamageFrom [ Bullet, BombBlast ]
 
+        --|> receivesCollisionDamageFrom [ Bullet, BombBlast ]
         Bullet ->
             entityNamed Bullet
                 |> withRadius 8
                 |> withColor darkGray
                 |> withGravitateToSingleton Player
                 |> hasBounceInScreenBehaviour 0.5
-                |> isKilledOnCollisionWith [ Bullet, BombBlast, Turret ]
+                |> isKilledOnCollisionWith [ BombBlast, Player, Turret, Bullet ]
 
         TimeBomb ->
             entityNamed TimeBomb
                 |> withGravitateToSingleton Player
-                |> isKilledOnCollisionWith [ Bullet, BombBlast, Turret, TimeBomb ]
+                |> isKilledOnCollisionWith [ TimeBomb, BombBlast, Player, Turret, Bullet ]
                 |> onDeathSpawnsBombBlast
 
         BombBlast ->

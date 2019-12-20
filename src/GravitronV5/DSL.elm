@@ -34,6 +34,9 @@ toString name =
 type alias Entity =
     { id : UUID
     , name : EntityName
+    , x : Number
+    , y : Number
+    , r : Number
     , moveBehaviour : MoveBehaviour
     }
 
@@ -54,14 +57,25 @@ getSingleton name (SingletonDict dict) =
 
 initialSingleton : EntityName -> Entity
 initialSingleton =
-    configOf
-        >> (\{ name, moveBehaviour } ->
-                Entity (SingletonID name) name moveBehaviour
-           )
+    let
+        i : EntityConfig -> Entity
+        i { name, x, y, r, moveBehaviour } =
+            { id = SingletonID name
+            , name = name
+            , x = x
+            , y = y
+            , r = r
+            , moveBehaviour = moveBehaviour
+            }
+    in
+    configOf >> i
 
 
 type alias EntityConfig =
     { name : EntityName
+    , x : Number
+    , y : Number
+    , r : Number
     , isSingleton : Bool
     , moveBehaviour : MoveBehaviour
     , bounceInScreen : Bool

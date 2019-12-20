@@ -99,6 +99,8 @@ configOf name =
     case name of
         Player ->
             singletonEntityNamed Player
+                |> withRadius 20
+                |> withColor green
                 |> hasRandomWalkerBehaviour
                 |> hasBounceInScreenBehaviour 1
 
@@ -167,6 +169,16 @@ entityNamed name =
 singletonEntityNamed : EntityName -> EntityConfig
 singletonEntityNamed =
     entityNamed >> (\c -> { c | isSingleton = True })
+
+
+withRadius : Number -> EntityConfig -> EntityConfig
+withRadius r c =
+    { c | r = r }
+
+
+withColor : Color -> EntityConfig -> EntityConfig
+withColor color c =
+    { c | color = color }
 
 
 hasRandomWalkerBehaviour : EntityConfig -> EntityConfig

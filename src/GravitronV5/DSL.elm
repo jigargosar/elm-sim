@@ -419,8 +419,7 @@ isCollidingWithAny entity =
     let
         isColliding other =
             List.member other.name entity.receivesDamageFrom
-                && entity.id
-                /= other.id
+                && (entity.id /= other.id)
                 && Geom.ccc entity.x entity.y entity.r other.x other.y other.r
     in
     List.any isColliding

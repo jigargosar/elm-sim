@@ -173,6 +173,8 @@ configOf name =
 
         Bullet ->
             entityNamed Bullet
+                |> withRadius 8
+                |> withColor darkGray
                 |> hasGravitateToSingletonBehaviour Player
                 |> hasBounceInScreenBehaviour 0.5
                 |> isKilledOnCollisionWith [ Bullet, BombBlast, Turret ]

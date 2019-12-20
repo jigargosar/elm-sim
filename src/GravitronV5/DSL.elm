@@ -429,13 +429,6 @@ stepMovement { time, screen } singletons e =
             e
 
         RandomWalker ->
-            let
-                dx =
-                    240
-
-                dy =
-                    400
-            in
             setPos (wave screen.left screen.right 6 time) (wave screen.top screen.bottom 8 time) e
 
         GravitateTo targetName ->

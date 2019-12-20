@@ -2,6 +2,7 @@ module GravitronV5.DSL exposing (main)
 
 import Basics.Extra exposing (flip, uncurry)
 import Dict exposing (Dict)
+import GravitronV5.Geom as Geom
 import List.Extra
 import Playground exposing (..)
 
@@ -432,13 +433,13 @@ stepMovement { time } singletons e =
             in
             setPos (zigzag -dx dx 1.92 time) (wave -dy dy 2.11 time) e
 
-        GravitateTo target ->
+        GravitateTo targetName ->
             let
                 player : Entity
                 player =
-                    getSingleton Player singletons
+                    getSingleton targetName singletons
             in
-            e
+            Geom.gravitateVelTo player.x player.y e
 
 
 stepPosition : Entity -> Entity

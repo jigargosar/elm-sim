@@ -37,6 +37,7 @@ type alias Entity =
     , x : Number
     , y : Number
     , r : Number
+    , color : Color
     , moveBehaviour : MoveBehaviour
     }
 
@@ -59,12 +60,13 @@ initialSingleton : EntityName -> Entity
 initialSingleton =
     let
         i : EntityConfig -> Entity
-        i { name, x, y, r, moveBehaviour } =
+        i { name, x, y, r, color, moveBehaviour } =
             { id = SingletonID name
             , name = name
             , x = x
             , y = y
             , r = r
+            , color = color
             , moveBehaviour = moveBehaviour
             }
     in
@@ -76,6 +78,7 @@ type alias EntityConfig =
     , x : Number
     , y : Number
     , r : Number
+    , color : Color
     , isSingleton : Bool
     , moveBehaviour : MoveBehaviour
     , bounceInScreen : Bool
@@ -145,6 +148,7 @@ entityNamed name =
     , x = 0
     , y = 0
     , r = 10
+    , color = blue
     , isSingleton = False
     , moveBehaviour = MoveBehaviour
     , bounceInScreen = False
@@ -225,9 +229,10 @@ viewMemory _ m =
     List.map viewEntity (Dict.values sDict)
 
 
-viewEntity entity =
-    circle red 100
-        |> move -100 100
+viewEntity : Entity -> Shape
+viewEntity { x, y, r, color } =
+    circle color r
+        |> move x y
 
 
 main =

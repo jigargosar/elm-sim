@@ -255,8 +255,8 @@ hasRandomWalkerBehaviour c =
 
 
 firesWeaponEvery : Int -> EntityConfig -> EntityConfig
-firesWeaponEvery _ =
-    identity
+firesWeaponEvery every c =
+    { c | weaponConfig = Just { every = every, name = Bullet, towards = Player } }
 
 
 hasHP =

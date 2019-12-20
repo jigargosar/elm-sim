@@ -31,6 +31,11 @@ type alias CommonProps =
     }
 
 
-initCommonProps : UUID -> CommonProps
-initCommonProps uuid =
-    { uuid = uuid, x = 0, y = 0, r = 0, vx = 0, vy = 0, color = blue }
+commonPropGenerator : Random.Generator CommonProps
+commonPropGenerator =
+    let
+        initCommonProps : UUID -> CommonProps
+        initCommonProps uuid =
+            { uuid = uuid, x = 0, y = 0, r = 0, vx = 0, vy = 0, color = blue }
+    in
+    randomUUID |> Random.map initCommonProps

@@ -1,6 +1,7 @@
 module GravitronV5.DSL exposing (..)
 
 import Playground exposing (..)
+import Random
 
 
 type Name
@@ -9,8 +10,18 @@ type Name
     | Bullet
 
 
+type UUID
+    = UUID Int
+
+
+randomUUID : Random.Generator UUID
+randomUUID =
+    Random.int 100 Random.maxInt
+        |> Random.map UUID
+
+
 type alias CommonProps =
-    { uuid : Int
+    { uuid : UUID
     , x : Number
     , y : Number
     , r : Number
@@ -18,3 +29,8 @@ type alias CommonProps =
     , vy : Number
     , color : Color
     }
+
+
+initCommonProps : UUID -> CommonProps
+initCommonProps uuid =
+    { uuid = uuid, x = 0, y = 0, r = 0, vx = 0, vy = 0, color = blue }

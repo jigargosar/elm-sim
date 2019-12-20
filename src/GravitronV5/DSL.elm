@@ -79,6 +79,7 @@ entityList : List Entity
 entityList =
     [ singletonEntityNamed Player
         |> hasRandomWalkerBehaviour
+        |> hasBounceInScreenBehaviour 1
     , entityNamed Turret
         |> firesWeaponEvery 60
         |> hasHP

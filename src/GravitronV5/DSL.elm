@@ -44,13 +44,18 @@ type alias Entity =
     }
 
 
+setPos : Number -> Number -> Entity -> Entity
+setPos x y e =
+    { e | x = x, y = y }
+
+
 type SingletonDict
     = SingletonDict (Dict String Entity)
 
 
 initSingletons : List EntityName -> SingletonDict
 initSingletons names =
-    List.map initialSingleton names
+    List.map initSingleton names
         |> List.foldl setSingleton (SingletonDict Dict.empty)
 
 
@@ -61,7 +66,7 @@ getSingleton name (SingletonDict dict) =
             entity
 
         Nothing ->
-            initialSingleton name
+            initSingleton name
 
 
 mapSingletons : (Entity -> Entity) -> SingletonDict -> SingletonDict
@@ -74,23 +79,36 @@ setSingleton entity (SingletonDict dict) =
     SingletonDict (Dict.insert (toString entity.name) entity dict)
 
 
-initialSingleton : EntityName -> Entity
-initialSingleton =
+entityFromIdConfig : UUID -> EntityConfig -> Entity
+entityFromIdConfig id { name, x, y, r, color, moveBehaviour } =
+    { id = id
+    , name = name
+    , x = x
+    , y = y
+    , r = r
+    , color = color
+    , moveBehaviour = moveBehaviour
+    , vx = 0
+    , vy = 0
+    }
+
+
+initSingleton : EntityName -> Entity
+initSingleton name =
     let
-        i : EntityConfig -> Entity
-        i { name, x, y, r, color, moveBehaviour } =
-            { id = SingletonID name
-            , name = name
-            , x = x
-            , y = y
-            , r = r
-            , color = color
-            , moveBehaviour = moveBehaviour
-            , vx = 0
-            , vy = 0
-            }
+        config =
+            configOf name
     in
-    configOf >> i
+    entityFromIdConfig (SingletonID name) config
+
+
+initEntity : UUID -> EntityName -> Entity
+initEntity id name =
+    let
+        config =
+            configOf name
+    in
+    entityFromIdConfig id config
 
 
 type alias EntityConfig =
@@ -251,8 +269,17 @@ type alias Mem =
 
 initialMemory : Mem
 initialMemory =
+    let
+        turrets =
+            [ ( -150, 150 ) ]
+                |> List.map
+                    (\( x, y ) ->
+                        initEntity (UUID 1) Turret
+                            |> setPos x y
+                    )
+    in
     { singletons = initSingletons [ Player ]
-    , entityList = []
+    , entityList = turrets
     }
 
 

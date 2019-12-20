@@ -39,6 +39,8 @@ type alias Entity =
     , r : Number
     , color : Color
     , moveBehaviour : MoveBehaviour
+    , vx : Number
+    , vy : Number
     }
 
 
@@ -84,6 +86,8 @@ initialSingleton =
             , r = r
             , color = color
             , moveBehaviour = moveBehaviour
+            , vx = 0
+            , vy = 0
             }
     in
     configOf >> i
@@ -251,11 +255,12 @@ updateMemory computer mem =
 
 updateEntity : Computer -> Entity -> Entity
 updateEntity computer e =
-    updateMovement computer e
+    stepMovement computer e
+        |> stepPosition
 
 
-updateMovement : Computer -> Entity -> Entity
-updateMovement { time } e =
+stepMovement : Computer -> Entity -> Entity
+stepMovement { time } e =
     case e.moveBehaviour of
         NoMovement ->
             e
@@ -269,6 +274,15 @@ updateMovement { time } e =
                     400
             in
             { e | x = zigzag -dx dx 1.92 time, y = wave -dy dy 2.11 time }
+
+
+stepPosition : Entity -> Entity
+stepPosition e =
+    let
+        { x, y, vx, vy } =
+            e
+    in
+    { e | x = x + vx, y = y + vy }
 
 
 viewMemory : Computer -> Mem -> List Shape

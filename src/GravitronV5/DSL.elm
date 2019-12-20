@@ -1,7 +1,6 @@
 module GravitronV5.DSL exposing (..)
 
 import Playground exposing (..)
-import Random
 
 
 type EntityType

@@ -59,7 +59,7 @@ receivesCollisionDamageFrom =
     Debug.todo "impl"
 
 
-isKilledBy =
+isKilledOnCollisionWith =
     Debug.todo "impl"
 
 
@@ -82,14 +82,14 @@ entityList =
     , entityNamed Turret
         |> firesWeaponEvery 60
         |> hasHP
-        |> receivesCollisionDamageFrom [ Bullet ]
+        |> receivesCollisionDamageFrom [ Bullet, BombBlast ]
     , entityNamed Bullet
         |> hasGravitateToSingletonBehaviour Player
         |> hasBounceInScreenBehaviour 0.5
-        |> isKilledBy [ Bullet, Turret ]
+        |> isKilledOnCollisionWith [ Bullet, BombBlast, Turret ]
     , entityNamed TimeBomb
         |> hasGravitateToSingletonBehaviour Player
-        |> isKilledBy [ Bullet, Turret, TimeBomb ]
+        |> isKilledOnCollisionWith [ Bullet, BombBlast, Turret, TimeBomb ]
         |> onDeathSpawnsBombBlast
     , entityNamed BombBlast
         |> isKilledOnNextUpdate

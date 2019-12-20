@@ -284,7 +284,8 @@ onDeathSpawnsBombBlast =
     identity
 
 
-hasBounceInScreenBehaviour _ =
+hasBounceInScreenBehaviour : Number -> EntityConfig -> EntityConfig
+hasBounceInScreenBehaviour bf =
     identity
 
 

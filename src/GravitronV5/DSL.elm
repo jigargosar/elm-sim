@@ -8,6 +8,7 @@ type EntityType
     = Player
     | Turret
     | Bullet
+    | TimeBomb
 
 
 type UUID
@@ -41,7 +42,7 @@ hasRandomWalkerBehaviour =
     Debug.todo "impl"
 
 
-firesBulletEvery =
+firesWeaponEvery =
     Debug.todo "impl"
 
 
@@ -70,7 +71,7 @@ entityList =
     [ singletonEntityNamed Player
         |> hasRandomWalkerBehaviour
     , entityNamed Turret
-        |> firesBulletEvery 60
+        |> firesWeaponEvery 60
         |> hasHP
         |> receivesCollisionDamageFrom [ Bullet ]
     , entityNamed Bullet

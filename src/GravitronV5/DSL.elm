@@ -183,12 +183,12 @@ configOf name =
                 |> withColor darkGray
                 |> withGravitateToSingleton Player
                 |> hasBounceInScreenBehaviour 0.5
-                |> isKilledOnCollisionWith [ BombBlast, Player, Turret, Bullet ]
+                |> receivesCollisionDamageFrom [ BombBlast, Player, Turret, Bullet ]
 
         TimeBomb ->
             entityNamed TimeBomb
                 |> withGravitateToSingleton Player
-                |> isKilledOnCollisionWith [ TimeBomb, BombBlast, Player, Turret, Bullet ]
+                |> receivesCollisionDamageFrom [ TimeBomb, BombBlast, Player, Turret, Bullet ]
                 |> onDeathSpawnsBombBlast
 
         BombBlast ->

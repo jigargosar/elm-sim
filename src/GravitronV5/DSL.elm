@@ -1,5 +1,6 @@
 module GravitronV5.DSL exposing (main)
 
+import Basics.Extra exposing (uncurry)
 import Dict exposing (Dict)
 import Playground exposing (..)
 
@@ -39,14 +40,25 @@ type alias Entity =
     , r : Number
     , color : Color
     , moveBehaviour : MoveBehaviour
+    , weapon : Weapon
     , vx : Number
     , vy : Number
     }
 
 
-setPos : Number -> Number -> Entity -> Entity
+setPos : Number -> Number -> { c | x : Number, y : Number } -> { c | x : Number, y : Number }
 setPos x y e =
     { e | x = x, y = y }
+
+
+movePos : Number -> Number -> { a | x : Number, y : Number } -> { a | x : Number, y : Number }
+movePos dx dy ({ x, y } as e) =
+    { e | x = x + dx, y = y + dy }
+
+
+setVel : Number -> Number -> { c | vx : Number, vy : Number } -> { c | vx : Number, vy : Number }
+setVel vx vy e =
+    { e | vx = vx, vy = vy }
 
 
 type SingletonDict
@@ -80,7 +92,7 @@ setSingleton entity (SingletonDict dict) =
 
 
 entityFromIdConfig : UUID -> EntityConfig -> Entity
-entityFromIdConfig id { name, x, y, r, color, moveBehaviour } =
+entityFromIdConfig id { name, x, y, r, vx, vy, color, moveBehaviour, weaponConfig } =
     { id = id
     , name = name
     , x = x
@@ -88,9 +100,15 @@ entityFromIdConfig id { name, x, y, r, color, moveBehaviour } =
     , r = r
     , color = color
     , moveBehaviour = moveBehaviour
-    , vx = 0
-    , vy = 0
+    , vx = vx
+    , vy = vy
+    , weapon = Maybe.map weaponFromConfig weaponConfig |> Maybe.withDefault NoWeapon
     }
+
+
+weaponFromConfig : WeaponConfig -> Weapon
+weaponFromConfig =
+    Weapon 0
 
 
 initSingleton : EntityName -> Entity
@@ -116,13 +134,15 @@ type alias EntityConfig =
     , x : Number
     , y : Number
     , r : Number
+    , vx : Number
+    , vy : Number
     , color : Color
     , isSingleton : Bool
     , moveBehaviour : MoveBehaviour
     , bounceInScreen : Bool
     , health : Health
     , receivesDamageFrom : List EntityName
-    , weaponConfig : WeaponConfig
+    , weaponConfig : Maybe WeaponConfig
     , onDeath : DeathBehaviour
     }
 
@@ -176,8 +196,13 @@ type Health
     = Health
 
 
-type WeaponConfig
+type alias WeaponConfig =
+    { every : Int, name : EntityName, towards : EntityName }
+
+
+type Weapon
     = NoWeapon
+    | Weapon Int WeaponConfig
 
 
 type DeathBehaviour
@@ -190,13 +215,15 @@ entityNamed name =
     , x = 0
     , y = 0
     , r = 10
+    , vx = 0
+    , vy = 0
     , color = blue
     , isSingleton = False
     , moveBehaviour = NoMovement
     , bounceInScreen = False
     , health = Health
     , receivesDamageFrom = []
-    , weaponConfig = NoWeapon
+    , weaponConfig = Nothing
     , onDeath = DeathBehaviour
     }
 
@@ -287,16 +314,62 @@ initialMemory =
 
 updateMemory : Computer -> Mem -> Mem
 updateMemory computer mem =
+    let
+        { singletons, entityList } =
+            mem
+
+        updateHelp =
+            updateEntity computer singletons
+    in
     { mem
-        | singletons = mapSingletons (updateEntity computer) mem.singletons
-        , entityList = List.map (updateEntity computer) mem.entityList
+        | singletons = mapSingletons updateHelp singletons
+        , entityList = List.map updateHelp entityList
     }
 
 
-updateEntity : Computer -> Entity -> Entity
-updateEntity computer e =
+updateEntity : Computer -> SingletonDict -> Entity -> Entity
+updateEntity computer singletons e =
     stepMovement computer e
         |> stepPosition
+        |> stepWeapon singletons
+
+
+stepWeapon : SingletonDict -> Entity -> Entity
+stepWeapon singletons e =
+    case e.weapon of
+        NoWeapon ->
+            e
+
+        Weapon elapsed ({ every, name, towards } as weaponConfig) ->
+            if elapsed >= every then
+                let
+                    player : Entity
+                    player =
+                        getSingleton Player singletons
+
+                    projectileConfig : EntityConfig
+                    projectileConfig =
+                        configOf name
+
+                    offset =
+                        projectileConfig.r + e.r
+
+                    angle =
+                        atan2 (player.y - e.y) (player.x - e.x)
+
+                    speed =
+                        3
+
+                    newProjectileConfig =
+                        projectileConfig
+                            |> setPos e.x e.y
+                            |> uncurry movePos (fromPolar ( offset, angle ))
+                            |> uncurry setVel (fromPolar ( speed, angle ))
+                in
+                { e | weapon = Weapon 0 weaponConfig }
+
+            else
+                { e | weapon = Weapon (elapsed + 1) weaponConfig }
 
 
 stepMovement : Computer -> Entity -> Entity

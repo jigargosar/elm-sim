@@ -507,6 +507,10 @@ updatePosition e =
     { e | x = x + vx, y = y + vy }
 
 
+
+-- VIEW
+
+
 viewMemory : Computer -> Mem -> List Shape
 viewMemory _ m =
     let

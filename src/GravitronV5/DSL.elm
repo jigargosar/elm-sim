@@ -520,15 +520,22 @@ viewMemory _ m =
 
 
 viewEntity : Entity -> Shape
-viewEntity { x, y, r, color, hp } =
+viewEntity { name, x, y, r, color, hp } =
     let
         moveToPosition =
             move x y
 
+        hpShape =
+            if List.member name [ Turret ] then
+                words black (String.fromInt (HP.remaining hp))
+
+            else
+                group []
+
         toShape =
             group
                 [ circle color r
-                , words black (String.fromInt (HP.remaining hp))
+                , hpShape
                 ]
     in
     toShape |> moveToPosition

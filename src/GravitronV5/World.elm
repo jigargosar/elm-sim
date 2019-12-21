@@ -24,7 +24,13 @@ type alias Entity =
     , hp : HP
     , preSteps : List PreStep
     , steps : List Step
+    , phase : Phase
     }
+
+
+type Phase
+    = ReadyForCollision
+    | Dying Int
 
 
 type PreStep
@@ -77,6 +83,7 @@ fromConfig id =
                                 Fire { every = 60, name = n, elapsed = 0 }
                     )
                     steps
+            , phase = ReadyForCollision
             }
     in
     EC.toRec >> fromConfigRec
@@ -195,14 +202,20 @@ kill e =
     { e | hp = HP.removeAll e.hp }
 
 
+isReadyForCollision e =
+    e.phase == ReadyForCollision
+
+
 isCollidingWithAny allE names e =
-    List.any
-        (\other ->
-            nameOneOf names other
-                && areIntersecting other e
-                && (other.id /= e.id)
-        )
-        allE
+    isReadyForCollision e
+        && List.any
+            (\other ->
+                isReadyForCollision other
+                    && nameOneOf names other
+                    && areIntersecting other e
+                    && (other.id /= e.id)
+            )
+            allE
 
 
 performPreStep : Env -> Entity -> PreStep -> ( Entity, PreStep )

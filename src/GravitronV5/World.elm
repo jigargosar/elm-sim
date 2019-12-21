@@ -56,48 +56,8 @@ foldResponses =
 
 
 updateEntity : Computer -> Entity name -> Response name
-updateEntity { screen, time } =
-    let
-        stepMove : Move name -> Entity name -> Entity name
-        stepMove move e =
-            case move of
-                RandomWalker ->
-                    withXY
-                        ( wave screen.left screen.right 6 time
-                        , wave screen.top screen.bottom 8 time
-                        )
-                        e
-
-                _ ->
-                    e
-
-        prependStep : Step name -> Entity name -> Entity name
-        prependStep step e =
-            { e | steps = step :: e.steps }
-
-        stepEntity : Step name -> ( Response name, Entity name ) -> ( Response name, Entity name )
-        stepEntity step ( res, e ) =
-            case step of
-                Move move ->
-                    ( res, stepMove move e |> prependStep step )
-
-                Fire r ->
-                    let
-                        newR =
-                            if r.elapsed > r.every then
-                                { r | elapsed = 0 }
-
-                            else
-                                { r | elapsed = r.elapsed + 1 }
-                    in
-                    ( res, prependStep (Fire newR) e )
-
-        revStep ( res, e ) =
-            Batch [ res, UpdateEntity { e | steps = List.reverse e.steps } ]
-    in
-    \e ->
-        List.foldl stepEntity ( NoResponse, { e | steps = [] } ) e.steps
-            |> revStep
+updateEntity computer =
+    performSteps computer
 
 
 performSteps : Computer -> Entity name -> Response name

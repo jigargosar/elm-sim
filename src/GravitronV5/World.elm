@@ -2,19 +2,20 @@ module GravitronV5.World exposing (Entity, World, WorldConfig, init, toList, upd
 
 import GravitronV5.EntityConfig as EC exposing (EntityConfig, Move(..), Step(..))
 import GravitronV5.Geom as Geom
+import GravitronV5.Names exposing (Name)
 import List.Extra
 import Playground exposing (Color, Computer, Number, wave)
 
 
-type World name
-    = World Int (List (Entity name))
+type World
+    = World Int (List Entity)
 
 
-type alias WorldConfig name =
-    { singletonNames : List name, configOf : name -> EntityConfig name }
+type alias WorldConfig =
+    { singletonNames : List Name, configOf : Name -> EntityConfig }
 
 
-init : WorldConfig name -> List (EntityConfig name) -> World name
+init : WorldConfig -> List EntityConfig -> World
 init _ initialEntityConfigList =
     let
         entityList =
@@ -24,20 +25,20 @@ init _ initialEntityConfigList =
     World (List.length entityList) entityList
 
 
-update : WorldConfig name -> Computer -> World name -> World name
+update : WorldConfig -> Computer -> World -> World
 update worldConfig computer (World nid lst) =
     List.map (updateEntity worldConfig computer lst) lst
         |> foldResponses nid
 
 
-type Response name
-    = UpdateEntity (Entity name)
-    | NewEntity (EntityConfig name)
-    | Batch (List (Response name))
+type Response
+    = UpdateEntity Entity
+    | NewEntity EntityConfig
+    | Batch (List Response)
     | NoResponse
 
 
-foldResponses : Int -> List (Response name) -> World name
+foldResponses : Int -> List Response -> World
 foldResponses =
     let
         foldOne r ((World nid acc) as world) =
@@ -60,19 +61,19 @@ foldResponses =
     \nid -> List.foldl foldOne (World nid []) >> revLst
 
 
-updateEntity : WorldConfig name -> Computer -> List (Entity name) -> Entity name -> Response name
+updateEntity : WorldConfig -> Computer -> List Entity -> Entity -> Response
 updateEntity =
     performSteps
 
 
-performSteps : WorldConfig name -> Computer -> List (Entity name) -> Entity name -> Response name
+performSteps : WorldConfig -> Computer -> List Entity -> Entity -> Response
 performSteps wc computer allEntities =
     let
-        one : Entity name -> ( ( Response name, Entity name ), List (Step name) )
+        one : Entity -> ( ( Response, Entity ), List Step )
         one e =
             List.Extra.mapAccuml (performStep wc computer allEntities) ( NoResponse, { e | steps = [] } ) e.steps
 
-        two : ( ( Response name, Entity name ), List (Step name) ) -> Response name
+        two : ( ( Response, Entity ), List Step ) -> Response
         two ( ( res, e ), steps ) =
             Batch [ res, UpdateEntity { e | steps = steps, x = e.x + e.vx, y = e.y + e.vy } ]
     in
@@ -84,12 +85,12 @@ propEq func s b =
     func b == s
 
 
-entityNamed : n -> List (Entity n) -> Maybe (Entity n)
+entityNamed : Name -> List Entity -> Maybe Entity
 entityNamed name =
     List.Extra.find (propEq .name name)
 
 
-performStep : WorldConfig name -> Computer -> List (Entity name) -> ( Response name, Entity name ) -> Step name -> ( ( Response name, Entity name ), Step name )
+performStep : WorldConfig -> Computer -> List Entity -> ( Response, Entity ) -> Step -> ( ( Response, Entity ), Step )
 performStep wc { screen, time } allEntities ( response, e ) step =
     case step of
         Move move ->
@@ -144,27 +145,27 @@ withXY ( x, y ) e =
     { e | x = x, y = y }
 
 
-type Step name
-    = Move (EC.Move name)
-    | Fire { every : Int, elapsed : Int, name : name }
+type Step
+    = Move EC.Move
+    | Fire { every : Int, elapsed : Int, name : Name }
 
 
-type alias Entity name =
-    { name : name
+type alias Entity =
+    { name : Name
     , x : Number
     , y : Number
     , r : Number
     , vx : Number
     , vy : Number
     , color : Color
-    , steps : List (Step name)
+    , steps : List Step
     }
 
 
-fromConfig : EntityConfig name -> Entity name
+fromConfig : EntityConfig -> Entity
 fromConfig =
     let
-        fromConfigRec : EC.Rec name -> Entity name
+        fromConfigRec : EC.Rec -> Entity
         fromConfigRec { name, x, y, r, vx, vy, color, step } =
             { name = name
             , x = x
@@ -189,6 +190,6 @@ fromConfig =
     EC.toRec >> fromConfigRec
 
 
-toList : WorldConfig name -> World name -> List (Entity name)
+toList : WorldConfig -> World -> List Entity
 toList worldConfig (World _ lst) =
     lst

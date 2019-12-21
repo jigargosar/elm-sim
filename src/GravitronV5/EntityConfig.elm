@@ -10,53 +10,54 @@ module GravitronV5.EntityConfig exposing
     , toRec
     )
 
+import GravitronV5.Names exposing (Name)
 import Playground exposing (..)
 
 
-type PreStep name
-    = ReceiveCollisionDamage (List name)
-    | DieOnCollision (List name)
+type PreStep
+    = ReceiveCollisionDamage (List Name)
+    | DieOnCollision (List Name)
     | DieOnTimeout Int
 
 
-type Move name
-    = GravitateTo name
+type Move
+    = GravitateTo Name
     | BounceInScreen Float
     | RandomWalker
 
 
-type Step name
-    = Move (Move name)
-    | Fire name
+type Step
+    = Move Move
+    | Fire Name
 
 
-type Death name
-    = Spawn name
+type Death
+    = Spawn Name
 
 
-type EntityConfig name
-    = EntityConfig (Rec name)
+type EntityConfig
+    = EntityConfig Rec
 
 
-type alias Rec name =
-    { name : name
+type alias Rec =
+    { name : Name
     , x : Number
     , y : Number
     , r : Number
     , vx : Number
     , vy : Number
     , color : Color
-    , preStep : List (PreStep name)
-    , step : List (Step name)
+    , preStep : List PreStep
+    , step : List Step
     , maxHP : Int
-    , death : List (Death name)
+    , death : List Death
     }
 
 
-named : name -> (Rec name -> Rec name) -> EntityConfig name
+named : Name -> (Rec -> Rec) -> EntityConfig
 named name func =
     let
-        default : Rec name
+        default : Rec
         default =
             { name = name
             , x = 0
@@ -74,16 +75,16 @@ named name func =
     func default |> EntityConfig
 
 
-map : (Rec name -> Rec name) -> EntityConfig name -> EntityConfig name
+map : (Rec -> Rec) -> EntityConfig -> EntityConfig
 map func =
     unwrap >> func >> EntityConfig
 
 
-unwrap : EntityConfig name -> Rec name
+unwrap : EntityConfig -> Rec
 unwrap (EntityConfig rec) =
     rec
 
 
-toRec : EntityConfig name -> Rec name
+toRec : EntityConfig -> Rec
 toRec =
     unwrap

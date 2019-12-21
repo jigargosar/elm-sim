@@ -1,17 +1,12 @@
 module GravitronV5.Main2 exposing (main)
 
 import GravitronV5.EntityConfig as EC exposing (EntityConfig, Move(..), Step(..))
+import GravitronV5.Names exposing (Name(..))
 import GravitronV5.World as World exposing (World, WorldConfig)
 import Playground exposing (..)
 
 
-type Name
-    = Player
-    | Turret
-    | Bullet
-
-
-playerConfig : EntityConfig Name
+playerConfig : EntityConfig
 playerConfig =
     EC.named Player
         (\rec ->
@@ -23,7 +18,7 @@ playerConfig =
         )
 
 
-turretConfig : EntityConfig Name
+turretConfig : EntityConfig
 turretConfig =
     EC.named Turret
         (\rec ->
@@ -35,7 +30,7 @@ turretConfig =
         )
 
 
-bulletConfig : EntityConfig Name
+bulletConfig : EntityConfig
 bulletConfig =
     EC.named Bullet
         (\rec ->
@@ -47,7 +42,7 @@ bulletConfig =
         )
 
 
-configOf : Name -> EntityConfig Name
+configOf : Name -> EntityConfig
 configOf name =
     case name of
         Player ->
@@ -60,7 +55,7 @@ configOf name =
             bulletConfig
 
 
-worldConfig : WorldConfig Name
+worldConfig : WorldConfig
 worldConfig =
     { singletonNames = [ Player ]
     , configOf = configOf
@@ -72,7 +67,7 @@ withXY ( x, y ) e =
     { e | x = x, y = y }
 
 
-initialEntities : List (EntityConfig Name)
+initialEntities : List EntityConfig
 initialEntities =
     let
         turrets =
@@ -86,23 +81,23 @@ initialEntities =
     configOf Player :: turrets
 
 
-initialMemory : World Name
+initialMemory : World
 initialMemory =
     World.init worldConfig initialEntities
 
 
-updateMemory : Computer -> World Name -> World Name
+updateMemory : Computer -> World -> World
 updateMemory computer world =
     World.update worldConfig computer world
 
 
-viewMemory : Computer -> World Name -> List Shape
+viewMemory : Computer -> World -> List Shape
 viewMemory computer world =
     World.toList worldConfig world
         |> List.map viewEntity
 
 
-viewEntity : World.Entity Name -> Shape
+viewEntity : World.Entity -> Shape
 viewEntity entity =
     let
         { x, y, r, color } =

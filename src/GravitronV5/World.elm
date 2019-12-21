@@ -31,6 +31,7 @@ update worldConfig computer (World nid lst) =
 
 type Response name
     = UpdateEntity (Entity name)
+    | NewEntity (EntityConfig name)
     | Batch (List (Response name))
     | NoResponse
 
@@ -42,6 +43,9 @@ foldResponses =
             case r of
                 UpdateEntity e ->
                     World nid (e :: acc)
+
+                NewEntity ec ->
+                    World nid (fromConfig ec :: acc)
 
                 Batch rLst ->
                     List.foldl foldOne world rLst

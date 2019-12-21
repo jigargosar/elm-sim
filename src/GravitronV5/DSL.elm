@@ -51,18 +51,18 @@ type alias Entity =
     }
 
 
-setPos : Number -> Number -> { c | x : Number, y : Number } -> { c | x : Number, y : Number }
-setPos x y e =
+withXY : ( Number, Number ) -> { c | x : Number, y : Number } -> { c | x : Number, y : Number }
+withXY ( x, y ) e =
     { e | x = x, y = y }
 
 
-movePos : Number -> Number -> { a | x : Number, y : Number } -> { a | x : Number, y : Number }
-movePos dx dy ({ x, y } as e) =
+movePos : ( Number, Number ) -> { a | x : Number, y : Number } -> { a | x : Number, y : Number }
+movePos ( dx, dy ) ({ x, y } as e) =
     { e | x = x + dx, y = y + dy }
 
 
-setVel : Number -> Number -> { c | vx : Number, vy : Number } -> { c | vx : Number, vy : Number }
-setVel vx vy e =
+setVel : ( Number, Number ) -> { c | vx : Number, vy : Number } -> { c | vx : Number, vy : Number }
+setVel ( vx, vy ) e =
     { e | vx = vx, vy = vy }
 
 
@@ -321,9 +321,9 @@ initialMemory =
         turrets =
             [ ( -150, 150 ) ]
                 |> List.map
-                    (\( x, y ) ->
+                    (\pos ->
                         initEntityWithIdName (UUID 1) Turret
-                            |> setPos x y
+                            |> withXY pos
                     )
     in
     { singletons = initSingletons singletonNames
@@ -455,9 +455,9 @@ stepWeapon singletons e =
 
                     newProjectileConfig =
                         projectileConfig
-                            |> setPos e.x e.y
-                            |> uncurry movePos (fromPolar ( offset, angle ))
-                            |> uncurry setVel (fromPolar ( speed, angle ))
+                            |> withXY ( e.x, e.y )
+                            |> movePos (fromPolar ( offset, angle ))
+                            |> setVel (fromPolar ( speed, angle ))
                 in
                 Batch [ NewEntity newProjectileConfig, UpdateEntity { e | weapon = Weapon 0 weaponConfig } ]
 
@@ -472,7 +472,7 @@ updateMovement { time, screen } singletons e =
             e
 
         RandomWalker ->
-            setPos (wave screen.left screen.right 6 time) (wave screen.top screen.bottom 8 time) e
+            withXY ( wave screen.left screen.right 6 time, wave screen.top screen.bottom 8 time ) e
 
         GravitateTo targetName ->
             let

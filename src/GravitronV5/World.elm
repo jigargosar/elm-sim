@@ -1,7 +1,7 @@
 module GravitronV5.World exposing (Entity, World, WorldConfig, init, toList, update)
 
-import GravitronV5.EntityConfig as EntityConfig exposing (EntityConfig)
-import Playground exposing (Color, Computer, Number)
+import GravitronV5.EntityConfig as EntityConfig exposing (EntityConfig, Move(..), Step(..))
+import Playground exposing (Color, Computer, Number, wave)
 
 
 type World name
@@ -23,8 +23,33 @@ init _ initialEntityConfigList =
 
 
 update : WorldConfig name -> Computer -> World name -> World name
-update computer worldConfig world =
-    world
+update worldConfig computer (World nid lst) =
+    World nid (List.map (updateEntity computer) lst)
+
+
+updateEntity : Computer -> Entity name -> Entity name
+updateEntity { screen, time } =
+    let
+        stepEntity : Step name -> Entity name -> Entity name
+        stepEntity step e =
+            case step of
+                Move mb ->
+                    case mb of
+                        RandomWalker ->
+                            withXY ( wave screen.left screen.right 6 time, wave screen.top screen.bottom 8 time ) e
+
+                        _ ->
+                            e
+
+                _ ->
+                    e
+    in
+    \e -> List.foldl stepEntity e e.step
+
+
+withXY : ( Number, Number ) -> { c | x : Number, y : Number } -> { c | x : Number, y : Number }
+withXY ( x, y ) e =
+    { e | x = x, y = y }
 
 
 type alias Entity name =
@@ -35,6 +60,7 @@ type alias Entity name =
     , vx : Number
     , vy : Number
     , color : Color
+    , step : List (EntityConfig.Step name)
     }
 
 
@@ -42,7 +68,7 @@ fromConfig : EntityConfig name -> Entity name
 fromConfig =
     let
         fromConfigRec : EntityConfig.Rec name -> Entity name
-        fromConfigRec { name, x, y, r, vx, vy, color } =
+        fromConfigRec { name, x, y, r, vx, vy, color, step } =
             { name = name
             , x = x
             , y = y
@@ -50,6 +76,7 @@ fromConfig =
             , vx = vx
             , vy = vy
             , color = color
+            , step = step
             }
     in
     EntityConfig.toRec >> fromConfigRec

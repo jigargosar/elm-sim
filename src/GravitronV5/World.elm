@@ -150,7 +150,7 @@ performSteps env =
 
 
 performStep : Env -> ( Response, Entity ) -> Step -> ( ( Response, Entity ), Step )
-performStep (Env wc { screen, time } entityList) ( response, e ) step =
+performStep (Env { configOf } { screen, time } entityList) ( response, e ) step =
     case step of
         Move move ->
             case move of
@@ -179,7 +179,7 @@ performStep (Env wc { screen, time } entityList) ( response, e ) step =
         Fire fire ->
             let
                 newConfig name =
-                    wc.configOf name
+                    configOf name
                         |> EC.map
                             (\ec ->
                                 let

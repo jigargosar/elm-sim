@@ -24,10 +24,37 @@ init _ initialEntityConfigList =
 
 update : WorldConfig name -> Computer -> World name -> World name
 update worldConfig computer (World nid lst) =
-    World nid (List.map (updateEntity computer) lst)
+    List.map (updateEntity computer) lst
+        |> foldResponses nid
 
 
-updateEntity : Computer -> Entity name -> Entity name
+type Response name
+    = UpdateEntity (Entity name)
+    | Batch (List (Response name))
+    | NoResponse
+
+
+foldResponses : Int -> List (Response name) -> World name
+foldResponses =
+    let
+        foldOne r ((World nid acc) as world) =
+            case r of
+                UpdateEntity e ->
+                    World nid (e :: acc)
+
+                Batch rLst ->
+                    List.foldl foldOne world rLst
+
+                NoResponse ->
+                    world
+
+        revLst (World nid lst) =
+            World nid (List.reverse lst)
+    in
+    \nid -> List.foldl foldOne (World nid []) >> revLst
+
+
+updateEntity : Computer -> Entity name -> Response name
 updateEntity { screen, time } =
     let
         stepMove : Move name -> Entity name -> Entity name
@@ -47,11 +74,11 @@ updateEntity { screen, time } =
         prependStep step e =
             { e | steps = step :: e.steps }
 
-        stepEntity : Step name -> Entity name -> Entity name
-        stepEntity step e =
+        stepEntity : Step name -> ( Response name, Entity name ) -> ( Response name, Entity name )
+        stepEntity step ( res, e ) =
             case step of
                 Move move ->
-                    stepMove move e |> prependStep step
+                    ( res, stepMove move e |> prependStep step )
 
                 Fire r ->
                     let
@@ -62,14 +89,13 @@ updateEntity { screen, time } =
                             else
                                 { r | elapsed = r.elapsed + 1 }
                     in
-                    prependStep (Fire newR) e
+                    ( res, prependStep (Fire newR) e )
 
-        revStep : Entity name -> Entity name
-        revStep e =
-            { e | steps = List.reverse e.steps }
+        revStep ( res, e ) =
+            Batch [ res, UpdateEntity { e | steps = List.reverse e.steps } ]
     in
     \e ->
-        List.foldl stepEntity { e | steps = [] } e.steps
+        List.foldl stepEntity ( NoResponse, { e | steps = [] } ) e.steps
             |> revStep
 
 

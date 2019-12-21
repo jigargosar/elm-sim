@@ -23,9 +23,14 @@ worldConfig =
     }
 
 
+initialEntities : List (EntityConfig Name)
+initialEntities =
+    []
+
+
 initialMemory : World Name
 initialMemory =
-    World.init worldConfig
+    World.init worldConfig initialEntities
 
 
 updateMemory : Computer -> World Name -> World Name
@@ -39,7 +44,7 @@ viewMemory computer world =
         |> List.map viewEntity
 
 
-viewEntity : World.Entity -> Shape
+viewEntity : World.Entity Name -> Shape
 viewEntity entity =
     group []
 

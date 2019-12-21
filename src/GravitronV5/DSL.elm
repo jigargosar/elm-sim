@@ -1,6 +1,6 @@
 module GravitronV5.DSL exposing (main)
 
-import Basics.Extra exposing (uncurry)
+import Basics.Extra exposing (flip, uncurry)
 import Dict exposing (Dict)
 import GravitronV5.Geom as Geom
 import GravitronV5.HP as HP exposing (HP)
@@ -401,13 +401,23 @@ stepEntity computer singletons others =
                 |> updateBounceInScreen computer.screen
                 |> updatePosition
                 |> stepWeapon singletons
-    in
-    \e ->
-        if isCollidingWithAny others e then
-            NoResponse
 
-        else
-            stepAlive e
+        preStep e =
+            let
+                hits =
+                    List.filter (flip isCollidingWith e) others
+                        |> List.length
+            in
+            { e | hp = HP.remove hits e.hp }
+
+        step e =
+            if HP.noneLeft e.hp then
+                NoResponse
+
+            else
+                stepAlive e
+    in
+    preStep >> step
 
 
 isCollidingWith : Entity -> Entity -> Bool

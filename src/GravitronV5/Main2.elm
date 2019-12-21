@@ -67,7 +67,7 @@ initialEntities =
             [ ( -150, 150 ) ]
                 |> List.map
                     (\pos ->
-                        configOf Turret
+                        turretConfig
                             |> EC.map (withXY pos)
                     )
     in

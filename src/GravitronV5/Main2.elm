@@ -1,6 +1,6 @@
 module GravitronV5.Main2 exposing (main)
 
-import GravitronV5.EntityConfig as EC exposing (EntityConfig)
+import GravitronV5.EntityConfig as EC exposing (EntityConfig, Move(..), Step(..))
 import GravitronV5.World as World exposing (World, WorldConfig)
 import Playground exposing (..)
 
@@ -15,7 +15,14 @@ configOf : Name -> EntityConfig Name
 configOf name =
     case name of
         Player ->
-            EC.named name (\rec -> { rec | r = 20, color = green })
+            EC.named name
+                (\rec ->
+                    { rec
+                        | r = 20
+                        , color = green
+                        , step = [ Move RandomWalker ]
+                    }
+                )
 
         _ ->
             EC.named name identity

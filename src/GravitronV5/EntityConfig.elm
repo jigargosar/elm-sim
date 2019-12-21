@@ -1,4 +1,14 @@
-module GravitronV5.EntityConfig exposing (Death(..), EntityConfig, Move(..), PreStep(..), Rec, Step(..), map, named, toRec)
+module GravitronV5.EntityConfig exposing
+    ( Death(..)
+    , EntityConfig
+    , Move(..)
+    , PreStep(..)
+    , Rec
+    , Step(..)
+    , map
+    , named
+    , toRec
+    )
 
 import Playground exposing (..)
 
@@ -7,12 +17,12 @@ type PreStep name
     = ReceiveCollisionDamage (List name)
     | DieOnCollision (List name)
     | DieOnTimeout Int
-    | RandomWalker
 
 
 type Move name
     = GravitateTo name
     | BounceInScreen Int
+    | RandomWalker
 
 
 type Step name

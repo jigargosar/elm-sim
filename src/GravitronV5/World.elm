@@ -165,23 +165,25 @@ foldResponses =
 
 updateEntity : Env -> Entity -> Response
 updateEntity env =
-    performPreSteps env
-        >> (\e ->
-                case e.phase of
-                    ReadyForCollision ->
-                        if HP.noneLeft e.hp then
-                            UpdateEntity { e | phase = Dying 0 }
+    let
+        foo e =
+            if HP.noneLeft e.hp then
+                UpdateEntity { e | phase = Dying 0 }
 
-                        else
-                            performSteps env e
+            else
+                performSteps env e
+    in
+    \e ->
+        case e.phase of
+            ReadyForCollision ->
+                performPreSteps env e |> foo
 
-                    Dying elapsed ->
-                        if elapsed >= 160 then
-                            UpdateEntity { e | phase = Dying (elapsed + 1) }
+            Dying elapsed ->
+                if elapsed >= 160 then
+                    UpdateEntity { e | phase = Dying (elapsed + 1) }
 
-                        else
-                            NoResponse
-           )
+                else
+                    NoResponse
 
 
 performPreSteps : Env -> Entity -> Entity

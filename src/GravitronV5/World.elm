@@ -107,7 +107,7 @@ performStep (Env wc { screen, time } entityList) ( response, e ) step =
                 RandomWalker ->
                     let
                         newE =
-                            withXY
+                            setXY
                                 ( wave screen.left screen.right 6 time
                                 , wave screen.top screen.bottom 8 time
                                 )
@@ -149,8 +149,8 @@ performStep (Env wc { screen, time } entityList) ( response, e ) step =
             ( ( newResponse, e ), Fire newFire )
 
 
-withXY : ( Number, Number ) -> { c | x : Number, y : Number } -> { c | x : Number, y : Number }
-withXY ( x, y ) e =
+setXY : ( Number, Number ) -> { c | x : Number, y : Number } -> { c | x : Number, y : Number }
+setXY ( x, y ) e =
     { e | x = x, y = y }
 
 

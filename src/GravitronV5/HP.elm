@@ -1,4 +1,4 @@
-module GravitronV5.HP exposing (HP, noneLeft, remaining, remove, withMax)
+module GravitronV5.HP exposing (HP, noneLeft, remaining, remove, removeAll, withMax)
 
 
 type HP
@@ -13,6 +13,11 @@ withMax mx =
 remove : Int -> HP -> HP
 remove hits (HP mx n) =
     HP mx (clamp 0 mx (n - hits))
+
+
+removeAll : HP -> HP
+removeAll (HP mx n) =
+    HP mx 0
 
 
 remaining : HP -> Int

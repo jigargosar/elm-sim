@@ -2,6 +2,7 @@ module GravitronV5.World exposing (Entity, World, WorldConfig, init, toList, upd
 
 import GravitronV5.EntityConfig as EC exposing (EntityConfig, Move(..), Step(..))
 import GravitronV5.Geom as Geom
+import GravitronV5.HP as HP exposing (HP)
 import GravitronV5.Names exposing (Name)
 import List.Extra
 import Playground exposing (Color, Computer, Number, wave)
@@ -19,6 +20,7 @@ type alias Entity =
     , vx : Number
     , vy : Number
     , color : Color
+    , hp : HP
     , preSteps : List PreStep
     , steps : List Step
     }
@@ -39,7 +41,7 @@ fromConfig : EntityConfig -> Entity
 fromConfig =
     let
         fromConfigRec : EC.Rec -> Entity
-        fromConfigRec { name, x, y, r, vx, vy, color, preSteps, steps } =
+        fromConfigRec { name, x, y, r, vx, vy, color, maxHP, preSteps, steps } =
             { name = name
             , x = x
             , y = y
@@ -47,6 +49,7 @@ fromConfig =
             , vx = vx
             , vy = vy
             , color = color
+            , hp = HP.withMax maxHP
             , preSteps =
                 List.map
                     (\s ->
@@ -178,6 +181,11 @@ areIntersecting other entity =
     Geom.ccc entity.x entity.y entity.r other.x other.y other.r
 
 
+kill : { a | hp : HP } -> { a | hp : HP }
+kill e =
+    { e | hp = HP.removeAll e.hp }
+
+
 performPreStep : Env -> Entity -> PreStep -> ( Entity, PreStep )
 performPreStep (Env _ _ allE) e preStep =
     case preStep of
@@ -187,7 +195,13 @@ performPreStep (Env _ _ allE) e preStep =
                     List.any (\other -> nameOneOf names other && areIntersecting other e)
                         allE
             in
-            ( e, preStep )
+            ( if isCollidingWithAny then
+                kill e
+
+              else
+                e
+            , preStep
+            )
 
         ReceiveCollisionDamage names ->
             ( e, preStep )

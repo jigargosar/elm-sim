@@ -398,7 +398,7 @@ stepEntity computer singletons others =
     let
         stepAlive e =
             updateMovement computer singletons e
-                |> updateBounceInScreen computer.screen
+                |> applyBounceInScreen computer.screen
                 |> Geom.applyVel
                 |> stepWeapon singletons
 
@@ -488,8 +488,8 @@ updateMovement { time, screen } singletons e =
             Geom.gravitateVelTo player.x player.y e
 
 
-updateBounceInScreen : Screen -> Entity -> Entity
-updateBounceInScreen screen e =
+applyBounceInScreen : Screen -> Entity -> Entity
+applyBounceInScreen screen e =
     case e.bounceInScreen of
         Just bounceFactor ->
             Geom.bounceVel bounceFactor screen e

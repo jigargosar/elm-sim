@@ -105,3 +105,8 @@ applyVel e =
             e
     in
     { e | x = x + vx, y = y + vy }
+
+
+addBoth : ( number, number ) -> ( number, number ) -> ( number, number )
+addBoth ( x, y ) ( x2, y2 ) =
+    ( x + x2, y + y2 )

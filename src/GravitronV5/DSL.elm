@@ -455,17 +455,13 @@ stepWeapon singletons e =
 
                     newProjectileConfig =
                         projectileConfig
-                            |> withXY (addBoth ( e.x, e.y ) (fromPolar ( offset, angle )))
+                            |> withXY (Geom.addBoth ( e.x, e.y ) (fromPolar ( offset, angle )))
                             |> withVel (fromPolar ( speed, angle ))
                 in
                 Batch [ NewEntity newProjectileConfig, UpdateEntity { e | weapon = Weapon 0 weaponConfig } ]
 
             else
                 UpdateEntity { e | weapon = Weapon (elapsed + 1) weaponConfig }
-
-
-addBoth ( x, y ) ( x2, y2 ) =
-    ( x + x2, y + y2 )
 
 
 updateMovement : Computer -> SingletonDict -> Entity -> Entity

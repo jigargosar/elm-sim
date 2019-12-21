@@ -3,6 +3,7 @@ module GravitronV5.DSL exposing (main)
 import Basics.Extra exposing (uncurry)
 import Dict exposing (Dict)
 import GravitronV5.Geom as Geom
+import GravitronV5.HP as HP exposing (HP)
 import Playground exposing (..)
 
 
@@ -46,6 +47,7 @@ type alias Entity =
     , vx : Number
     , vy : Number
     , receivesDamageFrom : List EntityName
+    , hp : HP
     }
 
 
@@ -100,7 +102,7 @@ entityFromIdConfig id config =
         { name, x, y, r, vx, vy, color } =
             config
 
-        { moveBehaviour, bounceInScreen, weaponConfig, receivesDamageFrom } =
+        { moveBehaviour, bounceInScreen, weaponConfig, receivesDamageFrom, maxHP } =
             config
     in
     { id = id
@@ -115,6 +117,7 @@ entityFromIdConfig id config =
     , vy = vy
     , weapon = Maybe.map weaponFromConfig weaponConfig |> Maybe.withDefault NoWeapon
     , receivesDamageFrom = receivesDamageFrom
+    , hp = HP.withMax maxHP
     }
 
 
@@ -152,7 +155,7 @@ type alias EntityConfig =
     , isSingleton : Bool
     , moveBehaviour : MoveBehaviour
     , bounceInScreen : Maybe Number
-    , health : Health
+    , maxHP : Int
     , receivesDamageFrom : List EntityName
     , weaponConfig : Maybe WeaponConfig
     , onDeath : DeathBehaviour
@@ -174,7 +177,7 @@ configOf name =
                 |> withRadius 25
                 |> withColor red
                 |> firesWeaponEvery 60
-                |> withMaxHP
+                |> withMaxHP 3
 
         --|> receivesCollisionDamageFrom [ Bullet, BombBlast ]
         Bullet ->
@@ -207,10 +210,6 @@ type MoveBehaviour
     | GravitateTo EntityName
 
 
-type Health
-    = Health
-
-
 type alias WeaponConfig =
     { every : Int, name : EntityName, towards : EntityName }
 
@@ -236,7 +235,7 @@ entityNamed name =
     , isSingleton = False
     , moveBehaviour = NoMovement
     , bounceInScreen = Nothing
-    , health = Health
+    , maxHP = 1
     , receivesDamageFrom = []
     , weaponConfig = Nothing
     , onDeath = DeathBehaviour
@@ -268,8 +267,9 @@ firesWeaponEvery every c =
     { c | weaponConfig = Just { every = every, name = Bullet, towards = Player } }
 
 
-withMaxHP =
-    identity
+withMaxHP : Int -> EntityConfig -> EntityConfig
+withMaxHP maxHP c =
+    { c | maxHP = maxHP }
 
 
 withGravitateToSingleton : EntityName -> EntityConfig -> EntityConfig
@@ -280,11 +280,6 @@ withGravitateToSingleton target c =
 receivesCollisionDamageFrom : List EntityName -> EntityConfig -> EntityConfig
 receivesCollisionDamageFrom l c =
     { c | receivesDamageFrom = l }
-
-
-isKilledOnCollisionWith : List EntityName -> EntityConfig -> EntityConfig
-isKilledOnCollisionWith =
-    receivesCollisionDamageFrom
 
 
 onDeathSpawnsBombBlast =

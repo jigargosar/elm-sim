@@ -27,8 +27,17 @@ init _ initialEntityConfigList =
 
 update : WorldConfig -> Computer -> World -> World
 update worldConfig computer (World nid lst) =
-    List.map (updateEntity worldConfig computer lst) lst
+    let
+        env : Env
+        env =
+            Env worldConfig computer lst
+    in
+    List.map (updateEntity env) lst
         |> foldResponses nid
+
+
+type Env
+    = Env WorldConfig Computer (List Entity)
 
 
 type Response
@@ -61,17 +70,17 @@ foldResponses =
     \nid -> List.foldl foldOne (World nid []) >> revLst
 
 
-updateEntity : WorldConfig -> Computer -> List Entity -> Entity -> Response
+updateEntity : Env -> Entity -> Response
 updateEntity =
     performSteps
 
 
-performSteps : WorldConfig -> Computer -> List Entity -> Entity -> Response
-performSteps wc computer allEntities =
+performSteps : Env -> Entity -> Response
+performSteps env =
     let
         one : Entity -> ( ( Response, Entity ), List Step )
         one e =
-            List.Extra.mapAccuml (performStep wc computer allEntities) ( NoResponse, { e | steps = [] } ) e.steps
+            List.Extra.mapAccuml (performStep env) ( NoResponse, { e | steps = [] } ) e.steps
 
         two : ( ( Response, Entity ), List Step ) -> Response
         two ( ( res, e ), steps ) =
@@ -90,8 +99,8 @@ entityNamed name =
     List.Extra.find (propEq .name name)
 
 
-performStep : WorldConfig -> Computer -> List Entity -> ( Response, Entity ) -> Step -> ( ( Response, Entity ), Step )
-performStep wc { screen, time } allEntities ( response, e ) step =
+performStep : Env -> ( Response, Entity ) -> Step -> ( ( Response, Entity ), Step )
+performStep (Env wc { screen, time } entityList) ( response, e ) step =
     case step of
         Move move ->
             case move of
@@ -110,7 +119,7 @@ performStep wc { screen, time } allEntities ( response, e ) step =
                     ( ( response, Geom.bounceVel bf screen e ), step )
 
                 GravitateTo name ->
-                    case entityNamed name allEntities of
+                    case entityNamed name entityList of
                         Just { x, y } ->
                             ( ( response, Geom.gravitateVelTo x y e ), step )
 

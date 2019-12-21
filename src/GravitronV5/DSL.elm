@@ -427,11 +427,6 @@ isCollidingWith other entity =
         && Geom.ccc entity.x entity.y entity.r other.x other.y other.r
 
 
-isCollidingWithAny : List Entity -> Entity -> Bool
-isCollidingWithAny others entity =
-    List.any (\other -> isCollidingWith other entity) others
-
-
 stepWeapon : SingletonDict -> Entity -> Response
 stepWeapon singletons e =
     case e.weapon of

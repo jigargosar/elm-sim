@@ -1,6 +1,7 @@
 module GravitronV5.World exposing (Entity, World, WorldConfig, init, toList, update)
 
 import GravitronV5.EntityConfig as EC exposing (EntityConfig, Move(..), Step(..))
+import List.Extra
 import Playground exposing (Color, Computer, Number, wave)
 
 
@@ -97,6 +98,51 @@ updateEntity { screen, time } =
     \e ->
         List.foldl stepEntity ( NoResponse, { e | steps = [] } ) e.steps
             |> revStep
+
+
+performSteps : Computer -> Entity name -> Response name
+performSteps computer =
+    let
+        one : Entity name -> ( ( Response name, Entity name ), List (Step name) )
+        one e =
+            List.Extra.mapAccuml (performStep computer) ( NoResponse, { e | steps = [] } ) e.steps
+
+        two : ( ( Response name, Entity name ), List (Step name) ) -> Response name
+        two ( ( res, e ), steps ) =
+            Batch [ res, UpdateEntity { e | steps = steps } ]
+    in
+    one >> two
+
+
+performStep : Computer -> ( Response name, Entity name ) -> Step name -> ( ( Response name, Entity name ), Step name )
+performStep { screen, time } ( response, e ) step =
+    case step of
+        Move move ->
+            case move of
+                RandomWalker ->
+                    let
+                        newE =
+                            withXY
+                                ( wave screen.left screen.right 6 time
+                                , wave screen.top screen.bottom 8 time
+                                )
+                                e
+                    in
+                    ( ( response, newE ), step )
+
+                _ ->
+                    ( ( response, e ), step )
+
+        Fire r ->
+            let
+                newR =
+                    if r.elapsed > r.every then
+                        { r | elapsed = 0 }
+
+                    else
+                        { r | elapsed = r.elapsed + 1 }
+            in
+            ( ( response, e ), Fire newR )
 
 
 withXY : ( Number, Number ) -> { c | x : Number, y : Number } -> { c | x : Number, y : Number }

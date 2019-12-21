@@ -35,6 +35,7 @@ turretConfig =
         )
 
 
+bulletConfig : EntityConfig Name
 bulletConfig =
     EC.named Bullet
         (\rec ->

@@ -1,4 +1,4 @@
-module GravitronV5.EntityConfiguration exposing (..)
+module GravitronV5.EntityConfig exposing (Death(..), EntityConfig, Move(..), PreStep(..), Rec, Step(..), map, named, toRec)
 
 import Playground exposing (..)
 
@@ -24,7 +24,11 @@ type Death name
     = Spawn name
 
 
-type alias EntityConfig name =
+type EntityConfig name
+    = EntityConfig (Rec name)
+
+
+type alias Rec name =
     { name : name
     , x : Number
     , y : Number
@@ -39,10 +43,10 @@ type alias EntityConfig name =
     }
 
 
-init : name -> (EntityConfig name -> EntityConfig name) -> EntityConfig name
-init name func =
+named : name -> (Rec name -> Rec name) -> EntityConfig name
+named name func =
     let
-        default : EntityConfig name
+        default : Rec name
         default =
             { name = name
             , x = 0
@@ -57,4 +61,19 @@ init name func =
             , death = []
             }
     in
-    func default
+    func default |> EntityConfig
+
+
+map : (Rec name -> Rec name) -> EntityConfig name -> EntityConfig name
+map func =
+    unwrap >> func >> EntityConfig
+
+
+unwrap : EntityConfig name -> Rec name
+unwrap (EntityConfig rec) =
+    rec
+
+
+toRec : EntityConfig name -> Rec name
+toRec =
+    unwrap

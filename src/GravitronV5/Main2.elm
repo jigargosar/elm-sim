@@ -115,8 +115,11 @@ viewEntity entity =
             let
                 pro =
                     toFloat now / toFloat hi
+
+                maxFade =
+                    0.7
             in
-            toCoreShape |> fade (0.5 - (pro * 0.5)) |> scale (1 + pro / 2) |> move x y
+            toCoreShape |> fade (maxFade - (pro * maxFade)) |> scale (1 + pro / 2) |> move x y
 
 
 main =

@@ -169,9 +169,31 @@ performPreSteps env =
     one >> two
 
 
+nameOneOf : List b -> { a | name : b } -> Bool
+nameOneOf names e =
+    List.member e.name names
+
+
+areIntersecting other entity =
+    Geom.ccc entity.x entity.y entity.r other.x other.y other.r
+
+
 performPreStep : Env -> Entity -> PreStep -> ( Entity, PreStep )
-performPreStep =
-    Debug.todo ""
+performPreStep (Env _ _ allE) e preStep =
+    case preStep of
+        DieOnCollision names ->
+            let
+                isCollidingWithAny =
+                    List.any (\other -> nameOneOf names other && areIntersecting other e)
+                        allE
+            in
+            ( e, preStep )
+
+        ReceiveCollisionDamage names ->
+            ( e, preStep )
+
+        DieOnTimeout int ->
+            ( e, preStep )
 
 
 performSteps : Env -> Entity -> Response

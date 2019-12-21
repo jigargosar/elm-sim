@@ -73,7 +73,7 @@ performSteps wc computer =
 
         two : ( ( Response name, Entity name ), List (Step name) ) -> Response name
         two ( ( res, e ), steps ) =
-            Batch [ res, UpdateEntity { e | steps = steps } ]
+            Batch [ res, UpdateEntity { e | steps = steps, x = e.x + e.vx, y = e.y + e.vy } ]
     in
     one >> two
 

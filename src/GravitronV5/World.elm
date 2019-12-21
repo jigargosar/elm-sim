@@ -25,7 +25,7 @@ init _ initialEntityConfigList =
 
 update : WorldConfig name -> Computer -> World name -> World name
 update worldConfig computer (World nid lst) =
-    List.map (updateEntity computer) lst
+    List.map (updateEntity worldConfig computer) lst
         |> foldResponses nid
 
 
@@ -59,17 +59,17 @@ foldResponses =
     \nid -> List.foldl foldOne (World nid []) >> revLst
 
 
-updateEntity : Computer -> Entity name -> Response name
-updateEntity computer =
-    performSteps computer
+updateEntity : WorldConfig name -> Computer -> Entity name -> Response name
+updateEntity =
+    performSteps
 
 
-performSteps : Computer -> Entity name -> Response name
-performSteps computer =
+performSteps : WorldConfig name -> Computer -> Entity name -> Response name
+performSteps wc computer =
     let
         one : Entity name -> ( ( Response name, Entity name ), List (Step name) )
         one e =
-            List.Extra.mapAccuml (performStep computer) ( NoResponse, { e | steps = [] } ) e.steps
+            List.Extra.mapAccuml (performStep wc computer) ( NoResponse, { e | steps = [] } ) e.steps
 
         two : ( ( Response name, Entity name ), List (Step name) ) -> Response name
         two ( ( res, e ), steps ) =
@@ -78,8 +78,8 @@ performSteps computer =
     one >> two
 
 
-performStep : Computer -> ( Response name, Entity name ) -> Step name -> ( ( Response name, Entity name ), Step name )
-performStep { screen, time } ( response, e ) step =
+performStep : WorldConfig name -> Computer -> ( Response name, Entity name ) -> Step name -> ( ( Response name, Entity name ), Step name )
+performStep wc { screen, time } ( response, e ) step =
     case step of
         Move move ->
             case move of
@@ -97,16 +97,27 @@ performStep { screen, time } ( response, e ) step =
                 _ ->
                     ( ( response, e ), step )
 
-        Fire r ->
+        Fire fire ->
             let
-                newR =
-                    if r.elapsed > r.every then
-                        { r | elapsed = 0 }
+                newConfig name =
+                    wc.configOf name
+                        |> EC.map
+                            (\ec ->
+                                let
+                                    ( vx, vy ) =
+                                        ( 1, 1 )
+                                in
+                                { ec | vx = vx, vy = vy }
+                            )
+
+                ( newResponse, newFire ) =
+                    if fire.elapsed > fire.every then
+                        ( Batch [ response, NewEntity (newConfig fire.name) ], { fire | elapsed = 0 } )
 
                     else
-                        { r | elapsed = r.elapsed + 1 }
+                        ( response, { fire | elapsed = fire.elapsed + 1 } )
             in
-            ( ( response, e ), Fire newR )
+            ( ( newResponse, e ), Fire newFire )
 
 
 withXY : ( Number, Number ) -> { c | x : Number, y : Number } -> { c | x : Number, y : Number }

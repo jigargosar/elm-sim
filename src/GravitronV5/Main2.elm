@@ -13,7 +13,7 @@ playerConfig =
             { rec
                 | r = 20
                 , color = green
-                , step = [ Move RandomWalker ]
+                , steps = [ Move RandomWalker ]
             }
         )
 
@@ -25,7 +25,7 @@ turretConfig =
             { rec
                 | r = 25
                 , color = red
-                , step = [ Fire Bullet ]
+                , steps = [ Fire Bullet ]
             }
         )
 
@@ -37,7 +37,7 @@ bulletConfig =
             { rec
                 | r = 10
                 , color = black
-                , step = [ Move (BounceInScreen 0.5), Move (GravitateTo Player) ]
+                , steps = [ Move (BounceInScreen 0.5), Move (GravitateTo Player) ]
             }
         )
 

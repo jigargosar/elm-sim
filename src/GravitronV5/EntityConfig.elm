@@ -47,10 +47,10 @@ type alias Rec =
     , vx : Number
     , vy : Number
     , color : Color
-    , preStep : List PreStep
-    , step : List Step
     , maxHP : Int
-    , death : List Death
+    , preSteps : List PreStep
+    , steps : List Step
+    , deathSteps : List Death
     }
 
 
@@ -67,9 +67,9 @@ named name func =
             , vy = 0
             , color = blue
             , maxHP = 1
-            , preStep = []
-            , step = []
-            , death = []
+            , preSteps = []
+            , steps = []
+            , deathSteps = []
             }
     in
     func default |> EntityConfig

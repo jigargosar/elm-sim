@@ -32,7 +32,7 @@ fromConfig : EntityConfig -> Entity
 fromConfig =
     let
         fromConfigRec : EC.Rec -> Entity
-        fromConfigRec { name, x, y, r, vx, vy, color, step } =
+        fromConfigRec { name, x, y, r, vx, vy, color, steps } =
             { name = name
             , x = x
             , y = y
@@ -50,7 +50,7 @@ fromConfig =
                             EC.Fire n ->
                                 Fire { every = 60, name = n, elapsed = 0 }
                     )
-                    step
+                    steps
             }
     in
     EC.toRec >> fromConfigRec

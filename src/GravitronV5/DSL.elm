@@ -408,22 +408,23 @@ stepEntity computer singletons others =
                 |> stepWeapon singletons
     in
     \e ->
-        if isCollidingWithAny e others then
+        if isCollidingWithAny others e then
             NoResponse
 
         else
             stepAlive e
 
 
-isCollidingWithAny : Entity -> List Entity -> Bool
-isCollidingWithAny entity =
-    let
-        isColliding other =
-            List.member other.name entity.receivesDamageFrom
-                && (entity.id /= other.id)
-                && Geom.ccc entity.x entity.y entity.r other.x other.y other.r
-    in
-    List.any isColliding
+isCollidingWith : Entity -> Entity -> Bool
+isCollidingWith other entity =
+    List.member other.name entity.receivesDamageFrom
+        && (entity.id /= other.id)
+        && Geom.ccc entity.x entity.y entity.r other.x other.y other.r
+
+
+isCollidingWithAny : List Entity -> Entity -> Bool
+isCollidingWithAny others entity =
+    List.any (\other -> isCollidingWith other entity) others
 
 
 stepWeapon : SingletonDict -> Entity -> Response

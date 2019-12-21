@@ -13,7 +13,8 @@ type World
 
 
 type alias Entity =
-    { name : Name
+    { id : Int
+    , name : Name
     , x : Number
     , y : Number
     , r : Number
@@ -37,12 +38,13 @@ type Step
     | Fire { every : Int, elapsed : Int, name : Name }
 
 
-fromConfig : EntityConfig -> Entity
-fromConfig =
+fromConfig : Int -> EntityConfig -> Entity
+fromConfig id =
     let
         fromConfigRec : EC.Rec -> Entity
         fromConfigRec { name, x, y, r, vx, vy, color, maxHP, preSteps, steps } =
-            { name = name
+            { id = id
+            , name = name
             , x = x
             , y = y
             , r = r
@@ -87,11 +89,11 @@ type alias WorldConfig =
 init : WorldConfig -> List EntityConfig -> World
 init _ initialEntityConfigList =
     let
-        entityList =
+        ( nid, entityList ) =
             initialEntityConfigList
-                |> List.map fromConfig
+                |> List.Extra.mapAccumr (\acc ec -> ( acc + 1, fromConfig acc ec )) 100
     in
-    World (List.length entityList) entityList
+    World nid entityList
 
 
 update : WorldConfig -> Computer -> World -> World
@@ -140,7 +142,7 @@ foldResponses =
                     World nid (e :: acc)
 
                 NewEntity ec ->
-                    World nid (fromConfig ec :: acc)
+                    World (nid + 1) (fromConfig nid ec :: acc)
 
                 Batch rLst ->
                     List.foldl foldOne world rLst
@@ -199,7 +201,12 @@ performPreStep (Env _ _ allE) e preStep =
         DieOnCollision names ->
             let
                 isCollidingWithAny =
-                    List.any (\other -> nameOneOf names other && areIntersecting other e)
+                    List.any
+                        (\other ->
+                            nameOneOf names other
+                                && areIntersecting other e
+                                && (other.id /= e.id)
+                        )
                         allE
             in
             ( if isCollidingWithAny then

@@ -399,7 +399,7 @@ stepEntity computer singletons others =
         stepAlive e =
             updateMovement computer singletons e
                 |> updateBounceInScreen computer.screen
-                |> applyVel
+                |> Geom.applyVel
                 |> stepWeapon singletons
 
         preStep e =
@@ -496,15 +496,6 @@ updateBounceInScreen screen e =
 
         Nothing ->
             e
-
-
-applyVel : Entity -> Entity
-applyVel e =
-    let
-        { x, y, vx, vy } =
-            e
-    in
-    { e | x = x + vx, y = y + vy }
 
 
 

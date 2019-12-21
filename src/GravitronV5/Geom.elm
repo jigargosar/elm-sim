@@ -96,3 +96,12 @@ ccc x y r x2 y2 r2 =
 angleFromTo : Float -> Float -> Float -> Float -> Float
 angleFromTo x y x2 y2 =
     atan2 (y2 - y) (x2 - x)
+
+
+applyVel : { a | x : number, y : number, vx : number, vy : number } -> { a | x : number, y : number, vx : number, vy : number }
+applyVel e =
+    let
+        { x, y, vx, vy } =
+            e
+    in
+    { e | x = x + vx, y = y + vy }

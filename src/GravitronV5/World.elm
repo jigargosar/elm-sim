@@ -11,11 +11,6 @@ type World
     = World Int (List Entity)
 
 
-type Step
-    = Move EC.Move
-    | Fire { every : Int, elapsed : Int, name : Name }
-
-
 type alias Entity =
     { name : Name
     , x : Number
@@ -33,6 +28,11 @@ type PreStep
     = ReceiveCollisionDamage (List Name)
     | DieOnCollision (List Name)
     | DieOnTimeout Int
+
+
+type Step
+    = Move EC.Move
+    | Fire { every : Int, elapsed : Int, name : Name }
 
 
 fromConfig : EntityConfig -> Entity

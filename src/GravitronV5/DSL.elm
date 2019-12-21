@@ -520,9 +520,18 @@ viewMemory _ m =
 
 
 viewEntity : Entity -> Shape
-viewEntity { x, y, r, color } =
-    circle color r
-        |> move x y
+viewEntity { x, y, r, color, hp } =
+    let
+        moveToPosition =
+            move x y
+
+        toShape =
+            group
+                [ circle color r
+                , words black (String.fromInt (HP.remaining hp))
+                ]
+    in
+    toShape |> moveToPosition
 
 
 main =

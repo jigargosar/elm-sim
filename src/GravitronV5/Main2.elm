@@ -25,7 +25,7 @@ worldConfig =
 
 initialEntities : List (EntityConfig Name)
 initialEntities =
-    []
+    [ configOf Player ]
 
 
 initialMemory : World Name
@@ -46,7 +46,12 @@ viewMemory computer world =
 
 viewEntity : World.Entity Name -> Shape
 viewEntity entity =
-    group []
+    let
+        { x, y, r, color } =
+            entity
+    in
+    group [ circle color r ]
+        |> move x y
 
 
 main =

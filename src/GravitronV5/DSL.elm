@@ -61,8 +61,8 @@ movePos ( dx, dy ) ({ x, y } as e) =
     { e | x = x + dx, y = y + dy }
 
 
-setVel : ( Number, Number ) -> { c | vx : Number, vy : Number } -> { c | vx : Number, vy : Number }
-setVel ( vx, vy ) e =
+withVel : ( Number, Number ) -> { c | vx : Number, vy : Number } -> { c | vx : Number, vy : Number }
+withVel ( vx, vy ) e =
     { e | vx = vx, vy = vy }
 
 
@@ -455,14 +455,17 @@ stepWeapon singletons e =
 
                     newProjectileConfig =
                         projectileConfig
-                            |> withXY ( e.x, e.y )
-                            |> movePos (fromPolar ( offset, angle ))
-                            |> setVel (fromPolar ( speed, angle ))
+                            |> withXY (addBoth ( e.x, e.y ) (fromPolar ( offset, angle )))
+                            |> withVel (fromPolar ( speed, angle ))
                 in
                 Batch [ NewEntity newProjectileConfig, UpdateEntity { e | weapon = Weapon 0 weaponConfig } ]
 
             else
                 UpdateEntity { e | weapon = Weapon (elapsed + 1) weaponConfig }
+
+
+addBoth ( x, y ) ( x2, y2 ) =
+    ( x + x2, y + y2 )
 
 
 updateMovement : Computer -> SingletonDict -> Entity -> Entity

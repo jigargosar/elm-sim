@@ -180,10 +180,10 @@ updateEntity env =
 
             Dying elapsed ->
                 if elapsed >= 160 then
-                    UpdateEntity { e | phase = Dying (elapsed + 1) }
+                    NoResponse
 
                 else
-                    NoResponse
+                    UpdateEntity { e | phase = Dying (elapsed + 1) }
 
 
 performPreSteps : Env -> Entity -> Entity

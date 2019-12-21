@@ -176,7 +176,7 @@ updateEntity env =
                             performSteps env e
 
                     Dying elapsed ->
-                        if elapsed >= 60 then
+                        if elapsed >= 160 then
                             UpdateEntity { e | phase = Dying (elapsed + 1) }
 
                         else

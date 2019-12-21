@@ -35,6 +35,17 @@ turretConfig =
         )
 
 
+bulletConfig =
+    EC.named Bullet
+        (\rec ->
+            { rec
+                | r = 10
+                , color = black
+                , step = [ Move (BounceInScreen 0.5) ]
+            }
+        )
+
+
 configOf : Name -> EntityConfig Name
 configOf name =
     case name of
@@ -44,8 +55,8 @@ configOf name =
         Turret ->
             turretConfig
 
-        _ ->
-            EC.named name identity
+        Bullet ->
+            bulletConfig
 
 
 worldConfig : WorldConfig Name

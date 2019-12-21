@@ -21,7 +21,7 @@ type PreStep name
 
 type Move name
     = GravitateTo name
-    | BounceInScreen Int
+    | BounceInScreen Float
     | RandomWalker
 
 

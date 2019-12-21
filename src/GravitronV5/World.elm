@@ -1,6 +1,7 @@
 module GravitronV5.World exposing (Entity, World, WorldConfig, init, toList, update)
 
 import GravitronV5.EntityConfig as EC exposing (EntityConfig, Move(..), Step(..))
+import GravitronV5.Geom as Geom
 import List.Extra
 import Playground exposing (Color, Computer, Number, wave)
 
@@ -93,6 +94,9 @@ performStep wc { screen, time } ( response, e ) step =
                                 e
                     in
                     ( ( response, newE ), step )
+
+                BounceInScreen bf ->
+                    ( ( response, Geom.bounceVel bf screen e ), step )
 
                 _ ->
                     ( ( response, e ), step )

@@ -44,11 +44,11 @@ fromConfig =
         fromConfigRec : EntityConfig.Rec name -> Entity name
         fromConfigRec { name, x, y, r, vx, vy, color } =
             { name = name
-            , x = 0
-            , y = 0
-            , r = 10
-            , vx = 0
-            , vy = 0
+            , x = x
+            , y = y
+            , r = r
+            , vx = vx
+            , vy = vy
             , color = color
             }
     in

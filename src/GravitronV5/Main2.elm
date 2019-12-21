@@ -13,7 +13,12 @@ type Name
 
 configOf : Name -> EntityConfig Name
 configOf name =
-    EC.named name (\rec -> rec)
+    case name of
+        Player ->
+            EC.named name (\rec -> { rec | r = 20, color = green })
+
+        _ ->
+            EC.named name identity
 
 
 worldConfig : WorldConfig Name

@@ -167,11 +167,20 @@ updateEntity : Env -> Entity -> Response
 updateEntity env =
     performPreSteps env
         >> (\e ->
-                if HP.noneLeft e.hp then
-                    NoResponse
+                case e.phase of
+                    ReadyForCollision ->
+                        if HP.noneLeft e.hp then
+                            UpdateEntity { e | phase = Dying 0 }
 
-                else
-                    performSteps env e
+                        else
+                            performSteps env e
+
+                    Dying elapsed ->
+                        if elapsed >= 60 then
+                            UpdateEntity { e | phase = Dying (elapsed + 1) }
+
+                        else
+                            NoResponse
            )
 
 

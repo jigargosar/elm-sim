@@ -111,8 +111,12 @@ viewEntity entity =
         World.ReadyForCollision ->
             toCoreShape |> move x y
 
-        World.Dying int ->
-            toCoreShape |> fade 0.5 |> scale 1.2 |> move x y
+        World.Dying hi now ->
+            let
+                pro =
+                    toFloat now / toFloat hi
+            in
+            toCoreShape |> fade (1 - pro) |> scale (1 + pro / 2) |> move x y
 
 
 main =

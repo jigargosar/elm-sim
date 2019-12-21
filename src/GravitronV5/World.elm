@@ -30,7 +30,7 @@ type alias Entity =
 
 type Phase
     = ReadyForCollision
-    | Dying Int
+    | Dying Int Int
 
 
 type PreStep
@@ -168,7 +168,7 @@ updateEntity env =
     let
         foo e =
             if HP.noneLeft e.hp then
-                UpdateEntity { e | phase = Dying 0 }
+                UpdateEntity { e | phase = Dying 120 0 }
 
             else
                 performSteps env e
@@ -178,12 +178,12 @@ updateEntity env =
             ReadyForCollision ->
                 performPreSteps env e |> foo
 
-            Dying elapsed ->
-                if elapsed >= 160 then
+            Dying hi elapsed ->
+                if elapsed >= hi then
                     NoResponse
 
                 else
-                    UpdateEntity { e | phase = Dying (elapsed + 1) }
+                    UpdateEntity { e | phase = Dying hi (elapsed + 1) }
 
 
 performPreSteps : Env -> Entity -> Entity

@@ -152,8 +152,26 @@ foldResponses =
 
 
 updateEntity : Env -> Entity -> Response
-updateEntity =
-    performSteps
+updateEntity env =
+    performPreSteps env >> performSteps env
+
+
+performPreSteps : Env -> Entity -> Entity
+performPreSteps env =
+    let
+        one : Entity -> ( Entity, List PreStep )
+        one e =
+            List.Extra.mapAccuml (performPreStep env) { e | preSteps = [] } e.preSteps
+
+        two ( e, preSteps ) =
+            { e | preSteps = preSteps }
+    in
+    one >> two
+
+
+performPreStep : Env -> Entity -> PreStep -> ( Entity, PreStep )
+performPreStep =
+    Debug.todo ""
 
 
 performSteps : Env -> Entity -> Response

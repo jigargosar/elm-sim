@@ -116,7 +116,7 @@ viewEntity entity =
                 pro =
                     toFloat now / toFloat hi
             in
-            toCoreShape |> fade (1 - pro) |> scale (1 + pro / 2) |> move x y
+            toCoreShape |> fade (0.5 - (pro * 0.5)) |> scale (1 + pro / 2) |> move x y
 
 
 main =

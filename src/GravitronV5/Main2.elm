@@ -25,7 +25,9 @@ turretConfig =
             { rec
                 | r = 25
                 , color = red
+                , preSteps = [ ReceiveCollisionDamage [ Bullet ] ]
                 , steps = [ Fire Bullet ]
+                , maxHP = 3
             }
         )
 

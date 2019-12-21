@@ -101,11 +101,18 @@ viewMemory computer world =
 viewEntity : World.Entity -> Shape
 viewEntity entity =
     let
-        { x, y, r, color } =
+        { x, y, r, color, phase } =
             entity
+
+        toCoreShape =
+            group [ circle color r ]
     in
-    group [ circle color r ]
-        |> move x y
+    case phase of
+        World.ReadyForCollision ->
+            toCoreShape |> move x y
+
+        World.Dying int ->
+            toCoreShape |> fade 0.5 |> scale 1.2 |> move x y
 
 
 main =

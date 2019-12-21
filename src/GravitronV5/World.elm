@@ -1,4 +1,4 @@
-module GravitronV5.World exposing (Entity, World, WorldConfig, init, toList, update)
+module GravitronV5.World exposing (Entity, Phase(..), World, WorldConfig, init, toList, update)
 
 import GravitronV5.EntityConfig as EC exposing (EntityConfig, Move(..), Step(..))
 import GravitronV5.Geom as Geom

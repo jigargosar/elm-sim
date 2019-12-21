@@ -476,11 +476,10 @@ updateMovement { time, screen } singletons e =
 
         GravitateTo targetName ->
             let
-                player : Entity
-                player =
+                { x, y } =
                     getSingleton targetName singletons
             in
-            Geom.gravitateVelTo player.x player.y e
+            Geom.gravitateVelTo x y e
 
 
 applyBounceInScreen : Screen -> Entity -> Entity

@@ -195,21 +195,21 @@ kill e =
     { e | hp = HP.removeAll e.hp }
 
 
+isCollidingWithAny allE names e =
+    List.any
+        (\other ->
+            nameOneOf names other
+                && areIntersecting other e
+                && (other.id /= e.id)
+        )
+        allE
+
+
 performPreStep : Env -> Entity -> PreStep -> ( Entity, PreStep )
 performPreStep (Env _ _ allE) e preStep =
     case preStep of
         DieOnCollision names ->
-            let
-                isCollidingWithAny =
-                    List.any
-                        (\other ->
-                            nameOneOf names other
-                                && areIntersecting other e
-                                && (other.id /= e.id)
-                        )
-                        allE
-            in
-            ( if isCollidingWithAny then
+            ( if isCollidingWithAny allE names e then
                 kill e
 
               else

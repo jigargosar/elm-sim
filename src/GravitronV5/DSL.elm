@@ -399,7 +399,7 @@ stepEntity computer singletons others =
         stepAlive e =
             updateMovement computer singletons e
                 |> updateBounceInScreen computer.screen
-                |> updatePosition
+                |> applyVel
                 |> stepWeapon singletons
 
         preStep e =
@@ -498,8 +498,8 @@ updateBounceInScreen screen e =
             e
 
 
-updatePosition : Entity -> Entity
-updatePosition e =
+applyVel : Entity -> Entity
+applyVel e =
     let
         { x, y, vx, vy } =
             e

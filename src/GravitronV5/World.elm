@@ -156,7 +156,14 @@ foldResponses =
 
 updateEntity : Env -> Entity -> Response
 updateEntity env =
-    performPreSteps env >> performSteps env
+    performPreSteps env
+        >> (\e ->
+                if HP.noneLeft e.hp then
+                    NoResponse
+
+                else
+                    performSteps env e
+           )
 
 
 performPreSteps : Env -> Entity -> Entity

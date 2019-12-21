@@ -24,15 +24,22 @@ type alias Entity =
     , vx : Number
     , vy : Number
     , color : Color
+    , preSteps : List PreStep
     , steps : List Step
     }
+
+
+type PreStep
+    = ReceiveCollisionDamage (List Name)
+    | DieOnCollision (List Name)
+    | DieOnTimeout Int
 
 
 fromConfig : EntityConfig -> Entity
 fromConfig =
     let
         fromConfigRec : EC.Rec -> Entity
-        fromConfigRec { name, x, y, r, vx, vy, color, steps } =
+        fromConfigRec { name, x, y, r, vx, vy, color, preSteps, steps } =
             { name = name
             , x = x
             , y = y
@@ -40,6 +47,20 @@ fromConfig =
             , vx = vx
             , vy = vy
             , color = color
+            , preSteps =
+                List.map
+                    (\s ->
+                        case s of
+                            EC.DieOnCollision ns ->
+                                DieOnCollision ns
+
+                            EC.ReceiveCollisionDamage names ->
+                                ReceiveCollisionDamage names
+
+                            EC.DieOnTimeout int ->
+                                DieOnTimeout int
+                    )
+                    preSteps
             , steps =
                 List.map
                     (\s ->

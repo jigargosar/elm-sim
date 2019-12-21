@@ -42,7 +42,7 @@ bulletConfig =
             { rec
                 | r = 10
                 , color = black
-                , step = [ Move (BounceInScreen 0.5) ]
+                , step = [ Move (BounceInScreen 0.5), Move (GravitateTo Player) ]
             }
         )
 

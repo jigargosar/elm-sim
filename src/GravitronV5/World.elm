@@ -26,7 +26,7 @@ init _ initialEntityConfigList =
 
 update : WorldConfig name -> Computer -> World name -> World name
 update worldConfig computer (World nid lst) =
-    List.map (updateEntity worldConfig computer) lst
+    List.map (updateEntity worldConfig computer lst) lst
         |> foldResponses nid
 
 
@@ -60,17 +60,17 @@ foldResponses =
     \nid -> List.foldl foldOne (World nid []) >> revLst
 
 
-updateEntity : WorldConfig name -> Computer -> Entity name -> Response name
+updateEntity : WorldConfig name -> Computer -> List (Entity name) -> Entity name -> Response name
 updateEntity =
     performSteps
 
 
-performSteps : WorldConfig name -> Computer -> Entity name -> Response name
-performSteps wc computer =
+performSteps : WorldConfig name -> Computer -> List (Entity name) -> Entity name -> Response name
+performSteps wc computer allEntities =
     let
         one : Entity name -> ( ( Response name, Entity name ), List (Step name) )
         one e =
-            List.Extra.mapAccuml (performStep wc computer) ( NoResponse, { e | steps = [] } ) e.steps
+            List.Extra.mapAccuml (performStep wc computer allEntities) ( NoResponse, { e | steps = [] } ) e.steps
 
         two : ( ( Response name, Entity name ), List (Step name) ) -> Response name
         two ( ( res, e ), steps ) =
@@ -79,8 +79,18 @@ performSteps wc computer =
     one >> two
 
 
-performStep : WorldConfig name -> Computer -> ( Response name, Entity name ) -> Step name -> ( ( Response name, Entity name ), Step name )
-performStep wc { screen, time } ( response, e ) step =
+propEq : (c -> b) -> b -> c -> Bool
+propEq func s b =
+    func b == s
+
+
+entityNamed : n -> List (Entity n) -> Maybe (Entity n)
+entityNamed name =
+    List.Extra.find (propEq .name name)
+
+
+performStep : WorldConfig name -> Computer -> List (Entity name) -> ( Response name, Entity name ) -> Step name -> ( ( Response name, Entity name ), Step name )
+performStep wc { screen, time } allEntities ( response, e ) step =
     case step of
         Move move ->
             case move of
@@ -98,8 +108,13 @@ performStep wc { screen, time } ( response, e ) step =
                 BounceInScreen bf ->
                     ( ( response, Geom.bounceVel bf screen e ), step )
 
-                _ ->
-                    ( ( response, e ), step )
+                GravitateTo name ->
+                    case entityNamed name allEntities of
+                        Just { x, y } ->
+                            ( ( response, Geom.gravitateVelTo x y e ), step )
+
+                        Nothing ->
+                            ( ( response, e ), step )
 
         Fire fire ->
             let

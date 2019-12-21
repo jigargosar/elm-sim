@@ -1,6 +1,6 @@
 module GravitronV5.Main2 exposing (main)
 
-import GravitronV5.EntityConfig as EC exposing (EntityConfig, Move(..), Step(..))
+import GravitronV5.EntityConfig as EC exposing (EntityConfig, Move(..), PreStep(..), Step(..))
 import GravitronV5.Names exposing (Name(..))
 import GravitronV5.World as World exposing (World, WorldConfig)
 import Playground exposing (..)
@@ -37,6 +37,7 @@ bulletConfig =
             { rec
                 | r = 10
                 , color = black
+                , preSteps = [ DieOnCollision [ Bullet, Player ] ]
                 , steps = [ Move (BounceInScreen 0.5), Move (GravitateTo Player) ]
             }
         )

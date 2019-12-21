@@ -178,8 +178,8 @@ configOf name =
                 |> withColor red
                 |> firesWeaponEvery 60
                 |> withMaxHP 3
+                |> receivesCollisionDamageFrom [ Bullet, BombBlast ]
 
-        --|> receivesCollisionDamageFrom [ Bullet, BombBlast ]
         Bullet ->
             entityNamed Bullet
                 |> withRadius 8

@@ -11,28 +11,38 @@ type Name
     | Bullet
 
 
+playerConfig : EntityConfig Name
+playerConfig =
+    EC.named Player
+        (\rec ->
+            { rec
+                | r = 20
+                , color = green
+                , step = [ Move RandomWalker ]
+            }
+        )
+
+
+turretConfig : EntityConfig Name
+turretConfig =
+    EC.named Turret
+        (\rec ->
+            { rec
+                | r = 25
+                , color = red
+                , step = [ Fire Bullet ]
+            }
+        )
+
+
 configOf : Name -> EntityConfig Name
 configOf name =
     case name of
         Player ->
-            EC.named name
-                (\rec ->
-                    { rec
-                        | r = 20
-                        , color = green
-                        , step = [ Move RandomWalker ]
-                    }
-                )
+            playerConfig
 
         Turret ->
-            EC.named name
-                (\rec ->
-                    { rec
-                        | r = 25
-                        , color = red
-                        , step = [ Fire Bullet ]
-                    }
-                )
+            turretConfig
 
         _ ->
             EC.named name identity

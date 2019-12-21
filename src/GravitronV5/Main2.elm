@@ -24,6 +24,16 @@ configOf name =
                     }
                 )
 
+        Turret ->
+            EC.named name
+                (\rec ->
+                    { rec
+                        | r = 25
+                        , color = red
+                        , step = [ Fire Bullet ]
+                    }
+                )
+
         _ ->
             EC.named name identity
 
@@ -35,9 +45,23 @@ worldConfig =
     }
 
 
+withXY : ( Number, Number ) -> { c | x : Number, y : Number } -> { c | x : Number, y : Number }
+withXY ( x, y ) e =
+    { e | x = x, y = y }
+
+
 initialEntities : List (EntityConfig Name)
 initialEntities =
-    [ configOf Player ]
+    let
+        turrets =
+            [ ( -150, 150 ) ]
+                |> List.map
+                    (\pos ->
+                        configOf Turret
+                            |> EC.map (withXY pos)
+                    )
+    in
+    configOf Player :: turrets
 
 
 initialMemory : World Name

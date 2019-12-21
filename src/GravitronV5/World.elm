@@ -30,20 +30,24 @@ update worldConfig computer (World nid lst) =
 updateEntity : Computer -> Entity name -> Entity name
 updateEntity { screen, time } =
     let
+        stepMove : Move name -> Entity name -> Entity name
+        stepMove move e =
+            case move of
+                RandomWalker ->
+                    withXY
+                        ( wave screen.left screen.right 6 time
+                        , wave screen.top screen.bottom 8 time
+                        )
+                        e
+
+                _ ->
+                    e
+
         stepEntity : Step name -> Entity name -> Entity name
         stepEntity step e =
             case step of
-                Move mb ->
-                    case mb of
-                        RandomWalker ->
-                            withXY
-                                ( wave screen.left screen.right 6 time
-                                , wave screen.top screen.bottom 8 time
-                                )
-                                e
-
-                        _ ->
-                            e
+                Move move ->
+                    stepMove move e
 
                 _ ->
                     e

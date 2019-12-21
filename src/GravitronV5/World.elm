@@ -11,6 +11,51 @@ type World
     = World Int (List Entity)
 
 
+type Step
+    = Move EC.Move
+    | Fire { every : Int, elapsed : Int, name : Name }
+
+
+type alias Entity =
+    { name : Name
+    , x : Number
+    , y : Number
+    , r : Number
+    , vx : Number
+    , vy : Number
+    , color : Color
+    , steps : List Step
+    }
+
+
+fromConfig : EntityConfig -> Entity
+fromConfig =
+    let
+        fromConfigRec : EC.Rec -> Entity
+        fromConfigRec { name, x, y, r, vx, vy, color, step } =
+            { name = name
+            , x = x
+            , y = y
+            , r = r
+            , vx = vx
+            , vy = vy
+            , color = color
+            , steps =
+                List.map
+                    (\s ->
+                        case s of
+                            EC.Move m ->
+                                Move m
+
+                            EC.Fire n ->
+                                Fire { every = 60, name = n, elapsed = 0 }
+                    )
+                    step
+            }
+    in
+    EC.toRec >> fromConfigRec
+
+
 type alias WorldConfig =
     { singletonNames : List Name, configOf : Name -> EntityConfig }
 
@@ -38,6 +83,21 @@ update worldConfig computer (World nid lst) =
 
 type Env
     = Env WorldConfig Computer (List Entity)
+
+
+propEq : (c -> b) -> b -> c -> Bool
+propEq func s b =
+    func b == s
+
+
+entityNamed : Name -> List Entity -> Maybe Entity
+entityNamed name =
+    List.Extra.find (propEq .name name)
+
+
+setXY : ( Number, Number ) -> { c | x : Number, y : Number } -> { c | x : Number, y : Number }
+setXY ( x, y ) e =
+    { e | x = x, y = y }
 
 
 type Response
@@ -89,16 +149,6 @@ performSteps env =
     one >> two
 
 
-propEq : (c -> b) -> b -> c -> Bool
-propEq func s b =
-    func b == s
-
-
-entityNamed : Name -> List Entity -> Maybe Entity
-entityNamed name =
-    List.Extra.find (propEq .name name)
-
-
 performStep : Env -> ( Response, Entity ) -> Step -> ( ( Response, Entity ), Step )
 performStep (Env wc { screen, time } entityList) ( response, e ) step =
     case step of
@@ -147,56 +197,6 @@ performStep (Env wc { screen, time } entityList) ( response, e ) step =
                         ( response, { fire | elapsed = fire.elapsed + 1 } )
             in
             ( ( newResponse, e ), Fire newFire )
-
-
-setXY : ( Number, Number ) -> { c | x : Number, y : Number } -> { c | x : Number, y : Number }
-setXY ( x, y ) e =
-    { e | x = x, y = y }
-
-
-type Step
-    = Move EC.Move
-    | Fire { every : Int, elapsed : Int, name : Name }
-
-
-type alias Entity =
-    { name : Name
-    , x : Number
-    , y : Number
-    , r : Number
-    , vx : Number
-    , vy : Number
-    , color : Color
-    , steps : List Step
-    }
-
-
-fromConfig : EntityConfig -> Entity
-fromConfig =
-    let
-        fromConfigRec : EC.Rec -> Entity
-        fromConfigRec { name, x, y, r, vx, vy, color, step } =
-            { name = name
-            , x = x
-            , y = y
-            , r = r
-            , vx = vx
-            , vy = vy
-            , color = color
-            , steps =
-                List.map
-                    (\s ->
-                        case s of
-                            EC.Move m ->
-                                Move m
-
-                            EC.Fire n ->
-                                Fire { every = 60, name = n, elapsed = 0 }
-                    )
-                    step
-            }
-    in
-    EC.toRec >> fromConfigRec
 
 
 toList : WorldConfig -> World -> List Entity

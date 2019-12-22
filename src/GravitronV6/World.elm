@@ -81,7 +81,7 @@ collectAliveSteps :
     ( Acc NewEntity, List AliveStep, Entity )
     -> ( Acc NewEntity, Acc UpdatedEntity -> Acc UpdatedEntity )
 collectAliveSteps ( accNew, steps, e ) =
-    ( accNew, accumulate { e | aliveSteps = steps, x = e.x + e.vx, y = e.y + e.vy } )
+    ( accNew, e |> Entity.withAliveSteps steps |> Entity.moveByVelocity |> accumulate )
 
 
 performAliveStep : Computer -> List Entity -> AliveStep -> ( Acc NewEntity, List AliveStep, Entity ) -> ( Acc NewEntity, List AliveStep, Entity )

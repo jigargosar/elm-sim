@@ -72,3 +72,13 @@ performRandomWalk { time, screen } e =
             )
     in
     { e | x = x, y = y }
+
+
+moveByVelocity : { a | x : Number, vx : Number, y : Number, vy : Number } -> { a | x : Number, vx : Number, y : Number, vy : Number }
+moveByVelocity e =
+    { e | x = e.x + e.vx, y = e.y + e.vy }
+
+
+withAliveSteps : a -> { b | aliveSteps : a } -> { b | aliveSteps : a }
+withAliveSteps aliveSteps e =
+    { e | aliveSteps = aliveSteps }

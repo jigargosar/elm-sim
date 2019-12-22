@@ -96,14 +96,9 @@ initialTurrets =
         |> List.map turretAt
 
 
-initialEntities : List EntityConfig
-initialEntities =
-    playerConfig :: initialTurrets
-
-
 initialMemory : World
 initialMemory =
-    World.init worldConfig initialEntities
+    World.init worldConfig (playerConfig :: initialTurrets)
 
 
 updateMemory : Computer -> World -> World

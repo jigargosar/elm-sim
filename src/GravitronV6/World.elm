@@ -40,6 +40,11 @@ type AccGen
     = AccGen (List Entity)
 
 
+emptyAccGen : AccGen
+emptyAccGen =
+    AccGen []
+
+
 collectGen : Entity -> AccGen -> AccGen
 collectGen e (AccGen list) =
     e :: list |> AccGen

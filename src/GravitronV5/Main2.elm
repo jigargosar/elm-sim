@@ -1,6 +1,7 @@
 module GravitronV5.Main2 exposing (main)
 
 import GravitronV5.EntityConfig as EC exposing (EntityConfig, Move(..), PreStep(..), Step(..))
+import GravitronV5.HP as HP
 import GravitronV5.Names exposing (Name(..))
 import GravitronV5.World as World exposing (World, WorldConfig)
 import Playground exposing (..)
@@ -27,7 +28,7 @@ turretConfig =
                 , color = red
                 , preSteps = [ ReceiveCollisionDamage [ Bullet ] ]
                 , steps = [ Fire Bullet Player ]
-                , maxHP = 3
+                , maxHP = 10
             }
         )
 
@@ -102,11 +103,18 @@ viewMemory computer world =
 viewEntity : World.Entity -> Shape
 viewEntity entity =
     let
-        { x, y, r, color, phase } =
+        { name, x, y, r, color, hp, phase } =
             entity
 
         toCoreShape =
-            group [ circle color r ]
+            group
+                [ circle color r
+                , if name == Turret then
+                    words darkCharcoal (String.fromInt (HP.remaining hp))
+
+                  else
+                    group []
+                ]
     in
     case phase of
         World.ReadyForCollision ->

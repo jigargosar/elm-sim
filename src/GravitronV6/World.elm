@@ -29,7 +29,7 @@ toList (World _ list) =
 update : Computer -> World -> World
 update computer (World nid oldEntities) =
     let
-        ( Acc NewEntity genEntities, Acc UpdatedEntity updatedEntities ) =
+        ( Acc genEntities, Acc updatedEntities ) =
             List.foldl (stepEntity computer oldEntities)
                 ( emptyAcc NewEntity, emptyAcc UpdatedEntity )
                 oldEntities
@@ -47,17 +47,17 @@ type UpdatedEntity
 
 
 type Acc tag
-    = Acc tag (List Entity)
+    = Acc (List Entity)
 
 
 emptyAcc : tag -> Acc tag
-emptyAcc tag =
-    Acc tag []
+emptyAcc _ =
+    Acc []
 
 
 accumulate : Entity -> Acc tag -> Acc tag
-accumulate e (Acc tag list) =
-    e :: list |> Acc tag
+accumulate e (Acc list) =
+    e :: list |> Acc
 
 
 reverseWorld : World -> World
@@ -90,7 +90,12 @@ performAliveStep computer allEntities step ( accNew, stepAcc, e ) =
         |> (\( accNewF, newStep, newE ) -> ( accNewF accNew, newStep :: stepAcc, newE ))
 
 
-performAliveStepHelp : Computer -> List Entity -> AliveStep -> Entity -> ( Acc NewEntity -> Acc NewEntity, AliveStep, Entity )
+performAliveStepHelp :
+    Computer
+    -> List Entity
+    -> AliveStep
+    -> Entity
+    -> ( Acc NewEntity -> Acc NewEntity, AliveStep, Entity )
 performAliveStepHelp computer allEntities step e =
     case step of
         WalkRandomly ->

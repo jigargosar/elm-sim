@@ -64,14 +64,14 @@ fromConfig id =
                 List.map
                     (\s ->
                         case s of
-                            EC.DieOnCollision ns ->
-                                DieOnCollision ns
+                            EC.DieOnCollision names ->
+                                DieOnCollision names
 
                             EC.ReceiveCollisionDamage names ->
                                 ReceiveCollisionDamage names
 
-                            EC.DieOnTimeout int ->
-                                DieOnTimeout int
+                            EC.DieOnTimeout timeout ->
+                                DieOnTimeout timeout
                     )
                     preSteps
             , steps =

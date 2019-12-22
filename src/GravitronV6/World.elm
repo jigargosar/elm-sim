@@ -44,10 +44,10 @@ reverseWorld (World nid list) =
 stepEntity : Computer -> List Entity -> Entity -> ( List Entity, List Entity ) -> ( List Entity, List Entity )
 stepEntity computer allEntities e ( genAcc, updatedAcc ) =
     List.foldl (performAliveStep computer allEntities) ( genAcc, [], e ) e.aliveSteps
-        |> setAliveSteps updatedAcc
+        |> accAliveSteps updatedAcc
 
 
-setAliveSteps updatedAcc ( newAcc, steps, e ) =
+accAliveSteps updatedAcc ( newAcc, steps, e ) =
     ( newAcc, { e | aliveSteps = steps, x = e.x + e.vx, y = e.y + e.vy } :: updatedAcc )
 
 

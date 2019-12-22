@@ -48,7 +48,7 @@ type alias Rec =
     , vy : Number
     , color : Color
     , maxHP : Int
-    , spawnDuration : Int
+    , spawnDuration : Float
     , preSteps : List PreStep
     , steps : List Step
     , deathSteps : List Death

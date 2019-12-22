@@ -90,7 +90,7 @@ fromConfig id =
                     ReadyForCollision
 
                 else
-                    Spawning spawnDuration 0
+                    Spawning (round spawnDuration) 0
             }
     in
     EC.toRec >> fromConfigRec

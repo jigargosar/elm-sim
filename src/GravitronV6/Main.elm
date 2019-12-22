@@ -31,8 +31,9 @@ view _ =
 viewEntity idx e =
     group
         [ circle e.color e.r
-        , ("z-" ++ String.fromInt idx)
+        , ("Z-" ++ String.fromInt idx)
             |> words black
+            |> moveDown (e.r + 10)
         ]
         |> move e.x e.y
 

@@ -48,6 +48,7 @@ type alias Rec =
     , vy : Number
     , color : Color
     , maxHP : Int
+    , spawnDuration : Int
     , preSteps : List PreStep
     , steps : List Step
     , deathSteps : List Death
@@ -67,6 +68,7 @@ named name func =
             , vy = 0
             , color = blue
             , maxHP = 1
+            , spawnDuration = 0
             , preSteps = []
             , steps = []
             , deathSteps = []

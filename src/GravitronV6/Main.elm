@@ -29,7 +29,14 @@ default =
 
 
 bulletTemplate =
-    { default | name = name Bullet, r = 10, color = charcoal, aliveSteps = [ WalkRandomly ] }
+    { default
+        | name = name Bullet
+        , r = 10
+        , color = charcoal
+        , vx = 1
+        , vy = 1
+        , aliveSteps = []
+    }
 
 
 init : World

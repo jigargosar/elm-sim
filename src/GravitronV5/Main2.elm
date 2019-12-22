@@ -116,7 +116,7 @@ updateMemory computer world =
 
 
 viewMemory : Computer -> World -> List Shape
-viewMemory computer world =
+viewMemory _ world =
     World.toList worldConfig world
         |> List.map viewEntity
 

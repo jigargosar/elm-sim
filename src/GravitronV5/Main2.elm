@@ -40,7 +40,7 @@ bulletConfig =
             { rec
                 | r = 10
                 , color = black
-                , preSteps = [ DieOnCollision [ Bullet, Player ] ]
+                , preSteps = [ DieOnCollision [ Bullet, Player, Turret ] ]
                 , steps = [ Move (BounceInScreen 0.5), Move (GravitateTo Player) ]
             }
         )

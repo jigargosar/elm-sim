@@ -1,6 +1,6 @@
 module GravitronV6.World exposing (World, init, toList, update)
 
-import GravitronV6.Entity exposing (Entity)
+import GravitronV6.Entity as Entity exposing (AliveStep(..), Entity)
 import Playground exposing (..)
 
 
@@ -33,11 +33,7 @@ stepEntity computer entities e =
     List.foldl (performAliveStep computer) e e.aliveSteps
 
 
-performAliveStep { time, screen } step e =
-    let
-        ( x, y ) =
-            ( wave screen.left screen.right 6 time
-            , wave screen.top screen.bottom 8 time
-            )
-    in
-    { e | x = x, y = y }
+performAliveStep computer step e =
+    case step of
+        WalkRandomly ->
+            Entity.performRandomWalk computer e

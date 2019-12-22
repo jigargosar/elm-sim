@@ -186,7 +186,7 @@ foldResponses =
 updateEntity : Env -> Entity -> Response
 updateEntity env =
     let
-        foo e =
+        performHealthCheck e =
             if HP.noneLeft e.hp then
                 UpdateEntity { e | phase = Dying 120 0 }
 
@@ -203,7 +203,7 @@ updateEntity env =
                     UpdateEntity { e | phase = Spawning hi (elapsed + 1) }
 
             ReadyForCollision ->
-                performPreSteps env e |> foo
+                performPreSteps env e |> performHealthCheck
 
             Dying hi elapsed ->
                 if elapsed >= hi then

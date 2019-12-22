@@ -30,7 +30,8 @@ type alias Entity =
 
 
 type Phase
-    = ReadyForCollision
+    = Spawning Int Int
+    | ReadyForCollision
     | Dying Int Int
 
 
@@ -49,7 +50,7 @@ fromConfig : Int -> EntityConfig -> Entity
 fromConfig id =
     let
         fromConfigRec : EC.Rec -> Entity
-        fromConfigRec { name, x, y, r, vx, vy, color, maxHP, preSteps, steps } =
+        fromConfigRec { name, x, y, r, vx, vy, color, maxHP, preSteps, steps, spawnDuration } =
             { id = id
             , name = name
             , x = x
@@ -84,7 +85,12 @@ fromConfig id =
                                 Fire { every = 60, name = n, elapsed = 0, toName = toN }
                     )
                     steps
-            , phase = ReadyForCollision
+            , phase =
+                if spawnDuration <= 0 then
+                    ReadyForCollision
+
+                else
+                    Spawning spawnDuration 0
             }
     in
     EC.toRec >> fromConfigRec
@@ -189,6 +195,13 @@ updateEntity env =
     in
     \e ->
         case e.phase of
+            Spawning hi elapsed ->
+                if elapsed >= hi then
+                    UpdateEntity { e | phase = ReadyForCollision }
+
+                else
+                    UpdateEntity { e | phase = Spawning hi (elapsed + 1) }
+
             ReadyForCollision ->
                 performPreSteps env e |> foo
 

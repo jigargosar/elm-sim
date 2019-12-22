@@ -1,5 +1,6 @@
 module GravitronV5.Main2 exposing (main)
 
+import Ease
 import GravitronV5.EntityConfig as EC exposing (EntityConfig, Move(..), PreStep(..), Step(..))
 import GravitronV5.HP as HP
 import GravitronV5.Names exposing (Name(..))
@@ -28,9 +29,10 @@ turretConfig =
             { rec
                 | r = 25
                 , color = red
+                , spawnDuration = 120
                 , preSteps = [ ReceiveCollisionDamage [ Bullet ] ]
                 , steps = [ Fire Bullet Player ]
-                , maxHP = 1
+                , maxHP = 0
             }
         )
 
@@ -148,6 +150,13 @@ viewEntity entity =
                     0.7
             in
             toCoreShape |> fade (maxFade - (pro * maxFade)) |> scale (1 + pro / 2) |> move x y
+
+        World.Spawning hi now ->
+            let
+                pro =
+                    toFloat now / toFloat hi
+            in
+            toCoreShape |> scale (Ease.outElastic pro) |> move x y
 
 
 main =

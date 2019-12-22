@@ -241,7 +241,7 @@ performPreStep (Env _ _ allE) e preStep =
             , preStep
             )
 
-        ReceiveCollisionDamage names ->
+        ReceiveCollisionDamage _ ->
             ( e, preStep )
 
         DieOnTimeout int ->

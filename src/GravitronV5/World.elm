@@ -1,11 +1,10 @@
 module GravitronV5.World exposing (Entity, Phase(..), World, WorldConfig, init, toList, update)
 
 import GravitronV5.Circ as Circ
-import GravitronV5.EntityConfig as EC exposing (EntityConfig, Move(..))
+import GravitronV5.EntityConfig as EC exposing (EntityConfig, Move(..), Step(..))
 import GravitronV5.Geom as Geom
 import GravitronV5.HP as HP exposing (HP)
 import GravitronV5.Names exposing (Name)
-import GravitronV5.Step as Step exposing (Step(..))
 import List.Extra
 import Playground exposing (Color, Computer, Number, wave)
 
@@ -42,6 +41,11 @@ type PreStep
     | DieOnTimeout Int
 
 
+type Step
+    = Move EC.Move
+    | Fire { every : Int, named : Name, towards : Name, speed : Number } Int
+
+
 fromConfig : Int -> EntityConfig -> Entity
 fromConfig id =
     let
@@ -75,10 +79,10 @@ fromConfig id =
                     (\s ->
                         case s of
                             EC.Move m ->
-                                Step.Move m
+                                Move m
 
                             EC.Fire name_ toN ->
-                                Step.Fire { every = 60, named = name_, towards = toN, speed = 3 } 0
+                                Fire { every = 60, named = name_, towards = toN, speed = 3 } 0
                     )
                     steps
             , phase =
@@ -311,7 +315,7 @@ performSteps env =
 performStep : Env -> Response -> Entity -> Step -> ( Response, Entity, Step )
 performStep (Env { configOf } { screen, time } entityList) response e step =
     case step of
-        Step.Move move ->
+        Move move ->
             case move of
                 RandomWalk ->
                     let
@@ -335,7 +339,7 @@ performStep (Env { configOf } { screen, time } entityList) response e step =
                         Nothing ->
                             ( response, e, step )
 
-        Step.Fire ({ named, towards, every, speed } as fireConf) elapsed ->
+        Fire ({ named, towards, every, speed } as fireConf) elapsed ->
             case findEntityNamed towards entityList of
                 Just toE ->
                     let
@@ -353,7 +357,7 @@ performStep (Env { configOf } { screen, time } entityList) response e step =
                             else
                                 ( response, elapsed + 1 )
                     in
-                    ( newResponse, e, Step.Fire fireConf newElapsed )
+                    ( newResponse, e, Fire fireConf newElapsed )
 
                 Nothing ->
                     ( response, e, step )

@@ -10,7 +10,7 @@ shoot from to speed c =
             angleFromTo from to
 
         offsetCords =
-            fromPolar ( from.r + from.r, ang )
+            fromPolar ( from.r + to.r + 1, ang )
 
         cords =
             addCords (cordsOf from) offsetCords

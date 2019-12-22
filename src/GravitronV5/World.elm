@@ -1,5 +1,6 @@
 module GravitronV5.World exposing (Entity, Phase(..), World, WorldConfig, init, toList, update)
 
+import GravitronV5.Circ as Circ
 import GravitronV5.EntityConfig as EC exposing (EntityConfig, Move(..), Step(..))
 import GravitronV5.Geom as Geom
 import GravitronV5.HP as HP exposing (HP)
@@ -301,26 +302,7 @@ performStep (Env { configOf } { screen, time } entityList) response e step =
                     let
                         newConfig name =
                             configOf name
-                                |> EC.map
-                                    (\ec ->
-                                        let
-                                            ang =
-                                                Geom.angleFromToRec e toE
-
-                                            speed =
-                                                3
-
-                                            ( dx, dy ) =
-                                                fromPolar ( e.r + ec.r, ang )
-
-                                            ( x, y ) =
-                                                ( e.x + dx, e.y + dy )
-
-                                            ( vx, vy ) =
-                                                fromPolar ( speed, ang )
-                                        in
-                                        { ec | x = x, y = y, vx = vx, vy = vy }
-                                    )
+                                |> EC.map (Circ.shoot e toE 3)
 
                         ( newResponse, newFire ) =
                             if fire.elapsed > fire.every then

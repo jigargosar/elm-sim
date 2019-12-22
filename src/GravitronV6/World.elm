@@ -36,18 +36,18 @@ update computer (World nid oldEntities) =
         |> reverseWorld
 
 
-type AccGen
-    = AccGen (List Entity)
+type Gen
+    = Gen (List Entity)
 
 
-emptyAccGen : AccGen
-emptyAccGen =
-    AccGen []
+emptyGen : Gen
+emptyGen =
+    Gen []
 
 
-collectGen : Entity -> AccGen -> AccGen
-collectGen e (AccGen list) =
-    e :: list |> AccGen
+collectGen : Entity -> Gen -> Gen
+collectGen e (Gen list) =
+    e :: list |> Gen
 
 
 reverseWorld : World -> World

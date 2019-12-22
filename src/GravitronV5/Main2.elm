@@ -98,7 +98,7 @@ initialTurrets =
 
 initialEntities : List EntityConfig
 initialEntities =
-    configOf Player :: initialTurrets
+    playerConfig :: initialTurrets
 
 
 initialMemory : World

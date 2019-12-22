@@ -137,9 +137,13 @@ viewEntity entity =
                     group []
                 ]
     in
+    toCoreShape |> phaseTransition phase |> move x y
+
+
+phaseTransition phase =
     case phase of
         World.ReadyForCollision ->
-            toCoreShape |> move x y
+            identity
 
         World.Dying hi now ->
             let
@@ -149,14 +153,14 @@ viewEntity entity =
                 maxFade =
                     0.7
             in
-            toCoreShape |> fade (maxFade - (pro * maxFade)) |> scale (1 + pro / 2) |> move x y
+            fade (maxFade - (pro * maxFade)) >> scale (1 + pro / 2)
 
         World.Spawning hi now ->
             let
                 pro =
                     toFloat now / toFloat hi
             in
-            toCoreShape |> scale (Ease.outElastic pro) |> move x y
+            scale (Ease.outElastic pro)
 
 
 main =

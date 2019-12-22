@@ -73,15 +73,15 @@ stepEntity :
     -> ( Acc NewEntity, Acc UpdatedEntity )
 stepEntity computer allEntities e ( accNew, accUpdated ) =
     List.foldl (performAliveStep computer allEntities) ( accNew, [], e ) e.aliveSteps
-        |> collectAliveSteps accUpdated
+        |> collectAliveSteps
+        |> Tuple.mapSecond ((|>) accUpdated)
 
 
 collectAliveSteps :
-    Acc UpdatedEntity
-    -> ( Acc NewEntity, List AliveStep, Entity )
-    -> ( Acc NewEntity, Acc UpdatedEntity )
-collectAliveSteps accUpdated ( accNew, steps, e ) =
-    ( accNew, accumulate { e | aliveSteps = steps, x = e.x + e.vx, y = e.y + e.vy } accUpdated )
+    ( Acc NewEntity, List AliveStep, Entity )
+    -> ( Acc NewEntity, Acc UpdatedEntity -> Acc UpdatedEntity )
+collectAliveSteps ( accNew, steps, e ) =
+    ( accNew, accumulate { e | aliveSteps = steps, x = e.x + e.vx, y = e.y + e.vy } )
 
 
 performAliveStep : Computer -> List Entity -> AliveStep -> ( Acc NewEntity, List AliveStep, Entity ) -> ( Acc NewEntity, List AliveStep, Entity )

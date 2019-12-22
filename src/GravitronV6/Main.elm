@@ -5,16 +5,51 @@ import GravitronV6.World as World exposing (World)
 import Playground exposing (..)
 
 
+type Name
+    = Player
+    | Turret
+    | Bullet
+
+
+name n =
+    case n of
+        Player ->
+            "Player"
+
+        Turret ->
+            "Turret"
+
+        Bullet ->
+            "Bullet"
+
+
 default : Entity
 default =
     Entity.default
 
 
+bulletTemplate =
+    { default | name = name Bullet, r = 10, color = charcoal, aliveSteps = [ WalkRandomly ] }
+
+
 init : World
 init =
     World.init
-        [ { default | r = 20, color = green, aliveSteps = [ WalkRandomly ] }
-        , { default | r = 25, color = red }
+        [ { default | name = name Player, r = 20, color = green, aliveSteps = [ WalkRandomly ] }
+        , { default
+            | name = name Turret
+            , r = 25
+            , color = red
+            , aliveSteps =
+                [ Fire
+                    { elapsed = 0
+                    , every = 60
+                    , toName = name Player
+                    , template = bulletTemplate
+                    , speed = 3
+                    }
+                ]
+          }
         ]
 
 

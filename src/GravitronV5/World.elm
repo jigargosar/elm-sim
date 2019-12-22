@@ -339,22 +339,22 @@ performStep (Env { configOf } { screen, time } entityList) response e step =
                         Nothing ->
                             ( response, e, step )
 
-        Fire fire ->
-            case entityNamed fire.toName entityList of
+        Fire ({ name, toName, elapsed, every } as model) ->
+            case entityNamed toName entityList of
                 Just toE ->
                     let
-                        newConfig name =
+                        newConfig =
                             configOf name
                                 |> EC.map (Circ.shoot e toE 3)
 
-                        ( newResponse, newFire ) =
-                            if fire.elapsed > fire.every then
-                                ( Batch [ response, NewEntity (newConfig fire.name) ], { fire | elapsed = 0 } )
+                        ( newResponse, newModel ) =
+                            if elapsed > every then
+                                ( Batch [ response, NewEntity newConfig ], { model | elapsed = 0 } )
 
                             else
-                                ( response, { fire | elapsed = fire.elapsed + 1 } )
+                                ( response, { model | elapsed = elapsed + 1 } )
                     in
-                    ( newResponse, e, Fire newFire )
+                    ( newResponse, e, Fire newModel )
 
                 Nothing ->
                     ( response, e, step )

@@ -30,10 +30,15 @@ update computer (World nid entities) =
 
 stepEntity : Computer -> List Entity -> Entity -> Entity
 stepEntity computer entities e =
-    List.foldl (performAliveStep computer) e e.aliveSteps
+    List.foldl (performAliveStep computer) ( [], e ) e.aliveSteps
+        |> setAliveSteps
 
 
-performAliveStep computer step e =
+setAliveSteps ( steps, e ) =
+    { e | aliveSteps = steps }
+
+
+performAliveStep computer step ( steps, e ) =
     case step of
         WalkRandomly ->
-            Entity.performRandomWalk computer e
+            ( step :: steps, Entity.performRandomWalk computer e )

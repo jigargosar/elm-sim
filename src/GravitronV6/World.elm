@@ -29,8 +29,10 @@ toList (World _ list) =
 update : Computer -> World -> World
 update computer (World nid oldEntities) =
     let
-        ( Acc NewEntity genEntities, updatedEntities ) =
-            List.foldl (stepEntity computer oldEntities) ( emptyAcc NewEntity, [] ) oldEntities
+        ( Acc NewEntity genEntities, Acc UpdatedEntity updatedEntities ) =
+            List.foldl (stepEntity computer oldEntities)
+                ( emptyAcc NewEntity, emptyAcc UpdatedEntity )
+                oldEntities
     in
     List.foldl addNew (World nid updatedEntities) genEntities
         |> reverseWorld
@@ -63,15 +65,23 @@ reverseWorld (World nid list) =
     List.reverse list |> World nid
 
 
-stepEntity : Computer -> List Entity -> Entity -> ( Acc NewEntity, List Entity ) -> ( Acc NewEntity, List Entity )
-stepEntity computer allEntities e ( gen, accUpdated ) =
-    List.foldl (performAliveStep computer allEntities) ( gen, [], e ) e.aliveSteps
+stepEntity :
+    Computer
+    -> List Entity
+    -> Entity
+    -> ( Acc NewEntity, Acc UpdatedEntity )
+    -> ( Acc NewEntity, Acc UpdatedEntity )
+stepEntity computer allEntities e ( accNew, accUpdated ) =
+    List.foldl (performAliveStep computer allEntities) ( accNew, [], e ) e.aliveSteps
         |> collectAliveSteps accUpdated
 
 
-collectAliveSteps : List Entity -> ( Acc NewEntity, List AliveStep, Entity ) -> ( Acc NewEntity, List Entity )
+collectAliveSteps :
+    Acc UpdatedEntity
+    -> ( Acc NewEntity, List AliveStep, Entity )
+    -> ( Acc NewEntity, Acc UpdatedEntity )
 collectAliveSteps accUpdated ( accGen, steps, e ) =
-    ( accGen, { e | aliveSteps = steps, x = e.x + e.vx, y = e.y + e.vy } :: accUpdated )
+    ( accGen, accumulate { e | aliveSteps = steps, x = e.x + e.vx, y = e.y + e.vy } accUpdated )
 
 
 performAliveStep : Computer -> List Entity -> AliveStep -> ( Acc NewEntity, List AliveStep, Entity ) -> ( Acc NewEntity, List AliveStep, Entity )

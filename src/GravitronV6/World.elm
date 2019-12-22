@@ -25,22 +25,22 @@ toList (World _ list) =
 
 
 update : Computer -> World -> World
-update computer (World nid entities) =
+update computer (World nid oldEntities) =
     let
         ( newEntities, updatedEntities ) =
-            List.foldl (stepEntity computer entities) ( [], [] ) entities
+            List.foldl (stepEntity computer) ( [], [] ) oldEntities
     in
     List.foldl addNew (World nid updatedEntities) newEntities
 
 
-stepEntity : Computer -> List Entity -> Entity -> ( List Entity, List Entity ) -> ( List Entity, List Entity )
-stepEntity computer entities e ( newAcc, updatedAcc ) =
+stepEntity : Computer -> Entity -> ( List Entity, List Entity ) -> ( List Entity, List Entity )
+stepEntity computer e ( newAcc, updatedAcc ) =
     List.foldl (performAliveStep computer) ( newAcc, [], e ) e.aliveSteps
         |> setAliveSteps updatedAcc
 
 
-setAliveSteps updatedAcc ( newEntities, steps, e ) =
-    ( newEntities, { e | aliveSteps = steps } :: updatedAcc )
+setAliveSteps updatedAcc ( newAcc, steps, e ) =
+    ( newAcc, { e | aliveSteps = steps } :: updatedAcc )
 
 
 performAliveStep computer step ( newAcc, stepAcc, e ) =

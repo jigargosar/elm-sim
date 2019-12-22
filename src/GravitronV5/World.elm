@@ -241,7 +241,7 @@ performPreStep (Env _ _ allE) e preStep =
             , preStep
             )
 
-        ReceiveCollisionDamage _ ->
+        ReceiveCollisionDamage names ->
             ( e, preStep )
 
         DieOnTimeout int ->
@@ -253,7 +253,13 @@ performSteps env =
     let
         one : Entity -> ( ( Response, Entity ), List Step )
         one e =
-            List.Extra.mapAccuml (performStep env) ( NoResponse, { e | steps = [] } ) e.steps
+            List.Extra.mapAccuml
+                (\( r, accE ) ->
+                    performStep env r accE
+                        >> (\( a, b, c ) -> ( ( a, b ), c ))
+                )
+                ( NoResponse, { e | steps = [] } )
+                e.steps
 
         two : ( ( Response, Entity ), List Step ) -> Response
         two ( ( res, e ), steps ) =
@@ -262,8 +268,8 @@ performSteps env =
     one >> two
 
 
-performStep : Env -> ( Response, Entity ) -> Step -> ( ( Response, Entity ), Step )
-performStep (Env { configOf } { screen, time } entityList) ( response, e ) step =
+performStep : Env -> Response -> Entity -> Step -> ( Response, Entity, Step )
+performStep (Env { configOf } { screen, time } entityList) response e step =
     case step of
         Move move ->
             case move of
@@ -276,18 +282,18 @@ performStep (Env { configOf } { screen, time } entityList) ( response, e ) step 
                                 )
                                 e
                     in
-                    ( ( response, newE ), step )
+                    ( response, newE, step )
 
                 BounceInScreen bf ->
-                    ( ( response, Geom.bounceVel bf screen e ), step )
+                    ( response, Geom.bounceVel bf screen e, step )
 
                 GravitateTo name ->
                     case entityNamed name entityList of
                         Just { x, y } ->
-                            ( ( response, Geom.gravitateVelTo x y e ), step )
+                            ( response, Geom.gravitateVelTo x y e, step )
 
                         Nothing ->
-                            ( ( response, e ), step )
+                            ( response, e, step )
 
         Fire fire ->
             let
@@ -309,7 +315,7 @@ performStep (Env { configOf } { screen, time } entityList) ( response, e ) step 
                     else
                         ( response, { fire | elapsed = fire.elapsed + 1 } )
             in
-            ( ( newResponse, e ), Fire newFire )
+            ( newResponse, e, Fire newFire )
 
 
 toList : WorldConfig -> World -> List Entity

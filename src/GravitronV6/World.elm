@@ -1,4 +1,4 @@
-module GravitronV6.World exposing (World, init, toList)
+module GravitronV6.World exposing (World, init, step, toList)
 
 import GravitronV6.Entity exposing (Entity)
 import Playground exposing (..)
@@ -21,6 +21,11 @@ addNew e (World nid list) =
 toList : World -> List Entity
 toList (World _ list) =
     list
+
+
+step : Computer -> World -> World
+step computer (World nid entities) =
+    World nid (List.map (stepEntity computer entities) entities)
 
 
 stepEntity : Computer -> List Entity -> Entity -> Entity

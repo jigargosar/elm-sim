@@ -43,7 +43,7 @@ type PreStep
 
 type Step
     = Move EC.Move
-    | Fire { every : Int, elapsed : Int, name : Name, toName : Name }
+    | Fire Int { every : Int, named : Name, towards : Name }
 
 
 fromConfig : Int -> EntityConfig -> Entity
@@ -81,8 +81,8 @@ fromConfig id =
                             EC.Move m ->
                                 Move m
 
-                            EC.Fire n toN ->
-                                Fire { every = 60, name = n, elapsed = 0, toName = toN }
+                            EC.Fire name_ toN ->
+                                Fire 0 { every = 60, named = name_, towards = toN }
                     )
                     steps
             , phase =
@@ -339,22 +339,22 @@ performStep (Env { configOf } { screen, time } entityList) response e step =
                         Nothing ->
                             ( response, e, step )
 
-        Fire ({ name, toName, elapsed, every } as model) ->
-            case entityNamed toName entityList of
+        Fire elapsed ({ named, towards, every } as fireConf) ->
+            case entityNamed towards entityList of
                 Just toE ->
                     let
                         newConfig =
-                            configOf name
+                            configOf named
                                 |> EC.map (Circ.shoot e toE 3)
 
-                        ( newResponse, newModel ) =
+                        ( newResponse, newElapsed ) =
                             if elapsed > every then
-                                ( Batch [ response, NewEntity newConfig ], { model | elapsed = 0 } )
+                                ( Batch [ response, NewEntity newConfig ], 0 )
 
                             else
-                                ( response, { model | elapsed = elapsed + 1 } )
+                                ( response, elapsed + 1 )
                     in
-                    ( newResponse, e, Fire newModel )
+                    ( newResponse, e, Fire newElapsed fireConf )
 
                 Nothing ->
                     ( response, e, step )

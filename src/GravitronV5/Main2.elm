@@ -2,7 +2,7 @@ module GravitronV5.Main2 exposing (main)
 
 import Ease
 import GravitronV5.EntityConfig as EC exposing (EntityConfig, Move(..), PreStep(..), Step(..))
-import GravitronV5.HP as HP
+import GravitronV5.HP as HP exposing (HP)
 import GravitronV5.Names exposing (Name(..))
 import GravitronV5.World as World exposing (World, WorldConfig)
 import List.Extra
@@ -130,6 +130,7 @@ viewEntity entity =
     toCoreShape entity |> phaseTransition phase |> move x y
 
 
+toCoreShape : { a | name : Name, r : Number, color : Color, hp : HP } -> Shape
 toCoreShape { name, r, color, hp } =
     group
         [ circle color r
@@ -141,6 +142,7 @@ toCoreShape { name, r, color, hp } =
         ]
 
 
+phaseTransition : World.Phase -> Shape -> Shape
 phaseTransition phase =
     case phase of
         World.ReadyForCollision ->

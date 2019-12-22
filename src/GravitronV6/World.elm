@@ -1,4 +1,4 @@
-module GravitronV6.World exposing (World)
+module GravitronV6.World exposing (World, init, toList)
 
 import GravitronV6.Entity exposing (Entity)
 import Playground exposing (Number)
@@ -16,3 +16,8 @@ init =
 addNew : Entity -> World -> World
 addNew e (World nid list) =
     World (nid + 1) ({ e | id = nid } :: list)
+
+
+toList : World -> List Entity
+toList (World _ list) =
+    list

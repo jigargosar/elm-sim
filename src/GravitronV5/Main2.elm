@@ -30,7 +30,7 @@ turretConfig =
                 , color = red
                 , preSteps = [ ReceiveCollisionDamage [ Bullet ] ]
                 , steps = [ Fire Bullet Player ]
-                , maxHP = 10
+                , maxHP = 2
             }
         )
 

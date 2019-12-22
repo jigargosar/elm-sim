@@ -4,7 +4,9 @@ import GravitronV5.EntityConfig as EC exposing (EntityConfig, Move(..), PreStep(
 import GravitronV5.HP as HP
 import GravitronV5.Names exposing (Name(..))
 import GravitronV5.World as World exposing (World, WorldConfig)
+import List.Extra
 import Playground exposing (..)
+import PointFree exposing (propEq)
 
 
 playerConfig : EntityConfig
@@ -59,9 +61,20 @@ configOf name =
             bulletConfig
 
 
-afterUpdate : List World.Entity -> List World.Entity
+afterUpdate : List World.Entity -> List EntityConfig
 afterUpdate list =
-    list
+    let
+        turretCount =
+            List.Extra.count (propEq .name Player) list
+
+        newTurrets =
+            if turretCount == 0 then
+                initialTurrets
+
+            else
+                []
+    in
+    newTurrets
 
 
 worldConfig : WorldConfig
@@ -76,18 +89,18 @@ withXY ( x, y ) e =
     { e | x = x, y = y }
 
 
+initialTurrets =
+    [ ( -150, 150 ) ]
+        |> List.map
+            (\pos ->
+                turretConfig
+                    |> EC.map (withXY pos)
+            )
+
+
 initialEntities : List EntityConfig
 initialEntities =
-    let
-        turrets =
-            [ ( -150, 150 ) ]
-                |> List.map
-                    (\pos ->
-                        turretConfig
-                            |> EC.map (withXY pos)
-                    )
-    in
-    configOf Player :: turrets
+    configOf Player :: initialTurrets
 
 
 initialMemory : World

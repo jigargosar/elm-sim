@@ -132,3 +132,8 @@ ifElse pred true false val =
 anyPass : List (b -> Bool) -> b -> Bool
 anyPass fnList val =
     List.any ((|>) val) fnList
+
+
+propEq : (c -> b) -> b -> c -> Bool
+propEq func a b =
+    func b == a

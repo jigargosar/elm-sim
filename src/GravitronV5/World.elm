@@ -92,7 +92,7 @@ fromConfig id =
 
 type alias WorldConfig =
     { configOf : Name -> EntityConfig
-    , afterUpdate : List Entity -> List Entity
+    , afterUpdate : List Entity -> List EntityConfig
     }
 
 
@@ -119,8 +119,8 @@ update worldConfig computer (World nid lst) =
 
 
 afterUpdateHook : WorldConfig -> World -> World
-afterUpdateHook wc (World nid list) =
-    World nid (wc.afterUpdate list)
+afterUpdateHook wc ((World _ list) as world) =
+    wc.afterUpdate list |> List.foldl addNewEntity world
 
 
 type Env
@@ -149,6 +149,11 @@ type Response
     | NoResponse
 
 
+addNewEntity : EntityConfig -> World -> World
+addNewEntity ec (World nid acc) =
+    World (nid + 1) (fromConfig nid ec :: acc)
+
+
 foldResponses : Int -> List Response -> World
 foldResponses =
     let
@@ -158,7 +163,7 @@ foldResponses =
                     World nid (e :: acc)
 
                 NewEntity ec ->
-                    World (nid + 1) (fromConfig nid ec :: acc)
+                    addNewEntity ec world
 
                 Batch rLst ->
                     List.foldl foldOne world rLst

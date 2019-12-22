@@ -29,9 +29,13 @@ update computer (World nid oldEntities) =
     let
         ( genEntities, updatedEntities ) =
             List.foldl (stepEntity computer) ( [], [] ) oldEntities
-                |> Tuple.mapSecond List.reverse
     in
     List.foldl addNew (World nid updatedEntities) genEntities
+        |> reverseWorld
+
+
+reverseWorld (World nid list) =
+    List.reverse list |> World nid
 
 
 stepEntity : Computer -> Entity -> ( List Entity, List Entity ) -> ( List Entity, List Entity )
@@ -41,7 +45,7 @@ stepEntity computer e ( genAcc, updatedAcc ) =
 
 
 setAliveSteps updatedAcc ( newAcc, steps, e ) =
-    ( newAcc, { e | aliveSteps = steps } :: updatedAcc )
+    ( newAcc, { e | aliveSteps = steps, x = e.x + e.vx, y = e.y + e.vy } :: updatedAcc )
 
 
 performAliveStep computer step ( genAcc, stepAcc, e ) =

@@ -1,4 +1,4 @@
-module GravitronV5.Circ exposing (setCords, shoot)
+module GravitronV5.Circ exposing (Cords, setCords, shoot)
 
 import Playground exposing (Number)
 

@@ -96,7 +96,7 @@ initialTurrets : List EntityConfig
 initialTurrets =
     let
         turretAt cords =
-            EC.map (Circ.setCords cords) turretConfig
+            EC.withXY cords turretConfig
     in
     [ ( -150, 150 ) ]
         |> List.map turretAt

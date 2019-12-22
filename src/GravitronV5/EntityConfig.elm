@@ -8,8 +8,10 @@ module GravitronV5.EntityConfig exposing
     , map
     , named
     , toRec
+    , withXY
     )
 
+import GravitronV5.Circ as Circ exposing (Cords)
 import GravitronV5.Names exposing (Name)
 import Playground exposing (..)
 
@@ -90,3 +92,8 @@ unwrap (EntityConfig rec) =
 toRec : EntityConfig -> Rec
 toRec =
     unwrap
+
+
+withXY : Cords -> EntityConfig -> EntityConfig
+withXY cords =
+    map (Circ.setCords cords)

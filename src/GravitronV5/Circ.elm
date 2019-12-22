@@ -3,16 +3,6 @@ module GravitronV5.Circ exposing (Circ, shoot)
 import Playground exposing (Number)
 
 
-type alias Circ a =
-    { a
-        | x : Number
-        , y : Number
-        , r : Number
-        , vx : Number
-        , vy : Number
-    }
-
-
 shoot : Circ a -> Circ b -> Float -> Circ c -> Circ c
 shoot from to speed c =
     let
@@ -30,6 +20,16 @@ shoot from to speed c =
     in
     { c | vx = vx, vy = vy }
         |> setCords cords
+
+
+type alias Circ a =
+    { a
+        | x : Number
+        , y : Number
+        , r : Number
+        , vx : Number
+        , vy : Number
+    }
 
 
 type alias Cords =

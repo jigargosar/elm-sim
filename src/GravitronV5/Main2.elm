@@ -124,20 +124,21 @@ viewMemory computer world =
 viewEntity : World.Entity -> Shape
 viewEntity entity =
     let
-        { name, x, y, r, color, hp, phase } =
+        { x, y, phase } =
             entity
-
-        toCoreShape =
-            group
-                [ circle color r
-                , if name == Turret then
-                    words darkCharcoal (String.fromInt (HP.remaining hp))
-
-                  else
-                    group []
-                ]
     in
-    toCoreShape |> phaseTransition phase |> move x y
+    toCoreShape entity |> phaseTransition phase |> move x y
+
+
+toCoreShape { name, r, color, hp } =
+    group
+        [ circle color r
+        , if name == Turret then
+            words darkCharcoal (String.fromInt (HP.remaining hp))
+
+          else
+            group []
+        ]
 
 
 phaseTransition phase =

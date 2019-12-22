@@ -65,7 +65,7 @@ afterUpdate : List World.Entity -> List EntityConfig
 afterUpdate list =
     let
         turretCount =
-            List.Extra.count (propEq .name Player) list
+            List.Extra.count (propEq .name Turret) list
 
         newTurrets =
             if turretCount == 0 then

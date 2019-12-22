@@ -29,12 +29,12 @@ toList (World _ list) =
 update : Computer -> World -> World
 update computer (World nid oldEntities) =
     let
-        ( Acc genEntities, Acc updatedEntities ) =
+        ( Acc newEntities, Acc updatedEntities ) =
             List.foldl (stepEntity computer oldEntities)
                 ( emptyAcc NewEntity, emptyAcc UpdatedEntity )
                 oldEntities
     in
-    List.foldl addNew (World nid updatedEntities) genEntities
+    List.foldl addNew (World nid updatedEntities) newEntities
         |> reverseWorld
 
 

@@ -34,6 +34,7 @@ update computer (World nid oldEntities) =
         |> reverseWorld
 
 
+reverseWorld : World -> World
 reverseWorld (World nid list) =
     List.reverse list |> World nid
 

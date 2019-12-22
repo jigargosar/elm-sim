@@ -49,6 +49,7 @@ setAliveSteps updatedAcc ( newAcc, steps, e ) =
     ( newAcc, { e | aliveSteps = steps, x = e.x + e.vx, y = e.y + e.vy } :: updatedAcc )
 
 
+performAliveStep : Computer -> AliveStep -> ( List Entity, List AliveStep, Entity ) -> ( List Entity, List AliveStep, Entity )
 performAliveStep computer step ( genAcc, stepAcc, e ) =
     case step of
         WalkRandomly ->
@@ -77,3 +78,34 @@ performAliveStep computer step ( genAcc, stepAcc, e ) =
                         identity
             in
             ( newGenAcc genAcc, newStep :: stepAcc, e )
+
+
+performAliveStepHelp : Computer -> AliveStep -> Entity -> ( List Entity -> List Entity, AliveStep, Entity )
+performAliveStepHelp computer step e =
+    case step of
+        WalkRandomly ->
+            ( identity, step, Entity.performRandomWalk computer e )
+
+        Fire rec ->
+            let
+                triggered =
+                    rec.elapsed >= rec.every
+
+                newRec =
+                    if triggered then
+                        { rec | elapsed = 0 }
+
+                    else
+                        { rec | elapsed = rec.elapsed + 1 }
+
+                newStep =
+                    Fire newRec
+
+                newGenAcc =
+                    if triggered then
+                        (::) rec.template
+
+                    else
+                        identity
+            in
+            ( newGenAcc, newStep, e )

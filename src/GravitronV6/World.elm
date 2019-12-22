@@ -80,14 +80,14 @@ collectAliveSteps :
     Acc UpdatedEntity
     -> ( Acc NewEntity, List AliveStep, Entity )
     -> ( Acc NewEntity, Acc UpdatedEntity )
-collectAliveSteps accUpdated ( accGen, steps, e ) =
-    ( accGen, accumulate { e | aliveSteps = steps, x = e.x + e.vx, y = e.y + e.vy } accUpdated )
+collectAliveSteps accUpdated ( accNew, steps, e ) =
+    ( accNew, accumulate { e | aliveSteps = steps, x = e.x + e.vx, y = e.y + e.vy } accUpdated )
 
 
 performAliveStep : Computer -> List Entity -> AliveStep -> ( Acc NewEntity, List AliveStep, Entity ) -> ( Acc NewEntity, List AliveStep, Entity )
-performAliveStep computer allEntities step ( gen, stepAcc, e ) =
+performAliveStep computer allEntities step ( accNew, stepAcc, e ) =
     performAliveStepHelp computer allEntities step e
-        |> (\( genF, newStep, newE ) -> ( genF gen, newStep :: stepAcc, newE ))
+        |> (\( accNewF, newStep, newE ) -> ( accNewF accNew, newStep :: stepAcc, newE ))
 
 
 performAliveStepHelp : Computer -> List Entity -> AliveStep -> Entity -> ( Acc NewEntity -> Acc NewEntity, AliveStep, Entity )

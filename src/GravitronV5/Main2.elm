@@ -60,8 +60,7 @@ configOf name =
 
 worldConfig : WorldConfig
 worldConfig =
-    { singletonNames = [ Player ]
-    , configOf = configOf
+    { configOf = configOf
     }
 
 

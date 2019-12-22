@@ -90,7 +90,7 @@ fromConfig id =
 
 
 type alias WorldConfig =
-    { singletonNames : List Name, configOf : Name -> EntityConfig }
+    { configOf : Name -> EntityConfig }
 
 
 init : WorldConfig -> List EntityConfig -> World

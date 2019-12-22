@@ -42,3 +42,20 @@ performAliveStep computer step ( steps, e ) =
     case step of
         WalkRandomly ->
             ( step :: steps, Entity.performRandomWalk computer e )
+
+        Fire rec ->
+            let
+                triggered =
+                    rec.elapsed >= rec.every
+
+                newRec =
+                    if triggered then
+                        { rec | elapsed = 0 }
+
+                    else
+                        { rec | elapsed = rec.elapsed + 1 }
+
+                newStep =
+                    Fire newRec
+            in
+            ( newStep :: steps, e )

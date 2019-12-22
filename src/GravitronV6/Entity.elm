@@ -9,6 +9,7 @@ type PreStep
 
 type AliveStep
     = WalkRandomly
+    | Fire { elapsed : Number, every : Number, toName : String, template : Entity, speed : Number }
 
 
 type DeathStep

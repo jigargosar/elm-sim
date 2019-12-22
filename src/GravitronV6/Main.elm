@@ -1,12 +1,20 @@
 module GravitronV6.Main exposing (main)
 
+import GravitronV6.Entity as Entity exposing (Entity)
 import GravitronV6.World as World exposing (World)
 import Playground exposing (..)
 
 
+default : Entity
+default =
+    Entity.default
+
+
 init : World
 init =
-    World.init []
+    World.init
+        [ { default | r = 20, color = green }
+        ]
 
 
 update _ =

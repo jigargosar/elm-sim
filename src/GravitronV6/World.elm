@@ -111,7 +111,7 @@ performAliveStepHelp computer allEntities step e =
                 newStep =
                     Fire newRec
 
-                genF =
+                accNewF =
                     if triggered then
                         case findNamed rec.toName allEntities of
                             Just to ->
@@ -123,7 +123,7 @@ performAliveStepHelp computer allEntities step e =
                     else
                         identity
             in
-            ( genF, newStep, e )
+            ( accNewF, newStep, e )
 
 
 findNamed : a -> List { b | name : a } -> Maybe { b | name : a }

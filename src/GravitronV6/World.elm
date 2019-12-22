@@ -29,25 +29,33 @@ toList (World _ list) =
 update : Computer -> World -> World
 update computer (World nid oldEntities) =
     let
-        ( Acc genEntities, updatedEntities ) =
-            List.foldl (stepEntity computer oldEntities) ( emptyAcc, [] ) oldEntities
+        ( Acc NewEntity genEntities, updatedEntities ) =
+            List.foldl (stepEntity computer oldEntities) ( emptyAcc NewEntity, [] ) oldEntities
     in
     List.foldl addNew (World nid updatedEntities) genEntities
         |> reverseWorld
 
 
-type Acc
-    = Acc (List Entity)
+type NewEntity
+    = NewEntity
 
 
-emptyAcc : Acc
-emptyAcc =
-    Acc []
+type UpdatedEntity
+    = UpdatedEntity
 
 
-accumulate : Entity -> Acc -> Acc
-accumulate e (Acc list) =
-    e :: list |> Acc
+type Acc tag
+    = Acc tag (List Entity)
+
+
+emptyAcc : tag -> Acc tag
+emptyAcc tag =
+    Acc tag []
+
+
+accumulate : Entity -> Acc tag -> Acc tag
+accumulate e (Acc tag list) =
+    e :: list |> Acc tag
 
 
 reverseWorld : World -> World
@@ -55,24 +63,24 @@ reverseWorld (World nid list) =
     List.reverse list |> World nid
 
 
-stepEntity : Computer -> List Entity -> Entity -> ( Acc, List Entity ) -> ( Acc, List Entity )
+stepEntity : Computer -> List Entity -> Entity -> ( Acc NewEntity, List Entity ) -> ( Acc NewEntity, List Entity )
 stepEntity computer allEntities e ( gen, accUpdated ) =
     List.foldl (performAliveStep computer allEntities) ( gen, [], e ) e.aliveSteps
         |> collectAliveSteps accUpdated
 
 
-collectAliveSteps : List Entity -> ( Acc, List AliveStep, Entity ) -> ( Acc, List Entity )
+collectAliveSteps : List Entity -> ( Acc NewEntity, List AliveStep, Entity ) -> ( Acc NewEntity, List Entity )
 collectAliveSteps accUpdated ( accGen, steps, e ) =
     ( accGen, { e | aliveSteps = steps, x = e.x + e.vx, y = e.y + e.vy } :: accUpdated )
 
 
-performAliveStep : Computer -> List Entity -> AliveStep -> ( Acc, List AliveStep, Entity ) -> ( Acc, List AliveStep, Entity )
+performAliveStep : Computer -> List Entity -> AliveStep -> ( Acc NewEntity, List AliveStep, Entity ) -> ( Acc NewEntity, List AliveStep, Entity )
 performAliveStep computer allEntities step ( gen, stepAcc, e ) =
     performAliveStepHelp computer allEntities step e
         |> (\( genF, newStep, newE ) -> ( genF gen, newStep :: stepAcc, newE ))
 
 
-performAliveStepHelp : Computer -> List Entity -> AliveStep -> Entity -> ( Acc -> Acc, AliveStep, Entity )
+performAliveStepHelp : Computer -> List Entity -> AliveStep -> Entity -> ( Acc NewEntity -> Acc NewEntity, AliveStep, Entity )
 performAliveStepHelp computer allEntities step e =
     case step of
         WalkRandomly ->

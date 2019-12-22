@@ -91,7 +91,9 @@ fromConfig id =
 
 
 type alias WorldConfig =
-    { configOf : Name -> EntityConfig }
+    { configOf : Name -> EntityConfig
+    , afterUpdate : List Entity -> List Entity
+    }
 
 
 init : WorldConfig -> List EntityConfig -> World

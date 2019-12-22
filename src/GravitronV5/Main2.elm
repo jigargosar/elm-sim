@@ -59,9 +59,15 @@ configOf name =
             bulletConfig
 
 
+afterUpdate : List World.Entity -> List World.Entity
+afterUpdate list =
+    list
+
+
 worldConfig : WorldConfig
 worldConfig =
     { configOf = configOf
+    , afterUpdate = afterUpdate
     }
 
 

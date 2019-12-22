@@ -17,8 +17,9 @@ init =
         ]
 
 
-update _ =
-    identity
+update : Computer -> World -> World
+update =
+    World.step
 
 
 view : Computer -> World -> List Shape

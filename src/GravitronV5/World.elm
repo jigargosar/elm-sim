@@ -138,8 +138,8 @@ propEq func s b =
     func b == s
 
 
-entityNamed : Name -> List Entity -> Maybe Entity
-entityNamed name =
+findEntityNamed : Name -> List Entity -> Maybe Entity
+findEntityNamed name =
     List.Extra.find (propEq .name name)
 
 
@@ -332,7 +332,7 @@ performStep (Env { configOf } { screen, time } entityList) response e step =
                     ( response, Geom.bounceVel bf screen e, step )
 
                 GravitateTo name ->
-                    case entityNamed name entityList of
+                    case findEntityNamed name entityList of
                         Just { x, y } ->
                             ( response, Geom.gravitateVelTo x y e, step )
 
@@ -340,12 +340,12 @@ performStep (Env { configOf } { screen, time } entityList) response e step =
                             ( response, e, step )
 
         Fire elapsed ({ named, towards, every } as fireConf) ->
-            case entityNamed towards entityList of
-                Just toE ->
+            case findEntityNamed towards entityList of
+                Just towardsEntity ->
                     let
                         newConfig =
                             configOf named
-                                |> EC.map (Circ.shoot e toE 3)
+                                |> EC.map (Circ.shoot e towardsEntity 3)
 
                         ( newResponse, newElapsed ) =
                             if elapsed > every then

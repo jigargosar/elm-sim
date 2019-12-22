@@ -214,13 +214,22 @@ kill e =
     { e | hp = HP.removeAll e.hp }
 
 
+hitHPBy : Int -> { a | hp : HP } -> { a | hp : HP }
+hitHPBy hits e =
+    { e | hp = HP.remove hits e.hp }
+
+
 isReadyForCollision e =
     e.phase == ReadyForCollision
 
 
 isCollidingWithAny allE names e =
-    isReadyForCollision e
-        && List.any
+    getCollisionCount allE names e > 0
+
+
+getCollisionCount allE names e =
+    if isReadyForCollision e then
+        List.filter
             (\other ->
                 isReadyForCollision other
                     && nameOneOf names other
@@ -228,6 +237,10 @@ isCollidingWithAny allE names e =
                     && (other.id /= e.id)
             )
             allE
+            |> List.length
+
+    else
+        0
 
 
 performPreStep : Env -> Entity -> PreStep -> ( Entity, PreStep )
@@ -243,7 +256,11 @@ performPreStep (Env _ _ allE) e preStep =
             )
 
         ReceiveCollisionDamage names ->
-            ( e, preStep )
+            let
+                hits =
+                    getCollisionCount allE names e
+            in
+            ( hitHPBy hits e, preStep )
 
         DieOnTimeout int ->
             ( e, preStep )

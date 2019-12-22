@@ -1,6 +1,7 @@
 module GravitronV5.Main2 exposing (main)
 
 import Ease
+import GravitronV5.Circ as Circ
 import GravitronV5.EntityConfig as EC exposing (EntityConfig, Move(..), PreStep(..), Step(..))
 import GravitronV5.HP as HP exposing (HP)
 import GravitronV5.Names exposing (Name(..))
@@ -91,13 +92,14 @@ withXY ( x, y ) e =
     { e | x = x, y = y }
 
 
+initialTurrets : List EntityConfig
 initialTurrets =
+    let
+        turretAt cords =
+            EC.map (Circ.setCords cords) turretConfig
+    in
     [ ( -150, 150 ) ]
-        |> List.map
-            (\pos ->
-                turretConfig
-                    |> EC.map (withXY pos)
-            )
+        |> List.map turretAt
 
 
 initialEntities : List EntityConfig

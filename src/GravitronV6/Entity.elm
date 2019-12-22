@@ -1,6 +1,6 @@
 module GravitronV6.Entity exposing (..)
 
-import Playground exposing (Color, Number, blue)
+import Playground exposing (..)
 
 
 type PreStep
@@ -60,3 +60,14 @@ default =
     , deathSteps = []
     , phase = Alive
     }
+
+
+performRandomWalk : Computer -> { c | x : Number, y : Number } -> { c | x : Number, y : Number }
+performRandomWalk { time, screen } e =
+    let
+        ( x, y ) =
+            ( wave screen.left screen.right 6 time
+            , wave screen.top screen.bottom 8 time
+            )
+    in
+    { e | x = x, y = y }

@@ -1,4 +1,4 @@
-module GravitronV5.Circ exposing (..)
+module GravitronV5.Circ exposing (Circ, shoot)
 
 import Playground exposing (Number)
 
@@ -13,10 +13,6 @@ type alias Circ a =
     }
 
 
-angleFromTo from to =
-    atan2 (to.y - from.y) (to.y - from.y)
-
-
 shoot : Circ a -> Circ b -> Float -> Circ c -> Circ c
 shoot from to speed c =
     let
@@ -26,13 +22,14 @@ shoot from to speed c =
         offsetCords =
             fromPolar ( from.r + from.r, ang )
 
-        ( x, y ) =
+        cords =
             addCords (cordsOf from) offsetCords
 
         ( vx, vy ) =
             fromPolar ( speed, ang )
     in
-    { c | x = x, y = y, vx = vx, vy = vy }
+    { c | vx = vx, vy = vy }
+        |> setCords cords
 
 
 type alias Cords =
@@ -47,3 +44,27 @@ addCords ( x1, y1 ) ( x2, y2 ) =
 cordsOf : Circ a -> Cords
 cordsOf c =
     ( c.x, c.y )
+
+
+setCords : Cords -> Circ a -> Circ a
+setCords ( x, y ) c =
+    { c | x = x, y = y }
+
+
+setSpeedAngle : Cords -> Circ a -> Circ a
+setSpeedAngle polar c =
+    let
+        ( vx, vy ) =
+            fromPolar polar
+    in
+    { c | vx = vx, vy = vy }
+
+
+angleFromTo : Circ a -> Circ b -> Float
+angleFromTo from to =
+    angleFromToCords (cordsOf from) (cordsOf to)
+
+
+angleFromToCords : Cords -> Cords -> Float
+angleFromToCords ( x1, y1 ) ( x2, y2 ) =
+    atan2 (y2 - y1) (x2 - x1)

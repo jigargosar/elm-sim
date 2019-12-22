@@ -360,6 +360,6 @@ performStep (Env { configOf } { screen, time } entityList) response e step =
                     ( response, e, step )
 
 
-toList : WorldConfig -> World -> List Entity
-toList worldConfig (World _ lst) =
+toList : World -> List Entity
+toList (World _ lst) =
     lst

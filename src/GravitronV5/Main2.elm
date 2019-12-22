@@ -79,13 +79,6 @@ afterUpdate list =
     newTurrets
 
 
-worldConfig : WorldConfig
-worldConfig =
-    { configOf = configOf
-    , afterUpdate = afterUpdate
-    }
-
-
 initialTurrets : List EntityConfig
 initialTurrets =
     let
@@ -101,6 +94,13 @@ initialMemory =
     World.init (playerConfig :: initialTurrets)
 
 
+worldConfig : WorldConfig
+worldConfig =
+    { configOf = configOf
+    , afterUpdate = afterUpdate
+    }
+
+
 updateMemory : Computer -> World -> World
 updateMemory computer world =
     World.update worldConfig computer world
@@ -108,7 +108,7 @@ updateMemory computer world =
 
 viewMemory : Computer -> World -> List Shape
 viewMemory _ world =
-    World.toList worldConfig world
+    World.toList world
         |> List.map viewEntity
 
 

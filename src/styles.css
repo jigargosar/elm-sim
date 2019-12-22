@@ -10,8 +10,11 @@ body {
 
 svg {
   user-select: none;
-  font-family: monospace;
-  font-size: 2rem;
+}
+
+svg text {
+  font-family: 'Open Sans', monospace;
+  font-size: 22px;
 }
 
 .fixed-full-screen {

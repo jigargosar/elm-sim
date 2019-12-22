@@ -43,7 +43,7 @@ type PreStep
 
 type Step
     = Move EC.Move
-    | Fire Int { every : Int, named : Name, towards : Name }
+    | Fire { every : Int, named : Name, towards : Name } Int
 
 
 fromConfig : Int -> EntityConfig -> Entity
@@ -82,7 +82,7 @@ fromConfig id =
                                 Move m
 
                             EC.Fire name_ toN ->
-                                Fire 0 { every = 60, named = name_, towards = toN }
+                                Fire { every = 60, named = name_, towards = toN } 0
                     )
                     steps
             , phase =
@@ -339,7 +339,7 @@ performStep (Env { configOf } { screen, time } entityList) response e step =
                         Nothing ->
                             ( response, e, step )
 
-        Fire elapsed ({ named, towards, every } as fireConf) ->
+        Fire ({ named, towards, every } as fireConf) elapsed ->
             case findEntityNamed towards entityList of
                 Just towardsEntity ->
                     let
@@ -354,7 +354,7 @@ performStep (Env { configOf } { screen, time } entityList) response e step =
                             else
                                 ( response, elapsed + 1 )
                     in
-                    ( newResponse, e, Fire newElapsed fireConf )
+                    ( newResponse, e, Fire fireConf newElapsed )
 
                 Nothing ->
                     ( response, e, step )

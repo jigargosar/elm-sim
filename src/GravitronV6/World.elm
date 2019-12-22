@@ -27,16 +27,16 @@ toList (World _ list) =
 update : Computer -> World -> World
 update computer (World nid oldEntities) =
     let
-        ( newEntities, updatedEntities ) =
+        ( genEntities, updatedEntities ) =
             List.foldl (stepEntity computer) ( [], [] ) oldEntities
                 |> Tuple.mapSecond List.reverse
     in
-    List.foldl addNew (World nid updatedEntities) newEntities
+    List.foldl addNew (World nid updatedEntities) genEntities
 
 
 stepEntity : Computer -> Entity -> ( List Entity, List Entity ) -> ( List Entity, List Entity )
-stepEntity computer e ( newAcc, updatedAcc ) =
-    List.foldl (performAliveStep computer) ( newAcc, [], e ) e.aliveSteps
+stepEntity computer e ( genAcc, updatedAcc ) =
+    List.foldl (performAliveStep computer) ( genAcc, [], e ) e.aliveSteps
         |> setAliveSteps updatedAcc
 
 
@@ -44,10 +44,10 @@ setAliveSteps updatedAcc ( newAcc, steps, e ) =
     ( newAcc, { e | aliveSteps = steps } :: updatedAcc )
 
 
-performAliveStep computer step ( newAcc, stepAcc, e ) =
+performAliveStep computer step ( genAcc, stepAcc, e ) =
     case step of
         WalkRandomly ->
-            ( newAcc, step :: stepAcc, Entity.performRandomWalk computer e )
+            ( genAcc, step :: stepAcc, Entity.performRandomWalk computer e )
 
         Fire rec ->
             let
@@ -64,4 +64,4 @@ performAliveStep computer step ( newAcc, stepAcc, e ) =
                 newStep =
                     Fire newRec
             in
-            ( newAcc, newStep :: stepAcc, e )
+            ( genAcc, newStep :: stepAcc, e )

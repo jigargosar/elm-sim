@@ -63,5 +63,12 @@ performAliveStep computer step ( genAcc, stepAcc, e ) =
 
                 newStep =
                     Fire newRec
+
+                newGenAcc =
+                    if triggered then
+                        (::) rec.template
+
+                    else
+                        identity
             in
-            ( genAcc, newStep :: stepAcc, e )
+            ( newGenAcc genAcc, newStep :: stepAcc, e )

@@ -29,6 +29,7 @@ update computer (World nid oldEntities) =
     let
         ( newEntities, updatedEntities ) =
             List.foldl (stepEntity computer) ( [], [] ) oldEntities
+                |> Tuple.mapSecond List.reverse
     in
     List.foldl addNew (World nid updatedEntities) newEntities
 

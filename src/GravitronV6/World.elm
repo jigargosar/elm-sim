@@ -36,6 +36,15 @@ update computer (World nid oldEntities) =
         |> reverseWorld
 
 
+type AccGen
+    = AccGen (List Entity)
+
+
+collectGen : Entity -> AccGen -> AccGen
+collectGen e (AccGen list) =
+    e :: list |> AccGen
+
+
 reverseWorld : World -> World
 reverseWorld (World nid list) =
     List.reverse list |> World nid

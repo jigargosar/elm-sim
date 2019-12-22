@@ -30,7 +30,7 @@ update computer (World nid oldEntities) =
         ( newEntities, updatedEntities ) =
             List.foldl (stepEntity computer) ( [], [] ) oldEntities
     in
-    List.foldl addNew (World nid (List.reverse updatedEntities)) newEntities
+    List.foldl addNew (World nid updatedEntities) newEntities
 
 
 stepEntity : Computer -> Entity -> ( List Entity, List Entity ) -> ( List Entity, List Entity )

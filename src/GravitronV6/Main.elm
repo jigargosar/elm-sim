@@ -25,11 +25,15 @@ update =
 
 view : Computer -> World -> List Shape
 view _ =
-    World.toList >> List.map viewEntity
+    World.toList >> List.indexedMap viewEntity
 
 
-viewEntity e =
-    circle e.color e.r
+viewEntity idx e =
+    group
+        [ circle e.color e.r
+        , ("z-" ++ String.fromInt idx)
+            |> words black
+        ]
         |> move e.x e.y
 
 

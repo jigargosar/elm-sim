@@ -102,8 +102,8 @@ type alias WorldConfig =
     }
 
 
-init : WorldConfig -> List EntityConfig -> World
-init _ initialEntityConfigList =
+init : List EntityConfig -> World
+init initialEntityConfigList =
     let
         ( nid, entityList ) =
             initialEntityConfigList

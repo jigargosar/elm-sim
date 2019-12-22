@@ -98,7 +98,7 @@ initialTurrets =
 
 initialMemory : World
 initialMemory =
-    World.init worldConfig (playerConfig :: initialTurrets)
+    World.init (playerConfig :: initialTurrets)
 
 
 updateMemory : Computer -> World -> World

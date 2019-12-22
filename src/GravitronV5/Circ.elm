@@ -14,12 +14,10 @@ shoot from to speed c =
 
         cords =
             addCords (cordsOf from) offsetCords
-
-        ( vx, vy ) =
-            fromPolar ( speed, ang )
     in
-    { c | vx = vx, vy = vy }
+    c
         |> setCords cords
+        |> setSpeedAngle ( speed, ang )
 
 
 type alias Circ a =

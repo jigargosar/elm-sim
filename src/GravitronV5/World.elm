@@ -317,7 +317,7 @@ performStep (Env { configOf } { screen, time } entityList) response e step =
     case step of
         Move move ->
             case move of
-                RandomWalker ->
+                RandomWalk ->
                     let
                         newE =
                             setXY

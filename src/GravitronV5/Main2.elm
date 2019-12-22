@@ -17,7 +17,7 @@ playerConfig =
             { rec
                 | r = 20
                 , color = green
-                , steps = [ Move RandomWalker ]
+                , steps = [ Move RandomWalk ]
             }
         )
 

@@ -77,13 +77,6 @@ stepEntity computer allEntities e ( accNew, accUpdated ) =
         |> Tuple.mapSecond ((|>) accUpdated)
 
 
-collectAliveStepsAndMoveByVelocity :
-    ( Acc NewEntity, List AliveStep, Entity )
-    -> ( Acc NewEntity, Acc UpdatedEntity -> Acc UpdatedEntity )
-collectAliveStepsAndMoveByVelocity ( accNew, steps, e ) =
-    ( accNew, e |> Entity.withAliveSteps steps |> Entity.moveByVelocity |> accumulate )
-
-
 performAliveStep :
     Computer
     -> List Entity
@@ -93,6 +86,13 @@ performAliveStep :
 performAliveStep computer allEntities step ( accNew, stepAcc, e ) =
     performAliveStepHelp computer allEntities step e
         |> (\( accNewF, newStep, newE ) -> ( accNewF accNew, newStep :: stepAcc, newE ))
+
+
+collectAliveStepsAndMoveByVelocity :
+    ( Acc NewEntity, List AliveStep, Entity )
+    -> ( Acc NewEntity, Acc UpdatedEntity -> Acc UpdatedEntity )
+collectAliveStepsAndMoveByVelocity ( accNew, steps, e ) =
+    ( accNew, e |> Entity.withAliveSteps steps |> Entity.moveByVelocity |> accumulate )
 
 
 performAliveStepHelp :

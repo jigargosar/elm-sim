@@ -47,8 +47,9 @@ stepEntity computer allEntities e ( genAcc, updatedAcc ) =
         |> accAliveSteps updatedAcc
 
 
-accAliveSteps updatedAcc ( newAcc, steps, e ) =
-    ( newAcc, { e | aliveSteps = steps, x = e.x + e.vx, y = e.y + e.vy } :: updatedAcc )
+accAliveSteps : List Entity -> ( List Entity, List AliveStep, Entity ) -> ( List Entity, List Entity )
+accAliveSteps accUpdated ( newAcc, steps, e ) =
+    ( newAcc, { e | aliveSteps = steps, x = e.x + e.vx, y = e.y + e.vy } :: accUpdated )
 
 
 performAliveStep : Computer -> List Entity -> AliveStep -> ( List Entity, List AliveStep, Entity ) -> ( List Entity, List AliveStep, Entity )

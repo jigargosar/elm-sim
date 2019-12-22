@@ -1,8 +1,10 @@
 module GravitronV6.World exposing (World, init, toList, update)
 
+import GravitronV6.Circ as Circ
 import GravitronV6.Entity as Entity exposing (AliveStep(..), Entity)
 import List.Extra
 import Playground exposing (..)
+import PointFree exposing (propEq)
 
 
 type World
@@ -28,7 +30,7 @@ update : Computer -> World -> World
 update computer (World nid oldEntities) =
     let
         ( genEntities, updatedEntities ) =
-            List.foldl (stepEntity computer) ( [], [] ) oldEntities
+            List.foldl (stepEntity computer oldEntities) ( [], [] ) oldEntities
     in
     List.foldl addNew (World nid updatedEntities) genEntities
         |> reverseWorld
@@ -39,9 +41,9 @@ reverseWorld (World nid list) =
     List.reverse list |> World nid
 
 
-stepEntity : Computer -> Entity -> ( List Entity, List Entity ) -> ( List Entity, List Entity )
-stepEntity computer e ( genAcc, updatedAcc ) =
-    List.foldl (performAliveStep computer) ( genAcc, [], e ) e.aliveSteps
+stepEntity : Computer -> List Entity -> Entity -> ( List Entity, List Entity ) -> ( List Entity, List Entity )
+stepEntity computer allEntities e ( genAcc, updatedAcc ) =
+    List.foldl (performAliveStep computer allEntities) ( genAcc, [], e ) e.aliveSteps
         |> setAliveSteps updatedAcc
 
 
@@ -49,14 +51,14 @@ setAliveSteps updatedAcc ( newAcc, steps, e ) =
     ( newAcc, { e | aliveSteps = steps, x = e.x + e.vx, y = e.y + e.vy } :: updatedAcc )
 
 
-performAliveStep : Computer -> AliveStep -> ( List Entity, List AliveStep, Entity ) -> ( List Entity, List AliveStep, Entity )
-performAliveStep computer step ( genAcc, stepAcc, e ) =
-    performAliveStepHelp computer step e
+performAliveStep : Computer -> List Entity -> AliveStep -> ( List Entity, List AliveStep, Entity ) -> ( List Entity, List AliveStep, Entity )
+performAliveStep computer allEntities step ( genAcc, stepAcc, e ) =
+    performAliveStepHelp computer allEntities step e
         |> (\( genAccF, newStep, newE ) -> ( genAccF genAcc, newStep :: stepAcc, newE ))
 
 
-performAliveStepHelp : Computer -> AliveStep -> Entity -> ( List Entity -> List Entity, AliveStep, Entity )
-performAliveStepHelp computer step e =
+performAliveStepHelp : Computer -> List Entity -> AliveStep -> Entity -> ( List Entity -> List Entity, AliveStep, Entity )
+performAliveStepHelp computer allEntities step e =
     case step of
         WalkRandomly ->
             ( identity, step, Entity.performRandomWalk computer e )
@@ -78,9 +80,19 @@ performAliveStepHelp computer step e =
 
                 newGenAcc =
                     if triggered then
-                        (::) rec.template
+                        case findNamed rec.toName allEntities of
+                            Just to ->
+                                (::) (Circ.shoot e to rec.speed rec.template)
+
+                            Nothing ->
+                                identity
 
                     else
                         identity
             in
             ( newGenAcc, newStep, e )
+
+
+findNamed : a -> List { b | name : a } -> Maybe { b | name : a }
+findNamed name =
+    List.Extra.find (propEq .name name)

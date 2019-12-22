@@ -98,6 +98,11 @@ angleFromTo x y x2 y2 =
     atan2 (y2 - y) (x2 - x)
 
 
+angleFromToRec : { a | x : Float, y : Float } -> { b | x : Float, y : Float } -> Float
+angleFromToRec a b =
+    angleFromTo a.x a.y b.x b.y
+
+
 applyVel : { a | x : number, y : number, vx : number, vy : number } -> { a | x : number, y : number, vx : number, vy : number }
 applyVel e =
     let

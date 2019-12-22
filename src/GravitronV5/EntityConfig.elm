@@ -28,7 +28,7 @@ type Move
 
 type Step
     = Move Move
-    | Fire Name
+    | Fire Name Name
 
 
 type Death

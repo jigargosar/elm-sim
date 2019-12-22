@@ -41,7 +41,7 @@ type PreStep
 
 type Step
     = Move EC.Move
-    | Fire { every : Int, elapsed : Int, name : Name }
+    | Fire { every : Int, elapsed : Int, name : Name, toName : Name }
 
 
 fromConfig : Int -> EntityConfig -> Entity
@@ -79,8 +79,8 @@ fromConfig id =
                             EC.Move m ->
                                 Move m
 
-                            EC.Fire n ->
-                                Fire { every = 60, name = n, elapsed = 0 }
+                            EC.Fire n toN ->
+                                Fire { every = 60, name = n, elapsed = 0, toName = toN }
                     )
                     steps
             , phase = ReadyForCollision
@@ -296,26 +296,43 @@ performStep (Env { configOf } { screen, time } entityList) response e step =
                             ( response, e, step )
 
         Fire fire ->
-            let
-                newConfig name =
-                    configOf name
-                        |> EC.map
-                            (\ec ->
-                                let
-                                    ( vx, vy ) =
-                                        ( 1, 1 )
-                                in
-                                { ec | vx = vx, vy = vy }
-                            )
+            case entityNamed fire.toName entityList of
+                Just toE ->
+                    let
+                        newConfig name =
+                            configOf name
+                                |> EC.map
+                                    (\ec ->
+                                        let
+                                            ang =
+                                                Geom.angleFromToRec e toE
 
-                ( newResponse, newFire ) =
-                    if fire.elapsed > fire.every then
-                        ( Batch [ response, NewEntity (newConfig fire.name) ], { fire | elapsed = 0 } )
+                                            speed =
+                                                3
 
-                    else
-                        ( response, { fire | elapsed = fire.elapsed + 1 } )
-            in
-            ( newResponse, e, Fire newFire )
+                                            ( dx, dy ) =
+                                                fromPolar ( e.r + ec.r, ang )
+
+                                            ( x, y ) =
+                                                ( e.x + dx, e.y + dy )
+
+                                            ( vx, vy ) =
+                                                fromPolar ( speed, ang )
+                                        in
+                                        { ec | x = x, y = y, vx = vx, vy = vy }
+                                    )
+
+                        ( newResponse, newFire ) =
+                            if fire.elapsed > fire.every then
+                                ( Batch [ response, NewEntity (newConfig fire.name) ], { fire | elapsed = 0 } )
+
+                            else
+                                ( response, { fire | elapsed = fire.elapsed + 1 } )
+                    in
+                    ( newResponse, e, Fire newFire )
+
+                Nothing ->
+                    ( response, e, step )
 
 
 toList : WorldConfig -> World -> List Entity

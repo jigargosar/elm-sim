@@ -1,6 +1,7 @@
 module GravitronV6.World exposing (World, init, toList, update)
 
 import GravitronV6.Entity as Entity exposing (AliveStep(..), Entity)
+import List.Extra
 import Playground exposing (..)
 
 
@@ -25,23 +26,27 @@ toList (World _ list) =
 
 update : Computer -> World -> World
 update computer (World nid entities) =
-    World nid (List.map (stepEntity computer entities) entities)
+    let
+        ( newEntities, updatedEntities ) =
+            List.foldl (stepEntity computer entities) ( [], [] ) entities
+    in
+    List.foldl addNew (World nid updatedEntities) newEntities
 
 
-stepEntity : Computer -> List Entity -> Entity -> Entity
-stepEntity computer entities e =
-    List.foldl (performAliveStep computer) ( [], e ) e.aliveSteps
-        |> setAliveSteps
+stepEntity : Computer -> List Entity -> Entity -> ( List Entity, List Entity ) -> ( List Entity, List Entity )
+stepEntity computer entities e ( newAcc, updatedAcc ) =
+    List.foldl (performAliveStep computer) ( newAcc, [], e ) e.aliveSteps
+        |> setAliveSteps updatedAcc
 
 
-setAliveSteps ( steps, e ) =
-    { e | aliveSteps = steps }
+setAliveSteps updatedAcc ( newEntities, steps, e ) =
+    ( newEntities, { e | aliveSteps = steps } :: updatedAcc )
 
 
-performAliveStep computer step ( steps, e ) =
+performAliveStep computer step ( newAcc, stepAcc, e ) =
     case step of
         WalkRandomly ->
-            ( step :: steps, Entity.performRandomWalk computer e )
+            ( newAcc, step :: stepAcc, Entity.performRandomWalk computer e )
 
         Fire rec ->
             let
@@ -58,4 +63,4 @@ performAliveStep computer step ( steps, e ) =
                 newStep =
                     Fire newRec
             in
-            ( newStep :: steps, e )
+            ( newAcc, newStep :: stepAcc, e )

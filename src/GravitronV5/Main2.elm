@@ -1,7 +1,6 @@
 module GravitronV5.Main2 exposing (main)
 
 import Ease
-import GravitronV5.Circ as Circ
 import GravitronV5.EntityConfig as EC exposing (EntityConfig, Move(..), PreStep(..), Step(..))
 import GravitronV5.HP as HP exposing (HP)
 import GravitronV5.Names exposing (Name(..))
@@ -85,11 +84,6 @@ worldConfig =
     { configOf = configOf
     , afterUpdate = afterUpdate
     }
-
-
-withXY : ( Number, Number ) -> { c | x : Number, y : Number } -> { c | x : Number, y : Number }
-withXY ( x, y ) e =
-    { e | x = x, y = y }
 
 
 initialTurrets : List EntityConfig

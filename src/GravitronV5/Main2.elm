@@ -32,7 +32,7 @@ turretConfig =
                 , spawnDuration = 120
                 , preSteps = [ ReceiveCollisionDamage [ Bullet ] ]
                 , steps = [ Fire Bullet Player ]
-                , maxHP = 0
+                , maxHP = 1
             }
         )
 

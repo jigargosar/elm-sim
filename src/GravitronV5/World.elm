@@ -115,6 +115,12 @@ update worldConfig computer (World nid lst) =
     in
     List.map (updateEntity env) lst
         |> foldResponses nid
+        |> afterUpdateHook worldConfig
+
+
+afterUpdateHook : WorldConfig -> World -> World
+afterUpdateHook wc (World nid list) =
+    World nid (wc.afterUpdate list)
 
 
 type Env

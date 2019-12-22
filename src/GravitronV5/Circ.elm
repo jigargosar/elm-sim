@@ -1,4 +1,4 @@
-module GravitronV5.Circ exposing (Circ, shoot)
+module GravitronV5.Circ exposing (shoot)
 
 import Playground exposing (Number)
 

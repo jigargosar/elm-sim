@@ -8,7 +8,7 @@ type PreStep
 
 
 type AliveStep
-    = AliveStep
+    = WalkRandomly
 
 
 type DeathStep

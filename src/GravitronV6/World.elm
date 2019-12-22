@@ -1,4 +1,4 @@
-module GravitronV6.World exposing (World, init, step, toList)
+module GravitronV6.World exposing (World, init, toList, update)
 
 import GravitronV6.Entity exposing (Entity)
 import Playground exposing (..)
@@ -23,13 +23,17 @@ toList (World _ list) =
     list
 
 
-step : Computer -> World -> World
-step computer (World nid entities) =
+update : Computer -> World -> World
+update computer (World nid entities) =
     World nid (List.map (stepEntity computer entities) entities)
 
 
 stepEntity : Computer -> List Entity -> Entity -> Entity
-stepEntity { time, screen } entities e =
+stepEntity computer entities e =
+    List.foldl (performAliveStep computer) e e.aliveSteps
+
+
+performAliveStep { time, screen } step e =
     let
         ( x, y ) =
             ( wave screen.left screen.right 6 time

@@ -84,7 +84,12 @@ collectAliveStepsAndMoveByVelocity ( accNew, steps, e ) =
     ( accNew, e |> Entity.withAliveSteps steps |> Entity.moveByVelocity |> accumulate )
 
 
-performAliveStep : Computer -> List Entity -> AliveStep -> ( Acc NewEntity, List AliveStep, Entity ) -> ( Acc NewEntity, List AliveStep, Entity )
+performAliveStep :
+    Computer
+    -> List Entity
+    -> AliveStep
+    -> ( Acc NewEntity, List AliveStep, Entity )
+    -> ( Acc NewEntity, List AliveStep, Entity )
 performAliveStep computer allEntities step ( accNew, stepAcc, e ) =
     performAliveStepHelp computer allEntities step e
         |> (\( accNewF, newStep, newE ) -> ( accNewF accNew, newStep :: stepAcc, newE ))

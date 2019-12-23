@@ -72,11 +72,24 @@ turretTemplate =
     }
 
 
+turretPositions =
+    let
+        f =
+            (*) 150
+    in
+    [ ( -1, 1 ), ( 1, -1 ), ( 1, 1 ), ( -1, -1 ) ] |> List.map (Tuple.mapBoth f f)
+
+
+turretTemplates : List Entity
+turretTemplates =
+    List.map (\( x, y ) -> { turretTemplate | x = x, y = y }) turretPositions
+
+
 init : World
 init =
-    [ { default | name = name Player, r = 20, color = green, aliveSteps = [ WalkRandomly ] }
-    , turretTemplate
-    ]
+    ({ default | name = name Player, r = 20, color = green, aliveSteps = [ WalkRandomly ] }
+        :: turretTemplates
+    )
         |> List.map World.newEntity
         |> World.init
 
@@ -91,7 +104,7 @@ afterUpdateHook =
     List.Extra.count (propEq .name (name Turret))
         >> (\tc ->
                 if tc == 0 then
-                    [ World.newEntity turretTemplate ]
+                    List.map World.newEntity turretTemplates
 
                 else
                     []
@@ -120,7 +133,7 @@ applyPhaseTransform phase shape =
             in
             shape
                 |> fade (progress + 0.1)
-                |> scale (progress + 0.1)
+                |> scale progress
 
         Alive ->
             shape

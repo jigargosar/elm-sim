@@ -4,7 +4,7 @@ import GravitronV6.Circ as Circ
 import GravitronV6.Entity as Entity exposing (AliveStep(..), Entity)
 import List.Extra
 import Playground exposing (..)
-import PointFree exposing (propEq, shift, shiftOn)
+import PointFree exposing (cons, consTo, propEq)
 
 
 type World
@@ -18,7 +18,7 @@ init =
 
 addNew : Entity -> World -> World
 addNew e (World nid list) =
-    World (nid + 1) (shift { e | id = nid } list)
+    World (nid + 1) (cons { e | id = nid } list)
 
 
 toList : World -> List Entity
@@ -68,7 +68,7 @@ stepEntity computer allEntities e updatedAcc =
                 ( geAcc, Entity.withAliveSteps stepAcc entityAcc )
            )
         |> Tuple.mapSecond Entity.moveByVelocity
-        |> Tuple.mapSecond (Updated >> shiftOn updatedAcc)
+        |> Tuple.mapSecond (Updated >> consTo updatedAcc)
 
 
 performAliveStep :

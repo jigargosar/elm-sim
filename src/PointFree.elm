@@ -144,11 +144,11 @@ flip func b a =
     func a b
 
 
-shift : a -> List a -> List a
-shift =
+cons : a -> List a -> List a
+cons =
     (::)
 
 
-shiftOn : List a -> a -> List a
-shiftOn =
-    flip shift
+consTo : List a -> a -> List a
+consTo =
+    flip cons

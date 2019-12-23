@@ -86,10 +86,26 @@ turretTemplates =
     List.map (\( x, y ) -> { turretTemplate | x = x, y = y }) turretPositions
 
 
+makeSubLevel : List (Entity -> Entity) -> List Entity
+makeSubLevel funcList =
+    List.map2 (<|) funcList turretTemplates
+
+
+basic1 : Entity -> Entity
+basic1 =
+    identity
+
+
+basic2 : Entity -> Entity
+basic2 t =
+    { t | color = blue, maxHP = 2 }
+
+
 levels =
-    [ turretTemplates |> List.take 1
-    , turretTemplates |> List.take 2
-    , turretTemplates |> List.take 2 |> List.map (\t -> { t | color = blue, maxHP = 2 })
+    [ makeSubLevel [ basic1 ]
+    , makeSubLevel [ basic1, basic1 ]
+    , makeSubLevel [ basic1, basic1, basic2 ]
+    , makeSubLevel (List.repeat 4 basic2)
     ]
 
 

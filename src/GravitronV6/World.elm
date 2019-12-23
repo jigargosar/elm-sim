@@ -2,6 +2,7 @@ module GravitronV6.World exposing (World, init, newEntity, toList, update)
 
 import GravitronV6.Entity as Entity exposing (AliveStep(..), Entity, FireModel, Phase(..))
 import GravitronV6.Geom as Geom
+import List.Extra
 import Playground exposing (..)
 import PointFree exposing (cons)
 import Stack exposing (Stack)
@@ -56,11 +57,27 @@ reverseWorld (World nid list) =
     List.reverse list |> World nid
 
 
+getCollisionCount names list e =
+    let
+        check o =
+            (o.phase == Alive)
+                && List.member o.name names
+                && Geom.ccc e.x e.y e.r o.x o.y o.r
+                && (e.id /= o.id)
+    in
+    if e.phase == Alive then
+        List.Extra.count check list
+
+    else
+        0
+
+
 isCollidingWithAnyOf : List String -> List Entity -> Entity -> Bool
 isCollidingWithAnyOf names list e =
     let
         check o =
-            List.member o.name names
+            (o.phase == Alive)
+                && List.member o.name names
                 && Geom.ccc e.x e.y e.r o.x o.y o.r
                 && (e.id /= o.id)
     in
@@ -131,6 +148,17 @@ performAliveStep computer allEntities step ( newStack, entity ) =
 
               else
                 entity
+            )
+
+        ReceiveCollisionDamageFrom names ->
+            let
+                hits : Float
+                hits =
+                    getCollisionCount names allEntities entity
+                        |> toFloat
+            in
+            ( newStack
+            , Entity.takeDamage hits entity
             )
 
 

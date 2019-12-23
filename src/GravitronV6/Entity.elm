@@ -27,6 +27,7 @@ type AliveStep
     | BounceInScreen Number
     | Fire FireModel
     | DieOnCollisionWith (List String)
+    | ReceiveCollisionDamageFrom (List String)
 
 
 performRandomWalk : Computer -> { c | x : Number, y : Number } -> { c | x : Number, y : Number }
@@ -102,6 +103,21 @@ type alias Entity =
 kill : Entity -> Entity
 kill entity =
     { entity | currentHP = 0, phase = Dying { elapsed = 0, duration = 60 } }
+
+
+takeDamage : Number -> Entity -> Entity
+takeDamage hits entity =
+    let
+        newHP =
+            entity.currentHP
+                - hits
+                |> max 0
+    in
+    if newHP <= 0 then
+        kill entity
+
+    else
+        { entity | currentHP = newHP }
 
 
 invalidId =

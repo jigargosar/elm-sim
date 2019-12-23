@@ -96,6 +96,16 @@ type alias Entity =
     }
 
 
+kill : Entity -> Entity
+kill entity =
+    { entity | currentHP = 0 }
+
+
+isAlive : Entity -> Bool
+isAlive e =
+    e.currentHP > 0
+
+
 invalidId =
     -1
 

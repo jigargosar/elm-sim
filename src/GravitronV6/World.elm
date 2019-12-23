@@ -1,6 +1,6 @@
 module GravitronV6.World exposing (World, init, newEntity, toList, update)
 
-import GravitronV6.Entity as Entity exposing (AliveStep(..), Entity, FireModel)
+import GravitronV6.Entity as Entity exposing (AliveStep(..), Entity, FireModel, PreStep(..))
 import GravitronV6.Geom as Geom
 import Playground exposing (..)
 import PointFree exposing (cons)
@@ -56,11 +56,10 @@ reverseWorld (World nid list) =
     List.reverse list |> World nid
 
 
-isCollidingWithAnyOf list e =
+isCollidingWithAnyOf names list e =
     let
         isC o =
-            e.name
-                == "Bullet"
+            List.member o.name names
                 && Geom.ccc e.x e.y e.r o.x o.y o.r
                 && e.id
                 /= o.id
@@ -69,13 +68,38 @@ isCollidingWithAnyOf list e =
 
 
 stepEntity : Computer -> List Entity -> Entity -> ( Stack New, Stack Updated ) -> ( Stack New, Stack Updated )
-stepEntity computer allEntities e ( newStack, updatedStack ) =
-    if isCollidingWithAnyOf allEntities e then
-        ( newStack, updatedStack )
+stepEntity computer allEntities =
+    let
+        pas newStack updatedStack e =
+            performAliveSteps computer allEntities newStack e
+                |> Tuple.mapSecond (updateAliveSteps >> Updated >> Stack.pushOn updatedStack)
 
-    else
-        performAliveSteps computer allEntities newStack e
-            |> Tuple.mapSecond (updateAliveSteps >> Updated >> Stack.pushOn updatedStack)
+        pre =
+            performPreSteps allEntities
+
+        do e ( ns, us ) =
+            if Entity.isAlive e then
+                pas ns us e
+
+            else
+                ( ns, us )
+    in
+    pre >> do
+
+
+performPreSteps : List Entity -> Entity -> Entity
+performPreSteps allEntities =
+    let
+        func pre entity =
+            case pre of
+                DieOnCollisionWith names ->
+                    if isCollidingWithAnyOf names allEntities entity then
+                        Entity.kill entity
+
+                    else
+                        entity
+    in
+    \entity -> List.foldl func entity entity.preSteps
 
 
 performAliveSteps : Computer -> List Entity -> Stack New -> Entity -> ( Stack New, Entity )

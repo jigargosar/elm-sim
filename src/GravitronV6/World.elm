@@ -29,35 +29,37 @@ toList (World _ list) =
 update : Computer -> World -> World
 update computer (World nid oldEntities) =
     let
-        ( Acc newEntities, Acc updatedEntities ) =
-            List.foldl (stepEntity computer oldEntities)
-                ( emptyAcc NewEntity, emptyAcc UpdatedEntity )
+        ( geList, ueList ) =
+            List.foldl
+                (\e ( geAcc, ueAcc ) ->
+                    stepEntity computer oldEntities e
+                        |> (\( ge, ue ) -> ( ge :: geAcc, ue :: ueAcc ))
+                )
+                ( [], [] )
                 oldEntities
+
+        newEntities =
+            generatedToEntityList geList
     in
-    List.foldl addNew (World nid updatedEntities) newEntities
+    List.foldl addNew (World nid ueList) newEntities
         |> reverseWorld
 
 
-type NewEntity
-    = NewEntity
+generatedToEntityList : List GeneratedEntity -> List Entity
+generatedToEntityList =
+    let
+        reducer ge eAcc =
+            case ge of
+                GeneratedNone ->
+                    eAcc
 
+                GeneratedSingle e ->
+                    e :: eAcc
 
-type UpdatedEntity
-    = UpdatedEntity
-
-
-type Acc tag
-    = Acc (List Entity)
-
-
-emptyAcc : tag -> Acc tag
-emptyAcc _ =
-    Acc []
-
-
-accumulate : Entity -> Acc tag -> Acc tag
-accumulate e (Acc list) =
-    e :: list |> Acc
+                BatchGenerated list ->
+                    List.foldl reducer eAcc list
+    in
+    List.foldl reducer []
 
 
 reverseWorld : World -> World
@@ -69,71 +71,38 @@ stepEntity :
     Computer
     -> List Entity
     -> Entity
-    -> ( Acc NewEntity, Acc UpdatedEntity )
-    -> ( Acc NewEntity, Acc UpdatedEntity )
-stepEntity computer allEntities e ( accNew, accUpdated ) =
-    List.foldl (performAliveStep computer allEntities) ( accNew, [], e ) e.aliveSteps
-        |> collectAliveStepsAndMoveByVelocity
-        |> Tuple.mapSecond ((|>) accUpdated)
+    -> ( GeneratedEntity, Entity )
+stepEntity computer allEntities e =
+    List.foldl
+        (\step ( geAcc, stepAcc, entityAcc ) ->
+            performAliveStep computer allEntities step entityAcc
+                |> (\( ge, updatedStep, updatedEntity ) -> ( ge :: geAcc, updatedStep :: stepAcc, updatedEntity ))
+        )
+        ( [], [], e )
+        e.aliveSteps
+        |> (\( geAcc, stepAcc, entityAcc ) ->
+                ( BatchGenerated (List.reverse geAcc), Entity.withAliveSteps stepAcc entityAcc )
+           )
+        |> Tuple.mapSecond Entity.moveByVelocity
 
 
 performAliveStep :
     Computer
     -> List Entity
     -> AliveStep
-    -> ( Acc NewEntity, List AliveStep, Entity )
-    -> ( Acc NewEntity, List AliveStep, Entity )
-performAliveStep computer allEntities step ( accNew, stepAcc, e ) =
-    performAliveStepHelp computer allEntities step e
-        |> (\( accNewF, newStep, newE ) -> ( accNewF accNew, newStep :: stepAcc, newE ))
-
-
-collectAliveStepsAndMoveByVelocity :
-    ( Acc NewEntity, List AliveStep, Entity )
-    -> ( Acc NewEntity, Acc UpdatedEntity -> Acc UpdatedEntity )
-collectAliveStepsAndMoveByVelocity ( accNew, steps, e ) =
-    ( accNew, e |> Entity.withAliveSteps steps |> Entity.moveByVelocity |> accumulate )
-
-
-performAliveStepHelp :
-    Computer
-    -> List Entity
-    -> AliveStep
     -> Entity
-    -> ( Acc NewEntity -> Acc NewEntity, AliveStep, Entity )
-performAliveStepHelp computer allEntities step e =
+    -> ( GeneratedEntity, AliveStep, Entity )
+performAliveStep computer allEntities step e =
     case step of
         WalkRandomly ->
-            ( identity, step, Entity.performRandomWalk computer e )
+            ( GeneratedNone, step, Entity.performRandomWalk computer e )
 
         Fire rec ->
             let
-                triggered =
-                    rec.elapsed >= rec.every
-
-                newRec =
-                    if triggered then
-                        { rec | elapsed = 0 }
-
-                    else
-                        { rec | elapsed = rec.elapsed + 1 }
-
-                newStep =
-                    Fire newRec
-
-                accNewF =
-                    if triggered then
-                        case findNamed rec.toName allEntities of
-                            Just to ->
-                                accumulate (Circ.shoot e to rec.speed rec.template)
-
-                            Nothing ->
-                                identity
-
-                    else
-                        identity
+                ( ge, newStep ) =
+                    performFire e allEntities rec
             in
-            ( accNewF, newStep, e )
+            ( ge, newStep, e )
 
 
 findNamed : a -> List { b | name : a } -> Maybe { b | name : a }
@@ -145,7 +114,7 @@ type alias FireModel =
     { elapsed : Number, every : Number, toName : String, speed : Float, template : Entity }
 
 
-performFire : Entity -> List Entity -> FireModel -> ( GeneratedEntity, AliveStep, Float )
+performFire : Entity -> List Entity -> FireModel -> ( GeneratedEntity, AliveStep )
 performFire from allEntities rec =
     let
         triggered =
@@ -174,7 +143,7 @@ performFire from allEntities rec =
             else
                 GeneratedNone
     in
-    ( generatedEntities, newStep, e )
+    ( generatedEntities, newStep )
 
 
 type GeneratedEntity

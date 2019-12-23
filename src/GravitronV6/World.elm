@@ -30,19 +30,16 @@ toList (World _ list) =
 update : Computer -> World -> World
 update computer (World nid oldEntities) =
     let
-        ( geList, ueList ) =
+        ( newStack, updatedStack ) =
             List.foldl
-                (\e ( geAcc, updatedStack ) ->
-                    stepEntity computer oldEntities e updatedStack
-                        |> Tuple.mapFirst (\ge -> ge :: geAcc)
-                )
-                ( [], Stack.empty )
+                (stepEntity computer oldEntities)
+                ( Stack.empty, Stack.empty )
                 oldEntities
 
         newEntities =
-            foldBatch (\(New e) acc -> e :: acc) [] geList
+            Stack.map (\(New e) -> e) newStack |> Stack.toLifo
     in
-    List.foldl addNew (World nid (Stack.map (\(Updated e) -> e) ueList |> Stack.toLifo)) newEntities
+    List.foldl addNew (World nid (Stack.map (\(Updated e) -> e) updatedStack |> Stack.toLifo)) newEntities
         |> reverseWorld
 
 
@@ -55,21 +52,23 @@ stepEntity :
     Computer
     -> List Entity
     -> Entity
-    -> Stack Updated
-    -> ( BatchNew, Stack Updated )
-stepEntity computer allEntities e updatedAcc =
+    -> ( Stack New, Stack Updated )
+    -> ( Stack New, Stack Updated )
+stepEntity computer allEntities e ( newStack, updatedStack ) =
     List.foldl
-        (\step ( geAcc, stepAcc, entityAcc ) ->
+        (\step ( nStack, stepAcc, entityAcc ) ->
             performAliveStep computer allEntities step entityAcc
-                |> (\( ge, updatedStep, updatedEntity ) -> ( BatchConcat [ ge, geAcc ], updatedStep :: stepAcc, updatedEntity ))
+                |> (\( newList, updatedStep, updatedEntity ) ->
+                        ( Stack.pushAll newList nStack, updatedStep :: stepAcc, updatedEntity )
+                   )
         )
-        ( BatchNone, [], e )
+        ( newStack, [], e )
         e.aliveSteps
         |> (\( geAcc, stepAcc, entityAcc ) ->
                 ( geAcc, Entity.withAliveSteps stepAcc entityAcc )
            )
         |> Tuple.mapSecond Entity.moveByVelocity
-        |> Tuple.mapSecond (Updated >> Stack.pushOn updatedAcc)
+        |> Tuple.mapSecond (Updated >> Stack.pushOn updatedStack)
 
 
 performAliveStep :
@@ -77,11 +76,11 @@ performAliveStep :
     -> List Entity
     -> AliveStep
     -> Entity
-    -> ( BatchNew, AliveStep, Entity )
+    -> ( List New, AliveStep, Entity )
 performAliveStep computer allEntities step e =
     case step of
         WalkRandomly ->
-            ( BatchNone, step, Entity.performRandomWalk computer e )
+            ( [], step, Entity.performRandomWalk computer e )
 
         Fire rec ->
             let
@@ -100,7 +99,7 @@ type alias FireModel =
     { elapsed : Number, every : Number, toName : String, speed : Float, template : Entity }
 
 
-performFire : Entity -> List Entity -> FireModel -> ( BatchNew, AliveStep )
+performFire : Entity -> List Entity -> FireModel -> ( List New, AliveStep )
 performFire from allEntities rec =
     let
         triggered =
@@ -116,24 +115,19 @@ performFire from allEntities rec =
         newStep =
             Fire newRec
 
-        generatedEntities : BatchNew
         generatedEntities =
             if triggered then
                 case findNamed rec.toName allEntities of
                     Just to ->
-                        BatchOne (New (Circ.shoot from to rec.speed rec.template))
+                        [ New (Circ.shoot from to rec.speed rec.template) ]
 
                     Nothing ->
-                        BatchNone
+                        []
 
             else
-                BatchNone
+                []
     in
     ( generatedEntities, newStep )
-
-
-type alias BatchNew =
-    Batch New
 
 
 type New
@@ -142,27 +136,3 @@ type New
 
 type Updated
     = Updated Entity
-
-
-type Batch a
-    = BatchConcat (List (Batch a))
-    | BatchOne a
-    | BatchNone
-
-
-foldBatch : (a -> b -> b) -> b -> List (Batch a) -> b
-foldBatch func =
-    let
-        reducer : Batch a -> b -> b
-        reducer batch acc =
-            case batch of
-                BatchNone ->
-                    acc
-
-                BatchConcat batches ->
-                    List.foldl reducer acc batches
-
-                BatchOne a ->
-                    func a acc
-    in
-    List.foldl reducer

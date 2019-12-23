@@ -65,12 +65,12 @@ stepEntity :
     -> ( Stack New, Stack Updated )
     -> ( Stack New, Stack Updated )
 stepEntity computer allEntities e ( newStack, updatedStack ) =
-    performAliveSteps computer allEntities e newStack
+    performAliveSteps computer allEntities newStack e
         |> Tuple.mapSecond (Entity.updateAliveSteps >> Updated >> Stack.pushOn updatedStack)
 
 
-performAliveSteps : Computer -> List Entity -> Entity -> Stack New -> ( Stack New, Entity )
-performAliveSteps computer allEntities entity stackOfNewEntities =
+performAliveSteps : Computer -> List Entity -> Stack New -> Entity -> ( Stack New, Entity )
+performAliveSteps computer allEntities stackOfNewEntities entity =
     entity.aliveSteps
         |> List.foldl (performAliveStep computer allEntities) ( stackOfNewEntities, entity )
         |> Tuple.mapSecond Entity.moveByVelocity

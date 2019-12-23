@@ -45,7 +45,7 @@ bulletTemplate =
         , aliveSteps =
             [ GravitateTo (name Player)
             , BounceInScreen 0.5
-            , DieOnCollisionWith (names [ Player, Turret ])
+            , DieOnCollisionWith (names [ Player, Turret, Bullet ])
             ]
     }
 
@@ -67,6 +67,7 @@ init =
                 , template = bulletTemplate
                 , speed = 3
                 }
+            , ReceiveCollisionDamageFrom (names [ Bullet ])
             ]
       }
     ]
@@ -123,6 +124,14 @@ toShape idx e =
         , ("z-" ++ String.fromInt idx)
             |> words black
             |> moveDown (e.r + 10)
+        , if name Turret == e.name then
+            group
+                [ String.fromInt (round e.currentHP)
+                    |> words white
+                ]
+
+          else
+            group []
         ]
 
 

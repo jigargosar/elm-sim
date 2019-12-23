@@ -71,16 +71,9 @@ stepEntity computer allEntities e ( newStack, updatedStack ) =
 
 performAliveSteps : Computer -> List Entity -> Entity -> Stack New -> ( Stack New, Entity )
 performAliveSteps computer allEntities =
-    let
-        setAliveSteps : ( ( Entity, Stack New ), List AliveStep ) -> ( Stack New, Entity )
-        setAliveSteps =
-            \( ( uEntity, uNewStack ), uAliveSteps ) ->
-                ( uNewStack, Entity.withAliveSteps uAliveSteps uEntity )
-    in
     \entity stackOfNewEntities ->
         entity.aliveSteps
-            |> mapAccuml (performAliveStep computer allEntities) ( entity, stackOfNewEntities )
-            |> setAliveSteps
+            |> List.foldl (performAliveStep computer allEntities) ( stackOfNewEntities, entity )
             |> Tuple.mapSecond Entity.moveByVelocity
 
 
@@ -88,19 +81,19 @@ performAliveStep :
     Computer
     -> List Entity
     -> AliveStep
-    -> ( Entity, Stack New )
-    -> ( AliveStep, ( Entity, Stack New ) )
-performAliveStep computer allEntities step ( e, newStack ) =
+    -> ( Stack New, Entity )
+    -> ( Stack New, Entity )
+performAliveStep computer allEntities step ( newStack, e ) =
     case step of
         WalkRandomly ->
-            ( step, ( Entity.performRandomWalk computer e, newStack ) )
+            ( newStack, Entity.performRandomWalk computer e )
 
-        Fire rec ->
+        Fire fireModel ->
             let
-                ( ge, newStep ) =
-                    performFire e allEntities rec
+                firedEntities =
+                    performFire e allEntities fireModel
             in
-            ( newStep, ( e, Stack.pushAll ge newStack ) )
+            ( Stack.pushAll firedEntities newStack, e )
 
 
 findNamed : a -> List { b | name : a } -> Maybe { b | name : a }
@@ -108,35 +101,18 @@ findNamed name =
     List.Extra.find (propEq .name name)
 
 
-performFire : Entity -> List Entity -> FireModel -> ( List New, AliveStep )
+performFire : Entity -> List Entity -> FireModel -> List New
 performFire from allEntities rec =
-    let
-        triggered =
-            rec.elapsed >= rec.every
+    if rec.didTrigger then
+        case findNamed rec.towards allEntities of
+            Just to ->
+                [ New (Circ.shoot from to rec.speed rec.template) ]
 
-        newRec =
-            if triggered then
-                { rec | elapsed = 0 }
-
-            else
-                { rec | elapsed = rec.elapsed + 1 }
-
-        newStep =
-            Fire newRec
-
-        generatedEntities =
-            if triggered then
-                case findNamed rec.towards allEntities of
-                    Just to ->
-                        [ New (Circ.shoot from to rec.speed rec.template) ]
-
-                    Nothing ->
-                        []
-
-            else
+            Nothing ->
                 []
-    in
-    ( generatedEntities, newStep )
+
+    else
+        []
 
 
 type New

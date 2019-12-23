@@ -45,19 +45,19 @@ update computer (World nid oldEntities) =
         |> reverseWorld
 
 
-generatedToEntityList : List GeneratedEntity -> List Entity
+generatedToEntityList : List BatchNew -> List Entity
 generatedToEntityList =
     let
         reducer ge eAcc =
             case ge of
-                GeneratedNone ->
+                BatchNone ->
                     eAcc
 
-                GeneratedSingle e ->
-                    e :: eAcc
+                BatchConcat batches ->
+                    List.foldl reducer eAcc batches
 
-                BatchGenerated list ->
-                    List.foldl reducer eAcc list
+                BatchOne (New e) ->
+                    e :: eAcc
     in
     List.foldl reducer []
 
@@ -71,17 +71,17 @@ stepEntity :
     Computer
     -> List Entity
     -> Entity
-    -> ( GeneratedEntity, Entity )
+    -> ( BatchNew, Entity )
 stepEntity computer allEntities e =
     List.foldl
         (\step ( geAcc, stepAcc, entityAcc ) ->
             performAliveStep computer allEntities step entityAcc
-                |> (\( ge, updatedStep, updatedEntity ) -> ( ge :: geAcc, updatedStep :: stepAcc, updatedEntity ))
+                |> (\( ge, updatedStep, updatedEntity ) -> ( BatchConcat [ ge, geAcc ], updatedStep :: stepAcc, updatedEntity ))
         )
-        ( [], [], e )
+        ( BatchNone, [], e )
         e.aliveSteps
         |> (\( geAcc, stepAcc, entityAcc ) ->
-                ( BatchGenerated (List.reverse geAcc), Entity.withAliveSteps stepAcc entityAcc )
+                ( geAcc, Entity.withAliveSteps stepAcc entityAcc )
            )
         |> Tuple.mapSecond Entity.moveByVelocity
 
@@ -91,11 +91,11 @@ performAliveStep :
     -> List Entity
     -> AliveStep
     -> Entity
-    -> ( GeneratedEntity, AliveStep, Entity )
+    -> ( BatchNew, AliveStep, Entity )
 performAliveStep computer allEntities step e =
     case step of
         WalkRandomly ->
-            ( GeneratedNone, step, Entity.performRandomWalk computer e )
+            ( BatchNone, step, Entity.performRandomWalk computer e )
 
         Fire rec ->
             let
@@ -114,7 +114,7 @@ type alias FireModel =
     { elapsed : Number, every : Number, toName : String, speed : Float, template : Entity }
 
 
-performFire : Entity -> List Entity -> FireModel -> ( GeneratedEntity, AliveStep )
+performFire : Entity -> List Entity -> FireModel -> ( BatchNew, AliveStep )
 performFire from allEntities rec =
     let
         triggered =
@@ -130,23 +130,31 @@ performFire from allEntities rec =
         newStep =
             Fire newRec
 
-        generatedEntities : GeneratedEntity
+        generatedEntities : BatchNew
         generatedEntities =
             if triggered then
                 case findNamed rec.toName allEntities of
                     Just to ->
-                        GeneratedSingle (Circ.shoot from to rec.speed rec.template)
+                        BatchOne (New (Circ.shoot from to rec.speed rec.template))
 
                     Nothing ->
-                        GeneratedNone
+                        BatchNone
 
             else
-                GeneratedNone
+                BatchNone
     in
     ( generatedEntities, newStep )
 
 
-type GeneratedEntity
-    = GeneratedNone
-    | GeneratedSingle Entity
-    | BatchGenerated (List GeneratedEntity)
+type alias BatchNew =
+    Batch New
+
+
+type New
+    = New Entity
+
+
+type Batch a
+    = BatchConcat (List (Batch a))
+    | BatchOne a
+    | BatchNone

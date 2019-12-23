@@ -2,7 +2,9 @@ module GravitronV6.Main exposing (main)
 
 import GravitronV6.Entity as Entity exposing (AliveStep(..), Entity, Phase(..))
 import GravitronV6.World as World exposing (World)
+import List.Extra
 import Playground exposing (..)
+import PointFree exposing (propEq)
 
 
 type Name
@@ -50,10 +52,8 @@ bulletTemplate =
     }
 
 
-init : World
-init =
-    [ { default | name = name Player, r = 20, color = green, aliveSteps = [ WalkRandomly ] }
-    , { default
+initialTurret =
+    { default
         | name = name Turret
         , r = 25
         , color = red
@@ -69,15 +69,35 @@ init =
                 }
             , ReceiveCollisionDamageFrom (names [ Bullet ])
             ]
-      }
+    }
+
+
+init : World
+init =
+    [ { default | name = name Player, r = 20, color = green, aliveSteps = [ WalkRandomly ] }
+    , initialTurret
     ]
         |> List.map World.newEntity
         |> World.init
 
 
 update : Computer -> World -> World
-update =
-    World.update
+update computer world =
+    World.update computer world
+        |> performLevelUpdate
+
+
+performLevelUpdate : World -> World
+performLevelUpdate w =
+    World.toList w
+        |> List.Extra.count (propEq .name (name Turret))
+        |> (\tc ->
+                if tc == 0 then
+                    World.addNew (World.newEntity initialTurret) w
+
+                else
+                    w
+           )
 
 
 view : Computer -> World -> List Shape

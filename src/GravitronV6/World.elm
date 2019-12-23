@@ -137,6 +137,10 @@ type New
     = New Entity
 
 
+type Update
+    = Update Entity
+
+
 type Batch a
     = BatchConcat (List (Batch a))
     | BatchOne a

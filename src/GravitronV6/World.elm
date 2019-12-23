@@ -57,33 +57,6 @@ reverseWorld (World nid list) =
     List.reverse list |> World nid
 
 
-getCollisionCount names list e =
-    let
-        check o =
-            (o.phase == Alive)
-                && List.member o.name names
-                && Geom.ccc e.x e.y e.r o.x o.y o.r
-                && (e.id /= o.id)
-    in
-    if e.phase == Alive then
-        List.Extra.count check list
-
-    else
-        0
-
-
-isCollidingWithAnyOf : List String -> List Entity -> Entity -> Bool
-isCollidingWithAnyOf names list e =
-    let
-        check o =
-            (o.phase == Alive)
-                && List.member o.name names
-                && Geom.ccc e.x e.y e.r o.x o.y o.r
-                && (e.id /= o.id)
-    in
-    e.phase == Alive && List.any check list
-
-
 stepEntity : Computer -> List Entity -> Entity -> ( Stack New, Stack Updated ) -> ( Stack New, Stack Updated )
 stepEntity computer allEntities entity ( newStack, updatedStack ) =
     let
@@ -160,6 +133,36 @@ performAliveStep computer allEntities step ( newStack, entity ) =
             ( newStack
             , Entity.takeDamage hits entity
             )
+
+
+getCollisionCount : List String -> List Entity -> Entity -> Int
+getCollisionCount names list e =
+    let
+        check o =
+            checkCollisionHelp names o e
+    in
+    if e.phase == Alive then
+        List.Extra.count check list
+
+    else
+        0
+
+
+checkCollisionHelp : List String -> Entity -> Entity -> Bool
+checkCollisionHelp names o e =
+    (o.phase == Alive)
+        && List.member o.name names
+        && Geom.ccc e.x e.y e.r o.x o.y o.r
+        && (e.id /= o.id)
+
+
+isCollidingWithAnyOf : List String -> List Entity -> Entity -> Bool
+isCollidingWithAnyOf names list e =
+    let
+        check o =
+            checkCollisionHelp names o e
+    in
+    e.phase == Alive && List.any check list
 
 
 updateAliveStepsIfStillAlive : Entity -> Entity

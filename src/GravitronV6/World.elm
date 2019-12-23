@@ -145,7 +145,7 @@ type alias FireModel =
     { elapsed : Number, every : Number, toName : String, speed : Float, template : Entity }
 
 
-performFire : Entity -> List Entity -> FireModel -> ( List Entity, AliveStep, Float )
+performFire : Entity -> List Entity -> FireModel -> ( GeneratedEntity, AliveStep, Float )
 performFire from allEntities rec =
     let
         triggered =
@@ -161,17 +161,23 @@ performFire from allEntities rec =
         newStep =
             Fire newRec
 
-        generatedEntities : List Entity
+        generatedEntities : GeneratedEntity
         generatedEntities =
             if triggered then
                 case findNamed rec.toName allEntities of
                     Just to ->
-                        [ Circ.shoot from to rec.speed rec.template ]
+                        GeneratedSingle (Circ.shoot from to rec.speed rec.template)
 
                     Nothing ->
-                        []
+                        GeneratedNone
 
             else
-                []
+                GeneratedNone
     in
     ( generatedEntities, newStep, e )
+
+
+type GeneratedEntity
+    = GeneratedNone
+    | GeneratedSingle Entity
+    | BatchGenerated (List GeneratedEntity)

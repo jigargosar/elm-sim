@@ -167,7 +167,7 @@ type alias Level =
 nextLevel : Level -> Level
 nextLevel ( a, b ) =
     if b + 1 >= 5 then
-        ( a + 1, 0 )
+        ( modBy (List.length levels) a + 1, 0 )
 
     else
         ( a, b + 1 )

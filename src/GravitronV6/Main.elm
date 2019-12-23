@@ -36,6 +36,11 @@ default =
     Entity.default
 
 
+withHP : Number -> Entity -> Entity
+withHP maxHp entity =
+    { entity | maxHP = maxHp, currentHP = maxHp }
+
+
 bulletTemplate : Entity
 bulletTemplate =
     { default
@@ -98,22 +103,26 @@ basic1 =
 
 basic2 : Entity -> Entity
 basic2 t =
-    { t | color = blue, maxHP = 2 }
+    { t | color = blue }
+        |> withHP 2
 
 
 basic2RevengeWanderer : Entity -> Entity
 basic2RevengeWanderer t =
-    { t | color = blue, maxHP = 2 }
+    { t | color = blue }
+        |> withHP 2
 
 
 tripleG : Entity -> Entity
 tripleG t =
-    { t | color = green, maxHP = 3 }
+    { t | color = green }
+        |> withHP 3
 
 
 heatSinkShooter : Entity -> Entity
 heatSinkShooter t =
-    { t | color = orange, maxHP = 5 }
+    { t | color = orange }
+        |> withHP 5
 
 
 type alias MinorLevel =

@@ -101,6 +101,21 @@ basic2 t =
     { t | color = blue, maxHP = 2 }
 
 
+basic2Revenge : Entity -> Entity
+basic2Revenge t =
+    { t | color = blue, maxHP = 2 }
+
+
+tripleG : Entity -> Entity
+tripleG t =
+    { t | color = green, maxHP = 3 }
+
+
+heatSinkShooter : Entity -> Entity
+heatSinkShooter t =
+    { t | color = orange, maxHP = 3 }
+
+
 type alias MinorLevel =
     List Entity
 
@@ -116,6 +131,11 @@ levels =
       , makeSubLevel [ basic1, basic2 ]
       , makeSubLevel [ basic1, basic1, basic2 ]
       , makeSubLevel (List.repeat 4 basic2)
+      ]
+    , [ makeSubLevel [ tripleG ]
+      , makeSubLevel [ basic1, tripleG, basic2 ]
+      , makeSubLevel [ tripleG, basic2Revenge ]
+      , makeSubLevel [ tripleG, heatSinkShooter, basic2Revenge ]
       ]
     ]
 

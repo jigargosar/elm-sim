@@ -87,9 +87,9 @@ performAliveSteps computer allEntities =
             performAliveStep computer allEntities step acc
                 |> swap
     in
-    \e newStack ->
-        e.aliveSteps
-            |> List.Extra.mapAccuml reducer ( e, newStack )
+    \entity stackOfNewEntities ->
+        entity.aliveSteps
+            |> List.Extra.mapAccuml reducer ( entity, stackOfNewEntities )
             |> (\( ( uEntity, uNewStack ), uAliveSteps ) ->
                     ( uNewStack, Entity.withAliveSteps uAliveSteps uEntity )
                )

@@ -118,6 +118,7 @@ applyPhaseTransform phase shape =
                 |> scale (1 + progress / 2)
 
 
+toShape : Int -> Entity -> Shape
 toShape idx e =
     group
         [ circle e.color e.r

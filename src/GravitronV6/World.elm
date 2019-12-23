@@ -39,15 +39,10 @@ update computer (World nid oldEntities) =
                 oldEntities
 
         newEntities =
-            generatedToEntityList geList
+            foldBatch (\(New e) acc -> e :: acc) [] geList
     in
     List.foldl addNew (World nid ueList) newEntities
         |> reverseWorld
-
-
-generatedToEntityList : List BatchNew -> List Entity
-generatedToEntityList =
-    foldBatch (\(New e) acc -> e :: acc) []
 
 
 reverseWorld : World -> World

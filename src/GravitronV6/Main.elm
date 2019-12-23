@@ -86,11 +86,9 @@ view _ =
 
 viewEntity : Int -> Entity -> Shape
 viewEntity idx e =
-    let
-        coreShape =
-            toShape idx e
-    in
-    coreShape |> applyPhaseTransform e.phase |> move e.x e.y
+    toShape idx e
+        |> applyPhaseTransform e.phase
+        |> move e.x e.y
 
 
 applyPhaseTransform : Phase -> Shape -> Shape

@@ -139,3 +139,38 @@ performAliveStepHelp computer allEntities step e =
 findNamed : a -> List { b | name : a } -> Maybe { b | name : a }
 findNamed name =
     List.Extra.find (propEq .name name)
+
+
+type alias FireModel =
+    { elapsed : Number, every : Number, toName : String, speed : Float, template : Entity }
+
+
+performFire : Entity -> List Entity -> FireModel -> ( Acc tag -> Acc tag, AliveStep, Float )
+performFire from allEntities rec =
+    let
+        triggered =
+            rec.elapsed >= rec.every
+
+        newRec =
+            if triggered then
+                { rec | elapsed = 0 }
+
+            else
+                { rec | elapsed = rec.elapsed + 1 }
+
+        newStep =
+            Fire newRec
+
+        accNewF =
+            if triggered then
+                case findNamed rec.toName allEntities of
+                    Just to ->
+                        accumulate (Circ.shoot from to rec.speed rec.template)
+
+                    Nothing ->
+                        identity
+
+            else
+                identity
+    in
+    ( accNewF, newStep, e )

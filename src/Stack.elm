@@ -1,4 +1,4 @@
-module Stack exposing (Stack, empty, push, pushAll)
+module Stack exposing (Stack, empty, foldFifo, push, pushAll, toFifo, toLifo)
 
 import PointFree exposing (cons)
 
@@ -30,3 +30,18 @@ push a =
 pushAll : List a -> Stack a -> Stack a
 pushAll items stack =
     List.foldl push stack items
+
+
+foldFifo : (a -> b -> b) -> b -> Stack a -> b
+foldFifo func acc =
+    unwrap >> List.foldr func acc
+
+
+toFifo : Stack a -> List a
+toFifo =
+    unwrap >> List.reverse
+
+
+toLifo : Stack a -> List a
+toLifo =
+    unwrap

@@ -101,6 +101,15 @@ basic2 t =
     { t | color = blue, maxHP = 2 }
 
 
+type alias MinorLevel =
+    List Entity
+
+
+type alias MajorLevel =
+    List MinorLevel
+
+
+levels : List MajorLevel
 levels =
     [ [ makeSubLevel [ basic1 ]
       , makeSubLevel [ basic1, basic1 ]
@@ -125,7 +134,7 @@ init =
     Mem lev (initWorld lev)
 
 
-getTurretsForLevel : Level -> List Entity
+getTurretsForLevel : Level -> MinorLevel
 getTurretsForLevel ( major, minor ) =
     let
         majorMax =

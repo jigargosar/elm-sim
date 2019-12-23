@@ -82,21 +82,18 @@ init =
 
 
 update : Computer -> World -> World
-update computer world =
-    World.update computer world
-        |> performLevelUpdate
+update =
+    World.update afterUpdateHook
 
 
-performLevelUpdate : World -> World
-performLevelUpdate w =
-    World.toList w
-        |> List.Extra.count (propEq .name (name Turret))
-        |> (\tc ->
+afterUpdateHook =
+    List.Extra.count (propEq .name (name Turret))
+        >> (\tc ->
                 if tc == 0 then
-                    World.addNew (World.newEntity initialTurret) w
+                    [ World.newEntity initialTurret ]
 
                 else
-                    w
+                    []
            )
 
 

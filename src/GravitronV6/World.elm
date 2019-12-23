@@ -1,4 +1,4 @@
-module GravitronV6.World exposing (World, addNew, init, newEntity, toList, update)
+module GravitronV6.World exposing (World, init, newEntity, toList, update)
 
 import GravitronV6.Entity as Entity exposing (AliveStep(..), Entity, FireModel, Phase(..))
 import GravitronV6.Geom as Geom
@@ -32,8 +32,8 @@ toList (World _ list) =
     list
 
 
-update : Computer -> World -> World
-update computer (World nid oldEntities) =
+update : (List Entity -> List New) -> Computer -> World -> World
+update afterUpdate computer (World nid oldEntities) =
     let
         emptyStacks : ( Stack New, Stack Updated )
         emptyStacks =
@@ -49,7 +49,13 @@ update computer (World nid oldEntities) =
             Stack.map (\(Updated e) -> e) updatedStack |> Stack.toLifo
     in
     Stack.foldFifo addNew (World nid updatedEntities) newStack
+        |> applyAfterUpdateHook afterUpdate
         |> reverseWorld
+
+
+applyAfterUpdateHook : (List Entity -> List New) -> World -> World
+applyAfterUpdateHook func ((World _ list) as w) =
+    List.foldl addNew w (func list)
 
 
 reverseWorld : World -> World

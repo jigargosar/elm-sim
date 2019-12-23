@@ -7,9 +7,18 @@ type PreStep
     = PreStep
 
 
+type alias FireModel =
+    { elapsed : Number
+    , every : Number
+    , towards : String
+    , speed : Float
+    , template : Entity
+    }
+
+
 type AliveStep
     = WalkRandomly
-    | Fire { elapsed : Number, every : Number, toName : String, template : Entity, speed : Number }
+    | Fire FireModel
 
 
 type DeathStep

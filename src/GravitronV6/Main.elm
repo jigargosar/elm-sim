@@ -50,7 +50,7 @@ init =
             [ Fire
                 { elapsed = 0
                 , every = 60
-                , toName = name Player
+                , towards = name Player
                 , template = bulletTemplate
                 , speed = 3
                 }

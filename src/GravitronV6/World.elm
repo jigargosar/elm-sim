@@ -2,7 +2,7 @@ module GravitronV6.World exposing (World, init, newEntity, toList, update)
 
 import Basics.Extra exposing (swap)
 import GravitronV6.Circ as Circ
-import GravitronV6.Entity as Entity exposing (AliveStep(..), Entity)
+import GravitronV6.Entity as Entity exposing (AliveStep(..), Entity, FireModel)
 import List.Extra
 import Playground exposing (..)
 import PointFree exposing (cons, mapAccuml, propEq)
@@ -118,10 +118,6 @@ findNamed name =
     List.Extra.find (propEq .name name)
 
 
-type alias FireModel =
-    { elapsed : Number, every : Number, toName : String, speed : Float, template : Entity }
-
-
 performFire : Entity -> List Entity -> FireModel -> ( List New, AliveStep )
 performFire from allEntities rec =
     let
@@ -140,7 +136,7 @@ performFire from allEntities rec =
 
         generatedEntities =
             if triggered then
-                case findNamed rec.toName allEntities of
+                case findNamed rec.towards allEntities of
                     Just to ->
                         [ New (Circ.shoot from to rec.speed rec.template) ]
 

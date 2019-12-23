@@ -74,20 +74,26 @@ stepEntity computer allEntities entity ( newStack, updatedStack ) =
             Updated >> Stack.pushOn updatedStack
     in
     case entity.phase of
-        Spawning ->
-            ( newStack, pushOnUpdated { entity | phase = Alive } )
+        Spawning sm ->
+            ( newStack
+            , if sm.elapsed >= sm.duration then
+                pushOnUpdated { entity | phase = Alive }
+
+              else
+                pushOnUpdated { entity | phase = Spawning { sm | elapsed = sm.elapsed + 1 } }
+            )
 
         Alive ->
             performAliveSteps computer allEntities newStack entity
                 |> Tuple.mapSecond (updateAliveStepsIfStillAlive >> pushOnUpdated)
 
-        Dying dyingModel ->
+        Dying dm ->
             ( newStack
-            , if dyingModel.elapsed >= dyingModel.duration then
+            , if dm.elapsed >= dm.duration then
                 updatedStack
 
               else
-                pushOnUpdated { entity | phase = Dying { dyingModel | elapsed = dyingModel.elapsed + 1 } }
+                pushOnUpdated { entity | phase = Dying { dm | elapsed = dm.elapsed + 1 } }
             )
 
 

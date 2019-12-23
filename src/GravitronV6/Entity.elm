@@ -73,9 +73,13 @@ type DeathStep
 
 
 type Phase
-    = Spawning
+    = Spawning SpawningModel
     | Alive
     | Dying DyingModel
+
+
+type alias SpawningModel =
+    { elapsed : Number, duration : Number }
 
 
 type alias DyingModel =
@@ -103,11 +107,6 @@ type alias Entity =
 kill : Entity -> Entity
 kill entity =
     { entity | currentHP = 0, phase = Dying { elapsed = 0, duration = 60 } }
-
-
-hasAnyHP : Entity -> Bool
-hasAnyHP e =
-    e.currentHP > 0
 
 
 invalidId =

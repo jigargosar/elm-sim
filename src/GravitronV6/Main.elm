@@ -94,8 +94,14 @@ viewEntity idx e =
 applyPhaseTransform : Phase -> Shape -> Shape
 applyPhaseTransform phase shape =
     case phase of
-        Spawning ->
+        Spawning sm ->
+            let
+                progress =
+                    sm.elapsed / sm.duration
+            in
             shape
+                |> fade (progress + 0.1)
+                |> scale (progress + 0.1)
 
         Alive ->
             shape

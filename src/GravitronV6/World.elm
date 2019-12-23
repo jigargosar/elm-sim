@@ -1,5 +1,6 @@
 module GravitronV6.World exposing (World, init, newEntity, toList, update)
 
+import Basics.Extra exposing (swap)
 import GravitronV6.Circ as Circ
 import GravitronV6.Entity as Entity exposing (AliveStep(..), Entity)
 import List.Extra
@@ -66,37 +67,50 @@ stepEntity :
 stepEntity computer allEntities e ( newStack, updatedStack ) =
     e.aliveSteps
         |> List.Extra.mapAccuml
-            (\( nStack, entityAcc ) step ->
-                performAliveStep computer allEntities step entityAcc
-                    |> (\( newList, updatedStep, updatedEntity ) ->
-                            ( ( Stack.pushAll newList nStack, updatedEntity ), updatedStep )
-                       )
+            (\acc step ->
+                performAliveStep computer allEntities step acc
+                    |> swap
             )
-            ( newStack, e )
-        |> (\( ( geAcc, entityAcc ), stepAcc ) ->
-                ( geAcc, Entity.withAliveSteps stepAcc entityAcc )
+            ( e, newStack )
+        |> (\( ( ue, geAcc ), aliveSteps ) ->
+                ( geAcc, Entity.withAliveSteps aliveSteps ue )
            )
         |> Tuple.mapSecond Entity.moveByVelocity
         |> Tuple.mapSecond (Updated >> Stack.pushOn updatedStack)
+
+
+performAliveSteps : Computer -> List Entity -> Entity -> Stack New -> ( Stack New, Entity )
+performAliveSteps computer allEntities e newStack =
+    e.aliveSteps
+        |> List.Extra.mapAccuml
+            (\acc step ->
+                performAliveStep computer allEntities step acc
+                    |> swap
+            )
+            ( e, newStack )
+        |> (\( ( ue, geAcc ), aliveSteps ) ->
+                ( geAcc, Entity.withAliveSteps aliveSteps ue )
+           )
+        |> Tuple.mapSecond Entity.moveByVelocity
 
 
 performAliveStep :
     Computer
     -> List Entity
     -> AliveStep
-    -> Entity
-    -> ( List New, AliveStep, Entity )
-performAliveStep computer allEntities step e =
+    -> ( Entity, Stack New )
+    -> ( AliveStep, ( Entity, Stack New ) )
+performAliveStep computer allEntities step ( e, newStack ) =
     case step of
         WalkRandomly ->
-            ( [], step, Entity.performRandomWalk computer e )
+            ( step, ( Entity.performRandomWalk computer e, newStack ) )
 
         Fire rec ->
             let
                 ( ge, newStep ) =
                     performFire e allEntities rec
             in
-            ( ge, newStep, e )
+            ( newStep, ( e, Stack.pushAll ge newStack ) )
 
 
 findNamed : a -> List { b | name : a } -> Maybe { b | name : a }

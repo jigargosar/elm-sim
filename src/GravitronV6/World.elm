@@ -65,17 +65,7 @@ stepEntity :
     -> ( Stack New, Stack Updated )
     -> ( Stack New, Stack Updated )
 stepEntity computer allEntities e ( newStack, updatedStack ) =
-    e.aliveSteps
-        |> List.Extra.mapAccuml
-            (\acc step ->
-                performAliveStep computer allEntities step acc
-                    |> swap
-            )
-            ( e, newStack )
-        |> (\( ( ue, geAcc ), aliveSteps ) ->
-                ( geAcc, Entity.withAliveSteps aliveSteps ue )
-           )
-        |> Tuple.mapSecond Entity.moveByVelocity
+    performAliveSteps computer allEntities e newStack
         |> Tuple.mapSecond (Updated >> Stack.pushOn updatedStack)
 
 

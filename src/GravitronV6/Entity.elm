@@ -11,10 +11,6 @@ findNamed name =
     List.Extra.find (propEq .name name)
 
 
-type PreStep
-    = PreStep
-
-
 type alias FireModel =
     { elapsed : Number
     , didTrigger : Bool
@@ -97,7 +93,6 @@ type alias Entity =
     , vy : Number
     , maxHP : Number
     , currentHP : Number
-    , preSteps : List PreStep
     , aliveSteps : List AliveStep
     , deathSteps : List DeathStep
     , phase : Phase
@@ -125,7 +120,6 @@ default =
     , vy = 0
     , maxHP = 1
     , currentHP = 1
-    , preSteps = []
     , aliveSteps = []
     , deathSteps = []
     , phase = Alive

@@ -1,6 +1,6 @@
 module GravitronV6.Main exposing (main)
 
-import GravitronV6.Entity as Entity exposing (AliveStep(..), Entity, Phase(..), PreStep(..))
+import GravitronV6.Entity as Entity exposing (AliveStep(..), Entity, Phase(..))
 import GravitronV6.World as World exposing (World)
 import Playground exposing (..)
 
@@ -41,7 +41,6 @@ bulletTemplate =
         , color = charcoal
         , vx = 1
         , vy = 1
-        , preSteps = []
         , aliveSteps =
             [ GravitateTo (name Player)
             , BounceInScreen 0.5

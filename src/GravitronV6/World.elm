@@ -1,6 +1,6 @@
 module GravitronV6.World exposing (World, init, newEntity, toList, update)
 
-import GravitronV6.Entity as Entity exposing (AliveStep(..), Entity, FireModel, Phase(..), PreStep(..))
+import GravitronV6.Entity as Entity exposing (AliveStep(..), Entity, FireModel, Phase(..))
 import GravitronV6.Geom as Geom
 import Playground exposing (..)
 import PointFree exposing (cons)

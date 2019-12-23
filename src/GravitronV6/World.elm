@@ -83,17 +83,17 @@ performAliveStep :
     -> AliveStep
     -> ( Stack New, Entity )
     -> ( Stack New, Entity )
-performAliveStep computer allEntities step ( newStack, e ) =
+performAliveStep computer allEntities step ( newStack, entity ) =
     case step of
         WalkRandomly ->
-            ( newStack, Entity.performRandomWalk computer e )
+            ( newStack, Entity.performRandomWalk computer entity )
 
         Fire fireModel ->
             let
                 firedEntityList =
-                    performFire e allEntities fireModel
+                    performFire entity allEntities fireModel
             in
-            ( Stack.pushAll firedEntityList newStack, e )
+            ( Stack.pushAll firedEntityList newStack, entity )
 
 
 findNamed : a -> List { b | name : a } -> Maybe { b | name : a }

@@ -85,7 +85,16 @@ stepEntity computer allEntities entity ( newStack, updatedStack ) =
 
         Alive ->
             performAliveSteps computer allEntities newStack entity
-                |> Tuple.mapSecond (updateAliveStepsIfStillAlive >> pushOnUpdated)
+                |> Tuple.mapSecond
+                    ((\e ->
+                        if e.currentHP <= 0 then
+                            { e | phase = Dying { elapsed = 0, duration = 60 } }
+
+                        else
+                            updateAliveSteps e
+                     )
+                        >> pushOnUpdated
+                    )
 
         Dying dm ->
             ( newStack
@@ -175,8 +184,8 @@ checkCollisionHelp names o e =
         && (e.id /= o.id)
 
 
-updateAliveStepsIfStillAlive : Entity -> Entity
-updateAliveStepsIfStillAlive entity =
+updateAliveSteps : Entity -> Entity
+updateAliveSteps entity =
     let
         func : AliveStep -> AliveStep
         func aliveStep =
@@ -198,11 +207,7 @@ updateAliveStepsIfStillAlive entity =
                 _ ->
                     aliveStep
     in
-    if entity.phase == Alive then
-        Entity.withAliveSteps (List.map func entity.aliveSteps) entity
-
-    else
-        entity
+    Entity.withAliveSteps (List.map func entity.aliveSteps) entity
 
 
 type New

@@ -5,7 +5,7 @@ import GravitronV6.Circ as Circ
 import GravitronV6.Entity as Entity exposing (AliveStep(..), Entity)
 import List.Extra
 import Playground exposing (..)
-import PointFree exposing (cons, propEq)
+import PointFree exposing (cons, mapAccuml, propEq)
 import Stack exposing (Stack)
 
 
@@ -82,17 +82,15 @@ stepEntity computer allEntities e ( newStack, updatedStack ) =
 performAliveSteps : Computer -> List Entity -> Entity -> Stack New -> ( Stack New, Entity )
 performAliveSteps computer allEntities =
     let
-        reducer : ( Entity, Stack New ) -> AliveStep -> ( ( Entity, Stack New ), AliveStep )
-        reducer acc step =
-            performAliveStep computer allEntities step acc
-                |> swap
+        setAliveSteps : ( ( Entity, Stack New ), List AliveStep ) -> ( Stack New, Entity )
+        setAliveSteps =
+            \( ( uEntity, uNewStack ), uAliveSteps ) ->
+                ( uNewStack, Entity.withAliveSteps uAliveSteps uEntity )
     in
     \entity stackOfNewEntities ->
         entity.aliveSteps
-            |> List.Extra.mapAccuml reducer ( entity, stackOfNewEntities )
-            |> (\( ( uEntity, uNewStack ), uAliveSteps ) ->
-                    ( uNewStack, Entity.withAliveSteps uAliveSteps uEntity )
-               )
+            |> mapAccuml (performAliveStep computer allEntities) ( entity, stackOfNewEntities )
+            |> setAliveSteps
             |> Tuple.mapSecond Entity.moveByVelocity
 
 

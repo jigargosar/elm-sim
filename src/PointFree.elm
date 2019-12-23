@@ -1,6 +1,6 @@
 module PointFree exposing (..)
 
-import Basics.Extra exposing (flip)
+import Basics.Extra exposing (flip, swap)
 import List.Extra
 import Random exposing (Generator, Seed)
 
@@ -152,3 +152,8 @@ cons =
 consTo : List a -> a -> List a
 consTo =
     flip cons
+
+
+mapAccuml : (a -> acc -> ( b, acc )) -> acc -> List a -> ( acc, List b )
+mapAccuml func acc =
+    List.Extra.mapAccuml (\a b -> func b a |> swap) acc

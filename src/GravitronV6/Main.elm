@@ -113,6 +113,7 @@ levels : List MajorLevel
 levels =
     [ [ makeSubLevel [ basic1 ]
       , makeSubLevel [ basic1, basic1 ]
+      , makeSubLevel [ basic1, basic2 ]
       , makeSubLevel [ basic1, basic1, basic2 ]
       , makeSubLevel (List.repeat 4 basic2)
       ]

@@ -57,6 +57,7 @@ init =
         | name = name Turret
         , r = 25
         , color = red
+        , phase = Spawning { elapsed = 0, duration = 60 }
         , aliveSteps =
             [ Fire
                 { elapsed = 0

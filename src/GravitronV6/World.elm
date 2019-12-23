@@ -58,13 +58,12 @@ reverseWorld (World nid list) =
 
 isCollidingWithAnyOf names list e =
     let
-        isC o =
+        check o =
             List.member o.name names
                 && Geom.ccc e.x e.y e.r o.x o.y o.r
-                && e.id
-                /= o.id
+                && (e.id /= o.id)
     in
-    List.any isC list
+    List.any check list
 
 
 stepEntity : Computer -> List Entity -> Entity -> ( Stack New, Stack Updated ) -> ( Stack New, Stack Updated )

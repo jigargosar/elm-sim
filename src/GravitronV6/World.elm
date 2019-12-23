@@ -133,8 +133,16 @@ type alias BatchNew =
     Batch New
 
 
+type alias BatchUpdate =
+    Batch Update
+
+
 type New
     = New Entity
+
+
+type Update
+    = Update Entity
 
 
 type Batch a

@@ -1,6 +1,6 @@
 module GravitronV6.Main exposing (main)
 
-import GravitronV6.Entity as Entity exposing (AliveStep(..), Entity, Phase(..), withHP)
+import GravitronV6.Entity as Entity exposing (AliveStep(..), Entity, Phase(..), withColor, withHP)
 import GravitronV6.World as World exposing (World)
 import List.Extra
 import Playground exposing (..)
@@ -97,27 +97,23 @@ basic1 =
 
 
 basic2 : Entity -> Entity
-basic2 t =
-    { t | color = blue }
-        |> withHP 2
+basic2 =
+    withColor blue >> withHP 2
 
 
 basic2RevengeWanderer : Entity -> Entity
-basic2RevengeWanderer t =
-    { t | color = blue }
-        |> withHP 2
+basic2RevengeWanderer =
+    withColor blue >> withHP 2
 
 
 tripleG : Entity -> Entity
-tripleG t =
-    { t | color = green }
-        |> withHP 3
+tripleG =
+    withColor green >> withHP 3
 
 
 heatSinkShooter : Entity -> Entity
-heatSinkShooter t =
-    { t | color = orange }
-        |> withHP 5
+heatSinkShooter =
+    withColor orange >> withHP 5
 
 
 type alias MinorLevel =

@@ -159,3 +159,8 @@ withAliveSteps aliveSteps e =
 withHP : Number -> Entity -> Entity
 withHP maxHp entity =
     { entity | maxHP = maxHp, currentHP = maxHp }
+
+
+withColor : Color -> Entity -> Entity
+withColor color entity =
+    { entity | color = color }

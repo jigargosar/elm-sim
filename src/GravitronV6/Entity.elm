@@ -1,6 +1,9 @@
 module GravitronV6.Entity exposing (..)
 
+import GravitronV6.Circ as Circ
+import List.Extra
 import Playground exposing (..)
+import PointFree exposing (propEq)
 
 
 type PreStep
@@ -20,6 +23,25 @@ type alias FireModel =
 type AliveStep
     = WalkRandomly
     | Fire FireModel
+
+
+findNamed : a -> List { b | name : a } -> Maybe { b | name : a }
+findNamed name =
+    List.Extra.find (propEq .name name)
+
+
+performFire : Entity -> List Entity -> FireModel -> List Entity
+performFire from allEntities fireModel =
+    if fireModel.didTrigger then
+        case findNamed fireModel.towards allEntities of
+            Just to ->
+                [ Circ.shoot from to fireModel.speed fireModel.template ]
+
+            Nothing ->
+                []
+
+    else
+        []
 
 
 updateAliveSteps : Entity -> Entity

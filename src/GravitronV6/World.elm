@@ -148,14 +148,6 @@ getCollisionCount names list e =
         0
 
 
-checkCollisionHelp : List String -> Entity -> Entity -> Bool
-checkCollisionHelp names o e =
-    (o.phase == Alive)
-        && List.member o.name names
-        && Geom.ccc e.x e.y e.r o.x o.y o.r
-        && (e.id /= o.id)
-
-
 isCollidingWithAnyOf : List String -> List Entity -> Entity -> Bool
 isCollidingWithAnyOf names list e =
     let
@@ -163,6 +155,14 @@ isCollidingWithAnyOf names list e =
             checkCollisionHelp names o e
     in
     e.phase == Alive && List.any check list
+
+
+checkCollisionHelp : List String -> Entity -> Entity -> Bool
+checkCollisionHelp names o e =
+    (o.phase == Alive)
+        && List.member o.name names
+        && Geom.ccc e.x e.y e.r o.x o.y o.r
+        && (e.id /= o.id)
 
 
 updateAliveStepsIfStillAlive : Entity -> Entity

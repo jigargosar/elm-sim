@@ -1,6 +1,6 @@
 module GravitronV6.Main exposing (main)
 
-import GravitronV6.Entity as Entity exposing (AliveStep(..), Entity, PreStep(..))
+import GravitronV6.Entity as Entity exposing (AliveStep(..), Entity, Phase(..), PreStep(..))
 import GravitronV6.World as World exposing (World)
 import Playground exposing (..)
 
@@ -42,7 +42,11 @@ bulletTemplate =
         , vx = 1
         , vy = 1
         , preSteps = []
-        , aliveSteps = [ GravitateTo (name Player), BounceInScreen 0.5, DieOnCollisionWith (names [ Player, Turret ]) ]
+        , aliveSteps =
+            [ GravitateTo (name Player)
+            , BounceInScreen 0.5
+            , DieOnCollisionWith (names [ Player, Turret ])
+            ]
     }
 
 
@@ -80,13 +84,39 @@ view _ =
 
 
 viewEntity idx e =
+    let
+        coreShape =
+            toShape idx e
+    in
+    coreShape |> applyPhaseTransform e.phase |> move e.x e.y
+
+
+applyPhaseTransform : Phase -> Shape -> Shape
+applyPhaseTransform phase shape =
+    case phase of
+        Spawning ->
+            shape
+
+        Alive ->
+            shape
+
+        Dying dm ->
+            let
+                progress =
+                    dm.elapsed / dm.duration
+            in
+            shape
+                |> fade (1 - progress)
+                |> scale (1 + progress / 2)
+
+
+toShape idx e =
     group
         [ circle e.color e.r
         , ("z-" ++ String.fromInt idx)
             |> words black
             |> moveDown (e.r + 10)
         ]
-        |> move e.x e.y
 
 
 main =

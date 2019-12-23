@@ -101,8 +101,8 @@ basic2 t =
     { t | color = blue, maxHP = 2 }
 
 
-basic2Revenge : Entity -> Entity
-basic2Revenge t =
+basic2RevengeWanderer : Entity -> Entity
+basic2RevengeWanderer t =
     { t | color = blue, maxHP = 2 }
 
 
@@ -134,8 +134,8 @@ levels =
       ]
     , [ makeSubLevel [ tripleG ]
       , makeSubLevel [ basic1, tripleG, basic2 ]
-      , makeSubLevel [ tripleG, basic2Revenge ]
-      , makeSubLevel [ tripleG, heatSinkShooter, basic2Revenge ]
+      , makeSubLevel [ tripleG, basic2RevengeWanderer ]
+      , makeSubLevel [ tripleG, heatSinkShooter, basic2RevengeWanderer ]
       ]
     ]
 

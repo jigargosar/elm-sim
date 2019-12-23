@@ -87,8 +87,9 @@ turretTemplates =
 
 
 levels =
-    [ turretTemplates
-    , turretTemplates |> List.map (\t -> { t | color = blue, maxHP = 2 })
+    [ turretTemplates |> List.take 1
+    , turretTemplates |> List.take 2
+    , turretTemplates |> List.take 2 |> List.map (\t -> { t | color = blue, maxHP = 2 })
     ]
 
 

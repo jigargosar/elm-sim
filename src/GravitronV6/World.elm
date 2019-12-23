@@ -47,19 +47,7 @@ update computer (World nid oldEntities) =
 
 generatedToEntityList : List BatchNew -> List Entity
 generatedToEntityList =
-    let
-        reducer ge eAcc =
-            case ge of
-                BatchNone ->
-                    eAcc
-
-                BatchConcat batches ->
-                    List.foldl reducer eAcc batches
-
-                BatchOne (New e) ->
-                    e :: eAcc
-    in
-    List.foldl reducer []
+    foldBatch (\(New e) acc -> e :: acc) []
 
 
 reverseWorld : World -> World
@@ -158,3 +146,21 @@ type Batch a
     = BatchConcat (List (Batch a))
     | BatchOne a
     | BatchNone
+
+
+foldBatch : (a -> b -> b) -> b -> List (Batch a) -> b
+foldBatch func =
+    let
+        reducer : Batch a -> b -> b
+        reducer batch acc =
+            case batch of
+                BatchNone ->
+                    acc
+
+                BatchConcat batches ->
+                    List.foldl reducer acc batches
+
+                BatchOne a ->
+                    func a acc
+    in
+    List.foldl reducer

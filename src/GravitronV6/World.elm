@@ -89,11 +89,9 @@ performAliveSteps computer allEntities =
     in
     \e newStack ->
         e.aliveSteps
-            |> List.Extra.mapAccuml
-                reducer
-                ( e, newStack )
-            |> (\( ( ue, geAcc ), aliveSteps ) ->
-                    ( geAcc, Entity.withAliveSteps aliveSteps ue )
+            |> List.Extra.mapAccuml reducer ( e, newStack )
+            |> (\( ( uEntity, uNewStack ), uAliveSteps ) ->
+                    ( uNewStack, Entity.withAliveSteps uAliveSteps uEntity )
                )
             |> Tuple.mapSecond Entity.moveByVelocity
 

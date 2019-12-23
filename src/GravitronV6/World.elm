@@ -1,6 +1,6 @@
 module GravitronV6.World exposing (World, init, newEntity, toList, update)
 
-import GravitronV6.Entity as Entity exposing (AliveStep(..), Entity, FireModel, PreStep(..))
+import GravitronV6.Entity as Entity exposing (AliveStep(..), Entity, FireModel, Phase(..), PreStep(..))
 import GravitronV6.Geom as Geom
 import Playground exposing (..)
 import PointFree exposing (cons)
@@ -64,36 +64,31 @@ isCollidingWithAnyOf names list e =
                 && Geom.ccc e.x e.y e.r o.x o.y o.r
                 && (e.id /= o.id)
     in
-    List.any check list
+    e.phase == Alive && List.any check list
 
 
 stepEntity : Computer -> List Entity -> Entity -> ( Stack New, Stack Updated ) -> ( Stack New, Stack Updated )
-stepEntity computer allEntities =
+stepEntity computer allEntities entity ( newStack, updatedStack ) =
     let
-        performHealthCheck entity ( newStack, updatedStack ) =
-            if Entity.isAlive entity then
-                performAliveSteps computer allEntities newStack entity
-                    |> Tuple.mapSecond (updateAliveSteps >> Updated >> Stack.pushOn updatedStack)
-
-            else
-                ( newStack, updatedStack )
+        pushOnUpdated =
+            Updated >> Stack.pushOn updatedStack
     in
-    performPreSteps allEntities >> performHealthCheck
+    case entity.phase of
+        Spawning ->
+            ( newStack, pushOnUpdated { entity | phase = Alive } )
 
+        Alive ->
+            performAliveSteps computer allEntities newStack entity
+                |> Tuple.mapSecond (updateAliveStepsIfStillAlive >> pushOnUpdated)
 
-performPreSteps : List Entity -> Entity -> Entity
-performPreSteps allEntities =
-    let
-        func pre entity =
-            case pre of
-                DieOnCollisionWith names ->
-                    if isCollidingWithAnyOf names allEntities entity then
-                        Entity.kill entity
+        Dying dyingModel ->
+            ( newStack
+            , if dyingModel.elapsed >= dyingModel.duration then
+                updatedStack
 
-                    else
-                        entity
-    in
-    \entity -> List.foldl func entity entity.preSteps
+              else
+                pushOnUpdated { entity | phase = Dying { dyingModel | elapsed = dyingModel.elapsed + 1 } }
+            )
 
 
 performAliveSteps : Computer -> List Entity -> Stack New -> Entity -> ( Stack New, Entity )
@@ -123,16 +118,22 @@ performAliveStep computer allEntities step ( newStack, entity ) =
             in
             ( Stack.pushAll firedEntityList newStack, entity )
 
+        DieOnCollisionWith names ->
+            ( newStack
+            , if isCollidingWithAnyOf names allEntities entity then
+                Entity.kill entity
 
-updateAliveSteps : Entity -> Entity
-updateAliveSteps entity =
+              else
+                entity
+            )
+
+
+updateAliveStepsIfStillAlive : Entity -> Entity
+updateAliveStepsIfStillAlive entity =
     let
         func : AliveStep -> AliveStep
         func aliveStep =
             case aliveStep of
-                WalkRandomly ->
-                    aliveStep
-
                 Fire rec ->
                     let
                         didTrigger =
@@ -147,13 +148,14 @@ updateAliveSteps entity =
                     in
                     Fire { newRec | didTrigger = didTrigger }
 
-                GravitateTo _ ->
-                    aliveStep
-
-                BounceInScreen _ ->
+                _ ->
                     aliveStep
     in
-    Entity.withAliveSteps (List.map func entity.aliveSteps) entity
+    if entity.phase == Alive then
+        Entity.withAliveSteps (List.map func entity.aliveSteps) entity
+
+    else
+        entity
 
 
 type New

@@ -1,7 +1,6 @@
 module GravitronV6.Entity exposing (..)
 
 import GravitronV6.Circ as Circ
-import GravitronV6.Geom as Geom
 import List.Extra
 import Playground exposing (..)
 import PointFree exposing (propEq)
@@ -13,7 +12,7 @@ findNamed name =
 
 
 type PreStep
-    = DieOnCollisionWith (List String)
+    = PreStep
 
 
 type alias FireModel =
@@ -31,6 +30,7 @@ type AliveStep
     | GravitateTo String
     | BounceInScreen Number
     | Fire FireModel
+    | DieOnCollisionWith (List String)
 
 
 performRandomWalk : Computer -> { c | x : Number, y : Number } -> { c | x : Number, y : Number }
@@ -75,7 +75,11 @@ type DeathStep
 type Phase
     = Spawning
     | Alive
-    | Dying
+    | Dying DyingModel
+
+
+type alias DyingModel =
+    { elapsed : Number, duration : Number }
 
 
 type alias Entity =
@@ -98,11 +102,11 @@ type alias Entity =
 
 kill : Entity -> Entity
 kill entity =
-    { entity | currentHP = 0 }
+    { entity | currentHP = 0, phase = Dying { elapsed = 0, duration = 60 } }
 
 
-isAlive : Entity -> Bool
-isAlive e =
+hasAnyHP : Entity -> Bool
+hasAnyHP e =
     e.currentHP > 0
 
 

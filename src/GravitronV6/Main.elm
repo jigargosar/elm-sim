@@ -41,8 +41,8 @@ bulletTemplate =
         , color = charcoal
         , vx = 1
         , vy = 1
-        , preSteps = [ DieOnCollisionWith (names [ Player, Turret ]) ]
-        , aliveSteps = [ GravitateTo (name Player), BounceInScreen 0.5 ]
+        , preSteps = []
+        , aliveSteps = [ GravitateTo (name Player), BounceInScreen 0.5, DieOnCollisionWith (names [ Player, Turret ]) ]
     }
 
 

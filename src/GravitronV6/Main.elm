@@ -135,6 +135,7 @@ levels =
     , [ makeSubLevel [ tripleG ]
       , makeSubLevel [ basic1, tripleG, basic2 ]
       , makeSubLevel [ tripleG, basic2RevengeWanderer ]
+      , makeSubLevel [ basic2RevengeWanderer, basic2RevengeWanderer, tripleG ]
       , makeSubLevel [ tripleG, heatSinkShooter, basic2RevengeWanderer ]
       ]
     ]

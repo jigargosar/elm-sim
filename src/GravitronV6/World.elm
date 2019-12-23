@@ -36,7 +36,7 @@ toList (World _ list) =
     list
 
 
-update : (List Entity -> List New) -> Computer -> World -> World
+update : (List Entity -> ( acc, List New )) -> Computer -> World -> ( acc, World )
 update afterUpdate computer (World nid oldEntities) =
     let
         emptyStacks : ( Stack New, Stack Updated )
@@ -54,12 +54,16 @@ update afterUpdate computer (World nid oldEntities) =
     in
     Stack.foldFifo addNew (World nid updatedEntities) newStack
         |> applyAfterUpdateHook afterUpdate
-        |> reverseWorld
+        |> Tuple.mapSecond reverseWorld
 
 
-applyAfterUpdateHook : (List Entity -> List New) -> World -> World
+applyAfterUpdateHook : (List Entity -> ( acc, List New )) -> World -> ( acc, World )
 applyAfterUpdateHook func ((World _ list) as w) =
-    List.foldl addNew w (func list)
+    let
+        ( acc, newList ) =
+            func list
+    in
+    ( acc, List.foldl addNew w newList )
 
 
 reverseWorld : World -> World

@@ -86,35 +86,72 @@ turretTemplates =
     List.map (\( x, y ) -> { turretTemplate | x = x, y = y }) turretPositions
 
 
-init : World
+levels =
+    [ turretTemplates
+    , turretTemplates |> List.map (\t -> { t | color = blue, maxHP = 2 })
+    ]
+
+
+type alias Mem =
+    { level : Int
+    , world : World
+    }
+
+
+init : Mem
 init =
+    let
+        lev =
+            0
+    in
+    Mem lev (initWorld lev)
+
+
+getTurretsForLevel : Int -> List Entity
+getTurretsForLevel level =
+    let
+        levelCt =
+            List.length levels
+    in
+    List.drop (modBy levelCt level) levels |> List.head |> Maybe.withDefault turretTemplates
+
+
+initWorld : Int -> World
+initWorld level =
     ({ default | name = name Player, r = 20, color = green, aliveSteps = [ WalkRandomly ] }
-        :: turretTemplates
+        :: getTurretsForLevel level
     )
         |> List.map World.newEntity
         |> World.init
 
 
-update : Computer -> World -> World
-update =
-    World.update afterUpdateHook
+update : Computer -> Mem -> Mem
+update computer mem =
+    let
+        ( lev, world ) =
+            World.update (afterUpdateHook mem.level) computer mem.world
+    in
+    { mem
+        | world = world
+        , level = lev
+    }
 
 
-afterUpdateHook : List Entity -> List World.NewEntity
-afterUpdateHook =
+afterUpdateHook : Int -> List Entity -> ( Int, List World.NewEntity )
+afterUpdateHook lev =
     List.Extra.count (propEq .name (name Turret))
         >> (\tc ->
                 if tc == 0 then
-                    List.map World.newEntity turretTemplates
+                    ( lev + 1, List.map World.newEntity (getTurretsForLevel (lev + 1)) )
 
                 else
-                    []
+                    ( lev, [] )
            )
 
 
-view : Computer -> World -> List Shape
+view : Computer -> Mem -> List Shape
 view _ =
-    World.toList >> List.indexedMap viewEntity
+    .world >> World.toList >> List.indexedMap viewEntity
 
 
 viewEntity : Int -> Entity -> Shape

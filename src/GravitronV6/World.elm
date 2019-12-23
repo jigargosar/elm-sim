@@ -80,18 +80,22 @@ stepEntity computer allEntities e ( newStack, updatedStack ) =
 
 
 performAliveSteps : Computer -> List Entity -> Entity -> Stack New -> ( Stack New, Entity )
-performAliveSteps computer allEntities e newStack =
-    e.aliveSteps
-        |> List.Extra.mapAccuml
-            (\acc step ->
-                performAliveStep computer allEntities step acc
-                    |> swap
-            )
-            ( e, newStack )
-        |> (\( ( ue, geAcc ), aliveSteps ) ->
-                ( geAcc, Entity.withAliveSteps aliveSteps ue )
-           )
-        |> Tuple.mapSecond Entity.moveByVelocity
+performAliveSteps computer allEntities =
+    let
+        reducer : ( Entity, Stack New ) -> AliveStep -> ( ( Entity, Stack New ), AliveStep )
+        reducer acc step =
+            performAliveStep computer allEntities step acc
+                |> swap
+    in
+    \e newStack ->
+        e.aliveSteps
+            |> List.Extra.mapAccuml
+                reducer
+                ( e, newStack )
+            |> (\( ( ue, geAcc ), aliveSteps ) ->
+                    ( geAcc, Entity.withAliveSteps aliveSteps ue )
+               )
+            |> Tuple.mapSecond Entity.moveByVelocity
 
 
 performAliveStep :

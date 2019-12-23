@@ -120,7 +120,7 @@ levels =
 
 
 type alias Mem =
-    { level : Level
+    { level : LevelId
     , world : World
     }
 
@@ -134,7 +134,7 @@ init =
     Mem lev (initWorld lev)
 
 
-getTurretsForLevel : Level -> MinorLevel
+getTurretsForLevel : LevelId -> MinorLevel
 getTurretsForLevel ( major, minor ) =
     let
         majorMax =
@@ -148,7 +148,7 @@ getTurretsForLevel ( major, minor ) =
         |> Maybe.withDefault turretTemplates
 
 
-initWorld : Level -> World
+initWorld : LevelId -> World
 initWorld level =
     ({ default | name = name Player, r = 20, color = green, aliveSteps = [ WalkRandomly ] }
         :: getTurretsForLevel level
@@ -169,11 +169,11 @@ update computer mem =
     }
 
 
-type alias Level =
+type alias LevelId =
     ( Int, Int )
 
 
-nextLevel : Level -> Level
+nextLevel : LevelId -> LevelId
 nextLevel ( a, b ) =
     if b + 1 >= 5 then
         ( modBy (List.length levels) a + 1, 0 )
@@ -182,7 +182,7 @@ nextLevel ( a, b ) =
         ( a, b + 1 )
 
 
-afterUpdateHook : Level -> List Entity -> ( Level, List World.NewEntity )
+afterUpdateHook : LevelId -> List Entity -> ( LevelId, List World.NewEntity )
 afterUpdateHook lev =
     List.Extra.count (propEq .name (name Turret))
         >> (\tc ->

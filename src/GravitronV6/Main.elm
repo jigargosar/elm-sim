@@ -145,7 +145,7 @@ applyPhaseTransform phase shape =
             in
             shape
                 |> fade (1 - progress)
-                |> scale (1 + progress / 2)
+                |> scale (1 + progress * 0.5)
 
 
 toShape : Int -> Entity -> Shape

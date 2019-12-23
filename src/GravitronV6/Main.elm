@@ -34,6 +34,7 @@ default =
     Entity.default
 
 
+bulletTemplate : Entity
 bulletTemplate =
     { default
         | name = name Bullet
@@ -83,6 +84,7 @@ view _ =
     World.toList >> List.indexedMap viewEntity
 
 
+viewEntity : Int -> Entity -> Shape
 viewEntity idx e =
     let
         coreShape =

@@ -1,4 +1,4 @@
-module GravitronV6.World exposing (World, init, toList, update)
+module GravitronV6.World exposing (World, init, newEntity, toList, update)
 
 import GravitronV6.Circ as Circ
 import GravitronV6.Entity as Entity exposing (AliveStep(..), Entity)
@@ -12,13 +12,18 @@ type World
     = World Number (List Entity)
 
 
-init : List Entity -> World
+init : List New -> World
 init =
-    List.foldl addNew (World 1 [])
+    List.foldr addNew (World 1 [])
 
 
-addNew : Entity -> World -> World
-addNew e (World nid list) =
+newEntity : Entity -> New
+newEntity =
+    New
+
+
+addNew : New -> World -> World
+addNew (New e) (World nid list) =
     World (nid + 1) (cons { e | id = nid } list)
 
 
@@ -40,13 +45,10 @@ update computer (World nid oldEntities) =
                 emptyStacks
                 oldEntities
 
-        newEntities =
-            Stack.map (\(New e) -> e) newStack |> Stack.toLifo
-
         updatedEntities =
             Stack.map (\(Updated e) -> e) updatedStack |> Stack.toLifo
     in
-    List.foldl addNew (World nid updatedEntities) newEntities
+    Stack.foldFifo addNew (World nid updatedEntities) newStack
         |> reverseWorld
 
 

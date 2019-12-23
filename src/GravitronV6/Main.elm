@@ -41,23 +41,24 @@ bulletTemplate =
 
 init : World
 init =
-    World.init
-        [ { default | name = name Player, r = 20, color = green, aliveSteps = [ WalkRandomly ] }
-        , { default
-            | name = name Turret
-            , r = 25
-            , color = red
-            , aliveSteps =
-                [ Fire
-                    { elapsed = 0
-                    , every = 60
-                    , toName = name Player
-                    , template = bulletTemplate
-                    , speed = 3
-                    }
-                ]
-          }
-        ]
+    [ { default | name = name Player, r = 20, color = green, aliveSteps = [ WalkRandomly ] }
+    , { default
+        | name = name Turret
+        , r = 25
+        , color = red
+        , aliveSteps =
+            [ Fire
+                { elapsed = 0
+                , every = 60
+                , toName = name Player
+                , template = bulletTemplate
+                , speed = 3
+                }
+            ]
+      }
+    ]
+        |> List.map World.newEntity
+        |> World.init
 
 
 update : Computer -> World -> World

@@ -86,6 +86,7 @@ update =
     World.update afterUpdateHook
 
 
+afterUpdateHook : List Entity -> List World.NewEntity
 afterUpdateHook =
     List.Extra.count (propEq .name (name Turret))
         >> (\tc ->

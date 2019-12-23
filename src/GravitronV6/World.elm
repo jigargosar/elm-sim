@@ -1,4 +1,4 @@
-module GravitronV6.World exposing (World, init, newEntity, toList, update)
+module GravitronV6.World exposing (NewEntity, World, init, newEntity, toList, update)
 
 import GravitronV6.Entity as Entity exposing (AliveStep(..), Entity, FireModel, Phase(..))
 import GravitronV6.Geom as Geom
@@ -17,7 +17,11 @@ init =
     List.foldr addNew (World 1 [])
 
 
-newEntity : Entity -> New
+type alias NewEntity =
+    New
+
+
+newEntity : Entity -> NewEntity
 newEntity =
     New
 

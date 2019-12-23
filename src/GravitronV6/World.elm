@@ -30,10 +30,14 @@ toList (World _ list) =
 update : Computer -> World -> World
 update computer (World nid oldEntities) =
     let
+        emptyStacks : ( Stack New, Stack Updated )
+        emptyStacks =
+            ( Stack.empty, Stack.empty )
+
         ( newStack, updatedStack ) =
             List.foldl
                 (stepEntity computer oldEntities)
-                ( Stack.empty, Stack.empty )
+                emptyStacks
                 oldEntities
 
         newEntities =

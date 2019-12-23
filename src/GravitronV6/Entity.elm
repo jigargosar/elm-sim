@@ -9,6 +9,7 @@ type PreStep
 
 type alias FireModel =
     { elapsed : Number
+    , didTrigger : Bool
     , every : Number
     , towards : String
     , speed : Float

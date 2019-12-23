@@ -49,6 +49,7 @@ init =
         , aliveSteps =
             [ Fire
                 { elapsed = 0
+                , didTrigger = False
                 , every = 60
                 , towards = name Player
                 , template = bulletTemplate

@@ -1,6 +1,7 @@
 module GravitronV6.Entity exposing (..)
 
 import GravitronV6.Circ as Circ
+import GravitronV6.Geom as Geom
 import List.Extra
 import Playground exposing (..)
 import PointFree exposing (propEq)
@@ -28,6 +29,7 @@ type alias FireModel =
 type AliveStep
     = WalkRandomly
     | GravitateTo String
+    | BounceInScreen Number
     | Fire FireModel
 
 
@@ -90,6 +92,9 @@ updateAliveSteps entity =
                     Fire { newRec | didTrigger = didTrigger }
 
                 GravitateTo _ ->
+                    aliveStep
+
+                BounceInScreen _ ->
                     aliveStep
     in
     withAliveSteps (List.map func entity.aliveSteps) entity

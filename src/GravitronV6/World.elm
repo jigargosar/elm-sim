@@ -3,6 +3,7 @@ module GravitronV6.World exposing (World, init, newEntity, toList, update)
 import Basics.Extra exposing (swap)
 import GravitronV6.Circ as Circ
 import GravitronV6.Entity as Entity exposing (AliveStep(..), Entity, FireModel)
+import GravitronV6.Geom as Geom
 import List.Extra
 import Playground exposing (..)
 import PointFree exposing (cons, mapAccuml, propEq)
@@ -79,6 +80,9 @@ performAliveStep computer allEntities step ( newStack, entity ) =
 
         GravitateTo towardsName ->
             ( newStack, Entity.gravitateTo allEntities towardsName entity )
+
+        BounceInScreen factor ->
+            ( newStack, Geom.bounceVel factor computer.screen entity )
 
         Fire fireModel ->
             let

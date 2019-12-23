@@ -35,7 +35,7 @@ bulletTemplate =
         , color = charcoal
         , vx = 1
         , vy = 1
-        , aliveSteps = []
+        , aliveSteps = [ GravitateTo (name Player), BounceInScreen 0.5 ]
     }
 
 

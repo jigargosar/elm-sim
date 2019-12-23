@@ -64,16 +64,16 @@ stepEntity :
     -> ( Stack New, Stack Updated )
     -> ( Stack New, Stack Updated )
 stepEntity computer allEntities e ( newStack, updatedStack ) =
-    List.foldl
-        (\step ( nStack, stepAcc, entityAcc ) ->
-            performAliveStep computer allEntities step entityAcc
-                |> (\( newList, updatedStep, updatedEntity ) ->
-                        ( Stack.pushAll newList nStack, updatedStep :: stepAcc, updatedEntity )
-                   )
-        )
-        ( newStack, [], e )
-        e.aliveSteps
-        |> (\( geAcc, stepAcc, entityAcc ) ->
+    e.aliveSteps
+        |> List.Extra.mapAccuml
+            (\( nStack, entityAcc ) step ->
+                performAliveStep computer allEntities step entityAcc
+                    |> (\( newList, updatedStep, updatedEntity ) ->
+                            ( ( Stack.pushAll newList nStack, updatedEntity ), updatedStep )
+                       )
+            )
+            ( newStack, e )
+        |> (\( ( geAcc, entityAcc ), stepAcc ) ->
                 ( geAcc, Entity.withAliveSteps stepAcc entityAcc )
            )
         |> Tuple.mapSecond Entity.moveByVelocity

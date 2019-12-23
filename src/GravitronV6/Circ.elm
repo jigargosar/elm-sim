@@ -1,4 +1,4 @@
-module GravitronV6.Circ exposing (Cords, setCords, shoot)
+module GravitronV6.Circ exposing (Cords, gravitateTo, setCords, shoot)
 
 import Playground exposing (Number)
 
@@ -18,6 +18,18 @@ shoot from to speed c =
     c
         |> setCords cords
         |> setSpeedAngle ( speed, ang )
+
+
+gravitateTo : { a | x : Float, y : Float } -> { b | x : Float, y : Float, vx : Float, vy : Float } -> { b | x : Float, y : Float, vx : Float, vy : Float }
+gravitateTo a b =
+    let
+        ( dx, dy ) =
+            ( a.x - b.x, a.y - b.y )
+                |> toPolar
+                |> Tuple.mapFirst (\m -> 20 / m)
+                |> fromPolar
+    in
+    { b | vx = b.vx + dx, vy = b.vy + dy }
 
 
 type alias Circ a =

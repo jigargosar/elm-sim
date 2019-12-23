@@ -6,6 +6,11 @@ import Playground exposing (..)
 import PointFree exposing (propEq)
 
 
+findNamed : a -> List { b | name : a } -> Maybe { b | name : a }
+findNamed name =
+    List.Extra.find (propEq .name name)
+
+
 type PreStep
     = PreStep
 
@@ -22,12 +27,19 @@ type alias FireModel =
 
 type AliveStep
     = WalkRandomly
+    | GravitateTo String
     | Fire FireModel
 
 
-findNamed : a -> List { b | name : a } -> Maybe { b | name : a }
-findNamed name =
-    List.Extra.find (propEq .name name)
+performRandomWalk : Computer -> { c | x : Number, y : Number } -> { c | x : Number, y : Number }
+performRandomWalk { time, screen } e =
+    let
+        ( x, y ) =
+            ( wave screen.left screen.right 6 time
+            , wave screen.top screen.bottom 8 time
+            )
+    in
+    { e | x = x, y = y }
 
 
 performFire : Entity -> List Entity -> FireModel -> List Entity
@@ -42,6 +54,15 @@ performFire from allEntities fireModel =
 
     else
         []
+
+
+performGravitateTo allEntities towardsName entity =
+    case findNamed towardsName allEntities of
+        Just to ->
+            entity
+
+        Nothing ->
+            entity
 
 
 updateAliveSteps : Entity -> Entity
@@ -66,6 +87,9 @@ updateAliveSteps entity =
                                 { rec | elapsed = rec.elapsed + 1 }
                     in
                     Fire { newRec | didTrigger = didTrigger }
+
+                GravitateTo _ ->
+                    aliveStep
     in
     withAliveSteps (List.map func entity.aliveSteps) entity
 
@@ -119,17 +143,6 @@ default =
     , deathSteps = []
     , phase = Alive
     }
-
-
-performRandomWalk : Computer -> { c | x : Number, y : Number } -> { c | x : Number, y : Number }
-performRandomWalk { time, screen } e =
-    let
-        ( x, y ) =
-            ( wave screen.left screen.right 6 time
-            , wave screen.top screen.bottom 8 time
-            )
-    in
-    { e | x = x, y = y }
 
 
 moveByVelocity : { a | x : Number, vx : Number, y : Number, vy : Number } -> { a | x : Number, vx : Number, y : Number, vy : Number }

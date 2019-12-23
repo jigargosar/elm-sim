@@ -85,6 +85,9 @@ performAliveStep computer allEntities step ( newStack, entity ) =
             in
             ( Stack.pushAll firedEntityList newStack, entity )
 
+        GravitateTo towardsName ->
+            ( newStack, Entity.performGravitateTo allEntities towardsName entity )
+
 
 type New
     = New Entity

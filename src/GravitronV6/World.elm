@@ -77,6 +77,9 @@ performAliveStep computer allEntities step ( newStack, entity ) =
         WalkRandomly ->
             ( newStack, Entity.performRandomWalk computer entity )
 
+        GravitateTo towardsName ->
+            ( newStack, Entity.gravitateTo allEntities towardsName entity )
+
         Fire fireModel ->
             let
                 firedEntityList =
@@ -84,9 +87,6 @@ performAliveStep computer allEntities step ( newStack, entity ) =
                         |> List.map New
             in
             ( Stack.pushAll firedEntityList newStack, entity )
-
-        GravitateTo towardsName ->
-            ( newStack, Entity.performGravitateTo allEntities towardsName entity )
 
 
 type New

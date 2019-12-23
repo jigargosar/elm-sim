@@ -6,7 +6,7 @@ import Playground exposing (..)
 import PointFree exposing (propEq)
 
 
-findNamed : a -> List { b | name : a } -> Maybe { b | name : a }
+findNamed : String -> List Entity -> Maybe Entity
 findNamed name =
     List.Extra.find (propEq .name name)
 
@@ -56,10 +56,11 @@ performFire from allEntities fireModel =
         []
 
 
-performGravitateTo allEntities towardsName entity =
+gravitateTo : List Entity -> String -> Entity -> Entity
+gravitateTo allEntities towardsName entity =
     case findNamed towardsName allEntities of
         Just to ->
-            entity
+            Circ.gravitateTo to entity
 
         Nothing ->
             entity

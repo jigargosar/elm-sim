@@ -20,7 +20,10 @@ shoot from to speed c =
         |> setSpeedAngle ( speed, ang )
 
 
-gravitateTo : { a | x : Float, y : Float } -> { b | x : Float, y : Float, vx : Float, vy : Float } -> { b | x : Float, y : Float, vx : Float, vy : Float }
+gravitateTo :
+    { a | x : Float, y : Float }
+    -> { b | x : Float, y : Float, vx : Float, vy : Float }
+    -> { b | x : Float, y : Float, vx : Float, vy : Float }
 gravitateTo a b =
     let
         ( dx, dy ) =

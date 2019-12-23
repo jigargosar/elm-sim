@@ -1,12 +1,9 @@
 module GravitronV6.World exposing (World, init, newEntity, toList, update)
 
-import Basics.Extra exposing (swap)
-import GravitronV6.Circ as Circ
 import GravitronV6.Entity as Entity exposing (AliveStep(..), Entity, FireModel)
 import GravitronV6.Geom as Geom
-import List.Extra
 import Playground exposing (..)
-import PointFree exposing (cons, mapAccuml, propEq)
+import PointFree exposing (cons)
 import Stack exposing (Stack)
 
 
@@ -62,7 +59,7 @@ reverseWorld (World nid list) =
 stepEntity : Computer -> List Entity -> Entity -> ( Stack New, Stack Updated ) -> ( Stack New, Stack Updated )
 stepEntity computer allEntities e ( newStack, updatedStack ) =
     performAliveSteps computer allEntities newStack e
-        |> Tuple.mapSecond (Entity.updateAliveSteps >> Updated >> Stack.pushOn updatedStack)
+        |> Tuple.mapSecond (updateAliveSteps >> Updated >> Stack.pushOn updatedStack)
 
 
 performAliveSteps : Computer -> List Entity -> Stack New -> Entity -> ( Stack New, Entity )
@@ -91,6 +88,38 @@ performAliveStep computer allEntities step ( newStack, entity ) =
                         |> List.map New
             in
             ( Stack.pushAll firedEntityList newStack, entity )
+
+
+updateAliveSteps : Entity -> Entity
+updateAliveSteps entity =
+    let
+        func : AliveStep -> AliveStep
+        func aliveStep =
+            case aliveStep of
+                WalkRandomly ->
+                    aliveStep
+
+                Fire rec ->
+                    let
+                        didTrigger =
+                            rec.elapsed >= rec.every
+
+                        newRec =
+                            if didTrigger then
+                                { rec | elapsed = 0 }
+
+                            else
+                                { rec | elapsed = rec.elapsed + 1 }
+                    in
+                    Fire { newRec | didTrigger = didTrigger }
+
+                GravitateTo _ ->
+                    aliveStep
+
+                BounceInScreen _ ->
+                    aliveStep
+    in
+    Entity.withAliveSteps (List.map func entity.aliveSteps) entity
 
 
 type New

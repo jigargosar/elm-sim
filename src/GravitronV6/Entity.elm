@@ -68,38 +68,6 @@ gravitateTo allEntities towardsName entity =
             entity
 
 
-updateAliveSteps : Entity -> Entity
-updateAliveSteps entity =
-    let
-        func : AliveStep -> AliveStep
-        func aliveStep =
-            case aliveStep of
-                WalkRandomly ->
-                    aliveStep
-
-                Fire rec ->
-                    let
-                        didTrigger =
-                            rec.elapsed >= rec.every
-
-                        newRec =
-                            if didTrigger then
-                                { rec | elapsed = 0 }
-
-                            else
-                                { rec | elapsed = rec.elapsed + 1 }
-                    in
-                    Fire { newRec | didTrigger = didTrigger }
-
-                GravitateTo _ ->
-                    aliveStep
-
-                BounceInScreen _ ->
-                    aliveStep
-    in
-    withAliveSteps (List.map func entity.aliveSteps) entity
-
-
 type DeathStep
     = DeathStep
 

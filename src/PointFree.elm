@@ -137,3 +137,18 @@ anyPass fnList val =
 propEq : (c -> b) -> b -> c -> Bool
 propEq func a b =
     func b == a
+
+
+flip : (c -> b -> a) -> b -> c -> a
+flip func b a =
+    func a b
+
+
+push : a -> List a -> List a
+push =
+    (::)
+
+
+pushOn : List a -> a -> List a
+pushOn =
+    flip push

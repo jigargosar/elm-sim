@@ -4,7 +4,7 @@ import GravitronV6.Circ as Circ
 import GravitronV6.Entity as Entity exposing (AliveStep(..), Entity)
 import List.Extra
 import Playground exposing (..)
-import PointFree exposing (propEq)
+import PointFree exposing (propEq, pushOn)
 
 
 type World
@@ -32,8 +32,8 @@ update computer (World nid oldEntities) =
         ( geList, ueList ) =
             List.foldl
                 (\e ( geAcc, ueAcc ) ->
-                    stepEntity computer oldEntities e
-                        |> (\( ge, ue ) -> ( ge :: geAcc, ue :: ueAcc ))
+                    stepEntity computer oldEntities e ueAcc
+                        |> Tuple.mapFirst (\ge -> ge :: geAcc)
                 )
                 ( [], [] )
                 oldEntities
@@ -41,7 +41,7 @@ update computer (World nid oldEntities) =
         newEntities =
             foldBatch (\(New e) acc -> e :: acc) [] geList
     in
-    List.foldl addNew (World nid ueList) newEntities
+    List.foldl addNew (World nid (List.map (\(Updated e) -> e) ueList)) newEntities
         |> reverseWorld
 
 
@@ -54,8 +54,9 @@ stepEntity :
     Computer
     -> List Entity
     -> Entity
-    -> ( BatchNew, Entity )
-stepEntity computer allEntities e =
+    -> List Updated
+    -> ( BatchNew, List Updated )
+stepEntity computer allEntities e updatedAcc =
     List.foldl
         (\step ( geAcc, stepAcc, entityAcc ) ->
             performAliveStep computer allEntities step entityAcc
@@ -67,6 +68,7 @@ stepEntity computer allEntities e =
                 ( geAcc, Entity.withAliveSteps stepAcc entityAcc )
            )
         |> Tuple.mapSecond Entity.moveByVelocity
+        |> Tuple.mapSecond (Updated >> pushOn updatedAcc)
 
 
 performAliveStep :
@@ -137,8 +139,8 @@ type New
     = New Entity
 
 
-type Update
-    = Update Entity
+type Updated
+    = Updated Entity
 
 
 type Batch a

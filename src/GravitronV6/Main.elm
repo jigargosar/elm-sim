@@ -72,6 +72,7 @@ turretTemplate =
     }
 
 
+turretPositions : List ( number, number )
 turretPositions =
     let
         f =

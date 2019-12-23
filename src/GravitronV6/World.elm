@@ -58,12 +58,7 @@ reverseWorld (World nid list) =
     List.reverse list |> World nid
 
 
-stepEntity :
-    Computer
-    -> List Entity
-    -> Entity
-    -> ( Stack New, Stack Updated )
-    -> ( Stack New, Stack Updated )
+stepEntity : Computer -> List Entity -> Entity -> ( Stack New, Stack Updated ) -> ( Stack New, Stack Updated )
 stepEntity computer allEntities e ( newStack, updatedStack ) =
     performAliveSteps computer allEntities newStack e
         |> Tuple.mapSecond (Entity.updateAliveSteps >> Updated >> Stack.pushOn updatedStack)
@@ -76,12 +71,7 @@ performAliveSteps computer allEntities stackOfNewEntities entity =
         |> Tuple.mapSecond Entity.moveByVelocity
 
 
-performAliveStep :
-    Computer
-    -> List Entity
-    -> AliveStep
-    -> ( Stack New, Entity )
-    -> ( Stack New, Entity )
+performAliveStep : Computer -> List Entity -> AliveStep -> ( Stack New, Entity ) -> ( Stack New, Entity )
 performAliveStep computer allEntities step ( newStack, entity ) =
     case step of
         WalkRandomly ->

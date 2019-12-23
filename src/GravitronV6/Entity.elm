@@ -154,3 +154,8 @@ moveByVelocity e =
 withAliveSteps : a -> { b | aliveSteps : a } -> { b | aliveSteps : a }
 withAliveSteps aliveSteps e =
     { e | aliveSteps = aliveSteps }
+
+
+withHP : Number -> Entity -> Entity
+withHP maxHp entity =
+    { entity | maxHP = maxHp, currentHP = maxHp }

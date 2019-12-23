@@ -1,6 +1,6 @@
 module GravitronV6.Main exposing (main)
 
-import GravitronV6.Entity as Entity exposing (AliveStep(..), Entity, Phase(..))
+import GravitronV6.Entity as Entity exposing (AliveStep(..), Entity, Phase(..), withHP)
 import GravitronV6.World as World exposing (World)
 import List.Extra
 import Playground exposing (..)
@@ -34,11 +34,6 @@ names =
 default : Entity
 default =
     Entity.default
-
-
-withHP : Number -> Entity -> Entity
-withHP maxHp entity =
-    { entity | maxHP = maxHp, currentHP = maxHp }
 
 
 bulletTemplate : Entity

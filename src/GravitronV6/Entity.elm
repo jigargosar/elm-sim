@@ -102,7 +102,11 @@ type alias Entity =
 
 kill : Entity -> Entity
 kill entity =
-    { entity | currentHP = 0, phase = Dying { elapsed = 0, duration = 60 } }
+    { entity
+        | currentHP = 0
+
+        --, phase = Dying { elapsed = 0, duration = 60 }
+    }
 
 
 takeDamage : Number -> Entity -> Entity

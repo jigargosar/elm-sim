@@ -38,8 +38,11 @@ update computer (World nid oldEntities) =
 
         newEntities =
             Stack.map (\(New e) -> e) newStack |> Stack.toLifo
+
+        updatedEntities =
+            Stack.map (\(Updated e) -> e) updatedStack |> Stack.toLifo
     in
-    List.foldl addNew (World nid (Stack.map (\(Updated e) -> e) updatedStack |> Stack.toLifo)) newEntities
+    List.foldl addNew (World nid updatedEntities) newEntities
         |> reverseWorld
 
 

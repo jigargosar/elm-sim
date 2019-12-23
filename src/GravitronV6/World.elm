@@ -81,6 +81,7 @@ performAliveStep computer allEntities step ( newStack, entity ) =
             let
                 firedEntityList =
                     performFire entity allEntities fireModel
+                        |> List.map New
             in
             ( Stack.pushAll firedEntityList newStack, entity )
 
@@ -90,12 +91,12 @@ findNamed name =
     List.Extra.find (propEq .name name)
 
 
-performFire : Entity -> List Entity -> FireModel -> List New
-performFire from allEntities rec =
-    if rec.didTrigger then
-        case findNamed rec.towards allEntities of
+performFire : Entity -> List Entity -> FireModel -> List Entity
+performFire from allEntities fireModel =
+    if fireModel.didTrigger then
+        case findNamed fireModel.towards allEntities of
             Just to ->
-                [ New (Circ.shoot from to rec.speed rec.template) ]
+                [ Circ.shoot from to fireModel.speed fireModel.template ]
 
             Nothing ->
                 []

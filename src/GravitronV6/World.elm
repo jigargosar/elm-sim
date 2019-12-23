@@ -70,21 +70,15 @@ isCollidingWithAnyOf names list e =
 stepEntity : Computer -> List Entity -> Entity -> ( Stack New, Stack Updated ) -> ( Stack New, Stack Updated )
 stepEntity computer allEntities =
     let
-        pas newStack updatedStack e =
-            performAliveSteps computer allEntities newStack e
-                |> Tuple.mapSecond (updateAliveSteps >> Updated >> Stack.pushOn updatedStack)
-
-        pre =
-            performPreSteps allEntities
-
-        do e ( ns, us ) =
-            if Entity.isAlive e then
-                pas ns us e
+        performHealthCheck entity ( newStack, updatedStack ) =
+            if Entity.isAlive entity then
+                performAliveSteps computer allEntities newStack entity
+                    |> Tuple.mapSecond (updateAliveSteps >> Updated >> Stack.pushOn updatedStack)
 
             else
-                ( ns, us )
+                ( newStack, updatedStack )
     in
-    pre >> do
+    performPreSteps allEntities >> performHealthCheck
 
 
 performPreSteps : List Entity -> Entity -> Entity

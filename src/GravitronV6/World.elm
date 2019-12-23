@@ -66,7 +66,11 @@ stepEntity :
     -> ( Stack New, Stack Updated )
 stepEntity computer allEntities e ( newStack, updatedStack ) =
     performAliveSteps computer allEntities e newStack
-        |> Tuple.mapSecond (Updated >> Stack.pushOn updatedStack)
+        |> Tuple.mapSecond (updateAliveSteps >> Updated >> Stack.pushOn updatedStack)
+
+
+updateAliveSteps entity =
+    Entity.withAliveSteps (List.map Entity.updateAliveStep entity.aliveSteps) entity
 
 
 performAliveSteps : Computer -> List Entity -> Entity -> Stack New -> ( Stack New, Entity )

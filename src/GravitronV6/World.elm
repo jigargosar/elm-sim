@@ -56,6 +56,7 @@ reverseWorld (World nid list) =
     List.reverse list |> World nid
 
 
+isCollidingWithAnyOf : List String -> List Entity -> Entity -> Bool
 isCollidingWithAnyOf names list e =
     let
         check o =

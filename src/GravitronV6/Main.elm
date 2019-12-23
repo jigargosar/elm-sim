@@ -113,7 +113,7 @@ tripleG t =
 
 heatSinkShooter : Entity -> Entity
 heatSinkShooter t =
-    { t | color = orange, maxHP = 3 }
+    { t | color = orange, maxHP = 5 }
 
 
 type alias MinorLevel =

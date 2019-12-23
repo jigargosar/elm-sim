@@ -102,15 +102,16 @@ basic2 t =
 
 
 levels =
-    [ makeSubLevel [ basic1 ]
-    , makeSubLevel [ basic1, basic1 ]
-    , makeSubLevel [ basic1, basic1, basic2 ]
-    , makeSubLevel (List.repeat 4 basic2)
+    [ [ makeSubLevel [ basic1 ]
+      , makeSubLevel [ basic1, basic1 ]
+      , makeSubLevel [ basic1, basic1, basic2 ]
+      , makeSubLevel (List.repeat 4 basic2)
+      ]
     ]
 
 
 type alias Mem =
-    { level : Int
+    { level : Level
     , world : World
     }
 
@@ -119,21 +120,26 @@ init : Mem
 init =
     let
         lev =
-            0
+            ( 0, 0 )
     in
     Mem lev (initWorld lev)
 
 
-getTurretsForLevel : Int -> List Entity
-getTurretsForLevel level =
+getTurretsForLevel : Level -> List Entity
+getTurretsForLevel ( major, minor ) =
     let
-        levelCt =
+        majorMax =
             List.length levels
+
+        minorMax =
+            5
     in
-    List.drop (modBy levelCt level) levels |> List.head |> Maybe.withDefault turretTemplates
+    List.Extra.getAt (modBy majorMax major) levels
+        |> Maybe.andThen (List.Extra.getAt (modBy minorMax minor))
+        |> Maybe.withDefault turretTemplates
 
 
-initWorld : Int -> World
+initWorld : Level -> World
 initWorld level =
     ({ default | name = name Player, r = 20, color = green, aliveSteps = [ WalkRandomly ] }
         :: getTurretsForLevel level
@@ -154,12 +160,29 @@ update computer mem =
     }
 
 
-afterUpdateHook : Int -> List Entity -> ( Int, List World.NewEntity )
+type alias Level =
+    ( Int, Int )
+
+
+nextLevel : Level -> Level
+nextLevel ( a, b ) =
+    if b + 1 >= 5 then
+        ( a + 1, 0 )
+
+    else
+        ( a, b + 1 )
+
+
+afterUpdateHook : Level -> List Entity -> ( Level, List World.NewEntity )
 afterUpdateHook lev =
     List.Extra.count (propEq .name (name Turret))
         >> (\tc ->
                 if tc == 0 then
-                    ( lev + 1, List.map World.newEntity (getTurretsForLevel (lev + 1)) )
+                    let
+                        nextLev =
+                            nextLevel lev
+                    in
+                    ( nextLev, List.map World.newEntity (getTurretsForLevel nextLev) )
 
                 else
                     ( lev, [] )

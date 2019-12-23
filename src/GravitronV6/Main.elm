@@ -52,7 +52,7 @@ bulletTemplate =
     }
 
 
-initialTurret =
+turretTemplate =
     { default
         | name = name Turret
         , r = 25
@@ -75,7 +75,7 @@ initialTurret =
 init : World
 init =
     [ { default | name = name Player, r = 20, color = green, aliveSteps = [ WalkRandomly ] }
-    , initialTurret
+    , turretTemplate
     ]
         |> List.map World.newEntity
         |> World.init
@@ -91,7 +91,7 @@ afterUpdateHook =
     List.Extra.count (propEq .name (name Turret))
         >> (\tc ->
                 if tc == 0 then
-                    [ World.newEntity initialTurret ]
+                    [ World.newEntity turretTemplate ]
 
                 else
                     []

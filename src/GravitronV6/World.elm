@@ -70,11 +70,10 @@ stepEntity computer allEntities e ( newStack, updatedStack ) =
 
 
 performAliveSteps : Computer -> List Entity -> Entity -> Stack New -> ( Stack New, Entity )
-performAliveSteps computer allEntities =
-    \entity stackOfNewEntities ->
-        entity.aliveSteps
-            |> List.foldl (performAliveStep computer allEntities) ( stackOfNewEntities, entity )
-            |> Tuple.mapSecond Entity.moveByVelocity
+performAliveSteps computer allEntities entity stackOfNewEntities =
+    entity.aliveSteps
+        |> List.foldl (performAliveStep computer allEntities) ( stackOfNewEntities, entity )
+        |> Tuple.mapSecond Entity.moveByVelocity
 
 
 performAliveStep :

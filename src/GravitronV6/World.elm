@@ -56,10 +56,26 @@ reverseWorld (World nid list) =
     List.reverse list |> World nid
 
 
+isCollidingWithAnyOf list e =
+    let
+        isC o =
+            e.name
+                == "Bullet"
+                && Geom.ccc e.x e.y e.r o.x o.y o.r
+                && e.id
+                /= o.id
+    in
+    List.any isC list
+
+
 stepEntity : Computer -> List Entity -> Entity -> ( Stack New, Stack Updated ) -> ( Stack New, Stack Updated )
 stepEntity computer allEntities e ( newStack, updatedStack ) =
-    performAliveSteps computer allEntities newStack e
-        |> Tuple.mapSecond (updateAliveSteps >> Updated >> Stack.pushOn updatedStack)
+    if isCollidingWithAnyOf allEntities e then
+        ( newStack, updatedStack )
+
+    else
+        performAliveSteps computer allEntities newStack e
+            |> Tuple.mapSecond (updateAliveSteps >> Updated >> Stack.pushOn updatedStack)
 
 
 performAliveSteps : Computer -> List Entity -> Stack New -> Entity -> ( Stack New, Entity )

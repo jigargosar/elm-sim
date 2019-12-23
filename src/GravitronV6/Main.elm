@@ -1,6 +1,6 @@
 module GravitronV6.Main exposing (main)
 
-import GravitronV6.Entity as Entity exposing (AliveStep(..), Entity)
+import GravitronV6.Entity as Entity exposing (AliveStep(..), Entity, PreStep(..))
 import GravitronV6.World as World exposing (World)
 import Playground exposing (..)
 
@@ -11,6 +11,7 @@ type Name
     | Bullet
 
 
+name : Name -> String
 name n =
     case n of
         Player ->
@@ -21,6 +22,11 @@ name n =
 
         Bullet ->
             "Bullet"
+
+
+names : List Name -> List String
+names =
+    List.map name
 
 
 default : Entity
@@ -35,6 +41,7 @@ bulletTemplate =
         , color = charcoal
         , vx = 1
         , vy = 1
+        , preSteps = [ DieOnCollisionWith (names [ Player, Turret ]) ]
         , aliveSteps = [ GravitateTo (name Player), BounceInScreen 0.5 ]
     }
 

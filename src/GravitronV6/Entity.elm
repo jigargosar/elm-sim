@@ -13,7 +13,7 @@ findNamed name =
 
 
 type PreStep
-    = PreStep
+    = DieOnCollisionWith (List String)
 
 
 type alias FireModel =

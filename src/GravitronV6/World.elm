@@ -90,10 +90,10 @@ performAliveStep computer allEntities step ( newStack, e ) =
 
         Fire fireModel ->
             let
-                firedEntities =
+                firedEntityList =
                     performFire e allEntities fireModel
             in
-            ( Stack.pushAll firedEntities newStack, e )
+            ( Stack.pushAll firedEntityList newStack, e )
 
 
 findNamed : a -> List { b | name : a } -> Maybe { b | name : a }

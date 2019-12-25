@@ -14,11 +14,14 @@ viewNums nums =
 main =
     let
         nums =
-            [ 1, 2, 3, 4 ]
+            [ 2, 4, 1, 3 ]
+
+        sortedNums =
+            List.sort nums
     in
     picture
         [ viewNums nums
             |> moveUp 20
-        , viewNums nums
+        , viewNums sortedNums
             |> moveDown 20
         ]

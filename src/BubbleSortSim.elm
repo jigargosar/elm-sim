@@ -1,4 +1,4 @@
-module BubbleSortSim exposing (..)
+module BubbleSortSim exposing (main)
 
 import Playground exposing (..)
 
@@ -11,6 +11,10 @@ viewNums nums =
     words black <| strRep
 
 
+customSort nums =
+    List.sort nums
+
+
 main =
     let
         nums =
@@ -18,6 +22,9 @@ main =
 
         sortedNums =
             List.sort nums
+
+        quickSortNums =
+            customSort nums
     in
     picture
         [ viewNums nums

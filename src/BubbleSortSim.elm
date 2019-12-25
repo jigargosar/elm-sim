@@ -19,12 +19,13 @@ type alias Model =
     , idx : Int
     , wasSwapMade : Bool
     , sorted : Bool
+    , elapsed : Int
     }
 
 
 init : List Int -> Model
 init nums =
-    Model nums nums (List.length nums) 0 False False
+    Model nums nums (List.length nums) 0 False False 0
 
 
 step : Model -> Model
@@ -72,7 +73,21 @@ main =
 
 
 update _ m =
-    m
+    let
+        interval =
+            60
+    in
+    (if modBy interval m.elapsed == interval - 1 then
+        step m
+
+     else
+        m
+    )
+        |> tick
+
+
+tick m =
+    { m | elapsed = m.elapsed + 1 }
 
 
 view _ m =

@@ -6,6 +6,10 @@ import Playground exposing (..)
 import PointFree exposing (propEq)
 
 
+type New
+    = New Entity
+
+
 findNamed : String -> List Entity -> Maybe Entity
 findNamed name =
     List.Extra.find (propEq .name name)

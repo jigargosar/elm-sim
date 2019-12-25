@@ -12,22 +12,22 @@ type World
     = World Number (List Entity)
 
 
-init : List New -> World
+init : List Entity.New -> World
 init =
     List.foldr addNew (World 1 [])
 
 
 type alias NewEntity =
-    New
+    Entity.New
 
 
 newEntity : Entity -> NewEntity
 newEntity =
-    New
+    Entity.New
 
 
-addNew : New -> World -> World
-addNew (New e) (World nid list) =
+addNew : Entity.New -> World -> World
+addNew (Entity.New e) (World nid list) =
     World (nid + 1) (cons { e | id = nid } list)
 
 
@@ -36,10 +36,10 @@ toList (World _ list) =
     list
 
 
-stepAll : (List Entity -> ( acc, List New )) -> Computer -> World -> ( acc, World )
+stepAll : (List Entity -> ( acc, List Entity.New )) -> Computer -> World -> ( acc, World )
 stepAll afterUpdate computer (World nid oldEntities) =
     let
-        emptyStacks : ( Stack New, Stack Updated )
+        emptyStacks : ( Stack Entity.New, Stack Updated )
         emptyStacks =
             ( Stack.empty, Stack.empty )
 
@@ -57,7 +57,7 @@ stepAll afterUpdate computer (World nid oldEntities) =
         |> Tuple.mapSecond reverseWorld
 
 
-applyAfterUpdateHook : (List Entity -> ( acc, List New )) -> World -> ( acc, World )
+applyAfterUpdateHook : (List Entity -> ( acc, List Entity.New )) -> World -> ( acc, World )
 applyAfterUpdateHook func ((World _ list) as w) =
     let
         ( acc, newList ) =
@@ -71,7 +71,7 @@ reverseWorld (World nid list) =
     List.reverse list |> World nid
 
 
-stepEntity : Computer -> List Entity -> Entity -> ( Stack New, Stack Updated ) -> ( Stack New, Stack Updated )
+stepEntity : Computer -> List Entity -> Entity -> ( Stack Entity.New, Stack Updated ) -> ( Stack Entity.New, Stack Updated )
 stepEntity computer allEntities entity ( newStack, updatedStack ) =
     let
         pushOnUpdated =
@@ -110,14 +110,14 @@ stepEntity computer allEntities entity ( newStack, updatedStack ) =
             )
 
 
-performAliveSteps : Computer -> List Entity -> Stack New -> Entity -> ( Stack New, Entity )
+performAliveSteps : Computer -> List Entity -> Stack Entity.New -> Entity -> ( Stack Entity.New, Entity )
 performAliveSteps computer allEntities stackOfNewEntities entity =
     entity.aliveSteps
         |> List.foldl (performAliveStep computer allEntities) ( stackOfNewEntities, entity )
         |> Tuple.mapSecond Entity.moveByVelocity
 
 
-performAliveStep : Computer -> List Entity -> AliveStep -> ( Stack New, Entity ) -> ( Stack New, Entity )
+performAliveStep : Computer -> List Entity -> AliveStep -> ( Stack Entity.New, Entity ) -> ( Stack Entity.New, Entity )
 performAliveStep computer allEntities step ( newStack, entity ) =
     case step of
         WalkRandomly ->
@@ -133,7 +133,7 @@ performAliveStep computer allEntities step ( newStack, entity ) =
             let
                 firedEntityList =
                     Entity.performFire entity allEntities fireModel
-                        |> List.map New
+                        |> List.map Entity.New
             in
             ( Stack.pushAll firedEntityList newStack, entity )
 
@@ -212,10 +212,6 @@ updateAliveSteps entity =
                     aliveStep
     in
     Entity.withAliveSteps (List.map func entity.aliveSteps) entity
-
-
-type New
-    = New Entity
 
 
 type Updated

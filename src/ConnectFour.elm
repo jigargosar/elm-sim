@@ -46,8 +46,28 @@ initialMem =
         |> setCellAt ( 7, 0 ) Yellow
 
 
-update _ mem =
+update : Computer -> Grid -> Grid
+update { mouse } mem =
+    let
+        gs =
+            toGridScreen mem
+
+        mouseGridCord =
+            screenCordToGridCord gs ( mouse.x, mouse.y )
+
+        _ =
+            if mouse.click then
+                Debug.log "mouseGridCord" mouseGridCord
+
+            else
+                mouseGridCord
+    in
     mem
+
+
+screenCordToGridCord : GridScreen -> ( Float, Float ) -> ( Int, Int )
+screenCordToGridCord gs ( x, y ) =
+    ( (x - gs.left) / gs.cellSize |> round, (y - gs.bottom) / gs.cellSize |> round )
 
 
 view _ grid =

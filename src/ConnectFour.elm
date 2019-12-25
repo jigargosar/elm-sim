@@ -36,18 +36,14 @@ initGrid w h =
     { width = w, height = h, cords = cords, cells = Dict.empty }
 
 
-cellAt : Int -> Int -> Grid -> Cell
-cellAt x y grid =
-    Dict.get ( x, y ) grid.cells |> Maybe.withDefault Empty
+cellAt : ( Int, Int ) -> Grid -> Cell
+cellAt cord grid =
+    Dict.get cord grid.cells |> Maybe.withDefault Empty
 
 
-setCellAt : Int -> Int -> Cell -> Grid -> Grid
-setCellAt x y cell grid =
-    if cell == Empty then
-        { grid | cells = Dict.remove ( x, y ) grid.cells }
-
-    else
-        { grid | cells = Dict.insert ( x, y ) cell grid.cells }
+setCellAt : ( Int, Int ) -> Cell -> Grid -> Grid
+setCellAt cord cell grid =
+    { grid | cells = Dict.insert cord cell grid.cells }
 
 
 toViewCord : Float -> ( Int, Int ) -> ( Float, Float )
@@ -81,7 +77,7 @@ viewCellAt size grid cord =
         ( x, y ) =
             toViewCord size cord
     in
-    circle blue ir
+    circle (cellColor (cellAt cord grid)) ir
         |> move x y
 
 

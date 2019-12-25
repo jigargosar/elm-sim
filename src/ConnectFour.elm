@@ -96,12 +96,7 @@ viewGrid grid =
     in
     group
         [ rectangle blue (gs.width + off) (gs.height + off)
-        , List.map (viewGridCell gs grid) grid.cords
-            |> group
-
-        {- |> moveDown (gs.height / 2)
-           |> moveLeft (gs.width / 2)
-        -}
+        , List.map (viewGridCell gs grid) grid.cords |> group
         ]
 
 

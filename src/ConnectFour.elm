@@ -2,7 +2,6 @@ module ConnectFour exposing (..)
 
 import Dict exposing (Dict)
 import Playground exposing (..)
-import PointFree exposing (flip)
 
 
 type Cell
@@ -68,6 +67,24 @@ cellColor cell =
             yellow
 
 
+gridCordToScreenCord : GridScreen -> ( Int, Int ) -> ( Float, Float )
+gridCordToScreenCord gs ( x, y ) =
+    ( gs.left + toFloat x * gs.cellSize, gs.bottom + toFloat y * gs.cellSize )
+
+
+viewGridCell : GridScreen -> Grid -> ( Int, Int ) -> Shape
+viewGridCell gs grid cord =
+    let
+        cell =
+            cellAt cord grid
+
+        ( x, y ) =
+            gridCordToScreenCord gs cord
+    in
+    circle (cellColor cell) gs.cellRadius
+        |> move x y
+
+
 viewGrid : Grid -> Shape
 viewGrid grid =
     let
@@ -76,26 +93,10 @@ viewGrid grid =
 
         off =
             gs.cellSize
-
-        cellList =
-            List.map (flip cellAt grid) grid.cords
-
-        toScreenCord ( x, y ) =
-            ( gs.left + toFloat x * gs.cellSize, gs.bottom + toFloat y * gs.cellSize )
-
-        screenCordList =
-            List.map toScreenCord grid.cords
-
-        screenCordCellPairs =
-            List.map2 Tuple.pair screenCordList cellList
-
-        viewCell2 ( ( x, y ), cell ) =
-            circle (cellColor cell) gs.cellRadius
-                |> move x y
     in
     group
         [ rectangle blue (gs.width + off) (gs.height + off)
-        , List.map viewCell2 screenCordCellPairs
+        , List.map (viewGridCell gs grid) grid.cords
             |> group
 
         {- |> moveDown (gs.height / 2)

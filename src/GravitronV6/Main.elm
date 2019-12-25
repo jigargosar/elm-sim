@@ -57,7 +57,7 @@ turretTemplate =
         | name = name Turret
         , r = 25
         , color = red
-        , phase = Spawning { elapsed = 0, duration = 60 }
+        , phase = SpawningPhase { elapsed = 0, duration = 60 }
         , aliveSteps =
             [ Fire
                 { elapsed = 0
@@ -235,7 +235,7 @@ viewEntity idx e =
 applyPhaseTransform : Phase -> Shape -> Shape
 applyPhaseTransform phase shape =
     case phase of
-        Spawning sm ->
+        SpawningPhase sm ->
             let
                 progress =
                     sm.elapsed / sm.duration
@@ -244,10 +244,10 @@ applyPhaseTransform phase shape =
                 |> fade (progress + 0.1)
                 |> scale progress
 
-        Alive ->
+        ReadyPhase ->
             shape
 
-        Dying dm ->
+        DyingPhase dm ->
             let
                 progress =
                     dm.elapsed / dm.duration

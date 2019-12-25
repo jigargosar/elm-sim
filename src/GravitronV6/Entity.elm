@@ -70,9 +70,9 @@ type DeathStep
 
 
 type Phase
-    = Spawning SpawningModel
-    | Alive
-    | Dying DyingModel
+    = SpawningPhase SpawningModel
+    | ReadyPhase
+    | DyingPhase DyingModel
 
 
 type alias SpawningModel =
@@ -102,11 +102,7 @@ type alias Entity =
 
 kill : Entity -> Entity
 kill entity =
-    { entity
-        | currentHP = 0
-
-        --, phase = Dying { elapsed = 0, duration = 60 }
-    }
+    { entity | currentHP = 0 }
 
 
 takeDamage : Number -> Entity -> Entity
@@ -142,7 +138,7 @@ default =
     , currentHP = 1
     , aliveSteps = []
     , deathSteps = []
-    , phase = Alive
+    , phase = ReadyPhase
     }
 
 

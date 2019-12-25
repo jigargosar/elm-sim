@@ -78,21 +78,21 @@ stepEntity computer allEntities entity ( newStack, updatedStack ) =
             Updated >> Stack.pushOn updatedStack
     in
     case entity.phase of
-        Spawning sm ->
+        SpawningPhase sm ->
             ( newStack
             , if sm.elapsed >= sm.duration then
-                pushOnUpdated { entity | phase = Alive }
+                pushOnUpdated { entity | phase = ReadyPhase }
 
               else
-                pushOnUpdated { entity | phase = Spawning { sm | elapsed = sm.elapsed + 1 } }
+                pushOnUpdated { entity | phase = SpawningPhase { sm | elapsed = sm.elapsed + 1 } }
             )
 
-        Alive ->
+        ReadyPhase ->
             performAliveSteps computer allEntities newStack entity
                 |> Tuple.mapSecond
                     ((\e ->
                         if e.currentHP <= 0 then
-                            { e | phase = Dying { elapsed = 0, duration = 60 } }
+                            { e | phase = DyingPhase { elapsed = 0, duration = 60 } }
 
                         else
                             updateAliveSteps e
@@ -100,13 +100,13 @@ stepEntity computer allEntities entity ( newStack, updatedStack ) =
                         >> pushOnUpdated
                     )
 
-        Dying dm ->
+        DyingPhase dm ->
             ( newStack
             , if dm.elapsed >= dm.duration then
                 updatedStack
 
               else
-                pushOnUpdated { entity | phase = Dying { dm | elapsed = dm.elapsed + 1 } }
+                pushOnUpdated { entity | phase = DyingPhase { dm | elapsed = dm.elapsed + 1 } }
             )
 
 
@@ -164,7 +164,7 @@ getCollisionCount names list e =
         check o =
             checkCollisionHelp names o e
     in
-    if e.phase == Alive then
+    if e.phase == ReadyPhase then
         List.Extra.count check list
 
     else
@@ -177,12 +177,12 @@ isCollidingWithAnyOf names list e =
         check o =
             checkCollisionHelp names o e
     in
-    e.phase == Alive && List.any check list
+    e.phase == ReadyPhase && List.any check list
 
 
 checkCollisionHelp : List String -> Entity -> Entity -> Bool
 checkCollisionHelp names o e =
-    (o.phase == Alive)
+    (o.phase == ReadyPhase)
         && List.member o.name names
         && Geom.ccc e.x e.y e.r o.x o.y o.r
         && (e.id /= o.id)

@@ -1,22 +1,14 @@
 module ConnectFour exposing (..)
 
-import Array exposing (Array)
 import Dict exposing (Dict)
 import Playground exposing (..)
+import PointFree exposing (flip)
 
 
 type Cell
     = Red
     | Yellow
     | Empty
-
-
-gridWidth =
-    10
-
-
-gridHeight =
-    10
 
 
 type alias Grid =
@@ -106,25 +98,72 @@ viewCellAt size grid cord =
 viewGrid : Grid -> Shape
 viewGrid grid =
     let
+        gs =
+            toGridScreen grid
+
+        off =
+            gs.cellSize
+
+        cellList =
+            List.map (flip cellAt grid) grid.cords
+
+        toScreenCord ( x, y ) =
+            ( gs.left + toFloat x * gs.cellSize, gs.bottom + toFloat y * gs.cellSize )
+
+        screenCordList =
+            List.map toScreenCord grid.cords
+
+        screenCordCellPairs =
+            List.map2 Tuple.pair screenCordList cellList
+
+        viewCell2 ( ( x, y ), cell ) =
+            circle (cellColor cell) gs.cellRadius
+                |> move x y
+    in
+    group
+        [ rectangle blue (gs.width + off) (gs.height + off)
+        , List.map viewCell2 screenCordCellPairs
+            |> group
+
+        {- |> moveDown (gs.height / 2)
+           |> moveLeft (gs.width / 2)
+        -}
+        ]
+
+
+type alias GridScreen =
+    { width : Float
+    , height : Float
+    , top : Float
+    , left : Float
+    , right : Float
+    , bottom : Float
+    , cellSize : Number
+    , cellRadius : Number
+    }
+
+
+toGridScreen : Grid -> GridScreen
+toGridScreen grid =
+    let
         cellSize =
             50
 
-        w =
+        width =
             toFloat (grid.width - 1) * cellSize
 
-        h =
+        height =
             toFloat (grid.height - 1) * cellSize
-
-        off =
-            cellSize
     in
-    group
-        [ rectangle blue (w + off) (h + off)
-        , List.map (viewCellAt cellSize grid) grid.cords
-            |> group
-            |> moveDown (h / 2)
-            |> moveLeft (w / 2)
-        ]
+    { width = width
+    , height = height
+    , top = height / 2
+    , left = -width / 2
+    , right = width / 2
+    , bottom = -height / 2
+    , cellSize = cellSize
+    , cellRadius = cellSize / 2 - cellSize / 10
+    }
 
 
 main =

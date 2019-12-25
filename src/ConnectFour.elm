@@ -48,7 +48,7 @@ setCellAt cord cell grid =
 
 initialMem : Grid
 initialMem =
-    initGrid 11 20
+    initGrid 10 18
         |> setCellAt ( 0, 0 ) Yellow
         |> setCellAt ( 0, 1 ) Red
         |> setCellAt ( 0, 2 ) Yellow

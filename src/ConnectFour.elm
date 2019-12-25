@@ -87,8 +87,14 @@ viewCellAt size grid cord =
 
 viewGrid : Grid -> Shape
 viewGrid grid =
-    List.map (viewCellAt 20 grid) grid.cords
+    let
+        cellSize =
+            20
+    in
+    List.map (viewCellAt cellSize grid) grid.cords
         |> group
+        |> moveDown (toFloat grid.height * cellSize / 2)
+        |> moveLeft (toFloat grid.width * cellSize / 2)
 
 
 main =

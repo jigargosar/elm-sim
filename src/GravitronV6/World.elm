@@ -168,9 +168,7 @@ performAliveStep computer allEntities step ( newStack, entity ) =
 
 scaleScreenBy : Float -> { a | width : Float, height : Float } -> Screen
 scaleScreenBy s screen =
-    rectFromDimension screen
-        |> Rectangle2d.scaleAbout Point2d.origin s
-        |> rectToScreen
+    toScreen (screen.width * s) (screen.height * s)
 
 
 toScreen : Float -> Float -> Screen
@@ -182,26 +180,6 @@ toScreen width height =
     , right = width / 2
     , bottom = -height / 2
     }
-
-
-rectToScreen : Rectangle2d.Rectangle2d Pixels.Pixels coordinates -> Screen
-rectToScreen rect =
-    let
-        ( w, h ) =
-            Rectangle2d.dimensions rect
-                |> Tuple.mapBoth Pixels.inPixels Pixels.inPixels
-    in
-    toScreen w h
-
-
-rectFromDimension : { a | width : Float, height : Float } -> Rectangle2d.Rectangle2d Pixels.Pixels coordinates
-rectFromDimension screen =
-    Rectangle2d.withDimensions ( Pixels.pixels screen.width, Pixels.pixels screen.height ) Quantity.zero Point2d.origin
-
-
-pointFromXY : { a | x : Float, y : Float } -> Point2d.Point2d Pixels.Pixels coordinates
-pointFromXY entity =
-    Point2d.fromPixels { x = entity.x, y = entity.y }
 
 
 getCollisionCount : List String -> List Entity -> Entity -> Int

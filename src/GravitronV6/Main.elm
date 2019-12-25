@@ -8,6 +8,10 @@ import Playground exposing (..)
 import PointFree exposing (propEq)
 
 
+
+-- TypeSafe Names
+
+
 type Name
     = Player
     | Turret
@@ -32,9 +36,18 @@ names =
     List.map name
 
 
+
+-- Entity Templates
+
+
 defaultTmpl : Entity
 defaultTmpl =
     Entity.default
+
+
+playerTemplate : Entity
+playerTemplate =
+    { defaultTmpl | name = name Player, r = 20, color = green, aliveSteps = [ WalkRandomly ] }
 
 
 bulletTemplate : Entity
@@ -88,11 +101,6 @@ turretTemplates =
     List.map (\( x, y ) -> { turretTemplate | x = x, y = y }) turretPositions
 
 
-makeSubLevel : List (Entity -> Entity) -> List Entity
-makeSubLevel funcList =
-    List.map2 (<|) funcList turretTemplates
-
-
 basic1 : Entity -> Entity
 basic1 =
     identity
@@ -118,6 +126,15 @@ heatSinkShooter =
     withColor orange >> withHP 5
 
 
+
+-- Level Config
+
+
+makeSubLevel : List (Entity -> Entity) -> List Entity
+makeSubLevel funcList =
+    List.map2 (<|) funcList turretTemplates
+
+
 levels : List MajorLevel
 levels =
     [ [ makeSubLevel [ basic1 ]
@@ -135,6 +152,10 @@ levels =
     ]
 
 
+
+-- Memory
+
+
 type alias Mem =
     { lid : LevelId
     , world : World
@@ -150,13 +171,14 @@ init =
     Mem lid (initWorld lid)
 
 
+getTurretsFor : LevelId -> List Entity
 getTurretsFor lid =
     LevelId.getMinorLevel levels lid |> Maybe.withDefault turretTemplates
 
 
 initWorld : LevelId -> World
 initWorld lid =
-    ({ defaultTmpl | name = name Player, r = 20, color = green, aliveSteps = [ WalkRandomly ] }
+    (playerTemplate
         :: getTurretsFor lid
     )
         |> List.map Entity.new

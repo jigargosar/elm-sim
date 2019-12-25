@@ -68,16 +68,21 @@ cellColor cell =
             yellow
 
 
+viewCell : Number -> Cell -> Shape
+viewCell r cell =
+    circle (cellColor cell) r
+
+
 viewCellAt : Float -> Grid -> ( Int, Int ) -> Shape
 viewCellAt size grid cord =
     let
-        ir =
+        cellR =
             size / 2 - 1
 
         ( x, y ) =
             toViewCord size cord
     in
-    circle (cellColor (cellAt cord grid)) ir
+    viewCell cellR (cellAt cord grid)
         |> move x y
 
 
@@ -94,4 +99,4 @@ viewGrid grid =
 
 
 main =
-    picture [ viewGrid (initGrid 8 12) ]
+    picture [ viewGrid (initGrid 7 7) ]

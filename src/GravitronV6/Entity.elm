@@ -78,10 +78,6 @@ gravitateTo allEntities towardsName entity =
             entity
 
 
-type DeathStep
-    = DeathStep
-
-
 type Phase
     = SpawningPhase SpawningModel
     | ReadyPhase
@@ -108,7 +104,6 @@ type alias Entity =
     , maxHP : Number
     , currentHP : Number
     , aliveSteps : List AliveStep
-    , deathSteps : List DeathStep
     , phase : Phase
     }
 
@@ -150,7 +145,6 @@ default =
     , maxHP = 1
     , currentHP = 1
     , aliveSteps = []
-    , deathSteps = []
     , phase = ReadyPhase
     }
 

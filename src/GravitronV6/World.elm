@@ -124,7 +124,7 @@ performAliveStep computer allEntities step ( newStack, entity ) =
             let
                 firedEntityList =
                     Entity.performFire entity allEntities fireModel
-                        |> List.map NewEntity
+                        |> List.map Entity.new
             in
             ( Stack.pushAll firedEntityList newStack, entity )
 

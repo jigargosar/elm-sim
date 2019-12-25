@@ -117,7 +117,9 @@ basic2 =
 
 basic2RevengeWanderer : Entity -> Entity
 basic2RevengeWanderer =
-    withColor blue >> withHP 2
+    withColor blue
+        >> withHP 2
+        >> (\e -> { e | vx = 1, vy = 1, aliveSteps = Wanderer :: e.aliveSteps })
 
 
 tripleG : Entity -> Entity
@@ -141,7 +143,7 @@ makeSubLevel funcList =
 
 levels : List MajorLevel
 levels =
-    [ [ makeSubLevel [ basic1 >> (\e -> { e | vx = 1, vy = 1, aliveSteps = Wanderer :: e.aliveSteps }) ]
+    [ [ makeSubLevel [ basic1 ]
       , makeSubLevel [ basic1, basic1 ]
       , makeSubLevel [ basic1, basic2 ]
       , makeSubLevel [ basic1, basic1, basic2 ]

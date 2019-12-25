@@ -111,4 +111,12 @@ viewGrid grid =
 
 
 main =
-    picture [ viewGrid (initGrid 7 7) ]
+    let
+        grid =
+            initGrid 8 8
+                |> setCellAt ( 0, 0 ) Yellow
+                |> setCellAt ( 0, 1 ) Red
+                |> setCellAt ( 0, 2 ) Yellow
+                |> setCellAt ( 7, 0 ) Yellow
+    in
+    picture [ viewGrid grid ]

@@ -44,8 +44,8 @@ type AliveStep
     | ReceiveCollisionDamageFrom (List String)
 
 
-wander : Entity -> Entity
-wander e =
+wander : Computer -> Entity -> Entity
+wander { screen } e =
     e
 
 

@@ -52,6 +52,7 @@ bulletTemplate =
     }
 
 
+turretTemplate : Entity
 turretTemplate =
     { default
         | name = name Turret

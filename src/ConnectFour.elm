@@ -49,11 +49,11 @@ initialMem =
 update : Computer -> Grid -> Grid
 update { mouse } mem =
     let
-        gs =
-            toGridScreen mem
+        gvm =
+            toGridViewModel mem
 
         mouseGridCord =
-            screenCordToGridCord gs ( mouse.x, mouse.y )
+            screenCordToGridCord gvm ( mouse.x, mouse.y )
 
         _ =
             if mouse.click then
@@ -65,9 +65,9 @@ update { mouse } mem =
     mem
 
 
-screenCordToGridCord : GridScreen -> ( Float, Float ) -> ( Int, Int )
-screenCordToGridCord gs ( x, y ) =
-    ( (x - gs.left) / gs.cellSize |> round, (y - gs.bottom) / gs.cellSize |> round )
+screenCordToGridCord : GridViewModel -> ( Float, Float ) -> ( Int, Int )
+screenCordToGridCord gvm ( x, y ) =
+    ( (x - gvm.left) / gvm.cellSize |> round, (y - gvm.bottom) / gvm.cellSize |> round )
 
 
 view _ grid =
@@ -87,40 +87,40 @@ cellColor cell =
             yellow
 
 
-gridCordToScreenCord : GridScreen -> ( Int, Int ) -> ( Float, Float )
-gridCordToScreenCord gs ( x, y ) =
-    ( gs.left + toFloat x * gs.cellSize, gs.bottom + toFloat y * gs.cellSize )
+gridCordToScreenCord : GridViewModel -> ( Int, Int ) -> ( Float, Float )
+gridCordToScreenCord gvm ( x, y ) =
+    ( gvm.left + toFloat x * gvm.cellSize, gvm.bottom + toFloat y * gvm.cellSize )
 
 
-viewGridCell : GridScreen -> Grid -> ( Int, Int ) -> Shape
-viewGridCell gs grid cord =
+viewGridCell : GridViewModel -> Grid -> ( Int, Int ) -> Shape
+viewGridCell gvm grid cord =
     let
         cell =
             cellAt cord grid
 
         ( x, y ) =
-            gridCordToScreenCord gs cord
+            gridCordToScreenCord gvm cord
     in
-    circle (cellColor cell) gs.cellRadius
+    circle (cellColor cell) gvm.cellRadius
         |> move x y
 
 
 viewGrid : Grid -> Shape
 viewGrid grid =
     let
-        gs =
-            toGridScreen grid
+        gvm =
+            toGridViewModel grid
 
         off =
-            gs.cellSize
+            gvm.cellSize
     in
     group
-        [ rectangle blue (gs.width + off) (gs.height + off)
-        , List.map (viewGridCell gs grid) grid.cords |> group
+        [ rectangle blue (gvm.width + off) (gvm.height + off)
+        , List.map (viewGridCell gvm grid) grid.cords |> group
         ]
 
 
-type alias GridScreen =
+type alias GridViewModel =
     { width : Float
     , height : Float
     , top : Float
@@ -132,8 +132,8 @@ type alias GridScreen =
     }
 
 
-toGridScreen : Grid -> GridScreen
-toGridScreen grid =
+toGridViewModel : Grid -> GridViewModel
+toGridViewModel grid =
     let
         cellSize =
             50

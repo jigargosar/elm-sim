@@ -23,8 +23,8 @@ type alias Grid =
     { width : Int, height : Int, cords : List ( Int, Int ), cells : Dict ( Int, Int ) Cell }
 
 
-emptyGrid : Int -> Int -> Grid
-emptyGrid w h =
+initGrid : Int -> Int -> Grid
+initGrid w h =
     let
         cords =
             List.range 0 w
@@ -50,5 +50,49 @@ setCellAt x y cell grid =
         { grid | cells = Dict.insert ( x, y ) cell grid.cells }
 
 
+toViewCord : Float -> ( Int, Int ) -> ( Float, Float )
+toViewCord mul =
+    let
+        f =
+            toFloat >> (*) mul
+    in
+    Tuple.mapBoth f f
+
+
+cellColor : Cell -> Color
+cellColor cell =
+    case cell of
+        Empty ->
+            black
+
+        Red ->
+            red
+
+        Yellow ->
+            yellow
+
+
+viewCellAt : Grid -> ( Int, Int ) -> Shape
+viewCellAt grid cord =
+    let
+        r =
+            10
+
+        gr =
+            r * 2 + 1
+
+        ( x, y ) =
+            toViewCord gr cord
+    in
+    circle blue r
+        |> move x y
+
+
+viewGrid : Grid -> Shape
+viewGrid grid =
+    List.map (viewCellAt grid) grid.cords
+        |> group
+
+
 main =
-    picture
+    picture [ viewGrid (initGrid 10 10) ]

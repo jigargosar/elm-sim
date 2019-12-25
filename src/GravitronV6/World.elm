@@ -62,7 +62,12 @@ reverseWorld (World nid list) =
     List.reverse list |> World nid
 
 
-stepEntity : Computer -> List Entity -> Entity -> ( Stack NewEntity, Stack Updated ) -> ( Stack NewEntity, Stack Updated )
+stepEntity :
+    Computer
+    -> List Entity
+    -> Entity
+    -> ( Stack NewEntity, Stack Updated )
+    -> ( Stack NewEntity, Stack Updated )
 stepEntity computer allEntities entity ( newStack, updatedStack ) =
     let
         pushOnUpdated =

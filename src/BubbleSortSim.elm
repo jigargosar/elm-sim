@@ -81,19 +81,25 @@ main =
 
         isCorrect =
             sortedNums == bubbleSortNums
-    in
-    picture
-        [ words black ("Input:  " ++ numsToString nums)
-            |> moveUp 20
-        , words lightBlue (numsToString sortedNums)
-            |> moveDown 20
-        , words
-            (if isCorrect then
-                green
 
-             else
-                red
-            )
-            (numsToString bubbleSortNums)
-            |> moveDown 60
-        ]
+        view _ m =
+            [ words black ("Input:  " ++ numsToString nums)
+                |> moveUp 20
+            , words lightBlue (numsToString sortedNums)
+                |> moveDown 20
+            , words
+                (if isCorrect then
+                    green
+
+                 else
+                    red
+                )
+                (numsToString bubbleSortNums)
+                |> moveDown 60
+            ]
+    in
+    game view update (init nums)
+
+
+update _ m =
+    m

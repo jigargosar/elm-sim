@@ -67,39 +67,33 @@ main =
     let
         nums =
             [ 2, 4, 1, 3 ]
-
-        sortedNums =
-            List.sort nums
-
-        bubbleSortNums =
-            init nums
-                |> step
-                |> step
-                |> step
-                |> step
-                |> .out
-
-        isCorrect =
-            sortedNums == bubbleSortNums
-
-        view _ m =
-            [ words black ("Input:  " ++ numsToString nums)
-                |> moveUp 20
-            , words lightBlue (numsToString sortedNums)
-                |> moveDown 20
-            , words
-                (if isCorrect then
-                    green
-
-                 else
-                    red
-                )
-                (numsToString bubbleSortNums)
-                |> moveDown 60
-            ]
     in
     game view update (init nums)
 
 
 update _ m =
     m
+
+
+view _ m =
+    let
+        sortedNums =
+            List.sort m.input
+
+        isCorrect =
+            sortedNums == m.out
+    in
+    [ words black ("Input:  " ++ numsToString m.input)
+        |> moveUp 20
+    , words lightBlue (numsToString sortedNums)
+        |> moveDown 20
+    , words
+        (if isCorrect then
+            green
+
+         else
+            red
+        )
+        (numsToString m.out)
+        |> moveDown 60
+    ]

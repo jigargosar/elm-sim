@@ -1,6 +1,7 @@
 module GravitronV6.Main exposing (main)
 
 import GravitronV6.Entity as Entity exposing (AliveStep(..), Entity, NewEntity, Phase(..), withColor, withHP)
+import GravitronV6.LevelId as LevelId exposing (LevelId, MajorLevel, MinorLevel)
 import GravitronV6.World as World exposing (World)
 import List.Extra
 import Playground exposing (..)
@@ -117,14 +118,6 @@ heatSinkShooter =
     withColor orange >> withHP 5
 
 
-type alias MinorLevel =
-    List Entity
-
-
-type alias MajorLevel =
-    List MinorLevel
-
-
 levels : List MajorLevel
 levels =
     [ [ makeSubLevel [ basic1 ]
@@ -157,24 +150,14 @@ init =
     Mem lev (initWorld lev)
 
 
-getTurretsForLevel : LevelId -> MinorLevel
-getTurretsForLevel ( major, minor ) =
-    let
-        majorMax =
-            List.length levels
-
-        minorMax =
-            5
-    in
-    List.Extra.getAt (modBy majorMax major) levels
-        |> Maybe.andThen (List.Extra.getAt (modBy minorMax minor))
-        |> Maybe.withDefault turretTemplates
+getTurretsFor lid =
+    LevelId.getMinorLevel levels lid |> Maybe.withDefault turretTemplates
 
 
 initWorld : LevelId -> World
-initWorld level =
+initWorld lid =
     ({ default | name = name Player, r = 20, color = green, aliveSteps = [ WalkRandomly ] }
-        :: getTurretsForLevel level
+        :: getTurretsFor lid
     )
         |> List.map Entity.new
         |> World.init
@@ -192,32 +175,19 @@ update computer mem =
     }
 
 
-type alias LevelId =
-    ( Int, Int )
-
-
-nextLevel : LevelId -> LevelId
-nextLevel ( a, b ) =
-    if b + 1 >= 5 then
-        ( modBy (List.length levels) a + 1, 0 )
-
-    else
-        ( a, b + 1 )
-
-
 afterUpdateHook : LevelId -> List Entity -> ( LevelId, List NewEntity )
-afterUpdateHook lev =
+afterUpdateHook lid =
     List.Extra.count (propEq .name (name Turret))
         >> (\tc ->
                 if tc == 0 then
                     let
-                        nextLev =
-                            nextLevel lev
+                        nextLid =
+                            LevelId.next levels lid
                     in
-                    ( nextLev, List.map Entity.new (getTurretsForLevel nextLev) )
+                    ( nextLid, List.map Entity.new (getTurretsFor nextLid) )
 
                 else
-                    ( lev, [] )
+                    ( lid, [] )
            )
 
 

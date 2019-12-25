@@ -46,6 +46,23 @@ setCellAt cord cell grid =
     { grid | cells = Dict.insert cord cell grid.cells }
 
 
+initialMem : Grid
+initialMem =
+    initGrid 11 20
+        |> setCellAt ( 0, 0 ) Yellow
+        |> setCellAt ( 0, 1 ) Red
+        |> setCellAt ( 0, 2 ) Yellow
+        |> setCellAt ( 7, 0 ) Yellow
+
+
+update _ mem =
+    mem
+
+
+view _ grid =
+    [ viewGrid grid ]
+
+
 toViewCord : Float -> ( Int, Int ) -> ( Float, Float )
 toViewCord mul =
     let
@@ -111,12 +128,4 @@ viewGrid grid =
 
 
 main =
-    let
-        grid =
-            initGrid 11 20
-                |> setCellAt ( 0, 0 ) Yellow
-                |> setCellAt ( 0, 1 ) Red
-                |> setCellAt ( 0, 2 ) Yellow
-                |> setCellAt ( 7, 0 ) Yellow
-    in
-    picture [ viewGrid grid ]
+    game view update initialMem

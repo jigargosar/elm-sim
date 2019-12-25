@@ -27,8 +27,8 @@ initGrid : Int -> Int -> Grid
 initGrid w h =
     let
         cords =
-            List.range 0 w
-                |> List.map (\x -> List.range 0 h |> List.map (\y -> ( x, y )))
+            List.range 0 (w - 1)
+                |> List.map (\x -> List.range 0 (h - 1) |> List.map (\y -> ( x, y )))
                 |> List.concat
                 |> List.sort
                 |> Debug.log "cords"
@@ -93,27 +93,27 @@ viewGrid grid =
             50
 
         w =
-            toFloat grid.width * cellSize
+            toFloat (grid.width - 1) * cellSize
 
         h =
-            toFloat grid.height * cellSize
+            toFloat (grid.height - 1) * cellSize
 
         off =
-            cellSize * 1.5
+            cellSize
     in
     group
         [ rectangle blue (w + off) (h + off)
         , List.map (viewCellAt cellSize grid) grid.cords
             |> group
-            |> moveDown (w / 2)
-            |> moveLeft (h / 2)
+            |> moveDown (h / 2)
+            |> moveLeft (w / 2)
         ]
 
 
 main =
     let
         grid =
-            initGrid 8 8
+            initGrid 11 20
                 |> setCellAt ( 0, 0 ) Yellow
                 |> setCellAt ( 0, 1 ) Red
                 |> setCellAt ( 0, 2 ) Yellow

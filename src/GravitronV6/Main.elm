@@ -66,6 +66,10 @@ bulletTemplate =
     }
 
 
+
+-- Turret Templates
+
+
 turretTemplate : Entity
 turretTemplate =
     { defaultTmpl

@@ -1,4 +1,4 @@
-module GravitronV6.World exposing (NewEntity, World, init, newEntity, toList, update)
+module GravitronV6.World exposing (NewEntity, World, init, newEntity, stepAll, toList)
 
 import GravitronV6.Entity as Entity exposing (AliveStep(..), Entity, FireModel, Phase(..))
 import GravitronV6.Geom as Geom
@@ -36,8 +36,8 @@ toList (World _ list) =
     list
 
 
-update : (List Entity -> ( acc, List New )) -> Computer -> World -> ( acc, World )
-update afterUpdate computer (World nid oldEntities) =
+stepAll : (List Entity -> ( acc, List New )) -> Computer -> World -> ( acc, World )
+stepAll afterUpdate computer (World nid oldEntities) =
     let
         emptyStacks : ( Stack New, Stack Updated )
         emptyStacks =

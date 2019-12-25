@@ -183,7 +183,7 @@ update : Computer -> Mem -> Mem
 update computer mem =
     let
         ( lev, world ) =
-            World.update (afterUpdateHook mem.level) computer mem.world
+            World.stepAll (afterUpdateHook mem.level) computer mem.world
     in
     { mem
         | world = world

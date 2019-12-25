@@ -59,7 +59,7 @@ cellColor : Cell -> Color
 cellColor cell =
     case cell of
         Empty ->
-            black
+            white
 
         Red ->
             red
@@ -91,11 +91,23 @@ viewGrid grid =
     let
         cellSize =
             50
+
+        w =
+            toFloat grid.width * cellSize
+
+        h =
+            toFloat grid.height * cellSize
+
+        off =
+            cellSize * 1.5
     in
-    List.map (viewCellAt cellSize grid) grid.cords
-        |> group
-        |> moveDown (toFloat grid.height * cellSize / 2)
-        |> moveLeft (toFloat grid.width * cellSize / 2)
+    group
+        [ rectangle blue (w + off) (h + off)
+        , List.map (viewCellAt cellSize grid) grid.cords
+            |> group
+            |> moveDown (w / 2)
+            |> moveLeft (h / 2)
+        ]
 
 
 main =

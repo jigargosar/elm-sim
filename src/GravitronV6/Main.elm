@@ -32,14 +32,14 @@ names =
     List.map name
 
 
-default : Entity
-default =
+defaultTmpl : Entity
+defaultTmpl =
     Entity.default
 
 
 bulletTemplate : Entity
 bulletTemplate =
-    { default
+    { defaultTmpl
         | name = name Bullet
         , r = 10
         , color = charcoal
@@ -55,7 +55,7 @@ bulletTemplate =
 
 turretTemplate : Entity
 turretTemplate =
-    { default
+    { defaultTmpl
         | name = name Turret
         , r = 25
         , color = red
@@ -156,7 +156,7 @@ getTurretsFor lid =
 
 initWorld : LevelId -> World
 initWorld lid =
-    ({ default | name = name Player, r = 20, color = green, aliveSteps = [ WalkRandomly ] }
+    ({ defaultTmpl | name = name Player, r = 20, color = green, aliveSteps = [ WalkRandomly ] }
         :: getTurretsFor lid
     )
         |> List.map Entity.new

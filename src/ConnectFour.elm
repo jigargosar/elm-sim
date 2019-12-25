@@ -43,7 +43,11 @@ cellAt x y grid =
 
 setCellAt : Int -> Int -> Cell -> Grid -> Grid
 setCellAt x y cell grid =
-    { grid | cells = Dict.insert ( x, y ) cell grid.cells }
+    if cell == Empty then
+        { grid | cells = Dict.remove ( x, y ) grid.cells }
+
+    else
+        { grid | cells = Dict.insert ( x, y ) cell grid.cells }
 
 
 main =

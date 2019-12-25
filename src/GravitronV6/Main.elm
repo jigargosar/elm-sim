@@ -141,7 +141,7 @@ makeSubLevel funcList =
 
 levels : List MajorLevel
 levels =
-    [ [ makeSubLevel [ basic1 ]
+    [ [ makeSubLevel [ basic1 >> (\e -> { e | vx = 1, vy = 1, aliveSteps = Wanderer :: e.aliveSteps }) ]
       , makeSubLevel [ basic1, basic1 ]
       , makeSubLevel [ basic1, basic2 ]
       , makeSubLevel [ basic1, basic1, basic2 ]

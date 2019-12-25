@@ -159,11 +159,7 @@ performAliveStep computer allEntities step ( newStack, entity ) =
             )
 
         Wanderer ->
-            let
-                _ =
-                    Geom.bounceVel 1 (scaleScreenBy 0.8 computer.screen) entity
-            in
-            ( newStack, Entity.wander computer entity )
+            ( newStack, Geom.bounceVel 1 (scaleScreenBy 0.8 computer.screen) entity )
 
 
 scaleScreenBy : Float -> { a | width : Float, height : Float } -> Screen

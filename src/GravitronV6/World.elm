@@ -153,6 +153,9 @@ performAliveStep computer allEntities step ( newStack, entity ) =
             , Entity.takeDamage hits entity
             )
 
+        Wanderer ->
+            ( newStack, Entity.wander entity )
+
 
 getCollisionCount : List String -> List Entity -> Entity -> Int
 getCollisionCount names list e =

@@ -37,10 +37,16 @@ type alias FireModel =
 type AliveStep
     = WalkRandomly
     | GravitateTo String
+    | Wanderer
     | BounceInScreen Number
     | Fire FireModel
     | DieOnCollisionWith (List String)
     | ReceiveCollisionDamageFrom (List String)
+
+
+wander : Entity -> Entity
+wander =
+    identity
 
 
 performRandomWalk : Computer -> { c | x : Number, y : Number } -> { c | x : Number, y : Number }

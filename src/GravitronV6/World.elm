@@ -1,6 +1,7 @@
 module GravitronV6.World exposing (World, init, stepAll, toList)
 
 import Frame2d
+import GravitronV6.Circ as Circ
 import GravitronV6.Entity as Entity exposing (AliveStep(..), Entity, FireModel, NewEntity, Phase(..))
 import GravitronV6.Geom as Geom
 import List.Extra
@@ -159,7 +160,23 @@ performAliveStep computer allEntities step ( newStack, entity ) =
             )
 
         Wanderer ->
-            ( newStack, Geom.bounceVel 1 (scaleScreenBy 0.8 computer.screen) entity )
+            let
+                ss =
+                    scaleScreenBy 0.8 computer.screen
+
+                newE =
+                    (if isOutsideSS then
+                        Entity.gravitateTo allEntities "Player" entity
+
+                     else
+                        entity
+                    )
+                        |> Geom.bounceVel 1 ss
+
+                isOutsideSS =
+                    entity.x <= ss.left || entity.x >= ss.right || entity.y >= ss.top || entity.y <= ss.bottom
+            in
+            ( newStack, newE )
 
 
 scaleScreenBy : Float -> { a | width : Float, height : Float } -> Screen

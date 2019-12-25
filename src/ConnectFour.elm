@@ -72,27 +72,24 @@ cellColor cell =
             yellow
 
 
-viewCellAt : Grid -> ( Int, Int ) -> Shape
-viewCellAt grid cord =
+viewCellAt : Float -> Grid -> ( Int, Int ) -> Shape
+viewCellAt size grid cord =
     let
-        r =
-            10
-
-        gr =
-            r * 2 + 1
+        ir =
+            size / 2 - 1
 
         ( x, y ) =
-            toViewCord gr cord
+            toViewCord size cord
     in
-    circle blue r
+    circle blue ir
         |> move x y
 
 
 viewGrid : Grid -> Shape
 viewGrid grid =
-    List.map (viewCellAt grid) grid.cords
+    List.map (viewCellAt 20 grid) grid.cords
         |> group
 
 
 main =
-    picture [ viewGrid (initGrid 10 10) ]
+    picture [ viewGrid (initGrid 16 10) ]

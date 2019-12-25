@@ -136,7 +136,7 @@ levels =
 
 
 type alias Mem =
-    { level : LevelId
+    { lid : LevelId
     , world : World
     }
 
@@ -144,10 +144,10 @@ type alias Mem =
 init : Mem
 init =
     let
-        lev =
+        lid =
             ( 0, 0 )
     in
-    Mem lev (initWorld lev)
+    Mem lid (initWorld lid)
 
 
 getTurretsFor lid =
@@ -166,12 +166,12 @@ initWorld lid =
 update : Computer -> Mem -> Mem
 update computer mem =
     let
-        ( lev, world ) =
-            World.stepAll (afterUpdateHook mem.level) computer mem.world
+        ( lid, world ) =
+            World.stepAll (afterUpdateHook mem.lid) computer mem.world
     in
     { mem
         | world = world
-        , level = lev
+        , lid = lid
     }
 
 

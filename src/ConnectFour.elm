@@ -85,7 +85,7 @@ viewGrid : Grid -> Shape
 viewGrid grid =
     let
         cellSize =
-            20
+            30
     in
     List.map (viewCellAt cellSize grid) grid.cords
         |> group
@@ -94,4 +94,4 @@ viewGrid grid =
 
 
 main =
-    picture [ viewGrid (initGrid 16 10) ]
+    picture [ viewGrid (initGrid 16 26) ]

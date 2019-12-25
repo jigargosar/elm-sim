@@ -45,8 +45,8 @@ type AliveStep
 
 
 wander : Entity -> Entity
-wander =
-    identity
+wander e =
+    e
 
 
 performRandomWalk : Computer -> { c | x : Number, y : Number } -> { c | x : Number, y : Number }

@@ -1,6 +1,6 @@
 module GravitronV6.Main exposing (main)
 
-import GravitronV6.Entity as Entity exposing (AliveStep(..), Entity, Phase(..), withColor, withHP)
+import GravitronV6.Entity as Entity exposing (AliveStep(..), Entity, NewEntity, Phase(..), withColor, withHP)
 import GravitronV6.World as World exposing (World)
 import List.Extra
 import Playground exposing (..)
@@ -175,7 +175,7 @@ initWorld level =
     ({ default | name = name Player, r = 20, color = green, aliveSteps = [ WalkRandomly ] }
         :: getTurretsForLevel level
     )
-        |> List.map World.newEntity
+        |> List.map Entity.new
         |> World.init
 
 
@@ -204,7 +204,7 @@ nextLevel ( a, b ) =
         ( a, b + 1 )
 
 
-afterUpdateHook : LevelId -> List Entity -> ( LevelId, List World.NewEntity )
+afterUpdateHook : LevelId -> List Entity -> ( LevelId, List NewEntity )
 afterUpdateHook lev =
     List.Extra.count (propEq .name (name Turret))
         >> (\tc ->
@@ -213,7 +213,7 @@ afterUpdateHook lev =
                         nextLev =
                             nextLevel lev
                     in
-                    ( nextLev, List.map World.newEntity (getTurretsForLevel nextLev) )
+                    ( nextLev, List.map Entity.new (getTurretsForLevel nextLev) )
 
                 else
                     ( lev, [] )

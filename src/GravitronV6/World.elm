@@ -1,6 +1,6 @@
-module GravitronV6.World exposing (NewEntity, World, init, newEntity, stepAll, toList)
+module GravitronV6.World exposing (World, init, stepAll, toList)
 
-import GravitronV6.Entity as Entity exposing (AliveStep(..), Entity, FireModel, Phase(..))
+import GravitronV6.Entity as Entity exposing (AliveStep(..), Entity, FireModel, NewEntity, Phase(..))
 import GravitronV6.Geom as Geom
 import List.Extra
 import Playground exposing (..)
@@ -12,21 +12,12 @@ type World
     = World Number (List Entity)
 
 
-init : List Entity.New -> World
+init : List NewEntity -> World
 init =
     List.foldr addNew (World 1 [])
 
 
-type alias NewEntity =
-    Entity.New
-
-
-newEntity : Entity -> NewEntity
-newEntity =
-    Entity.New
-
-
-addNew : Entity.New -> World -> World
+addNew : NewEntity -> World -> World
 addNew (Entity.New e) (World nid list) =
     World (nid + 1) (cons { e | id = nid } list)
 
@@ -36,10 +27,10 @@ toList (World _ list) =
     list
 
 
-stepAll : (List Entity -> ( acc, List Entity.New )) -> Computer -> World -> ( acc, World )
+stepAll : (List Entity -> ( acc, List NewEntity )) -> Computer -> World -> ( acc, World )
 stepAll afterUpdate computer (World nid oldEntities) =
     let
-        emptyStacks : ( Stack Entity.New, Stack Updated )
+        emptyStacks : ( Stack NewEntity, Stack Updated )
         emptyStacks =
             ( Stack.empty, Stack.empty )
 
@@ -57,7 +48,7 @@ stepAll afterUpdate computer (World nid oldEntities) =
         |> Tuple.mapSecond reverseWorld
 
 
-applyAfterUpdateHook : (List Entity -> ( acc, List Entity.New )) -> World -> ( acc, World )
+applyAfterUpdateHook : (List Entity -> ( acc, List NewEntity )) -> World -> ( acc, World )
 applyAfterUpdateHook func ((World _ list) as w) =
     let
         ( acc, newList ) =
@@ -71,7 +62,7 @@ reverseWorld (World nid list) =
     List.reverse list |> World nid
 
 
-stepEntity : Computer -> List Entity -> Entity -> ( Stack Entity.New, Stack Updated ) -> ( Stack Entity.New, Stack Updated )
+stepEntity : Computer -> List Entity -> Entity -> ( Stack NewEntity, Stack Updated ) -> ( Stack NewEntity, Stack Updated )
 stepEntity computer allEntities entity ( newStack, updatedStack ) =
     let
         pushOnUpdated =
@@ -110,14 +101,14 @@ stepEntity computer allEntities entity ( newStack, updatedStack ) =
             )
 
 
-performAliveSteps : Computer -> List Entity -> Stack Entity.New -> Entity -> ( Stack Entity.New, Entity )
+performAliveSteps : Computer -> List Entity -> Stack NewEntity -> Entity -> ( Stack NewEntity, Entity )
 performAliveSteps computer allEntities stackOfNewEntities entity =
     entity.aliveSteps
         |> List.foldl (performAliveStep computer allEntities) ( stackOfNewEntities, entity )
         |> Tuple.mapSecond Entity.moveByVelocity
 
 
-performAliveStep : Computer -> List Entity -> AliveStep -> ( Stack Entity.New, Entity ) -> ( Stack Entity.New, Entity )
+performAliveStep : Computer -> List Entity -> AliveStep -> ( Stack NewEntity, Entity ) -> ( Stack NewEntity, Entity )
 performAliveStep computer allEntities step ( newStack, entity ) =
     case step of
         WalkRandomly ->
@@ -133,7 +124,7 @@ performAliveStep computer allEntities step ( newStack, entity ) =
             let
                 firedEntityList =
                     Entity.performFire entity allEntities fireModel
-                        |> List.map Entity.New
+                        |> List.map NewEntity
             in
             ( Stack.pushAll firedEntityList newStack, entity )
 

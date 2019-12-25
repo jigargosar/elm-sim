@@ -10,6 +10,15 @@ type New
     = New Entity
 
 
+type alias NewEntity =
+    New
+
+
+new : Entity -> NewEntity
+new =
+    New
+
+
 findNamed : String -> List Entity -> Maybe Entity
 findNamed name =
     List.Extra.find (propEq .name name)

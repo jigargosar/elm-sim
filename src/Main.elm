@@ -1,6 +1,6 @@
 module Main exposing (main)
 
-import BubbleSortSim as Main
+import GravitronV6.Main as Main
 
 
 main =

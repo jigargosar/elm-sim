@@ -12,7 +12,7 @@ customSort nums =
     List.sort nums
 
 
-type alias Model =
+type alias Mem =
     { input : List Int
     , out : List Int
     , len : Int
@@ -23,12 +23,12 @@ type alias Model =
     }
 
 
-init : List Int -> Model
+init : List Int -> Mem
 init nums =
-    Model nums nums (List.length nums) 0 False False 0
+    Mem nums nums (List.length nums) 0 False False 0
 
 
-step : Model -> Model
+step : Mem -> Mem
 step m =
     if m.sorted then
         m
@@ -45,7 +45,7 @@ step m =
         performSwap m
 
 
-performSwap : Model -> Model
+performSwap : Mem -> Mem
 performSwap m =
     let
         newM =
@@ -72,24 +72,21 @@ main =
     game view update (init nums)
 
 
+update : Computer -> Mem -> Mem
 update _ m =
     let
         interval =
             60
     in
-    (if modBy interval m.elapsed == interval - 1 then
-        step m
+    if m.elapsed >= interval then
+        { m | elapsed = 0 }
+            |> step
 
-     else
-        m
-    )
-        |> tick
-
-
-tick m =
-    { m | elapsed = m.elapsed + 1 }
+    else
+        { m | elapsed = m.elapsed + 1 }
 
 
+view : Computer -> Mem -> List Shape
 view _ m =
     let
         sortedNums =

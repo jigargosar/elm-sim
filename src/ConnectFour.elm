@@ -77,7 +77,7 @@ viewCellAt : Float -> Grid -> ( Int, Int ) -> Shape
 viewCellAt size grid cord =
     let
         cellR =
-            size / 2 - 1
+            size / 2 - size / 10
 
         ( x, y ) =
             toViewCord size cord

@@ -10,8 +10,6 @@ module ConnectFour.Grid exposing
     , set
     , setAtFirstNonEmptyYOfX
     , toList
-    , update
-    , validateGridCord
     )
 
 import Dict exposing (Dict)
@@ -83,21 +81,12 @@ map func =
 
 set : Cord -> Cell -> Grid -> Grid
 set cord cell =
-    map <| \grid -> { grid | cells = Dict.insert cord cell grid.cells }
+    update cord (always cell)
 
 
 update : Cord -> (Cell -> Cell) -> Grid -> Grid
 update cord func =
     map <| \grid -> { grid | cells = Dict.update cord (Maybe.map func) grid.cells }
-
-
-validateGridCord : Cord -> Grid -> Maybe Cord
-validateGridCord cord grid =
-    if isValidGridCord cord grid then
-        Just cord
-
-    else
-        Nothing
 
 
 isValidGridCord : Cord -> Grid -> Bool

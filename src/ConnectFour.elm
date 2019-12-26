@@ -151,10 +151,10 @@ toGridViewModel : Screen -> Grid -> GridViewModel
 toGridViewModel screen grid =
     let
         maxCellWidth =
-            (screen.width * 0.9) / toFloat grid.width
+            (screen.width * 0.9) / toFloat (grid.width + 1)
 
         maxCellHeight =
-            (screen.height * 0.9) / toFloat grid.height
+            (screen.height * 0.9) / toFloat (grid.height + 1)
 
         cellSize =
             min maxCellWidth maxCellHeight |> round |> toFloat

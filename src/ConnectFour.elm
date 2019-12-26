@@ -150,14 +150,14 @@ type alias GridViewModel =
 toGridViewModel : Screen -> Grid -> GridViewModel
 toGridViewModel screen grid =
     let
-        cellWidth =
+        maxCellWidth =
             (screen.width * 0.9) / toFloat grid.width
 
-        cellHeight =
+        maxCellHeight =
             (screen.height * 0.9) / toFloat grid.height
 
         cellSize =
-            min cellWidth cellHeight |> round |> toFloat
+            min maxCellWidth maxCellHeight |> round |> toFloat
 
         width =
             toFloat (grid.width - 1) * cellSize

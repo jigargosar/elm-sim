@@ -5,6 +5,7 @@ module ConnectFour.Grid exposing
     , clampCord
     , empty
     , get
+    , getFirstNonEmptyCordWhereXEq
     , set
     , setAtFirstNonEmptyYOfX
     , update
@@ -101,16 +102,21 @@ xEq column ( x, _ ) =
 
 setAtFirstNonEmptyYOfX : Int -> Cell -> Grid -> Grid
 setAtFirstNonEmptyYOfX x cell grid =
-    let
-        pred cord cellAtCord =
-            xEq x cord && cellAtCord == Empty
-    in
-    case findCord pred grid of
+    case getFirstNonEmptyCordWhereXEq x grid of
         Just cord ->
             set cord cell grid
 
         Nothing ->
             grid
+
+
+getFirstNonEmptyCordWhereXEq : Int -> Grid -> Maybe ( Int, Int )
+getFirstNonEmptyCordWhereXEq x grid =
+    let
+        pred cord cellAtCord =
+            xEq x cord && cellAtCord == Empty
+    in
+    findCord pred grid
 
 
 find : (( Int, Int ) -> Cell -> Bool) -> Grid -> Maybe ( ( Int, Int ), Cell )

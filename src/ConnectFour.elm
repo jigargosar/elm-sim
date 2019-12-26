@@ -27,11 +27,6 @@ initGrid w h =
     { width = w, height = h, cords = cords, cells = Dict.empty }
 
 
-cellAtOrEmpty : ( Int, Int ) -> Grid -> Cell
-cellAtOrEmpty cord =
-    cellAt cord >> Maybe.withDefault Empty
-
-
 cellAt : ( Int, Int ) -> Grid -> Maybe Cell
 cellAt cord grid =
     if isValidGridCord cord grid then
@@ -163,14 +158,16 @@ gridCordToScreenCord gvm ( x, y ) =
 viewGridCellAt : ( Int, Int ) -> GridViewModel -> Shape
 viewGridCellAt cord gvm =
     let
-        cell =
-            cellAtOrEmpty cord gvm.grid
-
         ( x, y ) =
             gridCordToScreenCord gvm cord
     in
-    circle (cellColor cell) gvm.cellRadius
-        |> move x y
+    case cellAt cord gvm.grid of
+        Just cell ->
+            circle (cellColor cell) gvm.cellRadius
+                |> move x y
+
+        Nothing ->
+            group []
 
 
 viewGrid : Grid -> Shape

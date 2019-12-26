@@ -34,7 +34,11 @@ cellAtOrEmpty cord =
 
 cellAt : ( Int, Int ) -> Grid -> Maybe Cell
 cellAt cord grid =
-    Dict.get cord grid.cells
+    if isValidGridCord cord grid then
+        Just (Dict.get cord grid.cells |> Maybe.withDefault Empty)
+
+    else
+        Nothing
 
 
 setCellAt : ( Int, Int ) -> Cell -> Grid -> Grid

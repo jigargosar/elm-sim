@@ -91,8 +91,8 @@ isCellEmptyAt cord grid =
     get cord grid |> Maybe.map ((==) Empty) |> Maybe.withDefault True
 
 
-setAtFirstNonEmptyColumn : Int -> Cell -> Grid -> Grid
-setAtFirstNonEmptyColumn column cell grid =
+setAtFirstNonEmptyRowOfColumn : Int -> Cell -> Grid -> Grid
+setAtFirstNonEmptyRowOfColumn column cell grid =
     let
         columnCords : List ( Int, Int )
         columnCords =

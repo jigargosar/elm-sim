@@ -3,7 +3,7 @@ module ConnectFour.Grid exposing
     , Grid
     , empty
     , get
-    , setCellAt
+    , set
     , update
     , validateGridCord
     )
@@ -46,19 +46,14 @@ get cord grid =
         Nothing
 
 
-setCellAt : ( Int, Int ) -> Cell -> Grid -> Grid
-setCellAt cord cell grid =
+set : ( Int, Int ) -> Cell -> Grid -> Grid
+set cord cell grid =
     { grid | cells = Dict.insert cord cell grid.cells }
 
 
 update : ( Int, Int ) -> (Cell -> Cell) -> Grid -> Grid
 update cord func grid =
-    case get cord grid of
-        Just cell ->
-            setCellAt cord (func cell) grid
-
-        Nothing ->
-            grid
+    { grid | cells = Dict.update cord (Maybe.map func) grid.cells }
 
 
 validateGridCord : ( Int, Int ) -> Grid -> Maybe ( Int, Int )

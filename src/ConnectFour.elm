@@ -8,10 +8,10 @@ import PointFree exposing (flip)
 initialMem : Grid
 initialMem =
     Grid.empty 10 18
-        |> Grid.setCellAt ( 0, 0 ) Yellow
-        |> Grid.setCellAt ( 0, 1 ) Red
-        |> Grid.setCellAt ( 0, 2 ) Yellow
-        |> Grid.setCellAt ( 7, 0 ) Yellow
+        |> Grid.set ( 0, 0 ) Yellow
+        |> Grid.set ( 0, 1 ) Red
+        |> Grid.set ( 0, 2 ) Yellow
+        |> Grid.set ( 7, 0 ) Yellow
 
 
 update : Computer -> Grid -> Grid

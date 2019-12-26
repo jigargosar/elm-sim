@@ -22,7 +22,6 @@ initGrid w h =
                 |> List.map (\x -> List.range 0 (h - 1) |> List.map (\y -> ( x, y )))
                 |> List.concat
                 |> List.sort
-                |> Debug.log "cords"
     in
     { width = w, height = h, cords = cords, cells = Dict.empty }
 

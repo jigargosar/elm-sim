@@ -19,13 +19,6 @@ update { mouse } mem =
     let
         gvm =
             toGridViewModel mem
-
-        clickedGridCord =
-            if mouse.click then
-                Just <| screenCordToGridCord ( mouse.x, mouse.y ) gvm
-
-            else
-                Nothing
     in
     if mouse.click then
         cycleCellAt (screenCordToGridCord ( mouse.x, mouse.y ) gvm) mem

@@ -2,6 +2,7 @@ module ConnectFour exposing (..)
 
 import Dict exposing (Dict)
 import Playground exposing (..)
+import PointFree exposing (flip)
 
 
 type Cell
@@ -91,11 +92,11 @@ gridCordToScreenCord gvm ( x, y ) =
     ( gvm.left + toFloat x * gvm.cellSize, gvm.bottom + toFloat y * gvm.cellSize )
 
 
-viewGridCell : GridViewModel -> Grid -> ( Int, Int ) -> Shape
-viewGridCell gvm grid cord =
+viewGridCellAt : ( Int, Int ) -> GridViewModel -> Shape
+viewGridCellAt cord gvm =
     let
         cell =
-            cellAt cord grid
+            cellAt cord gvm.grid
 
         ( x, y ) =
             gridCordToScreenCord gvm cord
@@ -115,7 +116,7 @@ viewGrid grid =
     in
     group
         [ rectangle blue (gvm.width + off) (gvm.height + off)
-        , List.map (viewGridCell gvm grid) grid.cords |> group
+        , List.map (flip viewGridCellAt gvm) grid.cords |> group
         ]
 
 
@@ -128,6 +129,7 @@ type alias GridViewModel =
     , bottom : Float
     , cellSize : Number
     , cellRadius : Number
+    , grid : Grid
     }
 
 
@@ -151,6 +153,7 @@ toGridViewModel grid =
     , bottom = -height / 2
     , cellSize = cellSize
     , cellRadius = cellSize / 2 - cellSize / 10
+    , grid = grid
     }
 
 

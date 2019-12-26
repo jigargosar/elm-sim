@@ -127,7 +127,7 @@ viewGrid { screen, mouse, time } player grid =
             toGridViewModel screen grid
 
         frameOffset =
-            gvm.cellSize
+            gvm.cellSize + (gvm.cellSize / 4)
 
         frameWidth =
             gvm.width + frameOffset
@@ -143,7 +143,7 @@ viewGrid { screen, mouse, time } player grid =
 
         nextMoveTopIndicator =
             group
-                [ circle (rgb 60 60 60) gvm.cellRadius
+                [ circle (rgb 70 70 70) gvm.cellRadius
                 , circle white (gvm.cellRadius - 3)
                 , circle (cellColor (playerToCell player)) (gvm.cellRadius - 3)
                     |> fade (wave 0.6 1 1.5 time)

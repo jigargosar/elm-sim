@@ -5,7 +5,6 @@ module ConnectFour.Grid exposing
     , clampCord
     , dimensions
     , empty
-    , get
     , getFirstNonEmptyCordWhereXEq
     , set
     , setAtFirstNonEmptyYOfX
@@ -65,15 +64,6 @@ empty w h =
     Grid { width = w, height = h, cords = cords, cells = List.foldl setEmpty Dict.empty cords }
 
 
-get : Cord -> Grid -> Maybe Cell
-get cord ((Grid { cells }) as grid) =
-    if isValidGridCord cord grid then
-        Dict.get cord cells
-
-    else
-        Nothing
-
-
 map : (GridModel -> GridModel) -> Grid -> Grid
 map func =
     unwrap >> func >> Grid
@@ -87,18 +77,6 @@ set cord cell =
 update : Cord -> (Cell -> Cell) -> Grid -> Grid
 update cord func =
     map <| \grid -> { grid | cells = Dict.update cord (Maybe.map func) grid.cells }
-
-
-isValidGridCord : Cord -> Grid -> Bool
-isValidGridCord ( x, y ) =
-    unwrap
-        >> (\grid ->
-                let
-                    isInvalid =
-                        x < 0 || y < 0 || x >= grid.width || y >= grid.height
-                in
-                not isInvalid
-           )
 
 
 xEq : Int -> Cord -> Bool

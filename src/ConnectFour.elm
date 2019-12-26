@@ -155,19 +155,18 @@ gridCordToScreenCord gvm ( x, y ) =
     ( gvm.left + toFloat x * gvm.cellSize, gvm.bottom + toFloat y * gvm.cellSize )
 
 
-viewGridCellAt : ( Int, Int ) -> GridViewModel -> Shape
+viewGridCellAt : ( Int, Int ) -> GridViewModel -> Maybe Shape
 viewGridCellAt cord gvm =
     let
         ( x, y ) =
             gridCordToScreenCord gvm cord
-    in
-    case cellAt cord gvm.grid of
-        Just cell ->
+
+        func cell =
             circle (cellColor cell) gvm.cellRadius
                 |> move x y
-
-        Nothing ->
-            group []
+    in
+    cellAt cord gvm.grid
+        |> Maybe.map func
 
 
 viewGrid : Grid -> Shape
@@ -181,7 +180,7 @@ viewGrid grid =
     in
     group
         [ rectangle blue (gvm.width + off) (gvm.height + off)
-        , List.map (flip viewGridCellAt gvm) grid.cords |> group
+        , List.filterMap (flip viewGridCellAt gvm) grid.cords |> group
         ]
 
 

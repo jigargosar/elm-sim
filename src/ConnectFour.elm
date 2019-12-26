@@ -83,8 +83,10 @@ screenCordToGridCord ( x, y ) gvm =
 
 
 view : Computer -> Mem -> List Shape
-view computer mem =
-    [ viewGrid computer mem.currentPlayer mem.grid ]
+view ({ screen } as computer) mem =
+    [ rectangle lightBlue screen.width screen.height
+    , viewGrid computer mem.currentPlayer mem.grid
+    ]
 
 
 cellColor : Cell -> Color

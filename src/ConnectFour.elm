@@ -153,7 +153,7 @@ viewGrid { screen, mouse } grid =
 
 
 type alias ScreenCord =
-    ( Number, Number )
+    ( Float, Float )
 
 
 type alias GridViewModel =

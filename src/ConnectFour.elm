@@ -22,24 +22,16 @@ update { mouse } mem =
 
         clickedGridCord =
             if mouse.click then
-                screenCordToValidatedGridCord ( mouse.x, mouse.y ) gvm
+                Just <| screenCordToGridCord ( mouse.x, mouse.y ) gvm
 
             else
                 Nothing
-
-        _ =
-            if mouse.click then
-                Debug.log "mouseGridCord" clickedGridCord
-
-            else
-                clickedGridCord
     in
-    case clickedGridCord of
-        Just a ->
-            cycleCellAt a mem
+    if mouse.click then
+        cycleCellAt (screenCordToGridCord ( mouse.x, mouse.y ) gvm) mem
 
-        Nothing ->
-            mem
+    else
+        mem
 
 
 cycleCellAt : ( Int, Int ) -> Grid -> Grid
@@ -60,9 +52,12 @@ cycleCell cell =
             Empty
 
 
-screenCordToValidatedGridCord : ( Float, Float ) -> GridViewModel -> Maybe ( Int, Int )
-screenCordToValidatedGridCord screenCord gvm =
-    Grid.validateGridCord (screenCordToGridCord screenCord gvm) gvm.grid
+
+{-
+   screenCordToValidatedGridCord : ( Float, Float ) -> GridViewModel -> Maybe ( Int, Int )
+   screenCordToValidatedGridCord screenCord gvm =
+       Grid.validateGridCord (screenCordToGridCord screenCord gvm) gvm.grid
+-}
 
 
 screenCordToGridCord : ( Float, Float ) -> GridViewModel -> ( Int, Int )

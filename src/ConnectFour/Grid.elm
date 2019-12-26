@@ -45,7 +45,7 @@ empty w h =
 get : ( Int, Int ) -> Grid -> Maybe Cell
 get cord grid =
     if isValidGridCord cord grid then
-        Just (Dict.get cord grid.cells |> Maybe.withDefault Empty)
+        Dict.get cord grid.cells
 
     else
         Nothing

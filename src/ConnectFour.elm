@@ -170,7 +170,7 @@ viewGrid { screen, mouse } player grid =
     in
     group
         [ rectangle blue frameWidth frameHeight
-        , List.filterMap (flip viewGridCellAt gvm) grid.cords |> group
+        , List.filterMap (flip viewGridCellAt gvm) (Grid.cords__ grid) |> group
         , nextMoveTopIndicator
         , nextMoveCellIndicator
         ]
@@ -196,20 +196,24 @@ type alias GridViewModel =
 toGridViewModel : Screen -> Grid -> GridViewModel
 toGridViewModel screen grid =
     let
+        ( gw, gh ) =
+            Grid.dimensions grid
+                |> Tuple.mapBoth toFloat toFloat
+
         maxCellWidth =
-            (screen.width * 0.8) / toFloat (grid.width + 1)
+            (screen.width * 0.8) / (gw + 1)
 
         maxCellHeight =
-            (screen.height * 0.8) / toFloat (grid.height + 1)
+            (screen.height * 0.8) / (gh + 1)
 
         cellSize =
             min maxCellWidth maxCellHeight |> round |> toFloat
 
         width =
-            toFloat (grid.width - 1) * cellSize
+            (gw - 1) * cellSize
 
         height =
-            toFloat (grid.height - 1) * cellSize
+            (gh - 1) * cellSize
     in
     { width = width
     , height = height

@@ -3,6 +3,8 @@ module ConnectFour.Grid exposing
     , Cord
     , Grid
     , clampCord
+    , cords__
+    , dimensions
     , empty
     , get
     , getFirstNonEmptyCordWhereXEq
@@ -22,7 +24,11 @@ type Cell
     | Empty
 
 
-type alias Grid =
+type Grid
+    = Grid GridModel
+
+
+type alias GridModel =
     { width : Int
     , height : Int
     , cords : List ( Int, Int )
@@ -34,9 +40,14 @@ type alias Cord =
     ( Int, Int )
 
 
+unwrap : Grid -> GridModel
+unwrap (Grid grid) =
+    grid
+
+
 clampCord : Grid -> Cord -> Cord
-clampCord grid =
-    Tuple.mapBoth (clamp 0 (grid.width - 1)) (clamp 0 (grid.height - 1))
+clampCord =
+    unwrap >> (\grid -> Tuple.mapBoth (clamp 0 (grid.width - 1)) (clamp 0 (grid.height - 1)))
 
 
 empty : Int -> Int -> Grid
@@ -53,26 +64,31 @@ empty w h =
         setEmpty cord =
             Dict.insert cord Empty
     in
-    { width = w, height = h, cords = cords, cells = List.foldl setEmpty Dict.empty cords }
+    Grid { width = w, height = h, cords = cords, cells = List.foldl setEmpty Dict.empty cords }
 
 
 get : ( Int, Int ) -> Grid -> Maybe Cell
-get cord grid =
+get cord ((Grid { cells }) as grid) =
     if isValidGridCord cord grid then
-        Dict.get cord grid.cells
+        Dict.get cord cells
 
     else
         Nothing
 
 
+map : (GridModel -> GridModel) -> Grid -> Grid
+map func =
+    unwrap >> func >> Grid
+
+
 set : ( Int, Int ) -> Cell -> Grid -> Grid
-set cord cell grid =
-    { grid | cells = Dict.insert cord cell grid.cells }
+set cord cell =
+    map <| \grid -> { grid | cells = Dict.insert cord cell grid.cells }
 
 
 update : ( Int, Int ) -> (Cell -> Cell) -> Grid -> Grid
-update cord func grid =
-    { grid | cells = Dict.update cord (Maybe.map func) grid.cells }
+update cord func =
+    map <| \grid -> { grid | cells = Dict.update cord (Maybe.map func) grid.cells }
 
 
 validateGridCord : ( Int, Int ) -> Grid -> Maybe ( Int, Int )
@@ -85,12 +101,15 @@ validateGridCord cord grid =
 
 
 isValidGridCord : ( Int, Int ) -> Grid -> Bool
-isValidGridCord ( x, y ) grid =
-    let
-        isInvalid =
-            x < 0 || y < 0 || x >= grid.width || y >= grid.height
-    in
-    not isInvalid
+isValidGridCord ( x, y ) =
+    unwrap
+        >> (\grid ->
+                let
+                    isInvalid =
+                        x < 0 || y < 0 || x >= grid.width || y >= grid.height
+                in
+                not isInvalid
+           )
 
 
 xEq : Int -> ( Int, Int ) -> Bool
@@ -118,10 +137,20 @@ getFirstNonEmptyCordWhereXEq x grid =
 
 
 find : (( Int, Int ) -> Cell -> Bool) -> Grid -> Maybe ( ( Int, Int ), Cell )
-find pred grid =
-    Dict.Extra.find pred grid.cells
+find pred =
+    unwrap >> .cells >> Dict.Extra.find pred
 
 
 findCord : (( Int, Int ) -> Cell -> Bool) -> Grid -> Maybe ( Int, Int )
 findCord pred grid =
     find pred grid |> Maybe.map Tuple.first
+
+
+cords__ : Grid -> List ( Int, Int )
+cords__ =
+    unwrap >> .cords
+
+
+dimensions : Grid -> ( Int, Int )
+dimensions =
+    unwrap >> (\{ width, height } -> ( width, height ))

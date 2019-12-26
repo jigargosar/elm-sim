@@ -2,7 +2,6 @@ module ConnectFour exposing (main)
 
 import ConnectFour.Grid as Grid exposing (Cell(..), Grid)
 import Playground exposing (..)
-import PointFree exposing (flip)
 
 
 type alias Mem =

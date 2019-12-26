@@ -6,12 +6,19 @@ import PointFree exposing (flip)
 
 
 type alias Mem =
-    { grid : Grid, turn : Cell }
+    { grid : Grid
+    , currentPlayer : Player
+    }
+
+
+type Player
+    = PlayerRed
+    | PlayerYellow
 
 
 initialMem : Mem
 initialMem =
-    { grid = initialGrid, turn = Red }
+    { grid = initialGrid, currentPlayer = PlayerRed }
 
 
 initialGrid : Grid
@@ -34,33 +41,40 @@ update { mouse } mem =
                 screenCordToGridCord ( mouse.x, mouse.y ) gvm
 
             newGrid =
-                Grid.setAtFirstNonEmptyYOfX x mem.turn mem.grid
+                Grid.setAtFirstNonEmptyYOfX x mem.currentPlayer mem.grid
         in
         { mem
             | grid = newGrid
-            , turn =
+            , currentPlayer =
                 if newGrid == mem.grid then
-                    mem.turn
+                    mem.currentPlayer
 
                 else
-                    swapTurn mem.turn
+                    swapPlayer mem.currentPlayer
         }
 
     else
         mem
 
 
-swapTurn : Cell -> Cell
-swapTurn cell =
+swapPlayer : Player -> Player
+swapPlayer cell =
     case cell of
-        Red ->
+        PlayerRed ->
+            PlayerYellow
+
+        PlayerYellow ->
+            PlayerRed
+
+
+playerToCell : Player -> Cell
+playerToCell player =
+    case player of
+        PlayerRed ->
+            Red
+
+        PlayerYellow ->
             Yellow
-
-        Yellow ->
-            Red
-
-        Empty ->
-            Red
 
 
 screenCordToGridCord : ( Float, Float ) -> GridViewModel -> ( Int, Int )

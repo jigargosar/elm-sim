@@ -100,8 +100,8 @@ cellColor cell =
             yellow
 
 
-gridCordToScreenCord : GridViewModel -> ( Int, Int ) -> ( Float, Float )
-gridCordToScreenCord gvm ( x, y ) =
+gridCordToScreenCord : ( Int, Int ) -> GridViewModel -> ( Float, Float )
+gridCordToScreenCord ( x, y ) gvm =
     ( gvm.left + toFloat x * gvm.cellSize, gvm.bottom + toFloat y * gvm.cellSize )
 
 
@@ -109,7 +109,7 @@ viewGridCellAt : ( Int, Int ) -> GridViewModel -> Maybe Shape
 viewGridCellAt cord gvm =
     let
         ( x, y ) =
-            gridCordToScreenCord gvm cord
+            gridCordToScreenCord cord gvm
 
         func cell =
             circle (cellColor cell) gvm.cellRadius
@@ -135,11 +135,18 @@ viewGrid screen grid =
             gvm.height + frameOffset
 
         nextMoveIndicator =
-            circle lightRed gvm.cellSize
+            circle lightRed gvm.cellRadius
+                |> moveUp (frameHeight / 2 + gvm.cellRadius)
+                |> moveRight moveIndicatorX
+
+        moveIndicatorX =
+            gridCordToScreenCord ( 0, 0 ) gvm
+                |> Tuple.first
     in
     group
         [ rectangle blue frameWidth frameHeight
         , List.filterMap (flip viewGridCellAt gvm) grid.cords |> group
+        , nextMoveIndicator
         ]
 
 
@@ -160,10 +167,10 @@ toGridViewModel : Screen -> Grid -> GridViewModel
 toGridViewModel screen grid =
     let
         maxCellWidth =
-            (screen.width * 0.9) / toFloat (grid.width + 1)
+            (screen.width * 0.8) / toFloat (grid.width + 1)
 
         maxCellHeight =
-            (screen.height * 0.9) / toFloat (grid.height + 1)
+            (screen.height * 0.8) / toFloat (grid.height + 1)
 
         cellSize =
             min maxCellWidth maxCellHeight |> round |> toFloat

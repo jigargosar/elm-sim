@@ -1,4 +1,4 @@
-module ConnectFour exposing (..)
+module ConnectFour exposing (main)
 
 import Dict exposing (Dict)
 import Playground exposing (..)
@@ -27,14 +27,29 @@ initGrid w h =
     { width = w, height = h, cords = cords, cells = Dict.empty }
 
 
-cellAt : ( Int, Int ) -> Grid -> Cell
+cellAtOrEmpty : ( Int, Int ) -> Grid -> Cell
+cellAtOrEmpty cord =
+    cellAt cord >> Maybe.withDefault Empty
+
+
+cellAt : ( Int, Int ) -> Grid -> Maybe Cell
 cellAt cord grid =
-    Dict.get cord grid.cells |> Maybe.withDefault Empty
+    Dict.get cord grid.cells
 
 
 setCellAt : ( Int, Int ) -> Cell -> Grid -> Grid
 setCellAt cord cell grid =
     { grid | cells = Dict.insert cord cell grid.cells }
+
+
+mapCellAt : ( Int, Int ) -> (Cell -> Cell) -> Grid -> Grid
+mapCellAt cord func grid =
+    case cellAt cord grid of
+        Just cell ->
+            setCellAt cord (func cell) grid
+
+        Nothing ->
+            grid
 
 
 initialMem : Grid
@@ -66,7 +81,30 @@ update { mouse } mem =
             else
                 clickedGridCord
     in
-    mem
+    case clickedGridCord of
+        Just a ->
+            cycleCellAt a mem
+
+        Nothing ->
+            mem
+
+
+cycleCellAt : ( Int, Int ) -> Grid -> Grid
+cycleCellAt cord =
+    mapCellAt cord cycleCell
+
+
+cycleCell : Cell -> Cell
+cycleCell cell =
+    case cell of
+        Empty ->
+            Red
+
+        Red ->
+            Yellow
+
+        Yellow ->
+            Empty
 
 
 screenCordToGridCord : ( Float, Float ) -> GridViewModel -> Maybe ( Int, Int )
@@ -122,7 +160,7 @@ viewGridCellAt : ( Int, Int ) -> GridViewModel -> Shape
 viewGridCellAt cord gvm =
     let
         cell =
-            cellAt cord gvm.grid
+            cellAtOrEmpty cord gvm.grid
 
         ( x, y ) =
             gridCordToScreenCord gvm cord

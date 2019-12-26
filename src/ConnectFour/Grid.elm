@@ -4,6 +4,7 @@ module ConnectFour.Grid exposing
     , empty
     , get
     , set
+    , setAtFirstNonEmptyYOfX
     , update
     , validateGridCord
     )

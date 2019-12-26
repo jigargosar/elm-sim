@@ -21,10 +21,15 @@ update { mouse } mem =
             toGridViewModel mem
     in
     if mouse.click then
-        cycleCellAt (screenCordToGridCord ( mouse.x, mouse.y ) gvm) mem
+        fillGridColumn (screenCordToGridCord ( mouse.x, mouse.y ) gvm) mem
 
     else
         mem
+
+
+fillGridColumn : ( Int, Int ) -> Grid -> Grid
+fillGridColumn ( x, _ ) =
+    Grid.setAtFirstNonEmptyYOfX x Red
 
 
 cycleCellAt : ( Int, Int ) -> Grid -> Grid

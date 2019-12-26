@@ -110,13 +110,14 @@ viewGridCellAt cord gvm =
     let
         ( x, y ) =
             gridCordToScreenCord gvm cord
-
-        func cell =
-            circle (cellColor cell) gvm.cellRadius
-                |> move x y
     in
     Grid.get cord gvm.grid
-        |> Maybe.map func
+        |> Maybe.map (cellToShape gvm >> move x y)
+
+
+cellToShape : GridViewModel -> Cell -> Shape
+cellToShape gvm cell =
+    circle (cellColor cell) gvm.cellRadius
 
 
 viewGrid : Computer -> Player -> Grid -> Shape

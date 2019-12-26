@@ -41,7 +41,7 @@ update { mouse } mem =
                 screenCordToGridCord ( mouse.x, mouse.y ) gvm
 
             newGrid =
-                Grid.setAtFirstNonEmptyYOfX x mem.currentPlayer mem.grid
+                Grid.setAtFirstNonEmptyYOfX x (playerToCell mem.currentPlayer) mem.grid
         in
         { mem
             | grid = newGrid

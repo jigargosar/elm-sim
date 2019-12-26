@@ -52,22 +52,48 @@ update { mouse } mem =
         gvm =
             toGridViewModel mem
 
-        mouseGridCord =
-            screenCordToGridCord gvm ( mouse.x, mouse.y )
+        clickedGridCord =
+            if mouse.click then
+                screenCordToGridCord ( mouse.x, mouse.y ) gvm
+
+            else
+                Nothing
 
         _ =
             if mouse.click then
-                Debug.log "mouseGridCord" mouseGridCord
+                Debug.log "mouseGridCord" clickedGridCord
 
             else
-                mouseGridCord
+                clickedGridCord
     in
     mem
 
 
-screenCordToGridCord : GridViewModel -> ( Float, Float ) -> ( Int, Int )
-screenCordToGridCord gvm ( x, y ) =
-    ( (x - gvm.left) / gvm.cellSize |> round, (y - gvm.bottom) / gvm.cellSize |> round )
+screenCordToGridCord : ( Float, Float ) -> GridViewModel -> Maybe ( Int, Int )
+screenCordToGridCord ( x, y ) gvm =
+    let
+        gridCord =
+            ( (x - gvm.left) / gvm.cellSize |> round, (y - gvm.bottom) / gvm.cellSize |> round )
+    in
+    validateGridCord gridCord gvm.grid
+
+
+validateGridCord : ( Int, Int ) -> Grid -> Maybe ( Int, Int )
+validateGridCord cord grid =
+    if isValidGridCord cord grid then
+        Just cord
+
+    else
+        Nothing
+
+
+isValidGridCord : ( Int, Int ) -> Grid -> Bool
+isValidGridCord ( x, y ) grid =
+    let
+        isInvalid =
+            x < 0 || y < 0 || x >= grid.width || y >= grid.height
+    in
+    not isInvalid
 
 
 view _ grid =

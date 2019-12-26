@@ -44,7 +44,7 @@ update { mouse } mem =
 
 cycleCellAt : ( Int, Int ) -> Grid -> Grid
 cycleCellAt cord =
-    Grid.mapCellAt cord cycleCell
+    Grid.update cord cycleCell
 
 
 cycleCell : Cell -> Cell

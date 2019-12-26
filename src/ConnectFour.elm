@@ -145,7 +145,7 @@ viewGrid { screen, mouse, time } player grid =
 
         moveIndicatorShape =
             cellToShape gvm (playerToCell player)
-                |> fade (wave 0.7 1 1.5 time)
+                |> fade (wave 0.5 0.9 1.3 time + 0.1)
                 |> moveRight
                     (screenCordToGridCord ( mouse.x, mouse.y ) gvm
                         |> Grid.clampCord grid

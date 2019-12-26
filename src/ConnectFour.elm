@@ -139,20 +139,18 @@ viewGrid { screen, mouse, time } player grid =
         frameHeight =
             gvm.height + frameOffset
 
-        moveIndicatorScreenX =
-            screenCordToGridCord ( mouse.x, mouse.y ) gvm
-                |> Grid.clampCord grid
-                |> gridCordToScreenCord gvm
-                |> Tuple.first
+        moveIndicatorShape =
+            cellToShape gvm (playerToCell player)
+                |> fade (wave 0.7 1 1.5 time)
+                |> moveRight
+                    (screenCordToGridCord ( mouse.x, mouse.y ) gvm
+                        |> Grid.clampCord grid
+                        |> gridCordToScreenCord gvm
+                        |> Tuple.first
+                    )
 
         nextMoveTopIndicator =
-            group
-                [ circle (rgb 70 70 70) gvm.cellRadius
-                , circle white (gvm.cellRadius - 3)
-                , circle (cellColor (playerToCell player)) (gvm.cellRadius - 3)
-                    |> fade (wave 0.6 1 1.5 time)
-                ]
-                |> moveRight moveIndicatorScreenX
+            moveIndicatorShape
                 |> moveUp (frameHeight / 2 + gvm.cellRadius)
 
         nextMoveCellIndicator =
@@ -166,9 +164,7 @@ viewGrid { screen, mouse, time } player grid =
             in
             case maybeScreenY of
                 Just sy ->
-                    cellToShape gvm (playerToCell player)
-                        |> scale 0.8
-                        |> moveRight moveIndicatorScreenX
+                    moveIndicatorShape
                         |> moveUp sy
 
                 Nothing ->

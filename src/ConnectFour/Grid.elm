@@ -14,8 +14,6 @@ module ConnectFour.Grid exposing
 
 import Dict exposing (Dict)
 import Dict.Extra
-import List.Extra
-import PointFree exposing (flip)
 
 
 type Cell

@@ -142,8 +142,12 @@ viewGrid { screen, mouse, time } player grid =
                 |> Tuple.first
 
         nextMoveTopIndicator =
-            cellToShape gvm (playerToCell player)
-                |> scale 0.8
+            group
+                [ circle (rgb 60 60 60) gvm.cellRadius
+                , circle white (gvm.cellRadius - 3)
+                , circle (cellColor (playerToCell player)) (gvm.cellRadius - 3)
+                    |> fade (wave 0.5 1 1.2 time)
+                ]
                 |> moveRight moveIndicatorScreenX
                 |> moveUp (frameHeight / 2 + gvm.cellRadius)
 
@@ -170,7 +174,6 @@ viewGrid { screen, mouse, time } player grid =
         [ rectangle blue frameWidth frameHeight
         , List.map (viewGridCell gvm) (Grid.toList grid) |> group
         , nextMoveTopIndicator
-            |> fade (wave 0.5 1 1.5 time)
         , nextMoveCellIndicator
         ]
 

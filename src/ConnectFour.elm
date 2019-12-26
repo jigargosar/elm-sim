@@ -125,11 +125,20 @@ viewGrid screen grid =
         gvm =
             toGridViewModel screen grid
 
-        off =
+        frameOffset =
             gvm.cellSize
+
+        frameWidth =
+            gvm.width + frameOffset
+
+        frameHeight =
+            gvm.height + frameOffset
+
+        nextMoveIndicator =
+            circle lightRed gvm.cellSize
     in
     group
-        [ rectangle blue (gvm.width + off) (gvm.height + off)
+        [ rectangle blue frameWidth frameHeight
         , List.filterMap (flip viewGridCellAt gvm) grid.cords |> group
         ]
 

@@ -135,16 +135,19 @@ viewGrid { screen, mouse } player grid =
         frameHeight =
             gvm.height + frameOffset
 
-        nextMoveIndicator =
-            cellToShape gvm (playerToCell player)
-                |> moveUp (frameHeight / 2 + gvm.cellRadius)
-                |> moveRight moveIndicatorX
-
         moveIndicatorX =
             screenCordToGridCord ( mouse.x, mouse.y ) gvm
                 |> Grid.clampCord grid
                 |> gridCordToScreenCord gvm
                 |> Tuple.first
+
+        nextMoveShape =
+            cellToShape gvm (playerToCell player)
+                |> moveRight moveIndicatorX
+
+        nextMoveIndicator =
+            nextMoveShape
+                |> moveUp (frameHeight / 2 + gvm.cellRadius)
     in
     group
         [ rectangle blue frameWidth frameHeight

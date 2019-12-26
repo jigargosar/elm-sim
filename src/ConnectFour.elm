@@ -141,6 +141,7 @@ viewGrid { screen, mouse } grid =
 
         moveIndicatorX =
             screenCordToGridCord ( mouse.x, mouse.y ) gvm
+                |> Grid.clampCord grid
                 |> flip gridCordToScreenCord gvm
                 |> Tuple.first
     in

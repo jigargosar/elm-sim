@@ -1,6 +1,7 @@
 module ConnectFour.Grid exposing
     ( Cell(..)
     , Grid
+    , clampCord
     , empty
     , get
     , set
@@ -27,6 +28,15 @@ type alias Grid =
     , cords : List ( Int, Int )
     , cells : Dict ( Int, Int ) Cell
     }
+
+
+type alias Cord =
+    ( Int, Int )
+
+
+clampCord : Grid -> Cord -> Cord
+clampCord grid =
+    Tuple.mapBoth (clamp 0 (grid.width - 1)) (clamp 0 (grid.height - 1))
 
 
 empty : Int -> Int -> Grid

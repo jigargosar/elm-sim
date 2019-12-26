@@ -1,63 +1,17 @@
 module ConnectFour exposing (main)
 
-import Dict exposing (Dict)
+import ConnectFour.Grid as Grid exposing (Cell(..), Grid)
 import Playground exposing (..)
 import PointFree exposing (flip)
 
 
-type Cell
-    = Red
-    | Yellow
-    | Empty
-
-
-type alias Grid =
-    { width : Int, height : Int, cords : List ( Int, Int ), cells : Dict ( Int, Int ) Cell }
-
-
-initGrid : Int -> Int -> Grid
-initGrid w h =
-    let
-        cords =
-            List.range 0 (w - 1)
-                |> List.map (\x -> List.range 0 (h - 1) |> List.map (\y -> ( x, y )))
-                |> List.concat
-                |> List.sort
-    in
-    { width = w, height = h, cords = cords, cells = Dict.empty }
-
-
-cellAt : ( Int, Int ) -> Grid -> Maybe Cell
-cellAt cord grid =
-    if isValidGridCord cord grid then
-        Just (Dict.get cord grid.cells |> Maybe.withDefault Empty)
-
-    else
-        Nothing
-
-
-setCellAt : ( Int, Int ) -> Cell -> Grid -> Grid
-setCellAt cord cell grid =
-    { grid | cells = Dict.insert cord cell grid.cells }
-
-
-mapCellAt : ( Int, Int ) -> (Cell -> Cell) -> Grid -> Grid
-mapCellAt cord func grid =
-    case cellAt cord grid of
-        Just cell ->
-            setCellAt cord (func cell) grid
-
-        Nothing ->
-            grid
-
-
 initialMem : Grid
 initialMem =
-    initGrid 10 18
-        |> setCellAt ( 0, 0 ) Yellow
-        |> setCellAt ( 0, 1 ) Red
-        |> setCellAt ( 0, 2 ) Yellow
-        |> setCellAt ( 7, 0 ) Yellow
+    Grid.initGrid 10 18
+        |> Grid.setCellAt ( 0, 0 ) Yellow
+        |> Grid.setCellAt ( 0, 1 ) Red
+        |> Grid.setCellAt ( 0, 2 ) Yellow
+        |> Grid.setCellAt ( 7, 0 ) Yellow
 
 
 update : Computer -> Grid -> Grid
@@ -90,7 +44,7 @@ update { mouse } mem =
 
 cycleCellAt : ( Int, Int ) -> Grid -> Grid
 cycleCellAt cord =
-    mapCellAt cord cycleCell
+    Grid.mapCellAt cord cycleCell
 
 
 cycleCell : Cell -> Cell
@@ -112,25 +66,7 @@ screenCordToGridCord ( x, y ) gvm =
         gridCord =
             ( (x - gvm.left) / gvm.cellSize |> round, (y - gvm.bottom) / gvm.cellSize |> round )
     in
-    validateGridCord gridCord gvm.grid
-
-
-validateGridCord : ( Int, Int ) -> Grid -> Maybe ( Int, Int )
-validateGridCord cord grid =
-    if isValidGridCord cord grid then
-        Just cord
-
-    else
-        Nothing
-
-
-isValidGridCord : ( Int, Int ) -> Grid -> Bool
-isValidGridCord ( x, y ) grid =
-    let
-        isInvalid =
-            x < 0 || y < 0 || x >= grid.width || y >= grid.height
-    in
-    not isInvalid
+    Grid.validateGridCord gridCord gvm.grid
 
 
 view _ grid =
@@ -165,7 +101,7 @@ viewGridCellAt cord gvm =
             circle (cellColor cell) gvm.cellRadius
                 |> move x y
     in
-    cellAt cord gvm.grid
+    Grid.cellAt cord gvm.grid
         |> Maybe.map func
 
 

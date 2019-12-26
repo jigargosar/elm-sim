@@ -117,7 +117,11 @@ viewGridCell gvm ( cord, cell ) =
 
 cellToShape : GridViewModel -> Cell -> Shape
 cellToShape gvm cell =
-    circle (cellColor cell) gvm.cellRadius
+    group
+        [ circle white gvm.cellRadius
+        , circle (cellColor cell) gvm.cellRadius
+            |> scale 0.8
+        ]
 
 
 viewGrid : Computer -> Player -> Grid -> Shape

@@ -98,7 +98,11 @@ cellColor cell =
             red
 
         Yellow ->
-            yellow
+            rgb 230 178 0
+
+
+
+--  yellow
 
 
 gridCordToScreenCord : GridViewModel -> Grid.Cord -> ScreenCord

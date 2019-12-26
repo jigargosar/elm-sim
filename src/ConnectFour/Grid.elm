@@ -82,21 +82,16 @@ isValidGridCord ( x, y ) grid =
     not isInvalid
 
 
-columnEq : Int -> ( Int, Int ) -> Bool
-columnEq column ( x, _ ) =
+xEq : Int -> ( Int, Int ) -> Bool
+xEq column ( x, _ ) =
     column == x
 
 
-isCellEmptyAt : ( Int, Int ) -> Grid -> Bool
-isCellEmptyAt cord grid =
-    get cord grid |> Maybe.map ((==) Empty) |> Maybe.withDefault True
-
-
-setAtFirstNonEmptyRowOfColumn : Int -> Cell -> Grid -> Grid
-setAtFirstNonEmptyRowOfColumn column cell grid =
+setAtFirstNonEmptyYOfX : Int -> Cell -> Grid -> Grid
+setAtFirstNonEmptyYOfX x cell grid =
     let
         pred cord cellAtCord =
-            columnEq column cord && cellAtCord == Empty
+            xEq x cord && cellAtCord == Empty
     in
     case find pred grid of
         Just ( cord, _ ) ->

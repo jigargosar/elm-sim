@@ -28,13 +28,18 @@ type alias Grid =
 empty : Int -> Int -> Grid
 empty w h =
     let
+        cords : List ( Int, Int )
         cords =
             List.range 0 (w - 1)
                 |> List.map (\x -> List.range 0 (h - 1) |> List.map (\y -> ( x, y )))
                 |> List.concat
                 |> List.sort
+
+        setEmpty : ( Int, Int ) -> Dict ( Int, Int ) Cell -> Dict ( Int, Int ) Cell
+        setEmpty cord =
+            Dict.insert cord Empty
     in
-    { width = w, height = h, cords = cords, cells = Dict.empty }
+    { width = w, height = h, cords = cords, cells = List.foldl setEmpty Dict.empty cords }
 
 
 get : ( Int, Int ) -> Grid -> Maybe Cell

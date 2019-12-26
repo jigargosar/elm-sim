@@ -121,7 +121,7 @@ cellToShape gvm cell =
 
 
 viewGrid : Computer -> Player -> Grid -> Shape
-viewGrid { screen, mouse } player grid =
+viewGrid { screen, mouse, time } player grid =
     let
         gvm =
             toGridViewModel screen grid
@@ -170,6 +170,7 @@ viewGrid { screen, mouse } player grid =
         [ rectangle blue frameWidth frameHeight
         , List.map (viewGridCell gvm) (Grid.toList grid) |> group
         , nextMoveTopIndicator
+            |> fade (wave 0.5 1 1.5 time)
         , nextMoveCellIndicator
         ]
 

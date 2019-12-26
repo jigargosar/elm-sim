@@ -9,6 +9,7 @@ module ConnectFour.Grid exposing
     )
 
 import Dict exposing (Dict)
+import Dict.Extra
 import List.Extra
 import PointFree exposing (flip)
 
@@ -94,27 +95,17 @@ isCellEmptyAt cord grid =
 setAtFirstNonEmptyRowOfColumn : Int -> Cell -> Grid -> Grid
 setAtFirstNonEmptyRowOfColumn column cell grid =
     let
-        columnCords : List ( Int, Int )
-        columnCords =
-            List.filter (columnEq column) grid.cords
-
-        cellNotEmptyAt : ( Int, Int ) -> Bool
-        cellNotEmptyAt cord =
-            isCellEmptyAt cord grid |> not
+        pred cord cellAtCord =
+            columnEq column cord && cellAtCord == Empty
     in
-    case List.Extra.find cellNotEmptyAt columnCords of
-        Just cord ->
+    case find pred grid of
+        Just ( cord, _ ) ->
             set cord cell grid
 
         Nothing ->
             grid
 
 
-map : (( Int, Int ) -> Cell -> Cell) -> Grid -> Grid
-map func grid =
-    { grid
-        | cells =
-            Dict.toList grid.cells
-                |> List.map (\( cord, cell ) -> ( cord, func cord cell ))
-                |> Dict.fromList
-    }
+find : (( Int, Int ) -> Cell -> Bool) -> Grid -> Maybe ( ( Int, Int ), Cell )
+find pred grid =
+    Dict.Extra.find pred grid.cells

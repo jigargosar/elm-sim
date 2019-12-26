@@ -108,3 +108,13 @@ setAtFirstNonEmptyRowOfColumn column cell grid =
 
         Nothing ->
             grid
+
+
+map : (( Int, Int ) -> Cell -> Cell) -> Grid -> Grid
+map func grid =
+    { grid
+        | cells =
+            Dict.toList grid.cells
+                |> List.map (\( cord, cell ) -> ( cord, func cord cell ))
+                |> Dict.fromList
+    }

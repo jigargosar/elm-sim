@@ -23,7 +23,7 @@ initialMem =
 
 initialGrid : Grid
 initialGrid =
-    Grid.empty 10 18
+    Grid.empty 6 5
         |> Grid.set ( 0, 0 ) Yellow
         |> Grid.set ( 0, 1 ) Red
         |> Grid.set ( 0, 2 ) Yellow
@@ -31,11 +31,11 @@ initialGrid =
 
 
 update : Computer -> Mem -> Mem
-update { mouse } mem =
+update { mouse, screen } mem =
     if mouse.click then
         let
             gvm =
-                toGridViewModel mem.grid
+                toGridViewModel screen mem.grid
 
             ( x, _ ) =
                 screenCordToGridCord ( mouse.x, mouse.y ) gvm
@@ -83,8 +83,8 @@ screenCordToGridCord ( x, y ) gvm =
 
 
 view : Computer -> Mem -> List Shape
-view _ mem =
-    [ viewGrid mem.grid ]
+view { screen } mem =
+    [ viewGrid screen mem.grid ]
 
 
 cellColor : Cell -> Color
@@ -119,11 +119,11 @@ viewGridCellAt cord gvm =
         |> Maybe.map func
 
 
-viewGrid : Grid -> Shape
-viewGrid grid =
+viewGrid : Screen -> Grid -> Shape
+viewGrid screen grid =
     let
         gvm =
-            toGridViewModel grid
+            toGridViewModel screen grid
 
         off =
             gvm.cellSize
@@ -147,11 +147,17 @@ type alias GridViewModel =
     }
 
 
-toGridViewModel : Grid -> GridViewModel
-toGridViewModel grid =
+toGridViewModel : Screen -> Grid -> GridViewModel
+toGridViewModel screen grid =
     let
+        cellWidth =
+            (screen.width * 0.9) / toFloat grid.width
+
+        cellHeight =
+            (screen.height * 0.9) / toFloat grid.height
+
         cellSize =
-            50
+            min cellWidth cellHeight |> round |> toFloat
 
         width =
             toFloat (grid.width - 1) * cellSize

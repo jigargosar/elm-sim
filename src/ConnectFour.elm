@@ -77,7 +77,7 @@ playerToCell player =
             Yellow
 
 
-screenCordToGridCord : ( Float, Float ) -> GridViewModel -> Grid.Cord
+screenCordToGridCord : ScreenCord -> GridViewModel -> Grid.Cord
 screenCordToGridCord ( x, y ) gvm =
     ( (x - gvm.left) / gvm.cellSize |> round, (y - gvm.bottom) / gvm.cellSize |> round )
 
@@ -100,7 +100,7 @@ cellColor cell =
             yellow
 
 
-gridCordToScreenCord : GridViewModel -> Grid.Cord -> ( Float, Float )
+gridCordToScreenCord : GridViewModel -> Grid.Cord -> ScreenCord
 gridCordToScreenCord gvm ( x, y ) =
     ( gvm.left + toFloat x * gvm.cellSize, gvm.bottom + toFloat y * gvm.cellSize )
 
@@ -150,6 +150,10 @@ viewGrid { screen, mouse } grid =
         , List.filterMap (flip viewGridCellAt gvm) grid.cords |> group
         , nextMoveIndicator
         ]
+
+
+type alias ScreenCord =
+    ( Number, Number )
 
 
 type alias GridViewModel =

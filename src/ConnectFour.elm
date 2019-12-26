@@ -84,7 +84,7 @@ screenCordToGridCord ( x, y ) gvm =
 
 view : Computer -> Mem -> List Shape
 view computer mem =
-    [ viewGrid computer mem.grid ]
+    [ viewGrid computer mem.currentPlayer mem.grid ]
 
 
 cellColor : Cell -> Color
@@ -119,8 +119,8 @@ viewGridCellAt cord gvm =
         |> Maybe.map func
 
 
-viewGrid : Computer -> Grid -> Shape
-viewGrid { screen, mouse } grid =
+viewGrid : Computer -> Player -> Grid -> Shape
+viewGrid { screen, mouse } player grid =
     let
         gvm =
             toGridViewModel screen grid
@@ -135,7 +135,7 @@ viewGrid { screen, mouse } grid =
             gvm.height + frameOffset
 
         nextMoveIndicator =
-            circle lightRed gvm.cellRadius
+            circle (playerToCell player |> cellColor) gvm.cellRadius
                 |> moveUp (frameHeight / 2 + gvm.cellRadius)
                 |> moveRight moveIndicatorX
 

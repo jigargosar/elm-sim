@@ -7,7 +7,7 @@ import PointFree exposing (flip)
 
 initialMem : Grid
 initialMem =
-    Grid.initGrid 10 18
+    Grid.empty 10 18
         |> Grid.setCellAt ( 0, 0 ) Yellow
         |> Grid.setCellAt ( 0, 1 ) Red
         |> Grid.setCellAt ( 0, 2 ) Yellow
@@ -101,7 +101,7 @@ viewGridCellAt cord gvm =
             circle (cellColor cell) gvm.cellRadius
                 |> move x y
     in
-    Grid.cellAt cord gvm.grid
+    Grid.get cord gvm.grid
         |> Maybe.map func
 
 

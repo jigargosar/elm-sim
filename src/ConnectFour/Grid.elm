@@ -1,8 +1,8 @@
 module ConnectFour.Grid exposing
     ( Cell(..)
     , Grid
-    , cellAt
-    , initGrid
+    , empty
+    , get
     , mapCellAt
     , setCellAt
     , validateGridCord
@@ -18,11 +18,15 @@ type Cell
 
 
 type alias Grid =
-    { width : Int, height : Int, cords : List ( Int, Int ), cells : Dict ( Int, Int ) Cell }
+    { width : Int
+    , height : Int
+    , cords : List ( Int, Int )
+    , cells : Dict ( Int, Int ) Cell
+    }
 
 
-initGrid : Int -> Int -> Grid
-initGrid w h =
+empty : Int -> Int -> Grid
+empty w h =
     let
         cords =
             List.range 0 (w - 1)
@@ -33,8 +37,8 @@ initGrid w h =
     { width = w, height = h, cords = cords, cells = Dict.empty }
 
 
-cellAt : ( Int, Int ) -> Grid -> Maybe Cell
-cellAt cord grid =
+get : ( Int, Int ) -> Grid -> Maybe Cell
+get cord grid =
     if isValidGridCord cord grid then
         Just (Dict.get cord grid.cells |> Maybe.withDefault Empty)
 
@@ -49,7 +53,7 @@ setCellAt cord cell grid =
 
 mapCellAt : ( Int, Int ) -> (Cell -> Cell) -> Grid -> Grid
 mapCellAt cord func grid =
-    case cellAt cord grid of
+    case get cord grid of
         Just cell ->
             setCellAt cord (func cell) grid
 

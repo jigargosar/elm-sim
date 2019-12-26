@@ -9,6 +9,8 @@ module ConnectFour.Grid exposing
     )
 
 import Dict exposing (Dict)
+import List.Extra
+import PointFree exposing (flip)
 
 
 type Cell
@@ -77,3 +79,32 @@ isValidGridCord ( x, y ) grid =
             x < 0 || y < 0 || x >= grid.width || y >= grid.height
     in
     not isInvalid
+
+
+columnEq : Int -> ( Int, Int ) -> Bool
+columnEq column ( x, _ ) =
+    column == x
+
+
+isCellEmptyAt : ( Int, Int ) -> Grid -> Bool
+isCellEmptyAt cord grid =
+    get cord grid |> Maybe.map ((==) Empty) |> Maybe.withDefault True
+
+
+setAtFirstNonEmptyColumn : Int -> Cell -> Grid -> Grid
+setAtFirstNonEmptyColumn column cell grid =
+    let
+        columnCords : List ( Int, Int )
+        columnCords =
+            List.filter (columnEq column) grid.cords
+
+        cellNotEmptyAt : ( Int, Int ) -> Bool
+        cellNotEmptyAt cord =
+            isCellEmptyAt cord grid |> not
+    in
+    case List.Extra.find cellNotEmptyAt columnCords of
+        Just cord ->
+            set cord cell grid
+
+        Nothing ->
+            grid

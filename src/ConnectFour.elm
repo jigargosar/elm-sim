@@ -107,14 +107,13 @@ gridCordToScreenCord gvm ( x, y ) =
     ( gvm.left + toFloat x * gvm.cellSize, gvm.bottom + toFloat y * gvm.cellSize )
 
 
-viewGridCellAt : Grid.Cord -> GridViewModel -> Maybe Shape
-viewGridCellAt cord gvm =
+viewGridCell : GridViewModel -> ( Grid.Cord, Grid.Cell ) -> Shape
+viewGridCell gvm ( cord, cell ) =
     let
         ( x, y ) =
             gridCordToScreenCord gvm cord
     in
-    Grid.get cord gvm.grid
-        |> Maybe.map (cellToShape gvm >> move x y)
+    cell |> cellToShape gvm |> move x y
 
 
 cellToShape : GridViewModel -> Cell -> Shape
@@ -170,7 +169,7 @@ viewGrid { screen, mouse } player grid =
     in
     group
         [ rectangle blue frameWidth frameHeight
-        , List.filterMap (flip viewGridCellAt gvm) (Grid.cords__ grid) |> group
+        , List.map (viewGridCell gvm) (Grid.toList grid) |> group
         , nextMoveTopIndicator
         , nextMoveCellIndicator
         ]

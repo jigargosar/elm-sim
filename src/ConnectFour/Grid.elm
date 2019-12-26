@@ -3,13 +3,13 @@ module ConnectFour.Grid exposing
     , Cord
     , Grid
     , clampCord
-    , cords__
     , dimensions
     , empty
     , get
     , getFirstNonEmptyCordWhereXEq
     , set
     , setAtFirstNonEmptyYOfX
+    , toList
     , update
     , validateGridCord
     )
@@ -146,12 +146,7 @@ findCord pred grid =
     find pred grid |> Maybe.map Tuple.first
 
 
-cords__ : Grid -> List Cord
-cords__ =
-    unwrap >> .cords
-
-
-toList : Grid -> List ( ( Int, Int ), Cell )
+toList : Grid -> List ( Cord, Cell )
 toList =
     unwrap >> .cells >> Dict.toList
 

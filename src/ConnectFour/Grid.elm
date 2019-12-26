@@ -1,5 +1,6 @@
 module ConnectFour.Grid exposing
     ( Cell(..)
+    , Cord
     , Grid
     , clampCord
     , empty

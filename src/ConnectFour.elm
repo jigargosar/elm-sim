@@ -77,7 +77,7 @@ playerToCell player =
             Yellow
 
 
-screenCordToGridCord : ( Float, Float ) -> GridViewModel -> ( Int, Int )
+screenCordToGridCord : ( Float, Float ) -> GridViewModel -> Grid.Cord
 screenCordToGridCord ( x, y ) gvm =
     ( (x - gvm.left) / gvm.cellSize |> round, (y - gvm.bottom) / gvm.cellSize |> round )
 
@@ -100,16 +100,16 @@ cellColor cell =
             yellow
 
 
-gridCordToScreenCord : ( Int, Int ) -> GridViewModel -> ( Float, Float )
-gridCordToScreenCord ( x, y ) gvm =
+gridCordToScreenCord : GridViewModel -> Grid.Cord -> ( Float, Float )
+gridCordToScreenCord gvm ( x, y ) =
     ( gvm.left + toFloat x * gvm.cellSize, gvm.bottom + toFloat y * gvm.cellSize )
 
 
-viewGridCellAt : ( Int, Int ) -> GridViewModel -> Maybe Shape
+viewGridCellAt : Grid.Cord -> GridViewModel -> Maybe Shape
 viewGridCellAt cord gvm =
     let
         ( x, y ) =
-            gridCordToScreenCord cord gvm
+            gridCordToScreenCord gvm cord
 
         func cell =
             circle (cellColor cell) gvm.cellRadius
@@ -142,7 +142,7 @@ viewGrid { screen, mouse } grid =
         moveIndicatorX =
             screenCordToGridCord ( mouse.x, mouse.y ) gvm
                 |> Grid.clampCord grid
-                |> flip gridCordToScreenCord gvm
+                |> gridCordToScreenCord gvm
                 |> Tuple.first
     in
     group

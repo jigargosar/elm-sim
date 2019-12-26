@@ -25,46 +25,42 @@ initialGrid =
 
 update : Computer -> Mem -> Mem
 update { mouse } mem =
-    let
-        gvm =
-            toGridViewModel mem.grid
-    in
     if mouse.click then
-        { mem | grid = fillGridColumn (screenCordToGridCord ( mouse.x, mouse.y ) gvm) mem.grid }
+        let
+            gvm =
+                toGridViewModel mem.grid
+
+            ( x, _ ) =
+                screenCordToGridCord ( mouse.x, mouse.y ) gvm
+
+            newGrid =
+                Grid.setAtFirstNonEmptyYOfX x mem.turn mem.grid
+        in
+        { mem
+            | grid = newGrid
+            , turn =
+                if newGrid == mem.grid then
+                    mem.turn
+
+                else
+                    swapTurn mem.turn
+        }
 
     else
         mem
 
 
-fillGridColumn : ( Int, Int ) -> Grid -> Grid
-fillGridColumn ( x, _ ) =
-    Grid.setAtFirstNonEmptyYOfX x Red
-
-
-cycleCellAt : ( Int, Int ) -> Grid -> Grid
-cycleCellAt cord =
-    Grid.update cord cycleCell
-
-
-cycleCell : Cell -> Cell
-cycleCell cell =
+swapTurn : Cell -> Cell
+swapTurn cell =
     case cell of
-        Empty ->
-            Red
-
         Red ->
             Yellow
 
         Yellow ->
-            Empty
+            Red
 
-
-
-{-
-   screenCordToValidatedGridCord : ( Float, Float ) -> GridViewModel -> Maybe ( Int, Int )
-   screenCordToValidatedGridCord screenCord gvm =
-       Grid.validateGridCord (screenCordToGridCord screenCord gvm) gvm.grid
--}
+        Empty ->
+            Red
 
 
 screenCordToGridCord : ( Float, Float ) -> GridViewModel -> ( Int, Int )

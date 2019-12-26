@@ -5,8 +5,17 @@ import Playground exposing (..)
 import PointFree exposing (flip)
 
 
-initialMem : Grid
+type alias Mem =
+    { grid : Grid, turn : Cell }
+
+
+initialMem : Mem
 initialMem =
+    { grid = initialGrid, turn = Red }
+
+
+initialGrid : Grid
+initialGrid =
     Grid.empty 10 18
         |> Grid.set ( 0, 0 ) Yellow
         |> Grid.set ( 0, 1 ) Red
@@ -14,14 +23,14 @@ initialMem =
         |> Grid.set ( 7, 0 ) Yellow
 
 
-update : Computer -> Grid -> Grid
+update : Computer -> Mem -> Mem
 update { mouse } mem =
     let
         gvm =
-            toGridViewModel mem
+            toGridViewModel mem.grid
     in
     if mouse.click then
-        fillGridColumn (screenCordToGridCord ( mouse.x, mouse.y ) gvm) mem
+        { mem | grid = fillGridColumn (screenCordToGridCord ( mouse.x, mouse.y ) gvm) mem.grid }
 
     else
         mem
@@ -63,8 +72,9 @@ screenCordToGridCord ( x, y ) gvm =
     ( (x - gvm.left) / gvm.cellSize |> round, (y - gvm.bottom) / gvm.cellSize |> round )
 
 
-view _ grid =
-    [ viewGrid grid ]
+view : Computer -> Mem -> List Shape
+view _ mem =
+    [ viewGrid mem.grid ]
 
 
 cellColor : Cell -> Color

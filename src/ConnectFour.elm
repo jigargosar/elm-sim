@@ -83,8 +83,8 @@ screenCordToGridCord ( x, y ) gvm =
 
 
 view : Computer -> Mem -> List Shape
-view { screen } mem =
-    [ viewGrid screen mem.grid ]
+view computer mem =
+    [ viewGrid computer mem.grid ]
 
 
 cellColor : Cell -> Color
@@ -119,8 +119,8 @@ viewGridCellAt cord gvm =
         |> Maybe.map func
 
 
-viewGrid : Screen -> Grid -> Shape
-viewGrid screen grid =
+viewGrid : Computer -> Grid -> Shape
+viewGrid { screen, mouse } grid =
     let
         gvm =
             toGridViewModel screen grid
@@ -140,7 +140,8 @@ viewGrid screen grid =
                 |> moveRight moveIndicatorX
 
         moveIndicatorX =
-            gridCordToScreenCord ( 0, 0 ) gvm
+            screenCordToGridCord ( mouse.x, mouse.y ) gvm
+                |> flip gridCordToScreenCord gvm
                 |> Tuple.first
     in
     group

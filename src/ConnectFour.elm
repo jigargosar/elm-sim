@@ -209,7 +209,7 @@ toGridViewModel screen grid =
             (screen.height * 0.8) / (gh + 1)
 
         cellSize =
-            min maxCellWidth maxCellHeight |> round |> toFloat
+            min maxCellWidth maxCellHeight
 
         width =
             (gw - 1) * cellSize

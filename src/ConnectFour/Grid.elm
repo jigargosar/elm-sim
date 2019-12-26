@@ -93,8 +93,8 @@ setAtFirstNonEmptyYOfX x cell grid =
         pred cord cellAtCord =
             xEq x cord && cellAtCord == Empty
     in
-    case find pred grid of
-        Just ( cord, _ ) ->
+    case findCord pred grid of
+        Just cord ->
             set cord cell grid
 
         Nothing ->
@@ -104,3 +104,8 @@ setAtFirstNonEmptyYOfX x cell grid =
 find : (( Int, Int ) -> Cell -> Bool) -> Grid -> Maybe ( ( Int, Int ), Cell )
 find pred grid =
     Dict.Extra.find pred grid.cells
+
+
+findCord : (( Int, Int ) -> Cell -> Bool) -> Grid -> Maybe ( Int, Int )
+findCord pred grid =
+    find pred grid |> Maybe.map Tuple.first

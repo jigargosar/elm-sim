@@ -146,7 +146,7 @@ viewGrid { screen, mouse, time } player grid =
                 [ circle (rgb 60 60 60) gvm.cellRadius
                 , circle white (gvm.cellRadius - 3)
                 , circle (cellColor (playerToCell player)) (gvm.cellRadius - 3)
-                    |> fade (wave 0.5 1 1.2 time)
+                    |> fade (wave 0.6 1 1.5 time)
                 ]
                 |> moveRight moveIndicatorScreenX
                 |> moveUp (frameHeight / 2 + gvm.cellRadius)

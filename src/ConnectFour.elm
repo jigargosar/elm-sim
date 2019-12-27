@@ -117,21 +117,21 @@ viewGridCell gvm ( cord, cell ) =
         ( x, y ) =
             gridCordToScreenCord gvm cord
     in
-    cell |> gridCellToShape gvm |> move x y
+    cell |> cellToShape gvm |> move x y
 
 
-cellShapeForPlayer : GridViewModel -> Player -> Shape
-cellShapeForPlayer gvm player =
-    gridCellToShape gvm (playerToCell player)
+playerToCellShape : GridViewModel -> Player -> Shape
+playerToCellShape gvm player =
+    cellToShape gvm (playerToCell player)
 
 
-gridCellToShape : GridViewModel -> Cell -> Shape
-gridCellToShape gvm cell =
-    gridCellShapeWithColor gvm (cellToColor cell)
+cellToShape : GridViewModel -> Cell -> Shape
+cellToShape gvm cell =
+    cellShapeWithColor gvm (cellToColor cell)
 
 
-gridCellShapeWithColor : GridViewModel -> Color -> Shape
-gridCellShapeWithColor gvm color =
+cellShapeWithColor : GridViewModel -> Color -> Shape
+cellShapeWithColor gvm color =
     group
         [ circle white gvm.cellRadius
         , circle color gvm.cellRadius
@@ -155,7 +155,7 @@ viewGrid { screen, mouse, time } player grid =
             gvm.height + frameOffset
 
         moveIndicatorShape =
-            cellShapeForPlayer gvm player
+            playerToCellShape gvm player
                 |> fade (wave 0.5 0.9 1.3 time + 0.1)
                 |> moveRight
                     (screenCordToGridCord ( mouse.x, mouse.y ) gvm

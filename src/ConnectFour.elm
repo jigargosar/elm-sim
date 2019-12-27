@@ -159,7 +159,7 @@ viewGrid { screen, mouse, time } player grid =
                     screenCordToGridCord ( mouse.x, mouse.y ) gvm
 
                 maybeScreenY =
-                    Grid.getFirstNonEmptyCordWhereXEq x grid
+                    Grid.getFirstEmptyCordWhereXEq x grid
                         |> Maybe.map (gridCordToScreenCord gvm >> Tuple.second)
             in
             case maybeScreenY of

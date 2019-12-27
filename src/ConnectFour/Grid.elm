@@ -5,7 +5,7 @@ module ConnectFour.Grid exposing
     , clampCord
     , dimensions
     , empty
-    , getFirstNonEmptyCordWhereXEq
+    , getFirstEmptyCordWhereXEq
     , setFirstNonEmptyYOfX
     , toList
     )
@@ -79,7 +79,7 @@ xEq column ( x, _ ) =
 
 setFirstNonEmptyYOfX : Int -> Cell -> Grid -> Grid
 setFirstNonEmptyYOfX x cell grid =
-    case getFirstNonEmptyCordWhereXEq x grid of
+    case getFirstEmptyCordWhereXEq x grid of
         Just cord ->
             update cord (always cell) grid
 
@@ -87,8 +87,8 @@ setFirstNonEmptyYOfX x cell grid =
             grid
 
 
-getFirstNonEmptyCordWhereXEq : Int -> Grid -> Maybe Cord
-getFirstNonEmptyCordWhereXEq x =
+getFirstEmptyCordWhereXEq : Int -> Grid -> Maybe Cord
+getFirstEmptyCordWhereXEq x =
     let
         pred cord cell =
             xEq x cord && cell == Empty

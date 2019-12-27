@@ -2,6 +2,7 @@ module ConnectFour exposing (main)
 
 import ConnectFour.Grid as Grid exposing (Cell, Coin(..), Grid)
 import Playground exposing (..)
+import PointFree exposing (pairTo)
 
 
 type alias Mem =
@@ -177,7 +178,8 @@ viewGrid { screen, mouse, time } player grid =
     in
     group
         [ rectangle blue frameWidth frameHeight
-        , List.map (viewGridCell gvm) (Grid.toList grid) |> group
+        , List.map (viewGridCell gvm) (Grid.toList grid |> List.map (Tuple.mapSecond Just)) |> group
+        , List.map (viewGridCell gvm) (Grid.emptyPositions grid |> List.map (pairTo Nothing)) |> group
         , nextMoveTopIndicator
         , nextMoveCellIndicator
         ]

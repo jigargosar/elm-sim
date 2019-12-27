@@ -8,15 +8,15 @@ module ConnectFour.Grid exposing
     , clampCord
     , dimensions
     , empty
+    , emptyPositions
     , getFirstEmptyCordWhereXEq
     , setFirstEmptyYOfX
     , toList
     )
 
-import Dict exposing (Dict)
-import Dict.Extra
-import Grid
-import PointFree exposing (pairTo)
+import Grid.Bordered as Grid
+import Grid.Position exposing (Position)
+import List.Extra
 
 
 type Coin
@@ -45,7 +45,6 @@ type Grid
 type alias GridModel =
     { width : Int
     , height : Int
-    , cells : Dict Cord Cell
     , grid : Grid.Grid Coin
     }
 
@@ -66,18 +65,7 @@ clampCord =
 
 empty : Int -> Int -> Grid
 empty w h =
-    let
-        cords : List Cord
-        cords =
-            List.range 0 (w - 1)
-                |> List.map (\x -> List.range 0 (h - 1) |> List.map (\y -> ( x, y )))
-                |> List.concat
-                |> List.sort
-
-        emptyCells =
-            List.map (pairTo Nothing) cords |> Dict.fromList
-    in
-    Grid { width = w, height = h, cells = emptyCells, grid = Grid.empty { columns = w, rows = h } }
+    Grid { width = w, height = h, grid = Grid.empty { columns = w, rows = h } }
 
 
 map : (GridModel -> GridModel) -> Grid -> Grid
@@ -85,43 +73,53 @@ map func =
     unwrap >> func >> Grid
 
 
-update : Cord -> (Cell -> Cell) -> Grid -> Grid
-update cord func =
-    map <| \grid -> { grid | cells = Dict.update cord (Maybe.map func) grid.cells }
-
-
 xEq : Int -> Cord -> Bool
 xEq column ( x, _ ) =
     column == x
 
 
+setGrid : Grid.Grid Coin -> Grid -> Grid
+setGrid grid =
+    map <| \model -> { model | grid = grid }
+
+
 setFirstEmptyYOfX : Int -> Cell -> Grid -> Grid
-setFirstEmptyYOfX x cell grid =
-    case getFirstEmptyCordWhereXEq x grid of
+setFirstEmptyYOfX x cell model =
+    let
+        grid =
+            unwrap model |> .grid
+    in
+    case getFirstEmptyCordWhereXEq x model of
         Just cord ->
-            update cord (always cell) grid
+            case Grid.update cord (always (Ok cell)) grid of
+                Ok value ->
+                    setGrid value model
+
+                Err _ ->
+                    model
 
         Nothing ->
-            grid
+            model
 
 
 getFirstEmptyCordWhereXEq : Int -> Grid -> Maybe Cord
 getFirstEmptyCordWhereXEq x =
     let
-        pred cord cell =
-            xEq x cord && cell == Nothing
+        pred : Cord -> Bool
+        pred cord =
+            xEq x cord
     in
-    cells >> Dict.Extra.find pred >> Maybe.map Tuple.first
+    emptyPositions >> List.Extra.find pred
 
 
-toList : Grid -> List ( Cord, Cell )
+toList : Grid -> List ( Cord, Coin )
 toList =
-    cells >> Dict.toList
+    unwrap >> .grid >> Grid.toList
 
 
-cells : Grid -> Dict Cord Cell
-cells =
-    unwrap >> .cells
+emptyPositions : Grid -> List Cord
+emptyPositions =
+    unwrap >> .grid >> Grid.emptyPositions
 
 
 dimensions : Grid -> Cord

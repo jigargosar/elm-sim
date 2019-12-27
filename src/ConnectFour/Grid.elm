@@ -68,11 +68,6 @@ map func =
     unwrap >> func >> Grid
 
 
-set : Cord -> Cell -> Grid -> Grid
-set cord cell =
-    update cord (always cell)
-
-
 update : Cord -> (Cell -> Cell) -> Grid -> Grid
 update cord func =
     map <| \grid -> { grid | cells = Dict.update cord (Maybe.map func) grid.cells }
@@ -87,7 +82,7 @@ setFirstNonEmptyYOfX : Int -> Cell -> Grid -> Grid
 setFirstNonEmptyYOfX x cell grid =
     case getFirstNonEmptyCordWhereXEq x grid of
         Just cord ->
-            set cord cell grid
+            update cord (always cell) grid
 
         Nothing ->
             grid

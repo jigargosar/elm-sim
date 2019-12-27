@@ -26,7 +26,6 @@
             "ianmackenzie/elm-geometry": "3.0.0",
             "ianmackenzie/elm-geometry-svg": "3.0.0",
             "ianmackenzie/elm-units": "2.2.0",
-            "joakin/elm-grid": "1.0.1",
             "laserpants/elm-update-pipeline": "1.0.0",
             "savardd/elm-time-travel": "2.0.0"
         },

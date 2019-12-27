@@ -15,6 +15,7 @@ module ConnectFour.Grid exposing
 
 import Dict exposing (Dict)
 import Dict.Extra
+import Grid
 import PointFree exposing (pairTo)
 
 
@@ -45,6 +46,7 @@ type alias GridModel =
     { width : Int
     , height : Int
     , cells : Dict Cord Cell
+    , grid : Grid.Grid Coin
     }
 
 
@@ -75,7 +77,7 @@ empty w h =
         emptyCells =
             List.map (pairTo Nothing) cords |> Dict.fromList
     in
-    Grid { width = w, height = h, cells = emptyCells }
+    Grid { width = w, height = h, cells = emptyCells, grid = Grid.empty { columns = w, rows = h } }
 
 
 map : (GridModel -> GridModel) -> Grid -> Grid

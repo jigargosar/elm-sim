@@ -15,7 +15,6 @@ module ConnectFour.Grid exposing
     )
 
 import Grid.Bordered as Grid
-import Grid.Position exposing (Position)
 import List.Extra
 
 

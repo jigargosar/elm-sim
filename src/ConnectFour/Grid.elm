@@ -11,10 +11,12 @@ module ConnectFour.Grid exposing
     , emptyPositions
     , getFirstEmptyCordWhereXEq
     , setFirstEmptyYOfX
+    , toCellList
     , toList
     )
 
 import Grid.Bordered as Grid
+import Grid.Position exposing (Position)
 import List.Extra
 
 
@@ -119,6 +121,11 @@ toList =
 emptyPositions : Grid -> List Cord
 emptyPositions =
     unwrap >> .grid >> Grid.emptyPositions
+
+
+toCellList : Grid -> List ( Position, Cell )
+toCellList =
+    unwrap >> .grid >> Grid.foldl (\p c -> (::) ( p, c )) []
 
 
 dimensions : Grid -> Cord

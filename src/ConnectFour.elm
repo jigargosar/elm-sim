@@ -178,8 +178,7 @@ viewGrid { screen, mouse, time } player grid =
     in
     group
         [ rectangle blue frameWidth frameHeight
-        , List.map (viewGridCell gvm) (Grid.toList grid |> List.map (Tuple.mapSecond Just)) |> group
-        , List.map (viewGridCell gvm) (Grid.emptyPositions grid |> List.map (pairTo Nothing)) |> group
+        , List.map (viewGridCell gvm) (Grid.toCellList grid) |> group
         , nextMoveTopIndicator
         , nextMoveCellIndicator
         ]

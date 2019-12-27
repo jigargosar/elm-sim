@@ -23,12 +23,3 @@ type Error
 addCoinInRow : Int -> Coin -> Result Error Board
 addCoinInRow =
     Debug.todo "impl"
-
-
-type Walker
-    = Walker
-
-
-startAt : Int -> Int -> Board
-startAt =
-    Debug.todo "impl"

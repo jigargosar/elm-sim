@@ -6,7 +6,7 @@ module ConnectFour.Grid exposing
     , dimensions
     , empty
     , getFirstEmptyCordWhereXEq
-    , setFirstNonEmptyYOfX
+    , setFirstEmptyYOfX
     , toList
     )
 
@@ -77,8 +77,8 @@ xEq column ( x, _ ) =
     column == x
 
 
-setFirstNonEmptyYOfX : Int -> Cell -> Grid -> Grid
-setFirstNonEmptyYOfX x cell grid =
+setFirstEmptyYOfX : Int -> Cell -> Grid -> Grid
+setFirstEmptyYOfX x cell grid =
     case getFirstEmptyCordWhereXEq x grid of
         Just cord ->
             update cord (always cell) grid

@@ -102,8 +102,8 @@ find pred =
 
 
 findCord : (Cord -> Cell -> Bool) -> Grid -> Maybe Cord
-findCord pred grid =
-    find pred grid |> Maybe.map Tuple.first
+findCord pred =
+    find pred >> Maybe.map Tuple.first
 
 
 toList : Grid -> List ( Cord, Cell )

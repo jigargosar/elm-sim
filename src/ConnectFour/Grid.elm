@@ -93,17 +93,17 @@ getFirstNonEmptyCordWhereXEq x =
         pred cord cell =
             xEq x cord && cell == Empty
     in
-    find pred >> Maybe.map Tuple.first
-
-
-find : (Cord -> Cell -> Bool) -> Grid -> Maybe ( Cord, Cell )
-find pred =
-    unwrap >> .cells >> Dict.Extra.find pred
+    cells >> Dict.Extra.find pred >> Maybe.map Tuple.first
 
 
 toList : Grid -> List ( Cord, Cell )
 toList =
-    unwrap >> .cells >> Dict.toList
+    cells >> Dict.toList
+
+
+cells : Grid -> Dict Cord Cell
+cells =
+    unwrap >> .cells
 
 
 dimensions : Grid -> Cord

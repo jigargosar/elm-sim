@@ -1,7 +1,10 @@
 module ConnectFour.Grid exposing
-    ( Cell(..)
+    ( Cell
+    , Coin(..)
     , Cord
     , Grid
+    , cellToCoin
+    , cellWith
     , clampCord
     , dimensions
     , empty
@@ -15,10 +18,29 @@ import Dict.Extra
 import PointFree exposing (pairTo)
 
 
-type Cell
+type Coin
     = Red
     | Yellow
+
+
+type Cell
+    = Coin Coin
     | Empty
+
+
+cellWith : Coin -> Cell
+cellWith =
+    Coin
+
+
+cellToCoin : Cell -> Maybe Coin
+cellToCoin cell =
+    case cell of
+        Coin coin ->
+            Just coin
+
+        Empty ->
+            Nothing
 
 
 type Grid

@@ -1,6 +1,6 @@
 module ConnectFour exposing (main)
 
-import ConnectFour.Grid as Grid exposing (Cell(..), Grid)
+import ConnectFour.Grid as Grid exposing (Cell(..), Coin(..), Grid)
 import Playground exposing (..)
 
 
@@ -62,14 +62,18 @@ swapPlayer cell =
             PlayerRed
 
 
-playerToCell : Player -> Cell
-playerToCell player =
+playerToCoin : Player -> Coin
+playerToCoin player =
     case player of
         PlayerRed ->
             Red
 
         PlayerYellow ->
             Yellow
+
+
+playerToCell =
+    playerToCoin >> Grid.cellWith
 
 
 screenCordToGridCord : ScreenCord -> GridViewModel -> Grid.Cord
@@ -84,17 +88,18 @@ view ({ screen } as computer) mem =
     ]
 
 
-cellColor : Cell -> Color
-cellColor cell =
-    case cell of
-        Empty ->
-            white
+cellToColor : Cell -> Color
+cellToColor =
+    let
+        coinToColor coin =
+            case coin of
+                Red ->
+                    red
 
-        Red ->
-            red
-
-        Yellow ->
-            rgb 230 178 0
+                Yellow ->
+                    rgb 230 178 0
+    in
+    Grid.cellToCoin >> Maybe.map coinToColor >> Maybe.withDefault white
 
 
 
@@ -119,7 +124,7 @@ cellToShape : GridViewModel -> Cell -> Shape
 cellToShape gvm cell =
     group
         [ circle white gvm.cellRadius
-        , circle (cellColor cell) gvm.cellRadius
+        , circle (cellToColor cell) gvm.cellRadius
             |> scale 0.8
         ]
 

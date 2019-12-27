@@ -96,12 +96,12 @@ getFirstNonEmptyCordWhereXEq x grid =
     findCord pred grid
 
 
-find : (( Int, Int ) -> Cell -> Bool) -> Grid -> Maybe ( Cord, Cell )
+find : (Cord -> Cell -> Bool) -> Grid -> Maybe ( Cord, Cell )
 find pred =
     unwrap >> .cells >> Dict.Extra.find pred
 
 
-findCord : (( Int, Int ) -> Cell -> Bool) -> Grid -> Maybe Cord
+findCord : (Cord -> Cell -> Bool) -> Grid -> Maybe Cord
 findCord pred grid =
     find pred grid |> Maybe.map Tuple.first
 

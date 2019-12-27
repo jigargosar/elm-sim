@@ -23,24 +23,18 @@ type Coin
     | Yellow
 
 
-type Cell
-    = Coin Coin
-    | Empty
+type alias Cell =
+    Maybe Coin
 
 
 cellWith : Coin -> Cell
 cellWith =
-    Coin
+    Just
 
 
 cellToCoin : Cell -> Maybe Coin
-cellToCoin cell =
-    case cell of
-        Coin coin ->
-            Just coin
-
-        Empty ->
-            Nothing
+cellToCoin =
+    identity
 
 
 type Grid
@@ -79,7 +73,7 @@ empty w h =
                 |> List.sort
 
         emptyCells =
-            List.map (pairTo Empty) cords |> Dict.fromList
+            List.map (pairTo Nothing) cords |> Dict.fromList
     in
     Grid { width = w, height = h, cells = emptyCells }
 
@@ -113,7 +107,7 @@ getFirstEmptyCordWhereXEq : Int -> Grid -> Maybe Cord
 getFirstEmptyCordWhereXEq x =
     let
         pred cord cell =
-            xEq x cord && cell == Empty
+            xEq x cord && cell == Nothing
     in
     cells >> Dict.Extra.find pred >> Maybe.map Tuple.first
 

@@ -1,6 +1,6 @@
 module ConnectFour exposing (main)
 
-import ConnectFour.Grid as Grid exposing (Cell(..), Coin(..), Grid)
+import ConnectFour.Grid as Grid exposing (Cell, Coin(..), Grid)
 import Playground exposing (..)
 
 

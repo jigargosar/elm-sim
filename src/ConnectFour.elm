@@ -23,10 +23,6 @@ initialMem =
 initialGrid : Grid
 initialGrid =
     Grid.empty 6 5
-        |> Grid.set ( 0, 0 ) Yellow
-        |> Grid.set ( 0, 1 ) Red
-        |> Grid.set ( 0, 2 ) Yellow
-        |> Grid.set ( 7, 0 ) Yellow
 
 
 update : Computer -> Mem -> Mem

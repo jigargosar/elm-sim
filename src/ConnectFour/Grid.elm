@@ -6,7 +6,6 @@ module ConnectFour.Grid exposing
     , dimensions
     , empty
     , getFirstNonEmptyCordWhereXEq
-    , set
     , setFirstNonEmptyYOfX
     , toList
     )

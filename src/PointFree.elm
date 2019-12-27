@@ -157,3 +157,8 @@ consTo =
 mapAccuml : (a -> acc -> ( b, acc )) -> acc -> List a -> ( acc, List b )
 mapAccuml func acc =
     List.Extra.mapAccuml (\a b -> func b a |> swap) acc
+
+
+pairTo : b -> a -> ( a, b )
+pairTo =
+    flip Tuple.pair

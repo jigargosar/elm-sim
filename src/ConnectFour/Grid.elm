@@ -12,6 +12,7 @@ module ConnectFour.Grid exposing
 
 import Dict exposing (Dict)
 import Dict.Extra
+import PointFree exposing (pairTo)
 
 
 type Cell
@@ -56,11 +57,10 @@ empty w h =
                 |> List.concat
                 |> List.sort
 
-        setEmpty : Cord -> Dict Cord Cell -> Dict Cord Cell
-        setEmpty cord =
-            Dict.insert cord Empty
+        cells =
+            List.map (pairTo Empty) cords |> Dict.fromList
     in
-    Grid { width = w, height = h, cords = cords, cells = List.foldl setEmpty Dict.empty cords }
+    Grid { width = w, height = h, cords = cords, cells = cells }
 
 
 map : (GridModel -> GridModel) -> Grid -> Grid

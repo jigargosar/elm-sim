@@ -28,7 +28,6 @@ type Grid
 type alias GridModel =
     { width : Int
     , height : Int
-    , cords : List Cord
     , cells : Dict Cord Cell
     }
 
@@ -60,7 +59,7 @@ empty w h =
         cells =
             List.map (pairTo Empty) cords |> Dict.fromList
     in
-    Grid { width = w, height = h, cords = cords, cells = cells }
+    Grid { width = w, height = h, cells = cells }
 
 
 map : (GridModel -> GridModel) -> Grid -> Grid

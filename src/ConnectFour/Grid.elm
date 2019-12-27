@@ -56,10 +56,10 @@ empty w h =
                 |> List.concat
                 |> List.sort
 
-        cells =
+        emptyCells =
             List.map (pairTo Empty) cords |> Dict.fromList
     in
-    Grid { width = w, height = h, cells = cells }
+    Grid { width = w, height = h, cells = emptyCells }
 
 
 map : (GridModel -> GridModel) -> Grid -> Grid
@@ -88,22 +88,17 @@ setFirstNonEmptyYOfX x cell grid =
 
 
 getFirstNonEmptyCordWhereXEq : Int -> Grid -> Maybe Cord
-getFirstNonEmptyCordWhereXEq x grid =
+getFirstNonEmptyCordWhereXEq x =
     let
         pred cord cell =
             xEq x cord && cell == Empty
     in
-    findCord pred grid
+    find pred >> Maybe.map Tuple.first
 
 
 find : (Cord -> Cell -> Bool) -> Grid -> Maybe ( Cord, Cell )
 find pred =
     unwrap >> .cells >> Dict.Extra.find pred
-
-
-findCord : (Cord -> Cell -> Bool) -> Grid -> Maybe Cord
-findCord pred =
-    find pred >> Maybe.map Tuple.first
 
 
 toList : Grid -> List ( Cord, Cell )

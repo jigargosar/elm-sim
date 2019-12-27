@@ -2,7 +2,6 @@ module ConnectFour exposing (main)
 
 import ConnectFour.Grid as Grid exposing (Cell, Coin(..), Grid)
 import Playground exposing (..)
-import PointFree exposing (pairTo)
 
 
 type alias Mem =
@@ -37,7 +36,7 @@ update { mouse, screen } mem =
                 screenCordToGridCord ( mouse.x, mouse.y ) gvm
 
             newGrid =
-                Grid.setFirstEmptyYOfX x (playerToCell mem.currentPlayer) mem.grid
+                Grid.setFirstEmptyYOfX x (playerToCoin mem.currentPlayer) mem.grid
         in
         { mem
             | grid = newGrid

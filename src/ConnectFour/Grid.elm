@@ -12,7 +12,6 @@ module ConnectFour.Grid exposing
     , getFirstEmptyCordWhereXEq
     , setFirstEmptyYOfX
     , toCellList
-    , toList
     )
 
 import Grid.Bordered as Grid
@@ -84,15 +83,15 @@ setGrid grid =
     map <| \model -> { model | grid = grid }
 
 
-setFirstEmptyYOfX : Int -> Cell -> Grid -> Grid
-setFirstEmptyYOfX x cell model =
+setFirstEmptyYOfX : Int -> Coin -> Grid -> Grid
+setFirstEmptyYOfX x coin model =
     let
         grid =
             unwrap model |> .grid
     in
     case getFirstEmptyCordWhereXEq x model of
         Just cord ->
-            case Grid.update cord (always (Ok cell)) grid of
+            case Grid.insert cord coin grid of
                 Ok value ->
                     setGrid value model
 
@@ -111,11 +110,6 @@ getFirstEmptyCordWhereXEq x =
             xEq x cord
     in
     emptyPositions >> List.Extra.find pred
-
-
-toList : Grid -> List ( Cord, Coin )
-toList =
-    unwrap >> .grid >> Grid.toList
 
 
 emptyPositions : Grid -> List Cord

@@ -72,10 +72,6 @@ playerToCoin player =
             Yellow
 
 
-playerToCell =
-    playerToCoin >> Grid.cellWith
-
-
 screenCordToGridCord : ScreenCord -> GridViewModel -> Grid.Cord
 screenCordToGridCord ( x, y ) gvm =
     ( (x - gvm.left) / gvm.cellSize |> round, (y - gvm.bottom) / gvm.cellSize |> round )
@@ -90,16 +86,17 @@ view ({ screen } as computer) mem =
 
 cellToColor : Cell -> Color
 cellToColor =
-    let
-        coinToColor coin =
-            case coin of
-                Red ->
-                    red
-
-                Yellow ->
-                    rgb 230 178 0
-    in
     Grid.cellToCoin >> Maybe.map coinToColor >> Maybe.withDefault white
+
+
+coinToColor : Coin -> Color
+coinToColor coin =
+    case coin of
+        Red ->
+            red
+
+        Yellow ->
+            rgb 230 178 0
 
 
 
@@ -122,7 +119,7 @@ viewGridCell gvm ( cord, cell ) =
 
 playerToCellShape : GridViewModel -> Player -> Shape
 playerToCellShape gvm player =
-    cellToShape gvm (playerToCell player)
+    cellShapeWithColor gvm (playerToCoin >> coinToColor <| player)
 
 
 cellToShape : GridViewModel -> Cell -> Shape

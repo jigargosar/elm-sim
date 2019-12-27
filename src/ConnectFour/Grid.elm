@@ -90,8 +90,8 @@ setFirstNonEmptyYOfX x cell grid =
 getFirstNonEmptyCordWhereXEq : Int -> Grid -> Maybe Cord
 getFirstNonEmptyCordWhereXEq x grid =
     let
-        pred cord cellAtCord =
-            xEq x cord && cellAtCord == Empty
+        pred cord cell =
+            xEq x cord && cell == Empty
     in
     findCord pred grid
 

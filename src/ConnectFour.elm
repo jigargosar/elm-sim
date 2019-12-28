@@ -107,7 +107,7 @@ coinToColor coin =
 
 gridCordToScreenCord : GridScreenModel -> Grid.Position -> ScreenPosition
 gridCordToScreenCord gsm ( x, y ) =
-    ( gsm.left + toFloat x * gsm.cellSize, gsm.bottom + toFloat y * gsm.cellSize )
+    ( toFloat x * gsm.cellSize + gsm.left, toFloat y * gsm.cellSize + gsm.bottom )
 
 
 viewGridCell : GridScreenModel -> ( Grid.Position, Grid.Cell ) -> Shape

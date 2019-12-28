@@ -34,19 +34,16 @@ update { mouse, screen } mem =
 
             ( x, _ ) =
                 screenCordToGridCord ( mouse.x, mouse.y ) gvm
-
-            newGrid =
-                Grid.putCoinInColumnIgnoreError x (playerToCoin mem.currentPlayer) mem.grid
         in
-        { mem
-            | grid = newGrid
-            , currentPlayer =
-                if newGrid == mem.grid then
-                    mem.currentPlayer
+        case Grid.putCoinInColumn x (playerToCoin mem.currentPlayer) mem.grid of
+            Ok newGrid ->
+                { mem
+                    | grid = newGrid
+                    , currentPlayer = nextPlayer mem.currentPlayer
+                }
 
-                else
-                    nextPlayer mem.currentPlayer
-        }
+            Err _ ->
+                mem
 
     else
         mem

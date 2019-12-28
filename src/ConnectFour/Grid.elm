@@ -7,7 +7,7 @@ module ConnectFour.Grid exposing
     , dimensionsToTuple
     , empty
     , firstEmptyPositionInColumn
-    , putCoinInColumnIgnoreError
+    , putCoinInColumn
     , toCellList
     )
 
@@ -61,12 +61,6 @@ map func =
 setGrid : Grid.Grid Coin -> Grid -> Grid
 setGrid grid =
     map <| \model -> { model | grid = grid }
-
-
-putCoinInColumnIgnoreError : Int -> Coin -> Grid -> Grid
-putCoinInColumnIgnoreError column coin model =
-    putCoinInColumn column coin model
-        |> Result.withDefault model
 
 
 type Error

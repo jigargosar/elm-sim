@@ -162,3 +162,8 @@ mapAccuml func acc =
 pairTo : b -> a -> ( a, b )
 pairTo =
     flip Tuple.pair
+
+
+mulBy : number -> number -> number
+mulBy =
+    (*)

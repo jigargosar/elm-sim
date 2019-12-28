@@ -53,30 +53,17 @@ nextPlayerCoin playerCoin =
 mouseClickToGridColumn : Computer -> Grid -> Maybe Int
 mouseClickToGridColumn { mouse, screen } grid =
     if mouse.click then
-        Just <| mouseToGridColumn mouse (toGridScreenModel screen grid)
+        screenPositionToGridPosition ( mouse.x, mouse.y ) (toGridScreenModel screen grid)
+            |> Tuple.first
+            |> Just
 
     else
         Nothing
 
 
-mouseToGridColumn : Mouse -> GridScreenModel -> Int
-mouseToGridColumn mouse =
-    mouseToGridPosition mouse >> Tuple.first
-
-
-mouseToGridRow : Mouse -> GridScreenModel -> Int
-mouseToGridRow mouse =
-    mouseToGridPosition mouse >> Tuple.second
-
-
-mouseToGridPosition : Mouse -> GridScreenModel -> Grid.Position
-mouseToGridPosition mouse =
-    screenPositionToGridPosition ( mouse.x, mouse.y )
-
-
 screenPositionToGridPosition : ScreenPosition -> GridScreenModel -> Grid.Position
 screenPositionToGridPosition ( x, y ) gsm =
-    ( (x - gsm.left) / gsm.cellSize |> round, (y - gsm.bottom) / gsm.cellSize |> round )
+    ( (x - gsm.dx) / gsm.cellSize |> round, (y - gsm.dy) / gsm.cellSize |> round )
 
 
 view : Computer -> Mem -> List Shape
@@ -107,7 +94,7 @@ coinToColor coin =
 
 gridCordToScreenCord : GridScreenModel -> Grid.Position -> ScreenPosition
 gridCordToScreenCord gsm ( x, y ) =
-    ( toFloat x * gsm.cellSize + gsm.left, toFloat y * gsm.cellSize + gsm.bottom )
+    ( toFloat x * gsm.cellSize + gsm.dx, toFloat y * gsm.cellSize + gsm.dy )
 
 
 viewGridCell : GridScreenModel -> ( Grid.Position, Grid.Cell ) -> Shape
@@ -199,10 +186,8 @@ type alias ScreenPosition =
 type alias GridScreenModel =
     { width : Float
     , height : Float
-    , top : Float
-    , left : Float
-    , right : Float
-    , bottom : Float
+    , dx : Float
+    , dy : Float
     , cellSize : Number
     , cellRadius : Number
     }
@@ -240,10 +225,8 @@ toGridScreenModel screen grid =
     in
     { width = width
     , height = height
-    , top = height / 2
-    , left = -width / 2
-    , right = width / 2
-    , bottom = -height / 2
+    , dx = -width / 2
+    , dy = -height / 2
     , cellSize = cellSize
     , cellRadius = cellSize / 2 - cellSize / 10
     }

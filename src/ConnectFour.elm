@@ -36,7 +36,7 @@ update { mouse, screen } mem =
                 screenCordToGridCord ( mouse.x, mouse.y ) gvm
 
             newGrid =
-                Grid.insertCoinInColumnIgnoreError x (playerToCoin mem.currentPlayer) mem.grid
+                Grid.putCoinInColumnIgnoreError x (playerToCoin mem.currentPlayer) mem.grid
         in
         { mem
             | grid = newGrid

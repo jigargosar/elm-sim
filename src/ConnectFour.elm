@@ -32,10 +32,10 @@ update { mouse, screen } mem =
             gvm =
                 toGridViewModel screen mem.grid
 
-            ( x, _ ) =
-                screenCordToGridCord ( mouse.x, mouse.y ) gvm
+            ( column, _ ) =
+                screenPositionToGridPosition ( mouse.x, mouse.y ) gvm
         in
-        case Grid.putCoinInColumn x (playerToCoin mem.currentPlayer) mem.grid of
+        case Grid.putCoinInColumn column (playerToCoin mem.currentPlayer) mem.grid of
             Ok newGrid ->
                 { mem
                     | grid = newGrid
@@ -69,8 +69,8 @@ playerToCoin player =
             Yellow
 
 
-screenCordToGridCord : ScreenCord -> GridViewModel -> Grid.Position
-screenCordToGridCord ( x, y ) gvm =
+screenPositionToGridPosition : ScreenCord -> GridViewModel -> Grid.Position
+screenPositionToGridPosition ( x, y ) gvm =
     ( (x - gvm.left) / gvm.cellSize |> round, (y - gvm.bottom) / gvm.cellSize |> round )
 
 
@@ -152,7 +152,7 @@ viewGrid { screen, mouse, time } player grid =
             playerToCellShape gvm player
                 |> fade (wave 0.5 0.9 1.3 time + 0.1)
                 |> moveRight
-                    (screenCordToGridCord ( mouse.x, mouse.y ) gvm
+                    (screenPositionToGridPosition ( mouse.x, mouse.y ) gvm
                         |> Grid.clampPosition grid
                         |> gridCordToScreenCord gvm
                         |> Tuple.first
@@ -165,7 +165,7 @@ viewGrid { screen, mouse, time } player grid =
         nextMoveCellIndicator =
             let
                 ( x, _ ) =
-                    screenCordToGridCord ( mouse.x, mouse.y ) gvm
+                    screenPositionToGridPosition ( mouse.x, mouse.y ) gvm
 
                 maybeScreenY =
                     Grid.firstEmptyPositionInColumn x grid

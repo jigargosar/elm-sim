@@ -1,19 +1,18 @@
 module ConnectFour.Grid exposing
     ( Cell
     , Coin(..)
-    , Cord
     , Grid
-    , clampCord
+    , Position
+    , clampPosition
     , dimensions
     , empty
     , emptyPositions
-    , getFirstEmptyCordWhereXEq
+    , firstEmptyPositionInColumn
     , setFirstEmptyYOfX
     , toCellList
     )
 
 import Grid.Bordered as Grid
-import Grid.Position exposing (Position)
 import List.Extra
 
 
@@ -37,7 +36,7 @@ type alias GridModel =
     }
 
 
-type alias Cord =
+type alias Position =
     ( Int, Int )
 
 
@@ -46,8 +45,8 @@ unwrap (Grid grid) =
     grid
 
 
-clampCord : Grid -> Cord -> Cord
-clampCord =
+clampPosition : Grid -> Position -> Position
+clampPosition =
     unwrap >> (\grid -> Tuple.mapBoth (clamp 0 (grid.width - 1)) (clamp 0 (grid.height - 1)))
 
 
@@ -61,11 +60,6 @@ map func =
     unwrap >> func >> Grid
 
 
-xEq : Int -> Cord -> Bool
-xEq column ( x, _ ) =
-    column == x
-
-
 setGrid : Grid.Grid Coin -> Grid -> Grid
 setGrid grid =
     map <| \model -> { model | grid = grid }
@@ -77,7 +71,7 @@ setFirstEmptyYOfX x coin model =
         grid =
             unwrap model |> .grid
     in
-    case getFirstEmptyCordWhereXEq x model of
+    case firstEmptyPositionInColumn x model of
         Just cord ->
             case Grid.insert cord coin grid of
                 Ok value ->
@@ -90,12 +84,17 @@ setFirstEmptyYOfX x coin model =
             model
 
 
-getFirstEmptyCordWhereXEq : Int -> Grid -> Maybe Cord
-getFirstEmptyCordWhereXEq x =
-    emptyPositions >> List.Extra.find (xEq x)
+columnEq : Int -> Position -> Bool
+columnEq value ( column, _ ) =
+    value == column
 
 
-emptyPositions : Grid -> List Cord
+firstEmptyPositionInColumn : Int -> Grid -> Maybe Position
+firstEmptyPositionInColumn column =
+    emptyPositions >> List.Extra.find (columnEq column)
+
+
+emptyPositions : Grid -> List Position
 emptyPositions =
     unwrap >> .grid >> Grid.emptyPositions
 
@@ -105,6 +104,6 @@ toCellList =
     unwrap >> .grid >> Grid.foldl (\p c -> (::) ( p, c )) []
 
 
-dimensions : Grid -> Cord
+dimensions : Grid -> Position
 dimensions =
     unwrap >> (\{ width, height } -> ( width, height ))

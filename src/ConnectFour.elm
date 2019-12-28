@@ -72,7 +72,7 @@ playerToCoin player =
             Yellow
 
 
-screenCordToGridCord : ScreenCord -> GridViewModel -> Grid.Cord
+screenCordToGridCord : ScreenCord -> GridViewModel -> Grid.Position
 screenCordToGridCord ( x, y ) gvm =
     ( (x - gvm.left) / gvm.cellSize |> round, (y - gvm.bottom) / gvm.cellSize |> round )
 
@@ -103,12 +103,12 @@ coinToColor coin =
 --  yellow
 
 
-gridCordToScreenCord : GridViewModel -> Grid.Cord -> ScreenCord
+gridCordToScreenCord : GridViewModel -> Grid.Position -> ScreenCord
 gridCordToScreenCord gvm ( x, y ) =
     ( gvm.left + toFloat x * gvm.cellSize, gvm.bottom + toFloat y * gvm.cellSize )
 
 
-viewGridCell : GridViewModel -> ( Grid.Cord, Grid.Cell ) -> Shape
+viewGridCell : GridViewModel -> ( Grid.Position, Grid.Cell ) -> Shape
 viewGridCell gvm ( cord, cell ) =
     let
         ( x, y ) =
@@ -156,7 +156,7 @@ viewGrid { screen, mouse, time } player grid =
                 |> fade (wave 0.5 0.9 1.3 time + 0.1)
                 |> moveRight
                     (screenCordToGridCord ( mouse.x, mouse.y ) gvm
-                        |> Grid.clampCord grid
+                        |> Grid.clampPosition grid
                         |> gridCordToScreenCord gvm
                         |> Tuple.first
                     )
@@ -171,7 +171,7 @@ viewGrid { screen, mouse, time } player grid =
                     screenCordToGridCord ( mouse.x, mouse.y ) gvm
 
                 maybeScreenY =
-                    Grid.getFirstEmptyCordWhereXEq x grid
+                    Grid.firstEmptyPositionInColumn x grid
                         |> Maybe.map (gridCordToScreenCord gvm >> Tuple.second)
             in
             case maybeScreenY of

@@ -26,28 +26,25 @@ initialGrid =
 
 
 update : Computer -> Mem -> Mem
-update { mouse, screen } mem =
-    if mouse.click then
-        let
-            gsm =
-                toGridScreenModel screen mem.grid
-        in
-        case
-            Grid.putCoinInColumn (mouseToGridColumn mouse gsm)
-                (playerToCoin mem.currentPlayer)
-                mem.grid
-        of
-            Ok newGrid ->
-                { mem
-                    | grid = newGrid
-                    , currentPlayer = nextPlayer mem.currentPlayer
-                }
+update computer mem =
+    case mouseClickToGridColumn computer mem.grid of
+        Just column ->
+            case
+                Grid.putCoinInColumn column
+                    (playerToCoin mem.currentPlayer)
+                    mem.grid
+            of
+                Ok newGrid ->
+                    { mem
+                        | grid = newGrid
+                        , currentPlayer = nextPlayer mem.currentPlayer
+                    }
 
-            Err _ ->
-                mem
+                Err _ ->
+                    mem
 
-    else
-        mem
+        Nothing ->
+            mem
 
 
 nextPlayer : Player -> Player
@@ -70,8 +67,8 @@ playerToCoin player =
             Yellow
 
 
-mouseClickedOnGridColumn : Computer -> Grid -> Maybe Int
-mouseClickedOnGridColumn { mouse, screen } grid =
+mouseClickToGridColumn : Computer -> Grid -> Maybe Int
+mouseClickToGridColumn { mouse, screen } grid =
     if mouse.click then
         Just <| mouseToGridColumn mouse (toGridScreenModel screen grid)
 

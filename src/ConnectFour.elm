@@ -129,7 +129,7 @@ viewGrid { screen, mouse, time } currentPlayerCoin grid =
 
         nextMoveIndicatorShape =
             toCellShape gsm (coinToColor currentPlayerCoin)
-                |> fade (wave 0.5 0.9 1.3 time + 0.1)
+                |> fade (wave 0.3 0.9 1.3 time + 0.1)
 
         nextMoveTopIndicator =
             nextMoveIndicatorShape

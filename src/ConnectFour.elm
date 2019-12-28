@@ -60,7 +60,7 @@ update computer mem =
 
 
 
---
+-- GridScreenModel
 
 
 type alias ScreenPosition =
@@ -186,6 +186,12 @@ viewGridCell gsm ( cord, cell ) =
     moveShapeToGridPosition gsm (toCellShape gsm (cellToColor cell)) cord
 
 
+moveShapeToGridPosition : GridScreenModel -> Shape -> Grid.Position -> Shape
+moveShapeToGridPosition gsm shape =
+    gridPositionToScreenPosition gsm
+        >> (\( x, y ) -> shape |> move x y)
+
+
 toCellShape : GridScreenModel -> Color -> Shape
 toCellShape gsm color =
     group
@@ -232,12 +238,6 @@ viewGrid { screen, mouse, time } currentPlayerCoin grid =
         , nextMoveTopIndicator
         , nextMoveCellIndicator
         ]
-
-
-moveShapeToGridPosition : GridScreenModel -> Shape -> Grid.Position -> Shape
-moveShapeToGridPosition gsm shape =
-    gridPositionToScreenPosition gsm
-        >> (\( x, y ) -> shape |> move x y)
 
 
 main =

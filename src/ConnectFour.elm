@@ -6,18 +6,13 @@ import Playground exposing (..)
 
 type alias Mem =
     { grid : Grid
-    , currentPlayer : Player
+    , currentPlayerCoin : Grid.Coin
     }
-
-
-type Player
-    = PlayerRed
-    | PlayerYellow
 
 
 initialMem : Mem
 initialMem =
-    { grid = initialGrid, currentPlayer = PlayerRed }
+    { grid = initialGrid, currentPlayerCoin = Grid.Red }
 
 
 initialGrid : Grid
@@ -31,13 +26,13 @@ update computer mem =
         Just column ->
             case
                 Grid.putCoinInColumn column
-                    (playerToCoin mem.currentPlayer)
+                    (playerToCoin mem.currentPlayerCoin)
                     mem.grid
             of
                 Ok newGrid ->
                     { mem
                         | grid = newGrid
-                        , currentPlayer = nextPlayer mem.currentPlayer
+                        , currentPlayerCoin = nextPlayer mem.currentPlayerCoin
                     }
 
                 Err _ ->
@@ -47,24 +42,14 @@ update computer mem =
             mem
 
 
-nextPlayer : Player -> Player
-nextPlayer player =
-    case player of
-        PlayerRed ->
-            PlayerYellow
+nextPlayer : Coin -> Coin
+nextPlayer playerCoin =
+    case playerCoin of
+        Grid.Red ->
+            Grid.Yellow
 
-        PlayerYellow ->
-            PlayerRed
-
-
-playerToCoin : Player -> Coin
-playerToCoin player =
-    case player of
-        PlayerRed ->
-            Red
-
-        PlayerYellow ->
-            Yellow
+        Grid.Yellow ->
+            Grid.Red
 
 
 mouseClickToGridColumn : Computer -> Grid -> Maybe Int
@@ -99,7 +84,7 @@ screenPositionToGridPosition ( x, y ) gsm =
 view : Computer -> Mem -> List Shape
 view ({ screen } as computer) mem =
     [ rectangle lightBlue screen.width screen.height
-    , viewGrid computer mem.currentPlayer mem.grid
+    , viewGrid computer mem.currentPlayerCoin mem.grid
     ]
 
 
@@ -136,9 +121,9 @@ viewGridCell gsm ( cord, cell ) =
     cell |> cellToShape gsm |> move x y
 
 
-playerToCellShape : GridScreenModel -> Player -> Shape
-playerToCellShape gsm player =
-    cellShapeWithColor gsm (playerToCoin >> coinToColor <| player)
+coinToCellShape : GridScreenModel -> Coin -> Shape
+coinToCellShape gsm coin =
+    cellShapeWithColor gsm (coinToColor coin)
 
 
 cellToShape : GridScreenModel -> Cell -> Shape
@@ -155,8 +140,8 @@ cellShapeWithColor gsm color =
         ]
 
 
-viewGrid : Computer -> Player -> Grid -> Shape
-viewGrid { screen, mouse, time } player grid =
+viewGrid : Computer -> Coin -> Grid -> Shape
+viewGrid { screen, mouse, time } currentPlayerCoin grid =
     let
         gsm =
             toGridScreenModel screen grid
@@ -171,7 +156,7 @@ viewGrid { screen, mouse, time } player grid =
             gsm.height + frameOffset
 
         nextMoveIndicatorShape =
-            playerToCellShape gsm player
+            coinToCellShape gsm currentPlayerCoin
                 |> fade (wave 0.5 0.9 1.3 time + 0.1)
                 |> moveRight
                     (screenPositionToGridPosition ( mouse.x, mouse.y ) gsm

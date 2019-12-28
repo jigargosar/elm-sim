@@ -8,12 +8,13 @@ module ConnectFour.Grid exposing
     , empty
     , emptyPositions
     , firstEmptyPositionInColumn
-    , setFirstEmptyYOfX
+    , setFirstEmptyCellInColumn
     , toCellList
     )
 
 import Grid.Bordered as Grid
 import List.Extra
+import PointFree exposing (flip)
 
 
 type Coin
@@ -65,23 +66,28 @@ setGrid grid =
     map <| \model -> { model | grid = grid }
 
 
-setFirstEmptyYOfX : Int -> Coin -> Grid -> Grid
-setFirstEmptyYOfX x coin model =
-    let
-        grid =
-            unwrap model |> .grid
-    in
-    case firstEmptyPositionInColumn x model of
+setFirstEmptyCellInColumn : Int -> Coin -> Grid -> Grid
+setFirstEmptyCellInColumn column coin model =
+    case firstEmptyPositionInColumn column model of
         Just cord ->
-            case Grid.insert cord coin grid of
-                Ok value ->
-                    setGrid value model
+            case insert cord coin model of
+                Ok newModel ->
+                    newModel
 
                 Err _ ->
                     model
 
         Nothing ->
             model
+
+
+insert : Position -> Coin -> Grid -> Result Grid.Error Grid
+insert position coin model =
+    let
+        grid =
+            unwrap model |> .grid
+    in
+    Grid.insert position coin grid |> Result.map (flip setGrid model)
 
 
 columnEq : Int -> Position -> Bool

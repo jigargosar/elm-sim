@@ -8,7 +8,7 @@ module ConnectFour.Grid exposing
     , empty
     , emptyPositions
     , firstEmptyPositionInColumn
-    , setFirstEmptyCellInColumnIgnoreError
+    , insertCoinInColumnIgnoreError
     , toCellList
     )
 
@@ -66,9 +66,9 @@ setGrid grid =
     map <| \model -> { model | grid = grid }
 
 
-setFirstEmptyCellInColumnIgnoreError : Int -> Coin -> Grid -> Grid
-setFirstEmptyCellInColumnIgnoreError column coin model =
-    setFirstEmptyCellInColumn column coin model
+insertCoinInColumnIgnoreError : Int -> Coin -> Grid -> Grid
+insertCoinInColumnIgnoreError column coin model =
+    insertCoinInColumn column coin model
         |> Result.withDefault model
 
 
@@ -87,8 +87,8 @@ convertError error =
             NotSuccessful
 
 
-setFirstEmptyCellInColumn : Int -> Coin -> Grid -> Result Error Grid
-setFirstEmptyCellInColumn column coin model =
+insertCoinInColumn : Int -> Coin -> Grid -> Result Error Grid
+insertCoinInColumn column coin model =
     firstEmptyPositionInColumn column model
         |> Maybe.map
             (\position ->

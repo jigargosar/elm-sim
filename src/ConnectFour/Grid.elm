@@ -72,11 +72,30 @@ setFirstEmptyCellInColumnIgnoreError column coin model =
         |> Result.withDefault model
 
 
-setFirstEmptyCellInColumn : Int -> Coin -> Grid -> Result Grid.Error Grid
+type Error
+    = OutOfBounds
+    | NotSuccessful
+
+
+convertError : Grid.Error -> Error
+convertError error =
+    case error of
+        Grid.OutOfBounds ->
+            OutOfBounds
+
+        Grid.NotSuccessful ->
+            NotSuccessful
+
+
+setFirstEmptyCellInColumn : Int -> Coin -> Grid -> Result Error Grid
 setFirstEmptyCellInColumn column coin model =
     firstEmptyPositionInColumn column model
-        |> Maybe.map (\position -> insert position coin model)
-        |> Maybe.withDefault (Err Grid.NotSuccessful)
+        |> Maybe.map
+            (\position ->
+                insert position coin model
+                    |> Result.mapError convertError
+            )
+        |> Maybe.withDefault (Err NotSuccessful)
 
 
 insert : Position -> Coin -> Grid -> Result Grid.Error Grid

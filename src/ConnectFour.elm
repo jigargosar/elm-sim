@@ -45,16 +45,16 @@ update { mouse, screen } mem =
                     mem.currentPlayer
 
                 else
-                    swapPlayer mem.currentPlayer
+                    nextPlayer mem.currentPlayer
         }
 
     else
         mem
 
 
-swapPlayer : Player -> Player
-swapPlayer cell =
-    case cell of
+nextPlayer : Player -> Player
+nextPlayer player =
+    case player of
         PlayerRed ->
             PlayerYellow
 

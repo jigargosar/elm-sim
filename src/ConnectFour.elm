@@ -66,8 +66,8 @@ screenPositionToGridPosition ( x, y ) gsm =
     ( (x - gsm.dx) / gsm.cellSize |> round, (y - gsm.dy) / gsm.cellSize |> round )
 
 
-clampMouseToGridColumn : GridScreenModel -> Mouse -> Float
-clampMouseToGridColumn gsm mouse =
+snapMouseXToGrid : GridScreenModel -> Mouse -> Float
+snapMouseXToGrid gsm mouse =
     screenPositionToGridPosition ( mouse.x, mouse.y ) gsm
         |> Grid.clampPosition gsm.grid_
         |> gridPositionToScreenPosition gsm
@@ -142,12 +142,7 @@ viewGrid { screen, mouse, time } currentPlayerCoin grid =
         nextMoveTopIndicator =
             nextMoveIndicatorShape
                 |> moveUp (frameHeight / 2 + gsm.cellRadius)
-                |> moveRight
-                    (screenPositionToGridPosition ( mouse.x, mouse.y ) gsm
-                        |> Grid.clampPosition grid
-                        |> gridPositionToScreenPosition gsm
-                        |> Tuple.first
-                    )
+                |> moveRight (snapMouseXToGrid gsm mouse)
 
         nextMoveCellIndicator =
             let

@@ -211,7 +211,7 @@ toGridViewModel : Screen -> Grid -> GridViewModel
 toGridViewModel screen grid =
     let
         ( gw, gh ) =
-            Grid.dimensions grid
+            Grid.dimensionsToTuple grid
                 |> Tuple.mapBoth toFloat toFloat
 
         maxCellWidth =

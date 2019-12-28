@@ -4,7 +4,7 @@ module ConnectFour.Grid exposing
     , Grid
     , Position
     , clampPosition
-    , dimensions
+    , dimensionsToTuple
     , empty
     , emptyPositions
     , firstEmptyPositionInColumn
@@ -31,9 +31,7 @@ type Grid
 
 
 type alias GridModel =
-    { width : Int
-    , height : Int
-    , grid : Grid.Grid Coin
+    { grid : Grid.Grid Coin
     }
 
 
@@ -48,12 +46,12 @@ unwrap (Grid grid) =
 
 clampPosition : Grid -> Position -> Position
 clampPosition =
-    unwrap >> (\grid -> Tuple.mapBoth (clamp 0 (grid.width - 1)) (clamp 0 (grid.height - 1)))
+    dimensions >> (\{ width, height } -> Tuple.mapBoth (clamp 0 (width - 1)) (clamp 0 (height - 1)))
 
 
 empty : Int -> Int -> Grid
 empty w h =
-    Grid { width = w, height = h, grid = Grid.empty { columns = w, rows = h } }
+    Grid { grid = Grid.empty { columns = w, rows = h } }
 
 
 map : (GridModel -> GridModel) -> Grid -> Grid
@@ -127,6 +125,11 @@ toCellList =
     unwrap >> .grid >> Grid.foldl (\p c -> (::) ( p, c )) []
 
 
-dimensions : Grid -> Position
+dimensionsToTuple : Grid -> ( Int, Int )
+dimensionsToTuple =
+    unwrap >> .grid >> Grid.dimensions >> (\{ columns, rows } -> ( columns, rows ))
+
+
+dimensions : Grid -> { width : Int, height : Int }
 dimensions =
-    unwrap >> (\{ width, height } -> ( width, height ))
+    unwrap >> .grid >> Grid.dimensions >> (\{ columns, rows } -> { width = columns, height = rows })

@@ -159,6 +159,7 @@ viewGrid { screen, mouse, time } currentPlayerCoin grid =
         ]
 
 
+firstEmptyGridScreenPositionFromMouseX : Mouse -> GridScreenModel -> Maybe ScreenPosition
 firstEmptyGridScreenPositionFromMouseX mouse gsm =
     screenPositionToGridPosition ( mouse.x, mouse.y ) gsm
         |> Tuple.first

@@ -116,6 +116,11 @@ screenPositionToGridPosition ( x, y ) gsm =
     ( (x - gsm.dx) / gsm.cellSize |> round, (y - gsm.dy) / gsm.cellSize |> round )
 
 
+gridPositionToScreenPosition : GridScreenModel -> Grid.Position -> ScreenPosition
+gridPositionToScreenPosition gsm ( x, y ) =
+    ( toFloat x * gsm.cellSize + gsm.dx, toFloat y * gsm.cellSize + gsm.dy )
+
+
 snapMouseXToGrid : GridScreenModel -> Mouse -> Float
 snapMouseXToGrid gsm mouse =
     screenPositionToGridPosition ( mouse.x, mouse.y ) gsm
@@ -124,9 +129,12 @@ snapMouseXToGrid gsm mouse =
         |> Tuple.first
 
 
-gridPositionToScreenPosition : GridScreenModel -> Grid.Position -> ScreenPosition
-gridPositionToScreenPosition gsm ( x, y ) =
-    ( toFloat x * gsm.cellSize + gsm.dx, toFloat y * gsm.cellSize + gsm.dy )
+firstEmptyGridScreenPositionFromMouseX : Mouse -> GridScreenModel -> Maybe ScreenPosition
+firstEmptyGridScreenPositionFromMouseX mouse gsm =
+    screenPositionToGridPosition ( mouse.x, mouse.y ) gsm
+        |> Tuple.first
+        |> flip Grid.firstEmptyPositionInColumn gsm.grid_
+        |> Maybe.map (gridPositionToScreenPosition gsm)
 
 
 nextPlayerCoin : Coin -> Coin
@@ -212,14 +220,6 @@ viewGrid { screen, mouse, time } currentPlayerCoin grid =
         , nextMoveTopIndicator
         , nextMoveCellIndicator
         ]
-
-
-firstEmptyGridScreenPositionFromMouseX : Mouse -> GridScreenModel -> Maybe ScreenPosition
-firstEmptyGridScreenPositionFromMouseX mouse gsm =
-    screenPositionToGridPosition ( mouse.x, mouse.y ) gsm
-        |> Tuple.first
-        |> flip Grid.firstEmptyPositionInColumn gsm.grid_
-        |> Maybe.map (gridPositionToScreenPosition gsm)
 
 
 moveShapeToGridPosition : GridScreenModel -> Shape -> Grid.Position -> Shape

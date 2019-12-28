@@ -103,17 +103,12 @@ viewGridCell gsm ( cord, cell ) =
         ( x, y ) =
             gridCordToScreenCord gsm cord
     in
-    cell |> cellToShape gsm |> move x y
+    cellShapeWithColor gsm (cellToColor cell) |> move x y
 
 
 coinToCellShape : GridScreenModel -> Coin -> Shape
 coinToCellShape gsm coin =
     cellShapeWithColor gsm (coinToColor coin)
-
-
-cellToShape : GridScreenModel -> Cell -> Shape
-cellToShape gsm cell =
-    cellShapeWithColor gsm (cellToColor cell)
 
 
 cellShapeWithColor : GridScreenModel -> Color -> Shape
@@ -132,7 +127,8 @@ viewGrid { screen, mouse, time } currentPlayerCoin grid =
             toGridScreenModel screen grid
 
         frameOffset =
-            gsm.cellSize + (gsm.cellSize / 4)
+            -- gsm.cellSize + (gsm.cellSize / 4)
+            0
 
         frameWidth =
             gsm.width + frameOffset
@@ -218,15 +214,15 @@ toGridScreenModel screen grid =
             screenCellSize screen grid
 
         width =
-            (toFloat gridDimensions.width - 1) * cellSize
+            toFloat gridDimensions.width * cellSize
 
         height =
-            (toFloat gridDimensions.height - 1) * cellSize
+            toFloat gridDimensions.height * cellSize
     in
     { width = width
     , height = height
-    , dx = -width / 2
-    , dy = -height / 2
+    , dx = -width / 2 + cellSize / 2
+    , dy = -height / 2 + cellSize / 2
     , cellSize = cellSize
     , cellRadius = cellSize / 2 - cellSize / 10
     }

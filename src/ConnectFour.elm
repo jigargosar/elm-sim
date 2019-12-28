@@ -152,7 +152,7 @@ viewGrid { screen, mouse, time } currentPlayerCoin grid =
             in
             Grid.firstEmptyPositionInColumn column grid
                 |> Maybe.map
-                    (moveShapeByGridCord gsm nextMoveIndicatorShape)
+                    (moveShapeToGridPosition gsm nextMoveIndicatorShape)
                 |> Maybe.withDefault (group [])
     in
     group
@@ -163,8 +163,8 @@ viewGrid { screen, mouse, time } currentPlayerCoin grid =
         ]
 
 
-moveShapeByGridCord : GridScreenModel -> Shape -> Grid.Position -> Shape
-moveShapeByGridCord gsm shape =
+moveShapeToGridPosition : GridScreenModel -> Shape -> Grid.Position -> Shape
+moveShapeToGridPosition gsm shape =
     gridCordToScreenCord gsm
         >> (\( x, y ) -> shape |> move x y)
 

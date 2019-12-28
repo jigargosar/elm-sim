@@ -3,8 +3,6 @@ module ConnectFour.Grid exposing
     , Coin(..)
     , Cord
     , Grid
-    , cellToCoin
-    , cellWith
     , clampCord
     , dimensions
     , empty
@@ -26,16 +24,6 @@ type Coin
 
 type alias Cell =
     Maybe Coin
-
-
-cellWith : Coin -> Cell
-cellWith =
-    Just
-
-
-cellToCoin : Cell -> Maybe Coin
-cellToCoin =
-    identity
 
 
 type Grid

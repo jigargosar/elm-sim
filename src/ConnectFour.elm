@@ -86,7 +86,7 @@ view ({ screen } as computer) mem =
 
 cellToColor : Cell -> Color
 cellToColor =
-    Grid.cellToCoin >> Maybe.map coinToColor >> Maybe.withDefault white
+    Maybe.map coinToColor >> Maybe.withDefault white
 
 
 coinToColor : Coin -> Color

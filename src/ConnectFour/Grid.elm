@@ -6,7 +6,6 @@ module ConnectFour.Grid exposing
     , clampPosition
     , dimensionsToTuple
     , empty
-    , emptyPositions
     , firstEmptyPositionInColumn
     , insertCoinInColumnIgnoreError
     , toCellList

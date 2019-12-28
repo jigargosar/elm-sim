@@ -41,14 +41,63 @@ update computer mem =
             mem
 
 
-nextPlayerCoin : Coin -> Coin
-nextPlayerCoin playerCoin =
-    case playerCoin of
-        Grid.Red ->
-            Grid.Yellow
 
-        Grid.Yellow ->
-            Grid.Red
+--
+
+
+type alias ScreenPosition =
+    ( Float, Float )
+
+
+type alias GridScreenModel =
+    { width : Float
+    , height : Float
+    , dx : Float
+    , dy : Float
+    , cellSize : Number
+    , cellRadius : Number
+    , grid_ : Grid
+    }
+
+
+screenCellSize : Screen -> Grid -> Number
+screenCellSize screen grid =
+    let
+        gridDimensions =
+            Grid.dimensions grid
+
+        maxCellWidth =
+            (screen.width * 0.8) / (toFloat gridDimensions.width + 1)
+
+        maxCellHeight =
+            (screen.height * 0.8) / (toFloat gridDimensions.height + 1)
+    in
+    min maxCellWidth maxCellHeight
+
+
+toGridScreenModel : Screen -> Grid -> GridScreenModel
+toGridScreenModel screen grid =
+    let
+        gridDimensions =
+            Grid.dimensions grid
+
+        cellSize =
+            screenCellSize screen grid
+
+        width =
+            toFloat gridDimensions.width * cellSize
+
+        height =
+            toFloat gridDimensions.height * cellSize
+    in
+    { width = width
+    , height = height
+    , dx = -width / 2 + cellSize / 2
+    , dy = -height / 2 + cellSize / 2
+    , cellSize = cellSize
+    , cellRadius = cellSize / 2 - cellSize / 10
+    , grid_ = grid
+    }
 
 
 checkMouseClickOnGridColumn : Computer -> Grid -> Maybe Int
@@ -75,6 +124,21 @@ snapMouseXToGrid gsm mouse =
         |> Tuple.first
 
 
+gridPositionToScreenPosition : GridScreenModel -> Grid.Position -> ScreenPosition
+gridPositionToScreenPosition gsm ( x, y ) =
+    ( toFloat x * gsm.cellSize + gsm.dx, toFloat y * gsm.cellSize + gsm.dy )
+
+
+nextPlayerCoin : Coin -> Coin
+nextPlayerCoin playerCoin =
+    case playerCoin of
+        Grid.Red ->
+            Grid.Yellow
+
+        Grid.Yellow ->
+            Grid.Red
+
+
 view : Computer -> Mem -> List Shape
 view ({ screen } as computer) mem =
     [ rectangle lightBlue screen.width screen.height
@@ -95,15 +159,6 @@ coinToColor coin =
 
         Yellow ->
             rgb 230 178 0
-
-
-
---  yellow
-
-
-gridPositionToScreenPosition : GridScreenModel -> Grid.Position -> ScreenPosition
-gridPositionToScreenPosition gsm ( x, y ) =
-    ( toFloat x * gsm.cellSize + gsm.dx, toFloat y * gsm.cellSize + gsm.dy )
 
 
 viewGridCell : GridScreenModel -> ( Grid.Position, Grid.Cell ) -> Shape
@@ -171,61 +226,6 @@ moveShapeToGridPosition : GridScreenModel -> Shape -> Grid.Position -> Shape
 moveShapeToGridPosition gsm shape =
     gridPositionToScreenPosition gsm
         >> (\( x, y ) -> shape |> move x y)
-
-
-type alias ScreenPosition =
-    ( Float, Float )
-
-
-type alias GridScreenModel =
-    { width : Float
-    , height : Float
-    , dx : Float
-    , dy : Float
-    , cellSize : Number
-    , cellRadius : Number
-    , grid_ : Grid
-    }
-
-
-screenCellSize : Screen -> Grid -> Number
-screenCellSize screen grid =
-    let
-        gridDimensions =
-            Grid.dimensions grid
-
-        maxCellWidth =
-            (screen.width * 0.8) / (toFloat gridDimensions.width + 1)
-
-        maxCellHeight =
-            (screen.height * 0.8) / (toFloat gridDimensions.height + 1)
-    in
-    min maxCellWidth maxCellHeight
-
-
-toGridScreenModel : Screen -> Grid -> GridScreenModel
-toGridScreenModel screen grid =
-    let
-        gridDimensions =
-            Grid.dimensions grid
-
-        cellSize =
-            screenCellSize screen grid
-
-        width =
-            toFloat gridDimensions.width * cellSize
-
-        height =
-            toFloat gridDimensions.height * cellSize
-    in
-    { width = width
-    , height = height
-    , dx = -width / 2 + cellSize / 2
-    , dy = -height / 2 + cellSize / 2
-    , cellSize = cellSize
-    , cellRadius = cellSize / 2 - cellSize / 10
-    , grid_ = grid
-    }
 
 
 main =

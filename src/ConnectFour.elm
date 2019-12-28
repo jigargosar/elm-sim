@@ -36,7 +36,7 @@ update { mouse, screen } mem =
                 screenCordToGridCord ( mouse.x, mouse.y ) gvm
 
             newGrid =
-                Grid.setFirstEmptyCellInColumn x (playerToCoin mem.currentPlayer) mem.grid
+                Grid.setFirstEmptyCellInColumnIgnoreError x (playerToCoin mem.currentPlayer) mem.grid
         in
         { mem
             | grid = newGrid

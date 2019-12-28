@@ -200,7 +200,6 @@ type alias GridViewModel =
     , bottom : Float
     , cellSize : Number
     , cellRadius : Number
-    , grid : Grid
     }
 
 
@@ -234,7 +233,6 @@ toGridViewModel screen grid =
     , bottom = -height / 2
     , cellSize = cellSize
     , cellRadius = cellSize / 2 - cellSize / 10 |> round |> toFloat
-    , grid = grid
     }
 
 

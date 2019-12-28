@@ -134,6 +134,10 @@ viewGrid { screen, mouse, time } currentPlayerCoin grid =
         nextMoveIndicatorShape =
             toCellShape gsm (coinToColor currentPlayerCoin)
                 |> fade (wave 0.5 0.9 1.3 time + 0.1)
+
+        nextMoveTopIndicator =
+            nextMoveIndicatorShape
+                |> moveUp (frameHeight / 2 + gsm.cellRadius)
                 |> moveRight
                     (screenPositionToGridPosition ( mouse.x, mouse.y ) gsm
                         |> Grid.clampPosition grid
@@ -141,26 +145,15 @@ viewGrid { screen, mouse, time } currentPlayerCoin grid =
                         |> Tuple.first
                     )
 
-        nextMoveTopIndicator =
-            nextMoveIndicatorShape
-                |> moveUp (frameHeight / 2 + gsm.cellRadius)
-
         nextMoveCellIndicator =
             let
                 ( column, _ ) =
                     screenPositionToGridPosition ( mouse.x, mouse.y ) gsm
-
-                maybeScreenY =
-                    Grid.firstEmptyPositionInColumn column grid
-                        |> Maybe.map (gridCordToScreenCord gsm >> Tuple.second)
             in
-            case maybeScreenY of
-                Just sy ->
-                    nextMoveIndicatorShape
-                        |> moveUp sy
-
-                Nothing ->
-                    group []
+            Grid.firstEmptyPositionInColumn column grid
+                |> Maybe.map
+                    (moveShapeByGridCord gsm nextMoveIndicatorShape)
+                |> Maybe.withDefault (group [])
     in
     group
         [ rectangle blue frameWidth frameHeight
@@ -168,6 +161,12 @@ viewGrid { screen, mouse, time } currentPlayerCoin grid =
         , nextMoveTopIndicator
         , nextMoveCellIndicator
         ]
+
+
+moveShapeByGridCord : GridScreenModel -> Shape -> Grid.Position -> Shape
+moveShapeByGridCord gsm shape =
+    gridCordToScreenCord gsm
+        >> (\( x, y ) -> shape |> move x y)
 
 
 type alias ScreenPosition =

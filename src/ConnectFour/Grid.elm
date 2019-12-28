@@ -92,12 +92,7 @@ setFirstEmptyYOfX x coin model =
 
 getFirstEmptyCordWhereXEq : Int -> Grid -> Maybe Cord
 getFirstEmptyCordWhereXEq x =
-    let
-        pred : Cord -> Bool
-        pred cord =
-            xEq x cord
-    in
-    emptyPositions >> List.Extra.find pred
+    emptyPositions >> List.Extra.find (xEq x)
 
 
 emptyPositions : Grid -> List Cord

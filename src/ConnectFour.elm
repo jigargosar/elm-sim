@@ -25,14 +25,12 @@ update computer mem =
     case mouseClickToGridColumn computer mem.grid of
         Just column ->
             case
-                Grid.putCoinInColumn column
-                    (playerToCoin mem.currentPlayerCoin)
-                    mem.grid
+                Grid.putCoinInColumn column mem.currentPlayerCoin mem.grid
             of
                 Ok newGrid ->
                     { mem
                         | grid = newGrid
-                        , currentPlayerCoin = nextPlayer mem.currentPlayerCoin
+                        , currentPlayerCoin = nextPlayerCoin mem.currentPlayerCoin
                     }
 
                 Err _ ->
@@ -42,8 +40,8 @@ update computer mem =
             mem
 
 
-nextPlayer : Coin -> Coin
-nextPlayer playerCoin =
+nextPlayerCoin : Coin -> Coin
+nextPlayerCoin playerCoin =
     case playerCoin of
         Grid.Red ->
             Grid.Yellow

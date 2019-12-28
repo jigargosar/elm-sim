@@ -148,7 +148,7 @@ viewGrid { screen, mouse, time } player grid =
         frameHeight =
             gvm.height + frameOffset
 
-        moveIndicatorShape =
+        nextMoveIndicatorShape =
             playerToCellShape gvm player
                 |> fade (wave 0.5 0.9 1.3 time + 0.1)
                 |> moveRight
@@ -159,7 +159,7 @@ viewGrid { screen, mouse, time } player grid =
                     )
 
         nextMoveTopIndicator =
-            moveIndicatorShape
+            nextMoveIndicatorShape
                 |> moveUp (frameHeight / 2 + gvm.cellRadius)
 
         nextMoveCellIndicator =
@@ -173,7 +173,7 @@ viewGrid { screen, mouse, time } player grid =
             in
             case maybeScreenY of
                 Just sy ->
-                    moveIndicatorShape
+                    nextMoveIndicatorShape
                         |> moveUp sy
 
                 Nothing ->

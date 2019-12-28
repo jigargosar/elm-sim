@@ -103,11 +103,11 @@ viewGridCell gsm ( cord, cell ) =
         ( x, y ) =
             gridCordToScreenCord gsm cord
     in
-    cellShapeWithColor gsm (cellToColor cell) |> move x y
+    toCellShape gsm (cellToColor cell) |> move x y
 
 
-cellShapeWithColor : GridScreenModel -> Color -> Shape
-cellShapeWithColor gsm color =
+toCellShape : GridScreenModel -> Color -> Shape
+toCellShape gsm color =
     group
         [ circle white gsm.cellRadius
         , circle color gsm.cellRadius
@@ -132,7 +132,7 @@ viewGrid { screen, mouse, time } currentPlayerCoin grid =
             gsm.height + frameOffset
 
         nextMoveIndicatorShape =
-            cellShapeWithColor gsm (coinToColor currentPlayerCoin)
+            toCellShape gsm (coinToColor currentPlayerCoin)
                 |> fade (wave 0.5 0.9 1.3 time + 0.1)
                 |> moveRight
                     (screenPositionToGridPosition ( mouse.x, mouse.y ) gsm

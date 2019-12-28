@@ -29,11 +29,11 @@ update : Computer -> Mem -> Mem
 update { mouse, screen } mem =
     if mouse.click then
         let
-            gvm =
+            gsm =
                 toGridScreenModel screen mem.grid
 
             ( column, _ ) =
-                screenPositionToGridPosition ( mouse.x, mouse.y ) gvm
+                screenPositionToGridPosition ( mouse.x, mouse.y ) gsm
         in
         case Grid.putCoinInColumn column (playerToCoin mem.currentPlayer) mem.grid of
             Ok newGrid ->
@@ -70,8 +70,8 @@ playerToCoin player =
 
 
 screenPositionToGridPosition : ScreenPosition -> GridScreenModel -> Grid.Position
-screenPositionToGridPosition ( x, y ) gvm =
-    ( (x - gvm.left) / gvm.cellSize |> round, (y - gvm.bottom) / gvm.cellSize |> round )
+screenPositionToGridPosition ( x, y ) gsm =
+    ( (x - gsm.left) / gsm.cellSize |> round, (y - gsm.bottom) / gsm.cellSize |> round )
 
 
 view : Computer -> Mem -> List Shape
@@ -101,34 +101,34 @@ coinToColor coin =
 
 
 gridCordToScreenCord : GridScreenModel -> Grid.Position -> ScreenPosition
-gridCordToScreenCord gvm ( x, y ) =
-    ( gvm.left + toFloat x * gvm.cellSize, gvm.bottom + toFloat y * gvm.cellSize )
+gridCordToScreenCord gsm ( x, y ) =
+    ( gsm.left + toFloat x * gsm.cellSize, gsm.bottom + toFloat y * gsm.cellSize )
 
 
 viewGridCell : GridScreenModel -> ( Grid.Position, Grid.Cell ) -> Shape
-viewGridCell gvm ( cord, cell ) =
+viewGridCell gsm ( cord, cell ) =
     let
         ( x, y ) =
-            gridCordToScreenCord gvm cord
+            gridCordToScreenCord gsm cord
     in
-    cell |> cellToShape gvm |> move x y
+    cell |> cellToShape gsm |> move x y
 
 
 playerToCellShape : GridScreenModel -> Player -> Shape
-playerToCellShape gvm player =
-    cellShapeWithColor gvm (playerToCoin >> coinToColor <| player)
+playerToCellShape gsm player =
+    cellShapeWithColor gsm (playerToCoin >> coinToColor <| player)
 
 
 cellToShape : GridScreenModel -> Cell -> Shape
-cellToShape gvm cell =
-    cellShapeWithColor gvm (cellToColor cell)
+cellToShape gsm cell =
+    cellShapeWithColor gsm (cellToColor cell)
 
 
 cellShapeWithColor : GridScreenModel -> Color -> Shape
-cellShapeWithColor gvm color =
+cellShapeWithColor gsm color =
     group
-        [ circle white gvm.cellRadius
-        , circle color gvm.cellRadius
+        [ circle white gsm.cellRadius
+        , circle color gsm.cellRadius
             |> scale 0.8
         ]
 
@@ -136,40 +136,40 @@ cellShapeWithColor gvm color =
 viewGrid : Computer -> Player -> Grid -> Shape
 viewGrid { screen, mouse, time } player grid =
     let
-        gvm =
+        gsm =
             toGridScreenModel screen grid
 
         frameOffset =
-            gvm.cellSize + (gvm.cellSize / 4)
+            gsm.cellSize + (gsm.cellSize / 4)
 
         frameWidth =
-            gvm.width + frameOffset
+            gsm.width + frameOffset
 
         frameHeight =
-            gvm.height + frameOffset
+            gsm.height + frameOffset
 
         nextMoveIndicatorShape =
-            playerToCellShape gvm player
+            playerToCellShape gsm player
                 |> fade (wave 0.5 0.9 1.3 time + 0.1)
                 |> moveRight
-                    (screenPositionToGridPosition ( mouse.x, mouse.y ) gvm
+                    (screenPositionToGridPosition ( mouse.x, mouse.y ) gsm
                         |> Grid.clampPosition grid
-                        |> gridCordToScreenCord gvm
+                        |> gridCordToScreenCord gsm
                         |> Tuple.first
                     )
 
         nextMoveTopIndicator =
             nextMoveIndicatorShape
-                |> moveUp (frameHeight / 2 + gvm.cellRadius)
+                |> moveUp (frameHeight / 2 + gsm.cellRadius)
 
         nextMoveCellIndicator =
             let
                 ( column, _ ) =
-                    screenPositionToGridPosition ( mouse.x, mouse.y ) gvm
+                    screenPositionToGridPosition ( mouse.x, mouse.y ) gsm
 
                 maybeScreenY =
                     Grid.firstEmptyPositionInColumn column grid
-                        |> Maybe.map (gridCordToScreenCord gvm >> Tuple.second)
+                        |> Maybe.map (gridCordToScreenCord gsm >> Tuple.second)
             in
             case maybeScreenY of
                 Just sy ->
@@ -181,7 +181,7 @@ viewGrid { screen, mouse, time } player grid =
     in
     group
         [ rectangle blue frameWidth frameHeight
-        , List.map (viewGridCell gvm) (Grid.toCellList grid) |> group
+        , List.map (viewGridCell gsm) (Grid.toCellList grid) |> group
         , nextMoveTopIndicator
         , nextMoveCellIndicator
         ]

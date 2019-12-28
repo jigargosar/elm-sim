@@ -4,7 +4,7 @@ module ConnectFour.Grid exposing
     , Grid
     , Position
     , clampPosition
-    , dimensionsToTuple
+    , dimensions
     , empty
     , firstEmptyPositionInColumn
     , putCoinInColumn
@@ -116,11 +116,6 @@ emptyPositions =
 toCellList : Grid -> List ( Position, Cell )
 toCellList =
     unwrap >> .grid >> Grid.foldl (\p c -> (::) ( p, c )) []
-
-
-dimensionsToTuple : Grid -> ( Int, Int )
-dimensionsToTuple =
-    unwrap >> .grid >> Grid.dimensions >> (\{ columns, rows } -> ( columns, rows ))
 
 
 dimensions : Grid -> { width : Int, height : Int }

@@ -30,7 +30,7 @@ update { mouse, screen } mem =
     if mouse.click then
         let
             gvm =
-                toGridViewModel screen mem.grid
+                toGridScreenModel screen mem.grid
 
             ( column, _ ) =
                 screenPositionToGridPosition ( mouse.x, mouse.y ) gvm
@@ -137,7 +137,7 @@ viewGrid : Computer -> Player -> Grid -> Shape
 viewGrid { screen, mouse, time } player grid =
     let
         gvm =
-            toGridViewModel screen grid
+            toGridScreenModel screen grid
 
         frameOffset =
             gvm.cellSize + (gvm.cellSize / 4)
@@ -203,27 +203,35 @@ type alias GridViewModel =
     }
 
 
-toGridViewModel : Screen -> Grid -> GridViewModel
-toGridViewModel screen grid =
+screenCellSize : Screen -> Grid -> Number
+screenCellSize screen grid =
     let
-        ( gw, gh ) =
-            Grid.dimensionsToTuple grid
-                |> Tuple.mapBoth toFloat toFloat
+        gridDimensions =
+            Grid.dimensions grid
 
         maxCellWidth =
-            (screen.width * 0.8) / (gw + 1)
+            (screen.width * 0.8) / (toFloat gridDimensions.width + 1)
 
         maxCellHeight =
-            (screen.height * 0.8) / (gh + 1)
+            (screen.height * 0.8) / (toFloat gridDimensions.height + 1)
+    in
+    min maxCellWidth maxCellHeight
+
+
+toGridScreenModel : Screen -> Grid -> GridViewModel
+toGridScreenModel screen grid =
+    let
+        gridDimensions =
+            Grid.dimensions grid
 
         cellSize =
-            min maxCellWidth maxCellHeight
+            screenCellSize screen grid
 
         width =
-            (gw - 1) * cellSize
+            (toFloat gridDimensions.width - 1) * cellSize
 
         height =
-            (gh - 1) * cellSize
+            (toFloat gridDimensions.height - 1) * cellSize
     in
     { width = width
     , height = height

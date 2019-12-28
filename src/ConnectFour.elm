@@ -22,7 +22,7 @@ initialGrid =
 
 update : Computer -> Mem -> Mem
 update computer mem =
-    case mouseClickToGridColumn computer mem.grid of
+    case checkMouseClickOnGridColumn computer mem.grid of
         Just column ->
             case
                 Grid.putCoinInColumn column mem.currentPlayerCoin mem.grid
@@ -50,8 +50,8 @@ nextPlayerCoin playerCoin =
             Grid.Red
 
 
-mouseClickToGridColumn : Computer -> Grid -> Maybe Int
-mouseClickToGridColumn { mouse, screen } grid =
+checkMouseClickOnGridColumn : Computer -> Grid -> Maybe Int
+checkMouseClickOnGridColumn { mouse, screen } grid =
     if mouse.click then
         screenPositionToGridPosition ( mouse.x, mouse.y ) (toGridScreenModel screen grid)
             |> Tuple.first
@@ -99,11 +99,7 @@ gridCordToScreenCord gsm ( x, y ) =
 
 viewGridCell : GridScreenModel -> ( Grid.Position, Grid.Cell ) -> Shape
 viewGridCell gsm ( cord, cell ) =
-    let
-        ( x, y ) =
-            gridCordToScreenCord gsm cord
-    in
-    toCellShape gsm (cellToColor cell) |> move x y
+    moveShapeToGridPosition gsm (toCellShape gsm (cellToColor cell)) cord
 
 
 toCellShape : GridScreenModel -> Color -> Shape

@@ -164,11 +164,11 @@ viewGrid { screen, mouse, time } player grid =
 
         nextMoveCellIndicator =
             let
-                ( x, _ ) =
+                ( column, _ ) =
                     screenPositionToGridPosition ( mouse.x, mouse.y ) gvm
 
                 maybeScreenY =
-                    Grid.firstEmptyPositionInColumn x grid
+                    Grid.firstEmptyPositionInColumn column grid
                         |> Maybe.map (gridCordToScreenCord gvm >> Tuple.second)
             in
             case maybeScreenY of

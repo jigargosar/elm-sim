@@ -31,11 +31,12 @@ update { mouse, screen } mem =
         let
             gsm =
                 toGridScreenModel screen mem.grid
-
-            ( column, _ ) =
-                screenPositionToGridPosition ( mouse.x, mouse.y ) gsm
         in
-        case Grid.putCoinInColumn column (playerToCoin mem.currentPlayer) mem.grid of
+        case
+            Grid.putCoinInColumn (mouseToGridColumn mouse gsm)
+                (playerToCoin mem.currentPlayer)
+                mem.grid
+        of
             Ok newGrid ->
                 { mem
                     | grid = newGrid
@@ -67,6 +68,30 @@ playerToCoin player =
 
         PlayerYellow ->
             Yellow
+
+
+mouseClickedOnGridColumn : Computer -> Grid -> Maybe Int
+mouseClickedOnGridColumn { mouse, screen } grid =
+    if mouse.click then
+        Just <| mouseToGridColumn mouse (toGridScreenModel screen grid)
+
+    else
+        Nothing
+
+
+mouseToGridColumn : Mouse -> GridScreenModel -> Int
+mouseToGridColumn mouse =
+    mouseToGridPosition mouse >> Tuple.first
+
+
+mouseToGridRow : Mouse -> GridScreenModel -> Int
+mouseToGridRow mouse =
+    mouseToGridPosition mouse >> Tuple.second
+
+
+mouseToGridPosition : Mouse -> GridScreenModel -> Grid.Position
+mouseToGridPosition mouse =
+    screenPositionToGridPosition ( mouse.x, mouse.y )
 
 
 screenPositionToGridPosition : ScreenPosition -> GridScreenModel -> Grid.Position

@@ -66,6 +66,14 @@ screenPositionToGridPosition ( x, y ) gsm =
     ( (x - gsm.dx) / gsm.cellSize |> round, (y - gsm.dy) / gsm.cellSize |> round )
 
 
+clampMouseToGridColumn : GridScreenModel -> Mouse -> Float
+clampMouseToGridColumn gsm mouse =
+    screenPositionToGridPosition ( mouse.x, mouse.y ) gsm
+        |> Grid.clampPosition gsm.grid_
+        |> gridPositionToScreenPosition gsm
+        |> Tuple.first
+
+
 view : Computer -> Mem -> List Shape
 view ({ screen } as computer) mem =
     [ rectangle lightBlue screen.width screen.height
@@ -92,8 +100,8 @@ coinToColor coin =
 --  yellow
 
 
-gridCordToScreenCord : GridScreenModel -> Grid.Position -> ScreenPosition
-gridCordToScreenCord gsm ( x, y ) =
+gridPositionToScreenPosition : GridScreenModel -> Grid.Position -> ScreenPosition
+gridPositionToScreenPosition gsm ( x, y ) =
     ( toFloat x * gsm.cellSize + gsm.dx, toFloat y * gsm.cellSize + gsm.dy )
 
 
@@ -137,7 +145,7 @@ viewGrid { screen, mouse, time } currentPlayerCoin grid =
                 |> moveRight
                     (screenPositionToGridPosition ( mouse.x, mouse.y ) gsm
                         |> Grid.clampPosition grid
-                        |> gridCordToScreenCord gsm
+                        |> gridPositionToScreenPosition gsm
                         |> Tuple.first
                     )
 
@@ -161,7 +169,7 @@ viewGrid { screen, mouse, time } currentPlayerCoin grid =
 
 moveShapeToGridPosition : GridScreenModel -> Shape -> Grid.Position -> Shape
 moveShapeToGridPosition gsm shape =
-    gridCordToScreenCord gsm
+    gridPositionToScreenPosition gsm
         >> (\( x, y ) -> shape |> move x y)
 
 
@@ -176,6 +184,7 @@ type alias GridScreenModel =
     , dy : Float
     , cellSize : Number
     , cellRadius : Number
+    , grid_ : Grid
     }
 
 
@@ -215,6 +224,7 @@ toGridScreenModel screen grid =
     , dy = -height / 2 + cellSize / 2
     , cellSize = cellSize
     , cellRadius = cellSize / 2 - cellSize / 10
+    , grid_ = grid
     }
 
 

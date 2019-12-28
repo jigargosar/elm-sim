@@ -5,6 +5,10 @@ import Playground exposing (..)
 import PointFree exposing (flip)
 
 
+
+-- Mem
+
+
 type alias Mem =
     { grid : Grid
     , currentPlayerCoin : Grid.Coin
@@ -19,6 +23,20 @@ initialMem =
 initialGrid : Grid
 initialGrid =
     Grid.empty 6 5
+
+
+nextPlayerCoin : Coin -> Coin
+nextPlayerCoin playerCoin =
+    case playerCoin of
+        Grid.Red ->
+            Grid.Yellow
+
+        Grid.Yellow ->
+            Grid.Red
+
+
+
+-- Update
 
 
 update : Computer -> Mem -> Mem
@@ -137,14 +155,8 @@ firstEmptyGridScreenPositionFromMouseX mouse gsm =
         |> Maybe.map (gridPositionToScreenPosition gsm)
 
 
-nextPlayerCoin : Coin -> Coin
-nextPlayerCoin playerCoin =
-    case playerCoin of
-        Grid.Red ->
-            Grid.Yellow
 
-        Grid.Yellow ->
-            Grid.Red
+-- View
 
 
 view : Computer -> Mem -> List Shape

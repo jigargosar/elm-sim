@@ -2,6 +2,7 @@ module ConnectFour exposing (main)
 
 import ConnectFour.Grid as Grid exposing (Cell, Coin(..), Grid)
 import Playground exposing (..)
+import PointFree exposing (flip)
 
 
 type alias Mem =
@@ -145,13 +146,9 @@ viewGrid { screen, mouse, time } currentPlayerCoin grid =
                 |> moveRight (snapMouseXToGrid gsm mouse)
 
         nextMoveCellIndicator =
-            let
-                ( column, _ ) =
-                    screenPositionToGridPosition ( mouse.x, mouse.y ) gsm
-            in
-            Grid.firstEmptyPositionInColumn column grid
+            firstEmptyGridScreenPositionFromMouseX mouse gsm
                 |> Maybe.map
-                    (moveShapeToGridPosition gsm nextMoveIndicatorShape)
+                    (\( sx, sy ) -> nextMoveIndicatorShape |> move sx sy)
                 |> Maybe.withDefault (group [])
     in
     group
@@ -160,6 +157,13 @@ viewGrid { screen, mouse, time } currentPlayerCoin grid =
         , nextMoveTopIndicator
         , nextMoveCellIndicator
         ]
+
+
+firstEmptyGridScreenPositionFromMouseX mouse gsm =
+    screenPositionToGridPosition ( mouse.x, mouse.y ) gsm
+        |> Tuple.first
+        |> flip Grid.firstEmptyPositionInColumn gsm.grid_
+        |> Maybe.map (gridPositionToScreenPosition gsm)
 
 
 moveShapeToGridPosition : GridScreenModel -> Shape -> Grid.Position -> Shape

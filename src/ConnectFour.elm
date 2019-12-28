@@ -69,7 +69,7 @@ playerToCoin player =
             Yellow
 
 
-screenPositionToGridPosition : ScreenPosition -> GridViewModel -> Grid.Position
+screenPositionToGridPosition : ScreenPosition -> GridScreenModel -> Grid.Position
 screenPositionToGridPosition ( x, y ) gvm =
     ( (x - gvm.left) / gvm.cellSize |> round, (y - gvm.bottom) / gvm.cellSize |> round )
 
@@ -100,12 +100,12 @@ coinToColor coin =
 --  yellow
 
 
-gridCordToScreenCord : GridViewModel -> Grid.Position -> ScreenPosition
+gridCordToScreenCord : GridScreenModel -> Grid.Position -> ScreenPosition
 gridCordToScreenCord gvm ( x, y ) =
     ( gvm.left + toFloat x * gvm.cellSize, gvm.bottom + toFloat y * gvm.cellSize )
 
 
-viewGridCell : GridViewModel -> ( Grid.Position, Grid.Cell ) -> Shape
+viewGridCell : GridScreenModel -> ( Grid.Position, Grid.Cell ) -> Shape
 viewGridCell gvm ( cord, cell ) =
     let
         ( x, y ) =
@@ -114,17 +114,17 @@ viewGridCell gvm ( cord, cell ) =
     cell |> cellToShape gvm |> move x y
 
 
-playerToCellShape : GridViewModel -> Player -> Shape
+playerToCellShape : GridScreenModel -> Player -> Shape
 playerToCellShape gvm player =
     cellShapeWithColor gvm (playerToCoin >> coinToColor <| player)
 
 
-cellToShape : GridViewModel -> Cell -> Shape
+cellToShape : GridScreenModel -> Cell -> Shape
 cellToShape gvm cell =
     cellShapeWithColor gvm (cellToColor cell)
 
 
-cellShapeWithColor : GridViewModel -> Color -> Shape
+cellShapeWithColor : GridScreenModel -> Color -> Shape
 cellShapeWithColor gvm color =
     group
         [ circle white gvm.cellRadius
@@ -191,7 +191,7 @@ type alias ScreenPosition =
     ( Float, Float )
 
 
-type alias GridViewModel =
+type alias GridScreenModel =
     { width : Float
     , height : Float
     , top : Float
@@ -218,7 +218,7 @@ screenCellSize screen grid =
     min maxCellWidth maxCellHeight
 
 
-toGridScreenModel : Screen -> Grid -> GridViewModel
+toGridScreenModel : Screen -> Grid -> GridScreenModel
 toGridScreenModel screen grid =
     let
         gridDimensions =

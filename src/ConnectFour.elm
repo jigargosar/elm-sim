@@ -69,7 +69,7 @@ playerToCoin player =
             Yellow
 
 
-screenPositionToGridPosition : ScreenCord -> GridViewModel -> Grid.Position
+screenPositionToGridPosition : ScreenPosition -> GridViewModel -> Grid.Position
 screenPositionToGridPosition ( x, y ) gvm =
     ( (x - gvm.left) / gvm.cellSize |> round, (y - gvm.bottom) / gvm.cellSize |> round )
 
@@ -100,7 +100,7 @@ coinToColor coin =
 --  yellow
 
 
-gridCordToScreenCord : GridViewModel -> Grid.Position -> ScreenCord
+gridCordToScreenCord : GridViewModel -> Grid.Position -> ScreenPosition
 gridCordToScreenCord gvm ( x, y ) =
     ( gvm.left + toFloat x * gvm.cellSize, gvm.bottom + toFloat y * gvm.cellSize )
 
@@ -187,7 +187,7 @@ viewGrid { screen, mouse, time } player grid =
         ]
 
 
-type alias ScreenCord =
+type alias ScreenPosition =
     ( Float, Float )
 
 

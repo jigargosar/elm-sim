@@ -168,22 +168,17 @@ toCellList model =
         dict =
             toDict model
 
-        func position =
+        pairPositionWithCell : Position -> ( Position, Cell )
+        pairPositionWithCell position =
             ( position, Dict.get position dict )
     in
-    List.map func (allPositions model)
+    List.map pairPositionWithCell (allPositions model)
 
 
 allPositions : Grid -> List Position
 allPositions (Grid w h _) =
-    let
-        xCoordinates =
-            List.range 0 (w - 1)
-
-        yCoordinates =
-            List.range 0 (h - 1)
-    in
-    xCoordinates |> List.concatMap (\x -> yCoordinates |> List.map (\y -> ( x, y )))
+    List.Extra.initialize w (Tuple.pair >> List.Extra.initialize h)
+        |> List.concat
 
 
 toWH (Grid w h _) =

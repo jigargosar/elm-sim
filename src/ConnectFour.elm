@@ -1,6 +1,5 @@
 module ConnectFour exposing (main)
 
-import Basics.Extra exposing (uncurry)
 import ConnectFour.Grid as Grid exposing (Cell, Coin(..), Grid)
 import Playground exposing (..)
 import PointFree exposing (flip, mapEach)
@@ -8,7 +7,6 @@ import Set exposing (Set)
 
 
 
--- Game
 -- Mem
 
 
@@ -164,12 +162,11 @@ snapMouseXToGrid gsm mouse =
         |> Tuple.first
 
 
-firstEmptyGridScreenPositionFromMouseX : Mouse -> GridScreenModel -> Maybe ScreenPosition
-firstEmptyGridScreenPositionFromMouseX mouse gsm =
+firstEmptyGridPositionFromMouseX : Mouse -> GridScreenModel -> Maybe Grid.Position
+firstEmptyGridPositionFromMouseX mouse gsm =
     toGridPosition ( mouse.x, mouse.y ) gsm
         |> Tuple.first
         |> flip Grid.firstEmptyPositionInColumn gsm.grid_
-        |> Maybe.map (toScreenPosition gsm)
 
 
 
@@ -206,7 +203,7 @@ coinToColor coin =
 viewGridCell : GridScreenModel -> ( Grid.Position, Grid.Cell ) -> Shape
 viewGridCell gsm ( position, cell ) =
     toCellShape gsm (cellToColor cell)
-        |> move (toScreenPosition gsm position)
+        |> placeOnScreen gsm position
 
 
 viewGameOverGridCell : Time -> GridScreenModel -> Set Grid.Position -> ( Grid.Position, Grid.Cell ) -> Shape
@@ -218,12 +215,18 @@ viewGameOverGridCell time gsm gameOverPositions ( gridPosition, cell ) =
             else
                 identity
            )
-        |> move (toScreenPosition gsm gridPosition)
+        |> placeOnScreen gsm gridPosition
 
 
 move : ( Number, Number ) -> Shape -> Shape
 move ( x, y ) =
     Playground.move x y
+
+
+placeOnScreen : GridScreenModel -> Grid.Position -> Shape -> Shape
+placeOnScreen gsm gridPosition =
+    toScreenPosition gsm gridPosition
+        |> move
 
 
 toCellShape : GridScreenModel -> Color -> Shape
@@ -252,8 +255,12 @@ viewPlayerTurn { screen, mouse, time } currentPlayerCoin grid =
                 |> moveRight (snapMouseXToGrid gsm mouse)
 
         nextMoveCellIndicator =
-            firstEmptyGridScreenPositionFromMouseX mouse gsm
-                |> Maybe.map (moveShape nextMoveIndicatorShape)
+            firstEmptyGridPositionFromMouseX mouse gsm
+                |> Maybe.map
+                    (\gridPosition ->
+                        nextMoveIndicatorShape
+                            |> placeOnScreen gsm gridPosition
+                    )
                 |> Maybe.withDefault (group [])
     in
     group
@@ -262,11 +269,6 @@ viewPlayerTurn { screen, mouse, time } currentPlayerCoin grid =
         , nextMoveTopIndicator
         , nextMoveCellIndicator
         ]
-
-
-moveShape : Shape -> ( Number, Number ) -> Shape
-moveShape shape ( x, y ) =
-    Playground.move x y shape
 
 
 viewGameOver : Computer -> Set Grid.Position -> Coin -> Grid -> Shape

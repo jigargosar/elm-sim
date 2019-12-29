@@ -1,5 +1,6 @@
 module ConnectFour exposing (main)
 
+import Basics.Extra exposing (uncurry)
 import ConnectFour.Grid as Grid exposing (Cell, Coin(..), Grid)
 import Playground exposing (..)
 import PointFree exposing (flip, mapEach)
@@ -224,8 +225,12 @@ viewGameOverGridCell time gsm gameOverPositions ( position, cell ) =
 
 moveShapeToGridPosition : GridScreenModel -> Shape -> Grid.Position -> Shape
 moveShapeToGridPosition gsm shape =
-    gridPositionToScreenPosition gsm
-        >> (\( x, y ) -> shape |> move x y)
+    gridPositionToScreenPosition gsm >> moveShape shape
+
+
+move : ( Number, Number ) -> Shape -> Shape
+move ( x, y ) =
+    Playground.move x y
 
 
 toCellShape : GridScreenModel -> Color -> Shape
@@ -255,8 +260,7 @@ viewPlayerTurn { screen, mouse, time } currentPlayerCoin grid =
 
         nextMoveCellIndicator =
             firstEmptyGridScreenPositionFromMouseX mouse gsm
-                |> Maybe.map
-                    (\( sx, sy ) -> nextMoveIndicatorShape |> move sx sy)
+                |> Maybe.map (moveShape nextMoveIndicatorShape)
                 |> Maybe.withDefault (group [])
     in
     group
@@ -265,6 +269,11 @@ viewPlayerTurn { screen, mouse, time } currentPlayerCoin grid =
         , nextMoveTopIndicator
         , nextMoveCellIndicator
         ]
+
+
+moveShape : Shape -> ( Number, Number ) -> Shape
+moveShape shape ( x, y ) =
+    Playground.move x y shape
 
 
 viewGameOver : Computer -> Set Grid.Position -> Coin -> Grid -> Shape

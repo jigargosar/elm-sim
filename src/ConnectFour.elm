@@ -87,6 +87,7 @@ type alias ScreenPosition =
 type alias GridScreenModel =
     { width : Float
     , height : Float
+    , bottom : Number
     , dx : Float
     , dy : Float
     , cellSize : Number
@@ -122,6 +123,7 @@ toGridScreenModel screen grid =
     in
     { width = width
     , height = height
+    , bottom = -height / 2
     , dx = -width / 2 + cellSize / 2
     , dy = -height / 2 + cellSize / 2
     , cellSize = cellSize
@@ -277,22 +279,13 @@ viewGameOver { screen, mouse, time } winningPositions winningPlayerCoin grid =
     let
         gsm =
             toGridScreenModel screen grid
-
-        frameOffset =
-            -- gsm.cellSize + (gsm.cellSize / 4)
-            0
-
-        frameWidth =
-            gsm.width + frameOffset
-
-        frameHeight =
-            gsm.height + frameOffset
     in
     group
-        [ rectangle blue frameWidth frameHeight
+        [ rectangle blue gsm.width gsm.height
         , List.map (viewGameOverGridCell time gsm winningPositions) (Grid.toCellList grid) |> group
         , words (coinToColor winningPlayerCoin) "Game Over, Click to Restart"
-            |> moveDown (frameHeight / 2 + 20)
+            |> moveY gsm.bottom
+            |> moveDown 20
         ]
 
 

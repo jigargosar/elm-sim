@@ -112,12 +112,13 @@ screenCellSize screen grid =
 toGridScreenModel : Screen -> Grid -> GridScreenModel
 toGridScreenModel screen grid =
     let
+        cellSize : Number
+        cellSize =
+            screenCellSize screen grid
+
         ( width, height ) =
             ( Grid.width grid, Grid.height grid )
                 |> mapEach (toFloat >> (*) cellSize)
-
-        cellSize =
-            screenCellSize screen grid
     in
     { width = width
     , height = height

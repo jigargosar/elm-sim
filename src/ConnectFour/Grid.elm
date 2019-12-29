@@ -120,12 +120,32 @@ getGameOverPositions startPosition coin (Grid grid) =
 
         horizontalPositionSet =
             getConnectedPositionsInOpposingDirections ( 1, 0 ) validatePosition startPosition
-    in
-    if Set.size horizontalPositionSet >= winningSetSize then
-        horizontalPositionSet
 
-    else
-        Set.empty
+        verticalPositionSet =
+            getConnectedPositionsInOpposingDirections ( 0, 1 ) validatePosition startPosition
+
+        getWinningPositionsInDirection dir =
+            let
+                connectedPositionSet =
+                    getConnectedPositionsInOpposingDirections dir validatePosition startPosition
+            in
+            if Set.size connectedPositionSet >= 4 then
+                connectedPositionSet
+
+            else
+                Set.empty
+
+        directions =
+            [ ( 1, 0 ), ( 0, 1 ), ( 1, 1 ), ( -1, 1 ) ]
+
+        reducer d acc =
+            if Set.isEmpty acc then
+                getWinningPositionsInDirection d
+
+            else
+                acc
+    in
+    List.foldl reducer Set.empty directions
 
 
 getConnectedPositionsInOpposingDirections : Position -> (Position -> Maybe Position) -> Position -> Set Position

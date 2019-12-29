@@ -22,7 +22,13 @@ initialMem =
 
 initialGrid : Grid
 initialGrid =
-    Grid.empty 6 5
+    -- Grid.empty 6 5
+    Grid.fromList 6
+        5
+        [ ( ( 0, 0 ), Red )
+        , ( ( 0, 1 ), Red )
+        , ( ( 0, 2 ), Red )
+        ]
 
 
 nextPlayerCoin : Coin -> Coin

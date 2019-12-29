@@ -7,12 +7,15 @@ module ConnectFour.Grid exposing
     , dimensions
     , empty
     , firstEmptyPositionInColumn
+    , fromList
     , putCoinInColumn
     , toCellList
     )
 
+import Dict exposing (Dict)
 import Grid.Bordered as Grid
 import List.Extra
+import Set exposing (Set)
 
 
 type Coin
@@ -51,6 +54,11 @@ empty w h =
     Grid.empty { columns = w, rows = h } |> Grid
 
 
+fromList : Int -> Int -> List ( Position, Coin ) -> Grid
+fromList w h =
+    Grid.fromList { columns = w, rows = h } >> Grid
+
+
 map : (GridModel -> GridModel) -> Grid -> Grid
 map func =
     unwrap >> func >> Grid
@@ -80,6 +88,31 @@ putCoinInColumn column coin model =
                     |> Result.mapError convertError
             )
         |> Maybe.withDefault (Err NotSuccessful)
+
+
+checkGameOver : Position -> Grid -> Bool
+checkGameOver position (Grid grid) =
+    let
+        dict : Dict Position Coin
+        dict =
+            Grid.toDict grid
+
+        _ =
+            case Dict.get position dict of
+                Just coin ->
+                    let
+                        coinPositions : Set Position
+                        coinPositions =
+                            Dict.filter (\_ -> (==) coin) dict
+                                |> Dict.keys
+                                |> Set.fromList
+                    in
+                    False
+
+                Nothing ->
+                    False
+    in
+    False
 
 
 insert : Position -> Coin -> Grid -> Result Grid.Error Grid

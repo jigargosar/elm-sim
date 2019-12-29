@@ -112,18 +112,7 @@ getGameOverPositions startPosition coin (Grid grid) =
             else
                 Nothing
 
-        offsets =
-            List.range 0 3
-
-        winningSetSize =
-            List.length offsets
-
-        horizontalPositionSet =
-            getConnectedPositionsInOpposingDirections ( 1, 0 ) validatePosition startPosition
-
-        verticalPositionSet =
-            getConnectedPositionsInOpposingDirections ( 0, 1 ) validatePosition startPosition
-
+        getWinningPositionsInDirection : Position -> Set Position
         getWinningPositionsInDirection dir =
             let
                 connectedPositionSet =
@@ -138,12 +127,13 @@ getGameOverPositions startPosition coin (Grid grid) =
         directions =
             [ ( 1, 0 ), ( 0, 1 ), ( 1, 1 ), ( -1, 1 ) ]
 
-        reducer d acc =
-            if Set.isEmpty acc then
-                getWinningPositionsInDirection d
+        reducer : Position -> Set Position -> Set Position
+        reducer direction result =
+            if Set.isEmpty result then
+                getWinningPositionsInDirection direction
 
             else
-                acc
+                result
     in
     List.foldl reducer Set.empty directions
 

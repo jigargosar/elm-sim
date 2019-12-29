@@ -202,13 +202,13 @@ coinToColor coin =
 
 viewGridCell : GridScreenModel -> ( Grid.Position, Grid.Cell ) -> Shape
 viewGridCell gsm ( position, cell ) =
-    toCellShape gsm (cellToColor cell)
+    cellToShape gsm cell
         |> placeOnScreen gsm position
 
 
 viewGameOverGridCell : Time -> GridScreenModel -> Set Grid.Position -> ( Grid.Position, Grid.Cell ) -> Shape
 viewGameOverGridCell time gsm gameOverPositions ( gridPosition, cell ) =
-    toCellShape gsm (cellToColor cell)
+    cellToShape gsm cell
         |> (if Set.member gridPosition gameOverPositions then
                 fade (wave 0.3 0.9 1.3 time + 0.1)
 
@@ -229,6 +229,11 @@ placeOnScreen gsm gridPosition =
         |> move
 
 
+cellToShape : GridScreenModel -> Cell -> Shape
+cellToShape gsm cell =
+    toCellShape gsm (cellToColor cell)
+
+
 toCellShape : GridScreenModel -> Color -> Shape
 toCellShape gsm color =
     group
@@ -245,7 +250,7 @@ viewPlayerTurn { screen, mouse, time } currentPlayerCoin grid =
             toGridScreenModel screen grid
 
         nextMoveIndicatorShape =
-            toCellShape gsm (coinToColor currentPlayerCoin)
+            cellToShape gsm (Just currentPlayerCoin)
                 |> fade (wave 0.3 0.9 1.3 time + 0.1)
 
         nextMoveTopIndicator =

@@ -209,14 +209,13 @@ viewEmptyGridCell gsm position =
 
 viewGameOverGridCoin : Time -> GridScreenModel -> Set Grid.Position -> ( Grid.Position, Grid.Coin ) -> Shape
 viewGameOverGridCoin time gsm gameOverPositions ( gridPosition, coin ) =
-    coinToShape gsm coin
+    viewGridCoin gsm ( gridPosition, coin )
         |> (if Set.member gridPosition gameOverPositions then
                 fade (wave 0.3 0.9 1.3 time + 0.1)
 
             else
                 identity
            )
-        |> placeOnScreen gsm gridPosition
 
 
 move : ( Number, Number ) -> Shape -> Shape

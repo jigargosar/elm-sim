@@ -98,7 +98,7 @@ type alias GridScreenModel =
 screenCellSize : Screen -> Grid -> Number
 screenCellSize screen grid =
     let
-        ( gridWidth, gridHeight ) =
+        ( columns, rows ) =
             ( Grid.width grid, Grid.height grid )
                 |> mapEach (toFloat >> (+) 1)
 
@@ -106,7 +106,7 @@ screenCellSize screen grid =
             ( screen.width, screen.height )
                 |> mapEach ((*) 0.8)
     in
-    min (screenWidth / gridWidth) (screenHeight / gridHeight)
+    min (screenWidth / columns) (screenHeight / rows)
 
 
 toGridScreenModel : Screen -> Grid -> GridScreenModel

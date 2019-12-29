@@ -13,7 +13,6 @@ module ConnectFour.Grid exposing
 
 import Grid.Bordered as Grid
 import List.Extra
-import PointFree exposing (flip)
 
 
 type Coin

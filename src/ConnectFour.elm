@@ -88,6 +88,7 @@ type alias GridScreenModel =
     { width : Float
     , height : Float
     , bottom : Number
+    , top : Number
     , dx : Float
     , dy : Float
     , cellSize : Number
@@ -124,6 +125,7 @@ toGridScreenModel screen grid =
     { width = width
     , height = height
     , bottom = -height / 2
+    , top = height / 2
     , dx = -width / 2 + cellSize / 2
     , dy = -height / 2 + cellSize / 2
     , cellSize = cellSize
@@ -241,23 +243,14 @@ viewPlayerTurn { screen, mouse, time } currentPlayerCoin grid =
         gsm =
             toGridScreenModel screen grid
 
-        frameOffset =
-            -- gsm.cellSize + (gsm.cellSize / 4)
-            0
-
-        frameWidth =
-            gsm.width + frameOffset
-
-        frameHeight =
-            gsm.height + frameOffset
-
         nextMoveIndicatorShape =
             toCellShape gsm (coinToColor currentPlayerCoin)
                 |> fade (wave 0.3 0.9 1.3 time + 0.1)
 
         nextMoveTopIndicator =
             nextMoveIndicatorShape
-                |> moveUp (frameHeight / 2 + gsm.cellRadius)
+                |> moveY gsm.top
+                |> moveUp gsm.cellRadius
                 |> moveRight (snapMouseXToGrid gsm mouse)
 
         nextMoveCellIndicator =
@@ -267,7 +260,7 @@ viewPlayerTurn { screen, mouse, time } currentPlayerCoin grid =
                 |> Maybe.withDefault (group [])
     in
     group
-        [ rectangle blue frameWidth frameHeight
+        [ rectangle blue gsm.width gsm.height
         , List.map (viewGridCell gsm) (Grid.toCellList grid) |> group
         , nextMoveTopIndicator
         , nextMoveCellIndicator

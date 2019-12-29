@@ -107,10 +107,13 @@ getGameOverPositions position coin (Grid grid) =
         offsets =
             List.range 0 3
 
+        winningSetSize =
+            List.length offsets
+
         horizontalPositionSet =
             getConnectedHorizontalPositions position coin offsets dict
     in
-    if Set.size horizontalPositionSet >= 4 then
+    if Set.size horizontalPositionSet >= winningSetSize then
         horizontalPositionSet
 
     else

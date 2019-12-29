@@ -200,15 +200,21 @@ coinToColor coin =
             rgb 230 178 0
 
 
-viewGridCell : GridScreenModel -> ( Grid.Position, Grid.Cell ) -> Shape
-viewGridCell gsm ( position, cell ) =
-    cellToShape gsm cell
+viewGridCoin : GridScreenModel -> ( Grid.Position, Grid.Coin ) -> Shape
+viewGridCoin gsm ( position, coin ) =
+    cellToShape gsm (Just coin)
         |> placeOnScreen gsm position
 
 
-viewGameOverGridCell : Time -> GridScreenModel -> Set Grid.Position -> ( Grid.Position, Grid.Cell ) -> Shape
-viewGameOverGridCell time gsm gameOverPositions ( gridPosition, cell ) =
-    cellToShape gsm cell
+viewEmptyGridCell : GridScreenModel -> Grid.Position -> Shape
+viewEmptyGridCell gsm position =
+    cellToShape gsm Nothing
+        |> placeOnScreen gsm position
+
+
+viewGameOverGridCoin : Time -> GridScreenModel -> Set Grid.Position -> ( Grid.Position, Grid.Coin ) -> Shape
+viewGameOverGridCoin time gsm gameOverPositions ( gridPosition, coin ) =
+    cellToShape gsm (Just coin)
         |> (if Set.member gridPosition gameOverPositions then
                 fade (wave 0.3 0.9 1.3 time + 0.1)
 
@@ -265,7 +271,8 @@ viewPlayerTurn { screen, mouse, time } currentPlayerCoin grid =
     in
     group
         [ rectangle blue gsm.width gsm.height
-        , List.map (viewGridCell gsm) (Grid.toCellList grid) |> group
+        , List.map (viewEmptyGridCell gsm) (Grid.allPositions grid) |> group
+        , List.map (viewGridCoin gsm) (Grid.toList grid) |> group
         , nextMoveTopIndicator
         , nextMoveCellIndicator
         ]
@@ -279,7 +286,8 @@ viewGameOver { screen, mouse, time } winningPositions winningPlayerCoin grid =
     in
     group
         [ rectangle blue gsm.width gsm.height
-        , List.map (viewGameOverGridCell time gsm winningPositions) (Grid.toCellList grid) |> group
+        , List.map (viewEmptyGridCell gsm) (Grid.allPositions grid) |> group
+        , List.map (viewGameOverGridCoin time gsm winningPositions) (Grid.toList grid) |> group
         , words (coinToColor winningPlayerCoin) "Game Over, Click to Restart"
             |> moveY gsm.bottom
             |> moveDown 20

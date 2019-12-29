@@ -3,14 +3,14 @@ module ConnectFour.Grid exposing
     , Coin(..)
     , Grid
     , Position
+    , allPositions
     , clampPosition
-    , dimensions
     , empty
     , firstEmptyPositionInColumn
     , fromList
     , height
     , insertCoinInColumn
-    , toCellList
+    , toList
     , width
     )
 
@@ -157,6 +157,11 @@ toDict (Grid _ _ dict) =
     dict
 
 
+toList : Grid -> List ( Position, Coin )
+toList =
+    toDict >> Dict.toList
+
+
 toCellList : Grid -> List ( Position, Cell )
 toCellList model =
     let
@@ -174,11 +179,6 @@ allPositions : Grid -> List Position
 allPositions (Grid w h _) =
     List.Extra.initialize w (Tuple.pair >> List.Extra.initialize h)
         |> List.concat
-
-
-dimensions : Grid -> { width : Int, height : Int }
-dimensions (Grid w h _) =
-    { width = w, height = h }
 
 
 width : Grid -> Int

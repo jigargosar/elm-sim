@@ -231,14 +231,9 @@ placeOnScreen gsm gridPosition =
 
 cellToShape : GridScreenModel -> Cell -> Shape
 cellToShape gsm cell =
-    toCellShape gsm (cellToColor cell)
-
-
-toCellShape : GridScreenModel -> Color -> Shape
-toCellShape gsm color =
     group
         [ circle white gsm.cellRadius
-        , circle color gsm.cellRadius
+        , circle (cellToColor cell) gsm.cellRadius
             |> scale 0.8
         ]
 

@@ -6,19 +6,18 @@ import PointFree exposing (flip)
 
 
 
+-- Game
 -- Mem
 
 
-type alias Mem =
-    { grid : Grid
-    , currentPlayerCoin : Grid.Coin
-    , isGameOver : Bool
-    }
+type Mem
+    = PlayerTurn Coin Grid
+    | GameOver (List Grid.Position) Coin Grid
 
 
 initialMem : Mem
 initialMem =
-    { grid = initialGrid, currentPlayerCoin = Grid.Red, isGameOver = False }
+    PlayerTurn Grid.Red initialGrid
 
 
 initialGrid : Grid
@@ -48,22 +47,27 @@ nextPlayerCoin playerCoin =
 
 update : Computer -> Mem -> Mem
 update computer mem =
-    case checkMouseClickOnGridColumn computer mem.grid of
-        Just column ->
-            case
-                Grid.putCoinInColumn column mem.currentPlayerCoin mem.grid
-            of
-                Ok ( isGameOver, newGrid ) ->
-                    { mem
-                        | grid = newGrid
-                        , currentPlayerCoin = nextPlayerCoin mem.currentPlayerCoin
-                        , isGameOver = isGameOver
-                    }
+    case mem of
+        PlayerTurn currentPlayerCoin grid ->
+            case checkMouseClickOnGridColumn computer grid of
+                Just column ->
+                    case
+                        Grid.putCoinInColumn column currentPlayerCoin grid
+                    of
+                        Ok ( isGameOver, newGrid ) ->
+                            if isGameOver then
+                                GameOver [] currentPlayerCoin newGrid
 
-                Err _ ->
+                            else
+                                PlayerTurn (nextPlayerCoin currentPlayerCoin) newGrid
+
+                        Err _ ->
+                            mem
+
+                Nothing ->
                     mem
 
-        Nothing ->
+        GameOver list coin grid ->
             mem
 
 
@@ -170,7 +174,12 @@ firstEmptyGridScreenPositionFromMouseX mouse gsm =
 view : Computer -> Mem -> List Shape
 view ({ screen } as computer) mem =
     [ rectangle lightBlue screen.width screen.height
-    , viewGrid computer mem.currentPlayerCoin mem.grid
+    , case mem of
+        PlayerTurn currentPlayerCoin grid ->
+            viewPlayerTurn computer currentPlayerCoin grid
+
+        GameOver _ winningPlayerCoin grid ->
+            viewPlayerTurn computer winningPlayerCoin grid
     ]
 
 
@@ -209,8 +218,8 @@ toCellShape gsm color =
         ]
 
 
-viewGrid : Computer -> Coin -> Grid -> Shape
-viewGrid { screen, mouse, time } currentPlayerCoin grid =
+viewPlayerTurn : Computer -> Coin -> Grid -> Shape
+viewPlayerTurn { screen, mouse, time } currentPlayerCoin grid =
     let
         gsm =
             toGridScreenModel screen grid

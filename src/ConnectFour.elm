@@ -250,7 +250,7 @@ viewPlayerTurn { screen, mouse, time } currentPlayerCoin grid =
         nextMoveTopIndicator =
             nextMoveIndicatorShape
                 |> moveY gsm.top
-                |> moveUp gsm.cellRadius
+                |> moveUp (gsm.cellSize / 2)
                 |> moveRight (snapMouseXToGrid gsm mouse)
 
         nextMoveCellIndicator =

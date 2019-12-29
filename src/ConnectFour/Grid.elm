@@ -15,7 +15,7 @@ module ConnectFour.Grid exposing
 import Dict exposing (Dict)
 import Grid.Bordered as Grid
 import List.Extra
-import PointFree exposing (flip)
+import PointFree exposing (flip, mapEach)
 import Set exposing (Set)
 
 
@@ -98,11 +98,19 @@ withGameOverPositions position coin model =
 
 
 getGameOverPositions : Position -> Coin -> Grid -> Set Position
-getGameOverPositions position coin (Grid grid) =
+getGameOverPositions startPosition coin (Grid grid) =
     let
-        dict : Dict Position Coin
-        dict =
+        lookup : Dict Position Coin
+        lookup =
             Grid.toDict grid
+
+        validatePosition : Position -> Maybe Position
+        validatePosition p =
+            if Dict.get p lookup == Just coin then
+                Just p
+
+            else
+                Nothing
 
         offsets =
             List.range 0 3
@@ -111,7 +119,7 @@ getGameOverPositions position coin (Grid grid) =
             List.length offsets
 
         horizontalPositionSet =
-            getConnectedHorizontalPositions position coin offsets dict
+            getConnectedPositionsInOpposingDirections ( 1, 0 ) validatePosition startPosition
     in
     if Set.size horizontalPositionSet >= winningSetSize then
         horizontalPositionSet
@@ -120,38 +128,21 @@ getGameOverPositions position coin (Grid grid) =
         Set.empty
 
 
-getConnectedHorizontalPositions : Position -> Coin -> List Int -> Dict Position Coin -> Set Position
-getConnectedHorizontalPositions position coin offsets dict =
+getConnectedPositionsInOpposingDirections : Position -> (Position -> Maybe Position) -> Position -> Set Position
+getConnectedPositionsInOpposingDirections direction validatePosition startPosition =
     let
-        validatePosition : Position -> Maybe Position
-        validatePosition p =
-            if Dict.get p dict == Just coin then
-                Just p
-
-            else
-                Nothing
-
         moveBy : Position -> Position -> Position
         moveBy ( dx, dy ) ( x, y ) =
             ( x + dx, y + dy )
 
-        rightPositions : List Position
-        rightPositions =
-            List.Extra.iterate (moveBy ( 1, 0 ) >> validatePosition) position
-
-        leftPositions : List Position
-        leftPositions =
-            List.Extra.iterate (moveBy ( -1, 0 ) >> validatePosition) position
+        validPositionsInDirection : Position -> List Position
+        validPositionsInDirection dir =
+            List.Extra.iterate (moveBy dir >> validatePosition) startPosition
     in
-    Set.fromList (rightPositions ++ leftPositions)
-
-
-moveRight dx ( x, y ) =
-    ( x + dx, y )
-
-
-moveLeft dx ( x, y ) =
-    ( x - dx, y )
+    Set.fromList
+        (validPositionsInDirection direction
+            ++ validPositionsInDirection (mapEach negate direction)
+        )
 
 
 insert : Position -> Coin -> Grid -> Result Grid.Error Grid

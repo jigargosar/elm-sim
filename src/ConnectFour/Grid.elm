@@ -8,7 +8,7 @@ module ConnectFour.Grid exposing
     , empty
     , firstEmptyPositionInColumn
     , fromList
-    , putCoinInColumn
+    , insertCoinInColumn
     , toCellList
     )
 
@@ -60,8 +60,8 @@ type Error
     | NotSuccessful
 
 
-putCoinInColumn : Int -> Coin -> Grid -> Result Error ( Set Position, Grid )
-putCoinInColumn column coin model =
+insertCoinInColumn : Int -> Coin -> Grid -> Result Error ( Set Position, Grid )
+insertCoinInColumn column coin model =
     firstEmptyPositionInColumn column model
         |> Maybe.map
             (\position ->
@@ -137,6 +137,7 @@ insert position coin model =
         Err OutOfBounds
 
 
+mapDict : (Dict Position Coin -> Dict Position Coin) -> Grid -> Grid
 mapDict func (Grid w h dict) =
     func dict |> Grid w h
 

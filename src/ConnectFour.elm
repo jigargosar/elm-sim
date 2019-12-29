@@ -53,7 +53,7 @@ update computer mem =
             case checkMouseClickOnGridColumn computer grid of
                 Just column ->
                     case
-                        Grid.putCoinInColumn column currentPlayerCoin grid
+                        Grid.insertCoinInColumn column currentPlayerCoin grid
                     of
                         Ok ( winningPositions, newGrid ) ->
                             if Set.isEmpty winningPositions then

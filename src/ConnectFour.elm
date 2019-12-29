@@ -2,7 +2,7 @@ module ConnectFour exposing (main)
 
 import ConnectFour.Grid as Grid exposing (Cell, Coin(..), Grid)
 import Playground exposing (..)
-import PointFree exposing (flip)
+import PointFree exposing (flip, mapEach)
 import Set exposing (Set)
 
 
@@ -98,29 +98,26 @@ type alias GridScreenModel =
 screenCellSize : Screen -> Grid -> Number
 screenCellSize screen grid =
     let
-        maxCellWidth =
-            (screen.width * 0.8) / (toFloat (Grid.width grid) + 1)
+        ( gridWidth, gridHeight ) =
+            ( Grid.width grid, Grid.height grid )
+                |> mapEach (toFloat >> (+) 1)
 
-        maxCellHeight =
-            (screen.height * 0.8) / (toFloat (Grid.height grid) + 1)
+        ( screenWidth, screenHeight ) =
+            ( screen.width, screen.height )
+                |> mapEach ((*) 0.8)
     in
-    min maxCellWidth maxCellHeight
+    min (screenWidth / gridWidth) (screenHeight / gridHeight)
 
 
 toGridScreenModel : Screen -> Grid -> GridScreenModel
 toGridScreenModel screen grid =
     let
-        gridDimensions =
-            Grid.dimensions grid
+        ( width, height ) =
+            ( Grid.width grid, Grid.height grid )
+                |> mapEach (toFloat >> (*) cellSize)
 
         cellSize =
             screenCellSize screen grid
-
-        width =
-            toFloat gridDimensions.width * cellSize
-
-        height =
-            toFloat gridDimensions.height * cellSize
     in
     { width = width
     , height = height

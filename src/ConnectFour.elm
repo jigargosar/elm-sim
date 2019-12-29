@@ -276,7 +276,7 @@ viewGameOver { screen, mouse, time } winningPlayerCoin grid =
     group
         [ rectangle blue frameWidth frameHeight
         , List.map (viewGridCell gsm) (Grid.toCellList grid) |> group
-        , words black "Game Over Player Won"
+        , words (coinToColor winningPlayerCoin) "Game Over Player Won"
             |> moveDown (frameHeight / 2 + 20)
         ]
 

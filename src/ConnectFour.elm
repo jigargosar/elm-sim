@@ -208,13 +208,13 @@ viewGridCell gsm ( cord, cell ) =
     moveShapeToGridPosition gsm (toCellShape gsm (cellToColor cell)) cord
 
 
-viewGameOverGridCell : GridScreenModel -> Set Grid.Position -> ( Grid.Position, Grid.Cell ) -> Shape
-viewGameOverGridCell gsm gameOverPositions ( position, cell ) =
+viewGameOverGridCell : Time -> GridScreenModel -> Set Grid.Position -> ( Grid.Position, Grid.Cell ) -> Shape
+viewGameOverGridCell time gsm gameOverPositions ( position, cell ) =
     let
         cellShape =
             toCellShape gsm (cellToColor cell)
                 |> (if Set.member position gameOverPositions then
-                        fade 0.5
+                        fade (wave 0.3 0.9 1.3 time + 0.1)
 
                     else
                         identity
@@ -295,7 +295,7 @@ viewGameOver { screen, mouse, time } winningPositions winningPlayerCoin grid =
     in
     group
         [ rectangle blue frameWidth frameHeight
-        , List.map (viewGameOverGridCell gsm winningPositions) (Grid.toCellList grid) |> group
+        , List.map (viewGameOverGridCell time gsm winningPositions) (Grid.toCellList grid) |> group
         , words (coinToColor winningPlayerCoin) "Game Over, Click to Restart"
             |> moveDown (frameHeight / 2 + 20)
         ]

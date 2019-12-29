@@ -117,6 +117,7 @@ getGameOverPositions position coin (Grid grid) =
         Set.empty
 
 
+getConnectedHorizontalPositions : Position -> Coin -> List Int -> Dict Position Coin -> Set Position
 getConnectedHorizontalPositions position coin offsets dict =
     let
         rightPositions : List Position

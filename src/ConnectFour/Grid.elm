@@ -91,21 +91,21 @@ getWinningPositions startPosition coin (Grid _ _ dict) =
         moveBy ( dx, dy ) ( x, y ) =
             ( x + dx, y + dy )
 
-        validPositionsInDirection : Position -> List Position
-        validPositionsInDirection direction =
+        connectedPositionsInDirection : Position -> List Position
+        connectedPositionsInDirection direction =
             List.Extra.iterate (moveBy direction >> validatePosition) startPosition
 
         getWinningPositionsInOpposingDirections : Position -> Set Position
         getWinningPositionsInOpposingDirections direction =
             let
-                connectedPositionSet =
+                connectedPositions =
                     Set.fromList
-                        (validPositionsInDirection direction
-                            ++ validPositionsInDirection (mapEach negate direction)
+                        (connectedPositionsInDirection direction
+                            ++ connectedPositionsInDirection (mapEach negate direction)
                         )
             in
-            if Set.size connectedPositionSet >= 4 then
-                connectedPositionSet
+            if Set.size connectedPositions >= 4 then
+                connectedPositions
 
             else
                 Set.empty
@@ -174,10 +174,6 @@ allPositions (Grid w h _) =
         |> List.concat
 
 
-toWH (Grid w h _) =
-    ( w, h )
-
-
 dimensions : Grid -> { width : Int, height : Int }
-dimensions =
-    toWH >> (\( width, height ) -> { width = width, height = height })
+dimensions (Grid w h _) =
+    { width = w, height = h }

@@ -55,12 +55,12 @@ update computer mem =
                     case
                         Grid.putCoinInColumn column currentPlayerCoin grid
                     of
-                        Ok ( isGameOver, newGrid ) ->
-                            if isGameOver then
-                                GameOver Set.empty currentPlayerCoin newGrid
+                        Ok ( winningPositions, newGrid ) ->
+                            if Set.isEmpty winningPositions then
+                                PlayerTurn (nextPlayerCoin currentPlayerCoin) newGrid
 
                             else
-                                PlayerTurn (nextPlayerCoin currentPlayerCoin) newGrid
+                                GameOver winningPositions currentPlayerCoin newGrid
 
                         Err _ ->
                             mem

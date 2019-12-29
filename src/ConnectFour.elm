@@ -138,7 +138,7 @@ toGridScreenModel screen grid =
 checkMouseClickOnGridColumn : Computer -> Grid -> Maybe Int
 checkMouseClickOnGridColumn { mouse, screen } grid =
     if mouse.click then
-        screenPositionToGridPosition ( mouse.x, mouse.y ) (toGridScreenModel screen grid)
+        screenToGridPosition ( mouse.x, mouse.y ) (toGridScreenModel screen grid)
             |> Tuple.first
             |> Just
 
@@ -146,30 +146,30 @@ checkMouseClickOnGridColumn { mouse, screen } grid =
         Nothing
 
 
-screenPositionToGridPosition : ScreenPosition -> GridScreenModel -> Grid.Position
-screenPositionToGridPosition ( x, y ) gsm =
+screenToGridPosition : ScreenPosition -> GridScreenModel -> Grid.Position
+screenToGridPosition ( x, y ) gsm =
     ( (x - gsm.dx) / gsm.cellSize |> round, (y - gsm.dy) / gsm.cellSize |> round )
 
 
-gridPositionToScreenPosition : GridScreenModel -> Grid.Position -> ScreenPosition
-gridPositionToScreenPosition gsm ( x, y ) =
+gridToScreenPosition : GridScreenModel -> Grid.Position -> ScreenPosition
+gridToScreenPosition gsm ( x, y ) =
     ( toFloat x * gsm.cellSize + gsm.dx, toFloat y * gsm.cellSize + gsm.dy )
 
 
 snapMouseXToGrid : GridScreenModel -> Mouse -> Float
 snapMouseXToGrid gsm mouse =
-    screenPositionToGridPosition ( mouse.x, mouse.y ) gsm
+    screenToGridPosition ( mouse.x, mouse.y ) gsm
         |> Grid.clampPosition gsm.grid_
-        |> gridPositionToScreenPosition gsm
+        |> gridToScreenPosition gsm
         |> Tuple.first
 
 
 firstEmptyGridScreenPositionFromMouseX : Mouse -> GridScreenModel -> Maybe ScreenPosition
 firstEmptyGridScreenPositionFromMouseX mouse gsm =
-    screenPositionToGridPosition ( mouse.x, mouse.y ) gsm
+    screenToGridPosition ( mouse.x, mouse.y ) gsm
         |> Tuple.first
         |> flip Grid.firstEmptyPositionInColumn gsm.grid_
-        |> Maybe.map (gridPositionToScreenPosition gsm)
+        |> Maybe.map (gridToScreenPosition gsm)
 
 
 
@@ -204,28 +204,21 @@ coinToColor coin =
 
 
 viewGridCell : GridScreenModel -> ( Grid.Position, Grid.Cell ) -> Shape
-viewGridCell gsm ( cord, cell ) =
-    moveShapeToGridPosition gsm (toCellShape gsm (cellToColor cell)) cord
+viewGridCell gsm ( position, cell ) =
+    toCellShape gsm (cellToColor cell)
+        |> move (gridToScreenPosition gsm position)
 
 
 viewGameOverGridCell : Time -> GridScreenModel -> Set Grid.Position -> ( Grid.Position, Grid.Cell ) -> Shape
 viewGameOverGridCell time gsm gameOverPositions ( position, cell ) =
-    let
-        cellShape =
-            toCellShape gsm (cellToColor cell)
-                |> (if Set.member position gameOverPositions then
-                        fade (wave 0.3 0.9 1.3 time + 0.1)
+    toCellShape gsm (cellToColor cell)
+        |> (if Set.member position gameOverPositions then
+                fade (wave 0.3 0.9 1.3 time + 0.1)
 
-                    else
-                        identity
-                   )
-    in
-    moveShapeToGridPosition gsm cellShape position
-
-
-moveShapeToGridPosition : GridScreenModel -> Shape -> Grid.Position -> Shape
-moveShapeToGridPosition gsm shape =
-    gridPositionToScreenPosition gsm >> moveShape shape
+            else
+                identity
+           )
+        |> move (gridToScreenPosition gsm position)
 
 
 move : ( Number, Number ) -> Shape -> Shape

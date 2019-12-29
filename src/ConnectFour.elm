@@ -179,7 +179,7 @@ view ({ screen } as computer) mem =
             viewPlayerTurn computer currentPlayerCoin grid
 
         GameOver _ winningPlayerCoin grid ->
-            viewPlayerTurn computer winningPlayerCoin grid
+            viewGameOver computer winningPlayerCoin grid
     ]
 
 
@@ -254,6 +254,30 @@ viewPlayerTurn { screen, mouse, time } currentPlayerCoin grid =
         , List.map (viewGridCell gsm) (Grid.toCellList grid) |> group
         , nextMoveTopIndicator
         , nextMoveCellIndicator
+        ]
+
+
+viewGameOver : Computer -> Coin -> Grid -> Shape
+viewGameOver { screen, mouse, time } winningPlayerCoin grid =
+    let
+        gsm =
+            toGridScreenModel screen grid
+
+        frameOffset =
+            -- gsm.cellSize + (gsm.cellSize / 4)
+            0
+
+        frameWidth =
+            gsm.width + frameOffset
+
+        frameHeight =
+            gsm.height + frameOffset
+    in
+    group
+        [ rectangle blue frameWidth frameHeight
+        , List.map (viewGridCell gsm) (Grid.toCellList grid) |> group
+        , words black "Game Over Player Won"
+            |> moveDown (frameHeight / 2 + 20)
         ]
 
 

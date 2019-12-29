@@ -15,7 +15,7 @@ module ConnectFour.Grid exposing
 import Dict exposing (Dict)
 import Grid.Bordered as Grid
 import List.Extra
-import PointFree exposing (flip, mapEach)
+import PointFree exposing (mapEach)
 import Set exposing (Set)
 
 
@@ -28,21 +28,12 @@ type alias Cell =
     Maybe Coin
 
 
-type Grid
-    = Grid GridModel
-
-
-type alias GridModel =
-    Grid.Grid Coin
-
-
 type alias Position =
     ( Int, Int )
 
 
-unwrap : Grid -> GridModel
-unwrap (Grid grid) =
-    grid
+type Grid
+    = Grid Int Int (Dict Position Coin)
 
 
 clampPosition : Grid -> Position -> Position
@@ -52,17 +43,17 @@ clampPosition =
 
 empty : Int -> Int -> Grid
 empty w h =
-    Grid.empty { columns = w, rows = h } |> Grid
+    Grid w h Dict.empty
 
 
 fromList : Int -> Int -> List ( Position, Coin ) -> Grid
 fromList w h =
-    Grid.fromList { columns = w, rows = h } >> Grid
-
-
-map : (GridModel -> GridModel) -> Grid -> Grid
-map func =
-    unwrap >> func >> Grid
+    let
+        ignoreError : (Grid -> Result x Grid) -> Grid -> Grid
+        ignoreError func model =
+            func model |> Result.withDefault model
+    in
+    List.foldl (\( position, coin ) -> ignoreError (insert position coin)) (empty w h)
 
 
 type Error
@@ -87,7 +78,6 @@ putCoinInColumn column coin model =
             (\position ->
                 insert position coin model
                     |> Result.map (withWinningPositions position coin)
-                    |> Result.mapError convertError
             )
         |> Maybe.withDefault (Err NotSuccessful)
 
@@ -98,11 +88,11 @@ withWinningPositions position coin model =
 
 
 getWinningPositions : Position -> Coin -> Grid -> Set Position
-getWinningPositions startPosition coin (Grid grid) =
+getWinningPositions startPosition coin (Grid _ _ grid) =
     let
         lookup : Dict Position Coin
         lookup =
-            Grid.toDict grid
+            grid
 
         validatePosition : Position -> Maybe Position
         validatePosition p =
@@ -149,13 +139,21 @@ getWinningPositions startPosition coin (Grid grid) =
     List.foldl reducer Set.empty directions
 
 
-insert : Position -> Coin -> Grid -> Result Grid.Error Grid
+insert : Position -> Coin -> Grid -> Result Error Grid
 insert position coin model =
-    let
-        grid =
-            unwrap model
-    in
-    Grid.insert position coin grid |> Result.map Grid
+    if isValid position model then
+        mapDict (Dict.insert position coin) model |> Ok
+
+    else
+        Err OutOfBounds
+
+
+mapDict func (Grid w h dict) =
+    func dict |> Grid w h
+
+
+isValid ( x, y ) (Grid w h _) =
+    x >= 0 && x < w && y >= 0 && y < h
 
 
 columnEq : Int -> Position -> Bool
@@ -165,14 +163,44 @@ columnEq value ( column, _ ) =
 
 firstEmptyPositionInColumn : Int -> Grid -> Maybe Position
 firstEmptyPositionInColumn column =
-    unwrap >> Grid.emptyPositions >> List.Extra.find (columnEq column)
+    toCellList
+        >> List.Extra.find (\( position, cell ) -> columnEq column position && cell == Nothing)
+        >> Maybe.map Tuple.first
+
+
+toDict : Grid -> Dict Position Coin
+toDict (Grid _ _ dict) =
+    dict
 
 
 toCellList : Grid -> List ( Position, Cell )
-toCellList =
-    unwrap >> Grid.foldl (\p c -> (::) ( p, c )) []
+toCellList model =
+    let
+        dict =
+            toDict model
+
+        func position =
+            ( position, Dict.get position dict )
+    in
+    List.map func (allPositions model)
+
+
+allPositions : Grid -> List Position
+allPositions (Grid w h _) =
+    let
+        xCoordinates =
+            List.range 0 (w - 1)
+
+        yCoordinates =
+            List.range 0 (h - 1)
+    in
+    xCoordinates |> List.concatMap (\x -> yCoordinates |> List.map (\y -> ( x, y )))
+
+
+toWH (Grid w h _) =
+    ( w, h )
 
 
 dimensions : Grid -> { width : Int, height : Int }
 dimensions =
-    unwrap >> Grid.dimensions >> (\{ columns, rows } -> { width = columns, height = rows })
+    toWH >> (\( width, height ) -> { width = width, height = height })

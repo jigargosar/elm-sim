@@ -208,7 +208,7 @@ viewGridCoin gsm ( position, coin ) =
 
 viewEmptyGridCell : GridScreenModel -> Grid.Position -> Shape
 viewEmptyGridCell gsm position =
-    cellToShape gsm Nothing
+    emptyCellShape gsm
         |> placeOnScreen gsm position
 
 
@@ -244,6 +244,11 @@ cellToShape gsm cell =
         ]
 
 
+emptyCellShape : GridScreenModel -> Shape
+emptyCellShape gsm =
+    circle white gsm.cellRadius
+
+
 viewPlayerTurn : Computer -> Coin -> Grid -> Shape
 viewPlayerTurn { screen, mouse, time } currentPlayerCoin grid =
     let
@@ -251,8 +256,11 @@ viewPlayerTurn { screen, mouse, time } currentPlayerCoin grid =
             toGridScreenModel screen grid
 
         nextMoveIndicatorShape =
-            cellToShape gsm (Just currentPlayerCoin)
-                |> fade (wave 0.3 0.9 1.3 time + 0.1)
+            group
+                [ emptyCellShape gsm
+                , cellToShape gsm (Just currentPlayerCoin)
+                    |> fade (wave 0.3 0.9 1.3 time + 0.1)
+                ]
 
         nextMoveTopIndicator =
             nextMoveIndicatorShape

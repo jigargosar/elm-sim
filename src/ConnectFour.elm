@@ -185,11 +185,6 @@ view ({ screen } as computer) mem =
     ]
 
 
-cellToColor : Cell -> Color
-cellToColor =
-    Maybe.map coinToColor >> Maybe.withDefault white
-
-
 coinToColor : Coin -> Color
 coinToColor coin =
     case coin of
@@ -202,7 +197,7 @@ coinToColor coin =
 
 viewGridCoin : GridScreenModel -> ( Grid.Position, Grid.Coin ) -> Shape
 viewGridCoin gsm ( position, coin ) =
-    cellToShape gsm (Just coin)
+    coinToShape gsm coin
         |> placeOnScreen gsm position
 
 
@@ -214,7 +209,7 @@ viewEmptyGridCell gsm position =
 
 viewGameOverGridCoin : Time -> GridScreenModel -> Set Grid.Position -> ( Grid.Position, Grid.Coin ) -> Shape
 viewGameOverGridCoin time gsm gameOverPositions ( gridPosition, coin ) =
-    cellToShape gsm (Just coin)
+    coinToShape gsm coin
         |> (if Set.member gridPosition gameOverPositions then
                 fade (wave 0.3 0.9 1.3 time + 0.1)
 
@@ -235,13 +230,10 @@ placeOnScreen gsm gridPosition =
         |> move
 
 
-cellToShape : GridScreenModel -> Cell -> Shape
-cellToShape gsm cell =
-    group
-        [ circle white gsm.cellRadius
-        , circle (cellToColor cell) gsm.cellRadius
-            |> scale 0.8
-        ]
+coinToShape : GridScreenModel -> Coin -> Shape
+coinToShape gsm coin =
+    circle (coinToColor coin) gsm.cellRadius
+        |> scale 0.8
 
 
 emptyCellShape : GridScreenModel -> Shape
@@ -258,7 +250,7 @@ viewPlayerTurn { screen, mouse, time } currentPlayerCoin grid =
         nextMoveIndicatorShape =
             group
                 [ emptyCellShape gsm
-                , cellToShape gsm (Just currentPlayerCoin)
+                , coinToShape gsm currentPlayerCoin
                     |> fade (wave 0.3 0.9 1.3 time + 0.1)
                 ]
 

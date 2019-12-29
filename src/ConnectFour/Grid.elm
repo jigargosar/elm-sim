@@ -123,17 +123,25 @@ getGameOverPositions position coin (Grid grid) =
 getConnectedHorizontalPositions : Position -> Coin -> List Int -> Dict Position Coin -> Set Position
 getConnectedHorizontalPositions position coin offsets dict =
     let
+        validatePosition : Position -> Maybe Position
+        validatePosition p =
+            if Dict.get p dict == Just coin then
+                Just p
+
+            else
+                Nothing
+
+        moveBy : Position -> Position -> Position
+        moveBy ( dx, dy ) ( x, y ) =
+            ( x + dx, y + dy )
+
         rightPositions : List Position
         rightPositions =
-            offsets
-                |> List.map (flip moveRight position)
-                |> List.Extra.takeWhile (\p -> Dict.get p dict == Just coin)
+            List.Extra.iterate (moveBy ( 1, 0 ) >> validatePosition) position
 
         leftPositions : List Position
         leftPositions =
-            offsets
-                |> List.map (flip moveLeft position)
-                |> List.Extra.takeWhile (\p -> Dict.get p dict == Just coin)
+            List.Extra.iterate (moveBy ( -1, 0 ) >> validatePosition) position
     in
     Set.fromList (rightPositions ++ leftPositions)
 

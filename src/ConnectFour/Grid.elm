@@ -86,19 +86,19 @@ putCoinInColumn column coin model =
         |> Maybe.map
             (\position ->
                 insert position coin model
-                    |> Result.map (withGameOverPositions position coin)
+                    |> Result.map (withWinningPositions position coin)
                     |> Result.mapError convertError
             )
         |> Maybe.withDefault (Err NotSuccessful)
 
 
-withGameOverPositions : Position -> Coin -> Grid -> ( Set Position, Grid )
-withGameOverPositions position coin model =
-    ( getGameOverPositions position coin model, model )
+withWinningPositions : Position -> Coin -> Grid -> ( Set Position, Grid )
+withWinningPositions position coin model =
+    ( getWinningPositions position coin model, model )
 
 
-getGameOverPositions : Position -> Coin -> Grid -> Set Position
-getGameOverPositions startPosition coin (Grid grid) =
+getWinningPositions : Position -> Coin -> Grid -> Set Position
+getWinningPositions startPosition coin (Grid grid) =
     let
         lookup : Dict Position Coin
         lookup =
@@ -112,11 +112,22 @@ getGameOverPositions startPosition coin (Grid grid) =
             else
                 Nothing
 
-        getWinningPositionsInDirection : Position -> Set Position
-        getWinningPositionsInDirection dir =
+        moveBy : Position -> Position -> Position
+        moveBy ( dx, dy ) ( x, y ) =
+            ( x + dx, y + dy )
+
+        validPositionsInDirection : Position -> List Position
+        validPositionsInDirection direction =
+            List.Extra.iterate (moveBy direction >> validatePosition) startPosition
+
+        getWinningPositionsInOpposingDirections : Position -> Set Position
+        getWinningPositionsInOpposingDirections direction =
             let
                 connectedPositionSet =
-                    getConnectedPositionsInOpposingDirections dir validatePosition startPosition
+                    Set.fromList
+                        (validPositionsInDirection direction
+                            ++ validPositionsInDirection (mapEach negate direction)
+                        )
             in
             if Set.size connectedPositionSet >= 4 then
                 connectedPositionSet
@@ -130,29 +141,12 @@ getGameOverPositions startPosition coin (Grid grid) =
         reducer : Position -> Set Position -> Set Position
         reducer direction result =
             if Set.isEmpty result then
-                getWinningPositionsInDirection direction
+                getWinningPositionsInOpposingDirections direction
 
             else
                 result
     in
     List.foldl reducer Set.empty directions
-
-
-getConnectedPositionsInOpposingDirections : Position -> (Position -> Maybe Position) -> Position -> Set Position
-getConnectedPositionsInOpposingDirections direction validatePosition startPosition =
-    let
-        moveBy : Position -> Position -> Position
-        moveBy ( dx, dy ) ( x, y ) =
-            ( x + dx, y + dy )
-
-        validPositionsInDirection : Position -> List Position
-        validPositionsInDirection dir =
-            List.Extra.iterate (moveBy dir >> validatePosition) startPosition
-    in
-    Set.fromList
-        (validPositionsInDirection direction
-            ++ validPositionsInDirection (mapEach negate direction)
-        )
 
 
 insert : Position -> Coin -> Grid -> Result Grid.Error Grid

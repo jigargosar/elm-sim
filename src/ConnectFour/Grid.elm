@@ -36,8 +36,8 @@ type Grid
 
 
 clampPosition : Grid -> Position -> Position
-clampPosition =
-    dimensions >> (\{ width, height } -> Tuple.mapBoth (clamp 0 (width - 1)) (clamp 0 (height - 1)))
+clampPosition (Grid w h _) =
+    Tuple.mapBoth (clamp 0 (w - 1)) (clamp 0 (h - 1))
 
 
 empty : Int -> Int -> Grid

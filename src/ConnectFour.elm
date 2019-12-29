@@ -98,14 +98,11 @@ type alias GridScreenModel =
 screenCellSize : Screen -> Grid -> Number
 screenCellSize screen grid =
     let
-        gridDimensions =
-            Grid.dimensions grid
-
         maxCellWidth =
-            (screen.width * 0.8) / (toFloat gridDimensions.width + 1)
+            (screen.width * 0.8) / (toFloat (Grid.width grid) + 1)
 
         maxCellHeight =
-            (screen.height * 0.8) / (toFloat gridDimensions.height + 1)
+            (screen.height * 0.8) / (toFloat (Grid.height grid) + 1)
     in
     min maxCellWidth maxCellHeight
 

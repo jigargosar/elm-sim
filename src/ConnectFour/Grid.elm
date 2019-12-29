@@ -8,8 +8,10 @@ module ConnectFour.Grid exposing
     , empty
     , firstEmptyPositionInColumn
     , fromList
+    , height
     , insertCoinInColumn
     , toCellList
+    , width
     )
 
 import Dict exposing (Dict)
@@ -177,3 +179,13 @@ allPositions (Grid w h _) =
 dimensions : Grid -> { width : Int, height : Int }
 dimensions (Grid w h _) =
     { width = w, height = h }
+
+
+width : Grid -> Int
+width (Grid w _ _) =
+    w
+
+
+height : Grid -> Int
+height (Grid _ h _) =
+    h

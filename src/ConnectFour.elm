@@ -67,8 +67,12 @@ update computer mem =
                 Nothing ->
                     mem
 
-        GameOver list coin grid ->
-            mem
+        GameOver _ _ _ ->
+            if computer.mouse.click then
+                initialMem
+
+            else
+                mem
 
 
 
@@ -276,7 +280,7 @@ viewGameOver { screen, mouse, time } winningPlayerCoin grid =
     group
         [ rectangle blue frameWidth frameHeight
         , List.map (viewGridCell gsm) (Grid.toCellList grid) |> group
-        , words (coinToColor winningPlayerCoin) "Game Over Player Won"
+        , words (coinToColor winningPlayerCoin) "Game Over, Click to Restart"
             |> moveDown (frameHeight / 2 + 20)
         ]
 

@@ -77,15 +77,11 @@ withWinningPositions position coin model =
 
 
 getWinningPositions : Position -> Coin -> Grid -> Set Position
-getWinningPositions startPosition coin (Grid _ _ grid) =
+getWinningPositions startPosition coin (Grid _ _ dict) =
     let
-        lookup : Dict Position Coin
-        lookup =
-            grid
-
         validatePosition : Position -> Maybe Position
         validatePosition p =
-            if Dict.get p lookup == Just coin then
+            if Dict.get p dict == Just coin then
                 Just p
 
             else

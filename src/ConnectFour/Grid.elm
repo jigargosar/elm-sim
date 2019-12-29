@@ -30,8 +30,7 @@ type Grid
 
 
 type alias GridModel =
-    { grid : Grid.Grid Coin
-    }
+    Grid.Grid Coin
 
 
 type alias Position =
@@ -50,17 +49,12 @@ clampPosition =
 
 empty : Int -> Int -> Grid
 empty w h =
-    Grid { grid = Grid.empty { columns = w, rows = h } }
+    Grid.empty { columns = w, rows = h } |> Grid
 
 
 map : (GridModel -> GridModel) -> Grid -> Grid
 map func =
     unwrap >> func >> Grid
-
-
-setGrid : Grid.Grid Coin -> Grid -> Grid
-setGrid grid =
-    map <| \model -> { model | grid = grid }
 
 
 type Error
@@ -93,9 +87,9 @@ insert : Position -> Coin -> Grid -> Result Grid.Error Grid
 insert position coin model =
     let
         grid =
-            unwrap model |> .grid
+            unwrap model
     in
-    Grid.insert position coin grid |> Result.map (flip setGrid model)
+    Grid.insert position coin grid |> Result.map Grid
 
 
 columnEq : Int -> Position -> Bool
@@ -105,19 +99,14 @@ columnEq value ( column, _ ) =
 
 firstEmptyPositionInColumn : Int -> Grid -> Maybe Position
 firstEmptyPositionInColumn column =
-    emptyPositions >> List.Extra.find (columnEq column)
-
-
-emptyPositions : Grid -> List Position
-emptyPositions =
-    unwrap >> .grid >> Grid.emptyPositions
+    unwrap >> Grid.emptyPositions >> List.Extra.find (columnEq column)
 
 
 toCellList : Grid -> List ( Position, Cell )
 toCellList =
-    unwrap >> .grid >> Grid.foldl (\p c -> (::) ( p, c )) []
+    unwrap >> Grid.foldl (\p c -> (::) ( p, c )) []
 
 
 dimensions : Grid -> { width : Int, height : Int }
 dimensions =
-    unwrap >> .grid >> Grid.dimensions >> (\{ columns, rows } -> { width = columns, height = rows })
+    unwrap >> Grid.dimensions >> (\{ columns, rows } -> { width = columns, height = rows })

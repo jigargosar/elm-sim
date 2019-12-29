@@ -15,6 +15,7 @@ module ConnectFour.Grid exposing
 import Dict exposing (Dict)
 import Grid.Bordered as Grid
 import List.Extra
+import PointFree exposing (flip)
 import Set exposing (Set)
 
 
@@ -103,10 +104,39 @@ getGameOverPositions position coin (Grid grid) =
         dict =
             Grid.toDict grid
 
-        _ =
-            1
+        offsets =
+            List.range 0 3
+
+        horizontalPositions =
+            let
+                rightPositions : List Position
+                rightPositions =
+                    offsets
+                        |> List.map (flip moveRight position)
+                        |> List.Extra.takeWhile (\p -> Dict.get p dict == Just coin)
+
+                leftPositions : List Position
+                leftPositions =
+                    offsets
+                        |> List.map (flip moveLeft position)
+                        |> List.Extra.takeWhile (\p -> Dict.get p dict == Just coin)
+            in
+            Set.fromList (rightPositions ++ leftPositions)
     in
-    Set.fromList [ ( 0, 0 ), ( 1, 0 ), ( 2, 0 ), ( 3, 0 ) ]
+    -- Set.fromList [ ( 0, 0 ), ( 1, 0 ), ( 2, 0 ), ( 3, 0 ) ]
+    if Set.size horizontalPositions >= 4 then
+        horizontalPositions
+
+    else
+        Set.empty
+
+
+moveRight dx ( x, y ) =
+    ( x + dx, y )
+
+
+moveLeft dx ( x, y ) =
+    ( x - dx, y )
 
 
 insert : Position -> Coin -> Grid -> Result Grid.Error Grid

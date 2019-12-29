@@ -3,6 +3,7 @@ module ConnectFour exposing (main)
 import ConnectFour.Grid as Grid exposing (Cell, Coin(..), Grid)
 import Playground exposing (..)
 import PointFree exposing (flip)
+import Set exposing (Set)
 
 
 
@@ -12,7 +13,7 @@ import PointFree exposing (flip)
 
 type Mem
     = PlayerTurn Coin Grid
-    | GameOver (List Grid.Position) Coin Grid
+    | GameOver (Set Grid.Position) Coin Grid
 
 
 initialMem : Mem
@@ -56,7 +57,7 @@ update computer mem =
                     of
                         Ok ( isGameOver, newGrid ) ->
                             if isGameOver then
-                                GameOver [] currentPlayerCoin newGrid
+                                GameOver Set.empty currentPlayerCoin newGrid
 
                             else
                                 PlayerTurn (nextPlayerCoin currentPlayerCoin) newGrid
@@ -182,8 +183,8 @@ view ({ screen } as computer) mem =
         PlayerTurn currentPlayerCoin grid ->
             viewPlayerTurn computer currentPlayerCoin grid
 
-        GameOver _ winningPlayerCoin grid ->
-            viewGameOver computer winningPlayerCoin grid
+        GameOver winningPositions winningPlayerCoin grid ->
+            viewGameOver computer winningPositions winningPlayerCoin grid
     ]
 
 
@@ -205,6 +206,21 @@ coinToColor coin =
 viewGridCell : GridScreenModel -> ( Grid.Position, Grid.Cell ) -> Shape
 viewGridCell gsm ( cord, cell ) =
     moveShapeToGridPosition gsm (toCellShape gsm (cellToColor cell)) cord
+
+
+viewGameOverGridCell : GridScreenModel -> Set Grid.Position -> ( Grid.Position, Grid.Cell ) -> Shape
+viewGameOverGridCell gsm gameOverPositions ( position, cell ) =
+    let
+        cellShape =
+            toCellShape gsm (cellToColor cell)
+                |> (if Set.member position gameOverPositions then
+                        fade 0.5
+
+                    else
+                        identity
+                   )
+    in
+    moveShapeToGridPosition gsm cellShape position
 
 
 moveShapeToGridPosition : GridScreenModel -> Shape -> Grid.Position -> Shape
@@ -261,8 +277,8 @@ viewPlayerTurn { screen, mouse, time } currentPlayerCoin grid =
         ]
 
 
-viewGameOver : Computer -> Coin -> Grid -> Shape
-viewGameOver { screen, mouse, time } winningPlayerCoin grid =
+viewGameOver : Computer -> Set Grid.Position -> Coin -> Grid -> Shape
+viewGameOver { screen, mouse, time } winningPositions winningPlayerCoin grid =
     let
         gsm =
             toGridScreenModel screen grid
@@ -279,7 +295,7 @@ viewGameOver { screen, mouse, time } winningPlayerCoin grid =
     in
     group
         [ rectangle blue frameWidth frameHeight
-        , List.map (viewGridCell gsm) (Grid.toCellList grid) |> group
+        , List.map (viewGameOverGridCell gsm winningPositions) (Grid.toCellList grid) |> group
         , words (coinToColor winningPlayerCoin) "Game Over, Click to Restart"
             |> moveDown (frameHeight / 2 + 20)
         ]

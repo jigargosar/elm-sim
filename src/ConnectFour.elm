@@ -12,12 +12,13 @@ import PointFree exposing (flip)
 type alias Mem =
     { grid : Grid
     , currentPlayerCoin : Grid.Coin
+    , isGameOver : Bool
     }
 
 
 initialMem : Mem
 initialMem =
-    { grid = initialGrid, currentPlayerCoin = Grid.Red }
+    { grid = initialGrid, currentPlayerCoin = Grid.Red, isGameOver = False }
 
 
 initialGrid : Grid
@@ -25,9 +26,9 @@ initialGrid =
     -- Grid.empty 6 5
     Grid.fromList 6
         5
-        [ ( ( 0, 0 ), Red )
-        , ( ( 0, 1 ), Red )
-        , ( ( 0, 2 ), Red )
+        [ ( ( 1, 0 ), Red )
+        , ( ( 2, 0 ), Red )
+        , ( ( 3, 0 ), Red )
         ]
 
 
@@ -52,10 +53,11 @@ update computer mem =
             case
                 Grid.putCoinInColumn column mem.currentPlayerCoin mem.grid
             of
-                Ok newGrid ->
+                Ok ( isGameOver, newGrid ) ->
                     { mem
                         | grid = newGrid
                         , currentPlayerCoin = nextPlayerCoin mem.currentPlayerCoin
+                        , isGameOver = isGameOver
                     }
 
                 Err _ ->

@@ -79,12 +79,13 @@ convertError error =
             NotSuccessful
 
 
-putCoinInColumn : Int -> Coin -> Grid -> Result Error Grid
+putCoinInColumn : Int -> Coin -> Grid -> Result Error ( Bool, Grid )
 putCoinInColumn column coin model =
     firstEmptyPositionInColumn column model
         |> Maybe.map
             (\position ->
                 insert position coin model
+                    |> Result.map (Tuple.pair True)
                     |> Result.mapError convertError
             )
         |> Maybe.withDefault (Err NotSuccessful)

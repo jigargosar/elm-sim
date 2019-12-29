@@ -210,15 +210,15 @@ viewGridCell gsm ( position, cell ) =
 
 
 viewGameOverGridCell : Time -> GridScreenModel -> Set Grid.Position -> ( Grid.Position, Grid.Cell ) -> Shape
-viewGameOverGridCell time gsm gameOverPositions ( position, cell ) =
+viewGameOverGridCell time gsm gameOverPositions ( gridPosition, cell ) =
     toCellShape gsm (cellToColor cell)
-        |> (if Set.member position gameOverPositions then
+        |> (if Set.member gridPosition gameOverPositions then
                 fade (wave 0.3 0.9 1.3 time + 0.1)
 
             else
                 identity
            )
-        |> move (toScreenPosition gsm position)
+        |> move (toScreenPosition gsm gridPosition)
 
 
 move : ( Number, Number ) -> Shape -> Shape

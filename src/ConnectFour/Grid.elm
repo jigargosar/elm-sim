@@ -107,28 +107,31 @@ getGameOverPositions position coin (Grid grid) =
         offsets =
             List.range 0 3
 
-        horizontalPositions =
-            let
-                rightPositions : List Position
-                rightPositions =
-                    offsets
-                        |> List.map (flip moveRight position)
-                        |> List.Extra.takeWhile (\p -> Dict.get p dict == Just coin)
-
-                leftPositions : List Position
-                leftPositions =
-                    offsets
-                        |> List.map (flip moveLeft position)
-                        |> List.Extra.takeWhile (\p -> Dict.get p dict == Just coin)
-            in
-            Set.fromList (rightPositions ++ leftPositions)
+        horizontalPositionSet =
+            getConnectedHorizontalPositions position coin offsets dict
     in
-    -- Set.fromList [ ( 0, 0 ), ( 1, 0 ), ( 2, 0 ), ( 3, 0 ) ]
-    if Set.size horizontalPositions >= 4 then
-        horizontalPositions
+    if Set.size horizontalPositionSet >= 4 then
+        horizontalPositionSet
 
     else
         Set.empty
+
+
+getConnectedHorizontalPositions position coin offsets dict =
+    let
+        rightPositions : List Position
+        rightPositions =
+            offsets
+                |> List.map (flip moveRight position)
+                |> List.Extra.takeWhile (\p -> Dict.get p dict == Just coin)
+
+        leftPositions : List Position
+        leftPositions =
+            offsets
+                |> List.map (flip moveLeft position)
+                |> List.Extra.takeWhile (\p -> Dict.get p dict == Just coin)
+    in
+    Set.fromList (rightPositions ++ leftPositions)
 
 
 moveRight dx ( x, y ) =

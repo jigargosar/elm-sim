@@ -85,35 +85,28 @@ putCoinInColumn column coin model =
         |> Maybe.map
             (\position ->
                 insert position coin model
-                    |> Result.map (Tuple.pair (Set.fromList [ ( 0, 0 ), ( 1, 0 ), ( 2, 0 ), ( 3, 0 ) ]))
+                    |> Result.map (withGameOverPositions position coin)
                     |> Result.mapError convertError
             )
         |> Maybe.withDefault (Err NotSuccessful)
 
 
-checkGameOver : Position -> Grid -> Bool
-checkGameOver position (Grid grid) =
+withGameOverPositions : Position -> Coin -> Grid -> ( Set Position, Grid )
+withGameOverPositions position coin model =
+    ( getGameOverPositions position coin model, model )
+
+
+getGameOverPositions : Position -> Coin -> Grid -> Set Position
+getGameOverPositions position coin (Grid grid) =
     let
         dict : Dict Position Coin
         dict =
             Grid.toDict grid
 
         _ =
-            case Dict.get position dict of
-                Just coin ->
-                    let
-                        coinPositions : Set Position
-                        coinPositions =
-                            Dict.filter (\_ -> (==) coin) dict
-                                |> Dict.keys
-                                |> Set.fromList
-                    in
-                    False
-
-                Nothing ->
-                    False
+            1
     in
-    False
+    Set.fromList [ ( 0, 0 ), ( 1, 0 ), ( 2, 0 ), ( 3, 0 ) ]
 
 
 insert : Position -> Coin -> Grid -> Result Grid.Error Grid

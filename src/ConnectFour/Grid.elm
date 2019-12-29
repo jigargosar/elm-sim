@@ -141,19 +141,15 @@ mapDict func (Grid w h dict) =
     func dict |> Grid w h
 
 
+isValid : ( Int, Int ) -> Grid -> Bool
 isValid ( x, y ) (Grid w h _) =
     x >= 0 && x < w && y >= 0 && y < h
-
-
-columnEq : Int -> Position -> Bool
-columnEq value ( column, _ ) =
-    value == column
 
 
 firstEmptyPositionInColumn : Int -> Grid -> Maybe Position
 firstEmptyPositionInColumn column =
     toCellList
-        >> List.Extra.find (\( position, cell ) -> columnEq column position && cell == Nothing)
+        >> List.Extra.find (\( ( x, _ ), cell ) -> x == column && cell == Nothing)
         >> Maybe.map Tuple.first
 
 

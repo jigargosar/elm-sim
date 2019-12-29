@@ -13,7 +13,6 @@ module ConnectFour.Grid exposing
     )
 
 import Dict exposing (Dict)
-import Grid.Bordered as Grid
 import List.Extra
 import PointFree exposing (mapEach)
 import Set exposing (Set)
@@ -59,16 +58,6 @@ fromList w h =
 type Error
     = OutOfBounds
     | NotSuccessful
-
-
-convertError : Grid.Error -> Error
-convertError error =
-    case error of
-        Grid.OutOfBounds ->
-            OutOfBounds
-
-        Grid.NotSuccessful ->
-            NotSuccessful
 
 
 putCoinInColumn : Int -> Coin -> Grid -> Result Error ( Set Position, Grid )

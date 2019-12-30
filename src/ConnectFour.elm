@@ -62,7 +62,11 @@ nextPlayerCoin playerCoin =
 
 
 autoPlayDelay =
-    60
+    10
+
+
+autoRestartDuration =
+    120
 
 
 update : Computer -> Mem -> Mem
@@ -126,10 +130,6 @@ update computer mem =
                         mem
 
                 AutoRestart elapsed ->
-                    let
-                        autoRestartDuration =
-                            60
-                    in
                     if elapsed >= autoRestartDuration then
                         initialMem
 

@@ -4,18 +4,12 @@ import ConnectFour.Grid as Grid exposing (Cell, Coin(..), Grid)
 import Playground exposing (..)
 import PointFree exposing (flip, mapEach)
 import Random exposing (Seed)
-import Random.Extra
 import Random.Set
 import Set exposing (Set)
 
 
 
 -- Mem
-{- type Mem
-   = ManualPlay Coin Grid
-   | AutoPlay Int Seed Coin Grid
-   | WaitingForRestart Restart GameOverState
--}
 
 
 type GameState

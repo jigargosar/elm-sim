@@ -90,28 +90,71 @@ playableColumns =
         >> Set.fromList
 
 
+playablePositions : Grid -> List (Maybe Position)
+playablePositions grid =
+    List.Extra.initialize (width grid) (\column -> firstEmptyPositionInColumn column grid)
+
+
 type alias Score =
     Int
 
 
-columnScore : Int -> Grid -> Maybe Score
-columnScore column grid =
-    firstEmptyPositionInColumn column grid
-        |> Maybe.map
-            (\_ ->
-                if column == centerColumn grid then
-                    4
+positionScore : Position -> Coin -> Grid -> Score
+positionScore startPosition coin grid =
+    let
+        ( startColumn, _ ) =
+            startPosition
 
-                else
-                    0
+        centerScore =
+            if startColumn == centerColumn grid then
+                4
+
+            else
+                0
+
+        isValidCell : Cell -> Bool
+        isValidCell cell =
+            cell == Nothing || cell == Just coin
+
+        rightCells : List ( ( Int, Int ), Maybe Coin )
+        rightCells =
+            List.range 1 3
+                |> List.map
+                    (\n ->
+                        let
+                            position =
+                                moveX n startPosition
+                        in
+                        ( position, Dict.get position (toDict grid) )
+                    )
+                |> List.Extra.takeWhile (Tuple.second >> isValidCell)
+
+        leftCells =
+            List.range 1 3
+                |> List.map
+                    (\n ->
+                        let
+                            position =
+                                moveX n startPosition
+                        in
+                        ( position, Dict.get position (toDict grid) )
+                    )
+                |> List.Extra.takeWhile (Tuple.second >> isValidCell)
+    in
+    centerScore + 0
+
+
+moveX dx =
+    Tuple.mapFirst ((+) dx)
+
+
+columnScores : Coin -> Grid -> List ( Int, Maybe Score )
+columnScores coin grid =
+    playablePositions grid
+        |> List.indexedMap
+            (\column maybePosition ->
+                ( column, Maybe.map (\position -> positionScore position coin grid) maybePosition )
             )
-
-
-columnScores : Grid -> List ( Int, Maybe Score )
-columnScores grid =
-    playableColumns grid
-        |> Set.toList
-        |> List.map (\column -> ( column, columnScore column grid ))
 
 
 centerColumn : Grid -> Int
@@ -148,6 +191,11 @@ withGameOver position coin model =
     )
 
 
+moveBy : Position -> Position -> Position
+moveBy ( dx, dy ) ( x, y ) =
+    ( x + dx, y + dy )
+
+
 getWinningPositions : Position -> Coin -> Grid -> Set Position
 getWinningPositions startPosition coin (Grid _ _ dict) =
     let
@@ -158,10 +206,6 @@ getWinningPositions startPosition coin (Grid _ _ dict) =
 
             else
                 Nothing
-
-        moveBy : Position -> Position -> Position
-        moveBy ( dx, dy ) ( x, y ) =
-            ( x + dx, y + dy )
 
         connectedPositionsInDirection : Position -> List Position
         connectedPositionsInDirection direction =

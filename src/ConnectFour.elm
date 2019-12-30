@@ -392,7 +392,7 @@ viewPlayerTurn { screen, mouse, time } currentPlayerCoin grid =
         , List.map (viewGridCoin gsm) (Grid.toList grid) |> group
         , nextMoveTopIndicator
         , nextMoveCellIndicator
-        , List.map viewColumnScore (Grid.columnScores grid)
+        , List.map viewColumnScore (Grid.columnScores currentPlayerCoin grid)
             |> group
         ]
 

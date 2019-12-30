@@ -7,6 +7,7 @@ module ConnectFour.Grid exposing
     , Position
     , allPositions
     , clampPosition
+    , columnScores
     , empty
     , firstEmptyPositionInColumn
     , fromList
@@ -88,6 +89,35 @@ playableColumns =
                     Nothing
             )
         >> Set.fromList
+
+
+type alias Score =
+    Int
+
+
+columnScore : Int -> Grid -> Maybe Score
+columnScore column grid =
+    firstEmptyPositionInColumn column grid
+        |> Maybe.map
+            (\_ ->
+                if column == centerColumn grid then
+                    4
+
+                else
+                    0
+            )
+
+
+columnScores : Grid -> List ( Int, Score )
+columnScores grid =
+    playableColumns grid
+        |> Set.toList
+        |> List.filterMap (\column -> columnScore column grid |> Maybe.map (Tuple.pair column))
+
+
+centerColumn : Grid -> Int
+centerColumn =
+    width >> (toFloat >> (+) -1 >> (*) 0.5 >> floor)
 
 
 type GameOver

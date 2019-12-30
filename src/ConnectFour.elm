@@ -29,7 +29,8 @@ type Mem
 
 initialMem : Mem
 initialMem =
-    initAutoPlay (Random.initialSeed 123)
+    -- initAutoPlay (Random.initialSeed 123)
+    ManualPlay initialGameState
 
 
 initialGameState : GameState
@@ -43,7 +44,7 @@ initialGameState =
                , ( ( 3, 0 ), Red )
                ]
             -}
-            Grid.empty 6 5
+            Grid.empty 7 6
     in
     PlayerTurn Grid.Red initialGrid
 
@@ -366,6 +367,13 @@ viewPlayerTurn { screen, mouse, time } currentPlayerCoin grid =
                             |> placeOnScreen gsm gridPosition
                     )
                 |> Maybe.withDefault (group [])
+
+        viewColumnScores : a -> Shape
+        viewColumnScores =
+            Debug.toString
+                >> words black
+                >> moveY gsm.bottom
+                >> moveDown 30
     in
     group
         [ rectangle blue gsm.width gsm.height
@@ -373,6 +381,7 @@ viewPlayerTurn { screen, mouse, time } currentPlayerCoin grid =
         , List.map (viewGridCoin gsm) (Grid.toList grid) |> group
         , nextMoveTopIndicator
         , nextMoveCellIndicator
+        , viewColumnScores (Grid.columnScores grid)
         ]
 
 

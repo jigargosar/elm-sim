@@ -108,11 +108,11 @@ columnScore column grid =
             )
 
 
-columnScores : Grid -> List ( Int, Score )
+columnScores : Grid -> List ( Int, Maybe Score )
 columnScores grid =
     playableColumns grid
         |> Set.toList
-        |> List.filterMap (\column -> columnScore column grid |> Maybe.map (Tuple.pair column))
+        |> List.map (\column -> ( column, columnScore column grid ))
 
 
 centerColumn : Grid -> Int

@@ -37,14 +37,19 @@ initialGameState : GameState
 initialGameState =
     let
         initialGrid =
-            {- Grid.fromList 6
-               5
-               [ ( ( 1, 0 ), Red )
-               , ( ( 2, 0 ), Red )
-               , ( ( 3, 0 ), Red )
-               ]
-            -}
-            Grid.empty 7 6
+            let
+                g =
+                    Grid.fromList 7 6 <|
+                        [ ( ( 3, 0 ), Red )
+                        , ( ( 3, 1 ), Red )
+                        , ( ( 3, 2 ), Yellow )
+                        , ( ( 3, 3 ), Red )
+                        ]
+
+                _ =
+                    Grid.empty 7 6
+            in
+            g
     in
     PlayerTurn Grid.Red initialGrid
 

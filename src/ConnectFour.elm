@@ -368,12 +368,16 @@ viewPlayerTurn { screen, mouse, time } currentPlayerCoin grid =
                     )
                 |> Maybe.withDefault (group [])
 
-        viewColumnScores : a -> Shape
-        viewColumnScores =
-            Debug.toString
-                >> words black
-                >> moveY gsm.bottom
-                >> moveDown 30
+        viewColumnScore : ( Int, Maybe Int ) -> Shape
+        viewColumnScore ( column, maybeScore ) =
+            [ emptyCellShape gsm
+            , maybeScore
+                |> Maybe.map String.fromInt
+                |> Maybe.withDefault "X"
+                |> words black
+            ]
+                |> group
+                |> placeOnScreen gsm ( column, -1 )
     in
     group
         [ rectangle blue gsm.width gsm.height
@@ -381,7 +385,8 @@ viewPlayerTurn { screen, mouse, time } currentPlayerCoin grid =
         , List.map (viewGridCoin gsm) (Grid.toList grid) |> group
         , nextMoveTopIndicator
         , nextMoveCellIndicator
-        , viewColumnScores (Grid.columnScores grid)
+        , List.map viewColumnScore (Grid.columnScores grid)
+            |> group
         ]
 
 

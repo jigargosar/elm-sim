@@ -69,7 +69,7 @@ insertCoinInColumn column coin model =
         |> Maybe.map
             (\position ->
                 insert position coin model
-                    |> Result.map (withWinningPositions position coin)
+                    |> Result.map (withGameOver position coin)
             )
         |> Maybe.withDefault (Err NotSuccessful)
 
@@ -79,14 +79,22 @@ type GameOver
     | Draw
 
 
-withWinningPositions : Position -> Coin -> Grid -> ( Maybe GameOver, Grid )
-withWinningPositions position coin model =
+withGameOver : Position -> Coin -> Grid -> ( Maybe GameOver, Grid )
+withGameOver position coin model =
     let
         winningPositions =
             getWinningPositions position coin model
     in
     ( if Set.isEmpty winningPositions then
-        Nothing
+        let
+            isFilled =
+                Dict.size (toDict model) == (width model * height model)
+        in
+        if isFilled then
+            Just Draw
+
+        else
+            Nothing
 
       else
         WinningPositions winningPositions

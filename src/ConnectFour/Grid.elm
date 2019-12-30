@@ -139,8 +139,34 @@ positionScore startPosition coin grid =
                     ( False, [] )
                 |> Tuple.second
 
-        leftCells : List Cell
-        leftCells =
+        cellsInDir : Position -> List (Maybe Coin)
+        cellsInDir dir =
+            List.Extra.unfoldr
+                (\( n, p ) ->
+                    if n == 4 then
+                        Nothing
+
+                    else
+                        let
+                            nextPosition =
+                                moveBy dir p
+                        in
+                        case get nextPosition grid of
+                            Err _ ->
+                                Nothing
+
+                            Ok cell ->
+                                if cell == Nothing || cell == Just coin then
+                                    Just ( cell, ( n + 1, nextPosition ) )
+
+                                else
+                                    Nothing
+                )
+                ( 1, startPosition )
+                |> List.reverse
+
+        leftCells_ : List Cell
+        leftCells_ =
             List.range 1 3
                 |> List.foldl
                     (\n ( done, acc ) ->
@@ -165,6 +191,16 @@ positionScore startPosition coin grid =
                     )
                     ( False, [] )
                 |> Tuple.second
+
+        leftCells =
+            cellsInDir ( -1, 0 )
+
+        _ =
+            if startColumn == 4 then
+                Debug.log "leftCells,leftCells_" ( leftCells, leftCells_ )
+
+            else
+                ( leftCells, leftCells_ )
 
         rightScore =
             if List.length rightCells == 0 then

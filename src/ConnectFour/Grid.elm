@@ -137,32 +137,35 @@ positionScore startPosition coin grid =
                 )
                 ( 1, startPosition )
 
-        leftCells : List (Maybe Coin)
-        leftCells =
-            cellsInDir ( -1, 0 )
+        scoreInOpposingDirs : Position -> Int
+        scoreInOpposingDirs dir =
+            let
+                dirCells =
+                    cellsInDir dir
 
-        rightCells : List (Maybe Coin)
-        rightCells =
-            cellsInDir ( 1, 0 )
+                opposingDirCells =
+                    cellsInDir (mapEach negate dir)
 
-        hCells =
-            leftCells ++ [ Just coin ] ++ List.reverse rightCells
+                allCells =
+                    opposingDirCells ++ [ Just coin ] ++ List.reverse dirCells
 
-        rightScore =
-            if List.length rightCells == 0 then
-                0
+                dirScore =
+                    if List.isEmpty dirCells then
+                        0
 
-            else
-                cellsToScore coin (hCells |> List.reverse)
+                    else
+                        cellsToScore coin (allCells |> List.reverse)
 
-        leftScore =
-            if List.length leftCells == 0 then
-                0
+                oppScore =
+                    if List.isEmpty opposingDirCells then
+                        0
 
-            else
-                cellsToScore coin hCells
+                    else
+                        cellsToScore coin allCells
+            in
+            dirScore + oppScore
     in
-    centerScore + rightScore + leftScore
+    centerScore + scoreInOpposingDirs ( 1, 0 )
 
 
 cellsToScore : Coin -> List (Maybe Coin) -> number
@@ -187,10 +190,6 @@ cellsToScore coin list_ =
 
     else
         0
-
-
-moveX dx =
-    Tuple.mapFirst ((+) dx)
 
 
 columnScores : Coin -> Grid -> List ( Int, Maybe Score )

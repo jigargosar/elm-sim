@@ -14,6 +14,7 @@ type Mem
     = PlayerTurn Coin Grid
     | AutoPlay Int Coin Grid
     | GameOver (Set Grid.Position) Coin Grid
+    | GameDraw Coin Grid
 
 
 initialMem : Mem
@@ -24,13 +25,17 @@ initialMem =
 
 initialGrid : Grid
 initialGrid =
-    -- Grid.empty 6 5
-    Grid.fromList 6
-        5
-        [ ( ( 1, 0 ), Red )
-        , ( ( 2, 0 ), Red )
-        , ( ( 3, 0 ), Red )
-        ]
+    Grid.empty 6 5
+
+
+
+{- Grid.fromList 6
+   5
+   [ ( ( 1, 0 ), Red )
+   , ( ( 2, 0 ), Red )
+   , ( ( 3, 0 ), Red )
+   ]
+-}
 
 
 nextPlayerCoin : Coin -> Coin
@@ -55,14 +60,23 @@ update : Computer -> Mem -> Mem
 update computer mem =
     case mem of
         AutoPlay elapsed coin grid ->
+            let
+                randomColumn =
+                    wave 0 (Grid.width grid |> toFloat) 1 computer.time
+                        |> floor
+            in
             if elapsed >= autoPlayDelay then
-                case Grid.insertCoinInColumn 1 coin grid of
-                    Ok ( winningPositions, newGrid ) ->
-                        if Set.isEmpty winningPositions then
-                            AutoPlay 0 (nextPlayerCoin coin) newGrid
+                case Grid.insertCoinInColumn randomColumn coin grid of
+                    Ok ( Nothing, newGrid ) ->
+                        AutoPlay 0 (nextPlayerCoin coin) newGrid
 
-                        else
-                            GameOver winningPositions coin newGrid
+                    Ok ( Just gameOver, newGrid ) ->
+                        case gameOver of
+                            Grid.WinningPositions winningPositions ->
+                                GameOver winningPositions coin newGrid
+
+                            Grid.Draw ->
+                                GameDraw coin newGrid
 
                     Err _ ->
                         mem
@@ -70,18 +84,22 @@ update computer mem =
             else
                 AutoPlay (elapsed + 1) coin grid
 
-        PlayerTurn currentPlayerCoin grid ->
+        PlayerTurn coin grid ->
             case checkMouseClickOnGridColumn computer grid of
                 Just column ->
                     case
-                        Grid.insertCoinInColumn column currentPlayerCoin grid
+                        Grid.insertCoinInColumn column coin grid
                     of
-                        Ok ( winningPositions, newGrid ) ->
-                            if Set.isEmpty winningPositions then
-                                PlayerTurn (nextPlayerCoin currentPlayerCoin) newGrid
+                        Ok ( Nothing, newGrid ) ->
+                            PlayerTurn (nextPlayerCoin coin) newGrid
 
-                            else
-                                GameOver winningPositions currentPlayerCoin newGrid
+                        Ok ( Just gameOver, newGrid ) ->
+                            case gameOver of
+                                Grid.WinningPositions winningPositions ->
+                                    GameOver winningPositions coin newGrid
+
+                                Grid.Draw ->
+                                    GameDraw coin newGrid
 
                         Err _ ->
                             mem
@@ -90,6 +108,13 @@ update computer mem =
                     mem
 
         GameOver _ _ _ ->
+            if computer.mouse.click then
+                initialMem
+
+            else
+                mem
+
+        GameDraw _ _ ->
             if computer.mouse.click then
                 initialMem
 
@@ -207,6 +232,9 @@ view ({ screen } as computer) mem =
 
         GameOver winningPositions winningPlayerCoin grid ->
             viewGameOver computer winningPositions winningPlayerCoin grid
+
+        GameDraw _ grid ->
+            viewGameDraw computer grid
     ]
 
 
@@ -313,6 +341,22 @@ viewGameOver { screen, mouse, time } winningPositions winningPlayerCoin grid =
         , List.map (viewEmptyGridCell gsm) (Grid.allPositions grid) |> group
         , List.map (viewGameOverGridCoin time gsm winningPositions) (Grid.toList grid) |> group
         , words (coinToColor winningPlayerCoin) "Game Over, Click to Restart"
+            |> moveY gsm.bottom
+            |> moveDown 20
+        ]
+
+
+viewGameDraw : Computer -> Grid -> Shape
+viewGameDraw { screen, mouse, time } grid =
+    let
+        gsm =
+            toGridScreenModel screen grid
+    in
+    group
+        [ rectangle blue gsm.width gsm.height
+        , List.map (viewEmptyGridCell gsm) (Grid.allPositions grid) |> group
+        , List.map (viewGridCoin gsm) (Grid.toList grid) |> group
+        , words black "Game Draw, Click to Restart"
             |> moveY gsm.bottom
             |> moveDown 20
         ]

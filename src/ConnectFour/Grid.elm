@@ -1,6 +1,7 @@
 module ConnectFour.Grid exposing
     ( Cell
     , Coin(..)
+    , GameOver(..)
     , Grid
     , Position
     , allPositions
@@ -62,7 +63,7 @@ type Error
     | NotSuccessful
 
 
-insertCoinInColumn : Int -> Coin -> Grid -> Result Error ( Set Position, Grid )
+insertCoinInColumn : Int -> Coin -> Grid -> Result Error ( Maybe GameOver, Grid )
 insertCoinInColumn column coin model =
     firstEmptyPositionInColumn column model
         |> Maybe.map
@@ -73,9 +74,25 @@ insertCoinInColumn column coin model =
         |> Maybe.withDefault (Err NotSuccessful)
 
 
-withWinningPositions : Position -> Coin -> Grid -> ( Set Position, Grid )
+type GameOver
+    = WinningPositions (Set Position)
+    | Draw
+
+
+withWinningPositions : Position -> Coin -> Grid -> ( Maybe GameOver, Grid )
 withWinningPositions position coin model =
-    ( getWinningPositions position coin model, model )
+    let
+        winningPositions =
+            getWinningPositions position coin model
+    in
+    ( if Set.isEmpty winningPositions then
+        Nothing
+
+      else
+        WinningPositions winningPositions
+            |> Just
+    , model
+    )
 
 
 getWinningPositions : Position -> Coin -> Grid -> Set Position

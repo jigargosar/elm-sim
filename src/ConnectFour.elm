@@ -257,15 +257,21 @@ firstEmptyGridPositionFromMouseX mouse gsm =
 view : Computer -> Mem -> List Shape
 view ({ screen } as computer) mem =
     [ rectangle lightBlue screen.width screen.height
-    , case mem of
-        AutoPlay _ _ gameState ->
-            viewGameState computer gameState
-
-        ManualPlay gameState ->
-            viewGameState computer gameState
+    , viewGameState computer (toGameState mem)
     ]
 
 
+toGameState : Mem -> GameState
+toGameState mem =
+    case mem of
+        AutoPlay _ _ gameState ->
+            gameState
+
+        ManualPlay gameState ->
+            gameState
+
+
+viewGameState : Computer -> GameState -> Shape
 viewGameState computer gameState =
     case gameState of
         PlayerTurn coin grid ->

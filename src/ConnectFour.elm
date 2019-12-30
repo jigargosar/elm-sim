@@ -56,7 +56,7 @@ update computer mem =
     case mem of
         AutoPlay elapsed coin grid ->
             if elapsed >= autoPlayDelay then
-                case Grid.insertCoinInColumn 0 coin grid of
+                case Grid.insertCoinInColumn 1 coin grid of
                     Ok ( winningPositions, newGrid ) ->
                         if Set.isEmpty winningPositions then
                             AutoPlay 0 (nextPlayerCoin coin) newGrid

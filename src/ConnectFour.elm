@@ -134,7 +134,7 @@ updateAutoPlay elapsed seed gameState =
                 let
                     randomColumnGen : Random.Generator Int
                     randomColumnGen =
-                        Random.Set.sample (Grid.emptyColumns grid)
+                        Random.Set.sample (Grid.playableColumns grid)
                             |> Random.map (Maybe.withDefault 0)
 
                     ( randomColumn, nextSeed ) =

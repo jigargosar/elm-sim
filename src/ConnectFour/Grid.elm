@@ -8,11 +8,11 @@ module ConnectFour.Grid exposing
     , allPositions
     , clampPosition
     , empty
-    , emptyColumns
     , firstEmptyPositionInColumn
     , fromList
     , height
     , insertCoinInColumn
+    , playableColumns
     , toList
     , width
     )
@@ -76,8 +76,8 @@ insertCoinInColumn column coin model =
         |> Maybe.withDefault (Err NotSuccessful)
 
 
-emptyColumns : Grid -> Set Int
-emptyColumns =
+playableColumns : Grid -> Set Int
+playableColumns =
     toCellList
         >> List.filterMap
             (\( ( x, _ ), cell ) ->

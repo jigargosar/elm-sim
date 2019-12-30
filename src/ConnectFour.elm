@@ -14,10 +14,10 @@ import Set exposing (Set)
 
 type GameState
     = PlayerTurn Coin Grid
-    | GameOverState GameOverState
+    | GameOver GameOver
 
 
-type GameOverState
+type GameOver
     = Victory (Set Grid.Position) Coin Grid
     | Draw Grid
 
@@ -86,7 +86,7 @@ insertCoinInColumn column coin grid =
                     PlayerTurn (nextPlayerCoin coin) newGrid
 
                 ( Just gameOver, newGrid ) ->
-                    GameOverState <|
+                    GameOver <|
                         case gameOver of
                             Grid.WinningPositions winningPositions ->
                                 Victory winningPositions coin newGrid
@@ -110,7 +110,7 @@ updateGameState computer gameState =
                 Nothing ->
                     gameState
 
-        GameOverState _ ->
+        GameOver _ ->
             if computer.mouse.click then
                 initialGameState
 
@@ -148,7 +148,7 @@ updateAutoPlay elapsed seed gameState =
             else
                 AutoPlay (elapsed + 1) seed gameState
 
-        GameOverState _ ->
+        GameOver _ ->
             if elapsed >= autoRestartDuration then
                 initAutoPlay seed
 
@@ -277,10 +277,10 @@ viewGameState computer gameState =
         PlayerTurn coin grid ->
             viewPlayerTurn computer coin grid
 
-        GameOverState (Victory winningPositions coin grid) ->
+        GameOver (Victory winningPositions coin grid) ->
             viewGameOver computer winningPositions coin grid
 
-        GameOverState (Draw grid) ->
+        GameOver (Draw grid) ->
             viewGameDraw computer grid
 
 

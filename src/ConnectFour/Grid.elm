@@ -112,37 +112,121 @@ positionScore startPosition coin grid =
             else
                 0
 
-        isValidCell : Cell -> Bool
-        isValidCell cell =
-            cell == Nothing || cell == Just coin
+        isValidCell : Result x Cell -> Bool
+        isValidCell =
+            Result.map (\cell -> cell == Nothing || cell == Just coin)
+                >> Result.withDefault False
 
         rightCells : List ( ( Int, Int ), Maybe Coin )
         rightCells =
             List.range 1 3
-                |> List.map
-                    (\n ->
-                        let
-                            position =
-                                moveX n startPosition
-                        in
-                        ( position, Dict.get position (toDict grid) )
+                |> List.foldl
+                    (\n ( done, acc ) ->
+                        if done then
+                            ( done, acc )
+
+                        else
+                            let
+                                position =
+                                    moveX n startPosition
+                            in
+                            case get position grid of
+                                Err _ ->
+                                    ( True, acc )
+
+                                Ok cell ->
+                                    if cell == Nothing || cell == Just coin then
+                                        ( False, ( position, cell ) :: acc )
+
+                                    else
+                                        ( True, acc )
                     )
-                |> List.Extra.takeWhile (Tuple.second >> isValidCell)
+                    ( False, [] )
+                |> Tuple.second
 
         leftCells : List ( ( Int, Int ), Cell )
         leftCells =
             List.range 1 3
-                |> List.map
-                    (\n ->
-                        let
-                            position =
-                                moveX n startPosition
-                        in
-                        ( position, Dict.get position (toDict grid) )
+                |> List.foldl
+                    (\n ( done, acc ) ->
+                        if done then
+                            ( done, acc )
+
+                        else
+                            let
+                                position =
+                                    moveX -n startPosition
+                            in
+                            case get position grid of
+                                Err _ ->
+                                    ( True, acc )
+
+                                Ok cell ->
+                                    if cell == Nothing || cell == Just coin then
+                                        ( False, ( position, cell ) :: acc )
+
+                                    else
+                                        ( True, acc )
                     )
-                |> List.Extra.takeWhile (Tuple.second >> isValidCell)
+                    ( False, [] )
+                |> Tuple.second
+
+        -- hCells = leftCells ++ (startPosition, Just coin) :: rightCells
+        countCoins : List ( a, Maybe Coin ) -> Int
+        countCoins =
+            List.Extra.count (Tuple.second >> (==) (Just coin))
+
+        rightScore =
+            if List.length rightCells == 0 then
+                0
+
+            else
+                let
+                    cellsForRight =
+                        ( startPosition, Just coin )
+                            :: rightCells
+                            ++ leftCells
+                            |> List.take 4
+                in
+                case countCoins cellsForRight of
+                    2 ->
+                        2
+
+                    3 ->
+                        5
+
+                    4 ->
+                        1000
+
+                    _ ->
+                        0
+
+        leftScore =
+            if List.length leftCells == 0 then
+                0
+
+            else
+                let
+                    cellsForLeft =
+                        ( startPosition, Just coin )
+                            :: leftCells
+                            ++ rightCells
+                            |> List.take 4
+                in
+                case countCoins cellsForLeft of
+                    2 ->
+                        2
+
+                    3 ->
+                        5
+
+                    4 ->
+                        1000
+
+                    _ ->
+                        0
     in
-    centerScore + 0
+    centerScore + rightScore + leftScore
 
 
 moveX dx =
@@ -245,6 +329,15 @@ insert : Position -> Coin -> Grid -> Result Error Grid
 insert position coin model =
     if isValid position model then
         mapDict (Dict.insert position coin) model |> Ok
+
+    else
+        Err OutOfBounds
+
+
+get : Position -> Grid -> Result Error Cell
+get position model =
+    if isValid position model then
+        Dict.get position (toDict model) |> Ok
 
     else
         Err OutOfBounds

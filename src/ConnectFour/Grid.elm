@@ -166,51 +166,47 @@ positionScore startPosition coin grid =
                     ( False, [] )
                 |> Tuple.second
 
-        -- hCells = leftCells ++ (startPosition, Just coin) :: rightCells
-        cellsToScore : List (Maybe Coin) -> number
-        cellsToScore list_ =
-            let
-                list =
-                    list_ |> List.take 4
-            in
-            if List.length list == 4 then
-                case List.Extra.count ((==) (Just coin)) list of
-                    2 ->
-                        2
-
-                    3 ->
-                        5
-
-                    4 ->
-                        1000
-
-                    _ ->
-                        0
-
-            else
-                0
-
         rightScore =
             if List.length rightCells == 0 then
                 0
 
             else
-                Just coin
-                    :: rightCells
-                    ++ leftCells
-                    |> cellsToScore
+                (rightCells ++ leftCells)
+                    |> cellsToScore coin
 
         leftScore =
             if List.length leftCells == 0 then
                 0
 
             else
-                Just coin
-                    :: leftCells
-                    ++ rightCells
-                    |> cellsToScore
+                (leftCells ++ rightCells)
+                    |> cellsToScore coin
     in
     centerScore + rightScore + leftScore
+
+
+cellsToScore : Coin -> List (Maybe Coin) -> number
+cellsToScore coin list_ =
+    let
+        list =
+            Just coin :: list_ |> List.take 4
+    in
+    if List.length list == 4 then
+        case List.Extra.count ((==) (Just coin)) list of
+            2 ->
+                2
+
+            3 ->
+                5
+
+            4 ->
+                1000
+
+            _ ->
+                0
+
+    else
+        0
 
 
 moveX dx =

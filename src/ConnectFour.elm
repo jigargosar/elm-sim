@@ -14,7 +14,11 @@ import Set exposing (Set)
 
 type GameState
     = PlayerTurn Coin Grid
-    | Victory (Set Grid.Position) Coin Grid
+    | GameOverState GameOverState
+
+
+type GameOverState
+    = Victory (Set Grid.Position) Coin Grid
     | Draw Grid
 
 
@@ -82,12 +86,13 @@ insertCoinInColumn column coin grid =
                     PlayerTurn (nextPlayerCoin coin) newGrid
 
                 ( Just gameOver, newGrid ) ->
-                    case gameOver of
-                        Grid.WinningPositions winningPositions ->
-                            Victory winningPositions coin newGrid
+                    GameOverState <|
+                        case gameOver of
+                            Grid.WinningPositions winningPositions ->
+                                Victory winningPositions coin newGrid
 
-                        Grid.Draw ->
-                            Draw newGrid
+                            Grid.Draw ->
+                                Draw newGrid
     in
     Grid.insertCoinInColumn column coin grid
         |> Result.map responseToGameState
@@ -105,14 +110,7 @@ updateGameState computer gameState =
                 Nothing ->
                     gameState
 
-        Victory _ _ _ ->
-            if computer.mouse.click then
-                initialGameState
-
-            else
-                gameState
-
-        Draw _ ->
+        GameOverState _ ->
             if computer.mouse.click then
                 initialGameState
 
@@ -150,14 +148,7 @@ updateAutoPlay elapsed seed gameState =
             else
                 AutoPlay (elapsed + 1) seed gameState
 
-        Victory _ _ _ ->
-            if elapsed >= autoRestartDuration then
-                initAutoPlay seed
-
-            else
-                AutoPlay (elapsed + 1) seed gameState
-
-        Draw _ ->
+        GameOverState _ ->
             if elapsed >= autoRestartDuration then
                 initAutoPlay seed
 
@@ -280,10 +271,10 @@ viewGameState computer gameState =
         PlayerTurn coin grid ->
             viewPlayerTurn computer coin grid
 
-        Victory winningPositions coin grid ->
+        GameOverState (Victory winningPositions coin grid) ->
             viewGameOver computer winningPositions coin grid
 
-        Draw grid ->
+        GameOverState (Draw grid) ->
             viewGameDraw computer grid
 
 

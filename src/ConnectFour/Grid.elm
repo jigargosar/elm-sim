@@ -112,12 +112,7 @@ positionScore startPosition coin grid =
             else
                 0
 
-        isValidCell : Result x Cell -> Bool
-        isValidCell =
-            Result.map (\cell -> cell == Nothing || cell == Just coin)
-                >> Result.withDefault False
-
-        rightCells : List ( ( Int, Int ), Maybe Coin )
+        rightCells : List (Maybe Coin)
         rightCells =
             List.range 1 3
                 |> List.foldl
@@ -136,7 +131,7 @@ positionScore startPosition coin grid =
 
                                 Ok cell ->
                                     if cell == Nothing || cell == Just coin then
-                                        ( False, ( position, cell ) :: acc )
+                                        ( False, cell :: acc )
 
                                     else
                                         ( True, acc )
@@ -144,7 +139,7 @@ positionScore startPosition coin grid =
                     ( False, [] )
                 |> Tuple.second
 
-        leftCells : List ( ( Int, Int ), Cell )
+        leftCells : List Cell
         leftCells =
             List.range 1 3
                 |> List.foldl
@@ -163,7 +158,7 @@ positionScore startPosition coin grid =
 
                                 Ok cell ->
                                     if cell == Nothing || cell == Just coin then
-                                        ( False, ( position, cell ) :: acc )
+                                        ( False, cell :: acc )
 
                                     else
                                         ( True, acc )
@@ -172,59 +167,48 @@ positionScore startPosition coin grid =
                 |> Tuple.second
 
         -- hCells = leftCells ++ (startPosition, Just coin) :: rightCells
-        countCoins : List ( a, Maybe Coin ) -> Int
-        countCoins =
-            List.Extra.count (Tuple.second >> (==) (Just coin))
+        cellsToScore : List (Maybe Coin) -> number
+        cellsToScore list_ =
+            let
+                list =
+                    list_ |> List.take 4
+            in
+            if List.length list == 4 then
+                case List.Extra.count ((==) (Just coin)) list of
+                    2 ->
+                        2
+
+                    3 ->
+                        5
+
+                    4 ->
+                        1000
+
+                    _ ->
+                        0
+
+            else
+                0
 
         rightScore =
             if List.length rightCells == 0 then
                 0
 
             else
-                let
-                    cellsForRight =
-                        ( startPosition, Just coin )
-                            :: rightCells
-                            ++ leftCells
-                            |> List.take 4
-                in
-                case countCoins cellsForRight of
-                    2 ->
-                        2
-
-                    3 ->
-                        5
-
-                    4 ->
-                        1000
-
-                    _ ->
-                        0
+                Just coin
+                    :: rightCells
+                    ++ leftCells
+                    |> cellsToScore
 
         leftScore =
             if List.length leftCells == 0 then
                 0
 
             else
-                let
-                    cellsForLeft =
-                        ( startPosition, Just coin )
-                            :: leftCells
-                            ++ rightCells
-                            |> List.take 4
-                in
-                case countCoins cellsForLeft of
-                    2 ->
-                        2
-
-                    3 ->
-                        5
-
-                    4 ->
-                        1000
-
-                    _ ->
-                        0
+                Just coin
+                    :: leftCells
+                    ++ rightCells
+                    |> cellsToScore
     in
     centerScore + rightScore + leftScore
 

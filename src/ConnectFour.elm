@@ -12,12 +12,14 @@ import Set exposing (Set)
 
 type Mem
     = PlayerTurn Coin Grid
+    | AutoPlay Int Coin Grid
     | GameOver (Set Grid.Position) Coin Grid
 
 
 initialMem : Mem
 initialMem =
-    PlayerTurn Grid.Red initialGrid
+    -- PlayerTurn Grid.Red initialGrid
+    AutoPlay 0 Grid.Red initialGrid
 
 
 initialGrid : Grid
@@ -45,9 +47,20 @@ nextPlayerCoin playerCoin =
 -- Update
 
 
+autoPlayDelay =
+    60
+
+
 update : Computer -> Mem -> Mem
 update computer mem =
     case mem of
+        AutoPlay elapsed coin grid ->
+            if elapsed >= autoPlayDelay then
+                AutoPlay 0 coin grid
+
+            else
+                AutoPlay (elapsed + 1) coin grid
+
         PlayerTurn currentPlayerCoin grid ->
             case checkMouseClickOnGridColumn computer grid of
                 Just column ->
@@ -177,6 +190,9 @@ view : Computer -> Mem -> List Shape
 view ({ screen } as computer) mem =
     [ rectangle lightBlue screen.width screen.height
     , case mem of
+        AutoPlay _ coin grid ->
+            viewPlayerTurn computer coin grid
+
         PlayerTurn currentPlayerCoin grid ->
             viewPlayerTurn computer currentPlayerCoin grid
 

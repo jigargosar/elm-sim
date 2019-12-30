@@ -164,8 +164,11 @@ positionScore startPosition coin grid =
                         cellsToScore coin allCells
             in
             dirScore + oppScore
+
+        directions =
+            [ ( 1, 0 ), ( 0, 1 ), ( 1, 1 ), ( -1, 1 ) ]
     in
-    centerScore + scoreInOpposingDirs ( 1, 0 )
+    centerScore + (List.map scoreInOpposingDirs directions |> List.sum)
 
 
 cellsToScore : Coin -> List (Maybe Coin) -> number

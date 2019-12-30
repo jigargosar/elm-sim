@@ -7,6 +7,7 @@ module ConnectFour.Grid exposing
     , allPositions
     , clampPosition
     , empty
+    , emptyColumns
     , firstEmptyPositionInColumn
     , fromList
     , height
@@ -72,6 +73,20 @@ insertCoinInColumn column coin model =
                     |> Result.map (withGameOver position coin)
             )
         |> Maybe.withDefault (Err NotSuccessful)
+
+
+emptyColumns : Grid -> Set Int
+emptyColumns =
+    toCellList
+        >> List.filterMap
+            (\( ( x, _ ), cell ) ->
+                if cell == Nothing then
+                    Just x
+
+                else
+                    Nothing
+            )
+        >> Set.fromList
 
 
 type GameOver

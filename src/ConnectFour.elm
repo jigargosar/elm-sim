@@ -3,6 +3,9 @@ module ConnectFour exposing (main)
 import ConnectFour.Grid as Grid exposing (Cell, Coin(..), Grid)
 import Playground exposing (..)
 import PointFree exposing (flip, mapEach)
+import Random exposing (Seed)
+import Random.Extra
+import Random.Set
 import Set exposing (Set)
 
 
@@ -17,7 +20,7 @@ type Restart
 
 type Mem
     = PlayerTurn Coin Grid
-    | AutoPlay Int Coin Grid
+    | AutoPlay Int Seed Coin Grid
     | WaitingForRestart Restart GameOverState
 
 
@@ -29,7 +32,7 @@ type GameOverState
 initialMem : Mem
 initialMem =
     -- PlayerTurn Grid.Red initialGrid
-    AutoPlay 0 Grid.Red initialGrid
+    AutoPlay 0 (Random.initialSeed 123) Grid.Red initialGrid
 
 
 initialGrid : Grid
@@ -72,16 +75,20 @@ autoRestartDuration =
 update : Computer -> Mem -> Mem
 update computer mem =
     case mem of
-        AutoPlay elapsed coin grid ->
+        AutoPlay elapsed seed_ coin grid ->
             let
-                randomColumn =
-                    wave 0 (Grid.width grid |> toFloat) 1 computer.time
-                        |> floor
+                randomColumnGen : Random.Generator Int
+                randomColumnGen =
+                    Random.Set.sample (Grid.emptyColumns grid)
+                        |> Random.map (Maybe.withDefault 0)
+
+                ( randomColumn, nextSeed ) =
+                    Random.step randomColumnGen seed_
             in
             if elapsed >= autoPlayDelay then
                 case Grid.insertCoinInColumn randomColumn coin grid of
                     Ok ( Nothing, newGrid ) ->
-                        AutoPlay 0 (nextPlayerCoin coin) newGrid
+                        AutoPlay 0 nextSeed (nextPlayerCoin coin) newGrid
 
                     Ok ( Just gameOver, newGrid ) ->
                         case gameOver of
@@ -92,10 +99,11 @@ update computer mem =
                                 WaitingForRestart (AutoRestart 0) (Draw newGrid)
 
                     Err _ ->
-                        mem
+                        -- AutoPlay 0 nextSeed coin grid
+                        Debug.todo "should never happen, show invalid state on screen"
 
             else
-                AutoPlay (elapsed + 1) coin grid
+                AutoPlay (elapsed + 1) nextSeed coin grid
 
         PlayerTurn coin grid ->
             case checkMouseClickOnGridColumn computer grid of
@@ -239,7 +247,7 @@ view : Computer -> Mem -> List Shape
 view ({ screen } as computer) mem =
     [ rectangle lightBlue screen.width screen.height
     , case mem of
-        AutoPlay _ coin grid ->
+        AutoPlay _ _ coin grid ->
             viewPlayerTurn computer coin grid
 
         PlayerTurn currentPlayerCoin grid ->

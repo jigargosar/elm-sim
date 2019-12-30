@@ -86,21 +86,23 @@ update computer mem =
 
 insertCoinInColumn : Int -> Coin -> Grid -> Result Grid.Error GameState
 insertCoinInColumn column coin grid =
+    let
+        responseToGameState : ( Maybe Grid.GameOver, Grid ) -> GameState
+        responseToGameState response =
+            case response of
+                ( Nothing, newGrid ) ->
+                    PlayerTurn (nextPlayerCoin coin) newGrid
+
+                ( Just gameOver, newGrid ) ->
+                    case gameOver of
+                        Grid.WinningPositions winningPositions ->
+                            Victory winningPositions coin newGrid
+
+                        Grid.Draw ->
+                            Draw newGrid
+    in
     Grid.insertCoinInColumn column coin grid
-        |> Result.map
-            (\response ->
-                case response of
-                    ( Nothing, newGrid ) ->
-                        PlayerTurn (nextPlayerCoin coin) newGrid
-
-                    ( Just gameOver, newGrid ) ->
-                        case gameOver of
-                            Grid.WinningPositions winningPositions ->
-                                Victory winningPositions coin newGrid
-
-                            Grid.Draw ->
-                                Draw newGrid
-            )
+        |> Result.map responseToGameState
 
 
 updateGameState : Computer -> GameState -> GameState

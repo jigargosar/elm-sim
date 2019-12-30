@@ -49,16 +49,6 @@ initAutoPlay seed =
     AutoPlay 0 seed initialGameState
 
 
-nextPlayerCoin : Coin -> Coin
-nextPlayerCoin playerCoin =
-    case playerCoin of
-        Grid.Red ->
-            Grid.Yellow
-
-        Grid.Yellow ->
-            Grid.Red
-
-
 
 -- Update
 
@@ -76,6 +66,15 @@ update computer mem =
 insertCoinInColumn : Int -> Coin -> Grid -> Result Grid.Error GameState
 insertCoinInColumn column coin grid =
     let
+        nextPlayerCoin : Coin -> Coin
+        nextPlayerCoin playerCoin =
+            case playerCoin of
+                Grid.Red ->
+                    Grid.Yellow
+
+                Grid.Yellow ->
+                    Grid.Red
+
         responseToGameState : ( Maybe Grid.GameOver, Grid ) -> GameState
         responseToGameState response =
             case response of

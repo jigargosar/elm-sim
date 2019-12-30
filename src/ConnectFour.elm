@@ -1,6 +1,7 @@
 module ConnectFour exposing (main)
 
 import ConnectFour.Grid as Grid exposing (Cell, Coin(..), Grid)
+import List.Extra
 import Playground exposing (..)
 import PointFree exposing (flip, mapEach)
 import Random exposing (Seed)
@@ -38,18 +39,19 @@ initialGameState =
     let
         initialGrid =
             let
-                g =
-                    Grid.fromList 7 6 <|
-                        [ ( ( 3, 0 ), Red )
-                        , ( ( 3, 1 ), Red )
-                        , ( ( 3, 2 ), Yellow )
-                        , ( ( 3, 3 ), Red )
-                        ]
+                moves =
+                    List.Extra.initialize 6
+                        (\row ->
+                            ( ( 3, row )
+                            , if modBy 2 row == 0 then
+                                Red
 
-                _ =
-                    Grid.empty 7 6
+                              else
+                                Yellow
+                            )
+                        )
             in
-            g
+            Grid.fromList 7 6 moves
     in
     PlayerTurn Grid.Red initialGrid
 

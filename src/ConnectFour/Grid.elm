@@ -8,7 +8,6 @@ module ConnectFour.Grid exposing
     , allPositions
     , clampPosition
     , columnScores
-    , empty
     , firstEmptyPositionInColumn
     , fromList
     , height

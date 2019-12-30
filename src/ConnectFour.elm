@@ -10,11 +10,20 @@ import Set exposing (Set)
 -- Mem
 
 
+type Restart
+    = RestartOnClick
+    | AutoRestart Int
+
+
 type Mem
     = PlayerTurn Coin Grid
     | AutoPlay Int Coin Grid
-    | GameOver (Set Grid.Position) Coin Grid
-    | GameDraw Coin Grid
+    | WaitingForRestart Restart GameOverState
+
+
+type GameOverState
+    = Won (Set Grid.Position) Coin Grid
+    | Draw Grid
 
 
 initialMem : Mem
@@ -73,10 +82,10 @@ update computer mem =
                     Ok ( Just gameOver, newGrid ) ->
                         case gameOver of
                             Grid.WinningPositions winningPositions ->
-                                GameOver winningPositions coin newGrid
+                                WaitingForRestart (AutoRestart 0) (Won winningPositions coin newGrid)
 
                             Grid.Draw ->
-                                GameDraw coin newGrid
+                                WaitingForRestart (AutoRestart 0) (Draw newGrid)
 
                     Err _ ->
                         mem
@@ -96,10 +105,10 @@ update computer mem =
                         Ok ( Just gameOver, newGrid ) ->
                             case gameOver of
                                 Grid.WinningPositions winningPositions ->
-                                    GameOver winningPositions coin newGrid
+                                    WaitingForRestart RestartOnClick (Won winningPositions coin newGrid)
 
                                 Grid.Draw ->
-                                    GameDraw coin newGrid
+                                    WaitingForRestart RestartOnClick (Draw newGrid)
 
                         Err _ ->
                             mem
@@ -107,19 +116,25 @@ update computer mem =
                 Nothing ->
                     mem
 
-        GameOver _ _ _ ->
-            if computer.mouse.click then
-                initialMem
+        WaitingForRestart restart state ->
+            case restart of
+                RestartOnClick ->
+                    if computer.mouse.click then
+                        initialMem
 
-            else
-                mem
+                    else
+                        mem
 
-        GameDraw _ _ ->
-            if computer.mouse.click then
-                initialMem
+                AutoRestart elapsed ->
+                    let
+                        autoRestartDuration =
+                            60
+                    in
+                    if elapsed >= autoRestartDuration then
+                        initialMem
 
-            else
-                mem
+                    else
+                        WaitingForRestart (AutoRestart (elapsed + 1)) state
 
 
 
@@ -230,11 +245,13 @@ view ({ screen } as computer) mem =
         PlayerTurn currentPlayerCoin grid ->
             viewPlayerTurn computer currentPlayerCoin grid
 
-        GameOver winningPositions winningPlayerCoin grid ->
-            viewGameOver computer winningPositions winningPlayerCoin grid
+        WaitingForRestart _ state ->
+            case state of
+                Won winningPositions coin grid ->
+                    viewGameOver computer winningPositions coin grid
 
-        GameDraw _ grid ->
-            viewGameDraw computer grid
+                Draw grid ->
+                    viewGameDraw computer grid
     ]
 
 

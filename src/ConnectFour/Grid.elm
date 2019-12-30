@@ -112,33 +112,6 @@ positionScore startPosition coin grid =
             else
                 0
 
-        rightCells : List (Maybe Coin)
-        rightCells =
-            List.range 1 3
-                |> List.foldl
-                    (\n ( done, acc ) ->
-                        if done then
-                            ( done, acc )
-
-                        else
-                            let
-                                position =
-                                    moveX n startPosition
-                            in
-                            case get position grid of
-                                Err _ ->
-                                    ( True, acc )
-
-                                Ok cell ->
-                                    if cell == Nothing || cell == Just coin then
-                                        ( False, cell :: acc )
-
-                                    else
-                                        ( True, acc )
-                    )
-                    ( False, [] )
-                |> Tuple.second
-
         cellsInDir : Position -> List (Maybe Coin)
         cellsInDir dir =
             List.Extra.unfoldr
@@ -163,60 +136,31 @@ positionScore startPosition coin grid =
                                     Nothing
                 )
                 ( 1, startPosition )
-                |> List.reverse
 
-        leftCells_ : List Cell
-        leftCells_ =
-            List.range 1 3
-                |> List.foldl
-                    (\n ( done, acc ) ->
-                        if done then
-                            ( done, acc )
-
-                        else
-                            let
-                                position =
-                                    moveX -n startPosition
-                            in
-                            case get position grid of
-                                Err _ ->
-                                    ( True, acc )
-
-                                Ok cell ->
-                                    if cell == Nothing || cell == Just coin then
-                                        ( False, cell :: acc )
-
-                                    else
-                                        ( True, acc )
-                    )
-                    ( False, [] )
-                |> Tuple.second
-
+        leftCells : List (Maybe Coin)
         leftCells =
             cellsInDir ( -1, 0 )
 
-        _ =
-            if startColumn == 4 then
-                Debug.log "leftCells,leftCells_" ( leftCells, leftCells_ )
+        rightCells : List (Maybe Coin)
+        rightCells =
+            cellsInDir ( 1, 0 )
 
-            else
-                ( leftCells, leftCells_ )
+        hCells =
+            leftCells ++ [ Just coin ] ++ List.reverse rightCells
 
         rightScore =
             if List.length rightCells == 0 then
                 0
 
             else
-                (rightCells ++ leftCells)
-                    |> cellsToScore coin
+                cellsToScore coin (hCells |> List.reverse)
 
         leftScore =
             if List.length leftCells == 0 then
                 0
 
             else
-                (leftCells ++ rightCells)
-                    |> cellsToScore coin
+                cellsToScore coin hCells
     in
     centerScore + rightScore + leftScore
 
@@ -225,7 +169,7 @@ cellsToScore : Coin -> List (Maybe Coin) -> number
 cellsToScore coin list_ =
     let
         list =
-            Just coin :: list_ |> List.take 4
+            list_ |> List.take 4
     in
     if List.length list == 4 then
         case List.Extra.count ((==) (Just coin)) list of

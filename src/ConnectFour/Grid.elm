@@ -129,6 +129,7 @@ positionScore startPosition coin grid =
                     )
                 |> List.Extra.takeWhile (Tuple.second >> isValidCell)
 
+        leftCells : List ( ( Int, Int ), Cell )
         leftCells =
             List.range 1 3
                 |> List.map

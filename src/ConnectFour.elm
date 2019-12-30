@@ -84,28 +84,33 @@ update computer mem =
             ManualPlay <| updateGameState computer gameState
 
 
+insertCoinInColumn : Int -> Coin -> Grid -> Result Grid.Error GameState
+insertCoinInColumn column coin grid =
+    Grid.insertCoinInColumn column coin grid
+        |> Result.map
+            (\response ->
+                case response of
+                    ( Nothing, newGrid ) ->
+                        PlayerTurn (nextPlayerCoin coin) newGrid
+
+                    ( Just gameOver, newGrid ) ->
+                        case gameOver of
+                            Grid.WinningPositions winningPositions ->
+                                Victory winningPositions coin newGrid
+
+                            Grid.Draw ->
+                                Draw newGrid
+            )
+
+
 updateGameState : Computer -> GameState -> GameState
 updateGameState computer gameState =
     case gameState of
         PlayerTurn coin grid ->
             case checkMouseClickOnGridColumn computer grid of
                 Just column ->
-                    case
-                        Grid.insertCoinInColumn column coin grid
-                    of
-                        Ok ( Nothing, newGrid ) ->
-                            PlayerTurn (nextPlayerCoin coin) newGrid
-
-                        Ok ( Just gameOver, newGrid ) ->
-                            case gameOver of
-                                Grid.WinningPositions winningPositions ->
-                                    Victory winningPositions coin newGrid
-
-                                Grid.Draw ->
-                                    Draw newGrid
-
-                        Err _ ->
-                            gameState
+                    insertCoinInColumn column coin grid
+                        |> Result.withDefault gameState
 
                 Nothing ->
                     gameState
@@ -147,21 +152,10 @@ updateAutoPlay elapsed seed gameState =
                     ( randomColumn, nextSeed ) =
                         Random.step randomColumnGen seed
                 in
-                case Grid.insertCoinInColumn randomColumn coin grid of
-                    Ok ( Nothing, newGrid ) ->
-                        AutoPlay 0 nextSeed (PlayerTurn (nextPlayerCoin coin) newGrid)
-
-                    Ok ( Just gameOver, newGrid ) ->
-                        case gameOver of
-                            Grid.WinningPositions winningPositions ->
-                                AutoPlay 0 nextSeed (Victory winningPositions coin newGrid)
-
-                            Grid.Draw ->
-                                AutoPlay 0 nextSeed (Draw newGrid)
-
-                    Err _ ->
-                        -- AutoPlay 0 nextSeed coin grid
-                        Debug.todo "should never happen, show invalid state on screen"
+                insertCoinInColumn randomColumn coin grid
+                    |> Result.mapError (Debug.log "should never happen, show invalid state on screen")
+                    |> Result.withDefault gameState
+                    |> AutoPlay 0 nextSeed
 
             else
                 AutoPlay (elapsed + 1) seed gameState

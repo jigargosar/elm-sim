@@ -1,6 +1,7 @@
 module ConnectFour.Grid exposing
     ( Cell
     , Coin(..)
+    , Error(..)
     , GameOver(..)
     , Grid
     , Position

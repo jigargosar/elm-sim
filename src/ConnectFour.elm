@@ -11,22 +11,22 @@ import Set exposing (Set)
 
 
 -- Mem
+{- type Mem
+   = ManualPlay Coin Grid
+   | AutoPlay Int Seed Coin Grid
+   | WaitingForRestart Restart GameOverState
+-}
 
 
-type Restart
-    = RestartOnClick
-    | AutoRestart Int Seed
+type GameState
+    = PlayerTurn Coin Grid
+    | Victory (Set Grid.Position) Coin Grid
+    | Draw Grid
 
 
 type Mem
-    = PlayerTurn Coin Grid
-    | AutoPlay Int Seed Coin Grid
-    | WaitingForRestart Restart GameOverState
-
-
-type GameOverState
-    = Won (Set Grid.Position) Coin Grid
-    | Draw Grid
+    = AutoPlay Int Seed GameState
+    | ManualPlay GameState
 
 
 initialMem : Mem
@@ -40,9 +40,14 @@ initialGrid =
     Grid.empty 6 5
 
 
+initialGameState : GameState
+initialGameState =
+    PlayerTurn Grid.Red initialGrid
+
+
 initAutoPlay : Seed -> Mem
 initAutoPlay seed =
-    AutoPlay 0 seed Grid.Red initialGrid
+    AutoPlay 0 seed initialGameState
 
 
 
@@ -80,74 +85,91 @@ autoRestartDuration =
 update : Computer -> Mem -> Mem
 update computer mem =
     case mem of
-        AutoPlay elapsed seed_ coin grid ->
-            let
-                randomColumnGen : Random.Generator Int
-                randomColumnGen =
-                    Random.Set.sample (Grid.emptyColumns grid)
-                        |> Random.map (Maybe.withDefault 0)
+        AutoPlay elapsed seed gameState ->
+            case gameState of
+                PlayerTurn coin grid ->
+                    if elapsed >= autoPlayDelay then
+                        let
+                            randomColumnGen : Random.Generator Int
+                            randomColumnGen =
+                                Random.Set.sample (Grid.emptyColumns grid)
+                                    |> Random.map (Maybe.withDefault 0)
 
-                ( randomColumn, nextSeed ) =
-                    Random.step randomColumnGen seed_
-            in
-            if elapsed >= autoPlayDelay then
-                case Grid.insertCoinInColumn randomColumn coin grid of
-                    Ok ( Nothing, newGrid ) ->
-                        AutoPlay 0 nextSeed (nextPlayerCoin coin) newGrid
+                            ( randomColumn, nextSeed ) =
+                                Random.step randomColumnGen seed
+                        in
+                        case Grid.insertCoinInColumn randomColumn coin grid of
+                            Ok ( Nothing, newGrid ) ->
+                                AutoPlay 0 nextSeed (PlayerTurn (nextPlayerCoin coin) newGrid)
 
-                    Ok ( Just gameOver, newGrid ) ->
-                        case gameOver of
-                            Grid.WinningPositions winningPositions ->
-                                WaitingForRestart (AutoRestart 0 nextSeed) (Won winningPositions coin newGrid)
+                            Ok ( Just gameOver, newGrid ) ->
+                                case gameOver of
+                                    Grid.WinningPositions winningPositions ->
+                                        AutoPlay 0 nextSeed (Victory winningPositions coin newGrid)
 
-                            Grid.Draw ->
-                                WaitingForRestart (AutoRestart 0 nextSeed) (Draw newGrid)
+                                    Grid.Draw ->
+                                        AutoPlay 0 nextSeed (Draw newGrid)
 
-                    Err _ ->
-                        -- AutoPlay 0 nextSeed coin grid
-                        Debug.todo "should never happen, show invalid state on screen"
-
-            else
-                AutoPlay (elapsed + 1) nextSeed coin grid
-
-        PlayerTurn coin grid ->
-            case checkMouseClickOnGridColumn computer grid of
-                Just column ->
-                    case
-                        Grid.insertCoinInColumn column coin grid
-                    of
-                        Ok ( Nothing, newGrid ) ->
-                            PlayerTurn (nextPlayerCoin coin) newGrid
-
-                        Ok ( Just gameOver, newGrid ) ->
-                            case gameOver of
-                                Grid.WinningPositions winningPositions ->
-                                    WaitingForRestart RestartOnClick (Won winningPositions coin newGrid)
-
-                                Grid.Draw ->
-                                    WaitingForRestart RestartOnClick (Draw newGrid)
-
-                        Err _ ->
-                            mem
-
-                Nothing ->
-                    mem
-
-        WaitingForRestart restart state ->
-            case restart of
-                RestartOnClick ->
-                    if computer.mouse.click then
-                        initialMem
+                            Err _ ->
+                                -- AutoPlay 0 nextSeed coin grid
+                                Debug.todo "should never happen, show invalid state on screen"
 
                     else
-                        mem
+                        AutoPlay (elapsed + 1) seed gameState
 
-                AutoRestart elapsed seed ->
+                Victory _ _ _ ->
                     if elapsed >= autoRestartDuration then
                         initAutoPlay seed
 
                     else
-                        WaitingForRestart (AutoRestart (elapsed + 1) seed) state
+                        AutoPlay (elapsed + 1) seed gameState
+
+                Draw _ ->
+                    if elapsed >= autoRestartDuration then
+                        initAutoPlay seed
+
+                    else
+                        AutoPlay (elapsed + 1) seed gameState
+
+        ManualPlay gameState ->
+            ManualPlay <|
+                case gameState of
+                    PlayerTurn coin grid ->
+                        case checkMouseClickOnGridColumn computer grid of
+                            Just column ->
+                                case
+                                    Grid.insertCoinInColumn column coin grid
+                                of
+                                    Ok ( Nothing, newGrid ) ->
+                                        PlayerTurn (nextPlayerCoin coin) newGrid
+
+                                    Ok ( Just gameOver, newGrid ) ->
+                                        case gameOver of
+                                            Grid.WinningPositions winningPositions ->
+                                                Victory winningPositions coin newGrid
+
+                                            Grid.Draw ->
+                                                Draw newGrid
+
+                                    Err _ ->
+                                        gameState
+
+                            Nothing ->
+                                gameState
+
+                    Victory _ _ _ ->
+                        if computer.mouse.click then
+                            initialGameState
+
+                        else
+                            gameState
+
+                    Draw _ ->
+                        if computer.mouse.click then
+                            initialGameState
+
+                        else
+                            gameState
 
 
 
@@ -252,20 +274,24 @@ view : Computer -> Mem -> List Shape
 view ({ screen } as computer) mem =
     [ rectangle lightBlue screen.width screen.height
     , case mem of
-        AutoPlay _ _ coin grid ->
+        AutoPlay _ _ gameState ->
+            viewGameState computer gameState
+
+        ManualPlay gameState ->
+            viewGameState computer gameState
+    ]
+
+
+viewGameState computer gameState =
+    case gameState of
+        PlayerTurn coin grid ->
             viewPlayerTurn computer coin grid
 
-        PlayerTurn currentPlayerCoin grid ->
-            viewPlayerTurn computer currentPlayerCoin grid
+        Victory winningPositions coin grid ->
+            viewGameOver computer winningPositions coin grid
 
-        WaitingForRestart _ state ->
-            case state of
-                Won winningPositions coin grid ->
-                    viewGameOver computer winningPositions coin grid
-
-                Draw grid ->
-                    viewGameDraw computer grid
-    ]
+        Draw grid ->
+            viewGameDraw computer grid
 
 
 coinToColor : Coin -> Color

@@ -25,33 +25,28 @@ type Mem
 
 initialMem : Mem
 initialMem =
-    -- PlayerTurn Grid.Red initialGrid
     initAutoPlay (Random.initialSeed 123)
-
-
-initialGrid : Grid
-initialGrid =
-    Grid.empty 6 5
 
 
 initialGameState : GameState
 initialGameState =
+    let
+        initialGrid =
+            {- Grid.fromList 6
+               5
+               [ ( ( 1, 0 ), Red )
+               , ( ( 2, 0 ), Red )
+               , ( ( 3, 0 ), Red )
+               ]
+            -}
+            Grid.empty 6 5
+    in
     PlayerTurn Grid.Red initialGrid
 
 
 initAutoPlay : Seed -> Mem
 initAutoPlay seed =
     AutoPlay 0 seed initialGameState
-
-
-
-{- Grid.fromList 6
-   5
-   [ ( ( 1, 0 ), Red )
-   , ( ( 2, 0 ), Red )
-   , ( ( 3, 0 ), Red )
-   ]
--}
 
 
 nextPlayerCoin : Coin -> Coin

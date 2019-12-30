@@ -15,7 +15,7 @@ import Set exposing (Set)
 
 type Restart
     = RestartOnClick
-    | AutoRestart Int
+    | AutoRestart Int Seed
 
 
 type Mem
@@ -32,12 +32,17 @@ type GameOverState
 initialMem : Mem
 initialMem =
     -- PlayerTurn Grid.Red initialGrid
-    AutoPlay 0 (Random.initialSeed 123) Grid.Red initialGrid
+    initAutoPlay (Random.initialSeed 123)
 
 
 initialGrid : Grid
 initialGrid =
     Grid.empty 6 5
+
+
+initAutoPlay : Seed -> Mem
+initAutoPlay seed =
+    AutoPlay 0 seed Grid.Red initialGrid
 
 
 
@@ -93,10 +98,10 @@ update computer mem =
                     Ok ( Just gameOver, newGrid ) ->
                         case gameOver of
                             Grid.WinningPositions winningPositions ->
-                                WaitingForRestart (AutoRestart 0) (Won winningPositions coin newGrid)
+                                WaitingForRestart (AutoRestart 0 nextSeed) (Won winningPositions coin newGrid)
 
                             Grid.Draw ->
-                                WaitingForRestart (AutoRestart 0) (Draw newGrid)
+                                WaitingForRestart (AutoRestart 0 nextSeed) (Draw newGrid)
 
                     Err _ ->
                         -- AutoPlay 0 nextSeed coin grid
@@ -137,12 +142,12 @@ update computer mem =
                     else
                         mem
 
-                AutoRestart elapsed ->
+                AutoRestart elapsed seed ->
                     if elapsed >= autoRestartDuration then
-                        initialMem
+                        initAutoPlay seed
 
                     else
-                        WaitingForRestart (AutoRestart (elapsed + 1)) state
+                        WaitingForRestart (AutoRestart (elapsed + 1) seed) state
 
 
 

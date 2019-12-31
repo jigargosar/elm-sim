@@ -10,7 +10,6 @@ module ConnectFour.Grid exposing
     , columnScores
     , firstEmptyPositionInColumn
     , height
-    , ignoreError
     , insertCoinInColumn
     , playableColumns
     , toCellList
@@ -75,11 +74,6 @@ withInitialMoves w h =
     \coin moves ->
         List.foldl reducer (Ok ( coin, ( Nothing, empty w h ) )) moves
             |> Result.map (Tuple.mapSecond Tuple.second)
-
-
-ignoreError : (b -> Result Error b) -> b -> b
-ignoreError func model =
-    func model |> Result.withDefault model
 
 
 type Error
@@ -158,6 +152,7 @@ positionScore startPosition coin grid =
                                     Nothing
                 )
                 ( 1, startPosition )
+                |> List.reverse
 
         scoreInOpposingDirs : Position -> Int
         scoreInOpposingDirs dir =
@@ -169,7 +164,7 @@ positionScore startPosition coin grid =
                     cellsInDir (mapEach negate dir)
 
                 allCells =
-                    opposingDirCells ++ [ Just coin ] ++ List.reverse dirCells
+                    List.reverse opposingDirCells ++ [ Just coin ] ++ dirCells
 
                 dirScore =
                     if List.isEmpty dirCells then
@@ -189,8 +184,12 @@ positionScore startPosition coin grid =
 
         directions =
             [ ( 1, 0 ), ( 0, 1 ), ( 1, 1 ), ( -1, 1 ) ]
+
+        directionScores =
+            List.map scoreInOpposingDirs directions
+                |> List.sum
     in
-    centerScore + (List.map scoreInOpposingDirs directions |> List.sum)
+    centerScore + directionScores
 
 
 cellsToScore : Coin -> List (Maybe Coin) -> number

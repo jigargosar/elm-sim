@@ -38,7 +38,7 @@ initialMem =
 
 initialGameState : GameState
 initialGameState =
-    Grid.withInitialMoves 7 6 Red (List.repeat 6 3)
+    Grid.withInitialMoves 7 6 Red (List.repeat 6 3 ++ [ 1, 1 ])
         |> Result.map (uncurry PlayerTurn)
         |> Result.withDefault (Error "Grid.fromMoves")
 

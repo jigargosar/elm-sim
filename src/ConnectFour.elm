@@ -440,4 +440,4 @@ viewGameDraw { screen, mouse, time } grid =
 
 
 main =
-    game view2 update initialMem
+    game view update initialMem

@@ -1,4 +1,4 @@
-module ConnectFour.GridShape exposing (..)
+module ConnectFour.GridShape exposing (withCellSize)
 
 import ConnectFour.Grid as Grid exposing (Grid)
 import Playground exposing (..)

@@ -1,6 +1,7 @@
 module ConnectFour exposing (main)
 
 import ConnectFour.Grid as Grid exposing (Cell, Coin(..), Grid)
+import ConnectFour.GridShape as GridShape
 import List.Extra
 import Playground exposing (..)
 import PointFree exposing (flip, mapEach)
@@ -269,6 +270,13 @@ view ({ screen } as computer) mem =
     ]
 
 
+view2 : Computer -> Mem -> List Shape
+view2 ({ screen } as computer) mem =
+    [ rectangle lightBlue screen.width screen.height
+    , Grid.fromList 3 3 [] |> GridShape.withCellSize 50
+    ]
+
+
 toGameState : Mem -> GameState
 toGameState mem =
     case mem of
@@ -430,4 +438,4 @@ viewGameDraw { screen, mouse, time } grid =
 
 
 main =
-    game view update initialMem
+    game view2 update initialMem

@@ -12,13 +12,6 @@ withCellSize cellSize grid =
             ( Grid.width grid, Grid.height grid )
                 |> mapEach (toFloat >> (*) cellSize)
 
-        positions =
-            Grid.allPositions grid
-
-        viewEmptyCell ( x, y ) =
-            circle white (cellSize / 2 * 0.75)
-                |> move (toFloat x * cellSize) (toFloat y * cellSize)
-
         viewCell ( ( x, y ), cell ) =
             let
                 emptyR =

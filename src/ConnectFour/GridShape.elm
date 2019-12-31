@@ -29,8 +29,8 @@ withCellSize cellSize grid =
                 coinShapeFromColor color =
                     circle color coinR
 
-                coinColor : Maybe Color
-                coinColor =
+                maybeCoinColor : Maybe Color
+                maybeCoinColor =
                     cell
                         |> Maybe.map
                             (\coin ->
@@ -45,7 +45,7 @@ withCellSize cellSize grid =
                 shape =
                     group
                         [ cellBackgroundShape
-                        , coinColor
+                        , maybeCoinColor
                             |> Maybe.map coinShapeFromColor
                             |> Maybe.withDefault (group [])
                         ]

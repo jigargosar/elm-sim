@@ -39,7 +39,7 @@ initialMem =
 
 initialGameState : GameState
 initialGameState =
-    Grid.fromMoves 7 6 Red (List.repeat 6 3)
+    Grid.withInitialMoves 7 6 Red (List.repeat 6 3)
         |> Result.map (uncurry PlayerTurn)
         |> Result.withDefault (Error "Grid.fromMoves")
 
@@ -266,7 +266,7 @@ view ({ screen } as computer) mem =
 view2 : Computer -> Mem -> List Shape
 view2 ({ screen } as computer) mem =
     [ rectangle lightBlue screen.width screen.height
-    , Grid.fromMoves 6 6 Red [ 3, 3, 3, 2, 2 ]
+    , Grid.withInitialMoves 6 6 Red [ 3, 3, 3, 2, 2 ]
         |> Result.map (Tuple.second >> GridShape.withCellSize 50)
         |> Result.withDefault (words black "Error initGrid")
     ]

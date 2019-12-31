@@ -9,7 +9,6 @@ module ConnectFour.Grid exposing
     , clampPosition
     , columnScores
     , firstEmptyPositionInColumn
-    , fromMoves
     , height
     , ignoreError
     , insertCoinInColumn
@@ -17,6 +16,7 @@ module ConnectFour.Grid exposing
     , toCellList
     , toList
     , width
+    , withInitialMoves
     )
 
 import Dict exposing (Dict)
@@ -61,8 +61,8 @@ flipCoin coin =
         Red
 
 
-fromMoves : Int -> Int -> Coin -> List Int -> Result Error ( Coin, Grid )
-fromMoves w h =
+withInitialMoves : Int -> Int -> Coin -> List Int -> Result Error ( Coin, Grid )
+withInitialMoves w h =
     let
         reducer : Int -> Result Error ( Coin, ( a, Grid ) ) -> Result Error ( Coin, ( Maybe GameOver, Grid ) )
         reducer column =

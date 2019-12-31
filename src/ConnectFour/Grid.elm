@@ -40,6 +40,15 @@ type Grid
     = Grid Int Int (Dict Position Coin)
 
 
+type alias GridRecord =
+    { width : Int, height : Int, dict : Dict Position Coin }
+
+
+toRecord : Grid -> GridRecord
+toRecord (Grid w h dict) =
+    { width = w, height = h, dict = dict }
+
+
 clampPosition : Grid -> Position -> Position
 clampPosition (Grid w h _) =
     Tuple.mapBoth (clamp 0 (w - 1)) (clamp 0 (h - 1))

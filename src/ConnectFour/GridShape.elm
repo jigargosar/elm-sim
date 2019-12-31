@@ -20,18 +20,26 @@ withCellSize cellSize grid =
                 coinR =
                     emptyR * 0.8
 
+                coinShape color =
+                    circle color coinR
+
                 shape =
-                    case cell of
-                        Nothing ->
-                            circle white emptyR
+                    group
+                        [ circle white emptyR
+                        , case cell of
+                            Nothing ->
+                                group []
 
-                        Just coin ->
-                            case coin of
-                                Grid.Red ->
-                                    circle red coinR
+                            Just coin ->
+                                coinShape
+                                    (case coin of
+                                        Grid.Red ->
+                                            red
 
-                                Grid.Yellow ->
-                                    circle blue coinR
+                                        Grid.Yellow ->
+                                            blue
+                                    )
+                        ]
             in
             shape |> move (toFloat x * cellSize) (toFloat y * cellSize)
     in

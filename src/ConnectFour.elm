@@ -274,7 +274,7 @@ view2 : Computer -> Mem -> List Shape
 view2 ({ screen } as computer) mem =
     [ rectangle lightBlue screen.width screen.height
     , Grid.fromList 6 6 []
-        |> Grid.ignoreError (Grid.fillWithColumnMoves Red [ 3, 3, 3 ])
+        |> Grid.ignoreError (Grid.fillWithColumnMoves Red [ 3, 3, 3, 2, 2 ])
         |> GridShape.withCellSize 50
     ]
 

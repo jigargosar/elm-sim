@@ -8,9 +8,11 @@ module ConnectFour.Grid exposing
     , allPositions
     , clampPosition
     , columnScores
+    , fillWithColumnMoves
     , firstEmptyPositionInColumn
     , fromList
     , height
+    , ignoreError
     , insertCoinInColumn
     , playableColumns
     , toCellList
@@ -53,12 +55,12 @@ empty w h =
 
 fromList : Int -> Int -> List ( Position, Coin ) -> Grid
 fromList w h =
-    let
-        ignoreError : (Grid -> Result x Grid) -> Grid -> Grid
-        ignoreError func model =
-            func model |> Result.withDefault model
-    in
     List.foldl (\( position, coin ) -> ignoreError (insert position coin)) (empty w h)
+
+
+ignoreError : (b -> Result Error b) -> b -> b
+ignoreError func model =
+    func model |> Result.withDefault model
 
 
 type Error
@@ -75,6 +77,29 @@ insertCoinInColumn column coin model =
                     |> Result.map (withGameOver position coin)
             )
         |> Maybe.withDefault (Err NotSuccessful)
+
+
+fillWithColumnMoves : Coin -> List Int -> Grid -> Result Error Grid
+fillWithColumnMoves =
+    let
+        flipCoin coin =
+            if coin == Red then
+                Yellow
+
+            else
+                Red
+
+        reducer : Int -> Result Error ( Coin, ( a, Grid ) ) -> Result Error ( Coin, ( Maybe GameOver, Grid ) )
+        reducer column =
+            Result.andThen
+                (\( coin, ( _, grid ) ) ->
+                    insertCoinInColumn column coin grid
+                        |> Result.map (Tuple.pair (flipCoin coin))
+                )
+    in
+    \coin moves grid ->
+        List.foldl reducer (Ok ( coin, ( Nothing, grid ) )) moves
+            |> Result.map (Tuple.second >> Tuple.second)
 
 
 playableColumns : Grid -> Set Int

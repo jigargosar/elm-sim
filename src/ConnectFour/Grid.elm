@@ -152,7 +152,6 @@ positionScore startPosition coin grid =
                                     Nothing
                 )
                 ( 1, startPosition )
-                |> List.reverse
 
         scoreInOpposingDirs : Position -> Int
         scoreInOpposingDirs dir =
@@ -179,8 +178,22 @@ positionScore startPosition coin grid =
 
                     else
                         cellsToScore coin allCells
+
+                log val =
+                    let
+                        logVal =
+                            [ List.reverse opposingDirCells, [ Just coin ], dirCells ]
+
+                        _ =
+                            if dir == ( 1, 0 ) && startColumn == 2 then
+                                Debug.log "val" logVal
+
+                            else
+                                logVal
+                    in
+                    val
             in
-            dirScore + oppScore
+            log (dirScore + oppScore)
 
         directions =
             [ ( 1, 0 ), ( 0, 1 ), ( 1, 1 ), ( -1, 1 ) ]
@@ -197,6 +210,9 @@ cellsToScore coin list_ =
     let
         list =
             list_ |> List.take 4
+
+        _ =
+            List.Extra.groupsOfWithStep 4 1
     in
     if List.length list == 4 then
         case List.Extra.count ((==) (Just coin)) list of

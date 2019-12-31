@@ -14,31 +14,40 @@ withCellSize cellSize grid =
 
         viewCell ( ( x, y ), cell ) =
             let
-                emptyR =
-                    cellSize / 2 * 0.8
+                cellR =
+                    cellSize / 2
+
+                bgR =
+                    cellR * 0.8
+
+                cellBackgroundShape =
+                    circle white bgR
 
                 coinR =
-                    emptyR * 0.8
+                    bgR * 0.8
 
-                coinShape color =
+                coinShapeFromColor color =
                     circle color coinR
+
+                coinColor : Maybe Color
+                coinColor =
+                    cell
+                        |> Maybe.map
+                            (\coin ->
+                                case coin of
+                                    Grid.Red ->
+                                        red
+
+                                    Grid.Yellow ->
+                                        blue
+                            )
 
                 shape =
                     group
-                        [ circle white emptyR
-                        , case cell of
-                            Nothing ->
-                                group []
-
-                            Just coin ->
-                                coinShape
-                                    (case coin of
-                                        Grid.Red ->
-                                            red
-
-                                        Grid.Yellow ->
-                                            blue
-                                    )
+                        [ cellBackgroundShape
+                        , coinColor
+                            |> Maybe.map coinShapeFromColor
+                            |> Maybe.withDefault (group [])
                         ]
             in
             shape |> move (toFloat x * cellSize) (toFloat y * cellSize)

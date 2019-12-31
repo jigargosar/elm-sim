@@ -8,9 +8,8 @@ module ConnectFour.Grid exposing
     , allPositions
     , clampPosition
     , columnScores
-    , fillWithColumnMoves
     , firstEmptyPositionInColumn
-    , fromList
+    , fromMoves
     , height
     , ignoreError
     , insertCoinInColumn
@@ -53,9 +52,29 @@ empty w h =
     Grid w h Dict.empty
 
 
-fromList : Int -> Int -> List ( Position, Coin ) -> Grid
-fromList w h =
-    List.foldl (\( position, coin ) -> ignoreError (insert position coin)) (empty w h)
+flipCoin : Coin -> Coin
+flipCoin coin =
+    if coin == Red then
+        Yellow
+
+    else
+        Red
+
+
+fromMoves : Int -> Int -> Coin -> List Int -> Result Error ( Coin, Grid )
+fromMoves w h =
+    let
+        reducer : Int -> Result Error ( Coin, ( a, Grid ) ) -> Result Error ( Coin, ( Maybe GameOver, Grid ) )
+        reducer column =
+            Result.andThen
+                (\( coin, ( _, grid ) ) ->
+                    insertCoinInColumn column coin grid
+                        |> Result.map (Tuple.pair (flipCoin coin))
+                )
+    in
+    \coin moves ->
+        List.foldl reducer (Ok ( coin, ( Nothing, empty w h ) )) moves
+            |> Result.map (Tuple.mapSecond Tuple.second)
 
 
 ignoreError : (b -> Result Error b) -> b -> b
@@ -77,29 +96,6 @@ insertCoinInColumn column coin model =
                     |> Result.map (withGameOver position coin)
             )
         |> Maybe.withDefault (Err NotSuccessful)
-
-
-fillWithColumnMoves : Coin -> List Int -> Grid -> Result Error Grid
-fillWithColumnMoves =
-    let
-        flipCoin coin =
-            if coin == Red then
-                Yellow
-
-            else
-                Red
-
-        reducer : Int -> Result Error ( Coin, ( a, Grid ) ) -> Result Error ( Coin, ( Maybe GameOver, Grid ) )
-        reducer column =
-            Result.andThen
-                (\( coin, ( _, grid ) ) ->
-                    insertCoinInColumn column coin grid
-                        |> Result.map (Tuple.pair (flipCoin coin))
-                )
-    in
-    \coin moves grid ->
-        List.foldl reducer (Ok ( coin, ( Nothing, grid ) )) moves
-            |> Result.map (Tuple.second >> Tuple.second)
 
 
 playableColumns : Grid -> Set Int

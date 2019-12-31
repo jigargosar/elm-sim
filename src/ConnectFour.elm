@@ -1,5 +1,6 @@
 module ConnectFour exposing (main)
 
+import Basics.Extra exposing (uncurry)
 import ConnectFour.Grid as Grid exposing (Cell, Coin(..), Grid)
 import ConnectFour.GridShape as GridShape
 import List.Extra
@@ -17,6 +18,7 @@ import Set exposing (Set)
 type GameState
     = PlayerTurn Coin Grid
     | GameOver GameOver
+    | Error String
 
 
 type GameOver
@@ -37,24 +39,9 @@ initialMem =
 
 initialGameState : GameState
 initialGameState =
-    let
-        initialGrid =
-            let
-                moves =
-                    List.Extra.initialize 6
-                        (\row ->
-                            ( ( 3, row )
-                            , if modBy 2 row == 0 then
-                                Red
-
-                              else
-                                Yellow
-                            )
-                        )
-            in
-            Grid.fromList 7 6 moves
-    in
-    PlayerTurn Grid.Red initialGrid
+    Grid.fromMoves 7 6 Red (List.repeat 6 3)
+        |> Result.map (uncurry PlayerTurn)
+        |> Result.withDefault (Error "Grid.fromMoves")
 
 
 initAutoPlay : Seed -> Mem
@@ -126,6 +113,9 @@ updateGameState computer gameState =
             else
                 gameState
 
+        Error _ ->
+            gameState
+
 
 autoPlayDelay =
     10
@@ -163,6 +153,9 @@ updateAutoPlay elapsed seed gameState =
 
             else
                 AutoPlay (elapsed + 1) seed gameState
+
+        Error _ ->
+            AutoPlay elapsed seed gameState
 
 
 
@@ -273,9 +266,9 @@ view ({ screen } as computer) mem =
 view2 : Computer -> Mem -> List Shape
 view2 ({ screen } as computer) mem =
     [ rectangle lightBlue screen.width screen.height
-    , Grid.fromList 6 6 []
-        |> Grid.ignoreError (Grid.fillWithColumnMoves Red [ 3, 3, 3, 2, 2 ])
-        |> GridShape.withCellSize 50
+    , Grid.fromMoves 6 6 Red [ 3, 3, 3, 2, 2 ]
+        |> Result.map (Tuple.second >> GridShape.withCellSize 50)
+        |> Result.withDefault (words black "Error initGrid")
     ]
 
 
@@ -300,6 +293,9 @@ viewGameState computer gameState =
 
         GameOver (Draw grid) ->
             viewGameDraw computer grid
+
+        Error msg ->
+            words red <| "ERROR: " ++ msg
 
 
 coinToColor : Coin -> Color

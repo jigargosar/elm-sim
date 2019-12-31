@@ -118,16 +118,6 @@ type alias Score =
 positionScore : Position -> Coin -> Grid -> Score
 positionScore startPosition coin grid =
     let
-        ( startColumn, _ ) =
-            startPosition
-
-        centerScore =
-            if startColumn == centerColumn grid then
-                4
-
-            else
-                0
-
         cellsInDir : Position -> List (Maybe Coin)
         cellsInDir dir =
             List.Extra.unfoldr
@@ -164,72 +154,60 @@ positionScore startPosition coin grid =
 
                 allCells =
                     List.reverse opposingDirCells ++ [ Just coin ] ++ dirCells
-
-                dirScore =
-                    if List.isEmpty dirCells then
-                        0
-
-                    else
-                        cellsToScore coin (allCells |> List.reverse)
-
-                oppScore =
-                    if List.isEmpty opposingDirCells then
-                        0
-
-                    else
-                        cellsToScore coin allCells
-
-                log val =
-                    let
-                        logVal =
-                            [ List.reverse opposingDirCells, [ Just coin ], dirCells ]
-
-                        _ =
-                            if dir == ( 1, 0 ) && startColumn == 2 then
-                                Debug.log "val" logVal
-
-                            else
-                                logVal
-                    in
-                    val
             in
-            log (dirScore + oppScore)
+            cellsToScore coin allCells
+                |> (if List.isEmpty dirCells || List.isEmpty opposingDirCells then
+                        identity
+
+                    else
+                        (*) 2
+                   )
 
         directions =
             [ ( 1, 0 ), ( 0, 1 ), ( 1, 1 ), ( -1, 1 ) ]
 
         directionScores =
             List.map scoreInOpposingDirs directions
+                |> (if startPosition == ( 4, 0 ) then
+                        Debug.log "score"
+
+                    else
+                        identity
+                   )
                 |> List.sum
     in
-    centerScore + directionScores
+    directionScores
+        + (if centerColumn grid == Tuple.first startPosition then
+            4
+
+           else
+            0
+          )
 
 
 cellsToScore : Coin -> List (Maybe Coin) -> number
-cellsToScore coin list_ =
-    let
-        list =
-            list_ |> List.take 4
+cellsToScore coin =
+    List.Extra.groupsOfWithStep 4 1
+        >> List.map
+            (\l4 ->
+                case List.Extra.count ((==) (Just coin)) l4 of
+                    1 ->
+                        0
 
-        _ =
-            List.Extra.groupsOfWithStep 4 1
-    in
-    if List.length list == 4 then
-        case List.Extra.count ((==) (Just coin)) list of
-            2 ->
-                2
+                    2 ->
+                        2
 
-            3 ->
-                5
+                    3 ->
+                        5
 
-            4 ->
-                1000
+                    4 ->
+                        1000
 
-            _ ->
-                0
-
-    else
-        0
+                    _ ->
+                        0
+            )
+        >> List.maximum
+        >> Maybe.withDefault 0
 
 
 columnScores : Coin -> Grid -> List ( Int, Maybe Score )

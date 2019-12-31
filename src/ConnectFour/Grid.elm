@@ -13,6 +13,7 @@ module ConnectFour.Grid exposing
     , height
     , insertCoinInColumn
     , playableColumns
+    , toCellList
     , toList
     , width
     )

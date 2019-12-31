@@ -3,7 +3,6 @@ module ConnectFour exposing (main)
 import Basics.Extra exposing (uncurry)
 import ConnectFour.Grid as Grid exposing (Cell, Coin(..), Grid)
 import ConnectFour.GridShape as GridShape
-import List.Extra
 import Playground exposing (..)
 import PointFree exposing (flip, mapEach)
 import Random exposing (Seed)

@@ -32,7 +32,7 @@ initialMemory =
                 |> Debug.log "freq"
 
         _ =
-            initBoard 1 1 Blue [ 0, 0 ]
+            initBoard 1 1 [ 0, 0 ]
                 |> Debug.log "board"
     in
     { coin = Blue, grid = Dict.empty, width = 7, height = 6 }
@@ -42,8 +42,8 @@ type ValidBoard
     = ValidBoard Int Int Coin (List Int)
 
 
-initBoard : Int -> Int -> Coin -> List Int -> Maybe ValidBoard
-initBoard w h coin moves =
+initBoard : Int -> Int -> List Int -> Maybe ValidBoard
+initBoard w h moves =
     let
         ( columnIndices, columnLengths ) =
             Dict.Extra.frequencies moves
@@ -58,7 +58,7 @@ initBoard w h coin moves =
                 && List.all ((+) -1 >> isValidIdx h) columnLengths
     in
     if areMovesValid then
-        ValidBoard w h coin moves |> Just
+        ValidBoard w h Blue moves |> Just
 
     else
         Nothing

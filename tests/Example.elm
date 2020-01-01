@@ -48,11 +48,11 @@ suite2 =
         [ describe "init"
             [ test "zero sized board is valid as long as there are no moves" <|
                 \_ ->
-                    C4.initBoard 0 0 C4.Blue []
+                    C4.initBoard 0 0 []
                         |> Expect.notEqual Nothing
             ]
         , test "zero sized board are invalid with any move" <|
             \_ ->
-                C4.initBoard 0 0 C4.Blue [ 0 ]
+                C4.initBoard 0 0 [ 0 ]
                     |> Expect.equal Nothing
         ]

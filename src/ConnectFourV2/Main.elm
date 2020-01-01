@@ -52,7 +52,7 @@ viewMemory _ model =
                 moves =
                     Board.toList mem.board
             in
-            [ viewBoard 50 w h (toAllCells w h moves) ]
+            [ toBoardShape 50 w h (toAllCells w h moves) ]
 
         Err msg ->
             [ words black <| "Error: " ++ msg ]
@@ -130,8 +130,8 @@ coinToColor coin =
             red
 
 
-viewBoard : Float -> Int -> Int -> List ( ( Int, Int ), Maybe Coin ) -> Shape
-viewBoard cellSize w h list =
+toBoardShape : Float -> Int -> Int -> List ( ( Int, Int ), Maybe Coin ) -> Shape
+toBoardShape cellSize w h list =
     let
         ( widthPx, heightPx ) =
             ( toFloat w * cellSize, toFloat h * cellSize )

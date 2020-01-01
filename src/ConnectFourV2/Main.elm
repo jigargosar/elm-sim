@@ -112,7 +112,9 @@ viewBoard cellSize w h list =
 
         toCellBG : ( Int, Int ) -> Shape
         toCellBG pos =
-            circle white (cellSize / 2 * 0.8) |> moveCell pos
+            [ rectangle black cellSize cellSize, circle white (cellSize / 2 * 0.8) ]
+                |> group
+                |> moveCell pos
 
         toCoinShape : Int -> ( ( Int, Int ), Coin ) -> Shape
         toCoinShape idx ( position, coin ) =

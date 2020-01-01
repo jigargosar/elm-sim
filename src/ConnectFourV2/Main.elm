@@ -53,7 +53,7 @@ viewMemory _ model =
                 moves =
                     Board.toList mem.board
             in
-            [ BoardShape.toBoardShape 50 w h mem.board ]
+            [ BoardShape.toBoardShape 50 w h (BoardShape.toAllCells w h moves) ]
 
         Err msg ->
             [ words black <| "Error: " ++ msg ]

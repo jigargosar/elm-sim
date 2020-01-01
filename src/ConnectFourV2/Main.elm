@@ -17,9 +17,8 @@ type alias Position =
     ( Int, Int )
 
 
-type Memory
-    = Memory Mem
-    | Error String
+type alias Memory =
+    Result String Mem
 
 
 type alias Mem =
@@ -41,10 +40,10 @@ initialMemory =
             , height = 6
             , board = a
             }
-                |> Memory
+                |> Ok
 
         Nothing ->
-            Error "init board failed"
+            Err "init board failed"
 
 
 
@@ -59,10 +58,10 @@ updateMemory computer mem =
 viewMemory : Computer -> Memory -> List Shape
 viewMemory computer model =
     case model of
-        Memory mem ->
+        Ok mem ->
             [ viewBoard 50 mem.width mem.height (Dict.toList mem.grid) ]
 
-        Error msg ->
+        Err msg ->
             [ words black <| "Error: " ++ msg ]
 
 

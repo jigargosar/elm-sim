@@ -58,6 +58,23 @@ viewMemory _ model =
             [ words black <| "Error: " ++ msg ]
 
 
+
+-- ViewModel
+
+
+toAllCells : Int -> Int -> List Int -> List ( ( Int, Int ), Maybe Coin )
+toAllCells w h =
+    toPositionCoinPairs
+        >> Dict.fromList
+        >> (\dict ->
+                mapPositionsFromWH w
+                    h
+                    (\pos ->
+                        ( pos, Dict.get pos dict )
+                    )
+           )
+
+
 toPositionCoinPairs : List Int -> List ( ( Int, Int ), Coin )
 toPositionCoinPairs =
     let
@@ -87,21 +104,20 @@ toPositionCoinPairs =
         >> List.reverse
 
 
-toAllCells : Int -> Int -> List Int -> List ( ( Int, Int ), Maybe Coin )
-toAllCells w h =
-    toPositionCoinPairs
-        >> Dict.fromList
-        >> (\dict ->
-                mapPositionsFromWH w
-                    h
-                    (\pos ->
-                        ( pos, Dict.get pos dict )
-                    )
-           )
+toPositions : Int -> Int -> List ( Int, Int )
+toPositions w h =
+    List.Extra.initialize w
+        (\x -> List.Extra.initialize h (\y -> ( x, y )))
+        |> List.concat
+
+
+mapPositionsFromWH : Int -> Int -> (( Int, Int ) -> b) -> List b
+mapPositionsFromWH w h func =
+    toPositions w h |> List.map func
 
 
 
--- >> Dict.toList
+-- View
 
 
 coinToColor : Coin -> Color
@@ -151,18 +167,6 @@ viewBoard cellSize w h list =
         [ rectangle black widthPx heightPx
         , List.indexedMap toCellShape list |> group
         ]
-
-
-toPositions : Int -> Int -> List ( Int, Int )
-toPositions w h =
-    List.Extra.initialize w
-        (\x -> List.Extra.initialize h (\y -> ( x, y )))
-        |> List.concat
-
-
-mapPositionsFromWH : Int -> Int -> (( Int, Int ) -> b) -> List b
-mapPositionsFromWH w h func =
-    toPositions w h |> List.map func
 
 
 main =

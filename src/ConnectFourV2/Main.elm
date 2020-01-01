@@ -110,12 +110,12 @@ viewBoard cellSize w h list =
         moveCell ( x, y ) =
             move (toFloat x * cellSize) (toFloat y * cellSize)
 
-        posToCellShape : ( Int, Int ) -> Shape
-        posToCellShape pos =
+        toCellBG : ( Int, Int ) -> Shape
+        toCellBG pos =
             circle white (cellSize / 2 * 0.8) |> moveCell pos
 
-        viewCoin : Int -> ( ( Int, Int ), Coin ) -> Shape
-        viewCoin idx ( position, coin ) =
+        toCoinShape : Int -> ( ( Int, Int ), Coin ) -> Shape
+        toCoinShape idx ( position, coin ) =
             [ circle (coinToColor coin) (cellSize / 2 * 0.7)
             , words white (String.fromInt idx)
             ]
@@ -130,9 +130,9 @@ viewBoard cellSize w h list =
     in
     group
         [ rectangle black widthPx heightPx
-        , mapPositionsFromWH w h posToCellShape
+        , mapPositionsFromWH w h toCellBG
             |> groupGridCells
-        , List.indexedMap viewCoin list |> groupGridCells
+        , List.indexedMap toCoinShape list |> groupGridCells
         ]
 
 

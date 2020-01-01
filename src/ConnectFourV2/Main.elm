@@ -78,7 +78,8 @@ toVM =
             , ( ( column, lengthOfColumn column lenLookup ), coin ) :: acc
             )
     in
-    Board.foldl reducer ( ( Coin.Blue, Dict.empty ), [] )
+    Board.toList
+        >> List.foldl reducer ( ( Coin.Blue, Dict.empty ), [] )
         >> Tuple.second
         >> List.reverse
 

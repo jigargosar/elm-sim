@@ -1,4 +1,4 @@
-module ConnectFourV2.Board exposing (Board, empty, foldl, initWithMoves, move, wh)
+module ConnectFourV2.Board exposing (Board, empty, initWithMoves, move, toList, wh)
 
 import Dict
 import Dict.Extra
@@ -44,9 +44,9 @@ empty w h =
         Board w h [] |> Just
 
 
-foldl : (Int -> b -> b) -> b -> Board -> b
-foldl func acc (Board _ _ moves) =
-    List.foldl func acc moves
+toList : Board -> List Int
+toList (Board _ _ moves) =
+    moves
 
 
 wh : Board -> ( Int, Int )

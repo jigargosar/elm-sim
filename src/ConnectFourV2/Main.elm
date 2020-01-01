@@ -73,13 +73,14 @@ toVM =
         lengthOfColumn column lookup =
             Dict.get column lookup |> Maybe.withDefault 0
 
-        reducer column ( ( coin, lenLookup ), acc ) =
+        reducer : ( Coin, Dict Int Int ) -> Int -> ( ( Coin, Dict Int Int ), ( ( Int, Int ), Coin ) )
+        reducer ( coin, lenLookup ) column =
             ( ( Coin.flip coin, incLengthOfColumn column lenLookup )
-            , ( ( column, lengthOfColumn column lenLookup ), coin ) :: acc
+            , ( ( column, lengthOfColumn column lenLookup ), coin )
             )
     in
     Board.toList
-        >> List.foldl reducer ( ( Coin.Blue, Dict.empty ), [] )
+        >> List.Extra.mapAccuml reducer ( Coin.Blue, Dict.empty )
         >> Tuple.second
         >> List.reverse
 

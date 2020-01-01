@@ -107,7 +107,7 @@ viewBoard cellSize w h list =
         ( widthPx, heightPx ) =
             ( toFloat w * cellSize, toFloat h * cellSize )
 
-        moveCell ( x, y ) =
+        moveGridCell ( x, y ) =
             let
                 leftOffset =
                     -widthPx / 2 + cellSize / 2
@@ -122,7 +122,7 @@ viewBoard cellSize w h list =
         toCellBGShape pos =
             [ rectangle black cellSize cellSize, circle white (cellSize / 2 * 0.8) ]
                 |> group
-                |> moveCell pos
+                |> moveGridCell pos
 
         toCoinShape : Int -> ( ( Int, Int ), Coin ) -> Shape
         toCoinShape idx ( position, coin ) =
@@ -130,7 +130,7 @@ viewBoard cellSize w h list =
             , words white (String.fromInt idx)
             ]
                 |> group
-                |> moveCell position
+                |> moveGridCell position
     in
     group
         [ rectangle black widthPx heightPx

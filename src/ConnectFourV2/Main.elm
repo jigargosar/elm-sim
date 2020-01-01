@@ -58,27 +58,29 @@ viewMemory _ model =
 toVM : Board -> List ( ( Int, Int ), Coin )
 toVM =
     let
-        reducer column ( coin, dict ) =
-            ( Coin.flip coin
-            , Dict.update column
-                (\v ->
-                    case v of
-                        Nothing ->
-                            List.singleton coin |> Just
+        incLengthOfColumn : Int -> Dict Int Int -> Dict Int Int
+        incLengthOfColumn column =
+            Dict.update column <|
+                \maybeLength ->
+                    case maybeLength of
+                        Just length ->
+                            Just (length + 1)
 
-                        Just list ->
-                            coin :: list |> Just
-                )
-                dict
+                        Nothing ->
+                            Just 1
+
+        lengthOfColumn : Int -> Dict Int Int -> Int
+        lengthOfColumn column lookup =
+            Dict.get column lookup |> Maybe.withDefault 0
+
+        reducer column ( ( coin, lenLookup ), acc ) =
+            ( ( Coin.flip coin, incLengthOfColumn column lenLookup )
+            , Dict.insert ( column, lengthOfColumn column lenLookup ) coin acc
             )
     in
-    Board.foldl reducer ( Coin.Blue, Dict.empty )
+    Board.foldl reducer ( ( Coin.Blue, Dict.empty ), Dict.empty )
         >> Tuple.second
         >> Dict.toList
-        >> List.concatMap
-            (\( x, coins ) ->
-                List.indexedMap (\y -> Tuple.pair ( x, y )) coins
-            )
 
 
 coinToColor : Coin -> Color

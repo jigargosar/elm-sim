@@ -142,5 +142,12 @@ viewBoard cellSize w h list =
         ]
 
 
+toPositions : Int -> Int -> List ( Int, Int )
+toPositions w h =
+    List.Extra.initialize w
+        (\x -> List.Extra.initialize h (\y -> ( x, y )))
+        |> List.concat
+
+
 main =
     game viewMemory updateMemory initialMemory

@@ -2,6 +2,7 @@ module ConnectFourV2.Main exposing (main)
 
 import ConnectFourV2.Board as Board exposing (Board)
 import Dict exposing (Dict)
+import List.Extra
 import Playground exposing (..)
 
 
@@ -102,7 +103,7 @@ viewBoard cellSize w h list =
                  else
                     red
                 )
-                (cellSize / 2 * 0.75)
+                (cellSize / 2 * 0.7)
 
         moveCell x y =
             move (toFloat x * cellSize) (toFloat y * cellSize)
@@ -119,6 +120,16 @@ viewBoard cellSize w h list =
     in
     group
         [ rectangle black widthPx heightPx
+        , List.Extra.initialize w
+            (\x ->
+                List.Extra.initialize h
+                    (\y ->
+                        circle white (cellSize / 2 * 0.8)
+                            |> moveCell x y
+                    )
+            )
+            |> List.concat
+            |> groupGridCells
         , List.concatMap viewColumn list |> groupGridCells
         ]
 

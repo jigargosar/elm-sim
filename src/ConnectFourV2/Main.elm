@@ -45,7 +45,7 @@ initialMemory =
 
 
 type ValidBoard
-    = Board Int Int Coin (List Int)
+    = Board Int Int (List Int)
 
 
 initBoard : Int -> Int -> List Int -> Maybe ValidBoard
@@ -72,7 +72,7 @@ initBoard w h moves =
 
 emptyBoard : Int -> Int -> ValidBoard
 emptyBoard w h =
-    Board w h Blue []
+    Board w h []
 
 
 

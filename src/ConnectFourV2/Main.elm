@@ -1,4 +1,4 @@
-module ConnectFourV2.Main exposing (main)
+module ConnectFourV2.Main exposing (Coin(..), ValidBoard, initBoard)
 
 import Array exposing (Array)
 import Dict exposing (Dict)

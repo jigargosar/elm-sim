@@ -1,5 +1,6 @@
 module Example exposing (..)
 
+import ConnectFourV2.Main as C4
 import Expect exposing (Expectation)
 import Fuzz exposing (Fuzzer, int, list, string)
 import Test exposing (..)
@@ -36,5 +37,17 @@ suite =
                         |> String.reverse
                         |> String.reverse
                         |> Expect.equal randomlyGeneratedString
+            ]
+        ]
+
+
+suite2 : Test
+suite2 =
+    describe "ValidBoard"
+        [ describe "init"
+            [ test "w h 1" <|
+                \_ ->
+                    C4.initBoard 1 1 C4.Blue [ 0 ]
+                        |> Expect.equal Nothing
             ]
         ]

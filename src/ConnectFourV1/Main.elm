@@ -1,4 +1,4 @@
-module ConnectFour.Main exposing (main)
+module ConnectFourV1.Main exposing (main)
 
 import Basics.Extra exposing (uncurry)
 import ConnectFour.Grid as Grid exposing (Cell, Coin(..), Grid)

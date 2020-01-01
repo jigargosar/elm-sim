@@ -1,7 +1,7 @@
 module ConnectFour exposing (main)
 
-import ConnectFour.Main
+import ConnectFourV2.Main
 
 
 main =
-    ConnectFour.Main.main
+    ConnectFourV2.Main.main

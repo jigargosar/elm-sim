@@ -2,9 +2,6 @@ module ConnectFourV2.Main exposing (main)
 
 import ConnectFourV2.Board as Board exposing (Board)
 import ConnectFourV2.BoardShape as BoardShape
-import ConnectFourV2.Coin as Coin exposing (Coin)
-import Dict exposing (Dict)
-import List.Extra
 import Playground exposing (..)
 
 

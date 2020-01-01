@@ -33,7 +33,18 @@ updateMemory computer mem =
 
 viewMemory : Computer -> Mem -> List Shape
 viewMemory computer mem =
-    []
+    [ viewBoard 50 mem.width mem.height (Dict.toList mem.grid) ]
+
+
+viewBoard : Float -> Int -> Int -> List ( Position, Coin ) -> Shape
+viewBoard cellSize w h list =
+    let
+        ( widthPx, heightPx ) =
+            ( toFloat w * cellSize, toFloat h * cellSize )
+    in
+    group
+        [ rectangle black widthPx heightPx
+        ]
 
 
 main =

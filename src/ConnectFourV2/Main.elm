@@ -1,6 +1,7 @@
-module ConnectFourV2.Main exposing (Board, Coin(..), initBoard)
+module ConnectFourV2.Main exposing (main)
 
 import Array exposing (Array)
+import ConnectFourV2.Board as Board exposing (Board)
 import Dict exposing (Dict)
 import Dict.Extra
 import List.Extra
@@ -16,6 +17,11 @@ type alias Position =
     ( Int, Int )
 
 
+type Memory
+    = Memory Mem
+    | Error String
+
+
 type alias Mem =
     { coin : Coin
     , grid : Dict Position Coin
@@ -25,68 +31,39 @@ type alias Mem =
     }
 
 
-initialMemory : Mem
+initialMemory : Memory
 initialMemory =
-    let
-        _ =
-            Dict.Extra.frequencies [ 1, 2, 1, 1, 12, 1, 1 ]
-                |> Debug.log "freq"
+    case Board.empty 7 6 of
+        Just a ->
+            { coin = Blue
+            , grid = Dict.empty
+            , width = 7
+            , height = 6
+            , board = a
+            }
+                |> Memory
 
-        _ =
-            initBoard 1 1 [ 0, 0 ]
-                |> Debug.log "board"
-    in
-    { coin = Blue
-    , grid = Dict.empty
-    , width = 7
-    , height = 6
-    , board = emptyBoard 7 6
-    }
-
-
-type Board
-    = Board Int Int (List Int)
-
-
-initBoard : Int -> Int -> List Int -> Maybe Board
-initBoard w h moves =
-    let
-        ( columnIndices, columnLengths ) =
-            Dict.Extra.frequencies moves
-                |> Dict.toList
-                |> List.unzip
-
-        isValidIdx len idx =
-            idx >= 0 && idx < len
-
-        areMovesValid =
-            List.all (isValidIdx w) columnIndices
-                && List.all ((+) -1 >> isValidIdx h) columnLengths
-    in
-    if areMovesValid then
-        Board w h moves |> Just
-
-    else
-        Nothing
-
-
-emptyBoard : Int -> Int -> Board
-emptyBoard w h =
-    Board w h []
+        Nothing ->
+            Error "init board failed"
 
 
 
 -- makeMove column mem =
 
 
-updateMemory : Computer -> Mem -> Mem
+updateMemory : Computer -> Memory -> Memory
 updateMemory computer mem =
     mem
 
 
-viewMemory : Computer -> Mem -> List Shape
-viewMemory computer mem =
-    [ viewBoard 50 mem.width mem.height (Dict.toList mem.grid) ]
+viewMemory : Computer -> Memory -> List Shape
+viewMemory computer model =
+    case model of
+        Memory mem ->
+            [ viewBoard 50 mem.width mem.height (Dict.toList mem.grid) ]
+
+        Error msg ->
+            [ words black <| "Error: " ++ msg ]
 
 
 viewBoard : Float -> Int -> Int -> List ( Position, Coin ) -> Shape

@@ -1,6 +1,6 @@
 module Example exposing (..)
 
-import ConnectFourV2.Main as C4
+import ConnectFourV2.Board as Board
 import Expect exposing (Expectation)
 import Fuzz exposing (Fuzzer, int, list, string)
 import Test exposing (..)
@@ -46,13 +46,16 @@ suite2 : Test
 suite2 =
     describe "ValidBoard"
         [ describe "init"
-            [ test "zero sized board is valid as long as there are no moves" <|
-                \_ ->
-                    C4.initBoard 0 0 []
-                        |> Expect.notEqual Nothing
+            [ fuzz2 int int "board width & height should be greater than 0" <|
+                \w h ->
+                    let
+                        expectFunc =
+                            if w <= 0 || h <= 0 then
+                                Expect.equal
+
+                            else
+                                Expect.notEqual
+                    in
+                    Board.empty w h |> expectFunc Nothing
             ]
-        , test "zero sized board are invalid with any move" <|
-            \_ ->
-                C4.initBoard 0 0 [ 0 ]
-                    |> Expect.equal Nothing
         ]

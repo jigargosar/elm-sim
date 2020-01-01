@@ -21,7 +21,7 @@ type alias Mem =
 
 initialMemory : Memory
 initialMemory =
-    case Board.initWithMoves 7 6 [ 0, 0, 0 ] of
+    case Board.initWithMoves 7 6 [ 0, 1, 0, 1 ] of
         Just a ->
             { board = a
             }
@@ -54,50 +54,54 @@ viewMemory computer model =
             [ words black <| "Error: " ++ msg ]
 
 
-toVM : Board -> List ( Int, List Bool )
+toVM : Board -> List ( ( Int, Int ), Color )
 toVM =
     let
-        reducer column ( bool, dict ) =
-            ( not bool
+        flipColor color =
+            if color == red then
+                blue
+
+            else
+                red
+
+        reducer column ( color, dict ) =
+            ( flipColor color
             , Dict.update column
                 (\v ->
                     case v of
                         Nothing ->
-                            List.singleton bool |> Just
+                            List.singleton color |> Just
 
                         Just list ->
-                            bool :: list |> Just
+                            color :: list |> Just
                 )
                 dict
             )
     in
-    Board.foldl reducer ( True, Dict.empty )
+    Board.foldl reducer ( blue, Dict.empty )
         >> Tuple.second
         >> Dict.toList
+        >> List.concatMap
+            (\( x, coins ) ->
+                List.indexedMap (\y -> Tuple.pair ( x, y )) coins
+            )
 
 
-viewBoard : Float -> Int -> Int -> List ( Int, List Bool ) -> Shape
+viewBoard : Float -> Int -> Int -> List ( ( Int, Int ), Color ) -> Shape
 viewBoard cellSize w h list =
     let
         ( widthPx, heightPx ) =
             ( toFloat w * cellSize, toFloat h * cellSize )
 
-        viewCoin bool =
-            circle
-                (if bool then
-                    blue
-
-                 else
-                    red
-                )
-                (cellSize / 2 * 0.7)
-
         moveCell x y =
             move (toFloat x * cellSize) (toFloat y * cellSize)
 
-        viewColumn : ( Int, List Bool ) -> List Shape
-        viewColumn ( x, coins ) =
-            List.indexedMap (\y -> viewCoin >> moveCell x y) coins
+        viewColumn : ( ( Int, Int ), Color ) -> Shape
+        viewColumn ( ( x, y ), color ) =
+            circle
+                color
+                (cellSize / 2 * 0.7)
+                |> moveCell x y
 
         groupGridCells cellShapes =
             cellShapes
@@ -117,7 +121,7 @@ viewBoard cellSize w h list =
             )
             |> List.concat
             |> groupGridCells
-        , List.concatMap viewColumn list |> groupGridCells
+        , List.map viewColumn list |> groupGridCells
         ]
 
 

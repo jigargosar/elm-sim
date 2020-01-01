@@ -94,18 +94,21 @@ viewBoard cellSize w h list =
         ( widthPx, heightPx ) =
             ( toFloat w * cellSize, toFloat h * cellSize )
 
+        viewCoin bool =
+            circle
+                (if bool then
+                    blue
+
+                 else
+                    red
+                )
+                (cellSize / 2 * 0.75)
+
         viewColumn : ( Int, List Bool ) -> List Shape
         viewColumn ( x, cells ) =
             List.indexedMap
                 (\y bool ->
-                    circle
-                        (if bool then
-                            blue
-
-                         else
-                            red
-                        )
-                        (cellSize / 2 * 0.75)
+                    viewCoin bool
                         |> move (toFloat x * cellSize) (toFloat y * cellSize)
                 )
                 cells

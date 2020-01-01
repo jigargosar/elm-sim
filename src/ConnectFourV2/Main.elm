@@ -48,15 +48,18 @@ viewMemory _ model =
             let
                 ( w, h ) =
                     Board.wh mem.board
+
+                moves =
+                    Board.toList mem.board
             in
-            [ viewBoard 50 w h (toVM mem.board) ]
+            [ viewBoard 50 w h (toPositionCoinPairs moves) ]
 
         Err msg ->
             [ words black <| "Error: " ++ msg ]
 
 
-toVM : Board -> List ( ( Int, Int ), Coin )
-toVM =
+toPositionCoinPairs : List Int -> List ( ( Int, Int ), Coin )
+toPositionCoinPairs =
     let
         incLengthOfColumn : Int -> Dict Int Int -> Dict Int Int
         incLengthOfColumn column =
@@ -79,8 +82,7 @@ toVM =
             , ( ( column, lengthOfColumn column lenLookup ), coin )
             )
     in
-    Board.toList
-        >> List.Extra.mapAccuml reducer ( Coin.Blue, Dict.empty )
+    List.Extra.mapAccuml reducer ( Coin.Blue, Dict.empty )
         >> Tuple.second
         >> List.reverse
 

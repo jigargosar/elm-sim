@@ -29,7 +29,7 @@ type alias Mem =
 
 initialMemory : Memory
 initialMemory =
-    case Board.empty 7 6 of
+    case Board.initWithMoves 7 6 [ 0, 0, 0 ] of
         Just a ->
             { coin = Blue
             , grid = Dict.empty
@@ -56,20 +56,66 @@ viewMemory : Computer -> Memory -> List Shape
 viewMemory computer model =
     case model of
         Ok mem ->
-            [ viewBoard 50 mem.width mem.height (Dict.toList mem.grid) ]
+            let
+                ( w, h ) =
+                    Board.wh mem.board
+            in
+            [ viewBoard 50 w h (toVM mem.board) ]
 
         Err msg ->
             [ words black <| "Error: " ++ msg ]
 
 
-viewBoard : Float -> Int -> Int -> List ( Position, Coin ) -> Shape
+toVM : Board -> List ( Int, List Bool )
+toVM =
+    let
+        reducer column ( bool, dict ) =
+            ( not bool
+            , Dict.update column
+                (\v ->
+                    case v of
+                        Nothing ->
+                            List.singleton bool |> Just
+
+                        Just list ->
+                            bool :: list |> Just
+                )
+                dict
+            )
+    in
+    Board.foldl reducer ( True, Dict.empty )
+        >> Tuple.second
+        >> Dict.toList
+
+
+viewBoard : Float -> Int -> Int -> List ( Int, List Bool ) -> Shape
 viewBoard cellSize w h list =
     let
         ( widthPx, heightPx ) =
             ( toFloat w * cellSize, toFloat h * cellSize )
+
+        viewColumn : ( Int, List Bool ) -> List Shape
+        viewColumn ( x, cells ) =
+            List.indexedMap
+                (\y bool ->
+                    circle
+                        (if bool then
+                            blue
+
+                         else
+                            red
+                        )
+                        (cellSize / 2 * 0.75)
+                        |> move (toFloat x * cellSize) (toFloat y * cellSize)
+                )
+                cells
     in
     group
         [ rectangle black widthPx heightPx
+        , List.concatMap viewColumn list
+            |> group
+            |> moveLeft (widthPx / 2 - cellSize / 2)
+            |> moveDown (heightPx / 2 - cellSize / 2)
         ]
 
 

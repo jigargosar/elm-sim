@@ -120,15 +120,13 @@ viewBoard cellSize w h list =
 
         toCellBGShape : ( Int, Int ) -> Shape
         toCellBGShape pos =
-            [ rectangle black cellSize cellSize
-            , circle white (cellSize / 2 * 0.8)
-            ]
-                |> group
+            circle white (cellSize / 2 * 0.8)
                 |> moveCell pos
 
         toCoinShape : Int -> ( ( Int, Int ), Coin ) -> Shape
         toCoinShape idx ( position, coin ) =
-            [ circle (coinToColor coin) (cellSize / 2 * 0.7)
+            [ circle white (cellSize / 2 * 0.8)
+            , circle (coinToColor coin) (cellSize / 2 * 0.7)
             , words white (String.fromInt idx)
             ]
                 |> group

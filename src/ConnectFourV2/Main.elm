@@ -110,13 +110,17 @@ viewBoard cellSize w h list =
         viewColumn : ( Int, List Bool ) -> List Shape
         viewColumn ( x, coins ) =
             List.indexedMap (\y -> viewCoin >> moveCell x y) coins
+
+        groupGridCells cellShapes =
+            cellShapes
+                |> group
+                |> moveLeft (widthPx / 2 - cellSize / 2)
+                |> moveDown (heightPx / 2 - cellSize / 2)
     in
     group
         [ rectangle black widthPx heightPx
         , List.concatMap viewColumn list
-            |> group
-            |> moveLeft (widthPx / 2 - cellSize / 2)
-            |> moveDown (heightPx / 2 - cellSize / 2)
+            |> groupGridCells
         ]
 
 

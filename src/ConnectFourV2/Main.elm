@@ -124,7 +124,7 @@ viewBoard cellSize w h list =
                 |> group
                 |> moveCell position
 
-        groupGridCells cellShapes =
+        gridCellsToShape cellShapes =
             cellShapes
                 |> group
                 |> moveLeft (widthPx / 2 - cellSize / 2)
@@ -132,9 +132,8 @@ viewBoard cellSize w h list =
     in
     group
         [ rectangle black widthPx heightPx
-        , mapPositionsFromWH w h toCellBG
-            |> groupGridCells
-        , List.indexedMap toCoinShape list |> groupGridCells
+        , mapPositionsFromWH w h toCellBG |> gridCellsToShape
+        , List.indexedMap toCoinShape list |> gridCellsToShape
         ]
 
 

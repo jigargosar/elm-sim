@@ -6,11 +6,6 @@ import List.Extra
 import Playground exposing (..)
 
 
-type Coin
-    = Red
-    | Blue
-
-
 type alias Position =
     ( Int, Int )
 
@@ -20,11 +15,7 @@ type alias Memory =
 
 
 type alias Mem =
-    { coin : Coin
-    , grid : Dict Position Coin
-    , width : Int
-    , height : Int
-    , board : Board
+    { board : Board
     }
 
 
@@ -32,11 +23,7 @@ initialMemory : Memory
 initialMemory =
     case Board.initWithMoves 7 6 [ 0, 0, 0 ] of
         Just a ->
-            { coin = Blue
-            , grid = Dict.empty
-            , width = 7
-            , height = 6
-            , board = a
+            { board = a
             }
                 |> Ok
 

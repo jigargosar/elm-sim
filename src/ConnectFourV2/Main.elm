@@ -52,7 +52,7 @@ viewMemory _ model =
                 moves =
                     Board.toList mem.board
             in
-            [ viewBoard 50 w h (toPositionCoinPairs moves) ]
+            [ viewBoard 50 w h (toAllCells w h moves) ]
 
         Err msg ->
             [ words black <| "Error: " ++ msg ]
@@ -114,7 +114,7 @@ coinToColor coin =
             red
 
 
-viewBoard : Float -> Int -> Int -> List ( ( Int, Int ), Coin ) -> Shape
+viewBoard : Float -> Int -> Int -> List ( ( Int, Int ), Maybe Coin ) -> Shape
 viewBoard cellSize w h list =
     let
         ( widthPx, heightPx ) =
@@ -131,24 +131,25 @@ viewBoard cellSize w h list =
             move (toFloat x * cellSize + leftOffset)
                 (toFloat y * cellSize + bottomOffset)
 
-        toCellBGShape : ( Int, Int ) -> Shape
-        toCellBGShape pos =
-            circle white (cellSize / 2 * 0.8)
-                |> moveCell pos
+        toCellShape : Int -> ( ( Int, Int ), Maybe Coin ) -> Shape
+        toCellShape idx ( position, cell ) =
+            (circle white (cellSize / 2 * 0.8)
+                :: (case cell of
+                        Just coin ->
+                            [ circle (coinToColor coin) (cellSize / 2 * 0.7)
+                            , words white (String.fromInt idx)
+                            ]
 
-        toCoinShape : Int -> ( ( Int, Int ), Coin ) -> Shape
-        toCoinShape idx ( position, coin ) =
-            [ circle white (cellSize / 2 * 0.8)
-            , circle (coinToColor coin) (cellSize / 2 * 0.7)
-            , words white (String.fromInt idx)
-            ]
+                        Nothing ->
+                            []
+                   )
+            )
                 |> group
                 |> moveCell position
     in
     group
         [ rectangle black widthPx heightPx
-        , mapPositionsFromWH w h toCellBGShape |> group
-        , List.indexedMap toCoinShape list |> group
+        , List.indexedMap toCellShape list |> group
         ]
 
 

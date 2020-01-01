@@ -21,6 +21,7 @@ type alias Mem =
     , grid : Dict Position Coin
     , width : Int
     , height : Int
+    , board : ValidBoard
     }
 
 
@@ -35,11 +36,16 @@ initialMemory =
             initBoard 1 1 [ 0, 0 ]
                 |> Debug.log "board"
     in
-    { coin = Blue, grid = Dict.empty, width = 7, height = 6 }
+    { coin = Blue
+    , grid = Dict.empty
+    , width = 7
+    , height = 6
+    , board = emptyBoard 7 6
+    }
 
 
 type ValidBoard
-    = ValidBoard Int Int Coin (List Int)
+    = Board Int Int Coin (List Int)
 
 
 initBoard : Int -> Int -> List Int -> Maybe ValidBoard
@@ -58,7 +64,7 @@ initBoard w h moves =
                 && List.all ((+) -1 >> isValidIdx h) columnLengths
     in
     if areMovesValid then
-        ValidBoard w h Blue moves |> Just
+        Board w h Blue moves |> Just
 
     else
         Nothing
@@ -66,7 +72,7 @@ initBoard w h moves =
 
 emptyBoard : Int -> Int -> ValidBoard
 emptyBoard w h =
-    ValidBoard w h Blue []
+    Board w h Blue []
 
 
 

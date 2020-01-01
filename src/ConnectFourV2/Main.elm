@@ -1,4 +1,4 @@
-module ConnectFourV2.Main exposing (Coin(..), ValidBoard, initBoard)
+module ConnectFourV2.Main exposing (Board, Coin(..), initBoard)
 
 import Array exposing (Array)
 import Dict exposing (Dict)
@@ -21,7 +21,7 @@ type alias Mem =
     , grid : Dict Position Coin
     , width : Int
     , height : Int
-    , board : ValidBoard
+    , board : Board
     }
 
 
@@ -44,11 +44,11 @@ initialMemory =
     }
 
 
-type ValidBoard
+type Board
     = Board Int Int (List Int)
 
 
-initBoard : Int -> Int -> List Int -> Maybe ValidBoard
+initBoard : Int -> Int -> List Int -> Maybe Board
 initBoard w h moves =
     let
         ( columnIndices, columnLengths ) =
@@ -70,7 +70,7 @@ initBoard w h moves =
         Nothing
 
 
-emptyBoard : Int -> Int -> ValidBoard
+emptyBoard : Int -> Int -> Board
 emptyBoard w h =
     Board w h []
 

@@ -1,4 +1,4 @@
-module ConnectFourV2.Board exposing (Board, empty, initBoard)
+module ConnectFourV2.Board exposing (Board, empty, initWithMoves, move)
 
 import Dict
 import Dict.Extra
@@ -8,8 +8,8 @@ type Board
     = Board Int Int (List Int)
 
 
-initBoard : Int -> Int -> List Int -> Maybe Board
-initBoard w h moves =
+initWithMoves : Int -> Int -> List Int -> Maybe Board
+initWithMoves w h moves =
     let
         ( columnIndices, columnLengths ) =
             Dict.Extra.frequencies moves
@@ -28,6 +28,11 @@ initBoard w h moves =
 
     else
         Nothing
+
+
+move : Int -> Board -> Maybe Board
+move column (Board w h moves) =
+    initWithMoves w h (moves ++ [ column ])
 
 
 empty : Int -> Int -> Maybe Board

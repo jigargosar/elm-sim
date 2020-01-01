@@ -118,8 +118,8 @@ viewBoard cellSize w h list =
             move (toFloat x * cellSize + leftOffset)
                 (toFloat y * cellSize + bottomOffset)
 
-        toCellBG : ( Int, Int ) -> Shape
-        toCellBG pos =
+        toCellBGShape : ( Int, Int ) -> Shape
+        toCellBGShape pos =
             [ rectangle black cellSize cellSize, circle white (cellSize / 2 * 0.8) ]
                 |> group
                 |> moveCell pos
@@ -134,7 +134,7 @@ viewBoard cellSize w h list =
     in
     group
         [ rectangle black widthPx heightPx
-        , mapPositionsFromWH w h toCellBG |> group
+        , mapPositionsFromWH w h toCellBGShape |> group
         , List.indexedMap toCoinShape list |> group
         ]
 

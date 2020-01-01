@@ -87,6 +87,19 @@ toPositionCoinPairs =
         >> List.reverse
 
 
+toAllCells : Int -> Int -> List Int -> List ( ( Int, Int ), Maybe Coin )
+toAllCells w h =
+    toPositionCoinPairs
+        >> Dict.fromList
+        >> (\dict ->
+                mapPositionsFromWH w
+                    h
+                    (\pos ->
+                        ( pos, Dict.get pos dict )
+                    )
+           )
+
+
 
 -- >> Dict.toList
 

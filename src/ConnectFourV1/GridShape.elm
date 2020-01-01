@@ -1,6 +1,6 @@
-module ConnectFour.GridShape exposing (withCellSize)
+module ConnectFourV1.GridShape exposing (withCellSize)
 
-import ConnectFour.Grid as Grid exposing (Grid)
+import ConnectFourV1.Grid as Grid exposing (Grid)
 import Playground exposing (..)
 import PointFree exposing (mapEach)
 

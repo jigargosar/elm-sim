@@ -1,4 +1,4 @@
-module ConnectFour.Grid exposing
+module ConnectFourV1.Grid exposing
     ( Cell
     , Coin(..)
     , Error(..)

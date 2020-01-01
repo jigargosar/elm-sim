@@ -1,6 +1,7 @@
 module ConnectFourV2.Main exposing (main)
 
 import ConnectFourV2.Board as Board exposing (Board)
+import ConnectFourV2.Coin as Coin exposing (Coin)
 import Dict exposing (Dict)
 import List.Extra
 import Playground exposing (..)
@@ -36,12 +37,12 @@ initialMemory =
 
 
 updateMemory : Computer -> Memory -> Memory
-updateMemory computer mem =
+updateMemory _ mem =
     mem
 
 
 viewMemory : Computer -> Memory -> List Shape
-viewMemory computer model =
+viewMemory _ model =
     case model of
         Ok mem ->
             let
@@ -54,31 +55,24 @@ viewMemory computer model =
             [ words black <| "Error: " ++ msg ]
 
 
-toVM : Board -> List ( ( Int, Int ), Color )
+toVM : Board -> List ( ( Int, Int ), Coin )
 toVM =
     let
-        flipColor color =
-            if color == red then
-                blue
-
-            else
-                red
-
-        reducer column ( color, dict ) =
-            ( flipColor color
+        reducer column ( coin, dict ) =
+            ( Coin.flip coin
             , Dict.update column
                 (\v ->
                     case v of
                         Nothing ->
-                            List.singleton color |> Just
+                            List.singleton coin |> Just
 
                         Just list ->
-                            color :: list |> Just
+                            coin :: list |> Just
                 )
                 dict
             )
     in
-    Board.foldl reducer ( blue, Dict.empty )
+    Board.foldl reducer ( Coin.Blue, Dict.empty )
         >> Tuple.second
         >> Dict.toList
         >> List.concatMap
@@ -87,7 +81,17 @@ toVM =
             )
 
 
-viewBoard : Float -> Int -> Int -> List ( ( Int, Int ), Color ) -> Shape
+coinToColor : Coin -> Color
+coinToColor coin =
+    case coin of
+        Coin.Blue ->
+            blue
+
+        Coin.Red ->
+            red
+
+
+viewBoard : Float -> Int -> Int -> List ( ( Int, Int ), Coin ) -> Shape
 viewBoard cellSize w h list =
     let
         ( widthPx, heightPx ) =
@@ -96,10 +100,10 @@ viewBoard cellSize w h list =
         moveCell x y =
             move (toFloat x * cellSize) (toFloat y * cellSize)
 
-        viewColumn : Int -> ( ( Int, Int ), Color ) -> Shape
-        viewColumn idx ( ( x, y ), color ) =
+        viewColumn : Int -> ( ( Int, Int ), Coin ) -> Shape
+        viewColumn idx ( ( x, y ), coin ) =
             [ circle
-                color
+                (coinToColor coin)
                 (cellSize / 2 * 0.7)
             , words white (String.fromInt idx)
             ]

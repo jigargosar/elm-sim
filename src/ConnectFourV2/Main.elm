@@ -108,7 +108,15 @@ viewBoard cellSize w h list =
             ( toFloat w * cellSize, toFloat h * cellSize )
 
         moveCell ( x, y ) =
-            move (toFloat x * cellSize) (toFloat y * cellSize)
+            let
+                leftOffset =
+                    -widthPx / 2 + cellSize / 2
+
+                bottomOffset =
+                    -heightPx / 2 + cellSize / 2
+            in
+            move (toFloat x * cellSize + leftOffset)
+                (toFloat y * cellSize + bottomOffset)
 
         toCellBG : ( Int, Int ) -> Shape
         toCellBG pos =
@@ -123,17 +131,11 @@ viewBoard cellSize w h list =
             ]
                 |> group
                 |> moveCell position
-
-        gridCellsToShape cellShapes =
-            cellShapes
-                |> group
-                |> moveLeft (widthPx / 2 - cellSize / 2)
-                |> moveDown (heightPx / 2 - cellSize / 2)
     in
     group
         [ rectangle black widthPx heightPx
-        , mapPositionsFromWH w h toCellBG |> gridCellsToShape
-        , List.indexedMap toCoinShape list |> gridCellsToShape
+        , mapPositionsFromWH w h toCellBG |> group
+        , List.indexedMap toCoinShape list |> group
         ]
 
 

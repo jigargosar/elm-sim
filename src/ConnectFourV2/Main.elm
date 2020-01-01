@@ -45,15 +45,10 @@ type ValidBoard
 initBoard : Int -> Int -> Coin -> List Int -> Maybe ValidBoard
 initBoard w h coin moves =
     let
-        foo : ( List Int, List Int )
-        foo =
+        ( columnIndices, columnLengths ) =
             Dict.Extra.frequencies moves
                 |> Dict.toList
                 |> List.unzip
-                |> Debug.log "foo"
-
-        ( columnIndices, columnLengths ) =
-            foo
 
         isValidIdx len idx =
             idx >= 0 && idx < len

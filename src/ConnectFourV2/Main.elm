@@ -75,12 +75,16 @@ toVM =
 
         reducer column ( ( coin, lenLookup ), acc ) =
             ( ( Coin.flip coin, incLengthOfColumn column lenLookup )
-            , Dict.insert ( column, lengthOfColumn column lenLookup ) coin acc
+            , ( ( column, lengthOfColumn column lenLookup ), coin ) :: acc
             )
     in
-    Board.foldl reducer ( ( Coin.Blue, Dict.empty ), Dict.empty )
+    Board.foldl reducer ( ( Coin.Blue, Dict.empty ), [] )
         >> Tuple.second
-        >> Dict.toList
+        >> List.reverse
+
+
+
+-- >> Dict.toList
 
 
 coinToColor : Coin -> Color

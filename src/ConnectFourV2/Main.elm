@@ -64,7 +64,7 @@ initBoard w h moves =
                 && List.all ((+) -1 >> isValidIdx h) columnLengths
     in
     if areMovesValid then
-        Board w h Blue moves |> Just
+        Board w h moves |> Just
 
     else
         Nothing

@@ -107,18 +107,20 @@ viewBoard cellSize w h list =
         ( widthPx, heightPx ) =
             ( toFloat w * cellSize, toFloat h * cellSize )
 
-        moveCell x y =
+        moveCell ( x, y ) =
             move (toFloat x * cellSize) (toFloat y * cellSize)
 
-        viewColumn : Int -> ( ( Int, Int ), Coin ) -> Shape
-        viewColumn idx ( ( x, y ), coin ) =
-            [ circle
-                (coinToColor coin)
-                (cellSize / 2 * 0.7)
+        posToCellShape : ( Int, Int ) -> Shape
+        posToCellShape pos =
+            circle white (cellSize / 2 * 0.8) |> moveCell pos
+
+        viewCoin : Int -> ( ( Int, Int ), Coin ) -> Shape
+        viewCoin idx ( position, coin ) =
+            [ circle (coinToColor coin) (cellSize / 2 * 0.7)
             , words white (String.fromInt idx)
             ]
                 |> group
-                |> moveCell x y
+                |> moveCell position
 
         groupGridCells cellShapes =
             cellShapes
@@ -128,17 +130,9 @@ viewBoard cellSize w h list =
     in
     group
         [ rectangle black widthPx heightPx
-        , List.Extra.initialize w
-            (\x ->
-                List.Extra.initialize h
-                    (\y ->
-                        circle white (cellSize / 2 * 0.8)
-                            |> moveCell x y
-                    )
-            )
-            |> List.concat
+        , mapPositionsFromWH w h posToCellShape
             |> groupGridCells
-        , List.indexedMap viewColumn list |> groupGridCells
+        , List.indexedMap viewCoin list |> groupGridCells
         ]
 
 
@@ -147,6 +141,11 @@ toPositions w h =
     List.Extra.initialize w
         (\x -> List.Extra.initialize h (\y -> ( x, y )))
         |> List.concat
+
+
+mapPositionsFromWH : Int -> Int -> (( Int, Int ) -> b) -> List b
+mapPositionsFromWH w h func =
+    toPositions w h |> List.map func
 
 
 main =

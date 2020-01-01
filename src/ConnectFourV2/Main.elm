@@ -104,14 +104,12 @@ viewBoard cellSize w h list =
                 )
                 (cellSize / 2 * 0.75)
 
+        moveCell x y =
+            move (toFloat x * cellSize) (toFloat y * cellSize)
+
         viewColumn : ( Int, List Bool ) -> List Shape
-        viewColumn ( x, cells ) =
-            List.indexedMap
-                (\y bool ->
-                    viewCoin bool
-                        |> move (toFloat x * cellSize) (toFloat y * cellSize)
-                )
-                cells
+        viewColumn ( x, coins ) =
+            List.indexedMap (\y -> viewCoin >> moveCell x y) coins
     in
     group
         [ rectangle black widthPx heightPx

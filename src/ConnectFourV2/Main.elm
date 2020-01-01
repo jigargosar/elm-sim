@@ -64,6 +64,11 @@ initBoard w h moves =
         Nothing
 
 
+emptyBoard : Int -> Int -> ValidBoard
+emptyBoard w h =
+    ValidBoard w h Blue []
+
+
 
 -- makeMove column mem =
 

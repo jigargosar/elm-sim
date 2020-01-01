@@ -1,4 +1,4 @@
-module ConnectFourV2.Board exposing (Board, empty, initWithMoves, move)
+module ConnectFourV2.Board exposing (Board, empty, height, initWithMoves, move, width)
 
 import Dict
 import Dict.Extra
@@ -42,3 +42,13 @@ empty w h =
 
     else
         Board w h [] |> Just
+
+
+width : Board -> Int
+width (Board w _ _) =
+    w
+
+
+height : Board -> Int
+height (Board _ h _) =
+    h

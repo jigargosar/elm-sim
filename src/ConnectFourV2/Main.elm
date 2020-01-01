@@ -1,10 +1,7 @@
 module ConnectFourV2.Main exposing (main)
 
-import Array exposing (Array)
 import ConnectFourV2.Board as Board exposing (Board)
 import Dict exposing (Dict)
-import Dict.Extra
-import List.Extra
 import Playground exposing (..)
 
 

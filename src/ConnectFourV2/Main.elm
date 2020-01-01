@@ -119,8 +119,7 @@ viewBoard cellSize w h list =
     in
     group
         [ rectangle black widthPx heightPx
-        , List.concatMap viewColumn list
-            |> groupGridCells
+        , List.concatMap viewColumn list |> groupGridCells
         ]
 
 

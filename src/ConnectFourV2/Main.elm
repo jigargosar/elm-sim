@@ -96,11 +96,14 @@ viewBoard cellSize w h list =
         moveCell x y =
             move (toFloat x * cellSize) (toFloat y * cellSize)
 
-        viewColumn : ( ( Int, Int ), Color ) -> Shape
-        viewColumn ( ( x, y ), color ) =
-            circle
+        viewColumn : Int -> ( ( Int, Int ), Color ) -> Shape
+        viewColumn idx ( ( x, y ), color ) =
+            [ circle
                 color
                 (cellSize / 2 * 0.7)
+            , words white (String.fromInt idx)
+            ]
+                |> group
                 |> moveCell x y
 
         groupGridCells cellShapes =
@@ -121,7 +124,7 @@ viewBoard cellSize w h list =
             )
             |> List.concat
             |> groupGridCells
-        , List.map viewColumn list |> groupGridCells
+        , List.indexedMap viewColumn list |> groupGridCells
         ]
 
 

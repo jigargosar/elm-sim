@@ -21,14 +21,21 @@ rows =
     6
 
 
+type GameOver
+    = WinningPositions (List Position)
+    | Draw
+
+
 type alias Mem =
     { board : Dict Position Coin
+    , state : Maybe GameOver
+    , coin : Coin
     }
 
 
 initialMemory : Mem
 initialMemory =
-    { board = Dict.empty }
+    { board = Dict.empty, coin = Blue, state = Nothing }
 
 
 

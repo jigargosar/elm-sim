@@ -59,16 +59,16 @@ insertCoin column mem =
         case mem.state of
             Nothing ->
                 let
-                    columnLen =
+                    columnLength =
                         Dict.filter (\( x, _ ) _ -> x == column) mem.board
                             |> Dict.size
                 in
-                if columnLen < 0 || columnLen >= rows then
+                if columnLength >= rows then
                     mem
 
                 else
                     { mem
-                        | board = Dict.insert ( column, columnLen ) mem.coin mem.board
+                        | board = Dict.insert ( column, columnLength ) mem.coin mem.board
                         , coin = flipCoin mem.coin
                     }
 

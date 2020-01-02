@@ -190,7 +190,7 @@ viewBoard : Computer -> Float -> GridTransform -> Mem -> List ( Position, Cell )
 viewBoard { time } cellSize gt { columns, rows } cellList =
     let
         cellRadius =
-            cellSize / 2
+            GridTransform.cellSize gt / 2
 
         coinToShape highlight coin =
             circle (coinToColor coin) (cellRadius * 0.7)

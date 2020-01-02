@@ -12,33 +12,41 @@ module ConnectFourV3.GridTransform exposing
 
 
 type GridTransform
-    = GridTransform Float Float Float
+    = GridTransform Record
+
+
+type alias Record =
+    { cs : Float
+    , dx : Float
+    , dy : Float
+    }
 
 
 init : Float -> { a | columns : Int, rows : Int } -> GridTransform
 init cs { columns, rows } =
-    GridTransform cs
+    Record cs
         (-(toFloat columns * cs) / 2 + cs / 2)
         (-(toFloat rows * cs) / 2 + cs / 2)
+        |> GridTransform
 
 
 toScreenX : Int -> GridTransform -> Float
-toScreenX column (GridTransform cs dx _) =
+toScreenX column (GridTransform { cs, dx }) =
     (toFloat column * cs) + dx
 
 
 toScreenY : Int -> GridTransform -> Float
-toScreenY row (GridTransform cs _ dy) =
+toScreenY row (GridTransform { cs, dy }) =
     (toFloat row * cs) + dy
 
 
 fromScreenX : Float -> GridTransform -> Int
-fromScreenX x (GridTransform cs dx _) =
+fromScreenX x (GridTransform { cs, dx }) =
     (x - dx) / cs |> round
 
 
 fromScreenY : Float -> GridTransform -> Int
-fromScreenY y (GridTransform cs _ dy) =
+fromScreenY y (GridTransform { cs, dy }) =
     (y - dy) / cs |> round
 
 
@@ -53,5 +61,5 @@ fromScreen ( x, y ) model =
 
 
 cellSize : GridTransform -> Float
-cellSize (GridTransform cs _ _) =
+cellSize (GridTransform { cs }) =
     cs

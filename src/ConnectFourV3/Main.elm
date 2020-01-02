@@ -163,7 +163,7 @@ toCellList { mouse } gt ({ rows, columns, board } as mem) =
 
         emptyBoard : Dict Position Cell
         emptyBoard =
-            positionsFromCR columns rows
+            positions2d columns rows
                 |> List.map (\pos -> ( pos, Empty ))
                 |> Dict.fromList
     in
@@ -171,8 +171,8 @@ toCellList { mouse } gt ({ rows, columns, board } as mem) =
         |> Dict.toList
 
 
-positionsFromCR : Int -> Int -> List Position
-positionsFromCR columns rows =
+positions2d : Int -> Int -> List Position
+positions2d columns rows =
     List.range 0 (columns - 1)
         |> List.concatMap
             (\column ->

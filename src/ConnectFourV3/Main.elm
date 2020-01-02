@@ -52,28 +52,27 @@ flipCoin coin =
 
 insertCoin : Int -> Mem -> Mem
 insertCoin column mem =
-    if columns < 0 || column >= columns then
-        mem
-
-    else
-        case mem.state of
-            Nothing ->
-                let
-                    columnLength =
-                        Dict.filter (\( x, _ ) _ -> x == column) mem.board
-                            |> Dict.size
-                in
-                if columnLength >= rows then
-                    mem
-
-                else
-                    { mem
-                        | board = Dict.insert ( column, columnLength ) mem.coin mem.board
-                        , coin = flipCoin mem.coin
-                    }
-
-            Just _ ->
+    case mem.state of
+        Nothing ->
+            let
+                columnLength =
+                    Dict.filter (\( x, _ ) _ -> x == column) mem.board
+                        |> Dict.size
+            in
+            if
+                (columns < 0 || column >= columns)
+                    && (columnLength >= rows)
+            then
                 mem
+
+            else
+                { mem
+                    | board = Dict.insert ( column, columnLength ) mem.coin mem.board
+                    , coin = flipCoin mem.coin
+                }
+
+        Just _ ->
+            mem
 
 
 updateMemory : Computer -> Mem -> Mem

@@ -1,5 +1,6 @@
 module ConnectFourV3.Main exposing (main)
 
+import ConnectFourV3.GridTransform as GridTransform exposing (GridTransform)
 import Dict exposing (Dict)
 import Playground exposing (..)
 
@@ -31,7 +32,6 @@ type alias Mem =
     , coin : Coin
     , rows : Int
     , columns : Int
-    , boardView : BoardView
     }
 
 
@@ -43,24 +43,12 @@ initialMemory =
 
         rows =
             6
-
-        toBoardView : Float -> BoardView
-        toBoardView cellSize =
-            let
-                height =
-                    toFloat rows * cellSize
-            in
-            { cellSize = cellSize
-            , dx = -(toFloat columns * cellSize) / 2 + cellSize / 2
-            , dy = -height / 2 + cellSize / 2
-            }
     in
     { board = Dict.empty
     , coin = Blue
     , state = Nothing
     , columns = columns
     , rows = rows
-    , boardView = toBoardView defaultCellSize
     }
 
 
@@ -90,9 +78,13 @@ columnToInsertPosition column mem =
 
 updateMemory : Computer -> Mem -> Mem
 updateMemory { mouse } mem =
+    let
+        gt =
+            GridTransform.init defaultCellSize mem
+    in
     case mem.state of
         Nothing ->
-            mouseClickToBoardColumn mouse mem
+            mouseClickToBoardColumn mouse gt
                 |> Maybe.andThen (\column -> columnToInsertPosition column mem)
                 |> Maybe.map
                     (\position ->
@@ -107,15 +99,10 @@ updateMemory { mouse } mem =
             mem
 
 
-mouseClickToBoardColumn : Mouse -> Mem -> Maybe Int
-mouseClickToBoardColumn mouse mem =
+mouseClickToBoardColumn : Mouse -> GridTransform -> Maybe Int
+mouseClickToBoardColumn mouse gt =
     if mouse.click then
-        let
-            { cellSize, dx } =
-                mem.boardView
-        in
-        ((mouse.x - dx) / cellSize)
-            |> round
+        GridTransform.fromScreenX mouse.x gt
             |> Just
 
     else
@@ -145,7 +132,16 @@ defaultCellSize =
 
 viewMemory : Computer -> Mem -> List Shape
 viewMemory computer mem =
-    [ viewBoard computer mem (toCellList computer mem) ]
+    let
+        gt =
+            GridTransform.init defaultCellSize mem
+    in
+    [ viewBoard computer
+        defaultCellSize
+        gt
+        mem
+        (toCellList computer gt mem)
+    ]
 
 
 type Cell
@@ -153,15 +149,11 @@ type Cell
     | WithCoin Bool Coin
 
 
-toCellList : Computer -> Mem -> List ( Position, Cell )
-toCellList { mouse } ({ rows, columns, board } as mem) =
+toCellList : Computer -> GridTransform -> Mem -> List ( Position, Cell )
+toCellList { mouse } gt ({ rows, columns, board } as mem) =
     let
-        { cellSize, dx } =
-            mem.boardView
-
         clampedMouseColumn =
-            ((mouse.x - dx) / cellSize)
-                |> round
+            GridTransform.fromScreenX mouse.x gt
                 |> clamp 0 (columns - 1)
 
         insertIndicatorCoin : Dict Position Cell -> Dict Position Cell
@@ -194,12 +186,9 @@ toCellList { mouse } ({ rows, columns, board } as mem) =
         |> Dict.toList
 
 
-viewBoard : Computer -> Mem -> List ( Position, Cell ) -> Shape
-viewBoard { time } { boardView, columns, rows } cellList =
+viewBoard : Computer -> Float -> GridTransform -> Mem -> List ( Position, Cell ) -> Shape
+viewBoard { time } cellSize gt { columns, rows } cellList =
     let
-        { cellSize, dx, dy } =
-            boardView
-
         cellRadius =
             cellSize / 2
 
@@ -228,7 +217,7 @@ viewBoard { time } { boardView, columns, rows } cellList =
 
         viewCell ( ( x, y ), cell ) =
             toCellShape cell
-                |> move (toFloat x * cellSize + dx) (toFloat y * cellSize + dy)
+                |> move (GridTransform.toScreenX x gt) (GridTransform.toScreenY y gt)
     in
     group
         [ rectangle black (toFloat columns * cellSize) (toFloat rows * cellSize)

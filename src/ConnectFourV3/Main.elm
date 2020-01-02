@@ -133,19 +133,6 @@ mouseClickToBoardColumn mouse mem =
         Nothing
 
 
-screenXToBoardPosition : Float -> Mem -> Maybe Position
-screenXToBoardPosition x mem =
-    let
-        { cellSize, dx } =
-            mem.boardView
-
-        column : Int
-        column =
-            ((x - dx) / cellSize) |> round
-    in
-    columnToInsertPosition column mem
-
-
 type alias BoardView =
     { cellRadius : Float
     , cellSize : Float
@@ -187,7 +174,12 @@ toCellList { mouse } ({ rows, columns, board } as mem) =
             mem.boardView
 
         maybeMouseBoardPosition =
-            screenXToBoardPosition mouse.x mem
+            columnToInsertPosition
+                (((mouse.x - dx) / cellSize)
+                    |> round
+                    |> clamp 0 columns
+                )
+                mem
 
         withCell : Position -> ( Position, Cell )
         withCell pos =

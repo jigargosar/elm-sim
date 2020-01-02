@@ -196,9 +196,23 @@ toCellList { mouse } ({ rows, columns, board } as mem) =
                 |> Maybe.map (WithCoin False)
                 |> Maybe.withDefault defCell
             )
+
+        emptyBoard : Dict Position Cell
+        emptyBoard =
+            List.range 0 (columns - 1)
+                |> List.concatMap
+                    (\x ->
+                        List.range 0 (rows - 1)
+                            |> List.map (\y -> ( ( x, y ), Empty ))
+                    )
+                |> Dict.fromList
+
+        coinBoard : Dict Position Cell
+        coinBoard =
+            Dict.map (\_ -> WithCoin False) board
     in
-    List.range 0 (columns - 1)
-        |> List.concatMap (\x -> List.range 0 (rows - 1) |> List.map (Tuple.pair x >> withCell))
+    Dict.union coinBoard emptyBoard
+        |> Dict.toList
 
 
 viewBoard : Computer -> Mem -> List ( Position, Cell ) -> Shape

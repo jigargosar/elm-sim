@@ -171,11 +171,65 @@ defaultCellSize =
 
 
 viewMemory : Computer -> Mem -> List Shape
-viewMemory { mouse } ({ board } as mem) =
-    viewBoard mem
+viewMemory computer mem =
+    [ viewCells computer mem (toCellList mem |> Debug.log "cells") ]
 
 
-viewBoard { boardView, board, rows, columns } =
+type Cell
+    = Empty
+    | WithCoin Bool Coin
+
+
+toCellList : Mem -> List ( Position, Cell )
+toCellList { rows, columns, board } =
+    let
+        toPositionCellPair pos =
+            ( pos, Dict.get pos board |> Maybe.map (WithCoin False) |> Maybe.withDefault Empty )
+    in
+    List.range 0 (columns - 1)
+        |> List.concatMap (\x -> List.range 0 (rows - 1) |> List.map (Tuple.pair x >> toPositionCellPair))
+
+
+viewCells : Computer -> Mem -> List ( Position, Cell ) -> Shape
+viewCells { time } { boardView } cellList =
+    let
+        { width, height, cellSize, cellRadius, dx, dy } =
+            boardView
+
+        coinToShape highlight coin =
+            circle (coinToColor coin) (cellRadius * 0.7)
+                |> (if highlight then
+                        fade (wave 0 1 1 time)
+
+                    else
+                        fade 1
+                   )
+
+        cellBackgroundShape =
+            circle white (cellRadius * 0.9)
+
+        toCellShape cell =
+            case cell of
+                Empty ->
+                    cellBackgroundShape
+
+                WithCoin highlight coin ->
+                    group
+                        [ cellBackgroundShape
+                        , coinToShape highlight coin
+                        ]
+
+        viewCell ( ( x, y ), cell ) =
+            toCellShape cell
+                |> move (toFloat x * cellSize + dx) (toFloat y * cellSize + dy)
+    in
+    group
+        [ rectangle black width height
+        , List.map viewCell cellList |> group
+        ]
+
+
+viewBoard { boardView, board, rows, columns, state } =
     let
         { width, height, cellSize, cellRadius, dx, dy } =
             boardView

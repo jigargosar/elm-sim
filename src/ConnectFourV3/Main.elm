@@ -189,6 +189,7 @@ viewMemory _ { board } =
         viewCellBackgroundAt position =
             cellBackgroundShape |> moveCellShape position
 
+        viewBoardCoin : ( Position, Coin ) -> Shape
         viewBoardCoin ( pos, coin ) =
             coinToShape coin |> moveCellShape pos
     in

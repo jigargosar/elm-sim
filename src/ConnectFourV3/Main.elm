@@ -176,21 +176,29 @@ viewMemory _ { board } =
             List.range 0 (columns - 1)
                 |> List.concatMap (\x -> List.range 0 (rows - 1) |> List.map (Tuple.pair x))
 
-        viewCellAt ( x, y ) =
+        cellList : List ( Position, Maybe Coin )
+        cellList =
+            List.map (\pos -> ( pos, Dict.get pos board )) allBoardPositions
+
+        cellToShape : Maybe Coin -> Shape
+        cellToShape cell =
             group
                 [ circle white (cellRadius * 0.9)
-                , case Dict.get ( x, y ) board of
+                , case cell of
                     Just coin ->
                         circle (coinToColor coin) (cellRadius * 0.7)
 
                     Nothing ->
                         group []
                 ]
+
+        viewCellAt ( ( x, y ), cell ) =
+            cellToShape cell
                 |> move (toFloat x * cellSize + dx) (toFloat y * cellSize + dy)
     in
     [ group
         [ rectangle black width height
-        , List.map viewCellAt allBoardPositions
+        , List.map viewCellAt cellList
             |> group
         ]
     ]

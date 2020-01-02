@@ -172,7 +172,7 @@ defaultCellSize =
 
 viewMemory : Computer -> Mem -> List Shape
 viewMemory computer mem =
-    [ viewCells computer mem (toCellList mem |> Debug.log "cells") ]
+    [ viewBoard computer mem (toCellList mem |> Debug.log "cells") ]
 
 
 type Cell
@@ -190,8 +190,8 @@ toCellList { rows, columns, board } =
         |> List.concatMap (\x -> List.range 0 (rows - 1) |> List.map (Tuple.pair x >> toPositionCellPair))
 
 
-viewCells : Computer -> Mem -> List ( Position, Cell ) -> Shape
-viewCells { time } { boardView } cellList =
+viewBoard : Computer -> Mem -> List ( Position, Cell ) -> Shape
+viewBoard { time } { boardView } cellList =
     let
         { width, height, cellSize, cellRadius, dx, dy } =
             boardView
@@ -227,42 +227,6 @@ viewCells { time } { boardView } cellList =
         [ rectangle black width height
         , List.map viewCell cellList |> group
         ]
-
-
-viewBoard { boardView, board, rows, columns, state } =
-    let
-        { width, height, cellSize, cellRadius, dx, dy } =
-            boardView
-
-        allBoardPositions : List ( Int, Int )
-        allBoardPositions =
-            List.range 0 (columns - 1)
-                |> List.concatMap (\x -> List.range 0 (rows - 1) |> List.map (Tuple.pair x))
-
-        moveCellShape ( x, y ) shape =
-            shape
-                |> move (toFloat x * cellSize + dx) (toFloat y * cellSize + dy)
-
-        coinToShape coin =
-            circle (coinToColor coin) (cellRadius * 0.7)
-
-        cellBackgroundShape =
-            circle white (cellRadius * 0.9)
-
-        viewCellBackgroundAt : Position -> Shape
-        viewCellBackgroundAt position =
-            cellBackgroundShape |> moveCellShape position
-
-        viewBoardCoin : ( Position, Coin ) -> Shape
-        viewBoardCoin ( pos, coin ) =
-            coinToShape coin |> moveCellShape pos
-    in
-    [ group
-        [ rectangle black width height
-        , List.map viewCellBackgroundAt allBoardPositions |> group
-        , List.map viewBoardCoin (Dict.toList board) |> group
-        ]
-    ]
 
 
 

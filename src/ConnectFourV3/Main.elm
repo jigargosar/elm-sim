@@ -189,13 +189,13 @@ viewMemory _ { board } =
         viewCellBackgroundAt position =
             cellBackgroundShape |> moveCellShape position
 
-        viewCoinAt ( pos, coin ) =
+        viewBoardCoin ( pos, coin ) =
             coinToShape coin |> moveCellShape pos
     in
     [ group
         [ rectangle black width height
         , List.map viewCellBackgroundAt allBoardPositions |> group
-        , List.map viewCoinAt (Dict.toList board) |> group
+        , List.map viewBoardCoin (Dict.toList board) |> group
         ]
     ]
 

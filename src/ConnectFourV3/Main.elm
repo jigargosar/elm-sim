@@ -85,7 +85,11 @@ updateMemory { mouse } mem =
 mouseClickToBoardColumn : Mouse -> Maybe Int
 mouseClickToBoardColumn mouse =
     if mouse.click then
-        (mouse.x / (toBoardView defaultCellSize).cellSize)
+        let
+            { cellSize, dx } =
+                toBoardView defaultCellSize
+        in
+        ((mouse.x - dx) / cellSize)
             |> round
             |> Just
 

@@ -1,6 +1,8 @@
 module ConnectFourV3.Main exposing (main)
 
 import Dict exposing (Dict)
+import Dict.Extra
+import List.Extra
 import Playground exposing (..)
 
 
@@ -38,8 +40,40 @@ initialMemory =
     { board = Dict.empty, coin = Blue, state = Nothing }
 
 
+flipCoin : Coin -> Coin
+flipCoin coin =
+    case coin of
+        Red ->
+            Blue
 
--- makeMove column mem =
+        Blue ->
+            Red
+
+
+insertCoin : Int -> Mem -> Mem
+insertCoin column mem =
+    if columns < 0 || column >= columns then
+        mem
+
+    else
+        case mem.state of
+            Nothing ->
+                let
+                    columnLen =
+                        Dict.filter (\( x, _ ) _ -> x == column) mem.board
+                            |> Dict.size
+                in
+                if columnLen < 0 || columnLen >= rows then
+                    mem
+
+                else
+                    { mem
+                        | board = Dict.insert ( column, columnLen ) mem.coin mem.board
+                        , coin = flipCoin mem.coin
+                    }
+
+            Just _ ->
+                mem
 
 
 updateMemory : Computer -> Mem -> Mem

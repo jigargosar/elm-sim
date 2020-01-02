@@ -47,14 +47,11 @@ initialMemory =
         toBoardView : Float -> BoardView
         toBoardView cellSize =
             let
-                width =
-                    toFloat columns * cellSize
-
                 height =
                     toFloat rows * cellSize
             in
             { cellSize = cellSize
-            , dx = -width / 2 + cellSize / 2
+            , dx = -(toFloat columns * cellSize) / 2 + cellSize / 2
             , dy = -height / 2 + cellSize / 2
             }
     in

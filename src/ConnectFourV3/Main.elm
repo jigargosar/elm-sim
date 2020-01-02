@@ -173,29 +173,21 @@ toCellList { mouse } ({ rows, columns, board } as mem) =
         { cellSize, dx } =
             mem.boardView
 
-        maybeMouseBoardPosition =
-            columnToInsertPosition
-                (((mouse.x - dx) / cellSize)
-                    |> round
-                    |> clamp 0 columns
-                )
-                mem
+        insertIndicatorCoin : Dict Position Cell -> Dict Position Cell
+        insertIndicatorCoin =
+            case
+                columnToInsertPosition
+                    (((mouse.x - dx) / cellSize)
+                        |> round
+                        |> clamp 0 columns
+                    )
+                    mem
+            of
+                Just pos ->
+                    Dict.insert pos (WithCoin True mem.coin)
 
-        withCell : Position -> ( Position, Cell )
-        withCell pos =
-            let
-                defCell =
-                    if maybeMouseBoardPosition == Just pos then
-                        WithCoin True mem.coin
-
-                    else
-                        Empty
-            in
-            ( pos
-            , Dict.get pos board
-                |> Maybe.map (WithCoin False)
-                |> Maybe.withDefault defCell
-            )
+                Nothing ->
+                    identity
 
         emptyBoard : Dict Position Cell
         emptyBoard =
@@ -210,6 +202,7 @@ toCellList { mouse } ({ rows, columns, board } as mem) =
         coinBoard : Dict Position Cell
         coinBoard =
             Dict.map (\_ -> WithCoin False) board
+                |> insertIndicatorCoin
     in
     Dict.union coinBoard emptyBoard
         |> Dict.toList

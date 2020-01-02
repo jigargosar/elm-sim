@@ -3,6 +3,7 @@ module ConnectFourV3.Main exposing (main)
 import Basics.Extra exposing (uncurry)
 import Dict exposing (Dict)
 import Playground exposing (..)
+import Set
 
 
 type alias Position =
@@ -166,9 +167,13 @@ defaultCellSize =
 
 viewMemory : Computer -> Mem -> List Shape
 viewMemory _ { board } =
+    viewBoard { highlightCoinPositions = Set.empty } defaultCellSize board
+
+
+viewBoard { highlightCoinPositions } cellSize board =
     let
-        { width, height, cellRadius, cellSize, dx, dy } =
-            toBoardView defaultCellSize
+        { width, height, cellRadius, dx, dy } =
+            toBoardView cellSize
 
         allBoardPositions : List ( Int, Int )
         allBoardPositions =

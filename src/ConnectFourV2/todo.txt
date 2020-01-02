@@ -1,0 +1,20 @@
+Objective:
+
+* Portfolio Project
+* local 2 player connect 4 game.
+
+
+Stage 1.
+
+Constrains:
+* Deployed on Sat: 4th Jan 2020 before 6pm.
+* Bare minimum UI
+* board size w=7, h=6
+* Blue starts first.
+* Display board state with coins.
+* Display game state:
+    * X player to move.
+    * Game won by x : show winning positions.
+    * Game Draw
+    * Restart on input.
+* Input: show blinking move, based on mouse position.

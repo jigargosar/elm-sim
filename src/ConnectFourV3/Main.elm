@@ -76,24 +76,6 @@ flipCoin coin =
             Red
 
 
-insertCoin : Int -> Mem -> Mem
-insertCoin column mem =
-    case mem.state of
-        Nothing ->
-            case columnToInsertPosition column mem of
-                Just position ->
-                    { mem
-                        | board = Dict.insert position mem.coin mem.board
-                        , coin = flipCoin mem.coin
-                    }
-
-                Nothing ->
-                    mem
-
-        Just _ ->
-            mem
-
-
 columnToInsertPosition : Int -> Mem -> Maybe Position
 columnToInsertPosition column mem =
     let
@@ -110,9 +92,21 @@ columnToInsertPosition column mem =
 
 updateMemory : Computer -> Mem -> Mem
 updateMemory { mouse } mem =
-    mouseClickToBoardColumn mouse mem
-        |> Maybe.map (\column -> insertCoin column mem)
-        |> Maybe.withDefault mem
+    case mem.state of
+        Nothing ->
+            mouseClickToBoardColumn mouse mem
+                |> Maybe.andThen (\column -> columnToInsertPosition column mem)
+                |> Maybe.map
+                    (\position ->
+                        { mem
+                            | board = Dict.insert position mem.coin mem.board
+                            , coin = flipCoin mem.coin
+                        }
+                    )
+                |> Maybe.withDefault mem
+
+        Just _ ->
+            mem
 
 
 mouseClickToBoardColumn : Mouse -> Mem -> Maybe Int

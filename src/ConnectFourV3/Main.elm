@@ -1,9 +1,7 @@
 module ConnectFourV3.Main exposing (main)
 
-import Basics.Extra exposing (uncurry)
 import Dict exposing (Dict)
 import Playground exposing (..)
-import Set
 
 
 type alias Position =
@@ -15,14 +13,6 @@ type Coin
     | Blue
 
 
-columns =
-    7
-
-
-rows =
-    6
-
-
 type GameOver
     = WinningPositions (List Position)
     | Draw
@@ -32,12 +22,48 @@ type alias Mem =
     { board : Dict Position Coin
     , state : Maybe GameOver
     , coin : Coin
+    , rows : Int
+    , columns : Int
+    , boardView : BoardView
     }
 
 
 initialMemory : Mem
 initialMemory =
-    { board = Dict.empty, coin = Blue, state = Nothing }
+    let
+        columns =
+            7
+
+        rows =
+            6
+
+        toBoardView : Float -> BoardView
+        toBoardView cellSize =
+            let
+                width =
+                    toFloat columns * cellSize
+
+                height =
+                    toFloat rows * cellSize
+
+                cellRadius =
+                    cellSize / 2
+            in
+            { cellRadius = cellRadius
+            , cellSize = cellSize
+            , width = width
+            , height = height
+            , dx = -width / 2 + cellRadius
+            , dy = -height / 2 + cellRadius
+            }
+    in
+    { board = Dict.empty
+    , coin = Blue
+    , state = Nothing
+    , columns = columns
+    , rows = rows
+    , boardView = toBoardView defaultCellSize
+    }
 
 
 flipCoin : Coin -> Coin
@@ -76,8 +102,8 @@ columnToInsertPosition column mem =
                 |> Dict.size
     in
     if
-        (columns < 0 || column >= columns)
-            && (columnLength >= rows)
+        (mem.columns < 0 || column >= mem.columns)
+            && (columnLength >= mem.rows)
     then
         Nothing
 
@@ -87,17 +113,17 @@ columnToInsertPosition column mem =
 
 updateMemory : Computer -> Mem -> Mem
 updateMemory { mouse } mem =
-    mouseClickToBoardColumn mouse
+    mouseClickToBoardColumn mouse mem
         |> Maybe.map (\column -> insertCoin column mem)
         |> Maybe.withDefault mem
 
 
-mouseClickToBoardColumn : Mouse -> Maybe Int
-mouseClickToBoardColumn mouse =
+mouseClickToBoardColumn : Mouse -> Mem -> Maybe Int
+mouseClickToBoardColumn mouse mem =
     if mouse.click then
         let
             { cellSize, dx } =
-                toBoardView defaultCellSize
+                mem.boardView
         in
         ((mouse.x - dx) / cellSize)
             |> round
@@ -111,7 +137,7 @@ screenXToBoardPosition : Float -> Mem -> Maybe Position
 screenXToBoardPosition x mem =
     let
         { cellSize, dx } =
-            toBoardView defaultCellSize
+            mem.boardView
 
         column : Int
         column =
@@ -127,27 +153,6 @@ type alias BoardView =
     , height : Float
     , dx : Float
     , dy : Float
-    }
-
-
-toBoardView : Float -> BoardView
-toBoardView cellSize =
-    let
-        width =
-            toFloat columns * cellSize
-
-        height =
-            toFloat rows * cellSize
-
-        cellRadius =
-            cellSize / 2
-    in
-    { cellRadius = cellRadius
-    , cellSize = cellSize
-    , width = width
-    , height = height
-    , dx = -width / 2 + cellRadius
-    , dy = -height / 2 + cellRadius
     }
 
 
@@ -167,23 +172,13 @@ defaultCellSize =
 
 viewMemory : Computer -> Mem -> List Shape
 viewMemory { mouse } ({ board } as mem) =
-    let
-        highlightCoinPositions =
-            screenXToBoardPosition mouse.x mem
-                |> Maybe.map Set.singleton
-                |> Maybe.withDefault Set.empty
-    in
-    viewBoard
-        { highlightCoinPositions = highlightCoinPositions
-        }
-        defaultCellSize
-        board
+    viewBoard mem
 
 
-viewBoard { highlightCoinPositions } cellSize board =
+viewBoard { boardView, board, rows, columns } =
     let
-        { width, height, cellRadius, dx, dy } =
-            toBoardView cellSize
+        { width, height, cellSize, cellRadius, dx, dy } =
+            boardView
 
         allBoardPositions : List ( Int, Int )
         allBoardPositions =

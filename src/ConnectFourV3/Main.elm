@@ -54,15 +54,15 @@ insertCoin : Int -> Mem -> Mem
 insertCoin column mem =
     case mem.state of
         Nothing ->
-            columnToInsertPosition column mem
-                |> Maybe.map
-                    (\position ->
-                        { mem
-                            | board = Dict.insert position mem.coin mem.board
-                            , coin = flipCoin mem.coin
-                        }
-                    )
-                |> Maybe.withDefault mem
+            case columnToInsertPosition column mem of
+                Just position ->
+                    { mem
+                        | board = Dict.insert position mem.coin mem.board
+                        , coin = flipCoin mem.coin
+                    }
+
+                Nothing ->
+                    mem
 
         Just _ ->
             mem

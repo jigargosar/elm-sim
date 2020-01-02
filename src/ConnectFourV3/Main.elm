@@ -76,8 +76,21 @@ insertCoin column mem =
 
 
 updateMemory : Computer -> Mem -> Mem
-updateMemory _ mem =
-    mem
+updateMemory { mouse } mem =
+    mouseClickToBoardColumn mouse
+        |> Maybe.map (\column -> insertCoin column mem)
+        |> Maybe.withDefault mem
+
+
+mouseClickToBoardColumn : Mouse -> Maybe Int
+mouseClickToBoardColumn mouse =
+    if mouse.click then
+        (mouse.x / (toBoardView defaultCellSize).cellSize)
+            |> round
+            |> Just
+
+    else
+        Nothing
 
 
 type alias BoardView =
@@ -121,11 +134,15 @@ coinToColor coin =
             blue
 
 
+defaultCellSize =
+    50
+
+
 viewMemory : Computer -> Mem -> List Shape
 viewMemory _ { board } =
     let
         { width, height, cellRadius, cellSize, dx, dy } =
-            toBoardView 50
+            toBoardView defaultCellSize
 
         allBoardPositions : List ( Int, Int )
         allBoardPositions =

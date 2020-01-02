@@ -101,10 +101,7 @@ columnToInsertPosition column mem =
             Dict.filter (\( x, _ ) _ -> x == column) mem.board
                 |> Dict.size
     in
-    if
-        (mem.columns < 0 || column >= mem.columns)
-            && (columnLength >= mem.rows)
-    then
+    if column < 0 || column >= mem.columns || (columnLength >= mem.rows) then
         Nothing
 
     else
@@ -176,8 +173,8 @@ toCellList { mouse } ({ rows, columns, board } as mem) =
         clampedMouseColumn =
             ((mouse.x - dx) / cellSize)
                 |> round
-                |> clamp 0 columns
 
+        -- |> clamp 0 (columns - 1)
         insertIndicatorCoin : Dict Position Cell -> Dict Position Cell
         insertIndicatorCoin =
             case

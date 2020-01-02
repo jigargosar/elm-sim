@@ -173,15 +173,15 @@ toCellList { mouse } ({ rows, columns, board } as mem) =
         { cellSize, dx } =
             mem.boardView
 
+        clampedMouseColumn =
+            ((mouse.x - dx) / cellSize)
+                |> round
+                |> clamp 0 columns
+
         insertIndicatorCoin : Dict Position Cell -> Dict Position Cell
         insertIndicatorCoin =
             case
-                columnToInsertPosition
-                    (((mouse.x - dx) / cellSize)
-                        |> round
-                        |> clamp 0 columns
-                    )
-                    mem
+                columnToInsertPosition clampedMouseColumn mem
             of
                 Just pos ->
                     Dict.insert pos (WithCoin True mem.coin)

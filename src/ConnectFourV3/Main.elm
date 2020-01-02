@@ -136,11 +136,7 @@ viewMemory computer mem =
         gt =
             GridTransform.init defaultCellSize mem
     in
-    [ viewBoard computer
-        defaultCellSize
-        gt
-        mem
-        (toCellList computer gt mem)
+    [ viewBoard computer gt mem (toCellList computer gt mem)
     ]
 
 
@@ -186,8 +182,8 @@ toCellList { mouse } gt ({ rows, columns, board } as mem) =
         |> Dict.toList
 
 
-viewBoard : Computer -> Float -> GridTransform -> Mem -> List ( Position, Cell ) -> Shape
-viewBoard { time } cellSize gt { columns, rows } cellList =
+viewBoard : Computer -> GridTransform -> Mem -> List ( Position, Cell ) -> Shape
+viewBoard { time } gt { columns, rows } cellList =
     let
         cellRadius =
             GridTransform.cellSize gt / 2
@@ -220,7 +216,7 @@ viewBoard { time } cellSize gt { columns, rows } cellList =
                 |> move (GridTransform.toScreenX x gt) (GridTransform.toScreenY y gt)
     in
     group
-        [ rectangle black (toFloat columns * cellSize) (toFloat rows * cellSize)
+        [ rectangle black (GridTransform.width gt) (GridTransform.height gt)
         , List.map viewCell cellList |> group
         ]
 

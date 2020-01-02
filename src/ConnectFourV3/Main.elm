@@ -54,8 +54,6 @@ initialMemory =
                     toFloat rows * cellSize
             in
             { cellSize = cellSize
-            , width = width
-            , height = height
             , dx = -width / 2 + cellSize / 2
             , dy = -height / 2 + cellSize / 2
             }
@@ -129,8 +127,6 @@ mouseClickToBoardColumn mouse mem =
 
 type alias BoardView =
     { cellSize : Float
-    , width : Float
-    , height : Float
     , dx : Float
     , dy : Float
     }
@@ -204,7 +200,7 @@ toCellList { mouse } ({ rows, columns, board } as mem) =
 viewBoard : Computer -> Mem -> List ( Position, Cell ) -> Shape
 viewBoard { time } { boardView, columns, rows } cellList =
     let
-        { width, height, cellSize, dx, dy } =
+        { cellSize, dx, dy } =
             boardView
 
         cellRadius =

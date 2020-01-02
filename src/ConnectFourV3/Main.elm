@@ -166,8 +166,18 @@ defaultCellSize =
 
 
 viewMemory : Computer -> Mem -> List Shape
-viewMemory _ { board } =
-    viewBoard { highlightCoinPositions = Set.empty } defaultCellSize board
+viewMemory { mouse } ({ board } as mem) =
+    let
+        highlightCoinPositions =
+            screenXToBoardPosition mouse.x mem
+                |> Maybe.map Set.singleton
+                |> Maybe.withDefault Set.empty
+    in
+    viewBoard
+        { highlightCoinPositions = highlightCoinPositions
+        }
+        defaultCellSize
+        board
 
 
 viewBoard { highlightCoinPositions } cellSize board =

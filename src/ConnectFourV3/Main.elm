@@ -189,6 +189,11 @@ toCellList { mouse } ({ rows, columns, board } as mem) =
                 Nothing ->
                     identity
 
+        coinBoard : Dict Position Cell
+        coinBoard =
+            Dict.map (\_ -> WithCoin False) board
+                |> insertIndicatorCoin
+
         emptyBoard : Dict Position Cell
         emptyBoard =
             List.range 0 (columns - 1)
@@ -198,11 +203,6 @@ toCellList { mouse } ({ rows, columns, board } as mem) =
                             |> List.map (\y -> ( ( x, y ), Empty ))
                     )
                 |> Dict.fromList
-
-        coinBoard : Dict Position Cell
-        coinBoard =
-            Dict.map (\_ -> WithCoin False) board
-                |> insertIndicatorCoin
     in
     Dict.union coinBoard emptyBoard
         |> Dict.toList

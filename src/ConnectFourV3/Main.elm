@@ -172,7 +172,7 @@ defaultCellSize =
 
 viewMemory : Computer -> Mem -> List Shape
 viewMemory computer mem =
-    [ viewBoard computer mem (toCellList mem |> Debug.log "cells") ]
+    [ viewBoard computer mem (toCellList computer mem) ]
 
 
 type Cell
@@ -180,11 +180,29 @@ type Cell
     | WithCoin Bool Coin
 
 
-toCellList : Mem -> List ( Position, Cell )
-toCellList { rows, columns, board } =
+toCellList : Computer -> Mem -> List ( Position, Cell )
+toCellList { mouse } ({ rows, columns, board } as mem) =
     let
+        { cellSize, dx } =
+            mem.boardView
+
+        maybeMouseBoardPosition =
+            screenXToBoardPosition mouse.x mem
+
         toPositionCellPair pos =
-            ( pos, Dict.get pos board |> Maybe.map (WithCoin False) |> Maybe.withDefault Empty )
+            let
+                defCell =
+                    if maybeMouseBoardPosition == Just pos then
+                        WithCoin True mem.coin
+
+                    else
+                        Empty
+            in
+            ( pos
+            , Dict.get pos board
+                |> Maybe.map (WithCoin False)
+                |> Maybe.withDefault defCell
+            )
     in
     List.range 0 (columns - 1)
         |> List.concatMap (\x -> List.range 0 (rows - 1) |> List.map (Tuple.pair x >> toPositionCellPair))

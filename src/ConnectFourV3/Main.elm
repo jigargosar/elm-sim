@@ -136,7 +136,7 @@ viewMemory computer mem =
         gt =
             GridTransform.init defaultCellSize mem
     in
-    [ viewBoard computer gt mem (toCellList computer gt mem)
+    [ viewBoard computer gt (toCellList computer gt mem)
     ]
 
 
@@ -182,8 +182,8 @@ toCellList { mouse } gt ({ rows, columns, board } as mem) =
         |> Dict.toList
 
 
-viewBoard : Computer -> GridTransform -> Mem -> List ( Position, Cell ) -> Shape
-viewBoard { time } gt { columns, rows } cellList =
+viewBoard : Computer -> GridTransform -> List ( Position, Cell ) -> Shape
+viewBoard { time } gt cellList =
     let
         cellRadius =
             GridTransform.cellSize gt / 2

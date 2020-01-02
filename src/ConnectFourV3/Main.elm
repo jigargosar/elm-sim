@@ -163,16 +163,22 @@ toCellList { mouse } gt ({ rows, columns, board } as mem) =
 
         emptyBoard : Dict Position Cell
         emptyBoard =
-            List.range 0 (columns - 1)
-                |> List.concatMap
-                    (\column ->
-                        List.range 0 (rows - 1)
-                            |> List.map (\row -> ( ( column, row ), Empty ))
-                    )
+            positions2d columns rows
+                |> List.map (\pos -> ( pos, Empty ))
                 |> Dict.fromList
     in
     Dict.union coinBoard emptyBoard
         |> Dict.toList
+
+
+positions2d : Int -> Int -> List Position
+positions2d columns rows =
+    List.range 0 (columns - 1)
+        |> List.concatMap
+            (\column ->
+                List.range 0 (rows - 1)
+                    |> List.map (\row -> ( column, row ))
+            )
 
 
 viewBoard : Computer -> GridTransform -> List ( Position, Cell ) -> Shape

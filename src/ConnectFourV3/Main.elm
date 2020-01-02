@@ -54,25 +54,35 @@ insertCoin : Int -> Mem -> Mem
 insertCoin column mem =
     case mem.state of
         Nothing ->
-            let
-                columnLength =
-                    Dict.filter (\( x, _ ) _ -> x == column) mem.board
-                        |> Dict.size
-            in
-            if
-                (columns < 0 || column >= columns)
-                    && (columnLength >= rows)
-            then
-                mem
-
-            else
-                { mem
-                    | board = Dict.insert ( column, columnLength ) mem.coin mem.board
-                    , coin = flipCoin mem.coin
-                }
+            columnToInsertPosition column mem
+                |> Maybe.map
+                    (\position ->
+                        { mem
+                            | board = Dict.insert position mem.coin mem.board
+                            , coin = flipCoin mem.coin
+                        }
+                    )
+                |> Maybe.withDefault mem
 
         Just _ ->
             mem
+
+
+columnToInsertPosition : Int -> Mem -> Maybe Position
+columnToInsertPosition column mem =
+    let
+        columnLength =
+            Dict.filter (\( x, _ ) _ -> x == column) mem.board
+                |> Dict.size
+    in
+    if
+        (columns < 0 || column >= columns)
+            && (columnLength >= rows)
+    then
+        Nothing
+
+    else
+        Just ( column, columnLength )
 
 
 updateMemory : Computer -> Mem -> Mem
@@ -155,10 +165,10 @@ viewMemory _ { board } =
 
         viewCellAt ( x, y ) =
             group
-                [ circle white (cellRadius * 0.8)
+                [ circle white (cellRadius * 0.9)
                 , case Dict.get ( x, y ) board of
                     Just coin ->
-                        circle (coinToColor coin) (cellRadius * 0.8)
+                        circle (coinToColor coin) (cellRadius * 0.7)
 
                     Nothing ->
                         group []

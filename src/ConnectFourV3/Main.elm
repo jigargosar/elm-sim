@@ -107,15 +107,17 @@ mouseClickToBoardColumn mouse =
         Nothing
 
 
-screenXToBoardColumn : Float -> Maybe Int
-screenXToBoardColumn x =
+screenXToBoardPosition : Float -> Mem -> Maybe Position
+screenXToBoardPosition x mem =
     let
         { cellSize, dx } =
             toBoardView defaultCellSize
+
+        column : Int
+        column =
+            ((x - dx) / cellSize) |> round
     in
-    ((x - dx) / cellSize)
-        |> round
-        |> Just
+    columnToInsertPosition column mem
 
 
 type alias BoardView =

@@ -189,7 +189,8 @@ toCellList { mouse } ({ rows, columns, board } as mem) =
         maybeMouseBoardPosition =
             screenXToBoardPosition mouse.x mem
 
-        toPositionCellPair pos =
+        withCell : Position -> ( Position, Cell )
+        withCell pos =
             let
                 defCell =
                     if maybeMouseBoardPosition == Just pos then
@@ -205,7 +206,7 @@ toCellList { mouse } ({ rows, columns, board } as mem) =
             )
     in
     List.range 0 (columns - 1)
-        |> List.concatMap (\x -> List.range 0 (rows - 1) |> List.map (Tuple.pair x >> toPositionCellPair))
+        |> List.concatMap (\x -> List.range 0 (rows - 1) |> List.map (Tuple.pair x >> withCell))
 
 
 viewBoard : Computer -> Mem -> List ( Position, Cell ) -> Shape

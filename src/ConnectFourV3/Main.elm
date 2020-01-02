@@ -173,8 +173,8 @@ toCellList { mouse } ({ rows, columns, board } as mem) =
         clampedMouseColumn =
             ((mouse.x - dx) / cellSize)
                 |> round
+                |> clamp 0 (columns - 1)
 
-        -- |> clamp 0 (columns - 1)
         insertIndicatorCoin : Dict Position Cell -> Dict Position Cell
         insertIndicatorCoin =
             case

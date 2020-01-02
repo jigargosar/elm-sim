@@ -165,9 +165,9 @@ toCellList { mouse } gt ({ rows, columns, board } as mem) =
         emptyBoard =
             List.range 0 (columns - 1)
                 |> List.concatMap
-                    (\x ->
+                    (\column ->
                         List.range 0 (rows - 1)
-                            |> List.map (\y -> ( ( x, y ), Empty ))
+                            |> List.map (\row -> ( ( column, row ), Empty ))
                     )
                 |> Dict.fromList
     in
@@ -204,9 +204,9 @@ viewBoard { time } gt cellList =
                         , coinToShape highlight coin
                         ]
 
-        viewCell ( ( x, y ), cell ) =
+        viewCell ( ( column, row ), cell ) =
             toCellShape cell
-                |> move (GridTransform.toScreenX x gt) (GridTransform.toScreenY y gt)
+                |> move (GridTransform.toScreenX column gt) (GridTransform.toScreenY row gt)
     in
     group
         [ rectangle black (GridTransform.width gt) (GridTransform.height gt)

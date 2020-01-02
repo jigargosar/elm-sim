@@ -109,13 +109,6 @@ mouseClickToBoardColumn mouse gt =
         Nothing
 
 
-type alias BoardView =
-    { cellSize : Float
-    , dx : Float
-    , dy : Float
-    }
-
-
 coinToColor : Coin -> Color
 coinToColor coin =
     case coin of

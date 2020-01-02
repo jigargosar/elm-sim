@@ -1,8 +1,7 @@
 module ConnectFourV3.Main exposing (main)
 
+import Basics.Extra exposing (uncurry)
 import Dict exposing (Dict)
-import Dict.Extra
-import List.Extra
 import Playground exposing (..)
 
 
@@ -176,30 +175,27 @@ viewMemory _ { board } =
             List.range 0 (columns - 1)
                 |> List.concatMap (\x -> List.range 0 (rows - 1) |> List.map (Tuple.pair x))
 
-        cellList : List ( Position, Maybe Coin )
-        cellList =
-            List.map (\pos -> ( pos, Dict.get pos board )) allBoardPositions
-
-        cellToShape : Maybe Coin -> Shape
-        cellToShape cell =
-            group
-                [ circle white (cellRadius * 0.9)
-                , case cell of
-                    Just coin ->
-                        circle (coinToColor coin) (cellRadius * 0.7)
-
-                    Nothing ->
-                        group []
-                ]
-
-        viewCellAt ( ( x, y ), cell ) =
-            cellToShape cell
+        moveCellShape ( x, y ) shape =
+            shape
                 |> move (toFloat x * cellSize + dx) (toFloat y * cellSize + dy)
+
+        coinToShape coin =
+            circle (coinToColor coin) (cellRadius * 0.7)
+
+        cellBackgroundShape =
+            circle white (cellRadius * 0.9)
+
+        viewCellBackgroundAt : Position -> Shape
+        viewCellBackgroundAt position =
+            cellBackgroundShape |> moveCellShape position
+
+        viewCoinAt pos coin =
+            coinToShape coin |> moveCellShape pos
     in
     [ group
         [ rectangle black width height
-        , List.map viewCellAt cellList
-            |> group
+        , List.map viewCellBackgroundAt allBoardPositions |> group
+        , List.map (uncurry viewCoinAt) (Dict.toList board) |> group
         ]
     ]
 

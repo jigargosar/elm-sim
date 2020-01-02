@@ -107,6 +107,17 @@ mouseClickToBoardColumn mouse =
         Nothing
 
 
+screenXToBoardColumn : Float -> Maybe Int
+screenXToBoardColumn x =
+    let
+        { cellSize, dx } =
+            toBoardView defaultCellSize
+    in
+    ((x - dx) / cellSize)
+        |> round
+        |> Just
+
+
 type alias BoardView =
     { cellRadius : Float
     , cellSize : Float

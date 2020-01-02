@@ -13,9 +13,16 @@ type Coin
     | Blue
 
 
-type GameOver
-    = WinningPositions (List Position)
-    | Draw
+
+{-
+   type GameOver
+       = WinningPositions (List Position)
+       | Draw
+-}
+
+
+type alias GameOver =
+    ()
 
 
 type alias Mem =
@@ -45,16 +52,12 @@ initialMemory =
 
                 height =
                     toFloat rows * cellSize
-
-                cellRadius =
-                    cellSize / 2
             in
-            { cellRadius = cellRadius
-            , cellSize = cellSize
+            { cellSize = cellSize
             , width = width
             , height = height
-            , dx = -width / 2 + cellRadius
-            , dy = -height / 2 + cellRadius
+            , dx = -width / 2 + cellSize / 2
+            , dy = -height / 2 + cellSize / 2
             }
     in
     { board = Dict.empty
@@ -125,8 +128,7 @@ mouseClickToBoardColumn mouse mem =
 
 
 type alias BoardView =
-    { cellRadius : Float
-    , cellSize : Float
+    { cellSize : Float
     , width : Float
     , height : Float
     , dx : Float
@@ -200,10 +202,13 @@ toCellList { mouse } ({ rows, columns, board } as mem) =
 
 
 viewBoard : Computer -> Mem -> List ( Position, Cell ) -> Shape
-viewBoard { time } { boardView } cellList =
+viewBoard { time } { boardView, columns, rows } cellList =
     let
-        { width, height, cellSize, cellRadius, dx, dy } =
+        { width, height, cellSize, dx, dy } =
             boardView
+
+        cellRadius =
+            cellSize / 2
 
         coinToShape highlight coin =
             circle (coinToColor coin) (cellRadius * 0.7)
@@ -233,7 +238,7 @@ viewBoard { time } { boardView } cellList =
                 |> move (toFloat x * cellSize + dx) (toFloat y * cellSize + dy)
     in
     group
-        [ rectangle black width height
+        [ rectangle black (toFloat columns * cellSize) (toFloat rows * cellSize)
         , List.map viewCell cellList |> group
         ]
 

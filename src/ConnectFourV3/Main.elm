@@ -133,8 +133,8 @@ computeGameOverState position coin { columns, rows } board =
 getWinningPositions : Position -> Dict Position Coin -> Maybe (Set Position)
 getWinningPositions position board =
     [ ( 1, 0 ), ( 0, 1 ), ( -1, 1 ), ( 1, -1 ) ]
-        |> List.map (getConnectedPositionSetInOpposingDirections position board)
-        |> List.Extra.find (\positionSet -> Set.size positionSet == 3)
+        |> List.map (getConnectedPositionSetInOpposingDirections position board >> Set.insert position)
+        |> List.Extra.find (\positionSet -> Set.size positionSet == 4)
 
 
 getConnectedPositionSetInOpposingDirections : Position -> Dict Position Coin -> ( Int, Int ) -> Set Position

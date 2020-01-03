@@ -90,16 +90,23 @@ updateMemory { mouse, screen } mem =
     in
     case mem.state of
         Nothing ->
-            mouseClickToBoardColumn mouse gt
-                |> Maybe.andThen (\column -> columnToInsertPosition column mem)
-                |> Maybe.map
-                    (\position ->
-                        { mem
-                            | board = Dict.insert position mem.coin mem.board
-                            , coin = flipCoin mem.coin
-                        }
-                    )
-                |> Maybe.withDefault mem
+            if mouse.click then
+                let
+                    column =
+                        GridTransform.fromScreenX mouse.x gt
+                in
+                columnToInsertPosition column mem
+                    |> Maybe.map
+                        (\position ->
+                            { mem
+                                | board = Dict.insert position mem.coin mem.board
+                                , coin = flipCoin mem.coin
+                            }
+                        )
+                    |> Maybe.withDefault mem
+
+            else
+                mem
 
         Just _ ->
             mem

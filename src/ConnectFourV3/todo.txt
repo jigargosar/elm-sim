@@ -14,7 +14,7 @@ Constrains:
 * Display board state with coins.
 * Display game state:
     * X player to move.
-    * Game won by x : show winning positions.
+    * Game won by x : show blinking winning positions.
     * Game Draw
-    * Restart on input.
+    * Restart on mouse click.
 * Input: show blinking move, based on mouse position.

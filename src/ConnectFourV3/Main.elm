@@ -133,47 +133,18 @@ getWinningPositions : Position -> Dict Position Coin -> Maybe (Set Position)
 getWinningPositions position board =
     [ ( 1, 0 ), ( 0, 1 ), ( -1, 1 ), ( 1, -1 ) ]
         |> List.map (getConnectedPositionSetInOpposingDirections position board)
-        |> List.Extra.find (\positionSet -> Set.size positionSet == 4)
+        |> List.Extra.find (\positionSet -> Set.size positionSet == 3)
 
 
 getConnectedPositionSetInOpposingDirections : Position -> Dict Position Coin -> ( Int, Int ) -> Set Position
 getConnectedPositionSetInOpposingDirections startPosition board ( dx, dy ) =
-    connectedPositionsInDirection2 ( dx, dy ) startPosition board
+    connectedPositionsInDirection ( dx, dy ) startPosition board
         |> Set.fromList
-        |> Set.union (connectedPositionsInDirection2 ( -dx, -dy ) startPosition board |> Set.fromList)
+        |> Set.union (connectedPositionsInDirection ( -dx, -dy ) startPosition board |> Set.fromList)
 
 
 connectedPositionsInDirection : ( Int, Int ) -> Position -> Dict Position Coin -> List Position
 connectedPositionsInDirection ( dx, dy ) startPosition board =
-    case Dict.get startPosition board of
-        Just coin ->
-            List.range 1 3
-                |> List.foldl
-                    (\_ (( ( ( x, y ), isDone ), connectedPositions ) as acc) ->
-                        if isDone then
-                            acc
-
-                        else
-                            let
-                                newPosition =
-                                    ( x + dx, y + dy )
-                            in
-                            if Dict.get newPosition board == Just coin then
-                                ( ( newPosition, False ), newPosition :: connectedPositions )
-
-                            else
-                                ( ( ( x, y ), True ), connectedPositions )
-                    )
-                    ( ( startPosition, False ), [] )
-                |> Tuple.second
-                |> List.reverse
-
-        Nothing ->
-            []
-
-
-connectedPositionsInDirection2 : ( Int, Int ) -> Position -> Dict Position Coin -> List Position
-connectedPositionsInDirection2 ( dx, dy ) startPosition board =
     case Dict.get startPosition board of
         Just coin ->
             iterate

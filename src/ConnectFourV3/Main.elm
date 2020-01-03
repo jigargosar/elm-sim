@@ -98,8 +98,12 @@ updateMemory { mouse, screen } mem =
                 columnToInsertPosition column mem
                     |> Maybe.map
                         (\position ->
+                            let
+                                board =
+                                    Dict.insert position mem.coin mem.board
+                            in
                             { mem
-                                | board = Dict.insert position mem.coin mem.board
+                                | board = board
                                 , coin = flipCoin mem.coin
                             }
                         )

@@ -2,6 +2,7 @@ module ConnectFourV3.Main exposing (main)
 
 import ConnectFourV3.GridTransform as GridTransform exposing (GridTransform)
 import Dict exposing (Dict)
+import List.Extra
 import Playground exposing (..)
 
 
@@ -95,13 +96,13 @@ updateMemory { mouse, screen } mem =
                                 board =
                                     Dict.insert position mem.coin mem.board
 
-                                ( coin, nextGameState ) =
-                                    computeGameOverState position mem.coin gridDimension mem.board
+                                ( coin, state ) =
+                                    computeGameOverState position mem.coin gridDimension board
                             in
                             { mem
                                 | board = board
                                 , coin = coin
-                                , state = nextGameState
+                                , state = state
                             }
                         )
                     |> Maybe.withDefault mem
@@ -120,6 +121,51 @@ computeGameOverState position coin { columns, rows } board =
 
     else
         ( flipCoin coin, Nothing )
+
+
+positionsInDirection : Position -> GridZipper -> List Position
+positionsInDirection direction z =
+    List.Extra.iterate (moveBy direction) z
+        |> List.map zipperToPosition
+
+
+type GridZipper
+    = GridZipper Position GridDimension
+
+
+zipperToPosition : GridZipper -> Position
+zipperToPosition (GridZipper position _) =
+    position
+
+
+zipperAt : Position -> GridDimension -> Maybe GridZipper
+zipperAt position dimension =
+    if isPositionValidInDimension position dimension then
+        GridZipper position dimension
+            |> Just
+
+    else
+        Nothing
+
+
+isPositionValidInDimension : Position -> GridDimension -> Bool
+isPositionValidInDimension ( x, y ) { columns, rows } =
+    (x < 0 || y < 0 || x >= columns || y >= rows)
+        |> not
+
+
+moveBy : Position -> GridZipper -> Maybe GridZipper
+moveBy ( dx, dy ) (GridZipper ( x, y ) dimension) =
+    let
+        position =
+            ( x + dx, y + dy )
+    in
+    if isPositionValidInDimension position dimension then
+        GridZipper position dimension
+            |> Just
+
+    else
+        Nothing
 
 
 coinToColor : Coin -> Color

@@ -112,16 +112,6 @@ updateMemory { mouse, screen } mem =
             mem
 
 
-mouseClickToBoardColumn : Mouse -> GridTransform -> Maybe Int
-mouseClickToBoardColumn mouse gt =
-    if mouse.click then
-        GridTransform.fromScreenX mouse.x gt
-            |> Just
-
-    else
-        Nothing
-
-
 coinToColor : Coin -> Color
 coinToColor coin =
     case coin of

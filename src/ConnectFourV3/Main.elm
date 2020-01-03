@@ -119,15 +119,34 @@ coinToColor coin =
             blue
 
 
-defaultCellSize =
-    50
+computeCellSize : Screen -> { a | columns : Int, rows : Int } -> Float
+computeCellSize { width, height } { columns, rows } =
+    let
+        maxCellWidth =
+            width * 0.8 / toFloat columns
+
+        maxCellHeight =
+            height * 0.8 / toFloat rows
+    in
+    min maxCellWidth maxCellHeight
+
+
+getGridDimension : Mem -> { columns : Int, rows : Int }
+getGridDimension { columns, rows } =
+    { columns = columns, rows = rows }
 
 
 viewMemory : Computer -> Mem -> List Shape
 viewMemory computer mem =
     let
+        gridDimension =
+            getGridDimension mem
+
+        cellSize =
+            computeCellSize computer.screen (getGridDimension mem)
+
         gt =
-            GridTransform.init defaultCellSize mem
+            GridTransform.init cellSize gridDimension
     in
     [ viewBoard computer gt (toCellList computer gt mem)
     ]

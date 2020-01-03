@@ -33,7 +33,7 @@ type alias Record =
     }
 
 
-init : Float -> { a | columns : Int, rows : Int } -> GridTransform
+init : Float -> { columns : Int, rows : Int } -> GridTransform
 init cs { columns, rows } =
     { cs = cs
     , dx =

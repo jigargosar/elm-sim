@@ -71,10 +71,10 @@ updateMemory : Computer -> Mem -> Mem
 updateMemory { mouse, screen } mem =
     let
         gridDimension =
-            getGridDimension mem
+            Grid.dimension mem.grid
 
         cellSize =
-            computeCellSize screen (getGridDimension mem)
+            computeCellSize screen (Grid.dimension mem.grid)
 
         gt =
             GridTransform.init cellSize gridDimension
@@ -206,19 +206,14 @@ computeCellSize { width, height } { columns, rows } =
     min maxCellWidth maxCellHeight
 
 
-getGridDimension : Mem -> GridDimension
-getGridDimension { grid } =
-    Grid.dimension grid
-
-
 viewMemory : Computer -> Mem -> List Shape
 viewMemory computer mem =
     let
         gridDimension =
-            getGridDimension mem
+            Grid.dimension mem.grid
 
         cellSize =
-            computeCellSize computer.screen (getGridDimension mem)
+            computeCellSize computer.screen gridDimension
 
         gt =
             GridTransform.init cellSize gridDimension
@@ -250,7 +245,7 @@ toCellList : Computer -> GridTransform -> Mem -> List ( Position, Cell )
 toCellList { mouse } gt ({ board } as mem) =
     let
         { rows, columns } =
-            getGridDimension mem
+            Grid.dimension mem.grid
 
         clampedMouseColumn =
             GridTransform.fromScreenX mouse.x gt
@@ -301,7 +296,7 @@ toCellList { mouse } gt ({ board } as mem) =
 
         emptyBoard : Dict Position Cell
         emptyBoard =
-            dimensionToPositioins (getGridDimension mem)
+            dimensionToPositioins (Grid.dimension mem.grid)
                 |> List.map (\pos -> ( pos, Empty ))
                 |> Dict.fromList
     in

@@ -125,7 +125,7 @@ coinToColor coin =
             blue
 
 
-computeCellSize : Screen -> { a | columns : Int, rows : Int } -> Float
+computeCellSize : Screen -> GridDimension -> Float
 computeCellSize { width, height } { columns, rows } =
     let
         maxCellWidth =

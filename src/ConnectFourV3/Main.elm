@@ -77,10 +77,16 @@ columnToInsertPosition column mem =
 
 
 updateMemory : Computer -> Mem -> Mem
-updateMemory { mouse } mem =
+updateMemory { mouse, screen } mem =
     let
+        gridDimension =
+            getGridDimension mem
+
+        cellSize =
+            computeCellSize screen (getGridDimension mem)
+
         gt =
-            GridTransform.init defaultCellSize mem
+            GridTransform.init cellSize gridDimension
     in
     case mem.state of
         Nothing ->
@@ -131,7 +137,7 @@ computeCellSize { width, height } { columns, rows } =
     min maxCellWidth maxCellHeight
 
 
-getGridDimension : Mem -> { columns : Int, rows : Int }
+getGridDimension : Mem -> GridDimension
 getGridDimension { columns, rows } =
     { columns = columns, rows = rows }
 
@@ -150,6 +156,20 @@ viewMemory computer mem =
     in
     [ viewBoard computer gt (toCellList computer gt mem)
     ]
+
+
+type alias GridDimension =
+    { columns : Int, rows : Int }
+
+
+dimensionToPositioins : GridDimension -> List Position
+dimensionToPositioins { columns, rows } =
+    List.range 0 (columns - 1)
+        |> List.concatMap
+            (\column ->
+                List.range 0 (rows - 1)
+                    |> List.map (\row -> ( column, row ))
+            )
 
 
 type Cell
@@ -182,22 +202,12 @@ toCellList { mouse } gt ({ rows, columns, board } as mem) =
 
         emptyBoard : Dict Position Cell
         emptyBoard =
-            positions2d columns rows
+            dimensionToPositioins (getGridDimension mem)
                 |> List.map (\pos -> ( pos, Empty ))
                 |> Dict.fromList
     in
     Dict.union coinBoard emptyBoard
         |> Dict.toList
-
-
-positions2d : Int -> Int -> List Position
-positions2d columns rows =
-    List.range 0 (columns - 1)
-        |> List.concatMap
-            (\column ->
-                List.range 0 (rows - 1)
-                    |> List.map (\row -> ( column, row ))
-            )
 
 
 viewBoard : Computer -> GridTransform -> List ( Position, Cell ) -> Shape

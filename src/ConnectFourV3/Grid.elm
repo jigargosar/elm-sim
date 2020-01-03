@@ -1,4 +1,16 @@
-module ConnectFourV3.Grid exposing (Dimensions, Grid, Position, dimensions, empty, get, insert, isFull, map, toDict, update)
+module ConnectFourV3.Grid exposing
+    ( Dimensions
+    , Grid
+    , Position
+    , dimensions
+    , empty
+    , get
+    , insert
+    , isFull
+    , map
+    , toDict
+    , update
+    )
 
 import Dict exposing (Dict)
 

@@ -1,5 +1,6 @@
 module ConnectFourV3.Main exposing (main)
 
+import ConnectFourV3.Grid as Grid exposing (Grid)
 import ConnectFourV3.GridTransform as GridTransform exposing (GridTransform)
 import Dict exposing (Dict)
 import List.Extra
@@ -26,25 +27,16 @@ type alias Mem =
     { board : Dict Position Coin
     , state : Maybe GameOver
     , coin : Coin
-    , rows : Int
-    , columns : Int
+    , grid : Grid Coin
     }
 
 
 initialMemory : Mem
 initialMemory =
-    let
-        columns =
-            7
-
-        rows =
-            6
-    in
     { board = Dict.empty
     , coin = Blue
     , state = Nothing
-    , columns = columns
-    , rows = rows
+    , grid = Grid.empty { columns = 7, rows = 6 }
     }
 
 
@@ -58,14 +50,17 @@ flipCoin coin =
             Red
 
 
-columnToInsertPosition : Int -> Mem -> Maybe Position
-columnToInsertPosition column mem =
+columnToInsertPosition : Int -> Grid Coin -> Maybe Position
+columnToInsertPosition column grid =
     let
         columnLength =
-            Dict.filter (\( x, _ ) _ -> x == column) mem.board
+            Dict.filter (\( x, _ ) _ -> x == column) (Grid.toDict grid)
                 |> Dict.size
+
+        { columns, rows } =
+            Grid.dimension grid
     in
-    if column < 0 || column >= mem.columns || (columnLength >= mem.rows) then
+    if column < 0 || column >= columns || (columnLength >= rows) then
         Nothing
 
     else
@@ -91,7 +86,7 @@ updateMemory { mouse, screen } mem =
                     column =
                         GridTransform.fromScreenX mouse.x gt
                 in
-                columnToInsertPosition column mem
+                columnToInsertPosition column mem.grid
                     |> Maybe.map
                         (\position ->
                             let
@@ -212,8 +207,8 @@ computeCellSize { width, height } { columns, rows } =
 
 
 getGridDimension : Mem -> GridDimension
-getGridDimension { columns, rows } =
-    { columns = columns, rows = rows }
+getGridDimension { grid } =
+    Grid.dimension grid
 
 
 viewMemory : Computer -> Mem -> List Shape
@@ -252,8 +247,11 @@ type Cell
 
 
 toCellList : Computer -> GridTransform -> Mem -> List ( Position, Cell )
-toCellList { mouse } gt ({ rows, columns, board } as mem) =
+toCellList { mouse } gt ({ board } as mem) =
     let
+        { rows, columns } =
+            getGridDimension mem
+
         clampedMouseColumn =
             GridTransform.fromScreenX mouse.x gt
                 |> clamp 0 (columns - 1)
@@ -261,7 +259,7 @@ toCellList { mouse } gt ({ rows, columns, board } as mem) =
         insertIndicatorCoin : Dict Position Cell -> Dict Position Cell
         insertIndicatorCoin =
             case
-                columnToInsertPosition clampedMouseColumn mem
+                columnToInsertPosition clampedMouseColumn mem.grid
             of
                 Just pos ->
                     Dict.insert pos (WithCoin True mem.coin)

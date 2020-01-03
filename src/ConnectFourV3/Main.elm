@@ -188,16 +188,6 @@ iterate func a0 list =
             list
 
 
-addPositions : Position -> Position -> Position
-addPositions ( x1, y1 ) ( x2, y2 ) =
-    ( x1 + x2, y1 + y2 )
-
-
-subtractPositions : Position -> Position -> Position
-subtractPositions ( x1, y1 ) ( x2, y2 ) =
-    ( x1 - x2, y1 - y2 )
-
-
 coinToColor : Coin -> Color
 coinToColor coin =
     case coin of

@@ -14,16 +14,9 @@ type Coin
     | Blue
 
 
-
-{-
-   type GameOver
-       = WinningPositions (List Position)
-       | Draw
--}
-
-
-type alias GameOver =
-    ()
+type GameOver
+    = WinningPositions (List Position)
+    | Draw
 
 
 type alias Mem =
@@ -101,10 +94,14 @@ updateMemory { mouse, screen } mem =
                             let
                                 board =
                                     Dict.insert position mem.coin mem.board
+
+                                ( coin, nextGameState ) =
+                                    computeGameOverState position mem.coin gridDimension mem.board
                             in
                             { mem
                                 | board = board
-                                , coin = flipCoin mem.coin
+                                , coin = coin
+                                , state = nextGameState
                             }
                         )
                     |> Maybe.withDefault mem
@@ -114,6 +111,15 @@ updateMemory { mouse, screen } mem =
 
         Just _ ->
             mem
+
+
+computeGameOverState : Position -> Coin -> GridDimension -> Dict Position Coin -> ( Coin, Maybe GameOver )
+computeGameOverState position coin { columns, rows } board =
+    if Dict.size board >= columns * rows then
+        ( coin, Just Draw )
+
+    else
+        ( flipCoin coin, Nothing )
 
 
 coinToColor : Coin -> Color

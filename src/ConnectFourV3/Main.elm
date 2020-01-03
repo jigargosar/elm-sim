@@ -17,7 +17,7 @@ type Coin
 
 
 type GameOver
-    = WinningPositions (List Position)
+    = WinningPositions (Set Position)
     | Draw
 
 
@@ -116,26 +116,105 @@ updateMemory { mouse, screen } mem =
 
 
 computeGameOverState : Position -> Coin -> GridDimension -> Dict Position Coin -> ( Coin, Maybe GameOver )
-computeGameOverState position coin ({ columns, rows } as dimension) board =
+computeGameOverState position coin { columns, rows } board =
     if Dict.size board >= columns * rows then
         ( coin, Just Draw )
 
     else
-        ( flipCoin coin, Nothing )
+        case getWinningPositions position board of
+            Just positionSet ->
+                ( coin, Just (WinningPositions positionSet) )
+
+            Nothing ->
+                ( flipCoin coin, Nothing )
 
 
-positionSetInDirection direction startPosition =
-    List.range 1 3
-        |> List.foldl
-            (\_ ( position, acc ) ->
-                let
-                    newPosition =
-                        addPositions position direction
-                in
-                ( newPosition, Set.insert newPosition acc )
-            )
-            ( startPosition, Set.singleton startPosition )
-        |> Tuple.second
+getWinningPositions : Position -> Dict Position Coin -> Maybe (Set Position)
+getWinningPositions position board =
+    [ ( 1, 0 ), ( 0, 1 ), ( -1, 1 ), ( 1, -1 ) ]
+        |> List.map (getConnectedPositionSetInOpposingDirections position board)
+        |> List.Extra.find (\positionSet -> Set.size positionSet == 4)
+
+
+getConnectedPositionSetInOpposingDirections : Position -> Dict Position Coin -> ( Int, Int ) -> Set Position
+getConnectedPositionSetInOpposingDirections startPosition board ( dx, dy ) =
+    connectedPositionsInDirection2 ( dx, dy ) startPosition board
+        |> Set.fromList
+        |> Set.union (connectedPositionsInDirection2 ( -dx, -dy ) startPosition board |> Set.fromList)
+
+
+connectedPositionsInDirection : ( Int, Int ) -> Position -> Dict Position Coin -> List Position
+connectedPositionsInDirection ( dx, dy ) startPosition board =
+    case Dict.get startPosition board of
+        Just coin ->
+            List.range 1 3
+                |> List.foldl
+                    (\_ (( ( ( x, y ), isDone ), connectedPositions ) as acc) ->
+                        if isDone then
+                            acc
+
+                        else
+                            let
+                                newPosition =
+                                    ( x + dx, y + dy )
+                            in
+                            if Dict.get newPosition board == Just coin then
+                                ( ( newPosition, False ), newPosition :: connectedPositions )
+
+                            else
+                                ( ( ( x, y ), True ), connectedPositions )
+                    )
+                    ( ( startPosition, False ), [] )
+                |> Tuple.second
+                |> List.reverse
+
+        Nothing ->
+            []
+
+
+connectedPositionsInDirection2 : ( Int, Int ) -> Position -> Dict Position Coin -> List Position
+connectedPositionsInDirection2 ( dx, dy ) startPosition board =
+    case Dict.get startPosition board of
+        Just coin ->
+            iterate
+                (\( x, y ) ->
+                    let
+                        newPosition =
+                            ( x + dx, y + dy )
+                    in
+                    if Dict.get newPosition board == Just coin then
+                        Just newPosition
+
+                    else
+                        Nothing
+                )
+                startPosition
+                []
+                |> List.reverse
+                |> List.take 3
+
+        Nothing ->
+            []
+
+
+consWhile : (seed -> Maybe ( seed, a )) -> seed -> List a -> List a
+consWhile func seed0 aList =
+    case func seed0 of
+        Just ( seed1, a ) ->
+            consWhile func seed1 (a :: aList)
+
+        Nothing ->
+            aList
+
+
+iterate : (a -> Maybe a) -> a -> List a -> List a
+iterate func a0 list =
+    case func a0 of
+        Just a1 ->
+            iterate func a1 (a1 :: list)
+
+        Nothing ->
+            list
 
 
 addPositions : Position -> Position -> Position

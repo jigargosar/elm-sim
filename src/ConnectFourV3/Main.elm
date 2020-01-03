@@ -4,6 +4,7 @@ import ConnectFourV3.GridTransform as GridTransform exposing (GridTransform)
 import Dict exposing (Dict)
 import List.Extra
 import Playground exposing (..)
+import PointFree exposing (flip)
 import Set exposing (Set)
 
 
@@ -268,10 +269,37 @@ toCellList { mouse } gt ({ rows, columns, board } as mem) =
                 Nothing ->
                     identity
 
+        updateWinningPositions : Set Position -> Dict Position Cell -> Dict Position Cell
+        updateWinningPositions =
+            Set.foldl
+                (\pos ->
+                    Dict.update pos
+                        (Maybe.map
+                            (\cell ->
+                                case cell of
+                                    WithCoin _ coin ->
+                                        WithCoin True coin
+
+                                    _ ->
+                                        cell
+                            )
+                        )
+                )
+                |> flip
+
         coinBoard : Dict Position Cell
         coinBoard =
             Dict.map (\_ -> WithCoin False) board
-                |> insertIndicatorCoin
+                |> (case mem.state of
+                        Nothing ->
+                            insertIndicatorCoin
+
+                        Just (WinningPositions winningPositionSet) ->
+                            updateWinningPositions winningPositionSet
+
+                        Just Draw ->
+                            identity
+                   )
 
         emptyBoard : Dict Position Cell
         emptyBoard =

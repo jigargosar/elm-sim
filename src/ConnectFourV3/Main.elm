@@ -24,8 +24,7 @@ type GameOver
 
 
 type alias Mem =
-    { board : Dict Position Coin
-    , state : Maybe GameOver
+    { state : Maybe GameOver
     , coin : Coin
     , grid : Grid Coin
     }
@@ -33,8 +32,7 @@ type alias Mem =
 
 initialMemory : Mem
 initialMemory =
-    { board = Dict.empty
-    , coin = Blue
+    { coin = Blue
     , state = Nothing
     , grid = Grid.empty { columns = 7, rows = 6 }
     }
@@ -58,7 +56,7 @@ columnToInsertPosition column grid =
                 |> Dict.size
 
         { columns, rows } =
-            Grid.dimension grid
+            Grid.dimensions grid
     in
     if column < 0 || column >= columns || (columnLength >= rows) then
         Nothing
@@ -71,10 +69,10 @@ updateMemory : Computer -> Mem -> Mem
 updateMemory { mouse, screen } mem =
     let
         gridDimension =
-            Grid.dimension mem.grid
+            Grid.dimensions mem.grid
 
         cellSize =
-            computeCellSize screen (Grid.dimension mem.grid)
+            computeCellSize screen (Grid.dimensions mem.grid)
 
         gt =
             GridTransform.init cellSize gridDimension
@@ -89,18 +87,20 @@ updateMemory { mouse, screen } mem =
                 columnToInsertPosition column mem.grid
                     |> Maybe.map
                         (\position ->
-                            let
-                                board =
-                                    Dict.insert position mem.coin mem.board
+                            case Grid.insert position mem.coin mem.grid of
+                                Ok grid ->
+                                    let
+                                        ( coin, state ) =
+                                            computeGameOverState position mem.coin grid
+                                    in
+                                    { mem
+                                        | grid = grid
+                                        , coin = coin
+                                        , state = state
+                                    }
 
-                                ( coin, state ) =
-                                    computeGameOverState position mem.coin gridDimension board
-                            in
-                            { mem
-                                | board = board
-                                , coin = coin
-                                , state = state
-                            }
+                                Err _ ->
+                                    mem
                         )
                     |> Maybe.withDefault mem
 
@@ -111,13 +111,13 @@ updateMemory { mouse, screen } mem =
             mem
 
 
-computeGameOverState : Position -> Coin -> GridDimension -> Dict Position Coin -> ( Coin, Maybe GameOver )
-computeGameOverState position coin { columns, rows } board =
-    if Dict.size board >= columns * rows then
+computeGameOverState : Position -> Coin -> Grid Coin -> ( Coin, Maybe GameOver )
+computeGameOverState position coin grid =
+    if Grid.isFull grid then
         ( coin, Just Draw )
 
     else
-        case getWinningPositions position board of
+        case getWinningPositions position grid of
             Just positionSet ->
                 ( coin, Just (WinningPositions positionSet) )
 
@@ -125,31 +125,31 @@ computeGameOverState position coin { columns, rows } board =
                 ( flipCoin coin, Nothing )
 
 
-getWinningPositions : Position -> Dict Position Coin -> Maybe (Set Position)
-getWinningPositions position board =
+getWinningPositions : Position -> Grid Coin -> Maybe (Set Position)
+getWinningPositions position grid =
     [ ( 1, 0 ), ( 0, 1 ), ( -1, 1 ), ( 1, -1 ) ]
-        |> List.map (getConnectedPositionSetInOpposingDirections position board >> Set.insert position)
+        |> List.map (getConnectedPositionSetInOpposingDirections position grid >> Set.insert position)
         |> List.Extra.find (\positionSet -> Set.size positionSet == 4)
 
 
-getConnectedPositionSetInOpposingDirections : Position -> Dict Position Coin -> ( Int, Int ) -> Set Position
-getConnectedPositionSetInOpposingDirections startPosition board ( dx, dy ) =
-    connectedPositionsInDirection ( dx, dy ) startPosition board
+getConnectedPositionSetInOpposingDirections : Position -> Grid Coin -> ( Int, Int ) -> Set Position
+getConnectedPositionSetInOpposingDirections startPosition grid ( dx, dy ) =
+    connectedPositionsInDirection ( dx, dy ) startPosition grid
         |> Set.fromList
-        |> Set.union (connectedPositionsInDirection ( -dx, -dy ) startPosition board |> Set.fromList)
+        |> Set.union (connectedPositionsInDirection ( -dx, -dy ) startPosition grid |> Set.fromList)
 
 
-connectedPositionsInDirection : ( Int, Int ) -> Position -> Dict Position Coin -> List Position
-connectedPositionsInDirection ( dx, dy ) startPosition board =
-    case Dict.get startPosition board of
-        Just coin ->
+connectedPositionsInDirection : ( Int, Int ) -> Position -> Grid Coin -> List Position
+connectedPositionsInDirection ( dx, dy ) startPosition grid =
+    case Grid.get startPosition grid of
+        Ok coin ->
             iterate
                 (\( x, y ) ->
                     let
                         newPosition =
                             ( x + dx, y + dy )
                     in
-                    if Dict.get newPosition board == Just coin then
+                    if Grid.get newPosition grid == Ok coin then
                         Just newPosition
 
                     else
@@ -160,7 +160,7 @@ connectedPositionsInDirection ( dx, dy ) startPosition board =
                 |> List.reverse
                 |> List.take 3
 
-        Nothing ->
+        Err _ ->
             []
 
 
@@ -210,7 +210,7 @@ viewMemory : Computer -> Mem -> List Shape
 viewMemory computer mem =
     let
         gridDimension =
-            Grid.dimension mem.grid
+            Grid.dimensions mem.grid
 
         cellSize =
             computeCellSize computer.screen gridDimension
@@ -241,32 +241,38 @@ type Cell
     | WithCoin Bool Coin
 
 
+ignoreError : (b -> Result x b) -> b -> b
+ignoreError func val =
+    func val |> Result.withDefault val
+
+
 toCellList : Computer -> GridTransform -> Mem -> List ( Position, Cell )
-toCellList { mouse } gt ({ board } as mem) =
+toCellList { mouse } gt mem =
     let
         { rows, columns } =
-            Grid.dimension mem.grid
+            Grid.dimensions mem.grid
 
         clampedMouseColumn =
             GridTransform.fromScreenX mouse.x gt
                 |> clamp 0 (columns - 1)
 
-        insertIndicatorCoin : Dict Position Cell -> Dict Position Cell
+        insertIndicatorCoin : Grid Cell -> Grid Cell
         insertIndicatorCoin =
             case
                 columnToInsertPosition clampedMouseColumn mem.grid
             of
                 Just pos ->
-                    Dict.insert pos (WithCoin True mem.coin)
+                    Grid.insert pos (WithCoin True mem.coin)
+                        |> ignoreError
 
                 Nothing ->
                     identity
 
-        updateWinningPositions : Set Position -> Dict Position Cell -> Dict Position Cell
+        updateWinningPositions : Set Position -> Grid Cell -> Grid Cell
         updateWinningPositions =
             Set.foldl
                 (\pos ->
-                    Dict.update pos
+                    Grid.update pos
                         (Maybe.map
                             (\cell ->
                                 case cell of
@@ -277,12 +283,13 @@ toCellList { mouse } gt ({ board } as mem) =
                                         cell
                             )
                         )
+                        |> ignoreError
                 )
                 |> flip
 
         coinBoard : Dict Position Cell
         coinBoard =
-            Dict.map (\_ -> WithCoin False) board
+            Grid.map (\_ -> WithCoin False) mem.grid
                 |> (case mem.state of
                         Nothing ->
                             insertIndicatorCoin
@@ -293,10 +300,11 @@ toCellList { mouse } gt ({ board } as mem) =
                         Just Draw ->
                             identity
                    )
+                |> Grid.toDict
 
         emptyBoard : Dict Position Cell
         emptyBoard =
-            dimensionToPositioins (Grid.dimension mem.grid)
+            dimensionToPositioins (Grid.dimensions mem.grid)
                 |> List.map (\pos -> ( pos, Empty ))
                 |> Dict.fromList
     in

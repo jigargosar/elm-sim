@@ -5,7 +5,7 @@ import ConnectFourV3.GridTransform as GridTransform exposing (GridTransform)
 import Dict exposing (Dict)
 import List.Extra
 import Playground exposing (..)
-import PointFree exposing (flip, when)
+import PointFree exposing (flip, is, when)
 import Set exposing (Set)
 
 
@@ -201,14 +201,12 @@ columnToInsertPosition : Int -> Grid v -> Grid.Position
 columnToInsertPosition column grid =
     let
         columnLength =
-            List.Extra.count
-                (\( x, _ ) -> x == column)
-                (Grid.toDict grid |> Dict.keys)
-
-        position =
-            ( column, columnLength )
+            Grid.toDict grid
+                |> Dict.keys
+                |> List.Extra.count
+                    (Tuple.first >> is column)
     in
-    position
+    ( column, columnLength )
 
 
 insertInColumn : Int -> v -> Grid v -> Result Grid.Error ( Grid.Position, Grid v )

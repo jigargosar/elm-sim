@@ -167,3 +167,7 @@ pairTo =
 mulBy : number -> number -> number
 mulBy =
     (*)
+
+
+is =
+    (==)

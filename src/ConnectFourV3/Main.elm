@@ -112,12 +112,21 @@ updateMemory { mouse, screen } mem =
 
 
 computeGameOverState : Position -> Coin -> Grid Coin -> ( Coin, Maybe GameOver )
-computeGameOverState position coin grid =
+computeGameOverState startPosition coin grid =
     if Grid.isFull grid then
         ( coin, Just Draw )
 
     else
-        case getWinningPositions position grid of
+        let
+            validatePosition : Grid.Position -> Maybe Grid.Position
+            validatePosition position =
+                if Grid.get position grid == Ok (Just coin) then
+                    Just position
+
+                else
+                    Nothing
+        in
+        case getWinningPositions startPosition validatePosition of
             Just positionSet ->
                 ( coin, Just (WinningPositions positionSet) )
 
@@ -125,19 +134,22 @@ computeGameOverState position coin grid =
                 ( flipCoin coin, Nothing )
 
 
-getWinningPositions : Position -> Grid Coin -> Maybe (Set Position)
-getWinningPositions position grid =
+getWinningPositions startPosition validatePosition =
+    let
+        getPositionsInDirection ( dx, dy ) =
+            collectWhileUpto 3
+                (\( x, y ) -> validatePosition ( x + dx, y + dy ))
+                startPosition
+                |> Set.fromList
+
+        getPositionSetInOpposingDirections ( dx, dy ) =
+            getPositionsInDirection ( dx, dy )
+                |> Set.union (getPositionsInDirection ( -dx, -dy ))
+                |> Set.insert startPosition
+    in
     [ ( 1, 0 ), ( 0, 1 ), ( -1, 1 ), ( 1, -1 ) ]
-        |> List.map (getConnectedPositionSetInOpposingDirections position grid)
+        |> List.map getPositionSetInOpposingDirections
         |> List.Extra.find (\positionSet -> Set.size positionSet == 4)
-
-
-getConnectedPositionSetInOpposingDirections : Position -> Grid Coin -> ( Int, Int ) -> Set Position
-getConnectedPositionSetInOpposingDirections startPosition grid ( dx, dy ) =
-    connectedPositionsInDirection ( dx, dy ) startPosition grid
-        |> Set.fromList
-        |> Set.union (connectedPositionsInDirection ( -dx, -dy ) startPosition grid |> Set.fromList)
-        |> Set.insert startPosition
 
 
 collectWhileUpto : Int -> (a -> Maybe a) -> a -> List a
@@ -158,26 +170,6 @@ collectWhileUptoHelp maxCount nextSeedFunc seed accR =
 
             Nothing ->
                 accR
-
-
-connectedPositionsInDirection : ( Int, Int ) -> Position -> Grid Coin -> List Position
-connectedPositionsInDirection ( dx, dy ) startPosition grid =
-    case Grid.get startPosition grid of
-        Ok coin ->
-            let
-                validatePosition position =
-                    if Grid.get position grid == Ok coin then
-                        Just position
-
-                    else
-                        Nothing
-            in
-            collectWhileUpto 3
-                (\( x, y ) -> validatePosition ( x + dx, y + dy ))
-                startPosition
-
-        Err _ ->
-            []
 
 
 coinToColor : Coin -> Color

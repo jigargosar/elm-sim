@@ -226,23 +226,23 @@ updateIndicatorCoin mouse gt coin grid =
     ignoreError (Grid.insert position (CellView True coin)) grid
 
 
+updateWinningPositions : Set Grid.Position -> Grid CellView -> Grid CellView
+updateWinningPositions =
+    Set.foldl
+        (\pos ->
+            Grid.update pos
+                (Maybe.map
+                    (\(CellView _ coin) ->
+                        CellView True coin
+                    )
+                )
+                |> ignoreError
+        )
+        |> flip
+
+
 toCellViewGrid : Computer -> GridTransform -> Mem -> Grid CellView
 toCellViewGrid { mouse } gt mem =
-    let
-        updateWinningPositions : Set Grid.Position -> Grid CellView -> Grid CellView
-        updateWinningPositions =
-            Set.foldl
-                (\pos ->
-                    Grid.update pos
-                        (Maybe.map
-                            (\(CellView _ coin) ->
-                                CellView True coin
-                            )
-                        )
-                        |> ignoreError
-                )
-                |> flip
-    in
     Grid.mapAll (\_ -> Maybe.map (CellView False)) mem.grid
         |> (case mem.state of
                 Nothing ->

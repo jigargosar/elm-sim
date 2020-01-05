@@ -9,17 +9,13 @@ import PointFree exposing (flip)
 import Set exposing (Set)
 
 
-type alias Position =
-    ( Int, Int )
-
-
 type Coin
     = Red
     | Blue
 
 
 type GameOver
-    = WinningPositions (Set Position)
+    = WinningPositions (Set Grid.Position)
     | Draw
 
 
@@ -48,7 +44,7 @@ flipCoin coin =
             Red
 
 
-columnToInsertPosition : Int -> Grid Coin -> Maybe Position
+columnToInsertPosition : Int -> Grid Coin -> Maybe Grid.Position
 columnToInsertPosition column grid =
     let
         columnLength =
@@ -133,7 +129,7 @@ computeCellSize { width, height } { columns, rows } =
     min maxCellWidth maxCellHeight
 
 
-computeGameOverState : Position -> Coin -> Grid Coin -> ( Coin, Maybe GameOver )
+computeGameOverState : Grid.Position -> Coin -> Grid Coin -> ( Coin, Maybe GameOver )
 computeGameOverState startPosition coin grid =
     if Grid.isFull grid then
         ( coin, Just Draw )
@@ -147,7 +143,7 @@ computeGameOverState startPosition coin grid =
                 ( flipCoin coin, Nothing )
 
 
-computeWinningPositionSet : Position -> Coin -> Grid Coin -> Maybe (Set Position)
+computeWinningPositionSet : Grid.Position -> Coin -> Grid Coin -> Maybe (Set Grid.Position)
 computeWinningPositionSet startPosition coin grid =
     let
         validatePosition : Grid.Position -> Maybe Grid.Position
@@ -224,7 +220,7 @@ ignoreError func val =
     func val |> Result.withDefault val
 
 
-toCellList : Computer -> GridTransform -> Mem -> List ( Position, Cell )
+toCellList : Computer -> GridTransform -> Mem -> List ( Grid.Position, Cell )
 toCellList { mouse } gt mem =
     let
         { rows, columns } =
@@ -246,7 +242,7 @@ toCellList { mouse } gt mem =
                 Nothing ->
                     identity
 
-        updateWinningPositions : Set Position -> Grid Cell -> Grid Cell
+        updateWinningPositions : Set Grid.Position -> Grid Cell -> Grid Cell
         updateWinningPositions =
             Set.foldl
                 (\pos ->
@@ -265,7 +261,7 @@ toCellList { mouse } gt mem =
                 )
                 |> flip
 
-        coinBoard : Dict Position Cell
+        coinBoard : Dict Grid.Position Cell
         coinBoard =
             Grid.map (\_ -> WithCoin False) mem.grid
                 |> (case mem.state of
@@ -280,7 +276,7 @@ toCellList { mouse } gt mem =
                    )
                 |> Grid.toDict
 
-        emptyBoard : Dict Position Cell
+        emptyBoard : Dict Grid.Position Cell
         emptyBoard =
             dimensionToPositioins (Grid.dimensions mem.grid)
                 |> List.map (\pos -> ( pos, Empty ))
@@ -300,7 +296,7 @@ coinToColor coin =
             blue
 
 
-dimensionToPositioins : Grid.Dimensions -> List Position
+dimensionToPositioins : Grid.Dimensions -> List Grid.Position
 dimensionToPositioins { columns, rows } =
     List.range 0 (columns - 1)
         |> List.concatMap
@@ -310,7 +306,7 @@ dimensionToPositioins { columns, rows } =
             )
 
 
-viewBoard : Computer -> GridTransform -> List ( Position, Cell ) -> Shape
+viewBoard : Computer -> GridTransform -> List ( Grid.Position, Cell ) -> Shape
 viewBoard { time } gt cellList =
     let
         cellRadius =

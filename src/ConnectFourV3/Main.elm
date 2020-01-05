@@ -206,7 +206,7 @@ viewMemory computer mem =
         gt =
             GridTransform.init cellSize gridDimension
     in
-    [ viewBoard computer gt (toCellList computer gt mem)
+    [ viewBoard computer gt (toCellViewList computer gt mem)
     ]
 
 
@@ -220,8 +220,8 @@ ignoreError func val =
     func val |> Result.withDefault val
 
 
-toCellList : Computer -> GridTransform -> Mem -> List ( Grid.Position, CellView )
-toCellList { mouse } gt mem =
+toCellViewList : Computer -> GridTransform -> Mem -> List ( Grid.Position, CellView )
+toCellViewList { mouse } gt mem =
     let
         { rows, columns } =
             Grid.dimensions mem.grid

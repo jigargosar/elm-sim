@@ -263,7 +263,7 @@ toCellViewList { mouse } gt mem =
 
         coinBoard : Dict Grid.Position CellView
         coinBoard =
-            Grid.map (\_ -> WithCoin False) mem.grid
+            Grid.mapAll (\_ -> Maybe.map (WithCoin False) >> Maybe.withDefault Empty >> Just) mem.grid
                 |> (case mem.state of
                         Nothing ->
                             insertIndicatorCoin
@@ -275,14 +275,8 @@ toCellViewList { mouse } gt mem =
                             identity
                    )
                 |> Grid.toDict
-
-        emptyBoard : Dict Grid.Position CellView
-        emptyBoard =
-            dimensionToPositioins (Grid.dimensions mem.grid)
-                |> List.map (\pos -> ( pos, Empty ))
-                |> Dict.fromList
     in
-    Dict.union coinBoard emptyBoard
+    coinBoard
         |> Dict.toList
 
 
@@ -294,16 +288,6 @@ coinToColor coin =
 
         Blue ->
             blue
-
-
-dimensionToPositioins : Grid.Dimensions -> List Grid.Position
-dimensionToPositioins { columns, rows } =
-    List.range 0 (columns - 1)
-        |> List.concatMap
-            (\column ->
-                List.range 0 (rows - 1)
-                    |> List.map (\row -> ( column, row ))
-            )
 
 
 cellListToShape time gt =

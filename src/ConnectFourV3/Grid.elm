@@ -4,10 +4,12 @@ module ConnectFourV3.Grid exposing
     , Position
     , dimensions
     , empty
+    , foldl
     , get
     , insert
     , isFull
     , map
+    , mapAll
     , toDict
     , update
     )

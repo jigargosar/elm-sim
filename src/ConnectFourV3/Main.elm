@@ -199,8 +199,14 @@ viewMemory computer mem =
     let
         gt =
             computeGridTransform computer.screen mem.grid
+
+        cellList =
+            toCellViewList computer gt mem
     in
-    [ viewBoard computer gt (toCellViewList computer gt mem)
+    [ group
+        [ rectangle black (GridTransform.width gt) (GridTransform.height gt)
+        , cellListToShape computer.time gt cellList
+        ]
     ]
 
 
@@ -300,8 +306,7 @@ dimensionToPositioins { columns, rows } =
             )
 
 
-viewBoard : Computer -> GridTransform -> List ( Grid.Position, CellView ) -> Shape
-viewBoard { time } gt cellList =
+cellListToShape time gt =
     let
         cellRadius =
             GridTransform.cellSize gt / 2
@@ -333,10 +338,7 @@ viewBoard { time } gt cellList =
             toCellShape cell
                 |> move (GridTransform.toScreenX column gt) (GridTransform.toScreenY row gt)
     in
-    group
-        [ rectangle black (GridTransform.width gt) (GridTransform.height gt)
-        , List.map viewCell cellList |> group
-        ]
+    List.map viewCell >> group
 
 
 

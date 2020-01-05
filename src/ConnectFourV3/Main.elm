@@ -197,10 +197,10 @@ viewMemory { mouse, screen, time } mem =
             Grid.map (\_ -> CellView False) mem.grid
                 |> (case mem.state of
                         Nothing ->
-                            updateIndicatorCoin mouse gt mem.coin
+                            insertIndicatorCoinView mouse gt mem.coin
 
-                        Just (WinningPositions winningPositionSet) ->
-                            updateWinningPositions winningPositionSet
+                        Just (WinningPositions positions) ->
+                            highlightWinningPositions positions
 
                         Just Draw ->
                             identity
@@ -222,8 +222,8 @@ ignoreError func val =
     func val |> Result.withDefault val
 
 
-updateIndicatorCoin : Mouse -> GridTransform -> Coin -> Grid CellView -> Grid CellView
-updateIndicatorCoin mouse gt coin grid =
+insertIndicatorCoinView : Mouse -> GridTransform -> Coin -> Grid CellView -> Grid CellView
+insertIndicatorCoinView mouse gt coin grid =
     let
         { columns } =
             Grid.dimensions grid
@@ -236,8 +236,8 @@ updateIndicatorCoin mouse gt coin grid =
     ignoreError (Grid.insert position (CellView True coin)) grid
 
 
-updateWinningPositions : Set Grid.Position -> Grid CellView -> Grid CellView
-updateWinningPositions =
+highlightWinningPositions : Set Grid.Position -> Grid CellView -> Grid CellView
+highlightWinningPositions =
     Set.foldl
         (\pos ->
             Grid.update pos

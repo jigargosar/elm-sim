@@ -13,6 +13,7 @@ module ConnectFourV3.Grid exposing
     )
 
 import Dict exposing (Dict)
+import PointFree exposing (flip)
 
 
 type alias Dimensions =
@@ -97,3 +98,38 @@ update position func (Grid dim dict) =
 
     else
         Err OutOfBounds
+
+
+mapAll : (Position -> Maybe a -> Maybe b) -> Grid a -> Grid b
+mapAll func ((Grid dim _) as grid) =
+    foldl
+        (\position maybeA ->
+            case func position maybeA of
+                Just b ->
+                    Dict.insert position b
+
+                Nothing ->
+                    Dict.remove position
+        )
+        Dict.empty
+        grid
+        |> Grid dim
+
+
+foldl : (Position -> Maybe a -> b -> b) -> b -> Grid a -> b
+foldl func acc0 (Grid { columns, rows } dict) =
+    List.range 0 (columns - 1)
+        |> List.foldl
+            (\column acc1 ->
+                List.range 0 (rows - 1)
+                    |> List.foldl
+                        (\row ->
+                            let
+                                position =
+                                    ( column, row )
+                            in
+                            func position (Dict.get position dict)
+                        )
+                        acc1
+            )
+            acc0

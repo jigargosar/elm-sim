@@ -210,7 +210,7 @@ viewMemory computer mem =
     ]
 
 
-type Cell
+type CellView
     = Empty
     | WithCoin Bool Coin
 
@@ -220,7 +220,7 @@ ignoreError func val =
     func val |> Result.withDefault val
 
 
-toCellList : Computer -> GridTransform -> Mem -> List ( Grid.Position, Cell )
+toCellList : Computer -> GridTransform -> Mem -> List ( Grid.Position, CellView )
 toCellList { mouse } gt mem =
     let
         { rows, columns } =
@@ -230,7 +230,7 @@ toCellList { mouse } gt mem =
             GridTransform.fromScreenX mouse.x gt
                 |> clamp 0 (columns - 1)
 
-        insertIndicatorCoin : Grid Cell -> Grid Cell
+        insertIndicatorCoin : Grid CellView -> Grid CellView
         insertIndicatorCoin =
             case
                 columnToInsertPosition clampedMouseColumn mem.grid
@@ -242,7 +242,7 @@ toCellList { mouse } gt mem =
                 Nothing ->
                     identity
 
-        updateWinningPositions : Set Grid.Position -> Grid Cell -> Grid Cell
+        updateWinningPositions : Set Grid.Position -> Grid CellView -> Grid CellView
         updateWinningPositions =
             Set.foldl
                 (\pos ->
@@ -261,7 +261,7 @@ toCellList { mouse } gt mem =
                 )
                 |> flip
 
-        coinBoard : Dict Grid.Position Cell
+        coinBoard : Dict Grid.Position CellView
         coinBoard =
             Grid.map (\_ -> WithCoin False) mem.grid
                 |> (case mem.state of
@@ -276,7 +276,7 @@ toCellList { mouse } gt mem =
                    )
                 |> Grid.toDict
 
-        emptyBoard : Dict Grid.Position Cell
+        emptyBoard : Dict Grid.Position CellView
         emptyBoard =
             dimensionToPositioins (Grid.dimensions mem.grid)
                 |> List.map (\pos -> ( pos, Empty ))
@@ -306,7 +306,7 @@ dimensionToPositioins { columns, rows } =
             )
 
 
-viewBoard : Computer -> GridTransform -> List ( Grid.Position, Cell ) -> Shape
+viewBoard : Computer -> GridTransform -> List ( Grid.Position, CellView ) -> Shape
 viewBoard { time } gt cellList =
     let
         cellRadius =

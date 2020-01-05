@@ -200,19 +200,18 @@ viewMemory computer mem =
         gt =
             computeGridTransform computer.screen mem.grid
 
-        cellList =
-            toCellViewList computer gt mem
+        cellViewGrid =
+            toCellViewGrid computer gt mem
     in
     [ group
         [ rectangle black (GridTransform.width gt) (GridTransform.height gt)
-        , cellListToShape computer.time gt cellList
+        , cellViewGridToShape computer.time gt cellViewGrid
         ]
     ]
 
 
 type CellView
-    = Empty
-    | WithCoin Bool Coin
+    = CellView Bool Coin
 
 
 ignoreError : (b -> Result x b) -> b -> b
@@ -220,8 +219,8 @@ ignoreError func val =
     func val |> Result.withDefault val
 
 
-toCellViewList : Computer -> GridTransform -> Mem -> List ( Grid.Position, CellView )
-toCellViewList { mouse } gt mem =
+toCellViewGrid : Computer -> GridTransform -> Mem -> Grid CellView
+toCellViewGrid { mouse } gt mem =
     let
         { rows, columns } =
             Grid.dimensions mem.grid
@@ -236,7 +235,7 @@ toCellViewList { mouse } gt mem =
                 columnToInsertPosition clampedMouseColumn mem.grid
             of
                 Just pos ->
-                    Grid.update pos (\_ -> Just (WithCoin True mem.coin))
+                    Grid.update pos (\_ -> Just (CellView True mem.coin))
                         |> ignoreError
 
                 Nothing ->
@@ -248,36 +247,25 @@ toCellViewList { mouse } gt mem =
                 (\pos ->
                     Grid.update pos
                         (Maybe.map
-                            (\cell ->
-                                case cell of
-                                    WithCoin _ coin ->
-                                        WithCoin True coin
-
-                                    _ ->
-                                        cell
+                            (\(CellView _ coin) ->
+                                CellView True coin
                             )
                         )
                         |> ignoreError
                 )
                 |> flip
-
-        cellGrid : Dict Grid.Position CellView
-        cellGrid =
-            Grid.mapAll (\_ -> Maybe.map (WithCoin False) >> Maybe.withDefault Empty >> Just) mem.grid
-                |> (case mem.state of
-                        Nothing ->
-                            updateIndicatorCoin
-
-                        Just (WinningPositions winningPositionSet) ->
-                            updateWinningPositions winningPositionSet
-
-                        Just Draw ->
-                            identity
-                   )
-                |> Grid.toDict
     in
-    cellGrid
-        |> Dict.toList
+    Grid.mapAll (\_ -> Maybe.map (CellView False)) mem.grid
+        |> (case mem.state of
+                Nothing ->
+                    updateIndicatorCoin
+
+                Just (WinningPositions winningPositionSet) ->
+                    updateWinningPositions winningPositionSet
+
+                Just Draw ->
+                    identity
+           )
 
 
 coinToColor : Coin -> Color
@@ -290,7 +278,7 @@ coinToColor coin =
             blue
 
 
-cellListToShape time gt =
+cellViewGridToShape time gt =
     let
         cellRadius =
             GridTransform.cellSize gt / 2
@@ -309,20 +297,21 @@ cellListToShape time gt =
 
         toCellShape cell =
             case cell of
-                Empty ->
-                    cellBackgroundShape
-
-                WithCoin highlight coin ->
+                Just (CellView highlight coin) ->
                     group
                         [ cellBackgroundShape
                         , coinToShape highlight coin
                         ]
 
-        viewCell ( ( column, row ), cell ) =
+                _ ->
+                    cellBackgroundShape
+
+        viewCell ( column, row ) cell =
             toCellShape cell
                 |> move (GridTransform.toScreenX column gt) (GridTransform.toScreenY row gt)
+                |> (::)
     in
-    List.map viewCell >> group
+    Grid.foldl viewCell [] >> group
 
 
 

@@ -175,26 +175,6 @@ connectedPositionsInDirection ( dx, dy ) startPosition grid =
             []
 
 
-consWhile : (seed -> Maybe ( seed, a )) -> seed -> List a -> List a
-consWhile func seed0 aList =
-    case func seed0 of
-        Just ( seed1, a ) ->
-            consWhile func seed1 (a :: aList)
-
-        Nothing ->
-            aList
-
-
-iterate : (a -> Maybe a) -> a -> List a -> List a
-iterate func a0 list =
-    case func a0 of
-        Just a1 ->
-            iterate func a1 (a1 :: list)
-
-        Nothing ->
-            list
-
-
 coinToColor : Coin -> Color
 coinToColor coin =
     case coin of

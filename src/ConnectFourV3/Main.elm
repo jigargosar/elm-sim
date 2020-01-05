@@ -236,7 +236,7 @@ toCellViewList { mouse } gt mem =
                 columnToInsertPosition clampedMouseColumn mem.grid
             of
                 Just pos ->
-                    Grid.insert pos (WithCoin True mem.coin)
+                    Grid.update pos (\_ -> Just (WithCoin True mem.coin))
                         |> ignoreError
 
                 Nothing ->

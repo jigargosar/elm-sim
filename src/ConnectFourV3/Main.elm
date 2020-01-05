@@ -5,7 +5,7 @@ import ConnectFourV3.GridTransform as GridTransform exposing (GridTransform)
 import Dict exposing (Dict)
 import List.Extra
 import Playground exposing (..)
-import PointFree exposing (flip, is, when)
+import PointFree exposing (flip, is)
 import Set exposing (Set)
 
 
@@ -188,17 +188,27 @@ collectWhileUptoHelp maxCount nextSeedFunc seed accR =
 
 
 viewMemory : Computer -> Mem -> List Shape
-viewMemory computer mem =
+viewMemory { mouse, screen, time } mem =
     let
         gt =
-            computeGridTransform computer.screen mem.grid
+            computeGridTransform screen mem.grid
 
         cellViewGrid =
-            toCellViewGrid computer gt mem
+            Grid.map (\_ -> CellView False) mem.grid
+                |> (case mem.state of
+                        Nothing ->
+                            updateIndicatorCoin mouse gt mem.coin
+
+                        Just (WinningPositions winningPositionSet) ->
+                            updateWinningPositions winningPositionSet
+
+                        Just Draw ->
+                            identity
+                   )
     in
     [ group
         [ rectangle black (GridTransform.width gt) (GridTransform.height gt)
-        , cellViewGridToShape computer.time gt cellViewGrid
+        , cellViewGridToShape time gt cellViewGrid
         ]
     ]
 
@@ -239,21 +249,6 @@ updateWinningPositions =
                 |> ignoreError
         )
         |> flip
-
-
-toCellViewGrid : Computer -> GridTransform -> Mem -> Grid CellView
-toCellViewGrid { mouse } gt mem =
-    Grid.mapAll (\_ -> Maybe.map (CellView False)) mem.grid
-        |> (case mem.state of
-                Nothing ->
-                    updateIndicatorCoin mouse gt mem.coin
-
-                Just (WinningPositions winningPositionSet) ->
-                    updateWinningPositions winningPositionSet
-
-                Just Draw ->
-                    identity
-           )
 
 
 coinToColor : Coin -> Color

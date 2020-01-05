@@ -212,12 +212,8 @@ columnToInsertPosition column grid =
 insertInColumn : Int -> v -> Grid v -> Result Grid.Error ( Grid.Position, Grid v )
 insertInColumn column a grid =
     let
-        columnLength =
-            Dict.filter (\( x, _ ) _ -> x == column) (Grid.toDict grid)
-                |> Dict.size
-
         position =
-            ( column, columnLength )
+            columnToInsertPosition column grid
     in
     Grid.insert position a grid
         |> Result.map (Tuple.pair position)

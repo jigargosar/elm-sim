@@ -65,6 +65,10 @@ columnToInsertPosition column grid =
         Just ( column, columnLength )
 
 
+
+-- UPDATE
+
+
 updateMemory : Computer -> Mem -> Mem
 updateMemory { mouse, screen } mem =
     let
@@ -109,6 +113,18 @@ updateMemory { mouse, screen } mem =
 
         Just _ ->
             mem
+
+
+computeCellSize : Screen -> Grid.Dimensions -> Float
+computeCellSize { width, height } { columns, rows } =
+    let
+        maxCellWidth =
+            width * 0.8 / toFloat columns
+
+        maxCellHeight =
+            height * 0.8 / toFloat rows
+    in
+    min maxCellWidth maxCellHeight
 
 
 computeGameOverState : Position -> Coin -> Grid Coin -> ( Coin, Maybe GameOver )
@@ -172,26 +188,8 @@ collectWhileUptoHelp maxCount nextSeedFunc seed accR =
                 accR
 
 
-coinToColor : Coin -> Color
-coinToColor coin =
-    case coin of
-        Red ->
-            red
 
-        Blue ->
-            blue
-
-
-computeCellSize : Screen -> GridDimension -> Float
-computeCellSize { width, height } { columns, rows } =
-    let
-        maxCellWidth =
-            width * 0.8 / toFloat columns
-
-        maxCellHeight =
-            height * 0.8 / toFloat rows
-    in
-    min maxCellWidth maxCellHeight
+-- VIEW
 
 
 viewMemory : Computer -> Mem -> List Shape
@@ -208,20 +206,6 @@ viewMemory computer mem =
     in
     [ viewBoard computer gt (toCellList computer gt mem)
     ]
-
-
-type alias GridDimension =
-    { columns : Int, rows : Int }
-
-
-dimensionToPositioins : GridDimension -> List Position
-dimensionToPositioins { columns, rows } =
-    List.range 0 (columns - 1)
-        |> List.concatMap
-            (\column ->
-                List.range 0 (rows - 1)
-                    |> List.map (\row -> ( column, row ))
-            )
 
 
 type Cell
@@ -300,6 +284,26 @@ toCellList { mouse } gt mem =
         |> Dict.toList
 
 
+coinToColor : Coin -> Color
+coinToColor coin =
+    case coin of
+        Red ->
+            red
+
+        Blue ->
+            blue
+
+
+dimensionToPositioins : Grid.Dimensions -> List Position
+dimensionToPositioins { columns, rows } =
+    List.range 0 (columns - 1)
+        |> List.concatMap
+            (\column ->
+                List.range 0 (rows - 1)
+                    |> List.map (\row -> ( column, row ))
+            )
+
+
 viewBoard : Computer -> GridTransform -> List ( Position, Cell ) -> Shape
 viewBoard { time } gt cellList =
     let
@@ -340,7 +344,7 @@ viewBoard { time } gt cellList =
 
 
 
--- ViewModel
+-- Main
 
 
 main =

@@ -44,7 +44,7 @@ flipCoin coin =
             Red
 
 
-columnToInsertPosition : Int -> Grid Coin -> Maybe Grid.Position
+columnToInsertPosition : Int -> Grid a -> Maybe Grid.Position
 columnToInsertPosition column grid =
     let
         columnLength =
@@ -217,6 +217,16 @@ type CellView
 ignoreError : (b -> Result x b) -> b -> b
 ignoreError func val =
     func val |> Result.withDefault val
+
+
+insertInColumn : Int -> a -> Grid a -> Result Grid.Error (Grid a)
+insertInColumn column a grid =
+    let
+        columnLength =
+            Dict.filter (\( x, _ ) _ -> x == column) (Grid.toDict grid)
+                |> Dict.size
+    in
+    Grid.insert ( column, columnLength ) a grid
 
 
 toCellViewGrid : Computer -> GridTransform -> Mem -> Grid CellView

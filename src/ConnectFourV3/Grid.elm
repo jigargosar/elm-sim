@@ -1,5 +1,6 @@
 module ConnectFourV3.Grid exposing
     ( Dimensions
+    , Error(..)
     , Grid
     , Position
     , dimensions

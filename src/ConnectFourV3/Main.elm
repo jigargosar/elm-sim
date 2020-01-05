@@ -44,6 +44,18 @@ flipCoin coin =
             Red
 
 
+columnToInsertPositionIn : Grid v -> Int -> Grid.Position
+columnToInsertPositionIn grid column =
+    let
+        columnLength =
+            Grid.toDict grid
+                |> Dict.keys
+                |> List.Extra.count
+                    (Tuple.first >> is column)
+    in
+    ( column, columnLength )
+
+
 
 -- UPDATE
 
@@ -198,18 +210,6 @@ type CellView
 ignoreError : (b -> Result x b) -> b -> b
 ignoreError func val =
     func val |> Result.withDefault val
-
-
-columnToInsertPositionIn : Grid v -> Int -> Grid.Position
-columnToInsertPositionIn grid column =
-    let
-        columnLength =
-            Grid.toDict grid
-                |> Dict.keys
-                |> List.Extra.count
-                    (Tuple.first >> is column)
-    in
-    ( column, columnLength )
 
 
 updateIndicatorCoin : Mouse -> GridTransform -> Coin -> Grid CellView -> Grid CellView

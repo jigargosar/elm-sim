@@ -117,16 +117,7 @@ computeGameOverState startPosition coin grid =
         ( coin, Just Draw )
 
     else
-        let
-            validatePosition : Grid.Position -> Maybe Grid.Position
-            validatePosition position =
-                if Grid.get position grid == Ok (Just coin) then
-                    Just position
-
-                else
-                    Nothing
-        in
-        case computeWinningPositionSet startPosition validatePosition of
+        case computeWinningPositionSet startPosition coin grid of
             Just positionSet ->
                 ( coin, Just (WinningPositions positionSet) )
 
@@ -134,9 +125,17 @@ computeGameOverState startPosition coin grid =
                 ( flipCoin coin, Nothing )
 
 
-computeWinningPositionSet : Position -> (Position -> Maybe Position) -> Maybe (Set Position)
-computeWinningPositionSet startPosition validatePosition =
+computeWinningPositionSet : Position -> Coin -> Grid Coin -> Maybe (Set Position)
+computeWinningPositionSet startPosition coin grid =
     let
+        validatePosition : Grid.Position -> Maybe Grid.Position
+        validatePosition position =
+            if Grid.get position grid == Ok (Just coin) then
+                Just position
+
+            else
+                Nothing
+
         getPositionsInDirection ( dx, dy ) =
             collectWhileUpto 3
                 (\( x, y ) -> validatePosition ( x + dx, y + dy ))

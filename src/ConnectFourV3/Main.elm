@@ -44,23 +44,6 @@ flipCoin coin =
             Red
 
 
-columnToInsertPosition : Int -> Grid a -> Maybe Grid.Position
-columnToInsertPosition column grid =
-    let
-        columnLength =
-            Dict.filter (\( x, _ ) _ -> x == column) (Grid.toDict grid)
-                |> Dict.size
-
-        { columns, rows } =
-            Grid.dimensions grid
-    in
-    if column < 0 || column >= columns || (columnLength >= rows) then
-        Nothing
-
-    else
-        Just ( column, columnLength )
-
-
 
 -- UPDATE
 
@@ -90,25 +73,20 @@ updateMemory { mouse, screen } mem =
                     column =
                         GridTransform.fromScreenX mouse.x gt
                 in
-                columnToInsertPosition column mem.grid
-                    |> Maybe.map
-                        (\position ->
-                            case Grid.insert position mem.coin mem.grid of
-                                Ok grid ->
-                                    let
-                                        ( coin, state ) =
-                                            computeGameOverState position mem.coin grid
-                                    in
-                                    { mem
-                                        | grid = grid
-                                        , coin = coin
-                                        , state = state
-                                    }
+                case insertInColumn column mem.coin mem.grid of
+                    Ok ( position, grid ) ->
+                        let
+                            ( coin, state ) =
+                                computeGameOverState position mem.coin grid
+                        in
+                        { mem
+                            | grid = grid
+                            , coin = coin
+                            , state = state
+                        }
 
-                                Err _ ->
-                                    mem
-                        )
-                    |> Maybe.withDefault mem
+                    Err _ ->
+                        mem
 
             else
                 mem
@@ -219,14 +197,31 @@ ignoreError func val =
     func val |> Result.withDefault val
 
 
-insertInColumn : Int -> a -> Grid a -> Result Grid.Error (Grid a)
+columnToInsertPosition : Int -> Grid v -> Grid.Position
+columnToInsertPosition column grid =
+    let
+        columnLength =
+            Dict.filter (\( x, _ ) _ -> x == column) (Grid.toDict grid)
+                |> Dict.size
+
+        position =
+            ( column, columnLength )
+    in
+    position
+
+
+insertInColumn : Int -> v -> Grid v -> Result Grid.Error ( Grid.Position, Grid v )
 insertInColumn column a grid =
     let
         columnLength =
             Dict.filter (\( x, _ ) _ -> x == column) (Grid.toDict grid)
                 |> Dict.size
+
+        position =
+            ( column, columnLength )
     in
-    Grid.insert ( column, columnLength ) a grid
+    Grid.insert position a grid
+        |> Result.map (Tuple.pair position)
 
 
 toCellViewGrid : Computer -> GridTransform -> Mem -> Grid CellView
@@ -241,7 +236,9 @@ toCellViewGrid { mouse } gt mem =
 
         updateIndicatorCoin : Grid CellView -> Grid CellView
         updateIndicatorCoin =
-            insertInColumn clampedMouseColumn (CellView True mem.coin)
+            (insertInColumn clampedMouseColumn (CellView True mem.coin)
+                >> Result.map Tuple.second
+            )
                 |> ignoreError
 
         updateWinningPositions : Set Grid.Position -> Grid CellView -> Grid CellView

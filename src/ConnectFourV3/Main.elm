@@ -140,15 +140,21 @@ getConnectedPositionSetInOpposingDirections startPosition grid ( dx, dy ) =
         |> Set.insert startPosition
 
 
-collectWhileUpto : Int -> (a -> Maybe a) -> a -> List a -> List a
-collectWhileUpto maxCount nextSeedFunc seed accR =
+collectWhileUpto : Int -> (a -> Maybe a) -> a -> List a
+collectWhileUpto maxCount nextSeedFunc seed =
+    iterateUptoHelp maxCount nextSeedFunc seed []
+        |> List.reverse
+
+
+iterateUptoHelp : Int -> (a -> Maybe a) -> a -> List a -> List a
+iterateUptoHelp maxCount nextSeedFunc seed accR =
     if maxCount <= 0 then
         accR
 
     else
         case nextSeedFunc seed of
             Just nextSeed ->
-                collectWhileUpto (maxCount - 1) nextSeedFunc nextSeed (nextSeed :: accR)
+                iterateUptoHelp (maxCount - 1) nextSeedFunc nextSeed (nextSeed :: accR)
 
             Nothing ->
                 accR
@@ -169,8 +175,6 @@ connectedPositionsInDirection ( dx, dy ) startPosition grid =
             collectWhileUpto 3
                 (\( x, y ) -> validatePosition ( x + dx, y + dy ))
                 startPosition
-                []
-                |> List.reverse
 
         Err _ ->
             []

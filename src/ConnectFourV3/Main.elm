@@ -140,17 +140,18 @@ getConnectedPositionSetInOpposingDirections startPosition grid ( dx, dy ) =
         |> Set.insert startPosition
 
 
-collectWhileUpto maxCount nextSeedFunc seed reverseAccList =
+collectWhileUpto : Int -> (a -> Maybe a) -> a -> List a -> List a
+collectWhileUpto maxCount nextSeedFunc seed accR =
     if maxCount <= 0 then
-        reverseAccList
+        accR
 
     else
         case nextSeedFunc seed of
             Just nextSeed ->
-                collectWhileUpto (maxCount - 1) nextSeedFunc nextSeed (nextSeed :: reverseAccList)
+                collectWhileUpto (maxCount - 1) nextSeedFunc nextSeed (nextSeed :: accR)
 
             Nothing ->
-                reverseAccList
+                accR
 
 
 connectedPositionsInDirection : ( Int, Int ) -> Position -> Grid Coin -> List Position

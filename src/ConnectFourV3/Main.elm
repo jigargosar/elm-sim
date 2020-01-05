@@ -140,26 +140,36 @@ getConnectedPositionSetInOpposingDirections startPosition grid ( dx, dy ) =
         |> Set.insert startPosition
 
 
+collectWhileUpto maxCount nextSeedFunc seed reverseAccList =
+    if maxCount <= 0 then
+        reverseAccList
+
+    else
+        case nextSeedFunc seed of
+            Just nextSeed ->
+                collectWhileUpto (maxCount - 1) nextSeedFunc nextSeed (nextSeed :: reverseAccList)
+
+            Nothing ->
+                reverseAccList
+
+
 connectedPositionsInDirection : ( Int, Int ) -> Position -> Grid Coin -> List Position
 connectedPositionsInDirection ( dx, dy ) startPosition grid =
     case Grid.get startPosition grid of
         Ok coin ->
-            iterate
-                (\( x, y ) ->
-                    let
-                        newPosition =
-                            ( x + dx, y + dy )
-                    in
-                    if Grid.get newPosition grid == Ok coin then
-                        Just newPosition
+            let
+                validatePosition position =
+                    if Grid.get position grid == Ok coin then
+                        Just position
 
                     else
                         Nothing
-                )
+            in
+            collectWhileUpto 3
+                (\( x, y ) -> validatePosition ( x + dx, y + dy ))
                 startPosition
                 []
                 |> List.reverse
-                |> List.take 3
 
         Err _ ->
             []

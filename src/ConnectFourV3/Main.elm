@@ -69,17 +69,23 @@ columnToInsertPosition column grid =
 -- UPDATE
 
 
+computeGridTransform : Screen -> Grid a -> GridTransform
+computeGridTransform screen grid =
+    let
+        gridDimension =
+            Grid.dimensions grid
+
+        cellSize =
+            computeCellSize screen (Grid.dimensions grid)
+    in
+    GridTransform.init cellSize gridDimension
+
+
 updateMemory : Computer -> Mem -> Mem
 updateMemory { mouse, screen } mem =
     let
-        gridDimension =
-            Grid.dimensions mem.grid
-
-        cellSize =
-            computeCellSize screen (Grid.dimensions mem.grid)
-
         gt =
-            GridTransform.init cellSize gridDimension
+            computeGridTransform screen mem.grid
     in
     case mem.state of
         Nothing ->

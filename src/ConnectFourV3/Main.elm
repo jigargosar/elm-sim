@@ -261,8 +261,8 @@ toCellViewList { mouse } gt mem =
                 )
                 |> flip
 
-        coinBoard : Dict Grid.Position CellView
-        coinBoard =
+        cellGrid : Dict Grid.Position CellView
+        cellGrid =
             Grid.mapAll (\_ -> Maybe.map (WithCoin False) >> Maybe.withDefault Empty >> Just) mem.grid
                 |> (case mem.state of
                         Nothing ->
@@ -276,7 +276,7 @@ toCellViewList { mouse } gt mem =
                    )
                 |> Grid.toDict
     in
-    coinBoard
+    cellGrid
         |> Dict.toList
 
 

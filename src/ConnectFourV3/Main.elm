@@ -197,14 +197,8 @@ collectWhileUptoHelp maxCount nextSeedFunc seed accR =
 viewMemory : Computer -> Mem -> List Shape
 viewMemory computer mem =
     let
-        gridDimension =
-            Grid.dimensions mem.grid
-
-        cellSize =
-            computeCellSize computer.screen gridDimension
-
         gt =
-            GridTransform.init cellSize gridDimension
+            computeGridTransform computer.screen mem.grid
     in
     [ viewBoard computer gt (toCellViewList computer gt mem)
     ]

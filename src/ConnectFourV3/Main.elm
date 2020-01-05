@@ -72,9 +72,12 @@ updateMemory { mouse, screen } mem =
                 let
                     column =
                         GridTransform.fromScreenX mouse.x gt
+
+                    position =
+                        columnToInsertPosition column mem.grid
                 in
-                case insertInColumn column mem.coin mem.grid of
-                    Ok ( position, grid ) ->
+                case Grid.insert position mem.coin mem.grid of
+                    Ok grid ->
                         let
                             ( coin, state ) =
                                 computeGameOverState position mem.coin grid
@@ -209,14 +212,13 @@ columnToInsertPosition column grid =
     ( column, columnLength )
 
 
-insertInColumn : Int -> v -> Grid v -> Result Grid.Error ( Grid.Position, Grid v )
+insertInColumn : Int -> v -> Grid v -> Result Grid.Error (Grid v)
 insertInColumn column a grid =
     let
         position =
             columnToInsertPosition column grid
     in
     Grid.insert position a grid
-        |> Result.map (Tuple.pair position)
 
 
 toCellViewGrid : Computer -> GridTransform -> Mem -> Grid CellView
@@ -231,9 +233,7 @@ toCellViewGrid { mouse } gt mem =
 
         updateIndicatorCoin : Grid CellView -> Grid CellView
         updateIndicatorCoin =
-            (insertInColumn clampedMouseColumn (CellView True mem.coin)
-                >> Result.map Tuple.second
-            )
+            insertInColumn clampedMouseColumn (CellView True mem.coin)
                 |> ignoreError
 
         updateWinningPositions : Set Grid.Position -> Grid CellView -> Grid CellView

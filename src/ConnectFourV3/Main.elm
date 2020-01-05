@@ -126,7 +126,7 @@ computeGameOverState startPosition coin grid =
                 else
                     Nothing
         in
-        case getWinningPositions startPosition validatePosition of
+        case computeWinningPositionSet startPosition validatePosition of
             Just positionSet ->
                 ( coin, Just (WinningPositions positionSet) )
 
@@ -134,7 +134,8 @@ computeGameOverState startPosition coin grid =
                 ( flipCoin coin, Nothing )
 
 
-getWinningPositions startPosition validatePosition =
+computeWinningPositionSet : Position -> (Position -> Maybe Position) -> Maybe (Set Position)
+computeWinningPositionSet startPosition validatePosition =
     let
         getPositionsInDirection ( dx, dy ) =
             collectWhileUpto 3

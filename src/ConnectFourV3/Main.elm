@@ -128,7 +128,7 @@ computeGameOverState position coin grid =
 getWinningPositions : Position -> Grid Coin -> Maybe (Set Position)
 getWinningPositions position grid =
     [ ( 1, 0 ), ( 0, 1 ), ( -1, 1 ), ( 1, -1 ) ]
-        |> List.map (getConnectedPositionSetInOpposingDirections position grid >> Set.insert position)
+        |> List.map (getConnectedPositionSetInOpposingDirections position grid)
         |> List.Extra.find (\positionSet -> Set.size positionSet == 4)
 
 
@@ -137,6 +137,7 @@ getConnectedPositionSetInOpposingDirections startPosition grid ( dx, dy ) =
     connectedPositionsInDirection ( dx, dy ) startPosition grid
         |> Set.fromList
         |> Set.union (connectedPositionsInDirection ( -dx, -dy ) startPosition grid |> Set.fromList)
+        |> Set.insert startPosition
 
 
 connectedPositionsInDirection : ( Int, Int ) -> Position -> Grid Coin -> List Position

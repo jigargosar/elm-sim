@@ -230,8 +230,8 @@ toCellViewList { mouse } gt mem =
             GridTransform.fromScreenX mouse.x gt
                 |> clamp 0 (columns - 1)
 
-        insertIndicatorCoin : Grid CellView -> Grid CellView
-        insertIndicatorCoin =
+        updateIndicatorCoin : Grid CellView -> Grid CellView
+        updateIndicatorCoin =
             case
                 columnToInsertPosition clampedMouseColumn mem.grid
             of
@@ -266,7 +266,7 @@ toCellViewList { mouse } gt mem =
             Grid.mapAll (\_ -> Maybe.map (WithCoin False) >> Maybe.withDefault Empty >> Just) mem.grid
                 |> (case mem.state of
                         Nothing ->
-                            insertIndicatorCoin
+                            updateIndicatorCoin
 
                         Just (WinningPositions winningPositionSet) ->
                             updateWinningPositions winningPositionSet

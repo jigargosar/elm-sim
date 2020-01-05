@@ -212,22 +212,23 @@ columnToInsertPositionIn grid column =
     ( column, columnLength )
 
 
+updateIndicatorCoin : Mouse -> GridTransform -> Coin -> Grid CellView -> Grid CellView
+updateIndicatorCoin mouse gt coin grid =
+    let
+        { columns } =
+            Grid.dimensions grid
+
+        position =
+            GridTransform.fromScreenX mouse.x gt
+                |> clamp 0 (columns - 1)
+                |> columnToInsertPositionIn grid
+    in
+    ignoreError (Grid.insert position (CellView True coin)) grid
+
+
 toCellViewGrid : Computer -> GridTransform -> Mem -> Grid CellView
 toCellViewGrid { mouse } gt mem =
     let
-        { rows, columns } =
-            Grid.dimensions mem.grid
-
-        updateIndicatorCoin : Grid CellView -> Grid CellView
-        updateIndicatorCoin grid =
-            let
-                position =
-                    GridTransform.fromScreenX mouse.x gt
-                        |> clamp 0 (columns - 1)
-                        |> columnToInsertPositionIn grid
-            in
-            ignoreError (Grid.insert position (CellView True mem.coin)) grid
-
         updateWinningPositions : Set Grid.Position -> Grid CellView -> Grid CellView
         updateWinningPositions =
             Set.foldl
@@ -245,7 +246,7 @@ toCellViewGrid { mouse } gt mem =
     Grid.mapAll (\_ -> Maybe.map (CellView False)) mem.grid
         |> (case mem.state of
                 Nothing ->
-                    updateIndicatorCoin
+                    updateIndicatorCoin mouse gt mem.coin
 
                 Just (WinningPositions winningPositionSet) ->
                     updateWinningPositions winningPositionSet

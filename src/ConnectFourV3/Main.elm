@@ -74,7 +74,7 @@ updateMemory { mouse, screen } mem =
                         GridTransform.fromScreenX mouse.x gt
 
                     position =
-                        columnToInsertPosition column mem.grid
+                        columnToInsertPositionIn mem.grid column
                 in
                 case Grid.insert position mem.coin mem.grid of
                     Ok grid ->
@@ -200,8 +200,8 @@ ignoreError func val =
     func val |> Result.withDefault val
 
 
-columnToInsertPosition : Int -> Grid v -> Grid.Position
-columnToInsertPosition column grid =
+columnToInsertPositionIn : Grid v -> Int -> Grid.Position
+columnToInsertPositionIn grid column =
     let
         columnLength =
             Grid.toDict grid
@@ -212,29 +212,21 @@ columnToInsertPosition column grid =
     ( column, columnLength )
 
 
-insertInColumn : Int -> v -> Grid v -> Result Grid.Error (Grid v)
-insertInColumn column a grid =
-    let
-        position =
-            columnToInsertPosition column grid
-    in
-    Grid.insert position a grid
-
-
 toCellViewGrid : Computer -> GridTransform -> Mem -> Grid CellView
 toCellViewGrid { mouse } gt mem =
     let
         { rows, columns } =
             Grid.dimensions mem.grid
 
-        clampedMouseColumn =
-            GridTransform.fromScreenX mouse.x gt
-                |> clamp 0 (columns - 1)
-
         updateIndicatorCoin : Grid CellView -> Grid CellView
-        updateIndicatorCoin =
-            insertInColumn clampedMouseColumn (CellView True mem.coin)
-                |> ignoreError
+        updateIndicatorCoin grid =
+            let
+                position =
+                    GridTransform.fromScreenX mouse.x gt
+                        |> clamp 0 (columns - 1)
+                        |> columnToInsertPositionIn grid
+            in
+            ignoreError (Grid.insert position (CellView True mem.coin)) grid
 
         updateWinningPositions : Set Grid.Position -> Grid CellView -> Grid CellView
         updateWinningPositions =

@@ -235,7 +235,7 @@ toCellViewGrid { mouse } gt mem =
                 columnToInsertPosition clampedMouseColumn mem.grid
             of
                 Just pos ->
-                    Grid.update pos (\_ -> Just (CellView True mem.coin))
+                    Grid.insert pos (CellView True mem.coin)
                         |> ignoreError
 
                 Nothing ->

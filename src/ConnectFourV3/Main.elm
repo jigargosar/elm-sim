@@ -241,15 +241,8 @@ toCellViewGrid { mouse } gt mem =
 
         updateIndicatorCoin : Grid CellView -> Grid CellView
         updateIndicatorCoin =
-            case
-                columnToInsertPosition clampedMouseColumn mem.grid
-            of
-                Just pos ->
-                    Grid.insert pos (CellView True mem.coin)
-                        |> ignoreError
-
-                Nothing ->
-                    identity
+            insertInColumn clampedMouseColumn (CellView True mem.coin)
+                |> ignoreError
 
         updateWinningPositions : Set Grid.Position -> Grid CellView -> Grid CellView
         updateWinningPositions =

@@ -6,7 +6,7 @@ import ConnectFourV3.GridTransform as GridTransform exposing (GridTransform)
 import Dict exposing (Dict)
 import List.Extra
 import Playground exposing (..)
-import PointFree exposing (is)
+import PointFree exposing (ignoreNothing, is)
 import Set exposing (Set)
 
 
@@ -307,6 +307,7 @@ viewMemory { mouse, screen, time } mem =
             case mem.state of
                 Nothing ->
                     insertIndicatorCoinView mouse gt mem.coin
+                        >> Just
 
                 Just (WinningPositions positions) ->
                     highlightWinningPositions positions
@@ -333,8 +334,8 @@ type CellView
     = CellView Bool Coin
 
 
-insertIndicatorCoinView : Mouse -> GridTransform -> Coin -> Grid CellView -> Maybe (Grid CellView)
-insertIndicatorCoinView mouse gt coin ((Grid dim _) as grid) =
+insertIndicatorCoinView : Mouse -> GridTransform -> Coin -> Grid CellView -> Grid CellView
+insertIndicatorCoinView mouse gt coin grid =
     let
         column =
             GridTransform.fromScreenX mouse.x gt
@@ -342,12 +343,9 @@ insertIndicatorCoinView mouse gt coin ((Grid dim _) as grid) =
         value =
             CellView True coin
     in
-    case clampAndInsertInColumn column value grid of
-        Just ( _, newGrid ) ->
-            Just newGrid
-
-        Nothing ->
-            Just grid
+    clampAndInsertInColumn column value grid
+        |> Maybe.map Tuple.second
+        |> Maybe.withDefault grid
 
 
 highlightWinningPositions : Set Pos -> Grid CellView -> Maybe (Grid CellView)

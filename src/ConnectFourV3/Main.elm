@@ -1,6 +1,6 @@
 module ConnectFourV3.Main exposing (main)
 
-import ConnectFourV3.GridDimensions as Dim exposing (GridDimensions)
+import ConnectFourV3.GridDimensions as Dim
 import ConnectFourV3.GridTransform as GridTransform exposing (GridTransform)
 import Dict exposing (Dict)
 import List.Extra
@@ -11,6 +11,10 @@ import Set exposing (Set)
 
 type alias Grid a =
     Dict Position a
+
+
+type alias Dim =
+    Dim.GridDimensions
 
 
 type alias Position =
@@ -30,7 +34,7 @@ type GameOver
 type alias Mem =
     { state : Maybe GameOver
     , coin : Coin
-    , dimensions : GridDimensions
+    , dimensions : Dim
     , grid : Grid Coin
     }
 
@@ -38,7 +42,7 @@ type alias Mem =
 initialMemory : Mem
 initialMemory =
     let
-        dimensions : GridDimensions
+        dimensions : Dim
         dimensions =
             Dim.fromColumnsRows { columns = 7, rows = 6 }
     in
@@ -85,7 +89,7 @@ setInGridAt position value dim grid =
         Nothing
 
 
-updateInGridAt : Position -> (Maybe v -> Maybe v) -> GridDimensions -> Grid v -> Maybe (Grid v)
+updateInGridAt : Position -> (Maybe v -> Maybe v) -> Dim -> Grid v -> Maybe (Grid v)
 updateInGridAt position func dim grid =
     if Dim.contains position dim then
         Dict.update position func grid |> Just
@@ -98,7 +102,7 @@ updateInGridAt position func dim grid =
 -- UPDATE
 
 
-computeGridTransform : Screen -> GridDimensions -> GridTransform
+computeGridTransform : Screen -> Dim -> GridTransform
 computeGridTransform screen gridDimension =
     let
         cellSize =
@@ -149,7 +153,7 @@ updateMemory { mouse, screen } mem =
                 mem
 
 
-computeCellSize : Screen -> GridDimensions -> Float
+computeCellSize : Screen -> Dim -> Float
 computeCellSize { width, height } dim =
     let
         { columns, rows } =
@@ -164,7 +168,7 @@ computeCellSize { width, height } dim =
     min maxCellWidth maxCellHeight
 
 
-computeGameOverState : Position -> Coin -> GridDimensions -> Grid Coin -> ( Coin, Maybe GameOver )
+computeGameOverState : Position -> Coin -> Dim -> Grid Coin -> ( Coin, Maybe GameOver )
 computeGameOverState startPosition coin dim dict =
     if Dict.size dict == Dim.size dim then
         ( coin, Just Draw )
@@ -178,7 +182,7 @@ computeGameOverState startPosition coin dim dict =
                 ( flipCoin coin, Nothing )
 
 
-computeWinningPositionSet : Position -> Coin -> GridDimensions -> Grid Coin -> Maybe (Set Position)
+computeWinningPositionSet : Position -> Coin -> Dim -> Grid Coin -> Maybe (Set Position)
 computeWinningPositionSet startPosition coin dim dict =
     let
         validatePosition : Position -> Maybe Coin -> Maybe Position
@@ -204,7 +208,7 @@ computeWinningPositionSet startPosition coin dim dict =
         |> Maybe.map (Set.insert startPosition)
 
 
-mapNeighboursWhile : Position -> (Position -> Maybe a -> Maybe b) -> GridDimensions -> Grid a -> List (List b)
+mapNeighboursWhile : Position -> (Position -> Maybe a -> Maybe b) -> Dim -> Grid a -> List (List b)
 mapNeighboursWhile startPosition func dim dict =
     let
         mapWhileWithStep acc position step =
@@ -263,7 +267,7 @@ type CellView
     = CellView Bool Coin
 
 
-insertIndicatorCoinView : Mouse -> GridTransform -> Coin -> GridDimensions -> Grid CellView -> Grid CellView
+insertIndicatorCoinView : Mouse -> GridTransform -> Coin -> Dim -> Grid CellView -> Grid CellView
 insertIndicatorCoinView mouse gt coin dim grid =
     let
         unclampedColumn =
@@ -277,7 +281,7 @@ insertIndicatorCoinView mouse gt coin dim grid =
         |> Maybe.withDefault grid
 
 
-highlightWinningPositions : GridDimensions -> Set Position -> Grid CellView -> Grid CellView
+highlightWinningPositions : Dim -> Set Position -> Grid CellView -> Grid CellView
 highlightWinningPositions dim =
     Set.foldl
         (\pos grid ->

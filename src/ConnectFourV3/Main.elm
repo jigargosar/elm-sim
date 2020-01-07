@@ -116,15 +116,6 @@ columnToInsertPositionIn (Grid _ dict) column =
     ( column, columnLength )
 
 
-setInGridAt : Pos -> a -> Grid a -> Maybe (Grid a)
-setInGridAt position value (Grid dim dict) =
-    if Dim.contains position dim then
-        Dict.insert position value dict |> Grid dim |> Just
-
-    else
-        Nothing
-
-
 updateGridAt : Pos -> (Maybe v -> Maybe v) -> Grid v -> Maybe (Grid v)
 updateGridAt position func (Grid dim dict) =
     if Dim.contains position dim then

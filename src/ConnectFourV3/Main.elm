@@ -1,8 +1,7 @@
 module ConnectFourV3.Main exposing (main)
 
+import ConnectFourV3.FilledGrid as Grid
 import ConnectFourV3.GridTransform as GridTransform exposing (GridTransform)
-import ConnectFourV3.SparseGrid as Grid
-import Dict exposing (Dict)
 import List.Extra
 import Playground exposing (..)
 import PointFree exposing (flip, is)
@@ -10,7 +9,15 @@ import Set exposing (Set)
 
 
 type alias Grid a =
-    Grid.SparseGrid a
+    Grid.FilledGrid a
+
+
+type alias Position =
+    Grid.Position
+
+
+type alias CoinGrid =
+    Grid (Maybe Coin)
 
 
 type Coin
@@ -19,14 +26,14 @@ type Coin
 
 
 type GameOver
-    = WinningPositions (Set Grid.Position)
+    = WinningPositions (Set Position)
     | Draw
 
 
 type alias Mem =
     { state : Maybe GameOver
     , coin : Coin
-    , grid : Grid Coin
+    , grid : CoinGrid
     }
 
 
@@ -34,7 +41,7 @@ initialMemory : Mem
 initialMemory =
     { coin = Blue
     , state = Nothing
-    , grid = Grid.empty { columns = 7, rows = 6 }
+    , grid = Grid.init { columns = 7, rows = 6 } (always Nothing)
     }
 
 
@@ -48,14 +55,11 @@ flipCoin coin =
             Red
 
 
-columnToInsertPositionIn : Grid v -> Int -> Grid.Position
+columnToInsertPositionIn : Grid v -> Int -> Position
 columnToInsertPositionIn grid column =
     let
         columnLength =
-            Grid.toDict grid
-                |> Dict.keys
-                |> List.Extra.count
-                    (Tuple.first >> is column)
+            Grid.count (\( x, _ ) _ -> x == column) grid
     in
     ( column, columnLength )
 
@@ -64,14 +68,11 @@ columnToInsertPositionIn grid column =
 -- UPDATE
 
 
-computeGridTransform : Screen -> Grid a -> GridTransform
-computeGridTransform screen grid =
+computeGridTransform : Screen -> Grid.Dimensions -> GridTransform
+computeGridTransform screen gridDimension =
     let
-        gridDimension =
-            Grid.dimensions grid
-
         cellSize =
-            computeCellSize screen (Grid.dimensions grid)
+            computeCellSize screen gridDimension
     in
     GridTransform.init cellSize gridDimension
 
@@ -80,7 +81,7 @@ updateMemory : Computer -> Mem -> Mem
 updateMemory { mouse, screen } mem =
     let
         gt =
-            computeGridTransform screen mem.grid
+            computeGridTransform screen (Grid.dimensions mem.grid)
     in
     case mem.state of
         Nothing ->
@@ -92,8 +93,8 @@ updateMemory { mouse, screen } mem =
                     position =
                         columnToInsertPositionIn mem.grid column
                 in
-                case Grid.insert position mem.coin mem.grid of
-                    Ok grid ->
+                case Grid.update position (Just mem.coin |> always) mem.grid of
+                    Just grid ->
                         let
                             ( coin, state ) =
                                 computeGameOverState position mem.coin grid
@@ -104,7 +105,7 @@ updateMemory { mouse, screen } mem =
                             , state = state
                         }
 
-                    Err _ ->
+                    Nothing ->
                         mem
 
             else
@@ -126,9 +127,9 @@ computeCellSize { width, height } { columns, rows } =
     min maxCellWidth maxCellHeight
 
 
-computeGameOverState : Grid.Position -> Coin -> Grid Coin -> ( Coin, Maybe GameOver )
+computeGameOverState : Position -> Coin -> CoinGrid -> ( Coin, Maybe GameOver )
 computeGameOverState startPosition coin grid =
-    if Grid.isFull grid then
+    if Grid.count (\_ -> is Nothing) grid == 0 then
         ( coin, Just Draw )
 
     else
@@ -140,12 +141,12 @@ computeGameOverState startPosition coin grid =
                 ( flipCoin coin, Nothing )
 
 
-computeWinningPositionSet : Grid.Position -> Coin -> Grid Coin -> Maybe (Set Grid.Position)
+computeWinningPositionSet : Position -> Coin -> CoinGrid -> Maybe (Set Position)
 computeWinningPositionSet startPosition coin grid =
     let
-        validatePosition : Grid.Position -> Maybe Grid.Position
+        validatePosition : Position -> Maybe Position
         validatePosition position =
-            if Grid.get position grid == Ok (Just coin) then
+            if Grid.get position grid == Just (Just coin) then
                 Just position
 
             else
@@ -195,10 +196,10 @@ viewMemory : Computer -> Mem -> List Shape
 viewMemory { mouse, screen, time } mem =
     let
         gt =
-            computeGridTransform screen mem.grid
+            computeGridTransform screen (Grid.dimensions mem.grid)
 
         cellViewGrid =
-            Grid.map (\_ -> CellView False) mem.grid
+            Grid.map (\_ -> Maybe.map (CellView False)) mem.grid
                 |> updateCellViewGridWithGameState
 
         updateCellViewGridWithGameState =
@@ -223,12 +224,11 @@ type CellView
     = CellView Bool Coin
 
 
-ignoreError : (b -> Result x b) -> b -> b
-ignoreError func val =
-    func val |> Result.withDefault val
+type alias CellViewGrid =
+    Grid (Maybe CellView)
 
 
-insertIndicatorCoinView : Mouse -> GridTransform -> Coin -> Grid CellView -> Grid CellView
+insertIndicatorCoinView : Mouse -> GridTransform -> Coin -> CellViewGrid -> CellViewGrid
 insertIndicatorCoinView mouse gt coin grid =
     let
         { columns } =
@@ -239,20 +239,22 @@ insertIndicatorCoinView mouse gt coin grid =
                 |> clamp 0 (columns - 1)
                 |> columnToInsertPositionIn grid
     in
-    ignoreError (Grid.insert position (CellView True coin)) grid
+    Grid.update position (\_ -> CellView True coin |> Just) grid
+        |> Maybe.withDefault grid
 
 
-highlightWinningPositions : Set Grid.Position -> Grid CellView -> Grid CellView
+highlightWinningPositions : Set Position -> CellViewGrid -> CellViewGrid
 highlightWinningPositions =
     Set.foldl
-        (\pos ->
+        (\pos grid ->
             Grid.update pos
                 (Maybe.map
                     (\(CellView _ coin) ->
                         CellView True coin
                     )
                 )
-                |> ignoreError
+                grid
+                |> Maybe.withDefault grid
         )
         |> flip
 

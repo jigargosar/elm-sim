@@ -1,4 +1,4 @@
-module ConnectFourV3.FilledGrid exposing (Grid, count, foldl, get, init, map, size, update)
+module ConnectFourV3.FilledGrid exposing (FilledGrid, count, foldl, get, init, map, size, update)
 
 import ConnectFourV3.GridDimensions as GridDimensions
 import Dict exposing (Dict)
@@ -12,17 +12,17 @@ type alias Position =
     ( Int, Int )
 
 
-type Grid a
+type FilledGrid a
     = Grid Dimensions (Dict Position a)
 
 
-init : Dimensions -> (Position -> a) -> Grid a
+init : Dimensions -> (Position -> a) -> FilledGrid a
 init dim func =
     GridDimensions.foldl (\p -> Dict.insert p (func p)) Dict.empty dim
         |> Grid dim
 
 
-count : (Position -> a -> Bool) -> Grid a -> Int
+count : (Position -> a -> Bool) -> FilledGrid a -> Int
 count func =
     foldl
         (\p a ->
@@ -35,27 +35,27 @@ count func =
         0
 
 
-size : Grid a -> Int
+size : FilledGrid a -> Int
 size (Grid dim _) =
     GridDimensions.size dim
 
 
-get : Position -> Grid a -> Maybe a
+get : Position -> FilledGrid a -> Maybe a
 get position (Grid _ dict) =
     Dict.get position dict
 
 
-update : Position -> (a -> a) -> Grid a -> Maybe (Grid a)
+update : Position -> (a -> a) -> FilledGrid a -> Maybe (FilledGrid a)
 update position func (Grid dim dict) =
     Dict.get position dict
         |> Maybe.map (\a -> Dict.insert position (func a) dict |> Grid dim)
 
 
-map : (Position -> a -> b) -> Grid a -> Grid b
+map : (Position -> a -> b) -> FilledGrid a -> FilledGrid b
 map func (Grid dim dict) =
     Dict.map func dict |> Grid dim
 
 
-foldl : (Position -> a -> b -> b) -> b -> Grid a -> b
+foldl : (Position -> a -> b -> b) -> b -> FilledGrid a -> b
 foldl func acc (Grid _ dict) =
     Dict.foldl func acc dict

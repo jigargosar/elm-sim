@@ -262,10 +262,6 @@ viewMemory { mouse, screen, time } mem =
         gt =
             computeGridTransform screen (gridDimension mem.grid)
 
-        cellViewGrid =
-            mapGridDictValues (CellView False) mem.grid
-                |> ignoreNothing updateCellViewGridWithGameState
-
         updateCellViewGridWithGameState : Grid CellView -> Maybe (Grid CellView)
         updateCellViewGridWithGameState =
             case mem.state of
@@ -278,11 +274,19 @@ viewMemory { mouse, screen, time } mem =
                 Just Draw ->
                     Just
     in
-    [ group
-        [ rectangle black (GridTransform.width gt) (GridTransform.height gt)
-        , cellViewGridToShape time gt cellViewGrid
-        ]
-    ]
+    case
+        mapGridDictValues (CellView False) mem.grid
+            |> updateCellViewGridWithGameState
+    of
+        Just cellViewGrid ->
+            [ group
+                [ rectangle black (GridTransform.width gt) (GridTransform.height gt)
+                , cellViewGridToShape time gt cellViewGrid
+                ]
+            ]
+
+        Nothing ->
+            [ words red "error" ]
 
 
 type CellView

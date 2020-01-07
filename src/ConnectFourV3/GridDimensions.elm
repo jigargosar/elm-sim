@@ -1,6 +1,5 @@
 module ConnectFourV3.GridDimensions exposing
     ( GridDimensions
-    , GridPosition
     , clampColoumn
     , contains
     , foldl
@@ -11,13 +10,11 @@ module ConnectFourV3.GridDimensions exposing
     , toColoumnsRows
     )
 
+import ConnectFourV3.GridPosition exposing (GridPosition)
+
 
 type GridDimensions
     = GridDimensions { columns : Int, rows : Int }
-
-
-type alias GridPosition =
-    ( Int, Int )
 
 
 fromColumnsRows : { a | columns : Int, rows : Int } -> GridDimensions

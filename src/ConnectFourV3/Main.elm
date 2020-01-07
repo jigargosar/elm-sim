@@ -1,6 +1,7 @@
 module ConnectFourV3.Main exposing (main)
 
-import ConnectFourV3.GridDimensions as Dim
+import ConnectFourV3.GridDimensions as Dim exposing (GridDimensions)
+import ConnectFourV3.GridPosition exposing (GridPosition)
 import ConnectFourV3.GridTransform as GridTransform exposing (GridTransform)
 import Dict exposing (Dict)
 import List.Extra
@@ -10,15 +11,15 @@ import Set exposing (Set)
 
 
 type Grid a
-    = Grid (Dict Position a)
+    = Grid (Dict Pos a)
 
 
 type alias Dim =
-    Dim.GridDimensions
+    GridDimensions
 
 
-type alias Position =
-    Dim.GridPosition
+type alias Pos =
+    GridPosition
 
 
 type Coin
@@ -27,7 +28,7 @@ type Coin
 
 
 type GameOver
-    = WinningPositions (Set Position)
+    = WinningPositions (Set Pos)
     | Draw
 
 
@@ -63,7 +64,7 @@ flipCoin coin =
             Red
 
 
-columnToInsertPositionIn : Grid v -> Int -> Position
+columnToInsertPositionIn : Grid v -> Int -> Pos
 columnToInsertPositionIn (Grid dict) column =
     let
         columnLength =
@@ -81,7 +82,7 @@ columnToInsertPositionIn (Grid dict) column =
     ( column, columnLength )
 
 
-setInGridAt : Position -> a -> Dim.GridDimensions -> Grid a -> Maybe (Grid a)
+setInGridAt : Pos -> a -> Dim.GridDimensions -> Grid a -> Maybe (Grid a)
 setInGridAt position value dim (Grid dict) =
     if Dim.contains position dim then
         Dict.insert position value dict |> Grid |> Just
@@ -90,7 +91,7 @@ setInGridAt position value dim (Grid dict) =
         Nothing
 
 
-updateInGridAt : Position -> (Maybe v -> Maybe v) -> Dim -> Grid v -> Maybe (Grid v)
+updateInGridAt : Pos -> (Maybe v -> Maybe v) -> Dim -> Grid v -> Maybe (Grid v)
 updateInGridAt position func dim (Grid dict) =
     if Dim.contains position dim then
         Dict.update position func dict |> Grid |> Just
@@ -169,7 +170,7 @@ computeCellSize { width, height } dim =
     min maxCellWidth maxCellHeight
 
 
-computeGameOverState : Position -> Coin -> Dim -> Grid Coin -> ( Coin, Maybe GameOver )
+computeGameOverState : Pos -> Coin -> Dim -> Grid Coin -> ( Coin, Maybe GameOver )
 computeGameOverState startPosition coin dim ((Grid dict) as grid) =
     if Dict.size dict == Dim.size dim then
         ( coin, Just Draw )
@@ -183,10 +184,10 @@ computeGameOverState startPosition coin dim ((Grid dict) as grid) =
                 ( flipCoin coin, Nothing )
 
 
-computeWinningPositionSet : Position -> Coin -> Dim -> Grid Coin -> Maybe (Set Position)
+computeWinningPositionSet : Pos -> Coin -> Dim -> Grid Coin -> Maybe (Set Pos)
 computeWinningPositionSet startPosition coin dim dict =
     let
-        validatePosition : Position -> Maybe Coin -> Maybe Position
+        validatePosition : Pos -> Maybe Coin -> Maybe Pos
         validatePosition position maybeCoin =
             if maybeCoin == Just coin then
                 Just position
@@ -209,7 +210,7 @@ computeWinningPositionSet startPosition coin dim dict =
         |> Maybe.map (Set.insert startPosition)
 
 
-mapNeighboursWhile : Position -> (Position -> Maybe a -> Maybe b) -> Dim -> Grid a -> List (List b)
+mapNeighboursWhile : Pos -> (Pos -> Maybe a -> Maybe b) -> Dim -> Grid a -> List (List b)
 mapNeighboursWhile startPosition func dim (Grid dict) =
     let
         mapWhileWithStep acc position step =
@@ -286,7 +287,7 @@ insertIndicatorCoinView mouse gt coin dim grid =
         |> Maybe.withDefault grid
 
 
-highlightWinningPositions : Dim -> Set Position -> Grid CellView -> Grid CellView
+highlightWinningPositions : Dim -> Set Pos -> Grid CellView -> Grid CellView
 highlightWinningPositions dim =
     Set.foldl
         (\pos grid ->

@@ -6,7 +6,7 @@ import ConnectFourV3.GridTransform as GridTransform exposing (GridTransform)
 import Dict exposing (Dict)
 import List.Extra
 import Playground exposing (..)
-import PointFree exposing (ignoreNothing, is)
+import PointFree exposing (is)
 import Set exposing (Set)
 
 
@@ -96,24 +96,6 @@ insertInColumn column a (Grid dim dict) =
 type InsertError
     = InvalidColumn
     | ColumnFull
-
-
-columnToInsertPositionIn : Grid a -> Int -> Pos
-columnToInsertPositionIn (Grid _ dict) column =
-    let
-        columnLength =
-            Dict.foldl
-                (\( x, _ ) _ ->
-                    if x == column then
-                        (+) 1
-
-                    else
-                        identity
-                )
-                0
-                dict
-    in
-    ( column, columnLength )
 
 
 updateGridAt : Pos -> (Maybe v -> Maybe v) -> Grid v -> Maybe (Grid v)

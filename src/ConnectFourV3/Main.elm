@@ -1,13 +1,12 @@
 module ConnectFourV3.Main exposing (main)
 
-import Basics.Extra exposing (uncurry)
 import ConnectFourV3.Grid as Grid
-import ConnectFourV3.GridDimensions as GridDimensions exposing (GridDimensions)
+import ConnectFourV3.GridDimensions as Dim exposing (GridDimensions)
 import ConnectFourV3.GridTransform as GridTransform exposing (GridTransform)
-import Dict
+import Dict exposing (Dict)
 import List.Extra
 import Playground exposing (..)
-import PointFree exposing (flip, is, mapEach)
+import PointFree exposing (flip, is)
 import Set exposing (Set)
 
 
@@ -46,7 +45,7 @@ initialMemory =
     let
         dimensions : GridDimensions
         dimensions =
-            GridDimensions.fromColumnsRows { columns = 7, rows = 6 }
+            Dim.fromColumnsRows { columns = 7, rows = 6 }
     in
     { coin = Blue
     , state = Nothing
@@ -116,7 +115,7 @@ updateMemory { mouse, screen } mem =
                     Ok grid ->
                         let
                             ( coin, state ) =
-                                computeGameOverState position mem.coin mem.dimensions grid
+                                computeGameOverState position mem.coin mem.dimensions (Grid.toDict grid)
                         in
                         { mem
                             | grid = grid
@@ -142,7 +141,7 @@ computeCellSize : Screen -> GridDimensions -> Float
 computeCellSize { width, height } dim =
     let
         { columns, rows } =
-            GridDimensions.toColoumnsRows dim
+            Dim.toColoumnsRows dim
 
         maxCellWidth =
             width * 0.8 / toFloat columns
@@ -153,13 +152,13 @@ computeCellSize { width, height } dim =
     min maxCellWidth maxCellHeight
 
 
-computeGameOverState : Position -> Coin -> GridDimensions -> CoinGrid -> ( Coin, Maybe GameOver )
-computeGameOverState startPosition coin dim grid =
-    if (Grid.toDict grid |> Dict.size) == GridDimensions.size dim then
+computeGameOverState : Position -> Coin -> GridDimensions -> Dict Position Coin -> ( Coin, Maybe GameOver )
+computeGameOverState startPosition coin dim dict =
+    if Dict.size dict == Dim.size dim then
         ( coin, Just Draw )
 
     else
-        case computeWinningPositionSet startPosition coin grid of
+        case computeWinningPositionSet startPosition coin dim dict of
             Just positionSet ->
                 ( coin, Just (WinningPositions positionSet) )
 
@@ -167,8 +166,8 @@ computeGameOverState startPosition coin dim grid =
                 ( flipCoin coin, Nothing )
 
 
-computeWinningPositionSet : Position -> Coin -> CoinGrid -> Maybe (Set Position)
-computeWinningPositionSet startPosition coin grid =
+computeWinningPositionSet : Position -> Coin -> GridDimensions -> Dict Position Coin -> Maybe (Set Position)
+computeWinningPositionSet startPosition coin dim dict =
     let
         validatePosition : Position -> Maybe Coin -> Maybe Position
         validatePosition position maybeCoin =
@@ -179,7 +178,7 @@ computeWinningPositionSet startPosition coin grid =
                 Nothing
 
         connectedNeighboursList =
-            Grid.mapNeighboursWhile startPosition validatePosition grid
+            mapNeighboursWhile startPosition validatePosition dim dict
                 |> List.map Set.fromList
 
         cn1 =
@@ -191,6 +190,28 @@ computeWinningPositionSet startPosition coin grid =
     List.map2 Set.union cn1 cn2
         |> List.Extra.find (Set.size >> is 3)
         |> Maybe.map (Set.insert startPosition)
+
+
+mapNeighboursWhile : Position -> (Position -> Maybe a -> Maybe b) -> GridDimensions -> Dict Position a -> List (List b)
+mapNeighboursWhile startPosition func dim dict =
+    let
+        mapWhileWithStep acc position step =
+            case Dim.stepPositionBy step dim position of
+                Just nextPosition ->
+                    case func nextPosition (Dict.get nextPosition dict) of
+                        Just nextValue ->
+                            mapWhileWithStep (nextValue :: acc)
+                                nextPosition
+                                step
+
+                        Nothing ->
+                            acc
+
+                Nothing ->
+                    acc
+    in
+    List.map (mapWhileWithStep [] startPosition >> List.reverse)
+        Dim.neighboursOffset
 
 
 
@@ -241,7 +262,7 @@ insertIndicatorCoinView mouse gt coin dim grid =
             GridTransform.fromScreenX mouse.x gt
 
         position =
-            GridDimensions.clampColoumn unclampedColumn dim
+            Dim.clampColoumn unclampedColumn dim
                 |> columnToInsertPositionIn grid
     in
     Grid.update position (\_ -> CellView True coin |> Just) grid

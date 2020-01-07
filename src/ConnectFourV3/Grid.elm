@@ -6,7 +6,6 @@ module ConnectFourV3.Grid exposing
     , foldl
     , get
     , map
-    , mapNeighboursWhile
     , toDict
     , update
     )
@@ -78,25 +77,3 @@ foldl func acc (Grid dim dict) =
 toDict : Grid a -> Dict Position a
 toDict (Grid _ dict) =
     dict
-
-
-mapNeighboursWhile : Position -> (Position -> Maybe a -> Maybe b) -> Grid a -> List (List b)
-mapNeighboursWhile startPosition func (Grid dim dict) =
-    let
-        mapWhileWithStep acc position step =
-            case Dim.stepPositionBy step dim position of
-                Just nextPosition ->
-                    case func nextPosition (Dict.get nextPosition dict) of
-                        Just nextValue ->
-                            mapWhileWithStep (nextValue :: acc)
-                                nextPosition
-                                step
-
-                        Nothing ->
-                            acc
-
-                Nothing ->
-                    acc
-    in
-    List.map (mapWhileWithStep [] startPosition >> List.reverse)
-        Dim.neighboursOffset

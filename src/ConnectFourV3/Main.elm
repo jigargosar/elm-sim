@@ -59,7 +59,7 @@ flipCoin coin =
             Red
 
 
-columnToInsertPositionIn : Dict Position v -> Int -> Position
+columnToInsertPositionIn : Grid v -> Int -> Position
 columnToInsertPositionIn grid column =
     let
         columnLength =
@@ -85,7 +85,7 @@ setInGridAt position value dim grid =
         Nothing
 
 
-updateInGridAt : Position -> (Maybe v -> Maybe v) -> GridDimensions -> Grid v -> Maybe (Dict Position v)
+updateInGridAt : Position -> (Maybe v -> Maybe v) -> GridDimensions -> Grid v -> Maybe (Grid v)
 updateInGridAt position func dim grid =
     if Dim.contains position dim then
         Dict.update position func grid |> Just
@@ -164,7 +164,7 @@ computeCellSize { width, height } dim =
     min maxCellWidth maxCellHeight
 
 
-computeGameOverState : Position -> Coin -> GridDimensions -> Dict Position Coin -> ( Coin, Maybe GameOver )
+computeGameOverState : Position -> Coin -> GridDimensions -> Grid Coin -> ( Coin, Maybe GameOver )
 computeGameOverState startPosition coin dim dict =
     if Dict.size dict == Dim.size dim then
         ( coin, Just Draw )
@@ -178,7 +178,7 @@ computeGameOverState startPosition coin dim dict =
                 ( flipCoin coin, Nothing )
 
 
-computeWinningPositionSet : Position -> Coin -> GridDimensions -> Dict Position Coin -> Maybe (Set Position)
+computeWinningPositionSet : Position -> Coin -> GridDimensions -> Grid Coin -> Maybe (Set Position)
 computeWinningPositionSet startPosition coin dim dict =
     let
         validatePosition : Position -> Maybe Coin -> Maybe Position
@@ -204,7 +204,7 @@ computeWinningPositionSet startPosition coin dim dict =
         |> Maybe.map (Set.insert startPosition)
 
 
-mapNeighboursWhile : Position -> (Position -> Maybe a -> Maybe b) -> GridDimensions -> Dict Position a -> List (List b)
+mapNeighboursWhile : Position -> (Position -> Maybe a -> Maybe b) -> GridDimensions -> Grid a -> List (List b)
 mapNeighboursWhile startPosition func dim dict =
     let
         mapWhileWithStep acc position step =

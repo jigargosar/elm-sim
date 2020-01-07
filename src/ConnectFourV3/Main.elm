@@ -91,8 +91,8 @@ setInGridAt position value (Grid dim dict) =
         Nothing
 
 
-updateInGridAt : Pos -> (Maybe v -> Maybe v) -> Grid v -> Maybe (Grid v)
-updateInGridAt position func (Grid dim dict) =
+updateGridAt : Pos -> (Maybe v -> Maybe v) -> Grid v -> Maybe (Grid v)
+updateGridAt position func (Grid dim dict) =
     if Dim.contains position dim then
         Dict.update position func dict |> Grid dim |> Just
 
@@ -105,9 +105,14 @@ gridDimension (Grid dim _) =
     dim
 
 
-mapGridValues : (a -> b) -> Grid a -> Grid b
-mapGridValues func (Grid dim dict) =
+mapGridDictValues : (a -> b) -> Grid a -> Grid b
+mapGridDictValues func (Grid dim dict) =
     Dict.map (always func) dict |> Grid dim
+
+
+foldlGrid : (Pos -> Maybe a -> b -> b) -> b -> Grid a -> b
+foldlGrid func acc (Grid dim dict) =
+    Dim.foldl (\p -> func p (Dict.get p dict)) acc dim
 
 
 
@@ -253,7 +258,7 @@ viewMemory { mouse, screen, time } mem =
             computeGridTransform screen (gridDimension mem.grid)
 
         cellViewGrid =
-            mapGridValues (CellView False) mem.grid
+            mapGridDictValues (CellView False) mem.grid
                 |> updateCellViewGridWithGameState
 
         updateCellViewGridWithGameState : Grid CellView -> Grid CellView
@@ -297,7 +302,7 @@ highlightWinningPositions : Set Pos -> Grid CellView -> Grid CellView
 highlightWinningPositions =
     Set.foldl
         (\pos grid ->
-            updateInGridAt pos
+            updateGridAt pos
                 (Maybe.map
                     (\(CellView _ coin) ->
                         CellView True coin
@@ -320,7 +325,7 @@ coinToColor coin =
 
 
 cellViewGridToShape : Time -> GridTransform -> Grid CellView -> Shape
-cellViewGridToShape time gt (Grid dim dict) =
+cellViewGridToShape time gt grid =
     let
         cellRadius =
             GridTransform.cellSize gt / 2
@@ -353,7 +358,7 @@ cellViewGridToShape time gt (Grid dim dict) =
                 |> move (GridTransform.toScreenX column gt) (GridTransform.toScreenY row gt)
                 |> (::)
     in
-    Dim.foldl (\p -> viewCell p (Dict.get p dict)) [] dim |> group
+    foldlGrid viewCell [] grid |> group
 
 
 

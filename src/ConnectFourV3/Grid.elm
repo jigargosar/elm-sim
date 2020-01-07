@@ -12,6 +12,7 @@ module ConnectFourV3.Grid exposing
 
 import ConnectFourV3.GridDimensions as Dim exposing (GridDimensions)
 import Dict exposing (Dict)
+import PointFree exposing (mapEach)
 
 
 type alias Dimensions =
@@ -77,3 +78,41 @@ foldl func acc (Grid dim dict) =
 toDict : Grid a -> Dict Position a
 toDict (Grid _ dict) =
     dict
+
+
+neighboursOffset =
+    [ ( 1, 0 ), ( 1, 1 ), ( 0, 1 ), ( -1, 1 ), ( -1, 0 ), ( -1, -1 ), ( 0, -1 ), ( 1, -1 ) ]
+
+
+stepPosition : ( Int, Int ) -> GridDimensions -> Position -> Maybe Position
+stepPosition ( dx, dy ) dim ( x, y ) =
+    let
+        nextPosition =
+            ( x + dx, y + dy )
+    in
+    if Dim.contains nextPosition dim then
+        Just nextPosition
+
+    else
+        Nothing
+
+
+collectNeighboursWhile : Position -> (Position -> Maybe a -> Maybe b) -> Grid a -> List (List b)
+collectNeighboursWhile startPosition func (Grid dim dict) =
+    let
+        collectWithStep acc position step =
+            case stepPosition step dim position of
+                Just nextPosition ->
+                    case func nextPosition (Dict.get nextPosition dict) of
+                        Just nextValue ->
+                            collectWithStep (nextValue :: acc)
+                                nextPosition
+                                step
+
+                        Nothing ->
+                            acc
+
+                Nothing ->
+                    acc
+    in
+    List.map (collectWithStep [] startPosition >> List.reverse) neighboursOffset

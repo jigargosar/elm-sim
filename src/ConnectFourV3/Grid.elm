@@ -16,7 +16,6 @@ module ConnectFourV3.Grid exposing
     )
 
 import Dict exposing (Dict)
-import PointFree exposing (flip)
 
 
 type alias Dimensions =

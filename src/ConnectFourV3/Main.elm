@@ -55,11 +55,11 @@ flipCoin coin =
             Red
 
 
-columnToInsertPositionIn : Grid v -> Int -> Position
+columnToInsertPositionIn : Grid (Maybe v) -> Int -> Position
 columnToInsertPositionIn grid column =
     let
         columnLength =
-            Grid.count (\( x, _ ) _ -> x == column) grid
+            Grid.count (\( x, _ ) v -> x == column && v /= Nothing) grid
     in
     ( column, columnLength )
 

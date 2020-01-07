@@ -99,9 +99,4 @@ mapNeighboursWhile startPosition func (Grid dim dict) =
                     acc
     in
     List.map (mapWhileWithStep [] startPosition >> List.reverse)
-        neighboursOffset
-
-
-neighboursOffset : List ( Int, Int )
-neighboursOffset =
-    [ ( 1, 0 ), ( 1, 1 ), ( 0, 1 ), ( -1, 1 ), ( -1, 0 ), ( -1, -1 ), ( 0, -1 ), ( 1, -1 ) ]
+        Dim.neighboursOffset

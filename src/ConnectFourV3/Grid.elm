@@ -101,12 +101,12 @@ stepPosition ( dx, dy ) dim ( x, y ) =
 mapNeighboursWhile : Position -> (Position -> Maybe a -> Maybe b) -> Grid a -> List (List b)
 mapNeighboursWhile startPosition func (Grid dim dict) =
     let
-        collectWithStep acc position step =
+        mapWhileWithStep acc position step =
             case stepPosition step dim position of
                 Just nextPosition ->
                     case func nextPosition (Dict.get nextPosition dict) of
                         Just nextValue ->
-                            collectWithStep (nextValue :: acc)
+                            mapWhileWithStep (nextValue :: acc)
                                 nextPosition
                                 step
 
@@ -116,4 +116,4 @@ mapNeighboursWhile startPosition func (Grid dim dict) =
                 Nothing ->
                     acc
     in
-    List.map (collectWithStep [] startPosition >> List.reverse) neighboursOffset
+    List.map (mapWhileWithStep [] startPosition >> List.reverse) neighboursOffset

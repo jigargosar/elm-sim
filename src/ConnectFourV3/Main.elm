@@ -197,57 +197,6 @@ computeWinningPositionSet startPosition coin grid =
 
 
 
-{-
-   computeWinningPositionSet : Position -> Coin -> CoinGrid -> Maybe (Set Position)
-   computeWinningPositionSet startPosition coin grid =
-       let
-           validatePosition : Position -> Maybe Position
-           validatePosition position =
-               if Grid.get position grid == Ok (Just coin) then
-                   Just position
-
-               else
-                   Nothing
-
-           getPositionsInDirection ( dx, dy ) =
-               collectWhileUpto 3
-                   (\( x, y ) -> validatePosition ( x + dx, y + dy ))
-                   startPosition
-                   |> Set.fromList
-
-           getPositionSetInOpposingDirections ( dx, dy ) =
-               getPositionsInDirection ( dx, dy )
-                   |> Set.union (getPositionsInDirection ( -dx, -dy ))
-                   |> Set.insert startPosition
-       in
-       [ ( 1, 0 ), ( 0, 1 ), ( -1, 1 ), ( 1, -1 ) ]
-           |> List.map getPositionSetInOpposingDirections
-           |> List.Extra.find (\positionSet -> Set.size positionSet == 4)
-
--}
-
-
-collectWhileUpto : Int -> (a -> Maybe a) -> a -> List a
-collectWhileUpto maxCount nextSeedFunc seed =
-    collectWhileUptoHelp maxCount nextSeedFunc seed []
-        |> List.reverse
-
-
-collectWhileUptoHelp : Int -> (a -> Maybe a) -> a -> List a -> List a
-collectWhileUptoHelp maxCount nextSeedFunc seed accR =
-    if maxCount <= 0 then
-        accR
-
-    else
-        case nextSeedFunc seed of
-            Just nextSeed ->
-                collectWhileUptoHelp (maxCount - 1) nextSeedFunc nextSeed (nextSeed :: accR)
-
-            Nothing ->
-                accR
-
-
-
 -- VIEW
 
 

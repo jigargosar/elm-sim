@@ -327,9 +327,11 @@ coinToColor coin =
 cellViewGridToShape : Time -> GridTransform -> Grid CellView -> Shape
 cellViewGridToShape time gt grid =
     let
+        cellRadius : Float
         cellRadius =
             GridTransform.cellSize gt / 2
 
+        coinToShape : Bool -> Coin -> Shape
         coinToShape highlight coin =
             circle (coinToColor coin) (cellRadius * 0.7)
                 |> (if highlight then
@@ -339,9 +341,11 @@ cellViewGridToShape time gt grid =
                         fade 1
                    )
 
+        cellBackgroundShape : Shape
         cellBackgroundShape =
             circle white (cellRadius * 0.9)
 
+        toCellShape : Maybe CellView -> Shape
         toCellShape cell =
             case cell of
                 Just (CellView highlight coin) ->
@@ -353,8 +357,9 @@ cellViewGridToShape time gt grid =
                 _ ->
                     cellBackgroundShape
 
-        viewCell ( column, row ) cell =
-            toCellShape cell
+        viewCell : Pos -> Maybe CellView -> List Shape -> List Shape
+        viewCell ( column, row ) maybeCellView =
+            toCellShape maybeCellView
                 |> move (GridTransform.toScreenX column gt) (GridTransform.toScreenY row gt)
                 |> (::)
     in

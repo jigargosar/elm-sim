@@ -247,12 +247,11 @@ type alias CellViewGrid =
 insertIndicatorCoinView : Mouse -> GridTransform -> Coin -> GridDimensions -> CellViewGrid -> CellViewGrid
 insertIndicatorCoinView mouse gt coin dim grid =
     let
-        { columns } =
-            GridDimensions.toColoumnsRows dim
+        unclampedColumn =
+            GridTransform.fromScreenX mouse.x gt
 
         position =
-            GridTransform.fromScreenX mouse.x gt
-                |> clamp 0 (columns - 1)
+            GridDimensions.clampColoumn unclampedColumn dim
                 |> columnToInsertPositionIn grid
     in
     Grid.update position (\_ -> CellView True coin |> Just) grid

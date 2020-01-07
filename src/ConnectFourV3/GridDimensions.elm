@@ -1,5 +1,6 @@
 module ConnectFourV3.GridDimensions exposing
     ( GridDimensions
+    , clampColoumn
     , contains
     , foldl
     , fromColumnsRows
@@ -54,3 +55,8 @@ contains ( x, y ) (GridDimensions { columns, rows }) =
 size : GridDimensions -> Int
 size (GridDimensions { columns, rows }) =
     columns * rows
+
+
+clampColoumn : Int -> GridDimensions -> Int
+clampColoumn column (GridDimensions { columns }) =
+    clamp 0 (columns - 1) column

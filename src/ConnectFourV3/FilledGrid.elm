@@ -42,11 +42,8 @@ get position (Grid _ dict) =
 
 update : Position -> (a -> a) -> Grid a -> Maybe (Grid a)
 update position func (Grid dim dict) =
-    if GridDimensions.contains position dim then
-        Dict.update position (Maybe.map func) dict |> Grid dim |> Just
-
-    else
-        Nothing
+    Dict.get position dict
+        |> Maybe.map (\a -> Dict.insert position (func a) dict |> Grid dim)
 
 
 map : (Position -> a -> b) -> Grid a -> Grid b

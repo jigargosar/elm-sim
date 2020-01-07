@@ -10,16 +10,16 @@ import PointFree exposing (flip, is)
 import Set exposing (Set)
 
 
-type Grid a
-    = Grid (Dict Pos a)
-
-
 type alias Dim =
     GridDimensions
 
 
 type alias Pos =
     GridPosition
+
+
+type Grid a
+    = Grid Dim (Dict Pos a)
 
 
 type Coin
@@ -43,14 +43,14 @@ type alias Mem =
 initialMemory : Mem
 initialMemory =
     let
-        dimensions : Dim
-        dimensions =
+        dim : Dim
+        dim =
             Dim.fromColumnsRows { columns = 7, rows = 6 }
     in
     { coin = Blue
     , state = Nothing
-    , dimensions = dimensions
-    , grid = Grid Dict.empty
+    , dimensions = dim
+    , grid = Grid dim Dict.empty
     }
 
 
@@ -65,7 +65,7 @@ flipCoin coin =
 
 
 columnToInsertPositionIn : Grid v -> Int -> Pos
-columnToInsertPositionIn (Grid dict) column =
+columnToInsertPositionIn (Grid _ dict) column =
     let
         columnLength =
             Dict.foldl
@@ -82,19 +82,19 @@ columnToInsertPositionIn (Grid dict) column =
     ( column, columnLength )
 
 
-setInGridAt : Pos -> a -> Dim.GridDimensions -> Grid a -> Maybe (Grid a)
-setInGridAt position value dim (Grid dict) =
+setInGridAt : Pos -> a -> Grid a -> Maybe (Grid a)
+setInGridAt position value (Grid dim dict) =
     if Dim.contains position dim then
-        Dict.insert position value dict |> Grid |> Just
+        Dict.insert position value dict |> Grid dim |> Just
 
     else
         Nothing
 
 
-updateInGridAt : Pos -> (Maybe v -> Maybe v) -> Dim -> Grid v -> Maybe (Grid v)
-updateInGridAt position func dim (Grid dict) =
+updateInGridAt : Pos -> (Maybe v -> Maybe v) -> Grid v -> Maybe (Grid v)
+updateInGridAt position func (Grid dim dict) =
     if Dim.contains position dim then
-        Dict.update position func dict |> Grid |> Just
+        Dict.update position func dict |> Grid dim |> Just
 
     else
         Nothing
@@ -129,11 +129,11 @@ updateMemory { mouse, screen } mem =
                     position =
                         columnToInsertPositionIn mem.grid column
                 in
-                case setInGridAt position mem.coin mem.dimensions mem.grid of
+                case setInGridAt position mem.coin mem.grid of
                     Just grid ->
                         let
                             ( coin, state ) =
-                                computeGameOverState position mem.coin mem.dimensions grid
+                                computeGameOverState position mem.coin grid
                         in
                         { mem
                             | grid = grid
@@ -170,13 +170,13 @@ computeCellSize { width, height } dim =
     min maxCellWidth maxCellHeight
 
 
-computeGameOverState : Pos -> Coin -> Dim -> Grid Coin -> ( Coin, Maybe GameOver )
-computeGameOverState startPosition coin dim ((Grid dict) as grid) =
+computeGameOverState : Pos -> Coin -> Grid Coin -> ( Coin, Maybe GameOver )
+computeGameOverState startPosition coin ((Grid dim dict) as grid) =
     if Dict.size dict == Dim.size dim then
         ( coin, Just Draw )
 
     else
-        case computeWinningPositionSet startPosition coin dim grid of
+        case computeWinningPositionSet startPosition coin grid of
             Just positionSet ->
                 ( coin, Just (WinningPositions positionSet) )
 
@@ -184,8 +184,8 @@ computeGameOverState startPosition coin dim ((Grid dict) as grid) =
                 ( flipCoin coin, Nothing )
 
 
-computeWinningPositionSet : Pos -> Coin -> Dim -> Grid Coin -> Maybe (Set Pos)
-computeWinningPositionSet startPosition coin dim dict =
+computeWinningPositionSet : Pos -> Coin -> Grid Coin -> Maybe (Set Pos)
+computeWinningPositionSet startPosition coin grid =
     let
         validatePosition : Pos -> Maybe Coin -> Maybe Pos
         validatePosition position maybeCoin =
@@ -196,7 +196,7 @@ computeWinningPositionSet startPosition coin dim dict =
                 Nothing
 
         connectedNeighboursList =
-            mapNeighboursWhile startPosition validatePosition dim dict
+            mapNeighboursWhile startPosition validatePosition grid
                 |> List.map Set.fromList
 
         cn1 =
@@ -210,8 +210,8 @@ computeWinningPositionSet startPosition coin dim dict =
         |> Maybe.map (Set.insert startPosition)
 
 
-mapNeighboursWhile : Pos -> (Pos -> Maybe a -> Maybe b) -> Dim -> Grid a -> List (List b)
-mapNeighboursWhile startPosition func dim (Grid dict) =
+mapNeighboursWhile : Pos -> (Pos -> Maybe a -> Maybe b) -> Grid a -> List (List b)
+mapNeighboursWhile startPosition func (Grid dim dict) =
     let
         mapWhileWithStep acc position step =
             case Dim.stepPositionBy step dim position of
@@ -242,29 +242,29 @@ viewMemory { mouse, screen, time } mem =
         gt =
             computeGridTransform screen mem.dimensions
 
-        (Grid dict) =
+        (Grid dim dict) =
             mem.grid
 
         cellViewGrid =
             Dict.map (\_ -> CellView False) dict
-                |> Grid
+                |> Grid dim
                 |> updateCellViewGridWithGameState
 
         updateCellViewGridWithGameState : Grid CellView -> Grid CellView
         updateCellViewGridWithGameState =
             case mem.state of
                 Nothing ->
-                    insertIndicatorCoinView mouse gt mem.coin mem.dimensions
+                    insertIndicatorCoinView mouse gt mem.coin
 
                 Just (WinningPositions positions) ->
-                    highlightWinningPositions mem.dimensions positions
+                    highlightWinningPositions positions
 
                 Just Draw ->
                     identity
     in
     [ group
         [ rectangle black (GridTransform.width gt) (GridTransform.height gt)
-        , cellViewGridToShape time gt mem.dimensions cellViewGrid
+        , cellViewGridToShape time gt cellViewGrid
         ]
     ]
 
@@ -273,8 +273,8 @@ type CellView
     = CellView Bool Coin
 
 
-insertIndicatorCoinView : Mouse -> GridTransform -> Coin -> Dim -> Grid CellView -> Grid CellView
-insertIndicatorCoinView mouse gt coin dim grid =
+insertIndicatorCoinView : Mouse -> GridTransform -> Coin -> Grid CellView -> Grid CellView
+insertIndicatorCoinView mouse gt coin ((Grid dim _) as grid) =
     let
         unclampedColumn =
             GridTransform.fromScreenX mouse.x gt
@@ -283,12 +283,12 @@ insertIndicatorCoinView mouse gt coin dim grid =
             Dim.clampColoumn unclampedColumn dim
                 |> columnToInsertPositionIn grid
     in
-    setInGridAt position (CellView True coin) dim grid
+    setInGridAt position (CellView True coin) grid
         |> Maybe.withDefault grid
 
 
-highlightWinningPositions : Dim -> Set Pos -> Grid CellView -> Grid CellView
-highlightWinningPositions dim =
+highlightWinningPositions : Set Pos -> Grid CellView -> Grid CellView
+highlightWinningPositions =
     Set.foldl
         (\pos grid ->
             updateInGridAt pos
@@ -297,7 +297,6 @@ highlightWinningPositions dim =
                         CellView True coin
                     )
                 )
-                dim
                 grid
                 |> Maybe.withDefault grid
         )
@@ -314,8 +313,8 @@ coinToColor coin =
             blue
 
 
-cellViewGridToShape : Time -> GridTransform -> Dim.GridDimensions -> Grid CellView -> Shape
-cellViewGridToShape time gt dim (Grid dict) =
+cellViewGridToShape : Time -> GridTransform -> Grid CellView -> Shape
+cellViewGridToShape time gt (Grid dim dict) =
     let
         cellRadius =
             GridTransform.cellSize gt / 2

@@ -179,12 +179,9 @@ updateMemory { mouse, screen } mem =
                 let
                     column =
                         GridTransform.fromScreenX mouse.x gt
-
-                    position =
-                        columnToInsertPositionIn mem.grid column
                 in
-                case setInGridAt position mem.coin mem.grid of
-                    Just grid ->
+                case insertInColumn column mem.coin mem.grid of
+                    Ok ( position, grid ) ->
                         let
                             ( coin, state ) =
                                 computeGameOverState position mem.coin grid
@@ -195,7 +192,10 @@ updateMemory { mouse, screen } mem =
                             , state = state
                         }
 
-                    Nothing ->
+                    Err ColumnFull ->
+                        mem
+
+                    Err InvalidColumn ->
                         mem
 
             else

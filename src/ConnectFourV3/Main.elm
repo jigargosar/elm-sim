@@ -85,7 +85,7 @@ setInGridAt position value dim grid =
         Nothing
 
 
-updateInGridAt : Position -> (Maybe v -> Maybe v) -> GridDimensions -> Dict Position v -> Maybe (Dict Position v)
+updateInGridAt : Position -> (Maybe v -> Maybe v) -> GridDimensions -> Grid v -> Maybe (Dict Position v)
 updateInGridAt position func dim grid =
     if Dim.contains position dim then
         Dict.update position func grid |> Just

@@ -1,8 +1,8 @@
 module ConnectFourV3.SparseGrid exposing
     ( Dimensions
     , Error(..)
-    , Grid
     , Position
+    , SparseGrid
     , dimensions
     , empty
     , foldl
@@ -26,26 +26,26 @@ type alias Position =
     ( Int, Int )
 
 
-type Grid a
+type SparseGrid a
     = Grid Dimensions (Dict Position a)
 
 
-empty : Dimensions -> Grid a
+empty : Dimensions -> SparseGrid a
 empty dimensions_ =
     Grid dimensions_ Dict.empty
 
 
-toDict : Grid a -> Dict Position a
+toDict : SparseGrid a -> Dict Position a
 toDict (Grid _ dict) =
     dict
 
 
-dimensions : Grid a -> Dimensions
+dimensions : SparseGrid a -> Dimensions
 dimensions (Grid dimensions_ _) =
     dimensions_
 
 
-insert : Position -> a -> Grid a -> Result Error (Grid a)
+insert : Position -> a -> SparseGrid a -> Result Error (SparseGrid a)
 insert position a (Grid dim dict) =
     if isPositionWithinBounds position dim then
         case Dict.get position dict of
@@ -73,12 +73,12 @@ isPositionWithinBounds ( x, y ) { columns, rows } =
         |> not
 
 
-isFull : Grid a -> Bool
+isFull : SparseGrid a -> Bool
 isFull (Grid { columns, rows } dict) =
     rows * columns == Dict.size dict
 
 
-get : Position -> Grid a -> Result Error (Maybe a)
+get : Position -> SparseGrid a -> Result Error (Maybe a)
 get position (Grid dim dict) =
     if isPositionWithinBounds position dim then
         Dict.get position dict |> Ok
@@ -87,13 +87,13 @@ get position (Grid dim dict) =
         Err OutOfBounds
 
 
-map : (Position -> a -> b) -> Grid a -> Grid b
+map : (Position -> a -> b) -> SparseGrid a -> SparseGrid b
 map func (Grid dim dict) =
     Dict.map func dict
         |> Grid dim
 
 
-update : Position -> (Maybe a -> Maybe a) -> Grid a -> Result Error (Grid a)
+update : Position -> (Maybe a -> Maybe a) -> SparseGrid a -> Result Error (SparseGrid a)
 update position func (Grid dim dict) =
     if isPositionWithinBounds position dim then
         Dict.update position func dict |> Grid dim |> Ok
@@ -102,7 +102,7 @@ update position func (Grid dim dict) =
         Err OutOfBounds
 
 
-mapAll : (Position -> Maybe a -> Maybe b) -> Grid a -> Grid b
+mapAll : (Position -> Maybe a -> Maybe b) -> SparseGrid a -> SparseGrid b
 mapAll func ((Grid dim _) as grid) =
     foldl
         (\position maybeA ->
@@ -118,7 +118,7 @@ mapAll func ((Grid dim _) as grid) =
         |> Grid dim
 
 
-foldl : (Position -> Maybe a -> b -> b) -> b -> Grid a -> b
+foldl : (Position -> Maybe a -> b -> b) -> b -> SparseGrid a -> b
 foldl func acc0 (Grid { columns, rows } dict) =
     List.range 0 (columns - 1)
         |> List.foldl

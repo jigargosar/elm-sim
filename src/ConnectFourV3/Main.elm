@@ -6,7 +6,7 @@ import ConnectFourV3.GridTransform as GridTransform exposing (GridTransform)
 import Dict exposing (Dict)
 import List.Extra
 import Playground exposing (..)
-import PointFree exposing (is)
+import PointFree exposing (ignoreNothing, is)
 import Set exposing (Set)
 
 
@@ -64,7 +64,7 @@ flipCoin coin =
             Red
 
 
-columnToInsertPositionIn : Grid v -> Int -> Pos
+columnToInsertPositionIn : Grid a -> Int -> Pos
 columnToInsertPositionIn (Grid _ dict) column =
     let
         columnLength =
@@ -254,11 +254,6 @@ mapNeighboursWhile startPosition func (Grid dim dict) =
 
 
 -- VIEW
-
-
-ignoreNothing : (b -> Maybe b) -> b -> b
-ignoreNothing func val =
-    func val |> Maybe.withDefault val
 
 
 viewMemory : Computer -> Mem -> List Shape

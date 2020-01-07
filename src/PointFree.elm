@@ -171,3 +171,8 @@ mulBy =
 
 is =
     (==)
+
+
+ignoreNothing : (b -> Maybe b) -> b -> b
+ignoreNothing func val =
+    func val |> Maybe.withDefault val

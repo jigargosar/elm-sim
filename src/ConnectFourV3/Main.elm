@@ -35,7 +35,6 @@ type GameOver
 type alias Mem =
     { state : Maybe GameOver
     , coin : Coin
-    , dimensions : Dim
     , grid : Grid Coin
     }
 
@@ -49,7 +48,6 @@ initialMemory =
     in
     { coin = Blue
     , state = Nothing
-    , dimensions = dim
     , grid = Grid dim Dict.empty
     }
 

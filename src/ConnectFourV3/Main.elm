@@ -195,16 +195,18 @@ viewMemory { mouse, screen, time } mem =
 
         cellViewGrid =
             Grid.map (\_ -> CellView False) mem.grid
-                |> (case mem.state of
-                        Nothing ->
-                            insertIndicatorCoinView mouse gt mem.coin
+                |> updateCellViewGridWithGameState
 
-                        Just (WinningPositions positions) ->
-                            highlightWinningPositions positions
+        updateCellViewGridWithGameState =
+            case mem.state of
+                Nothing ->
+                    insertIndicatorCoinView mouse gt mem.coin
 
-                        Just Draw ->
-                            identity
-                   )
+                Just (WinningPositions positions) ->
+                    highlightWinningPositions positions
+
+                Just Draw ->
+                    identity
     in
     [ group
         [ rectangle black (GridTransform.width gt) (GridTransform.height gt)

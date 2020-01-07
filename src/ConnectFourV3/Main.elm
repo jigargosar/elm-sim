@@ -1,16 +1,17 @@
 module ConnectFourV3.Main exposing (main)
 
-import ConnectFourV3.FilledGrid as Grid
+import ConnectFourV3.Grid as Grid
 import ConnectFourV3.GridDimensions as GridDimensions exposing (GridDimensions)
 import ConnectFourV3.GridTransform as GridTransform exposing (GridTransform)
+import Dict
 import List.Extra
 import Playground exposing (..)
-import PointFree exposing (flip, is)
+import PointFree exposing (flip)
 import Set exposing (Set)
 
 
 type alias Grid a =
-    Grid.FilledGrid a
+    Grid.Grid a
 
 
 type alias Position =
@@ -18,7 +19,7 @@ type alias Position =
 
 
 type alias CoinGrid =
-    Grid (Maybe Coin)
+    Grid Coin
 
 
 type Coin
@@ -49,7 +50,7 @@ initialMemory =
     { coin = Blue
     , state = Nothing
     , dimensions = dimensions
-    , grid = Grid.init dimensions (always Nothing)
+    , grid = Grid.empty dimensions
     }
 
 
@@ -63,11 +64,20 @@ flipCoin coin =
             Red
 
 
-columnToInsertPositionIn : Grid (Maybe v) -> Int -> Position
+columnToInsertPositionIn : Grid v -> Int -> Position
 columnToInsertPositionIn grid column =
     let
         columnLength =
-            Grid.count (\( x, _ ) v -> x == column && v /= Nothing) grid
+            Grid.foldl
+                (\( x, _ ) v ->
+                    if x == column && v /= Nothing then
+                        (+) 1
+
+                    else
+                        identity
+                )
+                0
+                grid
     in
     ( column, columnLength )
 
@@ -102,10 +112,10 @@ updateMemory { mouse, screen } mem =
                         columnToInsertPositionIn mem.grid column
                 in
                 case Grid.update position (Just mem.coin |> always) mem.grid of
-                    Just grid ->
+                    Ok grid ->
                         let
                             ( coin, state ) =
-                                computeGameOverState position mem.coin grid
+                                computeGameOverState position mem.coin mem.dimensions grid
                         in
                         { mem
                             | grid = grid
@@ -113,7 +123,7 @@ updateMemory { mouse, screen } mem =
                             , state = state
                         }
 
-                    Nothing ->
+                    Err _ ->
                         mem
 
             else
@@ -142,9 +152,9 @@ computeCellSize { width, height } dim =
     min maxCellWidth maxCellHeight
 
 
-computeGameOverState : Position -> Coin -> CoinGrid -> ( Coin, Maybe GameOver )
-computeGameOverState startPosition coin grid =
-    if Grid.count (\_ -> is Nothing) grid == 0 then
+computeGameOverState : Position -> Coin -> GridDimensions -> CoinGrid -> ( Coin, Maybe GameOver )
+computeGameOverState startPosition coin dim grid =
+    if (Grid.toDict grid |> Dict.size) == GridDimensions.size dim then
         ( coin, Just Draw )
 
     else
@@ -161,7 +171,7 @@ computeWinningPositionSet startPosition coin grid =
     let
         validatePosition : Position -> Maybe Position
         validatePosition position =
-            if Grid.get position grid == Just (Just coin) then
+            if Grid.get position grid == Ok (Just coin) then
                 Just position
 
             else
@@ -241,7 +251,7 @@ type CellView
 
 
 type alias CellViewGrid =
-    Grid (Maybe CellView)
+    Grid CellView
 
 
 insertIndicatorCoinView : Mouse -> GridTransform -> Coin -> GridDimensions -> CellViewGrid -> CellViewGrid
@@ -255,7 +265,7 @@ insertIndicatorCoinView mouse gt coin dim grid =
                 |> columnToInsertPositionIn grid
     in
     Grid.update position (\_ -> CellView True coin |> Just) grid
-        |> Maybe.withDefault grid
+        |> Result.withDefault grid
 
 
 highlightWinningPositions : Set Position -> CellViewGrid -> CellViewGrid
@@ -269,7 +279,7 @@ highlightWinningPositions =
                     )
                 )
                 grid
-                |> Maybe.withDefault grid
+                |> Result.withDefault grid
         )
         |> flip
 

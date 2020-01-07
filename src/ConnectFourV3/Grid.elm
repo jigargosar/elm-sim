@@ -13,7 +13,6 @@ module ConnectFourV3.Grid exposing
 
 import ConnectFourV3.GridDimensions as Dim exposing (GridDimensions)
 import Dict exposing (Dict)
-import PointFree exposing (mapEach)
 
 
 type alias Dimensions =
@@ -85,7 +84,7 @@ mapNeighboursWhile : Position -> (Position -> Maybe a -> Maybe b) -> Grid a -> L
 mapNeighboursWhile startPosition func (Grid dim dict) =
     let
         mapWhileWithStep acc position step =
-            case stepPosition step dim position of
+            case Dim.stepPositionBy step dim position of
                 Just nextPosition ->
                     case func nextPosition (Dict.get nextPosition dict) of
                         Just nextValue ->
@@ -106,16 +105,3 @@ mapNeighboursWhile startPosition func (Grid dim dict) =
 neighboursOffset : List ( Int, Int )
 neighboursOffset =
     [ ( 1, 0 ), ( 1, 1 ), ( 0, 1 ), ( -1, 1 ), ( -1, 0 ), ( -1, -1 ), ( 0, -1 ), ( 1, -1 ) ]
-
-
-stepPosition : ( Int, Int ) -> GridDimensions -> Position -> Maybe Position
-stepPosition ( dx, dy ) dim ( x, y ) =
-    let
-        nextPosition =
-            ( x + dx, y + dy )
-    in
-    if Dim.contains nextPosition dim then
-        Just nextPosition
-
-    else
-        Nothing

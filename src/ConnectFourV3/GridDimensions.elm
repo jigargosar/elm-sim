@@ -5,6 +5,7 @@ module ConnectFourV3.GridDimensions exposing
     , foldl
     , fromColumnsRows
     , size
+    , stepPositionBy
     , toColoumnsRows
     )
 
@@ -60,3 +61,16 @@ size (GridDimensions { columns, rows }) =
 clampColoumn : Int -> GridDimensions -> Int
 clampColoumn column (GridDimensions { columns }) =
     clamp 0 (columns - 1) column
+
+
+stepPositionBy : ( Int, Int ) -> GridDimensions -> Position -> Maybe Position
+stepPositionBy ( dx, dy ) dim ( x, y ) =
+    let
+        nextPosition =
+            ( x + dx, y + dy )
+    in
+    if contains nextPosition dim then
+        Just nextPosition
+
+    else
+        Nothing

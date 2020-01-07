@@ -240,7 +240,7 @@ viewMemory { mouse, screen, time } mem =
             Dict.map (\_ -> CellView False) mem.grid
                 |> updateCellViewGridWithGameState
 
-        updateCellViewGridWithGameState : CellViewGrid -> CellViewGrid
+        updateCellViewGridWithGameState : Grid CellView -> Grid CellView
         updateCellViewGridWithGameState =
             case mem.state of
                 Nothing ->
@@ -263,11 +263,7 @@ type CellView
     = CellView Bool Coin
 
 
-type alias CellViewGrid =
-    Grid CellView
-
-
-insertIndicatorCoinView : Mouse -> GridTransform -> Coin -> GridDimensions -> CellViewGrid -> CellViewGrid
+insertIndicatorCoinView : Mouse -> GridTransform -> Coin -> GridDimensions -> Grid CellView -> Grid CellView
 insertIndicatorCoinView mouse gt coin dim grid =
     let
         unclampedColumn =
@@ -281,7 +277,7 @@ insertIndicatorCoinView mouse gt coin dim grid =
         |> Maybe.withDefault grid
 
 
-highlightWinningPositions : GridDimensions -> Set Position -> CellViewGrid -> CellViewGrid
+highlightWinningPositions : GridDimensions -> Set Position -> Grid CellView -> Grid CellView
 highlightWinningPositions dim =
     Set.foldl
         (\pos grid ->

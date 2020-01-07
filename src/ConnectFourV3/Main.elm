@@ -6,7 +6,7 @@ import ConnectFourV3.GridTransform as GridTransform exposing (GridTransform)
 import Dict exposing (Dict)
 import List.Extra
 import Playground exposing (..)
-import PointFree exposing (ignoreNothing, is)
+import PointFree exposing (is)
 import Set exposing (Set)
 
 

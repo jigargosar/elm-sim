@@ -180,18 +180,15 @@ computeWinningPositionSet startPosition coin grid =
 
         connectedNeighboursList =
             Grid.mapNeighboursWhile startPosition validatePosition grid
+                |> List.map Set.fromList
 
         cn1 =
             List.take 4 connectedNeighboursList
 
         cn2 =
             List.drop 4 connectedNeighboursList
-
-        positionListToSet : List Position -> List Position -> Set Position
-        positionListToSet l1 l2 =
-            Set.union (Set.fromList l1) (Set.fromList l2)
     in
-    List.map2 positionListToSet cn1 cn2
+    List.map2 Set.union cn1 cn2
         |> List.Extra.find (Set.size >> is 3)
         |> Maybe.map (Set.insert startPosition)
 

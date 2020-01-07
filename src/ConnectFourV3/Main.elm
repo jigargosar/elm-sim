@@ -299,8 +299,11 @@ insertIndicatorCoinView mouse gt coin ((Grid dim _) as grid) =
         unclampedColumn =
             GridTransform.fromScreenX mouse.x gt
 
-        position =
+        clampedColumn =
             Dim.clampColoumn unclampedColumn dim
+
+        position =
+            clampedColumn
                 |> columnToInsertPositionIn grid
     in
     setInGridAt position (CellView True coin) grid

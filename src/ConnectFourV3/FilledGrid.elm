@@ -50,13 +50,8 @@ update position func (Grid dim dict) =
 
 
 map : (Position -> a -> b) -> Grid a -> Grid b
-map func =
-    mapDict (Dict.map func)
-
-
-mapDict : (Dict Position a -> Dict Position b) -> Grid a -> Grid b
-mapDict func (Grid dim dict) =
-    Grid dim (func dict)
+map func (Grid dim dict) =
+    Dict.map func dict |> Grid dim
 
 
 foldl : (Position -> a -> b -> b) -> b -> Grid a -> b

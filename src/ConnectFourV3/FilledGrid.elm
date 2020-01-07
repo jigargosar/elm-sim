@@ -48,3 +48,13 @@ update position func (Grid dim dict) =
 
     else
         Nothing
+
+
+map : (Position -> a -> b) -> Grid a -> Grid b
+map func =
+    mapDict (Dict.map func)
+
+
+mapDict : (Dict Position a -> Dict Position b) -> Grid a -> Grid b
+mapDict func (Grid dim dict) =
+    Grid dim (func dict)

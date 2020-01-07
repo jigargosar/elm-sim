@@ -112,7 +112,11 @@ updateMemory { mouse, screen } mem =
                 mem
 
         Just _ ->
-            mem
+            if mouse.click then
+                initialMemory
+
+            else
+                mem
 
 
 computeCellSize : Screen -> Grid.Dimensions -> Float

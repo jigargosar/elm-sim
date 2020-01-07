@@ -10,6 +10,10 @@ import PointFree exposing (is)
 import Set exposing (Set)
 
 
+
+-- Shorthand
+
+
 type alias Dim =
     GridDimensions
 
@@ -18,8 +22,124 @@ type alias Pos =
     GridPosition
 
 
+
+-- Grid
+
+
 type Grid a
     = Grid Dim (Dict Pos a)
+
+
+clampAndInsertInColumn : Int -> a -> Grid a -> Maybe ( Pos, Grid a )
+clampAndInsertInColumn column_ a (Grid dim dict) =
+    let
+        column =
+            Dim.clampColoumn column_ dim
+
+        columnLength =
+            Dict.foldl
+                (\( x, _ ) _ ->
+                    if x == column then
+                        (+) 1
+
+                    else
+                        identity
+                )
+                0
+                dict
+
+        position =
+            ( column, columnLength )
+    in
+    if Dim.contains position dim then
+        Just ( position, Dict.insert position a dict |> Grid dim )
+
+    else
+        Nothing
+
+
+isValidGridColumn : Int -> Grid a -> Bool
+isValidGridColumn column (Grid dim _) =
+    Dim.containsColumn column dim
+
+
+insertInColumn : Int -> a -> Grid a -> Result InsertError ( Pos, Grid a )
+insertInColumn column a grid =
+    if isValidGridColumn column grid then
+        case clampAndInsertInColumn column a grid of
+            Just ret ->
+                Ok ret
+
+            Nothing ->
+                Err ColumnFull
+
+    else
+        Err InvalidColumn
+
+
+type InsertError
+    = InvalidColumn
+    | ColumnFull
+
+
+updateGridAt : Pos -> (Maybe v -> Maybe v) -> Grid v -> Maybe (Grid v)
+updateGridAt position func (Grid dim dict) =
+    if Dim.contains position dim then
+        Dict.update position func dict |> Grid dim |> Just
+
+    else
+        Nothing
+
+
+updateGridPositions : Set Pos -> (Maybe v -> Maybe v) -> Grid v -> Maybe (Grid v)
+updateGridPositions positions func grid =
+    Set.foldl (\p -> Maybe.andThen (updateGridAt p func)) (Just grid) positions
+
+
+gridDimension : Grid a -> Dim
+gridDimension (Grid dim _) =
+    dim
+
+
+mapGridDictValues : (a -> b) -> Grid a -> Grid b
+mapGridDictValues func (Grid dim dict) =
+    Dict.map (always func) dict |> Grid dim
+
+
+foldlGrid : (Pos -> Maybe a -> b -> b) -> b -> Grid a -> b
+foldlGrid func acc (Grid dim dict) =
+    Dim.foldl (\p -> func p (Dict.get p dict)) acc dim
+
+
+isGridFull : Grid a -> Bool
+isGridFull (Grid dim dict) =
+    Dim.size dim == Dict.size dict
+
+
+mapNeighboursWhile : Pos -> (Pos -> Maybe a -> Maybe b) -> Grid a -> List (List b)
+mapNeighboursWhile startPosition func (Grid dim dict) =
+    let
+        mapWhileWithStep acc position step =
+            case Dim.stepPositionBy step dim position of
+                Just nextPosition ->
+                    case func nextPosition (Dict.get nextPosition dict) of
+                        Just nextValue ->
+                            mapWhileWithStep (nextValue :: acc)
+                                nextPosition
+                                step
+
+                        Nothing ->
+                            acc
+
+                Nothing ->
+                    acc
+    in
+    List.map (mapWhileWithStep [] startPosition >> List.reverse)
+        Dim.neighboursOffset
+
+
+
+-- Model
 
 
 type Coin
@@ -60,69 +180,6 @@ flipCoin coin =
 
         Blue ->
             Red
-
-
-insertInColumn : Int -> a -> Grid a -> Result InsertError ( Pos, Grid a )
-insertInColumn column a (Grid dim dict) =
-    if Dim.containsColumn column dim then
-        let
-            columnLength =
-                Dict.foldl
-                    (\( x, _ ) _ ->
-                        if x == column then
-                            (+) 1
-
-                        else
-                            identity
-                    )
-                    0
-                    dict
-
-            position =
-                ( column, columnLength )
-        in
-        if Dim.contains position dim then
-            Ok ( position, Dict.insert position a dict |> Grid dim )
-
-        else
-            Err ColumnFull
-
-    else
-        Err InvalidColumn
-
-
-type InsertError
-    = InvalidColumn
-    | ColumnFull
-
-
-updateGridAt : Pos -> (Maybe v -> Maybe v) -> Grid v -> Maybe (Grid v)
-updateGridAt position func (Grid dim dict) =
-    if Dim.contains position dim then
-        Dict.update position func dict |> Grid dim |> Just
-
-    else
-        Nothing
-
-
-updateGridPositions : Set Pos -> (Maybe v -> Maybe v) -> Grid v -> Maybe (Grid v)
-updateGridPositions positions func grid =
-    Set.foldl (\p -> Maybe.andThen (updateGridAt p func)) (Just grid) positions
-
-
-gridDimension : Grid a -> Dim
-gridDimension (Grid dim _) =
-    dim
-
-
-mapGridDictValues : (a -> b) -> Grid a -> Grid b
-mapGridDictValues func (Grid dim dict) =
-    Dict.map (always func) dict |> Grid dim
-
-
-foldlGrid : (Pos -> Maybe a -> b -> b) -> b -> Grid a -> b
-foldlGrid func acc (Grid dim dict) =
-    Dim.foldl (\p -> func p (Dict.get p dict)) acc dim
 
 
 
@@ -196,8 +253,8 @@ computeCellSize { width, height } dim =
 
 
 computeGameOverState : Pos -> Coin -> Grid Coin -> ( Coin, Maybe GameOver )
-computeGameOverState startPosition coin ((Grid dim dict) as grid) =
-    if Dict.size dict == Dim.size dim then
+computeGameOverState startPosition coin grid =
+    if isGridFull grid then
         ( coin, Just Draw )
 
     else
@@ -233,28 +290,6 @@ computeWinningPositionSet startPosition coin grid =
     List.map2 Set.union cn1 cn2
         |> List.Extra.find (Set.size >> is 3)
         |> Maybe.map (Set.insert startPosition)
-
-
-mapNeighboursWhile : Pos -> (Pos -> Maybe a -> Maybe b) -> Grid a -> List (List b)
-mapNeighboursWhile startPosition func (Grid dim dict) =
-    let
-        mapWhileWithStep acc position step =
-            case Dim.stepPositionBy step dim position of
-                Just nextPosition ->
-                    case func nextPosition (Dict.get nextPosition dict) of
-                        Just nextValue ->
-                            mapWhileWithStep (nextValue :: acc)
-                                nextPosition
-                                step
-
-                        Nothing ->
-                            acc
-
-                Nothing ->
-                    acc
-    in
-    List.map (mapWhileWithStep [] startPosition >> List.reverse)
-        Dim.neighboursOffset
 
 
 

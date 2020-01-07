@@ -307,7 +307,6 @@ viewMemory { mouse, screen, time } mem =
             case mem.state of
                 Nothing ->
                     insertIndicatorCoinView mouse gt mem.coin
-                        >> Just
 
                 Just (WinningPositions positions) ->
                     highlightWinningPositions positions
@@ -334,7 +333,7 @@ type CellView
     = CellView Bool Coin
 
 
-insertIndicatorCoinView : Mouse -> GridTransform -> Coin -> Grid CellView -> Grid CellView
+insertIndicatorCoinView : Mouse -> GridTransform -> Coin -> Grid CellView -> Maybe (Grid CellView)
 insertIndicatorCoinView mouse gt coin grid =
     let
         column =
@@ -346,6 +345,7 @@ insertIndicatorCoinView mouse gt coin grid =
     clampAndInsertInColumn column value grid
         |> Maybe.map Tuple.second
         |> Maybe.withDefault grid
+        |> Just
 
 
 highlightWinningPositions : Set Pos -> Grid CellView -> Maybe (Grid CellView)

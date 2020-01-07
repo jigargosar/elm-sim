@@ -12,6 +12,8 @@ module ConnectFourV3.GridTransform exposing
     , width
     )
 
+import ConnectFourV3.GridDimensions as GridDimensions exposing (GridDimensions)
+
 
 type GridTransform
     = GridTransform Record
@@ -33,8 +35,12 @@ type alias Record =
     }
 
 
-init : Float -> { columns : Int, rows : Int } -> GridTransform
-init cs { columns, rows } =
+init : Float -> GridDimensions -> GridTransform
+init cs dim =
+    let
+        { columns, rows } =
+            GridDimensions.toColoumnsRows dim
+    in
     { cs = cs
     , dx =
         -(toFloat columns * cs) / 2 + cs / 2

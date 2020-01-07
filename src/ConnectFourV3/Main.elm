@@ -1,6 +1,7 @@
 module ConnectFourV3.Main exposing (main)
 
 import ConnectFourV3.FilledGrid as Grid
+import ConnectFourV3.GridDimensions as GridDimensions exposing (GridDimensions)
 import ConnectFourV3.GridTransform as GridTransform exposing (GridTransform)
 import List.Extra
 import Playground exposing (..)
@@ -33,15 +34,22 @@ type GameOver
 type alias Mem =
     { state : Maybe GameOver
     , coin : Coin
+    , dimensions : GridDimensions
     , grid : CoinGrid
     }
 
 
 initialMemory : Mem
 initialMemory =
+    let
+        dimensions : GridDimensions
+        dimensions =
+            GridDimensions.fromColumnsRows { columns = 7, rows = 6 }
+    in
     { coin = Blue
     , state = Nothing
-    , grid = Grid.init { columns = 7, rows = 6 } (always Nothing)
+    , dimensions = dimensions
+    , grid = Grid.init dimensions (always Nothing)
     }
 
 
@@ -68,7 +76,7 @@ columnToInsertPositionIn grid column =
 -- UPDATE
 
 
-computeGridTransform : Screen -> Grid.Dimensions -> GridTransform
+computeGridTransform : Screen -> GridDimensions -> GridTransform
 computeGridTransform screen gridDimension =
     let
         cellSize =
@@ -81,7 +89,7 @@ updateMemory : Computer -> Mem -> Mem
 updateMemory { mouse, screen } mem =
     let
         gt =
-            computeGridTransform screen (Grid.dimensions mem.grid)
+            computeGridTransform screen mem.dimensions
     in
     case mem.state of
         Nothing ->
@@ -119,9 +127,12 @@ updateMemory { mouse, screen } mem =
                 mem
 
 
-computeCellSize : Screen -> Grid.Dimensions -> Float
-computeCellSize { width, height } { columns, rows } =
+computeCellSize : Screen -> GridDimensions -> Float
+computeCellSize { width, height } dim =
     let
+        { columns, rows } =
+            GridDimensions.toColoumnsRows dim
+
         maxCellWidth =
             width * 0.8 / toFloat columns
 
@@ -200,16 +211,17 @@ viewMemory : Computer -> Mem -> List Shape
 viewMemory { mouse, screen, time } mem =
     let
         gt =
-            computeGridTransform screen (Grid.dimensions mem.grid)
+            computeGridTransform screen mem.dimensions
 
         cellViewGrid =
             Grid.map (\_ -> Maybe.map (CellView False)) mem.grid
                 |> updateCellViewGridWithGameState
 
+        updateCellViewGridWithGameState : CellViewGrid -> CellViewGrid
         updateCellViewGridWithGameState =
             case mem.state of
                 Nothing ->
-                    insertIndicatorCoinView mouse gt mem.coin
+                    insertIndicatorCoinView mouse gt mem.coin mem.dimensions
 
                 Just (WinningPositions positions) ->
                     highlightWinningPositions positions
@@ -232,11 +244,11 @@ type alias CellViewGrid =
     Grid (Maybe CellView)
 
 
-insertIndicatorCoinView : Mouse -> GridTransform -> Coin -> CellViewGrid -> CellViewGrid
-insertIndicatorCoinView mouse gt coin grid =
+insertIndicatorCoinView : Mouse -> GridTransform -> Coin -> GridDimensions -> CellViewGrid -> CellViewGrid
+insertIndicatorCoinView mouse gt coin dim grid =
     let
         { columns } =
-            Grid.dimensions grid
+            GridDimensions.toColoumnsRows dim
 
         position =
             GridTransform.fromScreenX mouse.x gt

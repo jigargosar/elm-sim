@@ -1,23 +1,20 @@
 module ConnectFourV3.FilledGrid exposing
-    ( Dimensions
-    , FilledGrid
+    ( FilledGrid
     , Position
     , count
-    , dimensions
     , foldl
     , get
     , init
     , map
-    , size
     , update
     )
 
-import ConnectFourV3.GridDimensions as GridDimensions
+import ConnectFourV3.GridDimensions as GridDimensions exposing (GridDimensions)
 import Dict exposing (Dict)
 
 
 type alias Dimensions =
-    { columns : Int, rows : Int }
+    GridDimensions
 
 
 type alias Position =
@@ -47,11 +44,6 @@ count func =
         0
 
 
-size : FilledGrid a -> Int
-size (Grid dim _) =
-    GridDimensions.size dim
-
-
 get : Position -> FilledGrid a -> Maybe a
 get position (Grid _ dict) =
     Dict.get position dict
@@ -71,8 +63,3 @@ map func (Grid dim dict) =
 foldl : (Position -> a -> b -> b) -> b -> FilledGrid a -> b
 foldl func acc (Grid _ dict) =
     Dict.foldl func acc dict
-
-
-dimensions : FilledGrid a -> Dimensions
-dimensions (Grid dim _) =
-    dim

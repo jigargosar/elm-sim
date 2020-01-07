@@ -1,4 +1,4 @@
-module ConnectFourV3.FilledGrid exposing (Grid, count, get, init, set)
+module ConnectFourV3.FilledGrid exposing (Grid, count, get, init, update)
 
 import ConnectFourV3.GridDimensions as GridDimensions
 import Dict exposing (Dict)
@@ -41,10 +41,10 @@ get position (Grid _ dict) =
     Dict.get position dict
 
 
-set : Position -> a -> Grid a -> Maybe (Grid a)
-set position a (Grid dim dict) =
+update : Position -> (a -> a) -> Grid a -> Maybe (Grid a)
+update position func (Grid dim dict) =
     if GridDimensions.contains position dim then
-        Dict.insert position a dict |> Grid dim |> Just
+        Dict.update position (Maybe.map func) dict |> Grid dim |> Just
 
     else
         Nothing

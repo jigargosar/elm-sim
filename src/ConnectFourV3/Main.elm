@@ -18,7 +18,7 @@ type alias Dim =
 
 
 type alias Position =
-    ( Int, Int )
+    Dim.GridPosition
 
 
 type Coin

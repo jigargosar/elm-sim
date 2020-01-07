@@ -1,5 +1,6 @@
 module ConnectFourV3.GridDimensions exposing
     ( GridDimensions
+    , GridPosition
     , clampColoumn
     , contains
     , foldl
@@ -15,7 +16,7 @@ type GridDimensions
     = GridDimensions { columns : Int, rows : Int }
 
 
-type alias Position =
+type alias GridPosition =
     ( Int, Int )
 
 
@@ -29,7 +30,7 @@ toColoumnsRows (GridDimensions rec) =
     rec
 
 
-foldl : (Position -> c -> c) -> c -> GridDimensions -> c
+foldl : (GridPosition -> c -> c) -> c -> GridDimensions -> c
 foldl func acc0 (GridDimensions { columns, rows }) =
     List.range 0 (columns - 1)
         |> List.foldl
@@ -48,7 +49,7 @@ foldl func acc0 (GridDimensions { columns, rows }) =
             acc0
 
 
-contains : Position -> GridDimensions -> Bool
+contains : GridPosition -> GridDimensions -> Bool
 contains ( x, y ) (GridDimensions { columns, rows }) =
     (x < 0 || y < 0 || x >= columns || y >= columns)
         |> not
@@ -64,7 +65,7 @@ clampColoumn column (GridDimensions { columns }) =
     clamp 0 (columns - 1) column
 
 
-stepPositionBy : ( Int, Int ) -> GridDimensions -> Position -> Maybe Position
+stepPositionBy : ( Int, Int ) -> GridDimensions -> GridPosition -> Maybe GridPosition
 stepPositionBy ( dx, dy ) dim ( x, y ) =
     let
         nextPosition =

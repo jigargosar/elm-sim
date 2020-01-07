@@ -286,7 +286,7 @@ viewMemory { mouse, screen, time } mem =
             ]
 
         Nothing ->
-            [ words red "error" ]
+            [ words red "error updating view with gameover state" ]
 
 
 type CellView

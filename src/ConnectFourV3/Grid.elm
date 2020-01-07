@@ -6,6 +6,7 @@ module ConnectFourV3.Grid exposing
     , foldl
     , get
     , map
+    , mapNeighboursWhile
     , toDict
     , update
     )

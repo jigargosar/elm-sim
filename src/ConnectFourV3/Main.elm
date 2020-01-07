@@ -1,12 +1,13 @@
 module ConnectFourV3.Main exposing (main)
 
+import Basics.Extra exposing (uncurry)
 import ConnectFourV3.Grid as Grid
 import ConnectFourV3.GridDimensions as GridDimensions exposing (GridDimensions)
 import ConnectFourV3.GridTransform as GridTransform exposing (GridTransform)
 import Dict
 import List.Extra
 import Playground exposing (..)
-import PointFree exposing (flip)
+import PointFree exposing (flip, is, mapEach)
 import Set exposing (Set)
 
 
@@ -169,28 +170,61 @@ computeGameOverState startPosition coin dim grid =
 computeWinningPositionSet : Position -> Coin -> CoinGrid -> Maybe (Set Position)
 computeWinningPositionSet startPosition coin grid =
     let
-        validatePosition : Position -> Maybe Position
-        validatePosition position =
-            if Grid.get position grid == Ok (Just coin) then
+        validatePosition : Position -> Maybe Coin -> Maybe Position
+        validatePosition position maybeCoin =
+            if maybeCoin == Just coin then
                 Just position
 
             else
                 Nothing
 
-        getPositionsInDirection ( dx, dy ) =
-            collectWhileUpto 3
-                (\( x, y ) -> validatePosition ( x + dx, y + dy ))
-                startPosition
-                |> Set.fromList
+        connectedNeighboursList =
+            Grid.mapNeighboursWhile startPosition validatePosition grid
 
-        getPositionSetInOpposingDirections ( dx, dy ) =
-            getPositionsInDirection ( dx, dy )
-                |> Set.union (getPositionsInDirection ( -dx, -dy ))
-                |> Set.insert startPosition
+        cn1 =
+            List.take 4 connectedNeighboursList
+
+        cn2 =
+            List.drop 4 connectedNeighboursList
+
+        positionListToSet : List Position -> List Position -> Set Position
+        positionListToSet l1 l2 =
+            Set.union (Set.fromList l1) (Set.fromList l2)
     in
-    [ ( 1, 0 ), ( 0, 1 ), ( -1, 1 ), ( 1, -1 ) ]
-        |> List.map getPositionSetInOpposingDirections
-        |> List.Extra.find (\positionSet -> Set.size positionSet == 4)
+    List.map2 positionListToSet cn1 cn2
+        |> List.Extra.find (Set.size >> is 3)
+        |> Maybe.map (Set.insert startPosition)
+
+
+
+{-
+   computeWinningPositionSet : Position -> Coin -> CoinGrid -> Maybe (Set Position)
+   computeWinningPositionSet startPosition coin grid =
+       let
+           validatePosition : Position -> Maybe Position
+           validatePosition position =
+               if Grid.get position grid == Ok (Just coin) then
+                   Just position
+
+               else
+                   Nothing
+
+           getPositionsInDirection ( dx, dy ) =
+               collectWhileUpto 3
+                   (\( x, y ) -> validatePosition ( x + dx, y + dy ))
+                   startPosition
+                   |> Set.fromList
+
+           getPositionSetInOpposingDirections ( dx, dy ) =
+               getPositionsInDirection ( dx, dy )
+                   |> Set.union (getPositionsInDirection ( -dx, -dy ))
+                   |> Set.insert startPosition
+       in
+       [ ( 1, 0 ), ( 0, 1 ), ( -1, 1 ), ( 1, -1 ) ]
+           |> List.map getPositionSetInOpposingDirections
+           |> List.Extra.find (\positionSet -> Set.size positionSet == 4)
+
+-}
 
 
 collectWhileUpto : Int -> (a -> Maybe a) -> a -> List a

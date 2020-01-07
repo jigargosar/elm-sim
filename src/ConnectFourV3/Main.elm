@@ -6,7 +6,7 @@ import ConnectFourV3.GridTransform as GridTransform exposing (GridTransform)
 import Dict exposing (Dict)
 import List.Extra
 import Playground exposing (..)
-import PointFree exposing (flip, is)
+import PointFree exposing (is)
 import Set exposing (Set)
 
 
@@ -98,6 +98,11 @@ updateGridAt position func (Grid dim dict) =
 
     else
         Nothing
+
+
+updateGridPositions : Set Pos -> (Maybe v -> Maybe v) -> Grid v -> Maybe (Grid v)
+updateGridPositions positions func grid =
+    Set.foldl (\p -> Maybe.andThen (updateGridAt p func)) (Just grid) positions
 
 
 gridDimension : Grid a -> Dim
@@ -251,6 +256,11 @@ mapNeighboursWhile startPosition func (Grid dim dict) =
 -- VIEW
 
 
+ignoreNothing : (b -> Maybe b) -> b -> b
+ignoreNothing func val =
+    func val |> Maybe.withDefault val
+
+
 viewMemory : Computer -> Mem -> List Shape
 viewMemory { mouse, screen, time } mem =
     let
@@ -259,9 +269,9 @@ viewMemory { mouse, screen, time } mem =
 
         cellViewGrid =
             mapGridDictValues (CellView False) mem.grid
-                |> updateCellViewGridWithGameState
+                |> ignoreNothing updateCellViewGridWithGameState
 
-        updateCellViewGridWithGameState : Grid CellView -> Grid CellView
+        updateCellViewGridWithGameState : Grid CellView -> Maybe (Grid CellView)
         updateCellViewGridWithGameState =
             case mem.state of
                 Nothing ->
@@ -271,7 +281,7 @@ viewMemory { mouse, screen, time } mem =
                     highlightWinningPositions positions
 
                 Just Draw ->
-                    identity
+                    Just
     in
     [ group
         [ rectangle black (GridTransform.width gt) (GridTransform.height gt)
@@ -284,7 +294,7 @@ type CellView
     = CellView Bool Coin
 
 
-insertIndicatorCoinView : Mouse -> GridTransform -> Coin -> Grid CellView -> Grid CellView
+insertIndicatorCoinView : Mouse -> GridTransform -> Coin -> Grid CellView -> Maybe (Grid CellView)
 insertIndicatorCoinView mouse gt coin ((Grid dim _) as grid) =
     let
         unclampedColumn =
@@ -295,23 +305,17 @@ insertIndicatorCoinView mouse gt coin ((Grid dim _) as grid) =
                 |> columnToInsertPositionIn grid
     in
     setInGridAt position (CellView True coin) grid
-        |> Maybe.withDefault grid
 
 
-highlightWinningPositions : Set Pos -> Grid CellView -> Grid CellView
-highlightWinningPositions =
-    Set.foldl
-        (\pos grid ->
-            updateGridAt pos
-                (Maybe.map
-                    (\(CellView _ coin) ->
-                        CellView True coin
-                    )
-                )
-                grid
-                |> Maybe.withDefault grid
+highlightWinningPositions : Set Pos -> Grid CellView -> Maybe (Grid CellView)
+highlightWinningPositions positions grid =
+    updateGridPositions positions
+        (Maybe.map
+            (\(CellView _ coin) ->
+                CellView True coin
+            )
         )
-        |> flip
+        grid
 
 
 coinToColor : Coin -> Color

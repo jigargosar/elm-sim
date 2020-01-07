@@ -2,6 +2,7 @@ module ConnectFourV3.GridDimensions exposing
     ( GridDimensions
     , clampColoumn
     , contains
+    , containsColumn
     , foldl
     , fromColumnsRows
     , neighboursOffset
@@ -49,6 +50,12 @@ foldl func acc0 (GridDimensions { columns, rows }) =
 contains : GridPosition -> GridDimensions -> Bool
 contains ( x, y ) (GridDimensions { columns, rows }) =
     (x < 0 || y < 0 || x >= columns || y >= columns)
+        |> not
+
+
+containsColumn : Int -> GridDimensions -> Bool
+containsColumn column (GridDimensions { columns }) =
+    (column < 0 || column >= columns)
         |> not
 
 

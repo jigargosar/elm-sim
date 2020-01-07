@@ -64,6 +64,40 @@ flipCoin coin =
             Red
 
 
+insertInColumn : Int -> a -> Grid a -> Result InsertError ( Pos, Grid a )
+insertInColumn column a (Grid dim dict) =
+    if Dim.containsColumn column dim then
+        let
+            columnLength =
+                Dict.foldl
+                    (\( x, _ ) _ ->
+                        if x == column then
+                            (+) 1
+
+                        else
+                            identity
+                    )
+                    0
+                    dict
+
+            position =
+                ( column, columnLength )
+        in
+        if Dim.contains position dim then
+            Ok ( position, Dict.insert position a dict |> Grid dim )
+
+        else
+            Err ColumnFull
+
+    else
+        Err InvalidColumn
+
+
+type InsertError
+    = InvalidColumn
+    | ColumnFull
+
+
 columnToInsertPositionIn : Grid a -> Int -> Pos
 columnToInsertPositionIn (Grid _ dict) column =
     let
@@ -296,17 +330,21 @@ type CellView
 insertIndicatorCoinView : Mouse -> GridTransform -> Coin -> Grid CellView -> Maybe (Grid CellView)
 insertIndicatorCoinView mouse gt coin ((Grid dim _) as grid) =
     let
-        unclampedColumn =
-            GridTransform.fromScreenX mouse.x gt
-
         clampedColumn =
-            Dim.clampColoumn unclampedColumn dim
+            Dim.clampColoumn (GridTransform.fromScreenX mouse.x gt) dim
 
-        position =
-            clampedColumn
-                |> columnToInsertPositionIn grid
+        value =
+            CellView True coin
     in
-    setInGridAt position (CellView True coin) grid
+    case insertInColumn clampedColumn value grid of
+        Ok ( _, newGrid ) ->
+            Just newGrid
+
+        Err InvalidColumn ->
+            Nothing
+
+        Err ColumnFull ->
+            Just grid
 
 
 highlightWinningPositions : Set Pos -> Grid CellView -> Maybe (Grid CellView)

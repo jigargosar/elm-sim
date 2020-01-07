@@ -7,7 +7,7 @@ module ConnectFourV3.Grid exposing
     , update
     )
 
-import ConnectFourV3.GridDimensions as GridDimensions exposing (GridDimensions)
+import ConnectFourV3.GridDimensions as Dim exposing (GridDimensions)
 import Dict exposing (Dict)
 
 
@@ -30,7 +30,7 @@ empty dim =
 
 get : Position -> Grid a -> Result Error (Maybe a)
 get position (Grid dim dict) =
-    if GridDimensions.contains position dim then
+    if Dim.contains position dim then
         Dict.get position dict |> Ok
 
     else
@@ -43,7 +43,7 @@ type Error
 
 update : Position -> (Maybe a -> Maybe a) -> Grid a -> Result Error (Grid a)
 update position func (Grid dim dict) =
-    if GridDimensions.contains position dim then
+    if Dim.contains position dim then
         Dict.update position func dict |> Grid dim |> Ok
 
     else
@@ -52,4 +52,4 @@ update position func (Grid dim dict) =
 
 foldl : (Position -> Maybe a -> b -> b) -> b -> Grid a -> b
 foldl func acc (Grid dim dict) =
-    GridDimensions.foldl (\p -> func p (Dict.get p dict)) acc dim
+    Dim.foldl (\p -> func p (Dict.get p dict)) acc dim

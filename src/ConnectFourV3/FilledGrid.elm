@@ -1,4 +1,4 @@
-module ConnectFourV3.FilledGrid exposing (Grid, count, get, init, update)
+module ConnectFourV3.FilledGrid exposing (Grid, count, foldl, get, init, map, update)
 
 import ConnectFourV3.GridDimensions as GridDimensions
 import Dict exposing (Dict)
@@ -23,8 +23,8 @@ init dim func =
 
 
 count : (Position -> a -> Bool) -> Grid a -> Int
-count func (Grid _ dict) =
-    Dict.foldl
+count func =
+    foldl
         (\p a ->
             if func p a then
                 (+) 1
@@ -33,7 +33,6 @@ count func (Grid _ dict) =
                 identity
         )
         0
-        dict
 
 
 get : Position -> Grid a -> Maybe a
@@ -58,3 +57,8 @@ map func =
 mapDict : (Dict Position a -> Dict Position b) -> Grid a -> Grid b
 mapDict func (Grid dim dict) =
     Grid dim (func dict)
+
+
+foldl : (Position -> a -> b -> b) -> b -> Grid a -> b
+foldl func acc (Grid _ dict) =
+    Dict.foldl func acc dict

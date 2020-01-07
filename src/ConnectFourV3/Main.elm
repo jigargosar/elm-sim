@@ -1,7 +1,7 @@
 module ConnectFourV3.Main exposing (main)
 
-import ConnectFourV3.Grid as Grid exposing (Grid)
 import ConnectFourV3.GridTransform as GridTransform exposing (GridTransform)
+import ConnectFourV3.SparseGrid as Grid exposing (Grid)
 import Dict exposing (Dict)
 import List.Extra
 import Playground exposing (..)

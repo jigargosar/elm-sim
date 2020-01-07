@@ -1,4 +1,4 @@
-module ConnectFourV3.Grid exposing
+module ConnectFourV3.SparseGrid exposing
     ( Dimensions
     , Error(..)
     , Grid

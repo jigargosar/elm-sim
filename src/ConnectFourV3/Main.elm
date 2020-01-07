@@ -399,7 +399,7 @@ cellViewGridToShape time gt grid =
                         , coinToShape highlight coin
                         ]
 
-                _ ->
+                Nothing ->
                     cellBackgroundShape
 
         viewCell : Pos -> Maybe CellView -> List Shape -> List Shape

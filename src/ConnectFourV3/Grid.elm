@@ -103,6 +103,7 @@ mapNeighboursWhile startPosition func (Grid dim dict) =
         neighboursOffset
 
 
+neighboursOffset : List ( Int, Int )
 neighboursOffset =
     [ ( 1, 0 ), ( 1, 1 ), ( 0, 1 ), ( -1, 1 ), ( -1, 0 ), ( -1, -1 ), ( 0, -1 ), ( 1, -1 ) ]
 

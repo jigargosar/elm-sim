@@ -97,8 +97,8 @@ stepPosition ( dx, dy ) dim ( x, y ) =
         Nothing
 
 
-collectNeighboursWhile : Position -> (Position -> Maybe a -> Maybe b) -> Grid a -> List (List b)
-collectNeighboursWhile startPosition func (Grid dim dict) =
+mapNeighboursWhile : Position -> (Position -> Maybe a -> Maybe b) -> Grid a -> List (List b)
+mapNeighboursWhile startPosition func (Grid dim dict) =
     let
         collectWithStep acc position step =
             case stepPosition step dim position of

@@ -336,20 +336,17 @@ type CellView
 insertIndicatorCoinView : Mouse -> GridTransform -> Coin -> Grid CellView -> Maybe (Grid CellView)
 insertIndicatorCoinView mouse gt coin ((Grid dim _) as grid) =
     let
-        clampedColumn =
-            Dim.clampColoumn (GridTransform.fromScreenX mouse.x gt) dim
+        column =
+            GridTransform.fromScreenX mouse.x gt
 
         value =
             CellView True coin
     in
-    case insertInColumn clampedColumn value grid of
-        Ok ( _, newGrid ) ->
+    case clampAndInsertInColumn column value grid of
+        Just ( _, newGrid ) ->
             Just newGrid
 
-        Err InvalidColumn ->
-            Nothing
-
-        Err ColumnFull ->
+        Nothing ->
             Just grid
 
 

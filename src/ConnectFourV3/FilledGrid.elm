@@ -1,4 +1,4 @@
-module ConnectFourV3.FilledGrid exposing (Grid, count, foldl, get, init, map, update)
+module ConnectFourV3.FilledGrid exposing (Grid, count, foldl, get, init, map, size, update)
 
 import ConnectFourV3.GridDimensions as GridDimensions
 import Dict exposing (Dict)
@@ -33,6 +33,11 @@ count func =
                 identity
         )
         0
+
+
+size : Grid a -> Int
+size (Grid dim _) =
+    GridDimensions.size dim
 
 
 get : Position -> Grid a -> Maybe a

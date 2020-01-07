@@ -1,4 +1,4 @@
-module ConnectFourV3.GridDimensions exposing (contains, foldl)
+module ConnectFourV3.GridDimensions exposing (contains, foldl, size)
 
 
 type alias GridDimensions =
@@ -32,3 +32,8 @@ contains : Position -> GridDimensions -> Bool
 contains ( x, y ) { columns, rows } =
     (x < 0 || y < 0 || x >= columns || y >= columns)
         |> not
+
+
+size : GridDimensions -> Int
+size { columns, rows } =
+    columns * rows

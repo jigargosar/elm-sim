@@ -26,11 +26,6 @@ type Coin
     | Blue
 
 
-type Cell
-    = Empty
-    | Coin Coin
-
-
 type GameOver
     = WinningPositions (Set Position)
     | Draw

@@ -81,23 +81,6 @@ toDict (Grid _ dict) =
     dict
 
 
-neighboursOffset =
-    [ ( 1, 0 ), ( 1, 1 ), ( 0, 1 ), ( -1, 1 ), ( -1, 0 ), ( -1, -1 ), ( 0, -1 ), ( 1, -1 ) ]
-
-
-stepPosition : ( Int, Int ) -> GridDimensions -> Position -> Maybe Position
-stepPosition ( dx, dy ) dim ( x, y ) =
-    let
-        nextPosition =
-            ( x + dx, y + dy )
-    in
-    if Dim.contains nextPosition dim then
-        Just nextPosition
-
-    else
-        Nothing
-
-
 mapNeighboursWhile : Position -> (Position -> Maybe a -> Maybe b) -> Grid a -> List (List b)
 mapNeighboursWhile startPosition func (Grid dim dict) =
     let
@@ -116,4 +99,22 @@ mapNeighboursWhile startPosition func (Grid dim dict) =
                 Nothing ->
                     acc
     in
-    List.map (mapWhileWithStep [] startPosition >> List.reverse) neighboursOffset
+    List.map (mapWhileWithStep [] startPosition >> List.reverse)
+        neighboursOffset
+
+
+neighboursOffset =
+    [ ( 1, 0 ), ( 1, 1 ), ( 0, 1 ), ( -1, 1 ), ( -1, 0 ), ( -1, -1 ), ( 0, -1 ), ( 1, -1 ) ]
+
+
+stepPosition : ( Int, Int ) -> GridDimensions -> Position -> Maybe Position
+stepPosition ( dx, dy ) dim ( x, y ) =
+    let
+        nextPosition =
+            ( x + dx, y + dy )
+    in
+    if Dim.contains nextPosition dim then
+        Just nextPosition
+
+    else
+        Nothing

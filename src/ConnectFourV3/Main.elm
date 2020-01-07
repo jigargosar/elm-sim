@@ -100,24 +100,34 @@ updateInGridAt position func (Grid dim dict) =
         Nothing
 
 
+gridDimension : Grid a -> Dim
+gridDimension (Grid dim _) =
+    dim
+
+
+mapGridValues : (a -> b) -> Grid a -> Grid b
+mapGridValues func (Grid dim dict) =
+    Dict.map (always func) dict |> Grid dim
+
+
 
 -- UPDATE
 
 
 computeGridTransform : Screen -> Dim -> GridTransform
-computeGridTransform screen gridDimension =
+computeGridTransform screen dim =
     let
         cellSize =
-            computeCellSize screen gridDimension
+            computeCellSize screen dim
     in
-    GridTransform.init cellSize gridDimension
+    GridTransform.init cellSize dim
 
 
 updateMemory : Computer -> Mem -> Mem
 updateMemory { mouse, screen } mem =
     let
         gt =
-            computeGridTransform screen mem.dimensions
+            computeGridTransform screen (gridDimension mem.grid)
     in
     case mem.state of
         Nothing ->
@@ -240,14 +250,10 @@ viewMemory : Computer -> Mem -> List Shape
 viewMemory { mouse, screen, time } mem =
     let
         gt =
-            computeGridTransform screen mem.dimensions
-
-        (Grid dim dict) =
-            mem.grid
+            computeGridTransform screen (gridDimension mem.grid)
 
         cellViewGrid =
-            Dict.map (\_ -> CellView False) dict
-                |> Grid dim
+            mapGridValues (CellView False) mem.grid
                 |> updateCellViewGridWithGameState
 
         updateCellViewGridWithGameState : Grid CellView -> Grid CellView

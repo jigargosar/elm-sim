@@ -156,13 +156,7 @@ type alias Mem =
     { state : Maybe GameOver
     , coin : Coin
     , grid : Grid Coin
-    , input : Input
     }
-
-
-type Input
-    = NoInput
-    | InsertPositionSelected Pos
 
 
 initialMemory : Mem
@@ -175,7 +169,6 @@ initialMemory =
     { coin = Blue
     , state = Nothing
     , grid = Grid dim Dict.empty
-    , input = NoInput
     }
 
 
@@ -202,11 +195,6 @@ computeGridTransform screen dim =
     Transform.init cellSize dim
 
 
-resetInput : Mem -> Mem
-resetInput mem =
-    { mem | input = NoInput }
-
-
 updateMemory : Computer -> Mem -> Mem
 updateMemory { mouse, screen } mem =
     let
@@ -215,46 +203,31 @@ updateMemory { mouse, screen } mem =
     in
     case mem.state of
         Nothing ->
-            let
-                column =
-                    Transform.fromScreenX mouse.x gt
-            in
-            case ( mouse.click, mem.input ) of
-                ( False, _ ) ->
-                    mem
+            if mouse.click then
+                let
+                    column =
+                        Transform.fromScreenX mouse.x gt
+                in
+                case insertInColumn column mem.coin mem.grid of
+                    Ok ( position, grid ) ->
+                        let
+                            ( coin, state ) =
+                                computeGameOverState position mem.coin grid
+                        in
+                        { mem
+                            | grid = grid
+                            , coin = coin
+                            , state = state
+                        }
 
-                ( True, NoInput ) ->
-                    { mem
-                        | input =
-                            insertInColumn column mem.coin mem.grid
-                                |> Result.map (Tuple.first >> InsertPositionSelected)
-                                |> Result.withDefault NoInput
-                    }
+                    Err ColumnFull ->
+                        mem
 
-                ( True, InsertPositionSelected prevPosition ) ->
-                    (case insertInColumn column mem.coin mem.grid of
-                        Ok ( position, grid ) ->
-                            if position == prevPosition then
-                                let
-                                    ( coin, state ) =
-                                        computeGameOverState position mem.coin grid
-                                in
-                                { mem
-                                    | grid = grid
-                                    , coin = coin
-                                    , state = state
-                                }
+                    Err InvalidColumn ->
+                        mem
 
-                            else
-                                mem
-
-                        Err ColumnFull ->
-                            mem
-
-                        Err InvalidColumn ->
-                            mem
-                    )
-                        |> resetInput
+            else
+                mem
 
         Just _ ->
             if mouse.click then
@@ -333,7 +306,7 @@ viewMemory { mouse, screen, time } mem =
         updateCellViewGridWithGameState =
             case mem.state of
                 Nothing ->
-                    insertIndicatorCoinViewWithInput mem.input mem.coin
+                    insertIndicatorCoinView mouse gt mem.coin
 
                 Just (WinningPositions positions) ->
                     highlightWinningPositions positions
@@ -390,8 +363,8 @@ type CellView
     = CellView Bool Coin
 
 
-insertIndicatorCoinViewAtMousePos : Mouse -> GridTransform -> Coin -> Grid CellView -> Maybe (Grid CellView)
-insertIndicatorCoinViewAtMousePos mouse gt coin grid =
+insertIndicatorCoinView : Mouse -> GridTransform -> Coin -> Grid CellView -> Maybe (Grid CellView)
+insertIndicatorCoinView mouse gt coin grid =
     let
         column =
             Transform.fromScreenX mouse.x gt
@@ -403,19 +376,6 @@ insertIndicatorCoinViewAtMousePos mouse gt coin grid =
         |> Maybe.map Tuple.second
         |> Maybe.withDefault grid
         |> Just
-
-
-insertIndicatorCoinViewWithInput : Input -> Coin -> Grid CellView -> Maybe (Grid CellView)
-insertIndicatorCoinViewWithInput input coin grid =
-    case input of
-        NoInput ->
-            Just grid
-
-        InsertPositionSelected ( column, _ ) ->
-            clampAndInsertInColumn column (CellView True coin) grid
-                |> Maybe.map Tuple.second
-                |> Maybe.withDefault grid
-                |> Just
 
 
 highlightWinningPositions : Set Pos -> Grid CellView -> Maybe (Grid CellView)

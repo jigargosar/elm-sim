@@ -6,7 +6,7 @@ import ConnectFourV3.GridTransform as GTransform exposing (GridTransform)
 import Dict exposing (Dict)
 import List.Extra
 import Playground exposing (..)
-import PointFree exposing (flip, is, whenTrue)
+import PointFree exposing (is, whenTrue)
 import Set exposing (Set)
 
 
@@ -156,7 +156,7 @@ type alias Mem =
     { state : Maybe GameOver
     , coin : Coin
     , grid : Grid Coin
-    , selectedColumn : Maybe Int
+    , selectedColumn : Int
     }
 
 
@@ -170,7 +170,7 @@ initialMemory =
     { coin = Blue
     , state = Nothing
     , grid = Grid dim Dict.empty
-    , selectedColumn = Nothing
+    , selectedColumn = Dim.centerColumn dim
     }
 
 
@@ -182,13 +182,6 @@ flipCoin coin =
 
         Blue ->
             Red
-
-
-selectedColumnToColumn : Maybe Int -> Dim -> Int
-selectedColumnToColumn selectedColumn dim =
-    selectedColumn
-        |> Maybe.map (flip Dim.clampColoumn dim)
-        |> Maybe.withDefault (Dim.centerColumn dim)
 
 
 
@@ -221,7 +214,7 @@ updateMemory { mouse, screen } mem =
                         GTransform.fromScreenX mouse.x gt
                 in
                 if Dim.containsColumn column dim then
-                    if selectedColumnToColumn mem.selectedColumn dim == column then
+                    if mem.selectedColumn == column then
                         case insertInColumn column mem.coin mem.grid of
                             Ok ( position, grid ) ->
                                 let
@@ -232,7 +225,6 @@ updateMemory { mouse, screen } mem =
                                     | grid = grid
                                     , coin = coin
                                     , state = state
-                                    , selectedColumn = Nothing
                                 }
 
                             Err ColumnFull ->
@@ -242,7 +234,7 @@ updateMemory { mouse, screen } mem =
                                 mem
 
                     else
-                        { mem | selectedColumn = Just column }
+                        { mem | selectedColumn = column }
 
                 else
                     mem
@@ -347,14 +339,11 @@ viewMemory { mouse, screen, time } mem =
         cfg =
             toCellViewConfig time gt
 
-        indicatorColumn =
-            selectedColumnToColumn mem.selectedColumn dim
-
         updateCellViewGridWithGameState : Grid CellView -> Maybe (Grid CellView)
         updateCellViewGridWithGameState =
             case mem.state of
                 Nothing ->
-                    insertIndicatorCoinView indicatorColumn mem.coin
+                    insertIndicatorCoinView mem.selectedColumn mem.coin
 
                 Just (WinningPositions positions) ->
                     updateGridPositions positions (Maybe.map highlightCellView)
@@ -378,7 +367,7 @@ viewMemory { mouse, screen, time } mem =
                     Nothing ->
                         coinToShape cfg mem.coin
                             |> applyHighlight cfg
-                            |> moveToGridPos cfg ( indicatorColumn, Dim.lastRow dim + 1 )
+                            |> moveToGridPos cfg ( mem.selectedColumn, Dim.lastRow dim + 1 )
 
                     _ ->
                         group []

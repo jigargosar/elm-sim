@@ -313,17 +313,6 @@ viewMemory { mouse, screen, time } mem =
 
                 Just Draw ->
                     Just
-
-        gameStateToString =
-            case mem.state of
-                Just Draw ->
-                    "Game Draw"
-
-                Just (WinningPositions _) ->
-                    "Game Won"
-
-                Nothing ->
-                    "Player turn"
     in
     case
         mapGridDictValues (CellView False) mem.grid
@@ -333,7 +322,7 @@ viewMemory { mouse, screen, time } mem =
             [ group
                 [ rectangle black (Transform.width gt) (Transform.height gt)
                 , cellViewGridToShape time gt cellViewGrid
-                , words black gameStateToString
+                , gameStateToWordsShape mem.coin mem.state
                     |> moveY (Transform.bottom gt)
                     |> moveDown 20
                 ]
@@ -341,6 +330,32 @@ viewMemory { mouse, screen, time } mem =
 
         Nothing ->
             [ words red "error updating view with gameover state" ]
+
+
+gameStateToWordsShape : Coin -> Maybe GameOver -> Shape
+gameStateToWordsShape coin state =
+    let
+        ( color, message ) =
+            case state of
+                Just Draw ->
+                    ( black, "Game Draw" )
+
+                Just (WinningPositions _) ->
+                    ( coinToColor coin, coinToString coin ++ " Won!" )
+
+                Nothing ->
+                    ( coinToColor coin, coinToString coin ++ "'s turn" )
+    in
+    words color message
+
+
+coinToString coin =
+    case coin of
+        Blue ->
+            "Blue"
+
+        Red ->
+            "Red"
 
 
 type CellView

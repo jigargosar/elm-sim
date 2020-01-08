@@ -1,7 +1,9 @@
 module ConnectFourV3Kata1.Main exposing (main)
 
+import Basics.Extra exposing (uncurry)
 import Dict exposing (Dict)
 import Playground exposing (..)
+import PointFree exposing (mapEach, mulBy)
 
 
 type alias Pos =
@@ -30,9 +32,37 @@ update computer mem =
     mem
 
 
+type alias ViewConfig =
+    { cellSize : Float
+    , width : Float
+    , height : Float
+    }
+
+
+toViewConfig : Computer -> Mem -> ViewConfig
+toViewConfig computer mem =
+    let
+        cellSize =
+            min (computer.screen.width * 0.7 / toFloat mem.width)
+                (computer.screen.height * 0.7 / toFloat mem.height)
+
+        ( widthPx, heightPx ) =
+            ( toFloat mem.width * cellSize, toFloat mem.height * cellSize )
+                |> mapEach (mulBy cellSize)
+    in
+    { cellSize = cellSize
+    , width = widthPx
+    , height = heightPx
+    }
+
+
 view : Computer -> Mem -> List Shape
 view computer mem =
-    []
+    let
+        { width, height } =
+            toViewConfig computer mem
+    in
+    [ rectangle black width height ]
 
 
 main =

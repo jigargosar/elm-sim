@@ -176,3 +176,7 @@ is =
 ignoreNothing : (b -> Maybe b) -> b -> b
 ignoreNothing func val =
     func val |> Maybe.withDefault val
+
+
+mapBoth2 func ( a1, b1 ) ( a2, b2 ) =
+    ( func a1 a2, func b1 b2 )

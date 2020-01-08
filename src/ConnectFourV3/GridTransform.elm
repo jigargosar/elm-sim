@@ -10,6 +10,7 @@ module ConnectFourV3.GridTransform exposing
     , toScreen
     , toScreenX
     , toScreenY
+    , top
     , width
     )
 
@@ -55,8 +56,13 @@ init cs dim =
 
 
 bottom : GridTransform -> Float
-bottom gt =
-    height gt / 2 * -1
+bottom =
+    top >> negate
+
+
+top : GridTransform -> Float
+top gt =
+    height gt / 2
 
 
 toScreenX : Int -> GridTransform -> Float

@@ -341,17 +341,19 @@ viewMemory { mouse, screen, time } mem =
         Just cellViewGrid ->
             [ group
                 [ rectangle black (GTransform.width gt) (GTransform.height gt)
-                , cellViewGridToShape time cfg cellViewGrid
+                , cellViewGridToShape cfg cellViewGrid
                 , gameStateToWordsShape mem.coin mem.state
                     |> scale 1.5
                     |> moveY (GTransform.bottom gt)
                     |> moveY -30
                 , case mem.state of
                     Nothing ->
-                        circle (coinToColor mem.coin) cfg.coinRadius
-                            |> applyHighlight time
-                            |> move (GTransform.toScreenX (selectedColumnToColumn mem.selectedColumn mem.grid) gt)
-                                (GTransform.toScreenY (Dim.lastRow dim + 1) gt)
+                        coinToShape cfg mem.coin
+                            |> applyHighlight cfg
+                            |> moveToGridPos cfg
+                                ( selectedColumnToColumn mem.selectedColumn mem.grid
+                                , Dim.lastRow dim + 1
+                                )
 
                     _ ->
                         group []
@@ -362,8 +364,8 @@ viewMemory { mouse, screen, time } mem =
             [ words red "error updating view with gameover state" ]
 
 
-applyHighlight : Time -> Shape -> Shape
-applyHighlight time =
+applyHighlight : CellViewConfig -> Shape -> Shape
+applyHighlight { time } =
     fade (wave 0.7 1 1 time)
 
 
@@ -384,6 +386,7 @@ gameStateToWordsShape coin state =
     words color message
 
 
+coinToString : Coin -> String
 coinToString coin =
     case coin of
         Blue ->
@@ -481,8 +484,8 @@ moveToGridPos { gt } ( column, row ) =
     move (GTransform.toScreenX column gt) (GTransform.toScreenY row gt)
 
 
-cellViewGridToShape : Time -> CellViewConfig -> Grid CellView -> Shape
-cellViewGridToShape time cfg grid =
+cellViewGridToShape : CellViewConfig -> Grid CellView -> Shape
+cellViewGridToShape cfg grid =
     let
         { gt, coinRadius, bgRadius } =
             cfg
@@ -494,7 +497,7 @@ cellViewGridToShape time cfg grid =
                     group
                         [ cellBackgroundShape cfg
                         , coinToShape cfg coin
-                            |> whenTrue highlight (applyHighlight time)
+                            |> whenTrue highlight (applyHighlight cfg)
                         ]
 
                 Nothing ->

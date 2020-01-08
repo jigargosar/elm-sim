@@ -113,7 +113,7 @@ view computer mem =
         |> List.map
             (\pos ->
                 cellBgShape c.cellSize
-                    |> moveCellShape c pos
+                    |> moveCell c pos
             )
         |> group
     , viewTopIndicator computer.time c mem
@@ -124,11 +124,11 @@ viewTopIndicator : Time -> Config -> Mem -> Shape
 viewTopIndicator time c mem =
     cellCoinShape c.cellSize mem.coin
         |> blink time
-        |> moveCellShape c ( mem.selectedColumn, mem.gDim.height )
+        |> moveCell c ( mem.selectedColumn, mem.gDim.height )
 
 
-moveCellShape : { a | cellSize : Float, dx : Float, dy : Float } -> Pos -> Shape -> Shape
-moveCellShape { cellSize, dx, dy } ( gx, gy ) =
+moveCell : { a | cellSize : Float, dx : Float, dy : Float } -> Pos -> Shape -> Shape
+moveCell { cellSize, dx, dy } ( gx, gy ) =
     let
         ( x, y ) =
             ( toFloat gx * cellSize - dx, toFloat gy * cellSize - dy )

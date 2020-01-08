@@ -6,6 +6,10 @@ import Playground exposing (..)
 import PointFree exposing (mapEach, mulBy)
 
 
+
+-- MODELS
+
+
 type alias Pos =
     ( Int, Int )
 
@@ -27,9 +31,22 @@ init =
     Mem 7 6 Dict.empty
 
 
+gridPositions : { a | width : Int, height : Int } -> List Pos
+gridPositions { width, height } =
+    List.range 0 ((width * height) - 1) |> List.map (\i -> ( i // width, modBy height i ))
+
+
+
+-- UPDATE
+
+
 update : Computer -> Mem -> Mem
 update computer mem =
     mem
+
+
+
+-- VIEW
 
 
 type alias Config =
@@ -76,22 +93,15 @@ cellBgShape cellSize =
 view : Computer -> Mem -> List Shape
 view computer mem =
     let
-        cfg =
+        c =
             toConfig computer mem
-
-        { width, height, cellSize, dx, dy } =
-            cfg
     in
-    [ rectangle black width height
-    , List.range 0 ((mem.width * mem.height) - 1)
+    [ rectangle black c.width c.height
+    , gridPositions mem
         |> List.map
-            (\i ->
-                let
-                    pos =
-                        ( i // mem.width, modBy mem.height i )
-                in
-                cellBgShape cellSize
-                    |> moveCellShape cfg pos
+            (\pos ->
+                cellBgShape c.cellSize
+                    |> moveCellShape c pos
             )
         |> group
     ]

@@ -1,9 +1,8 @@
 module ConnectFourV3Kata1.Main exposing (main)
 
-import Basics.Extra exposing (uncurry)
 import Dict exposing (Dict)
 import Playground exposing (..)
-import PointFree exposing (inc, mapEach, mulBy, whenTrue)
+import PointFree exposing (inc, whenTrue)
 
 
 

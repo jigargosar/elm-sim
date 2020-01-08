@@ -205,39 +205,34 @@ updateMemory { mouse, screen } mem =
 
         dim =
             gridDimension mem.grid
+
+        column =
+            GTransform.fromScreenX mouse.x gt
     in
     case mem.state of
         Nothing ->
-            if mouse.click then
-                let
-                    column =
-                        GTransform.fromScreenX mouse.x gt
-                in
-                if Dim.containsColumn column dim then
-                    if mem.selectedColumn == column then
-                        case insertInColumn column mem.coin mem.grid of
-                            Ok ( position, grid ) ->
-                                let
-                                    ( coin, state ) =
-                                        computeGameOverState position mem.coin grid
-                                in
-                                { mem
-                                    | grid = grid
-                                    , coin = coin
-                                    , state = state
-                                }
+            if Dim.containsColumn column dim then
+                if mouse.click && mem.selectedColumn == column then
+                    case insertInColumn column mem.coin mem.grid of
+                        Ok ( position, grid ) ->
+                            let
+                                ( coin, state ) =
+                                    computeGameOverState position mem.coin grid
+                            in
+                            { mem
+                                | grid = grid
+                                , coin = coin
+                                , state = state
+                            }
 
-                            Err ColumnFull ->
-                                mem
+                        Err ColumnFull ->
+                            mem
 
-                            Err InvalidColumn ->
-                                mem
-
-                    else
-                        { mem | selectedColumn = column }
+                        Err InvalidColumn ->
+                            mem
 
                 else
-                    mem
+                    { mem | selectedColumn = column }
 
             else
                 mem

@@ -184,6 +184,13 @@ flipCoin coin =
             Red
 
 
+selectedColumnToColumn : Maybe Int -> Dim -> Int
+selectedColumnToColumn selectedColumn dim =
+    selectedColumn
+        |> Maybe.map (flip Dim.clampColoumn dim)
+        |> Maybe.withDefault (Dim.centerColumn dim)
+
+
 
 -- UPDATE
 
@@ -310,6 +317,24 @@ computeWinningPositionSet startPosition coin grid =
 -- VIEW
 
 
+type CellView
+    = CellView CellViewRecord
+
+
+type alias CellViewRecord =
+    { highlight : Bool, coin : Coin }
+
+
+cellViewFromCoin : Coin -> CellView
+cellViewFromCoin coin =
+    CellView { highlight = False, coin = coin }
+
+
+highlightCellView : CellView -> CellView
+highlightCellView (CellView rec) =
+    CellView { rec | highlight = True }
+
+
 viewMemory : Computer -> Mem -> List Shape
 viewMemory { mouse, screen, time } mem =
     let
@@ -394,31 +419,6 @@ coinToString coin =
 
         Red ->
             "Red"
-
-
-type CellView
-    = CellView CellViewRecord
-
-
-type alias CellViewRecord =
-    { highlight : Bool, coin : Coin }
-
-
-cellViewFromCoin : Coin -> CellView
-cellViewFromCoin coin =
-    CellView { highlight = False, coin = coin }
-
-
-highlightCellView : CellView -> CellView
-highlightCellView (CellView rec) =
-    CellView { rec | highlight = True }
-
-
-selectedColumnToColumn : Maybe Int -> Dim -> Int
-selectedColumnToColumn selectedColumn dim =
-    selectedColumn
-        |> Maybe.map (flip Dim.clampColoumn dim)
-        |> Maybe.withDefault (Dim.centerColumn dim)
 
 
 insertIndicatorCoinView : Int -> Coin -> Grid CellView -> Maybe (Grid CellView)

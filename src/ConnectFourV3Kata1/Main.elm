@@ -36,6 +36,8 @@ type alias Config =
     { cellSize : Float
     , width : Float
     , height : Float
+    , dx : Float
+    , dy : Float
     }
 
 
@@ -52,6 +54,8 @@ toConfig computer mem =
     { cellSize = cellSize
     , width = widthPx
     , height = heightPx
+    , dx = (cellSize - widthPx) / 2
+    , dy = (cellSize - heightPx) / 2
     }
 
 
@@ -63,7 +67,7 @@ cellBgShape cellSize =
 view : Computer -> Mem -> List Shape
 view computer mem =
     let
-        { width, height, cellSize } =
+        { width, height, cellSize, dx, dy } =
             toConfig computer mem
     in
     [ rectangle black width height
@@ -75,13 +79,12 @@ view computer mem =
                         ( i // mem.width, modBy mem.height i )
 
                     ( x, y ) =
-                        ( toFloat gx * cellSize, toFloat gy * cellSize )
+                        ( toFloat gx * cellSize + dx, toFloat gy * cellSize + dy )
                 in
                 cellBgShape cellSize
                     |> move x y
             )
         |> group
-        |> move ((cellSize - width) / 2) ((cellSize - height) / 2)
     ]
 
 

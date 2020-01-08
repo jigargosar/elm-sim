@@ -44,6 +44,7 @@ gridPositions { width, height } =
 type alias Mem =
     { gDim : GDim
     , grid : Dict Pos Coin
+    , coin : Coin
     , selectedColumn : Int
     }
 
@@ -54,7 +55,11 @@ init =
         dim =
             { width = 7, height = 6 }
     in
-    Mem dim Dict.empty (centerColumn dim)
+    { gDim = dim
+    , grid = Dict.empty
+    , coin = Blue
+    , selectedColumn = centerColumn dim
+    }
 
 
 

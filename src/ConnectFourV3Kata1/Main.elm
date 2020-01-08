@@ -102,6 +102,31 @@ toConfig computer mem =
     }
 
 
+view : Computer -> Mem -> List Shape
+view computer mem =
+    let
+        c =
+            toConfig computer mem
+    in
+    [ rectangle black c.width c.height
+    , gridPositions mem.gDim
+        |> List.map
+            (\pos ->
+                cellBgShape c.cellSize
+                    |> moveCellShape c pos
+            )
+        |> group
+    , viewTopIndicator computer.time c mem
+    ]
+
+
+viewTopIndicator : Time -> Config -> Mem -> Shape
+viewTopIndicator time c mem =
+    cellCoinShape c.cellSize mem.coin
+        |> blink time
+        |> moveCellShape c ( mem.selectedColumn, mem.gDim.height )
+
+
 moveCellShape : { a | cellSize : Float, dx : Float, dy : Float } -> Pos -> Shape -> Shape
 moveCellShape { cellSize, dx, dy } ( gx, gy ) =
     let
@@ -134,29 +159,8 @@ blink =
     zigzag 0.5 1 1 >> fade
 
 
-view : Computer -> Mem -> List Shape
-view computer mem =
-    let
-        c =
-            toConfig computer mem
-    in
-    [ rectangle black c.width c.height
-    , gridPositions mem.gDim
-        |> List.map
-            (\pos ->
-                cellBgShape c.cellSize
-                    |> moveCellShape c pos
-            )
-        |> group
-    , viewTopIndicator computer.time c mem
-    ]
 
-
-viewTopIndicator : Time -> Config -> Mem -> Shape
-viewTopIndicator time c mem =
-    cellCoinShape c.cellSize mem.coin
-        |> blink time
-        |> moveCellShape c ( mem.selectedColumn, mem.gDim.height )
+-- MAIN
 
 
 main =

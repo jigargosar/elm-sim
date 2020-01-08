@@ -338,8 +338,8 @@ viewMemory { mouse, screen, time } mem =
                 , cellViewGridToShape time gt cellViewGrid
                 , gameStateToWordsShape mem.coin mem.state
                     |> scale 1.5
-                    |> moveY (Transform.top gt)
-                    |> moveUp 30
+                    |> moveY (Transform.bottom gt)
+                    |> moveY -30
                 ]
             ]
 

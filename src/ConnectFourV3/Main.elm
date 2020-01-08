@@ -329,7 +329,7 @@ viewMemory { mouse, screen, time } mem =
                     Just
     in
     case
-        mapGridDictValues (CellView False) mem.grid
+        mapGridDictValues cellViewFromCoin mem.grid
             |> updateCellViewGridWithGameState
     of
         Just cellViewGrid ->
@@ -374,16 +374,26 @@ coinToString coin =
 
 
 type CellView
-    = CellView Bool Coin
+    = CellView CellViewRecord
+
+
+type alias CellViewRecord =
+    { highlight : Bool, coin : Coin, msg : Maybe String }
 
 
 cellViewFromCoin : Coin -> CellView
 cellViewFromCoin coin =
-    CellView False coin
+    CellView { highlight = False, coin = coin, msg = Nothing }
 
 
-highlightCellView (CellView _ coin) =
-    CellView True coin
+highlightCellView : CellView -> CellView
+highlightCellView (CellView rec) =
+    CellView { rec | highlight = True }
+
+
+setCellViewMsg : String -> CellView -> CellView
+setCellViewMsg msg (CellView rec) =
+    CellView { rec | msg = Just msg }
 
 
 selectedColumnToColumn : Maybe Int -> Grid a -> Int
@@ -400,7 +410,9 @@ insertIndicatorCoinView selectedColumn coin grid =
             selectedColumnToColumn selectedColumn grid
 
         cellView =
-            cellViewFromCoin coin |> highlightCellView
+            cellViewFromCoin coin
+                |> highlightCellView
+                |> setCellViewMsg "confirm"
     in
     clampAndInsertInColumn column cellView grid
         |> Maybe.map Tuple.second
@@ -429,7 +441,7 @@ cellViewGridToShape time gt grid =
         coinToShape highlight coin =
             circle (coinToColor coin) (cellRadius * 0.7)
                 |> (if highlight then
-                        fade (wave 0 1 1 time)
+                        fade (wave 0.7 1 1 time)
 
                     else
                         fade 1
@@ -442,10 +454,18 @@ cellViewGridToShape time gt grid =
         toCellShape : Maybe CellView -> Shape
         toCellShape cell =
             case cell of
-                Just (CellView highlight coin) ->
+                Just (CellView { highlight, coin, msg }) ->
                     group
                         [ cellBackgroundShape
                         , coinToShape highlight coin
+                        , case msg of
+                            Just w ->
+                                words white w
+                                    |> scale 0.5
+                                    |> fade 0
+
+                            Nothing ->
+                                group []
                         ]
 
                 Nothing ->

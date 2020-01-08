@@ -1,6 +1,7 @@
 module ConnectFourV3Kata1.Board exposing (Board, init, insert, positions)
 
 import List.Extra
+import PointFree exposing (is)
 
 
 type Board
@@ -18,7 +19,17 @@ init { width, height } =
 
 insert : Int -> Board -> Board
 insert column (Board rec) =
-    Board { rec | reverseMoves = column :: rec.reverseMoves }
+    let
+        columnHeight =
+            List.Extra.count (is column) rec.reverseMoves
+    in
+    (if columnHeight < rec.height - 1 then
+        { rec | reverseMoves = column :: rec.reverseMoves }
+
+     else
+        rec
+    )
+        |> Board
 
 
 positions : Board -> List ( Int, Int )

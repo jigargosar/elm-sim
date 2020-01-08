@@ -116,6 +116,19 @@ cellBgShape cellSize =
     circle white (cellSize * 0.5 * 0.9)
 
 
+cellCoinShape : Float -> Coin -> Shape
+cellCoinShape cellSize coin =
+    circle
+        (case coin of
+            Blue ->
+                blue
+
+            Red ->
+                red
+        )
+        (cellSize * 0.5 * 0.75)
+
+
 view : Computer -> Mem -> List Shape
 view computer mem =
     let
@@ -130,6 +143,8 @@ view computer mem =
                     |> moveCellShape c pos
             )
         |> group
+    , cellCoinShape c.cellSize mem.coin
+        |> moveCellShape c ( mem.selectedColumn, mem.gDim.height )
     ]
 
 

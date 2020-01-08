@@ -71,8 +71,11 @@ view computer mem =
         |> List.map
             (\i ->
                 let
+                    ( col, row ) =
+                        ( i // mem.width, modBy mem.height i )
+
                     ( x, y ) =
-                        ( toFloat (i // mem.width) * cellSize, toFloat (modBy mem.height i) * cellSize )
+                        ( toFloat col * cellSize, toFloat row * cellSize )
                 in
                 cellBgShape cellSize
                     |> move x y

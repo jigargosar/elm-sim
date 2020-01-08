@@ -378,22 +378,17 @@ type CellView
 
 
 type alias CellViewRecord =
-    { highlight : Bool, coin : Coin, msg : Maybe String }
+    { highlight : Bool, coin : Coin }
 
 
 cellViewFromCoin : Coin -> CellView
 cellViewFromCoin coin =
-    CellView { highlight = False, coin = coin, msg = Nothing }
+    CellView { highlight = False, coin = coin }
 
 
 highlightCellView : CellView -> CellView
 highlightCellView (CellView rec) =
     CellView { rec | highlight = True }
-
-
-setCellViewMsg : String -> CellView -> CellView
-setCellViewMsg msg (CellView rec) =
-    CellView { rec | msg = Just msg }
 
 
 selectedColumnToColumn : Maybe Int -> Grid a -> Int
@@ -412,7 +407,6 @@ insertIndicatorCoinView selectedColumn coin grid =
         cellView =
             cellViewFromCoin coin
                 |> highlightCellView
-                |> setCellViewMsg "confirm"
     in
     clampAndInsertInColumn column cellView grid
         |> Maybe.map Tuple.second
@@ -454,18 +448,10 @@ cellViewGridToShape time gt grid =
         toCellShape : Maybe CellView -> Shape
         toCellShape cell =
             case cell of
-                Just (CellView { highlight, coin, msg }) ->
+                Just (CellView { highlight, coin }) ->
                     group
                         [ cellBackgroundShape
                         , coinToShape highlight coin
-                        , case msg of
-                            Just w ->
-                                words white w
-                                    |> scale 0.5
-                                    |> fade 0
-
-                            Nothing ->
-                                group []
                         ]
 
                 Nothing ->

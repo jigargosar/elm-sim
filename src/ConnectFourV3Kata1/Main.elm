@@ -74,9 +74,12 @@ init =
     let
         dim =
             { width = 7, height = 6 }
+
+        board =
+            Board.init dim
     in
     { gDim = dim
-    , board = Board.init dim
+    , board = [ 0, 0, 1, 1 ] |> List.foldl Board.insert board
     , grid = Dict.empty
     , coin = Blue
     , selectedColumn = centerColumn dim

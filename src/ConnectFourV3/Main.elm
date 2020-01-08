@@ -6,7 +6,7 @@ import ConnectFourV3.GridTransform as Transform exposing (GridTransform)
 import Dict exposing (Dict)
 import List.Extra
 import Playground exposing (..)
-import PointFree exposing (flip, is)
+import PointFree exposing (flip, is, whenTrue)
 import Set exposing (Set)
 
 
@@ -461,18 +461,16 @@ toCellViewConfig gt =
     }
 
 
-cellViewGridToShape : Time -> CellViewConfig -> Grid CellView -> Shape
-cellViewGridToShape time { gt, coinRadius, bgRadius } grid =
-    let
-        coinToShape : Bool -> Coin -> Shape
-        coinToShape highlight coin =
-            circle (coinToColor coin) coinRadius
-                |> (if highlight then
-                        applyHighlight time
+coinToShape : CellViewConfig -> Coin -> Shape
+coinToShape cfg coin =
+    circle (coinToColor coin) cfg.coinRadius
 
-                    else
-                        fade 1
-                   )
+
+cellViewGridToShape : Time -> CellViewConfig -> Grid CellView -> Shape
+cellViewGridToShape time cfg grid =
+    let
+        { gt, coinRadius, bgRadius } =
+            cfg
 
         cellBackgroundShape : Shape
         cellBackgroundShape =
@@ -484,7 +482,8 @@ cellViewGridToShape time { gt, coinRadius, bgRadius } grid =
                 Just (CellView { highlight, coin }) ->
                     group
                         [ cellBackgroundShape
-                        , coinToShape highlight coin
+                        , coinToShape cfg coin
+                            |> whenTrue highlight (applyHighlight time)
                         ]
 
                 Nothing ->

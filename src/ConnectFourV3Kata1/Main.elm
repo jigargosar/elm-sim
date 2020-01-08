@@ -32,15 +32,15 @@ update computer mem =
     mem
 
 
-type alias ViewConfig =
+type alias Config =
     { cellSize : Float
     , width : Float
     , height : Float
     }
 
 
-toViewConfig : Computer -> Mem -> ViewConfig
-toViewConfig computer mem =
+toConfig : Computer -> Mem -> Config
+toConfig computer mem =
     let
         cellSize =
             min (computer.screen.width * 0.7 / toFloat mem.width)
@@ -60,7 +60,7 @@ view : Computer -> Mem -> List Shape
 view computer mem =
     let
         { width, height } =
-            toViewConfig computer mem
+            toConfig computer mem
     in
     [ rectangle black width height ]
 

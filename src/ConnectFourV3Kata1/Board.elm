@@ -23,7 +23,7 @@ insert column (Board rec) =
         columnHeight =
             List.Extra.count (is column) rec.reverseMoves
     in
-    (if columnHeight < rec.height - 1 then
+    (if column >= 0 && column < rec.width && columnHeight < rec.height - 1 then
         { rec | reverseMoves = column :: rec.reverseMoves }
 
      else

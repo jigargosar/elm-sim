@@ -1,4 +1,4 @@
-module ConnectFourV3Kata1.Board exposing (Board)
+module ConnectFourV3Kata1.Board exposing (Board, init, insert)
 
 import Basics.Extra exposing (uncurry)
 import Dict
@@ -11,12 +11,24 @@ type Board
 
 
 type alias Rec =
-    { moves : List Int, width : Int, height : Int }
+    { reverseMoves : List Int, width : Int, height : Int }
+
+
+init : { a | width : Int, height : Int } -> Board
+init { width, height } =
+    Rec [] width height |> Board
+
+
+insert : Int -> Board -> Board
+insert column (Board rec) =
+    Board { rec | reverseMoves = column :: rec.reverseMoves }
 
 
 positions : Board -> List ( Int, Int )
 positions (Board rec) =
-    List.indexedMap Tuple.pair rec.moves
+    rec.reverseMoves
+        |> List.reverse
+        |> List.indexedMap Tuple.pair
         |> List.Extra.gatherEqualsBy Tuple.second
         |> List.concatMap
             (\( f, rest ) ->

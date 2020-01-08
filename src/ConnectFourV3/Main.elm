@@ -6,7 +6,7 @@ import ConnectFourV3.GridTransform as Transform exposing (GridTransform)
 import Dict exposing (Dict)
 import List.Extra
 import Playground exposing (..)
-import PointFree exposing (is)
+import PointFree exposing (flip, is)
 import Set exposing (Set)
 
 
@@ -156,6 +156,7 @@ type alias Mem =
     { state : Maybe GameOver
     , coin : Coin
     , grid : Grid Coin
+    , selectedColumn : Maybe Int
     }
 
 
@@ -169,6 +170,7 @@ initialMemory =
     { coin = Blue
     , state = Nothing
     , grid = Grid dim Dict.empty
+    , selectedColumn = Nothing
     }
 
 
@@ -306,7 +308,7 @@ viewMemory { mouse, screen, time } mem =
         updateCellViewGridWithGameState =
             case mem.state of
                 Nothing ->
-                    insertIndicatorCoinView mouse gt mem.coin
+                    insertIndicatorCoinView mem.selectedColumn mem.coin
 
                 Just (WinningPositions positions) ->
                     highlightWinningPositions positions
@@ -363,11 +365,36 @@ type CellView
     = CellView Bool Coin
 
 
-insertIndicatorCoinView : Mouse -> GridTransform -> Coin -> Grid CellView -> Maybe (Grid CellView)
-insertIndicatorCoinView mouse gt coin grid =
+
+{-
+   insertIndicatorCoinView : Mouse -> GridTransform -> Coin -> Grid CellView -> Maybe (Grid CellView)
+   insertIndicatorCoinView mouse gt coin grid =
+       let
+           column =
+               Transform.fromScreenX mouse.x gt
+
+           value =
+               CellView True coin
+       in
+       clampAndInsertInColumn column value grid
+           |> Maybe.map Tuple.second
+           |> Maybe.withDefault grid
+           |> Just
+-}
+
+
+selectedColumnToColumn : Maybe Int -> Grid a -> Int
+selectedColumnToColumn selectedColumn (Grid dim _) =
+    selectedColumn
+        |> Maybe.map (flip Dim.clampColoumn dim)
+        |> Maybe.withDefault (Dim.centerColumn dim)
+
+
+insertIndicatorCoinView : Maybe Int -> Coin -> Grid CellView -> Maybe (Grid CellView)
+insertIndicatorCoinView selectedColumn coin grid =
     let
         column =
-            Transform.fromScreenX mouse.x gt
+            selectedColumnToColumn selectedColumn grid
 
         value =
             CellView True coin

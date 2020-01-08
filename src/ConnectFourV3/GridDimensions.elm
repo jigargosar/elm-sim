@@ -1,5 +1,6 @@
 module ConnectFourV3.GridDimensions exposing
     ( GridDimensions
+    , centerColumn
     , clampColoumn
     , contains
     , containsColumn
@@ -67,6 +68,11 @@ size (GridDimensions { columns, rows }) =
 clampColoumn : Int -> GridDimensions -> Int
 clampColoumn column (GridDimensions { columns }) =
     clamp 0 (columns - 1) column
+
+
+centerColumn : GridDimensions -> Int
+centerColumn (GridDimensions { columns }) =
+    columns // 2
 
 
 stepPositionBy : ( Int, Int ) -> GridDimensions -> GridPosition -> Maybe GridPosition

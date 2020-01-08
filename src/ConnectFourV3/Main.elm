@@ -314,7 +314,10 @@ viewMemory : Computer -> Mem -> List Shape
 viewMemory { mouse, screen, time } mem =
     let
         gt =
-            computeGridTransform screen (gridDimension mem.grid)
+            computeGridTransform screen dim
+
+        dim =
+            gridDimension mem.grid
 
         cfg =
             toCellViewConfig gt
@@ -343,11 +346,25 @@ viewMemory { mouse, screen, time } mem =
                     |> scale 1.5
                     |> moveY (Transform.bottom gt)
                     |> moveY -30
+                , case mem.state of
+                    Nothing ->
+                        circle (coinToColor mem.coin) cfg.coinRadius
+                            |> applyHighlight time
+                            |> move (Transform.toScreenX (selectedColumnToColumn mem.selectedColumn mem.grid) gt)
+                                (Transform.toScreenY (Dim.lastRow dim + 1) gt)
+
+                    _ ->
+                        group []
                 ]
             ]
 
         Nothing ->
             [ words red "error updating view with gameover state" ]
+
+
+applyHighlight : Time -> Shape -> Shape
+applyHighlight time =
+    fade (wave 0.7 1 1 time)
 
 
 gameStateToWordsShape : Coin -> Maybe GameOver -> Shape
@@ -451,7 +468,7 @@ cellViewGridToShape time { gt, coinRadius, bgRadius } grid =
         coinToShape highlight coin =
             circle (coinToColor coin) coinRadius
                 |> (if highlight then
-                        fade (wave 0.7 1 1 time)
+                        applyHighlight time
 
                     else
                         fade 1

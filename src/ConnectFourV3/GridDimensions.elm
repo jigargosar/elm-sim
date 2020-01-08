@@ -6,6 +6,7 @@ module ConnectFourV3.GridDimensions exposing
     , containsColumn
     , foldl
     , fromColumnsRows
+    , lastRow
     , neighboursOffset
     , size
     , stepPositionBy
@@ -91,3 +92,8 @@ stepPositionBy ( dx, dy ) dim ( x, y ) =
 neighboursOffset : List ( Int, Int )
 neighboursOffset =
     [ ( 1, 0 ), ( 1, 1 ), ( 0, 1 ), ( -1, 1 ), ( -1, 0 ), ( -1, -1 ), ( 0, -1 ), ( 1, -1 ) ]
+
+
+lastRow : GridDimensions -> Int
+lastRow (GridDimensions { rows }) =
+    rows - 1

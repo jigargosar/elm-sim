@@ -48,7 +48,6 @@ toConfig computer mem =
 
         ( widthPx, heightPx ) =
             ( toFloat mem.width * cellSize, toFloat mem.height * cellSize )
-                |> mapEach (mulBy cellSize)
     in
     { cellSize = cellSize
     , width = widthPx

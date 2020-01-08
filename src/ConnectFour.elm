@@ -1,6 +1,6 @@
 module ConnectFour exposing (main)
 
-import ConnectFourV3.Main as Main
+import ConnectFourV3Kata1.Main as Main
 
 
 main =

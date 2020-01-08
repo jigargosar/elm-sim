@@ -386,24 +386,6 @@ highlightCellView (CellView _ coin) =
     CellView True coin
 
 
-
-{-
-   insertIndicatorCoinView : Mouse -> GridTransform -> Coin -> Grid CellView -> Maybe (Grid CellView)
-   insertIndicatorCoinView mouse gt coin grid =
-       let
-           column =
-               Transform.fromScreenX mouse.x gt
-
-           value =
-               CellView True coin
-       in
-       clampAndInsertInColumn column value grid
-           |> Maybe.map Tuple.second
-           |> Maybe.withDefault grid
-           |> Just
--}
-
-
 selectedColumnToColumn : Maybe Int -> Grid a -> Int
 selectedColumnToColumn selectedColumn (Grid dim _) =
     selectedColumn

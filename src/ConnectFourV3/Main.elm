@@ -361,8 +361,7 @@ viewMemory { mouse, screen, time } mem =
                 , cellViewGridToShape cfg cellViewGrid
                 , gameStateToWordsShape mem.coin mem.state
                     |> scale cfg.wordsScale
-                    |> moveY -cfg.lineHeightTop
-                    |> moveY (GTransform.bottom gt)
+                    |> moveY (GTransform.bottom gt + cfg.lineHeightBottom)
                 , case mem.state of
                     Nothing ->
                         coinToShape cfg mem.coin
@@ -440,6 +439,7 @@ type alias CellViewConfig =
     , gt : GridTransform
     , wordsScale : Float
     , lineHeightTop : Float
+    , lineHeightBottom : Float
     }
 
 
@@ -459,6 +459,7 @@ toCellViewConfig time gt =
     , gt = gt
     , wordsScale = cellRadius / 16
     , lineHeightTop = cellRadius
+    , lineHeightBottom = -cellRadius
     }
 
 

@@ -162,7 +162,7 @@ type alias Mem =
 
 type Input
     = NoInput
-    | ColumnSelected Int
+    | InsertPositionSelected Pos
 
 
 initialMemory : Mem
@@ -202,6 +202,11 @@ computeGridTransform screen dim =
     Transform.init cellSize dim
 
 
+resetInput : Mem -> Mem
+resetInput mem =
+    { mem | input = NoInput }
+
+
 updateMemory : Computer -> Mem -> Mem
 updateMemory { mouse, screen } mem =
     let
@@ -210,31 +215,46 @@ updateMemory { mouse, screen } mem =
     in
     case mem.state of
         Nothing ->
-            if mouse.click then
-                let
-                    column =
-                        Transform.fromScreenX mouse.x gt
-                in
-                case insertInColumn column mem.coin mem.grid of
-                    Ok ( position, grid ) ->
-                        let
-                            ( coin, state ) =
-                                computeGameOverState position mem.coin grid
-                        in
-                        { mem
-                            | grid = grid
-                            , coin = coin
-                            , state = state
-                        }
+            let
+                column =
+                    Transform.fromScreenX mouse.x gt
+            in
+            case ( mouse.click, mem.input ) of
+                ( False, _ ) ->
+                    mem
 
-                    Err ColumnFull ->
-                        mem
+                ( True, NoInput ) ->
+                    { mem
+                        | input =
+                            insertInColumn column mem.coin mem.grid
+                                |> Result.map (Tuple.first >> InsertPositionSelected)
+                                |> Result.withDefault NoInput
+                    }
 
-                    Err InvalidColumn ->
-                        mem
+                ( True, InsertPositionSelected prevPosition ) ->
+                    (case insertInColumn column mem.coin mem.grid of
+                        Ok ( position, grid ) ->
+                            if position == prevPosition then
+                                let
+                                    ( coin, state ) =
+                                        computeGameOverState position mem.coin grid
+                                in
+                                { mem
+                                    | grid = grid
+                                    , coin = coin
+                                    , state = state
+                                }
 
-            else
-                mem
+                            else
+                                mem
+
+                        Err ColumnFull ->
+                            mem
+
+                        Err InvalidColumn ->
+                            mem
+                    )
+                        |> resetInput
 
         Just _ ->
             if mouse.click then

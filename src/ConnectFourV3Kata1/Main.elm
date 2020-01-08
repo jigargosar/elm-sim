@@ -55,13 +55,31 @@ toConfig computer mem =
     }
 
 
+cellBgShape : Float -> Shape
+cellBgShape cellSize =
+    circle white (cellSize * 0.5 * 0.9)
+
+
 view : Computer -> Mem -> List Shape
 view computer mem =
     let
-        { width, height } =
+        { width, height, cellSize } =
             toConfig computer mem
     in
-    [ rectangle black width height ]
+    [ rectangle black width height
+    , List.range 0 ((mem.width * mem.height) - 1)
+        |> List.map
+            (\i ->
+                let
+                    ( x, y ) =
+                        ( toFloat (i // mem.width) * cellSize, toFloat (modBy mem.height i) * cellSize )
+                in
+                cellBgShape cellSize
+                    |> move x y
+            )
+        |> group
+        |> move ((cellSize - width) / 2) ((cellSize - height) / 2)
+    ]
 
 
 main =

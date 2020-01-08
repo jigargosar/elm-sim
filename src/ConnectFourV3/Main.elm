@@ -439,7 +439,7 @@ cellViewGridToShape time gt grid =
 
         coinToShape : Bool -> Coin -> Shape
         coinToShape highlight coin =
-            circle (coinToColor coin) (cellRadius * 0.7)
+            circle (coinToColor coin) (cellRadius * 0.75)
                 |> (if highlight then
                         fade (wave 0.7 1 1 time)
 

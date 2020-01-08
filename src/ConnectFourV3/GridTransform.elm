@@ -1,5 +1,6 @@
 module ConnectFourV3.GridTransform exposing
     ( GridTransform
+    , bottom
     , cellSize
     , fromScreen
     , fromScreenX
@@ -51,6 +52,11 @@ init cs dim =
     , height = toFloat rows * cs
     }
         |> GridTransform
+
+
+bottom : GridTransform -> Float
+bottom gt =
+    height gt / 2 * -1
 
 
 toScreenX : Int -> GridTransform -> Float

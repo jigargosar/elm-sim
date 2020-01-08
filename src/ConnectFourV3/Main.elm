@@ -2,7 +2,7 @@ module ConnectFourV3.Main exposing (main)
 
 import ConnectFourV3.GridDimensions as Dim exposing (GridDimensions)
 import ConnectFourV3.GridPosition exposing (GridPosition)
-import ConnectFourV3.GridTransform as GridTransform exposing (GridTransform)
+import ConnectFourV3.GridTransform as Transform exposing (GridTransform)
 import Dict exposing (Dict)
 import List.Extra
 import Playground exposing (..)
@@ -192,7 +192,7 @@ computeGridTransform screen dim =
         cellSize =
             computeCellSize screen dim
     in
-    GridTransform.init cellSize dim
+    Transform.init cellSize dim
 
 
 updateMemory : Computer -> Mem -> Mem
@@ -206,7 +206,7 @@ updateMemory { mouse, screen } mem =
             if mouse.click then
                 let
                     column =
-                        GridTransform.fromScreenX mouse.x gt
+                        Transform.fromScreenX mouse.x gt
                 in
                 case insertInColumn column mem.coin mem.grid of
                     Ok ( position, grid ) ->
@@ -313,6 +313,17 @@ viewMemory { mouse, screen, time } mem =
 
                 Just Draw ->
                     Just
+
+        gameStateToString =
+            case mem.state of
+                Just Draw ->
+                    "Game Draw"
+
+                Just (WinningPositions _) ->
+                    "Game Won"
+
+                Nothing ->
+                    "Player turn"
     in
     case
         mapGridDictValues (CellView False) mem.grid
@@ -320,8 +331,11 @@ viewMemory { mouse, screen, time } mem =
     of
         Just cellViewGrid ->
             [ group
-                [ rectangle black (GridTransform.width gt) (GridTransform.height gt)
+                [ rectangle black (Transform.width gt) (Transform.height gt)
                 , cellViewGridToShape time gt cellViewGrid
+                , words black gameStateToString
+                    |> moveY (Transform.bottom gt)
+                    |> moveDown 20
                 ]
             ]
 
@@ -337,7 +351,7 @@ insertIndicatorCoinView : Mouse -> GridTransform -> Coin -> Grid CellView -> May
 insertIndicatorCoinView mouse gt coin grid =
     let
         column =
-            GridTransform.fromScreenX mouse.x gt
+            Transform.fromScreenX mouse.x gt
 
         value =
             CellView True coin
@@ -374,7 +388,7 @@ cellViewGridToShape time gt grid =
     let
         cellRadius : Float
         cellRadius =
-            GridTransform.cellSize gt / 2
+            Transform.cellSize gt / 2
 
         coinToShape : Bool -> Coin -> Shape
         coinToShape highlight coin =
@@ -405,7 +419,7 @@ cellViewGridToShape time gt grid =
         viewCell : Pos -> Maybe CellView -> List Shape -> List Shape
         viewCell ( column, row ) maybeCellView =
             toCellShape maybeCellView
-                |> move (GridTransform.toScreenX column gt) (GridTransform.toScreenY row gt)
+                |> move (Transform.toScreenX column gt) (Transform.toScreenY row gt)
                 |> (::)
     in
     foldlGrid viewCell [] grid |> group

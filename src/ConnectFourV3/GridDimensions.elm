@@ -49,7 +49,7 @@ foldl func acc0 (GridDimensions { columns, rows }) =
 
 contains : GridPosition -> GridDimensions -> Bool
 contains ( x, y ) (GridDimensions { columns, rows }) =
-    (x < 0 || y < 0 || x >= columns || y >= columns)
+    (x < 0 || y < 0 || x >= columns || y >= rows)
         |> not
 
 

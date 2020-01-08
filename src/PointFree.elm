@@ -62,6 +62,11 @@ whenTrue bool t v =
         v
 
 
+inc : number -> number
+inc =
+    (+) 1
+
+
 whenFalse : Bool -> (c -> c) -> c -> c
 whenFalse bool =
     whenTrue (not bool)

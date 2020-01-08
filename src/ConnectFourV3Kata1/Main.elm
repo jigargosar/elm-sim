@@ -3,7 +3,7 @@ module ConnectFourV3Kata1.Main exposing (main)
 import Basics.Extra exposing (uncurry)
 import Dict exposing (Dict)
 import Playground exposing (..)
-import PointFree exposing (mapEach, mulBy)
+import PointFree exposing (inc, mapEach, mulBy, whenTrue)
 
 
 
@@ -37,6 +37,23 @@ gridPositions { width, height } =
     List.range 0 ((width * height) - 1) |> List.map (\i -> ( i // width, modBy height i ))
 
 
+validatePos : Pos -> GDim -> Maybe Pos
+validatePos pos { width, height } =
+    let
+        ( gx, gy ) =
+            pos
+
+        isOk =
+            (gx < 0 || gy < 0 || gx >= width || gy >= height)
+                |> not
+    in
+    if isOk then
+        Just pos
+
+    else
+        Nothing
+
+
 
 -- MEM
 
@@ -60,6 +77,15 @@ init =
     , coin = Blue
     , selectedColumn = centerColumn dim
     }
+
+
+insertPosition : Mem -> Maybe Pos
+insertPosition mem =
+    let
+        colLength =
+            Dict.foldl (\( x, _ ) _ -> whenTrue (x == mem.selectedColumn) inc) 0 mem.grid
+    in
+    validatePos ( mem.selectedColumn, colLength ) mem.gDim
 
 
 
@@ -112,7 +138,14 @@ view computer mem =
     , gridPositions mem.gDim
         |> List.map
             (\pos ->
-                cellBgShape c.cellSize
+                group
+                    [ cellBgShape c.cellSize
+                    , if Just pos == insertPosition mem then
+                        indicatorCoinShape computer.time c.cellSize mem.coin
+
+                      else
+                        group []
+                    ]
                     |> moveCell c pos
             )
         |> group
@@ -120,10 +153,15 @@ view computer mem =
     ]
 
 
+indicatorCoinShape : Time -> Float -> Coin -> Shape
+indicatorCoinShape time cellSize coin =
+    cellCoinShape cellSize coin
+        |> blink time
+
+
 viewTopIndicator : Time -> Config -> Mem -> Shape
 viewTopIndicator time c mem =
-    cellCoinShape c.cellSize mem.coin
-        |> blink time
+    indicatorCoinShape time c.cellSize mem.coin
         |> moveCell c ( mem.selectedColumn, mem.gDim.height )
 
 

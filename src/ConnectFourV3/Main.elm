@@ -316,6 +316,9 @@ viewMemory { mouse, screen, time } mem =
         gt =
             computeGridTransform screen (gridDimension mem.grid)
 
+        cfg =
+            toCellViewConfig gt
+
         updateCellViewGridWithGameState : Grid CellView -> Maybe (Grid CellView)
         updateCellViewGridWithGameState =
             case mem.state of
@@ -335,7 +338,7 @@ viewMemory { mouse, screen, time } mem =
         Just cellViewGrid ->
             [ group
                 [ rectangle black (Transform.width gt) (Transform.height gt)
-                , cellViewGridToShape time gt cellViewGrid
+                , cellViewGridToShape time cfg cellViewGrid
                 , gameStateToWordsShape mem.coin mem.state
                     |> scale 1.5
                     |> moveY (Transform.bottom gt)
@@ -424,16 +427,29 @@ coinToColor coin =
             blue
 
 
-cellViewGridToShape : Time -> GridTransform -> Grid CellView -> Shape
-cellViewGridToShape time gt grid =
+type alias CellViewConfig =
+    { bgRadius : Float, coinRadius : Float, gt : GridTransform }
+
+
+toCellViewConfig : GridTransform -> CellViewConfig
+toCellViewConfig gt =
     let
         cellRadius : Float
         cellRadius =
             Transform.cellSize gt / 2
+    in
+    { bgRadius = cellRadius * 0.9
+    , coinRadius = cellRadius * 0.75
+    , gt = gt
+    }
 
+
+cellViewGridToShape : Time -> CellViewConfig -> Grid CellView -> Shape
+cellViewGridToShape time { gt, coinRadius, bgRadius } grid =
+    let
         coinToShape : Bool -> Coin -> Shape
         coinToShape highlight coin =
-            circle (coinToColor coin) (cellRadius * 0.75)
+            circle (coinToColor coin) coinRadius
                 |> (if highlight then
                         fade (wave 0.7 1 1 time)
 
@@ -443,7 +459,7 @@ cellViewGridToShape time gt grid =
 
         cellBackgroundShape : Shape
         cellBackgroundShape =
-            circle white (cellRadius * 0.9)
+            circle white bgRadius
 
         toCellShape : Maybe CellView -> Shape
         toCellShape cell =

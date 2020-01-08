@@ -44,10 +44,9 @@ positions (Board rec) =
         |> List.indexedMap Tuple.pair
         |> List.Extra.gatherEqualsBy Tuple.second
         |> List.concatMap
-            (\( f, rest ) ->
-                f
-                    :: rest
-                    |> List.indexedMap (\y ( i, x ) -> ( i, ( x, y ) ))
+            (\( first, rest ) ->
+                (first :: rest)
+                    |> List.indexedMap (\y ( idx, x ) -> ( idx, ( x, y ) ))
             )
         |> List.sortBy Tuple.first
         |> List.map Tuple.second

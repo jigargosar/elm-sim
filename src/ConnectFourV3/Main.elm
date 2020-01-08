@@ -244,10 +244,10 @@ computeCellSize { width, height } dim =
             Dim.toColoumnsRows dim
 
         maxCellWidth =
-            width * 0.8 / toFloat columns
+            width * 0.7 / toFloat columns
 
         maxCellHeight =
-            height * 0.8 / toFloat rows
+            height * 0.7 / toFloat rows
     in
     min maxCellWidth maxCellHeight
 

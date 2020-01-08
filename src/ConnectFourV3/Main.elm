@@ -201,7 +201,10 @@ updateMemory : Computer -> Mem -> Mem
 updateMemory { mouse, screen } mem =
     let
         gt =
-            computeGridTransform screen (gridDimension mem.grid)
+            computeGridTransform screen dim
+
+        dim =
+            gridDimension mem.grid
     in
     case mem.state of
         Nothing ->
@@ -210,23 +213,32 @@ updateMemory { mouse, screen } mem =
                     column =
                         Transform.fromScreenX mouse.x gt
                 in
-                case insertInColumn column mem.coin mem.grid of
-                    Ok ( position, grid ) ->
-                        let
-                            ( coin, state ) =
-                                computeGameOverState position mem.coin grid
-                        in
-                        { mem
-                            | grid = grid
-                            , coin = coin
-                            , state = state
-                        }
+                if Dim.containsColumn column dim then
+                    if selectedColumnToColumn mem.selectedColumn mem.grid == column then
+                        case insertInColumn column mem.coin mem.grid of
+                            Ok ( position, grid ) ->
+                                let
+                                    ( coin, state ) =
+                                        computeGameOverState position mem.coin grid
+                                in
+                                { mem
+                                    | grid = grid
+                                    , coin = coin
+                                    , state = state
+                                    , selectedColumn = Nothing
+                                }
 
-                    Err ColumnFull ->
-                        mem
+                            Err ColumnFull ->
+                                mem
 
-                    Err InvalidColumn ->
-                        mem
+                            Err InvalidColumn ->
+                                mem
+
+                    else
+                        { mem | selectedColumn = Just column }
+
+                else
+                    mem
 
             else
                 mem

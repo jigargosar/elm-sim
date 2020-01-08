@@ -333,7 +333,7 @@ viewMemory { mouse, screen, time } mem =
         updateCellViewGridWithGameState =
             case mem.state of
                 Nothing ->
-                    insertIndicatorCoinView mouse gt mem.coin
+                    insertIndicatorCoinViewWithInput mem.input mem.coin
 
                 Just (WinningPositions positions) ->
                     highlightWinningPositions positions
@@ -390,8 +390,8 @@ type CellView
     = CellView Bool Coin
 
 
-insertIndicatorCoinView : Mouse -> GridTransform -> Coin -> Grid CellView -> Maybe (Grid CellView)
-insertIndicatorCoinView mouse gt coin grid =
+insertIndicatorCoinViewAtMousePos : Mouse -> GridTransform -> Coin -> Grid CellView -> Maybe (Grid CellView)
+insertIndicatorCoinViewAtMousePos mouse gt coin grid =
     let
         column =
             Transform.fromScreenX mouse.x gt
@@ -403,6 +403,19 @@ insertIndicatorCoinView mouse gt coin grid =
         |> Maybe.map Tuple.second
         |> Maybe.withDefault grid
         |> Just
+
+
+insertIndicatorCoinViewWithInput : Input -> Coin -> Grid CellView -> Maybe (Grid CellView)
+insertIndicatorCoinViewWithInput input coin grid =
+    case input of
+        NoInput ->
+            Just grid
+
+        InsertPositionSelected ( column, _ ) ->
+            clampAndInsertInColumn column (CellView True coin) grid
+                |> Maybe.map Tuple.second
+                |> Maybe.withDefault grid
+                |> Just
 
 
 highlightWinningPositions : Set Pos -> Grid CellView -> Maybe (Grid CellView)

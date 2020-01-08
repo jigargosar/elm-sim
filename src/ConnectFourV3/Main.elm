@@ -353,10 +353,7 @@ viewMemory { mouse, screen, time } mem =
                     Nothing ->
                         coinToShape cfg mem.coin
                             |> applyHighlight cfg
-                            |> moveToGridPos cfg
-                                ( indicatorColumn
-                                , Dim.lastRow dim + 1
-                                )
+                            |> moveToGridPos cfg ( indicatorColumn, Dim.lastRow dim + 1 )
 
                     _ ->
                         group []

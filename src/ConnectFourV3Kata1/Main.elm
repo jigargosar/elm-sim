@@ -129,6 +129,11 @@ cellCoinShape cellSize coin =
         (cellSize * 0.5 * 0.75)
 
 
+blink : Time -> Shape -> Shape
+blink =
+    zigzag 0.5 1 1 >> fade
+
+
 view : Computer -> Mem -> List Shape
 view computer mem =
     let
@@ -144,6 +149,7 @@ view computer mem =
             )
         |> group
     , cellCoinShape c.cellSize mem.coin
+        |> blink computer.time
         |> moveCellShape c ( mem.selectedColumn, mem.gDim.height )
     ]
 

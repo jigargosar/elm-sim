@@ -323,7 +323,7 @@ viewMemory { mouse, screen, time } mem =
                     insertIndicatorCoinView mem.selectedColumn mem.coin
 
                 Just (WinningPositions positions) ->
-                    highlightWinningPositions positions
+                    updateGridPositions positions (Maybe.map highlightCellView)
 
                 Just Draw ->
                     Just
@@ -377,6 +377,15 @@ type CellView
     = CellView Bool Coin
 
 
+cellViewFromCoin : Coin -> CellView
+cellViewFromCoin coin =
+    CellView False coin
+
+
+highlightCellView (CellView _ coin) =
+    CellView True coin
+
+
 
 {-
    insertIndicatorCoinView : Mouse -> GridTransform -> Coin -> Grid CellView -> Maybe (Grid CellView)
@@ -408,24 +417,13 @@ insertIndicatorCoinView selectedColumn coin grid =
         column =
             selectedColumnToColumn selectedColumn grid
 
-        value =
-            CellView True coin
+        cellView =
+            cellViewFromCoin coin |> highlightCellView
     in
-    clampAndInsertInColumn column value grid
+    clampAndInsertInColumn column cellView grid
         |> Maybe.map Tuple.second
         |> Maybe.withDefault grid
         |> Just
-
-
-highlightWinningPositions : Set Pos -> Grid CellView -> Maybe (Grid CellView)
-highlightWinningPositions positions grid =
-    updateGridPositions positions
-        (Maybe.map
-            (\(CellView _ coin) ->
-                CellView True coin
-            )
-        )
-        grid
 
 
 coinToColor : Coin -> Color

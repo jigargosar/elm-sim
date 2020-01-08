@@ -466,28 +466,34 @@ coinToShape cfg coin =
     circle (coinToColor coin) cfg.coinRadius
 
 
+cellBackgroundShape : CellViewConfig -> Shape
+cellBackgroundShape =
+    .bgRadius >> circle white
+
+
+moveToGridPos : CellViewConfig -> ( Int, Int ) -> Shape -> Shape
+moveToGridPos { gt } ( column, row ) =
+    move (Transform.toScreenX column gt) (Transform.toScreenY row gt)
+
+
 cellViewGridToShape : Time -> CellViewConfig -> Grid CellView -> Shape
 cellViewGridToShape time cfg grid =
     let
         { gt, coinRadius, bgRadius } =
             cfg
 
-        cellBackgroundShape : Shape
-        cellBackgroundShape =
-            circle white bgRadius
-
         toCellShape : Maybe CellView -> Shape
         toCellShape cell =
             case cell of
                 Just (CellView { highlight, coin }) ->
                     group
-                        [ cellBackgroundShape
+                        [ cellBackgroundShape cfg
                         , coinToShape cfg coin
                             |> whenTrue highlight (applyHighlight time)
                         ]
 
                 Nothing ->
-                    cellBackgroundShape
+                    cellBackgroundShape cfg
 
         viewCell : Pos -> Maybe CellView -> List Shape -> List Shape
         viewCell ( column, row ) maybeCellView =

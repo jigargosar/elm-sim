@@ -34,7 +34,9 @@ centerColumn { width } =
 
 gridPositions : GDim -> List Pos
 gridPositions { width, height } =
-    List.range 0 ((width * height) - 1) |> List.map (\i -> ( i // width, modBy height i ))
+    List.range 0 (height - 1)
+        |> List.concatMap
+            (\y -> List.range 0 (width - 1) |> List.map (\x -> ( x, y )))
 
 
 validatePos : Pos -> GDim -> Maybe Pos
@@ -96,7 +98,21 @@ insertPosition mem =
 
 update : Computer -> Mem -> Mem
 update computer mem =
-    mem
+    let
+        cfg =
+            toConfig computer mem
+    in
+    if computer.mouse.click then
+        let
+            column =
+                (computer.mouse.x + cfg.dx / cfg.cellSize)
+                    |> round
+                    |> clamp 0 (mem.gDim.width - 1)
+        in
+        { mem | board = Board.insert column mem.board }
+
+    else
+        mem
 
 
 
@@ -139,10 +155,11 @@ view computer mem =
         indicatorShape =
             insertCoinIndicatorShape computer.time c.cellSize mem.coin
     in
-    [ rectangle black c.width c.height
+    [ rectangle gray computer.screen.width computer.screen.height
+    , rectangle black c.width c.height
     , gridPositions mem.gDim
-        |> List.map
-            (\pos ->
+        |> List.indexedMap
+            (\idx pos ->
                 group
                     [ cellBgShape c.cellSize
                     , if Just pos == insertPosition mem then
@@ -150,6 +167,9 @@ view computer mem =
 
                       else
                         group []
+
+                    --, words black (Debug.toString pos)
+                    , words black (Debug.toString idx)
                     ]
                     |> moveCell c pos
             )

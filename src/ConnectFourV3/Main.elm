@@ -2,7 +2,7 @@ module ConnectFourV3.Main exposing (main)
 
 import ConnectFourV3.GridDimensions as Dim exposing (GridDimensions)
 import ConnectFourV3.GridPosition exposing (GridPosition)
-import ConnectFourV3.GridTransform as Transform exposing (GridTransform)
+import ConnectFourV3.GridTransform as GTransform exposing (GridTransform)
 import Dict exposing (Dict)
 import List.Extra
 import Playground exposing (..)
@@ -194,7 +194,7 @@ computeGridTransform screen dim =
         cellSize =
             computeCellSize screen dim
     in
-    Transform.init cellSize dim
+    GTransform.init cellSize dim
 
 
 updateMemory : Computer -> Mem -> Mem
@@ -211,7 +211,7 @@ updateMemory { mouse, screen } mem =
             if mouse.click then
                 let
                     column =
-                        Transform.fromScreenX mouse.x gt
+                        GTransform.fromScreenX mouse.x gt
                 in
                 if Dim.containsColumn column dim then
                     if selectedColumnToColumn mem.selectedColumn mem.grid == column then
@@ -320,7 +320,7 @@ viewMemory { mouse, screen, time } mem =
             gridDimension mem.grid
 
         cfg =
-            toCellViewConfig gt
+            toCellViewConfig time gt
 
         updateCellViewGridWithGameState : Grid CellView -> Maybe (Grid CellView)
         updateCellViewGridWithGameState =
@@ -340,18 +340,18 @@ viewMemory { mouse, screen, time } mem =
     of
         Just cellViewGrid ->
             [ group
-                [ rectangle black (Transform.width gt) (Transform.height gt)
+                [ rectangle black (GTransform.width gt) (GTransform.height gt)
                 , cellViewGridToShape time cfg cellViewGrid
                 , gameStateToWordsShape mem.coin mem.state
                     |> scale 1.5
-                    |> moveY (Transform.bottom gt)
+                    |> moveY (GTransform.bottom gt)
                     |> moveY -30
                 , case mem.state of
                     Nothing ->
                         circle (coinToColor mem.coin) cfg.coinRadius
                             |> applyHighlight time
-                            |> move (Transform.toScreenX (selectedColumnToColumn mem.selectedColumn mem.grid) gt)
-                                (Transform.toScreenY (Dim.lastRow dim + 1) gt)
+                            |> move (GTransform.toScreenX (selectedColumnToColumn mem.selectedColumn mem.grid) gt)
+                                (GTransform.toScreenY (Dim.lastRow dim + 1) gt)
 
                     _ ->
                         group []
@@ -445,18 +445,23 @@ coinToColor coin =
 
 
 type alias CellViewConfig =
-    { bgRadius : Float, coinRadius : Float, gt : GridTransform }
+    { bgRadius : Float
+    , coinRadius : Float
+    , time : Time
+    , gt : GridTransform
+    }
 
 
-toCellViewConfig : GridTransform -> CellViewConfig
-toCellViewConfig gt =
+toCellViewConfig : Time -> GridTransform -> CellViewConfig
+toCellViewConfig time gt =
     let
         cellRadius : Float
         cellRadius =
-            Transform.cellSize gt / 2
+            GTransform.cellSize gt / 2
     in
     { bgRadius = cellRadius * 0.9
     , coinRadius = cellRadius * 0.75
+    , time = time
     , gt = gt
     }
 
@@ -473,7 +478,7 @@ cellBackgroundShape =
 
 moveToGridPos : CellViewConfig -> ( Int, Int ) -> Shape -> Shape
 moveToGridPos { gt } ( column, row ) =
-    move (Transform.toScreenX column gt) (Transform.toScreenY row gt)
+    move (GTransform.toScreenX column gt) (GTransform.toScreenY row gt)
 
 
 cellViewGridToShape : Time -> CellViewConfig -> Grid CellView -> Shape
@@ -498,7 +503,7 @@ cellViewGridToShape time cfg grid =
         viewCell : Pos -> Maybe CellView -> List Shape -> List Shape
         viewCell ( column, row ) maybeCellView =
             toCellShape maybeCellView
-                |> move (Transform.toScreenX column gt) (Transform.toScreenY row gt)
+                |> move (GTransform.toScreenX column gt) (GTransform.toScreenY row gt)
                 |> (::)
     in
     foldlGrid viewCell [] grid |> group

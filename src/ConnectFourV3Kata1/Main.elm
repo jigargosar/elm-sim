@@ -146,6 +146,16 @@ toConfig computer mem =
     }
 
 
+flipCoin : Coin -> Coin
+flipCoin coin =
+    case coin of
+        Blue ->
+            Red
+
+        Red ->
+            Blue
+
+
 view : Computer -> Mem -> List Shape
 view computer mem =
     let
@@ -154,6 +164,15 @@ view computer mem =
 
         indicatorShape =
             insertCoinIndicatorShape computer.time c.cellSize mem.coin
+
+        coinGrid =
+            Board.positions mem.board
+                |> List.foldl
+                    (\p ( coin, dict ) ->
+                        ( flipCoin coin, Dict.insert p coin dict )
+                    )
+                    ( Blue, Dict.empty )
+                |> Tuple.second
     in
     [ rectangle gray computer.screen.width computer.screen.height
     , rectangle black c.width c.height
@@ -162,6 +181,12 @@ view computer mem =
             (\idx pos ->
                 group
                     [ cellBgShape c.cellSize
+                    , case Dict.get pos coinGrid of
+                        Just coin ->
+                            cellCoinShape c.cellSize coin
+
+                        Nothing ->
+                            group []
                     , if Just pos == insertPosition mem then
                         indicatorShape
 

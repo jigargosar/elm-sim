@@ -54,9 +54,18 @@ toConfig computer mem =
     { cellSize = cellSize
     , width = widthPx
     , height = heightPx
-    , dx = (cellSize - widthPx) / 2
-    , dy = (cellSize - heightPx) / 2
+    , dx = (widthPx - cellSize) / 2
+    , dy = (heightPx - cellSize) / 2
     }
+
+
+moveCellShape : { a | cellSize : Float, dx : Float, dy : Float } -> Pos -> Shape -> Shape
+moveCellShape { cellSize, dx, dy } ( gx, gy ) =
+    let
+        ( x, y ) =
+            ( toFloat gx * cellSize - dx, toFloat gy * cellSize - dy )
+    in
+    move x y
 
 
 cellBgShape : Float -> Shape
@@ -67,22 +76,22 @@ cellBgShape cellSize =
 view : Computer -> Mem -> List Shape
 view computer mem =
     let
-        { width, height, cellSize, dx, dy } =
+        cfg =
             toConfig computer mem
+
+        { width, height, cellSize, dx, dy } =
+            cfg
     in
     [ rectangle black width height
     , List.range 0 ((mem.width * mem.height) - 1)
         |> List.map
             (\i ->
                 let
-                    ( gx, gy ) =
+                    pos =
                         ( i // mem.width, modBy mem.height i )
-
-                    ( x, y ) =
-                        ( toFloat gx * cellSize + dx, toFloat gy * cellSize + dy )
                 in
                 cellBgShape cellSize
-                    |> move x y
+                    |> moveCellShape cfg pos
             )
         |> group
     ]

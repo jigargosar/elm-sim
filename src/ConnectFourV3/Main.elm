@@ -214,7 +214,7 @@ updateMemory { mouse, screen } mem =
                         GTransform.fromScreenX mouse.x gt
                 in
                 if Dim.containsColumn column dim then
-                    if selectedColumnToColumn mem.selectedColumn mem.grid == column then
+                    if selectedColumnToColumn mem.selectedColumn dim == column then
                         case insertInColumn column mem.coin mem.grid of
                             Ok ( position, grid ) ->
                                 let
@@ -322,11 +322,14 @@ viewMemory { mouse, screen, time } mem =
         cfg =
             toCellViewConfig time gt
 
+        indicatorColumn =
+            selectedColumnToColumn mem.selectedColumn dim
+
         updateCellViewGridWithGameState : Grid CellView -> Maybe (Grid CellView)
         updateCellViewGridWithGameState =
             case mem.state of
                 Nothing ->
-                    insertIndicatorCoinView mem.selectedColumn mem.coin
+                    insertIndicatorCoinView indicatorColumn mem.coin
 
                 Just (WinningPositions positions) ->
                     updateGridPositions positions (Maybe.map highlightCellView)
@@ -351,7 +354,7 @@ viewMemory { mouse, screen, time } mem =
                         coinToShape cfg mem.coin
                             |> applyHighlight cfg
                             |> moveToGridPos cfg
-                                ( selectedColumnToColumn mem.selectedColumn mem.grid
+                                ( indicatorColumn
                                 , Dim.lastRow dim + 1
                                 )
 
@@ -414,19 +417,16 @@ highlightCellView (CellView rec) =
     CellView { rec | highlight = True }
 
 
-selectedColumnToColumn : Maybe Int -> Grid a -> Int
-selectedColumnToColumn selectedColumn (Grid dim _) =
+selectedColumnToColumn : Maybe Int -> Dim -> Int
+selectedColumnToColumn selectedColumn dim =
     selectedColumn
         |> Maybe.map (flip Dim.clampColoumn dim)
         |> Maybe.withDefault (Dim.centerColumn dim)
 
 
-insertIndicatorCoinView : Maybe Int -> Coin -> Grid CellView -> Maybe (Grid CellView)
-insertIndicatorCoinView selectedColumn coin grid =
+insertIndicatorCoinView : Int -> Coin -> Grid CellView -> Maybe (Grid CellView)
+insertIndicatorCoinView column coin grid =
     let
-        column =
-            selectedColumnToColumn selectedColumn grid
-
         cellView =
             cellViewFromCoin coin
                 |> highlightCellView

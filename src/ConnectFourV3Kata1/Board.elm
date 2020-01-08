@@ -14,23 +14,15 @@ type alias Rec =
     { moves : List Int, width : Int, height : Int }
 
 
-foldl func acc0 (Board rec) =
-    let
-        reducer column acc =
-            acc
-
-        foo =
-            List.indexedMap (\i column -> ( column, modBy 2 i == 0 )) [ 0, 1, 0, 1, 1, 1, 1 ]
-                |> List.Extra.gatherEqualsBy Tuple.first
-                |> List.concatMap
-                    (\( f, rest ) ->
-                        f
-                            :: rest
-                            |> List.indexedMap (\r ( c, bool ) -> ( ( c, r ), bool ))
-                    )
-                |> List.foldl (uncurry Dict.insert) Dict.empty
-
-        _ =
-            1
-    in
-    List.foldl reducer acc0 rec.moves
+positions : Board -> List ( Int, Int )
+positions (Board rec) =
+    List.indexedMap Tuple.pair rec.moves
+        |> List.Extra.gatherEqualsBy Tuple.second
+        |> List.concatMap
+            (\( f, rest ) ->
+                f
+                    :: rest
+                    |> List.indexedMap (\y ( i, x ) -> ( i, ( x, y ) ))
+            )
+        |> List.sortBy Tuple.first
+        |> List.map Tuple.second

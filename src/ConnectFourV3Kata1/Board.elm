@@ -1,9 +1,6 @@
-module ConnectFourV3Kata1.Board exposing (Board, init, insert)
+module ConnectFourV3Kata1.Board exposing (Board, init, insert, positions)
 
-import Basics.Extra exposing (uncurry)
-import Dict
 import List.Extra
-import PointFree exposing (pairTo)
 
 
 type Board

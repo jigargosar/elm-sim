@@ -1,5 +1,6 @@
 module ConnectFourV3Kata1.Main exposing (main)
 
+import ConnectFourV3Kata1.Board as Board exposing (Board)
 import Dict exposing (Dict)
 import Playground exposing (..)
 import PointFree exposing (inc, whenTrue)
@@ -59,6 +60,7 @@ validatePos pos { width, height } =
 
 type alias Mem =
     { gDim : GDim
+    , board : Board
     , grid : Dict Pos Coin
     , coin : Coin
     , selectedColumn : Int
@@ -72,6 +74,7 @@ init =
             { width = 7, height = 6 }
     in
     { gDim = dim
+    , board = Board.init dim
     , grid = Dict.empty
     , coin = Blue
     , selectedColumn = centerColumn dim

@@ -20,15 +20,14 @@ type Coin
 
 
 type alias Mem =
-    { width : Int
-    , height : Int
+    { gDim : { width : Int, height : Int }
     , grid : Dict Pos Coin
     }
 
 
 init : Mem
 init =
-    Mem 7 6 Dict.empty
+    Mem { width = 7, height = 6 } Dict.empty
 
 
 gridPositions : { a | width : Int, height : Int } -> List Pos
@@ -62,11 +61,11 @@ toConfig : Computer -> Mem -> Config
 toConfig computer mem =
     let
         cellSize =
-            min (computer.screen.width * 0.7 / toFloat mem.width)
-                (computer.screen.height * 0.7 / toFloat mem.height)
+            min (computer.screen.width * 0.7 / toFloat mem.gDim.width)
+                (computer.screen.height * 0.7 / toFloat mem.gDim.height)
 
         ( widthPx, heightPx ) =
-            ( toFloat mem.width * cellSize, toFloat mem.height * cellSize )
+            ( toFloat mem.gDim.width * cellSize, toFloat mem.gDim.height * cellSize )
     in
     { cellSize = cellSize
     , width = widthPx
@@ -97,7 +96,7 @@ view computer mem =
             toConfig computer mem
     in
     [ rectangle black c.width c.height
-    , gridPositions mem
+    , gridPositions mem.gDim
         |> List.map
             (\pos ->
                 cellBgShape c.cellSize

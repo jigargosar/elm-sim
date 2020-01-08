@@ -18,18 +18,23 @@ init { width, height } =
 
 
 insert : Int -> Board -> Board
-insert column (Board rec) =
-    let
-        columnHeight =
-            List.Extra.count (is column) rec.reverseMoves
-    in
-    (if column >= 0 && column < rec.width && columnHeight < rec.height - 1 then
+insert column ((Board rec) as board) =
+    (if isValidInsertColumn column board then
         { rec | reverseMoves = column :: rec.reverseMoves }
 
      else
         rec
     )
         |> Board
+
+
+isValidInsertColumn : Int -> Board -> Bool
+isValidInsertColumn column (Board rec) =
+    let
+        columnHeight =
+            List.Extra.count (is column) rec.reverseMoves
+    in
+    column >= 0 && column < rec.width && columnHeight < rec.height - 1
 
 
 positions : Board -> List ( Int, Int )

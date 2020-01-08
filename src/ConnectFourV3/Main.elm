@@ -156,7 +156,13 @@ type alias Mem =
     { state : Maybe GameOver
     , coin : Coin
     , grid : Grid Coin
+    , input : Input
     }
+
+
+type Input
+    = NoInput
+    | ColumnSelected Int
 
 
 initialMemory : Mem
@@ -169,6 +175,7 @@ initialMemory =
     { coin = Blue
     , state = Nothing
     , grid = Grid dim Dict.empty
+    , input = NoInput
     }
 
 

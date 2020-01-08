@@ -19,20 +19,42 @@ type Coin
     | Red
 
 
+
+-- GRID DIMENSION
+
+
+type alias GDim =
+    { width : Int, height : Int }
+
+
+centerColumn : GDim -> Int
+centerColumn { width } =
+    width // 2
+
+
+gridPositions : GDim -> List Pos
+gridPositions { width, height } =
+    List.range 0 ((width * height) - 1) |> List.map (\i -> ( i // width, modBy height i ))
+
+
+
+-- MEM
+
+
 type alias Mem =
-    { gDim : { width : Int, height : Int }
+    { gDim : GDim
     , grid : Dict Pos Coin
+    , selectedColumn : Int
     }
 
 
 init : Mem
 init =
-    Mem { width = 7, height = 6 } Dict.empty
-
-
-gridPositions : { a | width : Int, height : Int } -> List Pos
-gridPositions { width, height } =
-    List.range 0 ((width * height) - 1) |> List.map (\i -> ( i // width, modBy height i ))
+    let
+        dim =
+            { width = 7, height = 6 }
+    in
+    Mem dim Dict.empty (centerColumn dim)
 
 
 

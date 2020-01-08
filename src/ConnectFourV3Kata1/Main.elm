@@ -133,6 +133,9 @@ view computer mem =
     let
         c =
             toConfig computer mem
+
+        indicatorShape =
+            insertCoinIndicatorShape computer.time c.cellSize mem.coin
     in
     [ rectangle black c.width c.height
     , gridPositions mem.gDim
@@ -141,7 +144,7 @@ view computer mem =
                 group
                     [ cellBgShape c.cellSize
                     , if Just pos == insertPosition mem then
-                        indicatorCoinShape computer.time c.cellSize mem.coin
+                        indicatorShape
 
                       else
                         group []
@@ -149,20 +152,19 @@ view computer mem =
                     |> moveCell c pos
             )
         |> group
-    , viewTopIndicator computer.time c mem
+    , indicatorShape |> moveTopIndicator c mem
     ]
 
 
-indicatorCoinShape : Time -> Float -> Coin -> Shape
-indicatorCoinShape time cellSize coin =
+insertCoinIndicatorShape : Time -> Float -> Coin -> Shape
+insertCoinIndicatorShape time cellSize coin =
     cellCoinShape cellSize coin
         |> blink time
 
 
-viewTopIndicator : Time -> Config -> Mem -> Shape
-viewTopIndicator time c mem =
-    indicatorCoinShape time c.cellSize mem.coin
-        |> moveCell c ( mem.selectedColumn, mem.gDim.height )
+moveTopIndicator : Config -> Mem -> Shape -> Shape
+moveTopIndicator c mem =
+    moveCell c ( mem.selectedColumn, mem.gDim.height )
 
 
 moveCell : { a | cellSize : Float, dx : Float, dy : Float } -> Pos -> Shape -> Shape

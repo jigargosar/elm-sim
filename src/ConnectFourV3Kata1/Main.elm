@@ -148,10 +148,15 @@ view computer mem =
                     |> moveCellShape c pos
             )
         |> group
-    , cellCoinShape c.cellSize mem.coin
-        |> blink computer.time
-        |> moveCellShape c ( mem.selectedColumn, mem.gDim.height )
+    , viewTopIndicator computer.time c mem
     ]
+
+
+viewTopIndicator : Time -> Config -> Mem -> Shape
+viewTopIndicator time c mem =
+    cellCoinShape c.cellSize mem.coin
+        |> blink time
+        |> moveCellShape c ( mem.selectedColumn, mem.gDim.height )
 
 
 main =

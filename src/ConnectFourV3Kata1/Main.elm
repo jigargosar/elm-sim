@@ -169,12 +169,9 @@ view computer mem =
             (\idx pos ->
                 group
                     [ cellBgShape c.cellSize
-                    , case Dict.get pos dict of
-                        Just player ->
-                            cellPlayerShape c.cellSize player
-
-                        Nothing ->
-                            group []
+                    , Dict.get pos dict
+                        |> Maybe.map (cellPlayerShape c.cellSize)
+                        |> maybeShape
                     , case ( Just pos == insertPosition mem, maybeIndicatorShape ) of
                         ( True, Just indicatorShape ) ->
                             indicatorShape
@@ -188,13 +185,25 @@ view computer mem =
                     |> moveCell c pos
             )
         |> group
-    , case maybeIndicatorShape of
-        Just indicatorShape ->
-            indicatorShape |> moveTopIndicator c mem
+    , maybeIndicatorShape
+        |> Maybe.map (moveTopIndicator c mem)
+        |> maybeShape
+    ]
+
+
+noShape : Shape
+noShape =
+    group []
+
+
+maybeShape : Maybe Shape -> Shape
+maybeShape val =
+    case val of
+        Just shape ->
+            shape
 
         Nothing ->
-            group []
-    ]
+            noShape
 
 
 moveIndicatorShape : Time -> Float -> Board.Player -> Shape

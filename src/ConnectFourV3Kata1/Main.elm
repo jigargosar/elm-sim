@@ -223,25 +223,30 @@ view computer mem =
 
                 _ ->
                     noShape
+
+        cellShape pos =
+            case Dict.get pos viewDict of
+                Just (Cell bool player) ->
+                    [ cellBgShape c.cellSize
+                    , cellPlayerShape c.cellSize player
+                        |> whenTrue bool (blink computer.time)
+                    ]
+                        |> group
+
+                Nothing ->
+                    cellBgShape c.cellSize
     in
     [ rectangle gray computer.screen.width computer.screen.height
     , rectangle black c.width c.height
     , gridPositions mem.dim
         |> List.indexedMap
             (\idx pos ->
-                group
-                    [ cellBgShape c.cellSize
-                    , case Dict.get pos viewDict of
-                        Just (Cell bool player) ->
-                            cellPlayerShape c.cellSize player
-                                |> whenTrue bool (blink computer.time)
+                [ cellShape pos
 
-                        Nothing ->
-                            noShape
-
-                    --, words black (Debug.toString pos)
-                    , words black (Debug.toString idx)
-                    ]
+                --, words black (Debug.toString pos)
+                , words black (Debug.toString idx)
+                ]
+                    |> group
                     |> moveCell c pos
             )
         |> group

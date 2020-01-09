@@ -7,6 +7,7 @@ module ConnectFourV3Kata1.Board exposing
     , init
     , insert
     , mapState
+    , toDict
     )
 
 import ConnectFourV3Kata1.Length as Len exposing (Length)

@@ -148,8 +148,8 @@ view computer mem =
         c =
             toConfig computer mem
 
-        info =
-            Board.info mem.board
+        dict =
+            Board.toDict mem.board
 
         maybeNextPlayer =
             Board.mapState
@@ -169,7 +169,7 @@ view computer mem =
             (\idx pos ->
                 group
                     [ cellBgShape c.cellSize
-                    , case Dict.get pos info.dict of
+                    , case Dict.get pos dict of
                         Just player ->
                             cellPlayerShape c.cellSize player
 

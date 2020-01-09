@@ -4,7 +4,7 @@ module ConnectFourV3Kata1.Board exposing
     , init
     , insert
     , toDict
-    , transFormState
+    , transformState
     )
 
 import ConnectFourV3Kata1.Length as Len exposing (Length)
@@ -104,15 +104,14 @@ columnToInsertPosition column board =
         Nothing
 
 
-type alias Callbacks a =
+transformState :
     { playerWon : Player -> Set ( Int, Int ) -> a
     , playerTurn : Player -> a
     , gameDraw : () -> a
     }
-
-
-transFormState : Callbacks a -> Board -> a
-transFormState cb (Board rec) =
+    -> Board
+    -> a
+transformState cb (Board rec) =
     case rec.state of
         Victory player winningPositions ->
             cb.playerWon player winningPositions

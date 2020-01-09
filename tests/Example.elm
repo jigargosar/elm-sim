@@ -67,7 +67,7 @@ makeMoves moves =
 
 expectPlayerWon : Board.Player -> Set.Set ( Int, Int ) -> Board.Board -> Expectation
 expectPlayerWon expectedPlayer expectedWinningPositions =
-    Board.transFormState
+    Board.transformState
         { playerWon =
             \player wp ->
                 ( player, wp )

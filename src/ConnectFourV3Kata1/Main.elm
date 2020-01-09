@@ -218,14 +218,6 @@ view computer mem =
 
                 _ ->
                     Nothing
-
-        isWinningPos pos =
-            case state of
-                Victory _ wp ->
-                    Set.member pos wp
-
-                _ ->
-                    False
     in
     [ rectangle gray computer.screen.width computer.screen.height
     , rectangle black c.width c.height

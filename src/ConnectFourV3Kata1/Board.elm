@@ -15,8 +15,8 @@ type Player
     | P2
 
 
-nextPlayer : Player -> Player
-nextPlayer player =
+flipPlayer : Player -> Player
+flipPlayer player =
     case player of
         P1 ->
             P2
@@ -96,7 +96,7 @@ toDict =
     positions
         >> List.foldl
             (\position ( player, acc ) ->
-                ( nextPlayer player, Dict.insert position player acc )
+                ( flipPlayer player, Dict.insert position player acc )
             )
             ( P1, Dict.empty )
         >> Tuple.second

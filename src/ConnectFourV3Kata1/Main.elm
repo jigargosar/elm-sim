@@ -56,7 +56,7 @@ validatePos pos { width, height } =
 
 
 type alias Mem =
-    { gDim : GDim
+    { dim : GDim
     , board : Board
     , grid : Dict Pos Board.Player
     , player : Board.Player
@@ -73,7 +73,7 @@ init =
         board =
             Board.init dim
     in
-    { gDim = dim
+    { dim = dim
     , board = [ 0, 0, 1, 1 ] |> List.foldl Board.insert board
     , grid = Dict.empty
     , player = Board.P1
@@ -87,7 +87,7 @@ insertPosition mem =
         colLength =
             Dict.foldl (\( x, _ ) _ -> whenTrue (x == mem.selectedColumn) inc) 0 mem.grid
     in
-    validatePos ( mem.selectedColumn, colLength ) mem.gDim
+    validatePos ( mem.selectedColumn, colLength ) mem.dim
 
 
 
@@ -105,7 +105,7 @@ update computer mem =
             column =
                 (computer.mouse.x + cfg.dx / cfg.cellSize)
                     |> round
-                    |> clamp 0 (mem.gDim.width - 1)
+                    |> clamp 0 (mem.dim.width - 1)
         in
         { mem | board = Board.insert column mem.board }
 
@@ -130,11 +130,11 @@ toConfig : Computer -> Mem -> Config
 toConfig computer mem =
     let
         cellSize =
-            min (computer.screen.width * 0.7 / toFloat mem.gDim.width)
-                (computer.screen.height * 0.7 / toFloat mem.gDim.height)
+            min (computer.screen.width * 0.7 / toFloat mem.dim.width)
+                (computer.screen.height * 0.7 / toFloat mem.dim.height)
 
         ( widthPx, heightPx ) =
-            ( toFloat mem.gDim.width * cellSize, toFloat mem.gDim.height * cellSize )
+            ( toFloat mem.dim.width * cellSize, toFloat mem.dim.height * cellSize )
     in
     { cellSize = cellSize
     , width = widthPx
@@ -158,7 +158,7 @@ view computer mem =
     in
     [ rectangle gray computer.screen.width computer.screen.height
     , rectangle black c.width c.height
-    , gridPositions mem.gDim
+    , gridPositions mem.dim
         |> List.indexedMap
             (\idx pos ->
                 group
@@ -193,7 +193,7 @@ insertPlayerIndicatorShape time cellSize player =
 
 moveTopIndicator : Config -> Mem -> Shape -> Shape
 moveTopIndicator c mem =
-    moveCell c ( mem.selectedColumn, mem.gDim.height )
+    moveCell c ( mem.selectedColumn, mem.dim.height )
 
 
 moveCell : { a | cellSize : Float, dx : Float, dy : Float } -> Pos -> Shape -> Shape

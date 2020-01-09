@@ -147,15 +147,40 @@ flipPlayer player =
             P1
 
 
+positions : Board -> List ( Int, Int )
+positions (Board rec) =
+    rec.reverseMoves
+        |> List.reverse
+        |> List.indexedMap Tuple.pair
+        |> List.Extra.gatherEqualsBy Tuple.second
+        |> List.concatMap
+            (\( first, rest ) ->
+                (first :: rest)
+                    |> List.indexedMap (\y ( idx, x ) -> ( idx, ( x, y ) ))
+            )
+        |> List.sortBy Tuple.first
+        |> List.map Tuple.second
+
+
 toDict : Board -> Dict ( Int, Int ) Player
-toDict =
-    positions
-        >> List.foldl
+toDict (Board rec) =
+    rec.reverseMoves
+        |> List.reverse
+        |> List.indexedMap Tuple.pair
+        |> List.Extra.gatherEqualsBy Tuple.second
+        |> List.concatMap
+            (\( first, rest ) ->
+                (first :: rest)
+                    |> List.indexedMap (\y ( idx, x ) -> ( idx, ( x, y ) ))
+            )
+        |> List.sortBy Tuple.first
+        |> List.map Tuple.second
+        |> List.foldl
             (\position ( player, acc ) ->
                 ( flipPlayer player, Dict.insert position player acc )
             )
             ( P1, Dict.empty )
-        >> Tuple.second
+        |> Tuple.second
 
 
 nextPlayer : Board -> Player
@@ -214,18 +239,3 @@ canInsertAt ( x, y ) =
 columnLength : Int -> Board -> Int
 columnLength column =
     unwrap >> (\rec -> List.Extra.count (is column) rec.reverseMoves)
-
-
-positions : Board -> List ( Int, Int )
-positions (Board rec) =
-    rec.reverseMoves
-        |> List.reverse
-        |> List.indexedMap Tuple.pair
-        |> List.Extra.gatherEqualsBy Tuple.second
-        |> List.concatMap
-            (\( first, rest ) ->
-                (first :: rest)
-                    |> List.indexedMap (\y ( idx, x ) -> ( idx, ( x, y ) ))
-            )
-        |> List.sortBy Tuple.first
-        |> List.map Tuple.second

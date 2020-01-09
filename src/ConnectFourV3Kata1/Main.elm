@@ -192,7 +192,7 @@ view computer mem =
         c =
             toConfig computer mem
 
-        viewDict =
+        cellDict =
             Board.toDict mem.board
                 |> Dict.map (\_ -> Cell False)
                 |> (case state of
@@ -225,7 +225,7 @@ view computer mem =
                     noShape
 
         cellShape pos =
-            case Dict.get pos viewDict of
+            case Dict.get pos cellDict of
                 Just (Cell bool player) ->
                     [ cellBgShape c.cellSize
                     , cellPlayerShape c.cellSize player

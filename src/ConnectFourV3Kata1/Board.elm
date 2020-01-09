@@ -11,7 +11,7 @@ module ConnectFourV3Kata1.Board exposing
 import ConnectFourV3Kata1.Length as Len exposing (Length)
 import Dict exposing (Dict)
 import List.Extra
-import PointFree exposing (allPass, anyPass, is, when)
+import PointFree exposing (allPass, is, when)
 import Set exposing (Set)
 
 
@@ -186,11 +186,6 @@ playerTurnAtMoveIdx idx board =
 
     else
         Just P2
-
-
-isDraw : Board -> Bool
-isDraw board =
-    moveCount board == maxMoves board
 
 
 maxMoves : Board -> Int

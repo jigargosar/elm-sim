@@ -215,7 +215,8 @@ appendMove move =
 
 canInsertInColumn : Int -> Board -> Bool
 canInsertInColumn column board =
-    isValidColumn column board && isValidRow (columnLength column board) board
+    isValidColumn column board
+        && isValidRow (columnLength column board) board
 
 
 isValidRow : Int -> Board -> Bool

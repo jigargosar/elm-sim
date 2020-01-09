@@ -182,6 +182,10 @@ type Cell
     = Cell Bool Board.Player
 
 
+highlightCell (Cell _ p) =
+    Cell True p
+
+
 view : Computer -> Mem -> List Shape
 view computer mem =
     let
@@ -202,7 +206,7 @@ view computer mem =
 
                         Victory _ wps ->
                             wps
-                                |> flip (Set.foldl (\pos -> Dict.update pos (Maybe.map identity)))
+                                |> flip (Set.foldl (\pos -> Dict.update pos (Maybe.map highlightCell)))
 
                         Draw ->
                             identity

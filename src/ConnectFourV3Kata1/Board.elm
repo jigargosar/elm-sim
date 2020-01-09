@@ -34,8 +34,7 @@ type State
 
 
 type alias Rec =
-    { reverseMoves : List Int
-    , width : Length
+    { width : Length
     , height : Length
     , dict : Dict ( Int, Int ) Player
     , state : State
@@ -44,8 +43,7 @@ type alias Rec =
 
 init : { a | width : Int, height : Int } -> Board
 init { width, height } =
-    { reverseMoves = []
-    , width = Len.fromInt width
+    { width = Len.fromInt width
     , height = Len.fromInt height
     , dict = Dict.empty
     , state = Turn P1
@@ -55,40 +53,33 @@ init { width, height } =
 
 insert : Int -> Board -> Board
 insert column ((Board rec) as board) =
-    let
-        newBoard =
-            case rec.state of
-                Turn player ->
-                    columnToInsertPosition column board
-                        |> Maybe.map
-                            (\pos ->
-                                let
-                                    dict =
-                                        Dict.insert pos player rec.dict
+    case rec.state of
+        Turn player ->
+            columnToInsertPosition column board
+                |> Maybe.map
+                    (\pos ->
+                        let
+                            dict =
+                                Dict.insert pos player rec.dict
 
-                                    state =
-                                        if Dict.size dict == maxMoves board then
-                                            Draw
+                            state =
+                                if Dict.size dict == maxMoves board then
+                                    Draw
 
-                                        else
-                                            case getWinningPositions pos player dict of
-                                                Just wp ->
-                                                    Victory player wp
+                                else
+                                    case getWinningPositions pos player dict of
+                                        Just wp ->
+                                            Victory player wp
 
-                                                Nothing ->
-                                                    Turn (flipPlayer player)
-                                in
-                                { rec | dict = dict, state = state } |> Board
-                            )
-                        |> Maybe.withDefault board
+                                        Nothing ->
+                                            Turn (flipPlayer player)
+                        in
+                        { rec | dict = dict, state = state } |> Board
+                    )
+                |> Maybe.withDefault board
 
-                Victory _ _ ->
-                    board
-
-                Draw ->
-                    board
-    in
-    newBoard
+        _ ->
+            board
 
 
 columnToInsertPosition : Int -> Board -> Maybe Pos

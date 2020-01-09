@@ -54,8 +54,45 @@ init { width, height } =
 
 
 insert : Int -> Board -> Board
-insert column =
-    when (allPass [ gameNotWon, canInsertInColumn column ]) (appendMove column)
+insert column ((Board rec) as board) =
+    let
+        _ =
+            case rec.state of
+                Turn player ->
+                    let
+                        _ =
+                            columnToInsertPosition column board
+                    in
+                    when (canInsertInColumn column)
+                        (appendMove column)
+                        board
+
+                Victory player set ->
+                    board
+
+                Draw ->
+                    board
+    in
+    when (allPass [ gameNotWon, canInsertInColumn column ])
+        (appendMove column)
+        board
+
+
+columnToInsertPosition : Int -> Board -> Maybe Pos
+columnToInsertPosition column board =
+    if isValidColumn column board then
+        let
+            row =
+                columnLength column board
+        in
+        if isValidRow row board then
+            ( column, row ) |> Just
+
+        else
+            Nothing
+
+    else
+        Nothing
 
 
 type alias Callbacks a =

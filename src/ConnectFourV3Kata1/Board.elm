@@ -23,10 +23,22 @@ type Player
     | P2
 
 
+type alias Pos =
+    ( Int, Int )
+
+
+type State
+    = Turn Player
+    | Victory Player (Set Pos)
+    | Draw
+
+
 type alias Rec =
     { reverseMoves : List Int
     , width : Length
     , height : Length
+    , dict : Dict ( Int, Int ) Player
+    , state : State
     }
 
 
@@ -35,6 +47,8 @@ init { width, height } =
     { reverseMoves = []
     , width = Len.fromInt width
     , height = Len.fromInt height
+    , dict = Dict.empty
+    , state = Turn P1
     }
         |> Board
 

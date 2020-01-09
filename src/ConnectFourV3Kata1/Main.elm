@@ -59,7 +59,6 @@ validatePos pos { width, height } =
 type alias Mem =
     { dim : GDim
     , board : Board
-    , grid : Dict Pos Board.Player
     , selectedColumn : Int
     }
 
@@ -75,7 +74,6 @@ init =
     in
     { dim = dim
     , board = [ 0, 1, 0, 1, 0, 1, 0, 1 ] |> List.foldl Board.insertInColumn board
-    , grid = Dict.empty
     , selectedColumn = centerColumn dim
     }
 
@@ -93,7 +91,7 @@ insertPosition : Mem -> Maybe Pos
 insertPosition mem =
     let
         colLength =
-            Dict.foldl (\( x, _ ) _ -> whenTrue (x == mem.selectedColumn) inc) 0 mem.grid
+            Dict.foldl (\( x, _ ) _ -> whenTrue (x == mem.selectedColumn) inc) 0 (Board.toDict mem.board)
     in
     validatePos ( mem.selectedColumn, colLength ) mem.dim
 

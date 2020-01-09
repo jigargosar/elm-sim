@@ -187,16 +187,16 @@ view computer mem =
         dict =
             Board.toDict mem.board
 
-        maybeNextPlayer =
-            Board.transformState
-                { playerWon = \player winningPositions -> Nothing
-                , playerTurn = \player -> Just player
-                , gameDraw = always Nothing
-                }
-                mem.board
+        state =
+            toBoardState mem.board
 
         maybeIndicatorShape =
-            maybeNextPlayer |> Maybe.map (indicatorShape computer.time c.cellSize)
+            case state of
+                Turn player ->
+                    Just (indicatorShape computer.time c.cellSize player)
+
+                _ ->
+                    Nothing
     in
     [ rectangle gray computer.screen.width computer.screen.height
     , rectangle black c.width c.height

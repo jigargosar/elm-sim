@@ -1,4 +1,4 @@
-module ConnectFourV3Kata1.Board exposing (Board, Player(..), init, insert, toDict)
+module ConnectFourV3Kata1.Board exposing (Board, Player(..), init, insert, nextPlayer, toDict)
 
 import ConnectFourV3Kata1.Length as Len exposing (Length)
 import Dict
@@ -55,6 +55,24 @@ toDict =
             )
             ( P1, Dict.empty )
         >> Tuple.second
+
+
+nextPlayer : Board -> Player
+nextPlayer board =
+    let
+        ct =
+            moveCount board
+    in
+    if modBy 2 ct == 0 then
+        P1
+
+    else
+        P2
+
+
+moveCount : Board -> Int
+moveCount =
+    unwrap >> .reverseMoves >> List.length
 
 
 unwrap : Board -> Rec

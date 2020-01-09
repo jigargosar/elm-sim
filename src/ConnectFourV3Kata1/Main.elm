@@ -59,7 +59,6 @@ type alias Mem =
     { dim : GDim
     , board : Board
     , grid : Dict Pos Board.Player
-    , player : Board.Player
     , selectedColumn : Int
     }
 
@@ -76,7 +75,6 @@ init =
     { dim = dim
     , board = [ 0, 0, 1, 1 ] |> List.foldl Board.insert board
     , grid = Dict.empty
-    , player = Board.P1
     , selectedColumn = centerColumn dim
     }
 
@@ -150,11 +148,11 @@ view computer mem =
         c =
             toConfig computer mem
 
-        indicatorShape =
-            insertPlayerIndicatorShape computer.time c.cellSize mem.player
+        ( nextPlayer, playerGrid ) =
+            ( Board.nextPlayer mem.board, Board.toDict mem.board )
 
-        playerGrid =
-            Board.toDict mem.board
+        indicatorShape =
+            insertPlayerIndicatorShape computer.time c.cellSize nextPlayer
     in
     [ rectangle gray computer.screen.width computer.screen.height
     , rectangle black c.width c.height

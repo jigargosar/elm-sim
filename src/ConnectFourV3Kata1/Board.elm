@@ -58,7 +58,7 @@ init { width, height } =
 
 insert : Int -> Board -> Board
 insert column =
-    when (allPass [ columnNotFull column, gameNotOver ]) (addMove column)
+    when (allPass [ columnNotFull column, gameNotOver ]) (appendMove column)
 
 
 info : Board -> Info
@@ -196,8 +196,8 @@ map func =
     unwrap >> func >> Board
 
 
-addMove : Int -> Board -> Board
-addMove move =
+appendMove : Int -> Board -> Board
+appendMove move =
     map (\rec -> { rec | reverseMoves = move :: rec.reverseMoves })
 
 

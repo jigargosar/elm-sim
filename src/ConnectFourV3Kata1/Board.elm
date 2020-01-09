@@ -222,6 +222,7 @@ toDict (Board rec) =
             )
             ( P1, Dict.empty )
         |> Tuple.second
+        |> always rec.dict
 
 
 playerTurnAtMoveIdx : Int -> Board -> Maybe Player
@@ -279,4 +280,4 @@ isValidColumn column =
 
 columnLength : Int -> Board -> Int
 columnLength column =
-    unwrap >> (\rec -> List.Extra.count (is column) rec.reverseMoves)
+    toDict >> Dict.keys >> (\positions -> List.Extra.count (Tuple.first >> is column) positions)

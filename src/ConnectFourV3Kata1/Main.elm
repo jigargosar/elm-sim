@@ -4,6 +4,7 @@ import ConnectFourV3Kata1.Board as Board exposing (Board)
 import Dict exposing (Dict)
 import Playground exposing (..)
 import PointFree exposing (inc, whenTrue)
+import Set exposing (Set)
 
 
 
@@ -79,6 +80,15 @@ init =
     }
 
 
+resetBoard : Mem -> Mem
+resetBoard mem =
+    let
+        dim =
+            mem.dim
+    in
+    { mem | board = Board.init dim, selectedColumn = centerColumn dim }
+
+
 insertPosition : Mem -> Maybe Pos
 insertPosition mem =
     let
@@ -92,23 +102,51 @@ insertPosition mem =
 -- UPDATE
 
 
+type BoardState
+    = Turn Board.Player
+    | Draw
+    | Victory Board.Player (Set Pos)
+
+
+toBoardState : Board -> BoardState
+toBoardState =
+    Board.transformState
+        { playerWon = Victory
+        , playerTurn = Turn
+        , gameDraw = always Draw
+        }
+
+
 update : Computer -> Mem -> Mem
 update computer mem =
     let
         cfg =
             toConfig computer mem
     in
-    if computer.mouse.click then
-        let
-            column =
-                (computer.mouse.x + cfg.dx / cfg.cellSize)
-                    |> round
-                    |> clamp 0 (mem.dim.width - 1)
-        in
-        { mem | board = Board.insertInColumn column mem.board }
+    case toBoardState mem.board of
+        Turn _ ->
+            if computer.mouse.click then
+                let
+                    column =
+                        ((computer.mouse.x + cfg.dx) / cfg.cellSize)
+                            |> round
+                            |> clamp 0 (mem.dim.width - 1)
+                in
+                if column == mem.selectedColumn then
+                    { mem | board = Board.insertInColumn column mem.board }
 
-    else
-        mem
+                else
+                    { mem | selectedColumn = column }
+
+            else
+                mem
+
+        _ ->
+            if computer.mouse.click then
+                resetBoard mem
+
+            else
+                mem
 
 
 
@@ -160,7 +198,7 @@ view computer mem =
                 mem.board
 
         maybeIndicatorShape =
-            maybeNextPlayer |> Maybe.map (moveIndicatorShape computer.time c.cellSize)
+            maybeNextPlayer |> Maybe.map (indicatorShape computer.time c.cellSize)
     in
     [ rectangle gray computer.screen.width computer.screen.height
     , rectangle black c.width c.height
@@ -172,8 +210,8 @@ view computer mem =
                     , Dict.get pos dict
                         |> maybeMapShape (cellPlayerShape c.cellSize)
                     , case ( Just pos == insertPosition mem, maybeIndicatorShape ) of
-                        ( True, Just indicatorShape ) ->
-                            indicatorShape
+                        ( True, Just sh ) ->
+                            sh
 
                         _ ->
                             group []
@@ -199,8 +237,8 @@ noShape =
     group []
 
 
-moveIndicatorShape : Time -> Float -> Board.Player -> Shape
-moveIndicatorShape time cellSize player =
+indicatorShape : Time -> Float -> Board.Player -> Shape
+indicatorShape time cellSize player =
     cellPlayerShape cellSize player
         |> blink time
 

@@ -61,6 +61,25 @@ insert column board =
             board
 
 
+transformState :
+    { playerWon : Player -> Set ( Int, Int ) -> a
+    , playerTurn : Player -> a
+    , gameDraw : () -> a
+    }
+    -> Board
+    -> a
+transformState cb (Board rec) =
+    case rec.state of
+        Victory player winningPositions ->
+            cb.playerWon player winningPositions
+
+        Turn player ->
+            cb.playerTurn player
+
+        Draw ->
+            cb.gameDraw ()
+
+
 toState : Board -> State
 toState =
     unwrap >> .state
@@ -102,25 +121,6 @@ columnToInsertPosition column board =
 
     else
         Nothing
-
-
-transformState :
-    { playerWon : Player -> Set ( Int, Int ) -> a
-    , playerTurn : Player -> a
-    , gameDraw : () -> a
-    }
-    -> Board
-    -> a
-transformState cb (Board rec) =
-    case rec.state of
-        Victory player winningPositions ->
-            cb.playerWon player winningPositions
-
-        Turn player ->
-            cb.playerTurn player
-
-        Draw ->
-            cb.gameDraw ()
 
 
 getWinningPositions : ( Int, Int ) -> Player -> Dict Pos Player -> Maybe (Set ( Int, Int ))

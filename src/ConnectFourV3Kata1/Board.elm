@@ -56,7 +56,7 @@ init { width, height } =
 insert : Int -> Board -> Board
 insert column ((Board rec) as board) =
     let
-        _ =
+        newBoard =
             case rec.state of
                 Turn player ->
                     columnToInsertPosition column board
@@ -90,7 +90,7 @@ insert column ((Board rec) as board) =
     in
     when (allPass [ gameNotWon, canInsertInColumn column ])
         (appendMove column)
-        board
+        newBoard
 
 
 columnToInsertPosition : Int -> Board -> Maybe Pos

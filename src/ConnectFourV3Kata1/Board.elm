@@ -58,7 +58,7 @@ init { width, height } =
 
 insert : Int -> Board -> Board
 insert column =
-    when (allPass [ columnNotFull column, gameNotWon ]) (appendMove column)
+    when (allPass [ gameNotWon, canInsertInColumn column ]) (appendMove column)
 
 
 info : Board -> Info
@@ -218,8 +218,8 @@ appendMove move =
     map (\rec -> { rec | reverseMoves = move :: rec.reverseMoves })
 
 
-columnNotFull : Int -> Board -> Bool
-columnNotFull column board =
+canInsertInColumn : Int -> Board -> Bool
+canInsertInColumn column board =
     canInsertAt ( column, columnLength column board ) board
 
 

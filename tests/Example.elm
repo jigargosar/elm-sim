@@ -1,8 +1,10 @@
 module Example exposing (..)
 
-import ConnectFourV2.Board as Board
+-- import Fuzz exposing (Fuzzer, int, list, string)
+
+import ConnectFourV3Kata1.Board as Board
 import Expect exposing (Expectation)
-import Fuzz exposing (Fuzzer, int, list, string)
+import Set
 import Test exposing (..)
 
 
@@ -46,16 +48,19 @@ suite2 : Test
 suite2 =
     describe "ValidBoard"
         [ describe "init"
-            [ fuzz2 int int "board width & height should be greater than 0" <|
-                \w h ->
+            [ test "board width & height should be greater than 0" <|
+                \_ ->
                     let
-                        expectFunc =
-                            if w <= 0 || h <= 0 then
-                                Expect.equal
+                        dim =
+                            { width = 7, height = 6 }
 
-                            else
-                                Expect.notEqual
+                        board =
+                            Board.init dim
                     in
-                    Board.empty w h |> expectFunc Nothing
+                    [ 0, 1, 0, 1, 0, 1, 0, 1 ]
+                        |> List.foldl Board.insert board
+                        |> Board.info
+                        |> .state
+                        |> Expect.equal (Board.GameOver (Board.PlayerWon Board.P1 Set.empty))
             ]
         ]

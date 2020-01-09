@@ -58,16 +58,16 @@ init { width, height } =
 
 insert : Int -> Board -> Board
 insert column =
-    when (allPass [ columnNotFull column, gameNotOver ]) (appendMove column)
+    when (allPass [ columnNotFull column, gameNotWon ]) (appendMove column)
 
 
 info : Board -> Info
 info board =
     { dict = toDict board
     , state =
-        case getGameOverState board of
-            Just gos ->
-                GameOver gos
+        case getPlayerWon board of
+            Just ( player, winningPositions ) ->
+                GameOver (PlayerWon player winningPositions)
 
             Nothing ->
                 case playerTurnAtMoveIdx (moveCount board) board of
@@ -79,27 +79,23 @@ info board =
     }
 
 
-gameNotOver : Board -> Bool
-gameNotOver board =
-    getGameOverState board == Nothing
+gameNotWon : Board -> Bool
+gameNotWon board =
+    getPlayerWon board == Nothing
 
 
-getGameOverState : Board -> Maybe GameOver
-getGameOverState board =
-    if isDraw board then
-        Just Draw
-
-    else
-        getLastMoveEntry board
-            |> Maybe.andThen
-                (\( pos, player ) ->
-                    winningPositions pos player board
-                        |> Maybe.map (PlayerWon player)
-                )
+getPlayerWon : Board -> Maybe ( Player, Set ( Int, Int ) )
+getPlayerWon board =
+    getLastMoveEntry board
+        |> Maybe.andThen
+            (\( pos, player ) ->
+                getWinningPositions pos player board
+                    |> Maybe.map (Tuple.pair player)
+            )
 
 
-winningPositions : ( Int, Int ) -> Player -> Board -> Maybe (Set ( Int, Int ))
-winningPositions startPosition player board =
+getWinningPositions : ( Int, Int ) -> Player -> Board -> Maybe (Set ( Int, Int ))
+getWinningPositions startPosition player board =
     let
         dict =
             toDict board

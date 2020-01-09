@@ -7,7 +7,6 @@ module ConnectFourV3Kata1.Board exposing
     , transformState
     )
 
-import ConnectFourV3Kata1.Length as Len exposing (Length)
 import Dict exposing (Dict)
 import List.Extra
 import PointFree exposing (is)
@@ -34,8 +33,8 @@ type State
 
 
 type alias Rec =
-    { width : Length
-    , height : Length
+    { width : Int
+    , height : Int
     , dict : Dict ( Int, Int ) Player
     , state : State
     }
@@ -43,8 +42,8 @@ type alias Rec =
 
 init : { a | width : Int, height : Int } -> Board
 init { width, height } =
-    { width = Len.fromInt width
-    , height = Len.fromInt height
+    { width = width
+    , height = height
     , dict = Dict.empty
     , state = Turn P1
     }
@@ -90,7 +89,7 @@ insertAt pos player (Board rec) =
             Dict.insert pos player rec.dict
 
         state =
-            if Dict.size dict == Len.toInt width * Len.toInt height then
+            if Dict.size dict == width * height then
                 Draw
 
             else
@@ -110,11 +109,16 @@ columnToInsertPosition column (Board { width, height, dict }) =
         row =
             dict |> Dict.keys >> List.Extra.count (Tuple.first >> is column)
     in
-    if Len.member column width && Len.member row height then
+    if isIdxValid width column && isIdxValid height row then
         ( column, row ) |> Just
 
     else
         Nothing
+
+
+isIdxValid : number -> number -> Bool
+isIdxValid len idx =
+    idx >= 0 && idx < len
 
 
 getWinningPositions : ( Int, Int ) -> Player -> Dict Pos Player -> Maybe (Set ( Int, Int ))

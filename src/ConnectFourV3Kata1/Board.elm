@@ -65,17 +65,27 @@ info : Board -> Info
 info board =
     { dict = toDict board
     , state =
-        case getGameOverState board of
-            Just gameOverState ->
-                GameOver gameOverState
+        case ( getGameOverState board, playerTurnAtMoveIdx (moveCount board) board ) of
+            ( Just gos, _ ) ->
+                GameOver gos
 
-            Nothing ->
-                NextPlayer (playerTurnAtMoveIdx (moveCount board) board |> Maybe.withDefault P1)
+            ( _, Just nextPlayer ) ->
+                NextPlayer nextPlayer
+
+            ( _, Nothing ) ->
+                GameOver Draw
     }
 
 
 gameNotOver : Board -> Bool
 gameNotOver board =
+    let
+        _ =
+            Debug.log "playerTurnAtMoveIdx (moveCount board - 1) board" (playerTurnAtMoveIdx (moveCount board - 1) board)
+
+        _ =
+            Debug.log "getLastMoveEntry board" (getLastMoveEntry board)
+    in
     getGameOverState board == Nothing
 
 
@@ -180,7 +190,7 @@ playerTurnAtMoveIdx idx board =
     if idx < 0 || idx >= maxMoves board then
         Nothing
 
-    else if modBy 2 (moveCount board) == 0 then
+    else if modBy 2 idx == 0 then
         Just P1
 
     else

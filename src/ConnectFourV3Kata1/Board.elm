@@ -65,12 +65,72 @@ info : Board -> Info
 info board =
     { dict = toDict board
     , state =
-        if isDraw board then
-            GameOver Draw
+        case getGameOverState board of
+            Just gameOverState ->
+                GameOver gameOverState
 
-        else
-            NextPlayer (nextPlayer board)
+            Nothing ->
+                NextPlayer (nextPlayer board)
     }
+
+
+getGameOverState : Board -> Maybe GameOver
+getGameOverState board =
+    if isDraw board then
+        Just Draw
+
+    else
+        getLastMoveEntry board
+            |> Maybe.andThen (\( pos, player ) -> getPlayerWon pos player board)
+
+
+getPlayerWon : ( Int, Int ) -> Player -> Board -> Maybe GameOver
+getPlayerWon startPosition player board =
+    let
+        dict =
+            toDict board
+
+        stepPosition ( dx, dy ) ( x, y ) =
+            ( x + dx, y + dy )
+
+        negateStep ( dx, dy ) =
+            ( -dx, -dy )
+
+        connectedPositionsHelp step position acc =
+            let
+                nextPosition =
+                    stepPosition step position
+            in
+            if Dict.get nextPosition dict == Just player then
+                connectedPositionsHelp step nextPosition (Set.insert nextPosition acc)
+
+            else
+                acc
+
+        connectedPositions step =
+            connectedPositionsHelp step startPosition Set.empty
+
+        connectedOpposingPositions step =
+            connectedPositions step
+                |> Set.union (connectedPositions (negateStep step))
+                |> Set.insert startPosition
+    in
+    [ ( 1, 0 ), ( 1, 1 ), ( 0, 1 ), ( -1, 1 ) ]
+        |> List.map connectedOpposingPositions
+        |> List.Extra.find (Set.size >> is 4)
+        |> Maybe.map (PlayerWon player)
+
+
+getLastMoveEntry : Board -> Maybe ( ( Int, Int ), Player )
+getLastMoveEntry board =
+    let
+        lastPosition =
+            positions board |> List.reverse |> List.head
+    in
+    positions board
+        |> List.reverse
+        |> List.head
+        |> Maybe.map (\pos -> ( pos, flipPlayer (nextPlayer board) ))
 
 
 flipPlayer : Player -> Player

@@ -10,7 +10,7 @@ module ConnectFourV3Kata1.Board exposing
 import ConnectFourV3Kata1.Length as Len exposing (Length)
 import Dict exposing (Dict)
 import List.Extra
-import PointFree exposing (allPass, is, when)
+import PointFree exposing (is)
 import Set exposing (Set)
 
 
@@ -88,9 +88,7 @@ insert column ((Board rec) as board) =
                 Draw ->
                     board
     in
-    when (allPass [ gameNotWon, canInsertInColumn column ])
-        (appendMove column)
-        newBoard
+    newBoard
 
 
 columnToInsertPosition : Int -> Board -> Maybe Pos
@@ -130,21 +128,6 @@ mapState cb (Board rec) =
             cb.gameDraw ()
 
 
-gameNotWon : Board -> Bool
-gameNotWon board =
-    getPlayerWon board == Nothing
-
-
-getPlayerWon : Board -> Maybe ( Player, Set ( Int, Int ) )
-getPlayerWon board =
-    getLastMoveEntry board
-        |> Maybe.andThen
-            (\( pos, player ) ->
-                getWinningPositions pos player (toDict board)
-                    |> Maybe.map (Tuple.pair player)
-            )
-
-
 getWinningPositions : ( Int, Int ) -> Player -> Dict Pos Player -> Maybe (Set ( Int, Int ))
 getWinningPositions startPosition player dict =
     let
@@ -176,21 +159,6 @@ getWinningPositions startPosition player dict =
     [ ( 1, 0 ), ( 1, 1 ), ( 0, 1 ), ( -1, 1 ) ]
         |> List.map connectedOpposingPositions
         |> List.Extra.find (Set.size >> is 4)
-
-
-getLastMoveEntry : Board -> Maybe ( ( Int, Int ), Player )
-getLastMoveEntry board =
-    Maybe.map2 Tuple.pair (lastMovePosition board) (playerTurnAtMoveIdx (moveCount board - 1) board)
-
-
-lastMove : Board -> Maybe Int
-lastMove =
-    unwrap >> .reverseMoves >> List.head
-
-
-lastMovePosition : Board -> Maybe ( Int, Int )
-lastMovePosition board =
-    lastMove board |> Maybe.map (\column -> ( column, columnLength column board - 1 ))
 
 
 flipPlayer : Player -> Player
@@ -225,26 +193,9 @@ toDict (Board rec) =
         |> always rec.dict
 
 
-playerTurnAtMoveIdx : Int -> Board -> Maybe Player
-playerTurnAtMoveIdx idx board =
-    if idx < 0 || idx >= maxMoves board then
-        Nothing
-
-    else if modBy 2 idx == 0 then
-        Just P1
-
-    else
-        Just P2
-
-
 maxMoves : Board -> Int
 maxMoves (Board { width, height }) =
     Len.toInt width * Len.toInt height
-
-
-moveCount : Board -> Int
-moveCount =
-    unwrap >> .reverseMoves >> List.length
 
 
 unwrap : Board -> Rec
@@ -255,17 +206,6 @@ unwrap (Board rec) =
 map : (Rec -> Rec) -> Board -> Board
 map func =
     unwrap >> func >> Board
-
-
-appendMove : Int -> Board -> Board
-appendMove move =
-    map (\rec -> { rec | reverseMoves = move :: rec.reverseMoves })
-
-
-canInsertInColumn : Int -> Board -> Bool
-canInsertInColumn column board =
-    isValidColumn column board
-        && isValidRow (columnLength column board) board
 
 
 isValidRow : Int -> Board -> Bool

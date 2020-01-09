@@ -61,11 +61,6 @@ insert column =
     when (allPass [ columnNotFull column, gameNotOver ]) (addMove column)
 
 
-gameNotOver : Board -> Bool
-gameNotOver board =
-    getGameOverState board == Nothing
-
-
 info : Board -> Info
 info board =
     { dict = toDict board
@@ -77,6 +72,11 @@ info board =
             Nothing ->
                 NextPlayer (nextPlayer board)
     }
+
+
+gameNotOver : Board -> Bool
+gameNotOver board =
+    getGameOverState board == Nothing
 
 
 getGameOverState : Board -> Maybe GameOver

@@ -65,15 +65,17 @@ info : Board -> Info
 info board =
     { dict = toDict board
     , state =
-        case ( getGameOverState board, playerTurnAtMoveIdx (moveCount board) board ) of
-            ( Just gos, _ ) ->
+        case getGameOverState board of
+            Just gos ->
                 GameOver gos
 
-            ( _, Just nextPlayer ) ->
-                NextPlayer nextPlayer
+            Nothing ->
+                case playerTurnAtMoveIdx (moveCount board) board of
+                    Just nextPlayer ->
+                        NextPlayer nextPlayer
 
-            ( _, Nothing ) ->
-                GameOver Draw
+                    Nothing ->
+                        GameOver Draw
     }
 
 

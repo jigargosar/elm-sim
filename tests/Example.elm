@@ -46,21 +46,25 @@ import Test exposing (..)
 
 suite2 : Test
 suite2 =
-    describe "ValidBoard"
-        [ describe "init"
-            [ test "board width & height should be greater than 0" <|
-                \_ ->
-                    let
-                        dim =
-                            { width = 7, height = 6 }
-
-                        board =
-                            Board.init dim
-                    in
-                    [ 0, 1, 0, 1, 0, 1, 0, 1 ]
-                        |> List.foldl Board.insert board
-                        |> Board.info
-                        |> .state
-                        |> Expect.equal (Board.GameOver (Board.PlayerWon Board.P1 Set.empty))
-            ]
+    describe "Board State"
+        [ test "horizontal win" <|
+            \_ ->
+                let
+                    winningPositions =
+                        List.range 0 3 |> List.map (\y -> ( 0, y )) |> Set.fromList
+                in
+                [ 0, 1, 0, 1, 0, 1, 0, 1 ]
+                    |> boardStateAfterMoves
+                    |> Expect.equal (p1Won winningPositions)
         ]
+
+
+boardStateAfterMoves moves =
+    moves
+        |> List.foldl Board.insert (Board.init { width = 7, height = 6 })
+        |> Board.info
+        |> .state
+
+
+p1Won wp =
+    Board.GameOver (Board.PlayerWon Board.P1 wp)

@@ -118,18 +118,16 @@ type alias Callbacks a =
 
 
 mapState : Callbacks a -> Board -> a
-mapState cb board =
-    case getPlayerWon board of
-        Just ( player, winningPositions ) ->
+mapState cb (Board rec) =
+    case rec.state of
+        Victory player winningPositions ->
             cb.playerWon player winningPositions
 
-        Nothing ->
-            case playerTurnAtMoveIdx (moveCount board) board of
-                Just nextPlayer ->
-                    cb.playerTurn nextPlayer
+        Turn player ->
+            cb.playerTurn player
 
-                Nothing ->
-                    cb.gameDraw ()
+        Draw ->
+            cb.gameDraw ()
 
 
 gameNotWon : Board -> Bool

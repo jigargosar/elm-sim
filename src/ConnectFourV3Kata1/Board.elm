@@ -1,4 +1,12 @@
-module ConnectFourV3Kata1.Board exposing (Board, Player(..), init, insert, nextPlayer, toDict)
+module ConnectFourV3Kata1.Board exposing
+    ( Board
+    , GameOver(..)
+    , Player(..)
+    , State(..)
+    , info
+    , init
+    , insert
+    )
 
 import ConnectFourV3Kata1.Length as Len exposing (Length)
 import Dict exposing (Dict)
@@ -18,7 +26,7 @@ type Player
 
 type GameOver
     = PlayerWon Player (Set ( Int, Int ))
-    | GameDraw
+    | Draw
 
 
 type State
@@ -42,8 +50,8 @@ type alias Rec =
 init : { a | width : Int, height : Int } -> Board
 init { width, height } =
     { reverseMoves = []
-    , width = Len.init width
-    , height = Len.init height
+    , width = Len.fromInt width
+    , height = Len.fromInt height
     }
         |> Board
 
@@ -51,6 +59,18 @@ init { width, height } =
 insert : Int -> Board -> Board
 insert column =
     when (canInsertIn column) (addMove column)
+
+
+info : Board -> Info
+info board =
+    { dict = toDict board
+    , state =
+        if isDraw board then
+            GameOver Draw
+
+        else
+            NextPlayer (nextPlayer board)
+    }
 
 
 flipPlayer : Player -> Player
@@ -85,6 +105,16 @@ nextPlayer board =
 
     else
         P2
+
+
+isDraw : Board -> Bool
+isDraw board =
+    moveCount board == maxMoves board
+
+
+maxMoves : Board -> Int
+maxMoves (Board { width, height }) =
+    Len.toInt width * Len.toInt height
 
 
 moveCount : Board -> Int

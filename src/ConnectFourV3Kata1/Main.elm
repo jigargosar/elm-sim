@@ -148,11 +148,19 @@ view computer mem =
         c =
             toConfig computer mem
 
-        ( nextPlayer, playerGrid ) =
-            ( Board.nextPlayer mem.board, Board.toDict mem.board )
+        info =
+            Board.info mem.board
 
-        indicatorShape =
-            insertPlayerIndicatorShape computer.time c.cellSize nextPlayer
+        maybeNextPlayer =
+            case info.state of
+                Board.NextPlayer player ->
+                    Just player
+
+                _ ->
+                    Nothing
+
+        maybeIndicatorShape =
+            maybeNextPlayer |> Maybe.map (insertPlayerIndicatorShape computer.time c.cellSize)
     in
     [ rectangle gray computer.screen.width computer.screen.height
     , rectangle black c.width c.height
@@ -161,17 +169,18 @@ view computer mem =
             (\idx pos ->
                 group
                     [ cellBgShape c.cellSize
-                    , case Dict.get pos playerGrid of
+                    , case Dict.get pos info.dict of
                         Just player ->
                             cellPlayerShape c.cellSize player
 
                         Nothing ->
                             group []
-                    , if Just pos == insertPosition mem then
-                        indicatorShape
+                    , case ( Just pos == insertPosition mem, maybeIndicatorShape ) of
+                        ( True, Just indicatorShape ) ->
+                            indicatorShape
 
-                      else
-                        group []
+                        _ ->
+                            group []
 
                     --, words black (Debug.toString pos)
                     , words black (Debug.toString idx)
@@ -179,7 +188,12 @@ view computer mem =
                     |> moveCell c pos
             )
         |> group
-    , indicatorShape |> moveTopIndicator c mem
+    , case maybeIndicatorShape of
+        Just indicatorShape ->
+            indicatorShape |> moveTopIndicator c mem
+
+        Nothing ->
+            group []
     ]
 
 

@@ -1,6 +1,6 @@
 module ConnectFourV3Kata1.Board exposing (Board, init, insert, positions)
 
-import ConnectFourV3Kata1.Length as Length exposing (Length)
+import ConnectFourV3Kata1.Length as Len exposing (Length)
 import List.Extra
 import PointFree exposing (is, when)
 
@@ -19,8 +19,8 @@ type alias Rec =
 init : { a | width : Int, height : Int } -> Board
 init { width, height } =
     { reverseMoves = []
-    , width = Length.init width
-    , height = Length.init height
+    , width = Len.init width
+    , height = Len.init height
     }
         |> Board
 
@@ -53,7 +53,7 @@ validMove column =
                     row =
                         List.Extra.count (is column) rec.reverseMoves
                 in
-                Length.member column rec.width && Length.member row rec.height
+                Len.member column rec.width && Len.member row rec.height
            )
 
 

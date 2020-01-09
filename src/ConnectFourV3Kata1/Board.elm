@@ -51,15 +51,40 @@ init { width, height } =
 
 
 insertInColumn : Int -> Board -> Board
-insertInColumn column ((Board rec) as board) =
-    case ( rec.state, columnToDictPosition column board ) of
-        ( Turn player, Just pos ) ->
-            { rec | dict = Dict.insert pos player rec.dict }
-                |> updateState pos player
-                |> Board
+insertInColumn x ((Board rec) as board) =
+    let
+        y =
+            rec.dict |> Dict.keys >> List.Extra.count (Tuple.first >> is x)
+
+        pos =
+            ( x, y )
+    in
+    case rec.state of
+        Turn player ->
+            insertAt pos player rec |> Board
 
         _ ->
             board
+
+
+insertAt : Pos -> Player -> Rec -> Rec
+insertAt pos player rec =
+    let
+        { width, height, dict } =
+            rec
+
+        ( x, y ) =
+            pos
+
+        isPositionWithinBounds =
+            x >= 0 && x < width && y >= 0 && y < height
+    in
+    if isPositionWithinBounds then
+        { rec | dict = Dict.insert pos player dict }
+            |> updateState pos player
+
+    else
+        rec
 
 
 transformState :

@@ -1,9 +1,6 @@
 module ConnectFourV3Kata1.Board exposing
     ( Board
-    , GameOver(..)
     , Player(..)
-    , State(..)
-    , info
     , init
     , insert
     , mapState
@@ -26,22 +23,6 @@ type Player
     | P2
 
 
-type GameOver
-    = PlayerWon Player (Set ( Int, Int ))
-    | Draw
-
-
-type State
-    = NextPlayer Player
-    | GameOver GameOver
-
-
-type alias Info =
-    { dict : Dict ( Int, Int ) Player
-    , state : State
-    }
-
-
 type alias Rec =
     { reverseMoves : List Int
     , width : Length
@@ -61,24 +42,6 @@ init { width, height } =
 insert : Int -> Board -> Board
 insert column =
     when (allPass [ gameNotWon, canInsertInColumn column ]) (appendMove column)
-
-
-info : Board -> Info
-info board =
-    { dict = toDict board
-    , state =
-        case getPlayerWon board of
-            Just ( player, winningPositions ) ->
-                GameOver (PlayerWon player winningPositions)
-
-            Nothing ->
-                case playerTurnAtMoveIdx (moveCount board) board of
-                    Just nextPlayer ->
-                        NextPlayer nextPlayer
-
-                    Nothing ->
-                        GameOver Draw
-    }
 
 
 type alias Callbacks a =

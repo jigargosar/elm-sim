@@ -52,8 +52,8 @@ init { width, height } =
 
 
 insert : Int -> Board -> Board
-insert column board =
-    case ( toState board, columnToInsertPosition column board ) of
+insert column ((Board rec) as board) =
+    case ( rec.state, columnToInsertPosition column board ) of
         ( Turn player, Just pos ) ->
             insertAt pos player board
 
@@ -80,11 +80,6 @@ transformState cb (Board rec) =
             cb.gameDraw ()
 
 
-toState : Board -> State
-toState =
-    unwrap >> .state
-
-
 insertAt : Pos -> Player -> Board -> Board
 insertAt pos player ((Board rec) as board) =
     let
@@ -107,11 +102,11 @@ insertAt pos player ((Board rec) as board) =
 
 
 columnToInsertPosition : Int -> Board -> Maybe Pos
-columnToInsertPosition column board =
-    if isValidColumn column board then
+columnToInsertPosition column ((Board { width, dict }) as board) =
+    if Len.member column width then
         let
             row =
-                columnLength column board
+                dict |> Dict.keys >> List.Extra.count (Tuple.first >> is column)
         in
         if isValidRow row board then
             ( column, row ) |> Just
@@ -189,13 +184,3 @@ map func =
 isValidRow : Int -> Board -> Bool
 isValidRow row =
     unwrap >> (\rec -> Len.member row rec.height)
-
-
-isValidColumn : Int -> Board -> Bool
-isValidColumn column =
-    unwrap >> (\rec -> Len.member column rec.width)
-
-
-columnLength : Int -> Board -> Int
-columnLength column =
-    toDict >> Dict.keys >> (\positions -> List.Extra.count (Tuple.first >> is column) positions)

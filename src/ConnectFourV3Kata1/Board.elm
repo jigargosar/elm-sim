@@ -6,6 +6,7 @@ module ConnectFourV3Kata1.Board exposing
     , info
     , init
     , insert
+    , mapState
     )
 
 import ConnectFourV3Kata1.Length as Len exposing (Length)
@@ -77,6 +78,28 @@ info board =
                     Nothing ->
                         GameOver Draw
     }
+
+
+type alias Callbacks a =
+    { playerWon : Player -> Set ( Int, Int ) -> a
+    , playerTurn : Player -> a
+    , gameDraw : () -> a
+    }
+
+
+mapState : Callbacks a -> Board -> a
+mapState cb board =
+    case getPlayerWon board of
+        Just ( player, winningPositions ) ->
+            cb.playerWon player winningPositions
+
+        Nothing ->
+            case playerTurnAtMoveIdx (moveCount board) board of
+                Just nextPlayer ->
+                    cb.playerTurn nextPlayer
+
+                Nothing ->
+                    cb.gameDraw ()
 
 
 gameNotWon : Board -> Bool

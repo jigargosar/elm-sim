@@ -152,15 +152,15 @@ view computer mem =
             Board.info mem.board
 
         maybeNextPlayer =
-            case info.state of
-                Board.NextPlayer player ->
-                    Just player
-
-                _ ->
-                    Nothing
+            Board.mapState
+                { playerWon = \player winningPositions -> Nothing
+                , playerTurn = \player -> Just player
+                , gameDraw = always Nothing
+                }
+                mem.board
 
         maybeIndicatorShape =
-            maybeNextPlayer |> Maybe.map (insertPlayerIndicatorShape computer.time c.cellSize)
+            maybeNextPlayer |> Maybe.map (moveIndicatorShape computer.time c.cellSize)
     in
     [ rectangle gray computer.screen.width computer.screen.height
     , rectangle black c.width c.height
@@ -197,8 +197,8 @@ view computer mem =
     ]
 
 
-insertPlayerIndicatorShape : Time -> Float -> Board.Player -> Shape
-insertPlayerIndicatorShape time cellSize player =
+moveIndicatorShape : Time -> Float -> Board.Player -> Shape
+moveIndicatorShape time cellSize player =
     cellPlayerShape cellSize player
         |> blink time
 

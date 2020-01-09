@@ -220,12 +220,17 @@ appendMove move =
 
 canInsertInColumn : Int -> Board -> Bool
 canInsertInColumn column board =
-    isPositionWithinBoard ( column, columnLength column board ) board
+    isColumnInBoard column board && isRowWithinBoard (columnLength column board) board
 
 
-isPositionWithinBoard : ( Int, Int ) -> Board -> Bool
-isPositionWithinBoard ( x, y ) =
-    unwrap >> (\rec -> Len.member x rec.width && Len.member y rec.height)
+isRowWithinBoard : Int -> Board -> Bool
+isRowWithinBoard row =
+    unwrap >> (\rec -> Len.member row rec.height)
+
+
+isColumnInBoard : Int -> Board -> Bool
+isColumnInBoard column =
+    unwrap >> (\rec -> Len.member column rec.width)
 
 
 columnLength : Int -> Board -> Int

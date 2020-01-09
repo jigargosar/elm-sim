@@ -30,31 +30,34 @@ unwrap (Board rec) =
     rec
 
 
+map : (Rec -> Rec) -> Board -> Board
 map func =
     unwrap >> func >> Board
 
 
 insert : Int -> Board -> Board
 insert column =
-    when (validMove column) (appendMove column)
+    when (canInsertIn column) (addMove column)
 
 
-appendMove : Int -> Board -> Board
-appendMove move (Board rec) =
-    { rec | reverseMoves = move :: rec.reverseMoves }
-        |> Board
+addMove : Int -> Board -> Board
+addMove move =
+    map (\rec -> { rec | reverseMoves = move :: rec.reverseMoves })
 
 
-validMove : Int -> Board -> Bool
-validMove column =
-    unwrap
-        >> (\rec ->
-                let
-                    row =
-                        List.Extra.count (is column) rec.reverseMoves
-                in
-                Len.member column rec.width && Len.member row rec.height
-           )
+canInsertIn : Int -> Board -> Bool
+canInsertIn column board =
+    canInsertAt ( column, columnLength column board ) board
+
+
+canInsertAt : ( Int, Int ) -> Board -> Bool
+canInsertAt ( x, y ) =
+    unwrap >> (\rec -> Len.member x rec.width && Len.member y rec.height)
+
+
+columnLength : Int -> Board -> Int
+columnLength column =
+    unwrap >> (\rec -> List.Extra.count (is column) rec.reverseMoves)
 
 
 positions : Board -> List ( Int, Int )

@@ -215,16 +215,16 @@ appendMove move =
 
 canInsertInColumn : Int -> Board -> Bool
 canInsertInColumn column board =
-    isColumnInBoard column board && isRowWithinBoard (columnLength column board) board
+    isValidColumn column board && isValidRow (columnLength column board) board
 
 
-isRowWithinBoard : Int -> Board -> Bool
-isRowWithinBoard row =
+isValidRow : Int -> Board -> Bool
+isValidRow row =
     unwrap >> (\rec -> Len.member row rec.height)
 
 
-isColumnInBoard : Int -> Board -> Bool
-isColumnInBoard column =
+isValidColumn : Int -> Board -> Bool
+isValidColumn column =
     unwrap >> (\rec -> Len.member column rec.width)
 
 

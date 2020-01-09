@@ -62,7 +62,7 @@ suite2 =
 makeMoves : List Int -> Board.Board
 makeMoves moves =
     moves
-        |> List.foldl Board.insert (Board.init { width = 7, height = 6 })
+        |> List.foldl Board.insertInColumn (Board.init { width = 7, height = 6 })
 
 
 expectPlayerWon : Board.Player -> Set.Set ( Int, Int ) -> Board.Board -> Expectation

@@ -2,7 +2,7 @@ module ConnectFourV3Kata1.Board exposing
     ( Board
     , Player(..)
     , init
-    , insert
+    , insertInColumn
     , toDict
     , transformState
     )
@@ -50,9 +50,9 @@ init { width, height } =
         |> Board
 
 
-insert : Int -> Board -> Board
-insert column ((Board rec) as board) =
-    case ( rec.state, columnToInsertPosition column board ) of
+insertInColumn : Int -> Board -> Board
+insertInColumn column ((Board rec) as board) =
+    case ( rec.state, columnToDictPosition column board ) of
         ( Turn player, Just pos ) ->
             insertAt pos player board
 
@@ -103,8 +103,8 @@ insertAt pos player (Board rec) =
     { rec | dict = dict, state = state } |> Board
 
 
-columnToInsertPosition : Int -> Board -> Maybe Pos
-columnToInsertPosition column (Board { width, height, dict }) =
+columnToDictPosition : Int -> Board -> Maybe Pos
+columnToDictPosition column (Board { width, height, dict }) =
     let
         row =
             dict |> Dict.keys >> List.Extra.count (Tuple.first >> is column)

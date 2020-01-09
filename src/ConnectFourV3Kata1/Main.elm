@@ -73,7 +73,7 @@ init =
             Board.init dim
     in
     { dim = dim
-    , board = [ 0, 1, 0, 1, 0, 1, 0, 1 ] |> List.foldl Board.insert board
+    , board = [ 0, 1, 0, 1, 0, 1, 0, 1 ] |> List.foldl Board.insertInColumn board
     , grid = Dict.empty
     , selectedColumn = centerColumn dim
     }
@@ -105,7 +105,7 @@ update computer mem =
                     |> round
                     |> clamp 0 (mem.dim.width - 1)
         in
-        { mem | board = Board.insert column mem.board }
+        { mem | board = Board.insertInColumn column mem.board }
 
     else
         mem

@@ -192,7 +192,7 @@ view computer mem =
         c =
             toConfig computer mem
 
-        dict =
+        viewDict =
             Board.toDict mem.board
                 |> Dict.map (\_ -> Cell False)
                 |> (case state of
@@ -214,6 +214,15 @@ view computer mem =
 
         state =
             toBoardState mem.board
+
+        topIndicatorShape =
+            case state of
+                Turn player ->
+                    indicatorShape computer.time c.cellSize player
+                        |> moveTopIndicator c mem
+
+                _ ->
+                    noShape
     in
     [ rectangle gray computer.screen.width computer.screen.height
     , rectangle black c.width c.height
@@ -222,7 +231,7 @@ view computer mem =
             (\idx pos ->
                 group
                     [ cellBgShape c.cellSize
-                    , case Dict.get pos dict of
+                    , case Dict.get pos viewDict of
                         Just (Cell bool player) ->
                             cellPlayerShape c.cellSize player
                                 |> whenTrue bool (blink computer.time)
@@ -236,13 +245,7 @@ view computer mem =
                     |> moveCell c pos
             )
         |> group
-    , case state of
-        Turn player ->
-            indicatorShape computer.time c.cellSize player
-                |> moveTopIndicator c mem
-
-        _ ->
-            noShape
+    , topIndicatorShape
     ]
 
 

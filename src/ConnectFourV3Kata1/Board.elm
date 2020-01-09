@@ -81,11 +81,15 @@ getGameOverState board =
 
     else
         getLastMoveEntry board
-            |> Maybe.andThen (\( pos, player ) -> getPlayerWon pos player board)
+            |> Maybe.andThen
+                (\( pos, player ) ->
+                    winningPositions pos player board
+                        |> Maybe.map (PlayerWon player)
+                )
 
 
-getPlayerWon : ( Int, Int ) -> Player -> Board -> Maybe GameOver
-getPlayerWon startPosition player board =
+winningPositions : ( Int, Int ) -> Player -> Board -> Maybe (Set ( Int, Int ))
+winningPositions startPosition player board =
     let
         dict =
             toDict board
@@ -118,15 +122,10 @@ getPlayerWon startPosition player board =
     [ ( 1, 0 ), ( 1, 1 ), ( 0, 1 ), ( -1, 1 ) ]
         |> List.map connectedOpposingPositions
         |> List.Extra.find (Set.size >> is 4)
-        |> Maybe.map (PlayerWon player)
 
 
 getLastMoveEntry : Board -> Maybe ( ( Int, Int ), Player )
 getLastMoveEntry board =
-    let
-        lastPosition =
-            positions board |> List.reverse |> List.head
-    in
     positions board
         |> List.reverse
         |> List.head

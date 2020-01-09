@@ -3,7 +3,7 @@ module ConnectFourV3Kata1.Main exposing (main)
 import ConnectFourV3Kata1.Board as Board exposing (Board)
 import Dict exposing (Dict)
 import Playground exposing (..)
-import PointFree exposing (inc, whenTrue)
+import PointFree exposing (flip, inc, whenTrue)
 import Set exposing (Set)
 
 
@@ -178,6 +178,10 @@ toConfig computer mem =
     }
 
 
+type Cell
+    = Cell Bool Board.Player
+
+
 view : Computer -> Mem -> List Shape
 view computer mem =
     let
@@ -186,6 +190,23 @@ view computer mem =
 
         dict =
             Board.toDict mem.board
+                |> Dict.map (\_ -> Cell False)
+                |> (case state of
+                        Turn player ->
+                            case insertPosition mem of
+                                Just pos ->
+                                    Dict.insert pos (Cell True player)
+
+                                Nothing ->
+                                    identity
+
+                        Victory _ wps ->
+                            wps
+                                |> flip (Set.foldl (\pos -> Dict.update pos (Maybe.map identity)))
+
+                        Draw ->
+                            identity
+                   )
 
         state =
             toBoardState mem.board
@@ -205,9 +226,6 @@ view computer mem =
 
                 _ ->
                     False
-
-        highlightIfWinningPos pos =
-            whenTrue (isWinningPos pos) (blink computer.time)
     in
     [ rectangle gray computer.screen.width computer.screen.height
     , rectangle black c.width c.height
@@ -216,17 +234,13 @@ view computer mem =
             (\idx pos ->
                 group
                     [ cellBgShape c.cellSize
-                    , Dict.get pos dict
-                        |> maybeMapShape
-                            (cellPlayerShape c.cellSize
-                                >> highlightIfWinningPos pos
-                            )
-                    , case ( Just pos == insertPosition mem, maybeIndicatorShape ) of
-                        ( True, Just sh ) ->
-                            sh
+                    , case Dict.get pos dict of
+                        Just (Cell bool player) ->
+                            cellPlayerShape c.cellSize player
+                                |> whenTrue bool (blink computer.time)
 
-                        _ ->
-                            group []
+                        Nothing ->
+                            noShape
 
                     --, words black (Debug.toString pos)
                     , words black (Debug.toString idx)

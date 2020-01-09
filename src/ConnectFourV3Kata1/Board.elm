@@ -25,6 +25,15 @@ init { width, height } =
         |> Board
 
 
+unwrap : Board -> Rec
+unwrap (Board rec) =
+    rec
+
+
+map func =
+    unwrap >> func >> Board
+
+
 insert : Int -> Board -> Board
 insert column =
     when (validMove column) (appendMove column)
@@ -37,12 +46,15 @@ appendMove move (Board rec) =
 
 
 validMove : Int -> Board -> Bool
-validMove column (Board rec) =
-    let
-        row =
-            List.Extra.count (is column) rec.reverseMoves
-    in
-    Length.member column rec.width && Length.member row rec.height
+validMove column =
+    unwrap
+        >> (\rec ->
+                let
+                    row =
+                        List.Extra.count (is column) rec.reverseMoves
+                in
+                Length.member column rec.width && Length.member row rec.height
+           )
 
 
 positions : Board -> List ( Int, Int )

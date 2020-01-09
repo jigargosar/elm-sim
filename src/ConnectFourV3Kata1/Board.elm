@@ -1,4 +1,4 @@
-module ConnectFourV3Kata1.Board exposing (Board, Player(..), init, insert, positions, toDict)
+module ConnectFourV3Kata1.Board exposing (Board, Player(..), init, insert, toDict)
 
 import ConnectFourV3Kata1.Length as Len exposing (Length)
 import Dict
@@ -41,6 +41,22 @@ init { width, height } =
         |> Board
 
 
+insert : Int -> Board -> Board
+insert column =
+    when (canInsertIn column) (addMove column)
+
+
+toDict : Board -> Dict.Dict ( Int, Int ) Player
+toDict =
+    positions
+        >> List.foldl
+            (\position ( player, acc ) ->
+                ( flipPlayer player, Dict.insert position player acc )
+            )
+            ( P1, Dict.empty )
+        >> Tuple.second
+
+
 unwrap : Board -> Rec
 unwrap (Board rec) =
     rec
@@ -49,11 +65,6 @@ unwrap (Board rec) =
 map : (Rec -> Rec) -> Board -> Board
 map func =
     unwrap >> func >> Board
-
-
-insert : Int -> Board -> Board
-insert column =
-    when (canInsertIn column) (addMove column)
 
 
 addMove : Int -> Board -> Board
@@ -89,14 +100,3 @@ positions (Board rec) =
             )
         |> List.sortBy Tuple.first
         |> List.map Tuple.second
-
-
-toDict : Board -> Dict.Dict ( Int, Int ) Player
-toDict =
-    positions
-        >> List.foldl
-            (\position ( player, acc ) ->
-                ( flipPlayer player, Dict.insert position player acc )
-            )
-            ( P1, Dict.empty )
-        >> Tuple.second

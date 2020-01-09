@@ -10,12 +10,19 @@ type Board
 
 
 type alias Rec =
-    { reverseMoves : List Int, width : Length, height : Length }
+    { reverseMoves : List Int
+    , width : Length
+    , height : Length
+    }
 
 
 init : { a | width : Int, height : Int } -> Board
 init { width, height } =
-    { reverseMoves = [], width = Length.init width, height = Length.init height } |> Board
+    { reverseMoves = []
+    , width = Length.init width
+    , height = Length.init height
+    }
+        |> Board
 
 
 insert : Int -> Board -> Board

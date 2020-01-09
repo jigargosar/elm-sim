@@ -32,16 +32,6 @@ type alias Info =
     }
 
 
-flipPlayer : Player -> Player
-flipPlayer player =
-    case player of
-        P1 ->
-            P2
-
-        P2 ->
-            P1
-
-
 type alias Rec =
     { reverseMoves : List Int
     , width : Length
@@ -61,6 +51,16 @@ init { width, height } =
 insert : Int -> Board -> Board
 insert column =
     when (canInsertIn column) (addMove column)
+
+
+flipPlayer : Player -> Player
+flipPlayer player =
+    case player of
+        P1 ->
+            P2
+
+        P2 ->
+            P1
 
 
 toDict : Board -> Dict ( Int, Int ) Player

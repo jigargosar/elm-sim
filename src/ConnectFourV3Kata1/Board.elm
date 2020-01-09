@@ -3,8 +3,8 @@ module ConnectFourV3Kata1.Board exposing
     , Player(..)
     , init
     , insert
-    , mapState
     , toDict
+    , transFormState
     )
 
 import ConnectFourV3Kata1.Length as Len exposing (Length)
@@ -111,8 +111,8 @@ type alias Callbacks a =
     }
 
 
-mapState : Callbacks a -> Board -> a
-mapState cb (Board rec) =
+transFormState : Callbacks a -> Board -> a
+transFormState cb (Board rec) =
     case rec.state of
         Victory player winningPositions ->
             cb.playerWon player winningPositions

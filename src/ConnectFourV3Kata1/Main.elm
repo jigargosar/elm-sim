@@ -152,7 +152,7 @@ view computer mem =
             Board.toDict mem.board
 
         maybeNextPlayer =
-            Board.mapState
+            Board.transFormState
                 { playerWon = \player winningPositions -> Nothing
                 , playerTurn = \player -> Just player
                 , gameDraw = always Nothing

@@ -11,7 +11,7 @@ module ConnectFourV3Kata1.Board exposing
 import ConnectFourV3Kata1.Length as Len exposing (Length)
 import Dict exposing (Dict)
 import List.Extra
-import PointFree exposing (is, when)
+import PointFree exposing (anyPass, is, when)
 import Set exposing (Set)
 
 
@@ -58,7 +58,12 @@ init { width, height } =
 
 insert : Int -> Board -> Board
 insert column =
-    when (canInsertIn column) (addMove column)
+    when (anyPass [ canInsertIn column, isGameOver >> not ]) (addMove column)
+
+
+isGameOver : Board -> Bool
+isGameOver board =
+    getGameOverState board /= Nothing
 
 
 info : Board -> Info

@@ -59,15 +59,30 @@ insert column ((Board rec) as board) =
         _ =
             case rec.state of
                 Turn player ->
-                    let
-                        _ =
-                            columnToInsertPosition column board
-                    in
-                    when (canInsertInColumn column)
-                        (appendMove column)
-                        board
+                    columnToInsertPosition column board
+                        |> Maybe.map
+                            (\pos ->
+                                let
+                                    dict =
+                                        Dict.insert pos player rec.dict
 
-                Victory player set ->
+                                    state =
+                                        if Dict.size dict == maxMoves board then
+                                            Draw
+
+                                        else
+                                            case getWinningPositions pos player dict of
+                                                Just wp ->
+                                                    Victory player wp
+
+                                                Nothing ->
+                                                    Turn (flipPlayer player)
+                                in
+                                { rec | dict = dict, state = state } |> Board
+                            )
+                        |> Maybe.withDefault board
+
+                Victory _ _ ->
                     board
 
                 Draw ->
@@ -127,17 +142,14 @@ getPlayerWon board =
     getLastMoveEntry board
         |> Maybe.andThen
             (\( pos, player ) ->
-                getWinningPositions pos player board
+                getWinningPositions pos player (toDict board)
                     |> Maybe.map (Tuple.pair player)
             )
 
 
-getWinningPositions : ( Int, Int ) -> Player -> Board -> Maybe (Set ( Int, Int ))
-getWinningPositions startPosition player board =
+getWinningPositions : ( Int, Int ) -> Player -> Dict Pos Player -> Maybe (Set ( Int, Int ))
+getWinningPositions startPosition player dict =
     let
-        dict =
-            toDict board
-
         stepPosition ( dx, dy ) ( x, y ) =
             ( x + dx, y + dy )
 

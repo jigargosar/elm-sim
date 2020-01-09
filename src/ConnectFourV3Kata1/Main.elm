@@ -197,6 +197,17 @@ view computer mem =
 
                 _ ->
                     Nothing
+
+        isWinningPos pos =
+            case state of
+                Victory _ wp ->
+                    Set.member pos wp
+
+                _ ->
+                    False
+
+        highlightIfWinningPos pos =
+            whenTrue (isWinningPos pos) (blink computer.time)
     in
     [ rectangle gray computer.screen.width computer.screen.height
     , rectangle black c.width c.height
@@ -206,7 +217,10 @@ view computer mem =
                 group
                     [ cellBgShape c.cellSize
                     , Dict.get pos dict
-                        |> maybeMapShape (cellPlayerShape c.cellSize)
+                        |> maybeMapShape
+                            (cellPlayerShape c.cellSize
+                                >> highlightIfWinningPos pos
+                            )
                     , case ( Just pos == insertPosition mem, maybeIndicatorShape ) of
                         ( True, Just sh ) ->
                             sh

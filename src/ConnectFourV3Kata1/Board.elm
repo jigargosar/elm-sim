@@ -1,9 +1,10 @@
 module ConnectFourV3Kata1.Board exposing (Board, Player(..), init, insert, nextPlayer, toDict)
 
 import ConnectFourV3Kata1.Length as Len exposing (Length)
-import Dict
+import Dict exposing (Dict)
 import List.Extra
 import PointFree exposing (is, when)
+import Set exposing (Set)
 
 
 type Board
@@ -13,6 +14,22 @@ type Board
 type Player
     = P1
     | P2
+
+
+type GameOver
+    = PlayerWon Player (Set ( Int, Int ))
+    | GameDraw
+
+
+type State
+    = NextPlayer Player
+    | GameOver GameOver
+
+
+type alias Info =
+    { dict : Dict ( Int, Int ) Player
+    , state : State
+    }
 
 
 flipPlayer : Player -> Player
@@ -46,7 +63,7 @@ insert column =
     when (canInsertIn column) (addMove column)
 
 
-toDict : Board -> Dict.Dict ( Int, Int ) Player
+toDict : Board -> Dict ( Int, Int ) Player
 toDict =
     positions
         >> List.foldl

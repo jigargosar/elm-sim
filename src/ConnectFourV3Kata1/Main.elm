@@ -59,7 +59,7 @@ type alias Mem =
     { gDim : GDim
     , board : Board
     , grid : Dict Pos Board.Player
-    , coin : Board.Player
+    , player : Board.Player
     , selectedColumn : Int
     }
 
@@ -76,7 +76,7 @@ init =
     { gDim = dim
     , board = [ 0, 0, 1, 1 ] |> List.foldl Board.insert board
     , grid = Dict.empty
-    , coin = Board.P1
+    , player = Board.P1
     , selectedColumn = centerColumn dim
     }
 
@@ -151,9 +151,9 @@ view computer mem =
             toConfig computer mem
 
         indicatorShape =
-            insertCoinIndicatorShape computer.time c.cellSize mem.coin
+            insertPlayerIndicatorShape computer.time c.cellSize mem.player
 
-        coinGrid =
+        playerGrid =
             Board.toDict mem.board
     in
     [ rectangle gray computer.screen.width computer.screen.height
@@ -163,9 +163,9 @@ view computer mem =
             (\idx pos ->
                 group
                     [ cellBgShape c.cellSize
-                    , case Dict.get pos coinGrid of
-                        Just coin ->
-                            cellCoinShape c.cellSize coin
+                    , case Dict.get pos playerGrid of
+                        Just player ->
+                            cellPlayerShape c.cellSize player
 
                         Nothing ->
                             group []
@@ -185,9 +185,9 @@ view computer mem =
     ]
 
 
-insertCoinIndicatorShape : Time -> Float -> Board.Player -> Shape
-insertCoinIndicatorShape time cellSize coin =
-    cellCoinShape cellSize coin
+insertPlayerIndicatorShape : Time -> Float -> Board.Player -> Shape
+insertPlayerIndicatorShape time cellSize player =
+    cellPlayerShape cellSize player
         |> blink time
 
 
@@ -210,10 +210,10 @@ cellBgShape cellSize =
     circle white (cellSize * 0.5 * 0.9)
 
 
-cellCoinShape : Float -> Board.Player -> Shape
-cellCoinShape cellSize coin =
+cellPlayerShape : Float -> Board.Player -> Shape
+cellPlayerShape cellSize player =
     circle
-        (case coin of
+        (case player of
             Board.P1 ->
                 blue
 

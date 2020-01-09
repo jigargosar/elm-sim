@@ -11,7 +11,7 @@ module ConnectFourV3Kata1.Board exposing
 import ConnectFourV3Kata1.Length as Len exposing (Length)
 import Dict exposing (Dict)
 import List.Extra
-import PointFree exposing (anyPass, is, when)
+import PointFree exposing (allPass, anyPass, is, when)
 import Set exposing (Set)
 
 
@@ -58,12 +58,12 @@ init { width, height } =
 
 insert : Int -> Board -> Board
 insert column =
-    when (anyPass [ canInsertIn column, isGameOver >> not ]) (addMove column)
+    when (allPass [ columnNotFull column, gameNotOver ]) (addMove column)
 
 
-isGameOver : Board -> Bool
-isGameOver board =
-    getGameOverState board /= Nothing
+gameNotOver : Board -> Bool
+gameNotOver board =
+    getGameOverState board == Nothing
 
 
 info : Board -> Info
@@ -201,8 +201,8 @@ addMove move =
     map (\rec -> { rec | reverseMoves = move :: rec.reverseMoves })
 
 
-canInsertIn : Int -> Board -> Bool
-canInsertIn column board =
+columnNotFull : Int -> Board -> Bool
+columnNotFull column board =
     canInsertAt ( column, columnLength column board ) board
 
 

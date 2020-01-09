@@ -139,6 +139,11 @@ anyPass fnList val =
     List.any ((|>) val) fnList
 
 
+allPass : List (b -> Bool) -> b -> Bool
+allPass fnList val =
+    List.all ((|>) val) fnList
+
+
 propEq : (c -> b) -> b -> c -> Bool
 propEq func a b =
     func b == a

@@ -81,13 +81,16 @@ transformState cb (Board rec) =
 
 
 insertAt : Pos -> Player -> Board -> Board
-insertAt pos player ((Board rec) as board) =
+insertAt pos player (Board rec) =
     let
+        { width, height } =
+            rec
+
         dict =
             Dict.insert pos player rec.dict
 
         state =
-            if Dict.size dict == maxMoves board then
+            if Dict.size dict == Len.toInt width * Len.toInt height then
                 Draw
 
             else
@@ -162,11 +165,6 @@ toDict (Board rec) =
     rec.dict
 
 
-maxMoves : Board -> Int
-maxMoves (Board { width, height }) =
-    Len.toInt width * Len.toInt height
-
-
 unwrap : Board -> Rec
 unwrap (Board rec) =
     rec
@@ -175,8 +173,3 @@ unwrap (Board rec) =
 map : (Rec -> Rec) -> Board -> Board
 map func =
     unwrap >> func >> Board
-
-
-isValidRow : Int -> Board -> Bool
-isValidRow row =
-    unwrap >> (\rec -> Len.member row rec.height)

@@ -52,34 +52,39 @@ init { width, height } =
 
 
 insert : Int -> Board -> Board
-insert column ((Board rec) as board) =
-    case rec.state of
-        Turn player ->
-            columnToInsertPosition column board
-                |> Maybe.map
-                    (\pos ->
-                        let
-                            dict =
-                                Dict.insert pos player rec.dict
-
-                            state =
-                                if Dict.size dict == maxMoves board then
-                                    Draw
-
-                                else
-                                    case getWinningPositions pos player dict of
-                                        Just wp ->
-                                            Victory player wp
-
-                                        Nothing ->
-                                            Turn (flipPlayer player)
-                        in
-                        { rec | dict = dict, state = state } |> Board
-                    )
-                |> Maybe.withDefault board
+insert column board =
+    case ( toState board, columnToInsertPosition column board ) of
+        ( Turn player, Just pos ) ->
+            insertAt pos player board
 
         _ ->
             board
+
+
+toState : Board -> State
+toState =
+    unwrap >> .state
+
+
+insertAt : Pos -> Player -> Board -> Board
+insertAt pos player ((Board rec) as board) =
+    let
+        dict =
+            Dict.insert pos player rec.dict
+
+        state =
+            if Dict.size dict == maxMoves board then
+                Draw
+
+            else
+                case getWinningPositions pos player dict of
+                    Just wp ->
+                        Victory player wp
+
+                    Nothing ->
+                        Turn (flipPlayer player)
+    in
+    { rec | dict = dict, state = state } |> Board
 
 
 columnToInsertPosition : Int -> Board -> Maybe Pos

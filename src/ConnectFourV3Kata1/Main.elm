@@ -73,7 +73,7 @@ init =
             Board.init dim
     in
     { dim = dim
-    , board = [ 0, 0, 1, 1 ] |> List.foldl Board.insert board
+    , board = [ 0, 1, 0, 1, 0, 1, 0, 1, 1, 1 ] |> List.foldl Board.insert board
     , grid = Dict.empty
     , selectedColumn = centerColumn dim
     }

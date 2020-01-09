@@ -54,12 +54,13 @@ suite2 =
                         List.range 0 3 |> List.map (\y -> ( 0, y )) |> Set.fromList
                 in
                 [ 0, 1, 0, 1, 0, 1, 0, 1 ]
-                    |> boardWithMoves
+                    |> makeMoves
                     |> expectPlayerWon Board.P1 winningPositions
         ]
 
 
-boardWithMoves moves =
+makeMoves : List Int -> Board.Board
+makeMoves moves =
     moves
         |> List.foldl Board.insert (Board.init { width = 7, height = 6 })
 

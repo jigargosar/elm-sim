@@ -54,7 +54,9 @@ insertInColumn : Int -> Board -> Board
 insertInColumn column ((Board rec) as board) =
     case ( rec.state, columnToDictPosition column board ) of
         ( Turn player, Just pos ) ->
-            insertAt pos player board
+            { rec | dict = Dict.insert pos player rec.dict }
+                |> updateState pos player
+                |> Board
 
         _ ->
             board
@@ -79,16 +81,14 @@ transformState cb (Board rec) =
             cb.gameDraw ()
 
 
-insertAt : Pos -> Player -> Board -> Board
-insertAt pos player (Board rec) =
+updateState : ( Int, Int ) -> Player -> Rec -> Rec
+updateState pos player rec =
     let
-        { width, height } =
+        { width, height, dict } =
             rec
-
-        dict =
-            Dict.insert pos player rec.dict
-
-        state =
+    in
+    { rec
+        | state =
             if Dict.size dict == width * height then
                 Draw
 
@@ -99,8 +99,7 @@ insertAt pos player (Board rec) =
 
                     Nothing ->
                         Turn (flipPlayer player)
-    in
-    { rec | dict = dict, state = state } |> Board
+    }
 
 
 columnToDictPosition : Int -> Board -> Maybe Pos

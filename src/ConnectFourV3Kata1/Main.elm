@@ -219,7 +219,7 @@ view computer mem =
             case state of
                 Turn player ->
                     indicatorShape computer.time c.cellSize player
-                        |> translateTopIndicatorShape c mem
+                        |> translateTopIndicator c mem
 
                 _ ->
                     noShape
@@ -238,7 +238,7 @@ view computer mem =
                 , words black (Debug.toString idx)
                 ]
                     |> group
-                    |> translateCellShape c pos
+                    |> translateCell c pos
             )
         |> group
     , topIndicatorShape
@@ -269,13 +269,13 @@ indicatorShape time cellSize player =
         |> blink time
 
 
-translateTopIndicatorShape : Config -> Mem -> Shape -> Shape
-translateTopIndicatorShape c mem =
-    translateCellShape c ( mem.selectedColumn, mem.dim.height )
+translateTopIndicator : Config -> Mem -> Shape -> Shape
+translateTopIndicator c mem =
+    translateCell c ( mem.selectedColumn, mem.dim.height )
 
 
-translateCellShape : { a | cellSize : Float, dx : Float, dy : Float } -> Pos -> Shape -> Shape
-translateCellShape { cellSize, dx, dy } ( gx, gy ) =
+translateCell : { a | cellSize : Float, dx : Float, dy : Float } -> Pos -> Shape -> Shape
+translateCell { cellSize, dx, dy } ( gx, gy ) =
     let
         ( x, y ) =
             ( toFloat gx * cellSize - dx, toFloat gy * cellSize - dy )

@@ -214,14 +214,6 @@ view computer mem =
 
         state =
             toBoardState mem.board
-
-        maybeIndicatorShape =
-            case state of
-                Turn player ->
-                    Just (indicatorShape computer.time c.cellSize player)
-
-                _ ->
-                    Nothing
     in
     [ rectangle gray computer.screen.width computer.screen.height
     , rectangle black c.width c.height
@@ -244,8 +236,13 @@ view computer mem =
                     |> moveCell c pos
             )
         |> group
-    , maybeIndicatorShape
-        |> maybeMapShape (moveTopIndicator c mem)
+    , case state of
+        Turn player ->
+            indicatorShape computer.time c.cellSize player
+                |> moveTopIndicator c mem
+
+        _ ->
+            noShape
     ]
 
 

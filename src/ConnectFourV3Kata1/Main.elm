@@ -224,39 +224,38 @@ view computer mem =
                 _ ->
                     noShape
 
-        cellShape pos =
-            case Dict.get pos cellDict of
-                Just (Cell bool player) ->
-                    [ cellBgShape c.cellSize
-                    , cellPlayerShape c.cellSize player
-                        |> whenTrue bool (blink computer.time)
-                    ]
-                        |> group
-
-                Nothing ->
-                    cellBgShape c.cellSize
+        cellAt pos =
+            Dict.get pos cellDict
     in
     [ rectangle gray computer.screen.width computer.screen.height
     , rectangle black c.width c.height
     , gridPositions mem.dim
         |> List.indexedMap
             (\idx pos ->
-                [ cellShape pos
+                [ toCellShape computer.time c.cellSize (cellAt pos)
 
                 --, words black (Debug.toString pos)
                 , words black (Debug.toString idx)
                 ]
                     |> group
-                    |> moveCell c pos
+                    |> translateCellShape c pos
             )
         |> group
     , topIndicatorShape
     ]
 
 
-maybeMapShape : (a -> Shape) -> Maybe a -> Shape
-maybeMapShape func =
-    Maybe.map func >> Maybe.withDefault noShape
+toCellShape time cellSize maybeCell =
+    case maybeCell of
+        Just (Cell bool player) ->
+            [ cellBgShape cellSize
+            , cellPlayerShape cellSize player
+                |> whenTrue bool (blink time)
+            ]
+                |> group
+
+        Nothing ->
+            cellBgShape cellSize
 
 
 noShape : Shape
@@ -272,11 +271,11 @@ indicatorShape time cellSize player =
 
 moveTopIndicator : Config -> Mem -> Shape -> Shape
 moveTopIndicator c mem =
-    moveCell c ( mem.selectedColumn, mem.dim.height )
+    translateCellShape c ( mem.selectedColumn, mem.dim.height )
 
 
-moveCell : { a | cellSize : Float, dx : Float, dy : Float } -> Pos -> Shape -> Shape
-moveCell { cellSize, dx, dy } ( gx, gy ) =
+translateCellShape : { a | cellSize : Float, dx : Float, dy : Float } -> Pos -> Shape -> Shape
+translateCellShape { cellSize, dx, dy } ( gx, gy ) =
     let
         ( x, y ) =
             ( toFloat gx * cellSize - dx, toFloat gy * cellSize - dy )

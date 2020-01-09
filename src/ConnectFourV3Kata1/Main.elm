@@ -219,7 +219,7 @@ view computer mem =
             case state of
                 Turn player ->
                     indicatorShape computer.time c.cellSize player
-                        |> moveTopIndicator c mem
+                        |> translateTopIndicatorShape c mem
 
                 _ ->
                     noShape
@@ -269,8 +269,8 @@ indicatorShape time cellSize player =
         |> blink time
 
 
-moveTopIndicator : Config -> Mem -> Shape -> Shape
-moveTopIndicator c mem =
+translateTopIndicatorShape : Config -> Mem -> Shape -> Shape
+translateTopIndicatorShape c mem =
     translateCellShape c ( mem.selectedColumn, mem.dim.height )
 
 

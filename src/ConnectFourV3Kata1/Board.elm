@@ -70,7 +70,7 @@ info board =
                 GameOver gameOverState
 
             Nothing ->
-                NextPlayer (nextPlayer board)
+                NextPlayer (playerTurnAtMoveIdx (moveCount board) board |> Maybe.withDefault P1)
     }
 
 
@@ -131,10 +131,17 @@ winningPositions startPosition player board =
 
 getLastMoveEntry : Board -> Maybe ( ( Int, Int ), Player )
 getLastMoveEntry board =
-    positions board
-        |> List.reverse
-        |> List.head
-        |> Maybe.map (\pos -> ( pos, flipPlayer (nextPlayer board) ))
+    Maybe.map2 Tuple.pair (lastMovePosition board) (playerTurnAtMoveIdx (moveCount board - 1) board)
+
+
+lastMove : Board -> Maybe Int
+lastMove =
+    unwrap >> .reverseMoves >> List.head
+
+
+lastMovePosition : Board -> Maybe ( Int, Int )
+lastMovePosition board =
+    lastMove board |> Maybe.map (\column -> ( column, columnLength column board - 1 ))
 
 
 flipPlayer : Player -> Player
@@ -145,21 +152,6 @@ flipPlayer player =
 
         P2 ->
             P1
-
-
-positions : Board -> List ( Int, Int )
-positions (Board rec) =
-    rec.reverseMoves
-        |> List.reverse
-        |> List.indexedMap Tuple.pair
-        |> List.Extra.gatherEqualsBy Tuple.second
-        |> List.concatMap
-            (\( first, rest ) ->
-                (first :: rest)
-                    |> List.indexedMap (\y ( idx, x ) -> ( idx, ( x, y ) ))
-            )
-        |> List.sortBy Tuple.first
-        |> List.map Tuple.second
 
 
 toDict : Board -> Dict ( Int, Int ) Player
@@ -183,17 +175,16 @@ toDict (Board rec) =
         |> Tuple.second
 
 
-nextPlayer : Board -> Player
-nextPlayer board =
-    let
-        ct =
-            moveCount board
-    in
-    if modBy 2 ct == 0 then
-        P1
+playerTurnAtMoveIdx : Int -> Board -> Maybe Player
+playerTurnAtMoveIdx idx board =
+    if idx < 0 || idx >= maxMoves board then
+        Nothing
+
+    else if modBy 2 (moveCount board) == 0 then
+        Just P1
 
     else
-        P2
+        Just P2
 
 
 isDraw : Board -> Bool

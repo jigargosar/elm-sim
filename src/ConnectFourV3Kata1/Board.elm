@@ -79,13 +79,6 @@ info board =
 
 gameNotOver : Board -> Bool
 gameNotOver board =
-    let
-        _ =
-            Debug.log "playerTurnAtMoveIdx (moveCount board - 1) board" (playerTurnAtMoveIdx (moveCount board - 1) board)
-
-        _ =
-            Debug.log "getLastMoveEntry board" (getLastMoveEntry board)
-    in
     getGameOverState board == Nothing
 
 

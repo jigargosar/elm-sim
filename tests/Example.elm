@@ -52,21 +52,25 @@ suite2 =
                 let
                     winningPositions =
                         List.range 0 3 |> List.map (\y -> ( 0, y )) |> Set.fromList
-
-                    expectPlayerWon : ( Board.Player, Set.Set ( Int, Int ) ) -> Board.Board -> Expectation
-                    expectPlayerWon playerWon =
-                        Board.mapState
-                            { playerWon = \player wp -> playerWon |> Expect.equal ( player, wp )
-                            , playerTurn = \player -> Expect.fail "player turn"
-                            , gameDraw = \() -> Expect.fail "game draw"
-                            }
                 in
                 [ 0, 1, 0, 1, 0, 1, 0, 1 ]
                     |> boardWithMoves
-                    |> expectPlayerWon ( Board.P1, winningPositions )
+                    |> expectPlayerWon Board.P1 winningPositions
         ]
 
 
 boardWithMoves moves =
     moves
         |> List.foldl Board.insert (Board.init { width = 7, height = 6 })
+
+
+expectPlayerWon : Board.Player -> Set.Set ( Int, Int ) -> Board.Board -> Expectation
+expectPlayerWon expectedPlayer expectedWinningPositions =
+    Board.mapState
+        { playerWon =
+            \player wp ->
+                ( player, wp )
+                    |> Expect.equal ( expectedPlayer, expectedWinningPositions )
+        , playerTurn = \player -> Expect.fail "player turn"
+        , gameDraw = \() -> Expect.fail "game draw"
+        }

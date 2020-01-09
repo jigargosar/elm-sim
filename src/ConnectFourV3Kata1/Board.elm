@@ -1,12 +1,28 @@
-module ConnectFourV3Kata1.Board exposing (Board, init, insert, positions)
+module ConnectFourV3Kata1.Board exposing (Board, Player(..), init, insert, positions, toDict)
 
 import ConnectFourV3Kata1.Length as Len exposing (Length)
+import Dict
 import List.Extra
 import PointFree exposing (is, when)
 
 
 type Board
     = Board Rec
+
+
+type Player
+    = P1
+    | P2
+
+
+nextPlayer : Player -> Player
+nextPlayer player =
+    case player of
+        P1 ->
+            P2
+
+        P2 ->
+            P1
 
 
 type alias Rec =
@@ -73,3 +89,14 @@ positions (Board rec) =
             )
         |> List.sortBy Tuple.first
         |> List.map Tuple.second
+
+
+toDict : Board -> Dict.Dict ( Int, Int ) Player
+toDict =
+    positions
+        >> List.foldl
+            (\position ( player, acc ) ->
+                ( nextPlayer player, Dict.insert position player acc )
+            )
+            ( P1, Dict.empty )
+        >> Tuple.second

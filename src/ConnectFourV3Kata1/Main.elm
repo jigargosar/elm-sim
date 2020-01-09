@@ -14,11 +14,6 @@ type alias Pos =
     ( Int, Int )
 
 
-type Coin
-    = Blue
-    | Red
-
-
 
 -- GRID DIMENSION
 
@@ -63,8 +58,8 @@ validatePos pos { width, height } =
 type alias Mem =
     { gDim : GDim
     , board : Board
-    , grid : Dict Pos Coin
-    , coin : Coin
+    , grid : Dict Pos Board.Player
+    , coin : Board.Player
     , selectedColumn : Int
     }
 
@@ -81,7 +76,7 @@ init =
     { gDim = dim
     , board = [ 0, 0, 1, 1 ] |> List.foldl Board.insert board
     , grid = Dict.empty
-    , coin = Blue
+    , coin = Board.P1
     , selectedColumn = centerColumn dim
     }
 
@@ -149,16 +144,6 @@ toConfig computer mem =
     }
 
 
-flipCoin : Coin -> Coin
-flipCoin coin =
-    case coin of
-        Blue ->
-            Red
-
-        Red ->
-            Blue
-
-
 view : Computer -> Mem -> List Shape
 view computer mem =
     let
@@ -169,13 +154,7 @@ view computer mem =
             insertCoinIndicatorShape computer.time c.cellSize mem.coin
 
         coinGrid =
-            Board.positions mem.board
-                |> List.foldl
-                    (\p ( coin, dict ) ->
-                        ( flipCoin coin, Dict.insert p coin dict )
-                    )
-                    ( Blue, Dict.empty )
-                |> Tuple.second
+            Board.toDict mem.board
     in
     [ rectangle gray computer.screen.width computer.screen.height
     , rectangle black c.width c.height
@@ -206,7 +185,7 @@ view computer mem =
     ]
 
 
-insertCoinIndicatorShape : Time -> Float -> Coin -> Shape
+insertCoinIndicatorShape : Time -> Float -> Board.Player -> Shape
 insertCoinIndicatorShape time cellSize coin =
     cellCoinShape cellSize coin
         |> blink time
@@ -231,14 +210,14 @@ cellBgShape cellSize =
     circle white (cellSize * 0.5 * 0.9)
 
 
-cellCoinShape : Float -> Coin -> Shape
+cellCoinShape : Float -> Board.Player -> Shape
 cellCoinShape cellSize coin =
     circle
         (case coin of
-            Blue ->
+            Board.P1 ->
                 blue
 
-            Red ->
+            Board.P2 ->
                 red
         )
         (cellSize * 0.5 * 0.75)

@@ -102,17 +102,13 @@ insertAt pos player ((Board rec) as board) =
 
 
 columnToInsertPosition : Int -> Board -> Maybe Pos
-columnToInsertPosition column ((Board { width, dict }) as board) =
-    if Len.member column width then
-        let
-            row =
-                dict |> Dict.keys >> List.Extra.count (Tuple.first >> is column)
-        in
-        if isValidRow row board then
-            ( column, row ) |> Just
-
-        else
-            Nothing
+columnToInsertPosition column (Board { width, height, dict }) =
+    let
+        row =
+            dict |> Dict.keys >> List.Extra.count (Tuple.first >> is column)
+    in
+    if Len.member column width && Len.member row height then
+        ( column, row ) |> Just
 
     else
         Nothing

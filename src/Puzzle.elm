@@ -85,8 +85,21 @@ update computer mem =
         Dragging pos token ->
             if not mouse.down then
                 let
+                    dropPos =
+                        cfg.toGrid ( mouse.x, mouse.y )
+
                     newDict =
-                        mem.dict
+                        if isPositionValid dropPos mem then
+                            Dict.remove pos mem.dict
+                                |> Dict.insert dropPos token
+                                |> (\dict ->
+                                        Dict.get dropPos mem.dict
+                                            |> Maybe.map (\tk -> Dict.insert pos tk dict)
+                                            |> Maybe.withDefault dict
+                                   )
+
+                        else
+                            mem.dict
                 in
                 { mem
                     | drag = NotDragging

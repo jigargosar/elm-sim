@@ -59,6 +59,16 @@ subDim a b =
     { width = a.width - b.width, height = a.height - b.height }
 
 
+mapDimAsTuple : (( a, b ) -> ( c, d )) -> { e | width : a, height : b } -> { width : c, height : d }
+mapDimAsTuple func { width, height } =
+    func ( width, height ) |> dimFromTuple
+
+
+dimFromTuple : ( a, b ) -> { width : a, height : b }
+dimFromTuple ( width, height ) =
+    { width = width, height = height }
+
+
 
 -- MEM
 

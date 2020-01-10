@@ -1,9 +1,11 @@
 module ConnectFourV3Kata1.Board exposing
     ( Board
     , Player(..)
+    , State(..)
     , init
     , insertInColumn
     , insertPositionFromColumn
+    , state
     , toDict
     , transformState
     )
@@ -45,19 +47,6 @@ type State
     = Turn Player
     | Victory Player (Set Pos)
     | Draw
-
-
-fromInternalState : InternalState -> State
-fromInternalState iState =
-    case iState of
-        I_Turn p ->
-            Turn p
-
-        I_Victory player set ->
-            Victory player set
-
-        I_Draw ->
-            Draw
 
 
 init : { a | width : Int, height : Int } -> Board
@@ -117,6 +106,24 @@ transformState cb (Board rec) =
 
         I_Draw ->
             cb.gameDraw ()
+
+
+state : Board -> State
+state =
+    unwrap >> .state >> fromInternalState
+
+
+fromInternalState : InternalState -> State
+fromInternalState iState =
+    case iState of
+        I_Turn p ->
+            Turn p
+
+        I_Victory player set ->
+            Victory player set
+
+        I_Draw ->
+            Draw
 
 
 updateState : ( Int, Int ) -> Player -> Rec -> Rec

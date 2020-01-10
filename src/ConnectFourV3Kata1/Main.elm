@@ -286,14 +286,12 @@ view computer mem =
         state =
             toBoardState mem.board
 
-        dim =
-            Board.dimensions mem.board
-
         topIndicatorShape =
             case state of
                 Board.Turn player ->
                     indicatorShape computer.time cfg.cellDim player
-                        |> translateCell cfg ( mem.selectedColumn, dim.height )
+                        |> translateCell cfg
+                            ( mem.selectedColumn, (Board.dimensions mem.board).height )
 
                 _ ->
                     noShape

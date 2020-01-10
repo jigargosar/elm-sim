@@ -57,16 +57,33 @@ update computer mem =
 -- VIEW
 
 
+tokenShape : { a | cellRadius : Float } -> Token -> Shape
+tokenShape cfg token =
+    case token of
+        RedCircle ->
+            circle red (cfg.cellRadius * 0.75)
+
+
 view : Computer -> Mem -> List Shape
 view { screen } mem =
     let
         cfg =
             toConfig screen mem
+
+        tokenShapeAt pos =
+            case Dict.get pos mem.dict of
+                Just token ->
+                    tokenShape cfg token
+
+                Nothing ->
+                    noShape
     in
     [ rectangle black cfg.width cfg.height
     , mapAllPos
         (\pos ->
-            [ circle white (cfg.cellRadius * 0.9) ]
+            [ circle white (cfg.cellRadius * 0.9)
+            , tokenShapeAt pos
+            ]
                 |> group
                 |> moveCell cfg pos
         )
@@ -162,3 +179,7 @@ isValidIdx idx len =
 isPositionValid : Pos -> { a | width : Int, height : Int } -> Bool
 isPositionValid ( x, y ) mem =
     isValidIdx x mem.width && isValidIdx y mem.height
+
+
+noShape =
+    group []

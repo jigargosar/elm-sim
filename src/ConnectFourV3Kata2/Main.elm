@@ -58,6 +58,7 @@ insertInColumns columns mem =
     List.foldl insertInColumn mem columns
 
 
+insertInColumn : Int -> { width : Int, height : Int, dict : Dict Pos Coin, state : State, selectedColumn : Int } -> Mem
 insertInColumn column mem =
     case ( mem.state, insertPosition column mem ) of
         ( Turn coin, Just pos ) ->
@@ -196,7 +197,7 @@ view computer mem =
             insertPosition mem.selectedColumn mem
 
         coinToShape coin =
-            circle (coin2Color coin) (cellSize * 0.75)
+            circle (coin2Color coin) (cellSize * 0.5 * 0.75)
 
         wps =
             case mem.state of
@@ -248,7 +249,7 @@ view computer mem =
     [ rectangle black (cellSize * toFloat mem.width) (cellSize * toFloat mem.height)
     , mapAllPos
         (\pos ->
-            [ circle white (cellSize * 0.9)
+            [ circle white (cellSize * 0.5 * 0.9)
             , viewCellAt pos
             ]
                 |> group

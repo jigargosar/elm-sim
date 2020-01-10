@@ -132,8 +132,7 @@ update computer mem =
 
 type alias Config =
     { cellSize : Float
-    , width : Float
-    , height : Float
+    , dim : FloatDim
     , dx : Float
     , dy : Float
     }
@@ -160,8 +159,7 @@ toConfig computer mem =
             scaleDim cellSize gDim
     in
     { cellSize = cellSize
-    , width = widthPx
-    , height = heightPx
+    , dim = boardScreenDim
     , dx = (widthPx - cellSize) / 2
     , dy = (heightPx - cellSize) / 2
     }
@@ -232,7 +230,7 @@ view computer mem =
             Dict.get pos cellDict
     in
     [ rectangle2 gray computer.screen
-    , rectangle2 black cfg
+    , rectangle2 black cfg.dim
     , Board.allPositions mem.board
         |> List.indexedMap
             (\idx pos ->

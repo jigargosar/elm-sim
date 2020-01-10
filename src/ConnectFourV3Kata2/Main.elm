@@ -294,6 +294,17 @@ view computer mem =
 
                 _ ->
                     noShape
+
+        stateWords =
+            case mem.state of
+                Turn coin ->
+                    words (coin2Color coin) "Player Turn"
+
+                Victory coin _ ->
+                    words (coin2Color coin) "Victory!"
+
+                Draw ->
+                    words black "DRAW"
     in
     [ rectangle black (cellSize * toFloat mem.width) (cellSize * toFloat mem.height)
     , mapAllPos
@@ -307,6 +318,9 @@ view computer mem =
         mem
         |> group
     , indicatorShape
+    , stateWords
+        |> scale (cellSize / 32)
+        |> moveCell ( mem.width // 2, -1 )
     ]
 
 

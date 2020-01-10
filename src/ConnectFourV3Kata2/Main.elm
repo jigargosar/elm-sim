@@ -36,7 +36,7 @@ type State
 init : Mem
 init =
     initWithDim { width = 7, height = 6 }
-        |> insertInColumns [ 0, 1, 0, 1, 0, 1, 0, 1, 0 ]
+        |> insertInColumns [ 3, 4, 3, 4, 3, 4, 3, 4, 3, 4 ]
         |> Debug.log "mem"
 
 

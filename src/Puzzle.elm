@@ -202,10 +202,10 @@ view { screen, mouse } mem =
             )
             mem
             |> group
-      , draggingShape
       ]
         |> group
         |> move mem.pan
+    , draggingShape
     ]
 
 

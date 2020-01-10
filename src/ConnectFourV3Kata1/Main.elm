@@ -3,7 +3,7 @@ module ConnectFourV3Kata1.Main exposing (main)
 import ConnectFourV3Kata1.Board as Board exposing (Board)
 import Dict exposing (Dict)
 import Playground exposing (..)
-import PointFree exposing (flip, inc, whenTrue)
+import PointFree exposing (flip, whenTrue)
 import Set exposing (Set)
 
 
@@ -33,23 +33,6 @@ gridPositions { width, height } =
     List.range 0 (height - 1)
         |> List.concatMap
             (\y -> List.range 0 (width - 1) |> List.map (\x -> ( x, y )))
-
-
-validatePos : Pos -> GDim -> Maybe Pos
-validatePos pos { width, height } =
-    let
-        ( gx, gy ) =
-            pos
-
-        isOk =
-            (gx < 0 || gy < 0 || gx >= width || gy >= height)
-                |> not
-    in
-    if isOk then
-        Just pos
-
-    else
-        Nothing
 
 
 
@@ -89,11 +72,7 @@ resetBoard mem =
 
 insertPosition : Mem -> Maybe Pos
 insertPosition mem =
-    let
-        colLength =
-            Dict.foldl (\( x, _ ) _ -> whenTrue (x == mem.selectedColumn) inc) 0 (Board.toDict mem.board)
-    in
-    validatePos ( mem.selectedColumn, colLength ) mem.dim
+    Board.insertPositionFromColumn mem.selectedColumn mem.board
 
 
 

@@ -245,6 +245,7 @@ view computer mem =
     ]
 
 
+toCellShape : Time -> Float -> Maybe Cell -> Shape
 toCellShape time cellSize maybeCell =
     case maybeCell of
         Just (Cell bool player) ->

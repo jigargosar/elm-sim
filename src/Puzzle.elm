@@ -129,7 +129,7 @@ update computer mem =
                         NotDragging
 
                     else
-                        mem.drag
+                        Panning mouse.x mouse.y
                 , pan = ( px + dx, py + dy )
             }
 

@@ -201,7 +201,7 @@ view { screen, mouse } mem =
             case draggingToken of
                 Just token ->
                     tokenShape cfg token
-                        |> move ( mouse.x, mouse.y )
+                        |> move (cfg.screenToWorldPos ( mouse.x, mouse.y ))
 
                 Nothing ->
                     noShape
@@ -226,10 +226,10 @@ view { screen, mouse } mem =
             )
             mem
             |> group
+      , draggingShape
       ]
         |> group
         |> move mem.pan
-    , draggingShape
     ]
 
 
@@ -254,6 +254,7 @@ type alias Config =
     , cellRadius : Float
     , gridToWorldPos : Pos -> ( Float, Float )
     , screenToGridPos : ( Float, Float ) -> Pos
+    , screenToWorldPos : ( Float, Float ) -> ( Float, Float )
     , worldToGridPos : ( Float, Float ) -> Pos
     , width : Float
     , height : Float
@@ -294,6 +295,7 @@ toConfig screen mem =
     , gridToWorldPos = gridToWorldPos
     , screenToGridPos = screenToGridPos
     , worldToGridPos = worldToGridPos
+    , screenToWorldPos = screenToWorldPos
     , width = cellSize * toFloat mem.width
     , height = cellSize * toFloat mem.height
     }

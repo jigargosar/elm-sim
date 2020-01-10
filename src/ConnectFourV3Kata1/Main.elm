@@ -131,8 +131,7 @@ update computer mem =
 
 
 type alias Config =
-    { cellSize : Float
-    , dim : FloatDim
+    { dim : FloatDim
     , cDim : FloatDim
     , dx : Float
     , dy : Float
@@ -159,8 +158,7 @@ toConfig computer mem =
         boardScreenDim =
             scaleDim cellSize gDim
     in
-    { cellSize = cellSize
-    , dim = boardScreenDim
+    { dim = boardScreenDim
     , cDim = FloatDim cellSize cellSize
     , dx = (widthPx - cellSize) / 2
     , dy = (heightPx - cellSize) / 2
@@ -284,11 +282,11 @@ translateTopIndicator c mem =
     translateCell c ( mem.selectedColumn, mem.dim.height )
 
 
-translateCell : { a | cellSize : Float, dx : Float, dy : Float } -> Pos -> Shape -> Shape
-translateCell { cellSize, dx, dy } ( gx, gy ) =
+translateCell : Config -> ( Int, Int ) -> Shape -> Shape
+translateCell { cDim, dx, dy } ( gx, gy ) =
     let
         ( x, y ) =
-            ( toFloat gx * cellSize - dx, toFloat gy * cellSize - dy )
+            ( toFloat gx * cDim.width - dx, toFloat gy * cDim.height - dy )
     in
     move x y
 

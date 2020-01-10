@@ -37,6 +37,16 @@ scaleDim sc { width, height } =
     { width = width * sc, height = height * sc }
 
 
+fDivDim : { a | width : Float, height : Float } -> { b | width : Float, height : Float } -> FloatDim
+fDivDim a b =
+    FloatDim (a.width / b.width) (a.height / b.height)
+
+
+minDim : { a | width : comparable, height : comparable } -> comparable
+minDim { width, height } =
+    min width height
+
+
 
 -- MEM
 
@@ -132,18 +142,16 @@ type alias Config =
 toConfig : Computer -> Mem -> Config
 toConfig computer mem =
     let
+        gDim : FloatDim
         gDim =
-            Board.dimensions mem.board
-                |> toFloatDim
+            Board.dimensions mem.board |> toFloatDim
 
-        sDim : { width : Float, height : Float }
+        sDim : FloatDim
         sDim =
-            computer.screen
-                |> scaleDim 0.7
+            computer.screen |> scaleDim 0.7
 
         cellSize =
-            min (sDim.width / gDim.width)
-                (sDim.height / gDim.height)
+            fDivDim sDim gDim |> minDim
 
         ( widthPx, heightPx ) =
             ( boardScreenDim.width, boardScreenDim.height )

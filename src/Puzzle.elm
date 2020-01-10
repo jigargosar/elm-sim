@@ -41,6 +41,7 @@ type alias Pos =
 
 type alias Config =
     { cellSize : Float
+    , cellRadius : Float
     , toScreen : Pos -> ( Float, Float )
     , toGrid : ( Float, Float ) -> Pos
     , width : Float
@@ -68,6 +69,7 @@ toConfig screen mem =
             ( round ((x - dx) / cellSize), round ((y - dy) / cellSize) )
     in
     { cellSize = cellSize
+    , cellRadius = cellSize / 2
     , toScreen = toScreen
     , toGrid = toGrid
     , width = cellSize * toFloat mem.width
@@ -81,7 +83,39 @@ view { screen } mem =
         cfg =
             toConfig screen mem
     in
-    []
+    [ rectangle black cfg.width cfg.height
+    , mapAllPos
+        (\pos ->
+            [ circle white (cfg.cellRadius * 0.9) ]
+                |> group
+                |> moveCell cfg pos
+        )
+        mem
+        |> group
+    ]
+
+
+moveCell cfg pos =
+    move (cfg.toScreen pos)
+
+
+move ( x, y ) =
+    Playground.move x y
+
+
+mapAllPos : (Pos -> b) -> { a | width : Int, height : Int } -> List b
+mapAllPos func mem =
+    List.map func (allPos mem)
+
+
+allPos : { a | width : Int, height : Int } -> List Pos
+allPos { width, height } =
+    List.range 0 (height - 1)
+        |> List.concatMap
+            (\y ->
+                List.range 0 (width - 1)
+                    |> List.map (\x -> ( x, y ))
+            )
 
 
 main =

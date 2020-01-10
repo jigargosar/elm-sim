@@ -1,4 +1,4 @@
-module ConnectFourV3Kata1.Grid exposing (Grid, allPositions, centerX, empty)
+module ConnectFourV3Kata1.Grid exposing (centerX, positions)
 
 import Dict exposing (Dict)
 
@@ -13,42 +13,13 @@ type alias Pos =
     ( Int, Int )
 
 
-type Grid a
-    = Grid Dim (Dict Pos a)
+centerX : Dim -> Int
+centerX { width } =
+    width // 2
 
 
-empty : { a | width : Int, height : Int } -> Grid v
-empty rec =
-    Grid (Dim rec.width rec.height) Dict.empty
-
-
-centerX : Grid a -> Int
-centerX grid =
-    width grid // 2
-
-
-allPositions : Grid a -> List Pos
-allPositions g =
-    List.range 0 (height g - 1)
+positions : Dim -> List Pos
+positions { width, height } =
+    List.range 0 (height - 1)
         |> List.concatMap
-            (\y -> List.range 0 (width g - 1) |> List.map (\x -> toPos x y))
-
-
-toPos : Int -> Int -> Pos
-toPos =
-    Tuple.pair
-
-
-width : Grid a -> Int
-width =
-    toDim >> .width
-
-
-height : Grid a -> Int
-height =
-    toDim >> .height
-
-
-toDim : Grid a -> Dim
-toDim (Grid dim _) =
-    dim
+            (\y -> List.range 0 (width - 1) |> List.map (\x -> ( x, y )))

@@ -2,9 +2,11 @@ module ConnectFourV3Kata1.Board exposing
     ( Board
     , Player(..)
     , State(..)
+    , centerColumn
     , init
     , insertInColumn
     , insertPositionFromColumn
+    , reset
     , state
     , toDict
     )
@@ -58,6 +60,21 @@ init { width, height } =
         |> Board
 
 
+reset : Board -> Board
+reset (Board rec) =
+    init rec
+
+
+clampColumn : Int -> Board -> Int
+clampColumn column (Board { width }) =
+    clampIdx width column
+
+
+centerColumn : Board -> Int
+centerColumn (Board { width }) =
+    width // 2
+
+
 insertInColumn : Int -> Board -> Board
 insertInColumn x ((Board rec) as board) =
     case ( rec.state, insertPositionFromColumn x board ) of
@@ -76,16 +93,21 @@ insertPositionFromColumn column (Board { width, height, dict }) =
         row =
             dict |> Dict.keys >> List.Extra.count (Tuple.first >> is column)
     in
-    if isIdxValid width column && isIdxValid height row then
+    if isIdxValidFor width column && isIdxValidFor height row then
         ( column, row ) |> Just
 
     else
         Nothing
 
 
-isIdxValid : number -> number -> Bool
-isIdxValid len idx =
+isIdxValidFor : number -> number -> Bool
+isIdxValidFor len idx =
     idx >= 0 && idx < len
+
+
+clampIdx : number -> number -> number
+clampIdx len =
+    clamp 0 (len - 1)
 
 
 state : Board -> State

@@ -63,11 +63,10 @@ init =
 
 resetBoard : Mem -> Mem
 resetBoard mem =
-    let
-        dim =
-            mem.dim
-    in
-    { mem | board = Board.init dim, selectedColumn = centerColumn dim }
+    { mem
+        | board = Board.reset mem.board
+        , selectedColumn = Board.centerColumn mem.board
+    }
 
 
 

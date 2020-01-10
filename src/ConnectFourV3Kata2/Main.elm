@@ -180,7 +180,9 @@ update computer mem =
 
 
 type alias Config =
-    { cellSize : Float, dx : Float, dy : Float }
+    { cellSize : Float
+    , toScreen : Pos -> ( Float, Float )
+    }
 
 
 toConfig : { a | width : Float, height : Float } -> { b | width : Int, height : Int } -> Config
@@ -195,10 +197,12 @@ toConfig screen mem =
 
         dy =
             (cellSize - (cellSize * toFloat mem.height)) / 2
+
+        toScreen ( gx, gy ) =
+            ( (toFloat gx * cellSize) + dx, (toFloat gy * cellSize) + dy )
     in
     { cellSize = cellSize
-    , dx = dx
-    , dy = dy
+    , toScreen = toScreen
     }
 
 
@@ -208,14 +212,14 @@ view computer mem =
         { screen, time } =
             computer
 
-        { cellSize, dx, dy } =
+        cfg =
             toConfig screen mem
 
-        toScreenPos ( gx, gy ) =
-            ( (toFloat gx * cellSize) + dx, (toFloat gy * cellSize) + dy )
+        { cellSize } =
+            cfg
 
         moveCell pos =
-            move (toScreenPos pos)
+            move (cfg.toScreen pos)
 
         cellAt pos =
             Dict.get pos mem.dict

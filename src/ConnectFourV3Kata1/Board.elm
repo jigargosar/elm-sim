@@ -3,6 +3,7 @@ module ConnectFourV3Kata1.Board exposing
     , Player(..)
     , init
     , insertInColumn
+    , insertPositionFromColumn
     , toDict
     , transformState
     )
@@ -52,39 +53,33 @@ init { width, height } =
 
 insertInColumn : Int -> Board -> Board
 insertInColumn x ((Board rec) as board) =
-    let
-        y =
-            rec.dict |> Dict.keys >> List.Extra.count (Tuple.first >> is x)
-
-        pos =
-            ( x, y )
-    in
-    case rec.state of
-        Turn player ->
-            insertAt pos player rec |> Board
+    case ( rec.state, insertPositionFromColumn x board ) of
+        ( Turn player, Just pos ) ->
+            { rec | dict = Dict.insert pos player rec.dict }
+                |> updateState pos player
+                |> Board
 
         _ ->
             board
 
 
-insertAt : Pos -> Player -> Rec -> Rec
-insertAt pos player rec =
+insertPositionFromColumn : Int -> Board -> Maybe ( Int, Int )
+insertPositionFromColumn x (Board { width, height, dict }) =
     let
-        { width, height, dict } =
-            rec
+        y =
+            dict |> Dict.keys >> List.Extra.count (Tuple.first >> is x)
 
-        ( x, y ) =
-            pos
+        pos =
+            ( x, y )
 
         isPositionWithinBounds =
             x >= 0 && x < width && y >= 0 && y < height
     in
     if isPositionWithinBounds then
-        { rec | dict = Dict.insert pos player dict }
-            |> updateState pos player
+        Just pos
 
     else
-        rec
+        Nothing
 
 
 transformState :

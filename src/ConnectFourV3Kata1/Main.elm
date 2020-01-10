@@ -145,8 +145,6 @@ update computer mem =
 type alias Config =
     { dim : FloatDim
     , cellDim : FloatDim
-    , dx : Float
-    , dy : Float
     , cellT : Transform
     }
 
@@ -157,7 +155,7 @@ toBoardX cfg x =
 
 
 toScreenPos : Config -> Pos -> ScreenPos
-toScreenPos { cellT, cellDim, dx, dy } ( gx, gy ) =
+toScreenPos { cellT } ( gx, gy ) =
     applyTransform cellT ( toFloat gx, toFloat gy )
 
 
@@ -182,19 +180,15 @@ toConfig computer mem =
             FloatDim cellSize cellSize
 
         translateDim =
-            subDim dim cellDim |> scaleDim 0.5
-
-        dx =
-            translateDim.width
-
-        dy =
-            translateDim.height
+            subDim dim cellDim |> scaleDim -0.5
     in
     { dim = dim
     , cellDim = cellDim
-    , dx = translateDim.width
-    , dy = translateDim.height
-    , cellT = Transform [ Scale cellDim.width cellDim.height, Translate -dx -dy ]
+    , cellT =
+        Transform
+            [ Scale cellDim.width cellDim.height
+            , Translate translateDim.width translateDim.height
+            ]
     }
 
 

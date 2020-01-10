@@ -170,10 +170,16 @@ tokenShape cfg token =
 
 
 view : Computer -> Mem -> List Shape
-view { screen, mouse } mem =
+view computer mem =
     let
+        { screen, mouse } =
+            computer
+
         cfg =
             toConfig screen mem
+
+        _ =
+            viewWorld computer cfg
 
         draggingPos : Maybe Pos
         draggingPos =
@@ -230,6 +236,64 @@ view { screen, mouse } mem =
       ]
         |> group
         |> move mem.pan
+    ]
+
+
+viewWorld : Computer -> Config -> Mem -> List Shape
+viewWorld { mouse } cfg mem =
+    let
+        draggingPos : Maybe Pos
+        draggingPos =
+            case mem.drag of
+                Dragging pos _ ->
+                    Just pos
+
+                _ ->
+                    Nothing
+
+        draggingToken : Maybe Token
+        draggingToken =
+            case mem.drag of
+                Dragging _ token ->
+                    Just token
+
+                _ ->
+                    Nothing
+
+        dimIfDragging pos =
+            whenTrue (Just pos == draggingPos)
+                (fade 0.5)
+
+        draggingShape =
+            case draggingToken of
+                Just token ->
+                    tokenShape cfg token
+                        |> move (cfg.screenToWorldPos ( mouse.x, mouse.y ))
+
+                Nothing ->
+                    noShape
+
+        tokenShapeAt pos =
+            case Dict.get pos mem.dict of
+                Just token ->
+                    tokenShape cfg token
+                        |> dimIfDragging pos
+
+                Nothing ->
+                    noShape
+    in
+    [ rectangle black cfg.width cfg.height
+    , mapAllPos
+        (\pos ->
+            [ circle white (cfg.cellRadius * 0.9)
+            , tokenShapeAt pos
+            ]
+                |> group
+                |> moveCell cfg pos
+        )
+        mem
+        |> group
+    , draggingShape
     ]
 
 

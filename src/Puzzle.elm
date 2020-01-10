@@ -102,7 +102,7 @@ tokenShape cfg token =
 
 
 view : Computer -> Mem -> List Shape
-view { screen } mem =
+view { screen, mouse } mem =
     let
         cfg =
             toConfig screen mem
@@ -119,6 +119,18 @@ view { screen } mem =
         dimIfDragging pos =
             whenTrue (Just pos == draggingPos)
                 (fade 0.5)
+
+        draggingToken =
+            Maybe.andThen (\pos -> Dict.get pos mem.dict) draggingPos
+
+        draggingShape =
+            case draggingToken of
+                Just token ->
+                    tokenShape cfg token
+                        |> move ( mouse.x, mouse.y )
+
+                Nothing ->
+                    noShape
 
         tokenShapeAt pos =
             case Dict.get pos mem.dict of
@@ -140,6 +152,7 @@ view { screen } mem =
         )
         mem
         |> group
+    , draggingShape
     ]
 
 

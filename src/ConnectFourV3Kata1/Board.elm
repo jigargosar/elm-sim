@@ -29,9 +29,9 @@ type alias Pos =
 
 
 type InternalState
-    = I_Turn Player
-    | I_Victory Player (Set Pos)
-    | I_Draw
+    = S_Turn Player
+    | S_Victory Player (Set Pos)
+    | S_Draw
 
 
 type alias Rec =
@@ -53,7 +53,7 @@ init { width, height } =
     { width = width
     , height = height
     , dict = Dict.empty
-    , state = I_Turn P1
+    , state = S_Turn P1
     }
         |> Board
 
@@ -61,7 +61,7 @@ init { width, height } =
 insertInColumn : Int -> Board -> Board
 insertInColumn x ((Board rec) as board) =
     case ( rec.state, insertPositionFromColumn x board ) of
-        ( I_Turn player, Just pos ) ->
+        ( S_Turn player, Just pos ) ->
             { rec | dict = Dict.insert pos player rec.dict }
                 |> updateState pos player
                 |> Board
@@ -96,13 +96,13 @@ state =
 fromInternalState : InternalState -> State
 fromInternalState iState =
     case iState of
-        I_Turn p ->
+        S_Turn p ->
             Turn p
 
-        I_Victory player set ->
+        S_Victory player set ->
             Victory player set
 
-        I_Draw ->
+        S_Draw ->
             Draw
 
 
@@ -115,15 +115,15 @@ updateState pos player rec =
     { rec
         | state =
             if Dict.size dict == width * height then
-                I_Draw
+                S_Draw
 
             else
                 case getWinningPositions pos player dict of
                     Just wp ->
-                        I_Victory player wp
+                        S_Victory player wp
 
                     Nothing ->
-                        I_Turn (flipPlayer player)
+                        S_Turn (flipPlayer player)
     }
 
 

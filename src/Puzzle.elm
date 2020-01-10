@@ -35,6 +35,36 @@ update computer mem =
 -- VIEW
 
 
+view : Computer -> Mem -> List Shape
+view { screen } mem =
+    let
+        cfg =
+            toConfig screen mem
+    in
+    [ rectangle black cfg.width cfg.height
+    , mapAllPos
+        (\pos ->
+            [ circle white (cfg.cellRadius * 0.9) ]
+                |> group
+                |> moveCell cfg pos
+        )
+        mem
+        |> group
+    ]
+
+
+
+-- Main
+
+
+main =
+    game view update init
+
+
+
+-- Common
+
+
 type alias Pos =
     ( Int, Int )
 
@@ -77,28 +107,12 @@ toConfig screen mem =
     }
 
 
-view : Computer -> Mem -> List Shape
-view { screen } mem =
-    let
-        cfg =
-            toConfig screen mem
-    in
-    [ rectangle black cfg.width cfg.height
-    , mapAllPos
-        (\pos ->
-            [ circle white (cfg.cellRadius * 0.9) ]
-                |> group
-                |> moveCell cfg pos
-        )
-        mem
-        |> group
-    ]
-
-
+moveCell : { a | toScreen : b -> ( Number, Number ) } -> b -> Shape -> Shape
 moveCell cfg pos =
     move (cfg.toScreen pos)
 
 
+move : ( Number, Number ) -> Shape -> Shape
 move ( x, y ) =
     Playground.move x y
 
@@ -116,7 +130,3 @@ allPos { width, height } =
                 List.range 0 (width - 1)
                     |> List.map (\x -> ( x, y ))
             )
-
-
-main =
-    game view update init

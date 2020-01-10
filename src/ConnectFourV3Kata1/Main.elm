@@ -231,8 +231,8 @@ view computer mem =
         cellAt pos =
             Dict.get pos cellDict
     in
-    [ rectangle gray computer.screen.width computer.screen.height
-    , rectangle black cfg.width cfg.height
+    [ rectangle2 gray computer.screen
+    , rectangle2 black cfg
     , Board.allPositions mem.board
         |> List.indexedMap
             (\idx pos ->
@@ -247,6 +247,11 @@ view computer mem =
         |> group
     , topIndicatorShape
     ]
+
+
+rectangle2 : Color -> { a | width : Number, height : Number } -> Shape
+rectangle2 color { width, height } =
+    rectangle color width height
 
 
 toCellShape : Time -> Float -> Maybe Cell -> Shape

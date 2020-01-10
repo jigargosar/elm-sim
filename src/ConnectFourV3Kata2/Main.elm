@@ -170,7 +170,7 @@ update computer mem =
 
         _ ->
             if mouse.click then
-                init
+                initWithDim mem
 
             else
                 mem

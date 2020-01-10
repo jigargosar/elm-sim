@@ -164,7 +164,7 @@ update computer mem =
             computer
     in
     case mem.state of
-        Turn coin ->
+        Turn _ ->
             mem
 
         _ ->
@@ -182,6 +182,7 @@ update computer mem =
 type alias Config =
     { cellSize : Float
     , toScreen : Pos -> ( Float, Float )
+    , toGrid : ( Float, Float ) -> Pos
     }
 
 
@@ -200,9 +201,13 @@ toConfig screen mem =
 
         toScreen ( gx, gy ) =
             ( (toFloat gx * cellSize) + dx, (toFloat gy * cellSize) + dy )
+
+        toGrid ( x, y ) =
+            ( round ((x - dx) / cellSize), round ((y - dy) / cellSize) )
     in
     { cellSize = cellSize
     , toScreen = toScreen
+    , toGrid = toGrid
     }
 
 

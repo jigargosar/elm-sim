@@ -1,9 +1,7 @@
 module ConnectFourV3Kata2.Main exposing (main)
 
 import Dict exposing (Dict)
-import List.Extra
 import Playground exposing (..)
-import PointFree exposing (is, whenTrue)
 import Set exposing (Set)
 
 
@@ -146,7 +144,7 @@ getWPS sp coin mem =
     in
     [ ( 1, 0 ), ( 1, 1 ), ( 0, 1 ), ( -1, 1 ) ]
         |> List.map connectedPositions
-        |> List.Extra.find (Set.size >> is 4)
+        |> find (Set.size >> is 4)
 
 
 flipCoin coin =
@@ -362,3 +360,34 @@ allPos { width, height } =
 
 main =
     game view update init
+
+
+
+-- PointFree
+
+
+is =
+    (==)
+
+
+whenTrue : Bool -> (c -> c) -> c -> c
+whenTrue bool t v =
+    if bool then
+        t v
+
+    else
+        v
+
+
+find : (a -> Bool) -> List a -> Maybe a
+find predicate list =
+    case list of
+        [] ->
+            Nothing
+
+        first :: rest ->
+            if predicate first then
+                Just first
+
+            else
+                find predicate rest

@@ -200,8 +200,8 @@ view computer mem =
 
         wps =
             case mem.state of
-                Victory _ wps ->
-                    wps
+                Victory _ s ->
+                    s
 
                 _ ->
                     Set.empty
@@ -282,7 +282,7 @@ mapAllPos func mem =
     List.map func (allPos mem)
 
 
-allPos : { a | width : b, height : Int } -> List Pos
+allPos : { a | width : Int, height : Int } -> List Pos
 allPos { width, height } =
     List.range 0 (height - 1)
         |> List.concatMap

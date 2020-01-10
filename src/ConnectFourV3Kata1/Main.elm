@@ -74,19 +74,13 @@ resetBoard mem =
 -- UPDATE
 
 
-type BoardState
-    = Turn Board.Player
-    | Draw
-    | Victory Board.Player (Set Pos)
+type alias BoardState =
+    Board.State
 
 
 toBoardState : Board -> BoardState
 toBoardState =
-    Board.transformState
-        { playerWon = Victory
-        , playerTurn = Turn
-        , gameDraw = always Draw
-        }
+    Board.state
 
 
 update : Computer -> Mem -> Mem
@@ -96,7 +90,7 @@ update computer mem =
             toConfig computer mem
     in
     case toBoardState mem.board of
-        Turn _ ->
+        Board.Turn _ ->
             if computer.mouse.click then
                 let
                     column =
@@ -191,13 +185,13 @@ view computer mem =
             Board.toDict mem.board
                 |> Dict.map (\_ -> Cell False)
                 |> (case state of
-                        Turn player ->
+                        Board.Turn player ->
                             insertIndicatorCell player mem
 
-                        Victory _ wps ->
+                        Board.Victory _ wps ->
                             highlightCells wps
 
-                        Draw ->
+                        Board.Draw ->
                             identity
                    )
 
@@ -206,7 +200,7 @@ view computer mem =
 
         topIndicatorShape =
             case state of
-                Turn player ->
+                Board.Turn player ->
                     indicatorShape computer.time c.cellSize player
                         |> translateTopIndicator c mem
 

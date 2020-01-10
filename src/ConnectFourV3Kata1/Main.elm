@@ -291,14 +291,18 @@ translateCell { cellSize, dx, dy } ( gx, gy ) =
     move x y
 
 
+circle2 c r =
+    Playground.oval c (r * 2) (r * 2)
+
+
 cellBgShape : Float -> Shape
 cellBgShape cellSize =
-    circle white (cellSize * 0.5 * 0.9)
+    circle2 white (cellSize * 0.5 * 0.9)
 
 
 cellPlayerShape : Float -> Board.Player -> Shape
 cellPlayerShape cellSize player =
-    circle
+    circle2
         (case player of
             Board.P1 ->
                 blue

@@ -175,9 +175,44 @@ view computer mem =
         cellSize =
             min ((screen.width * 0.7) / toFloat mem.width)
                 ((screen.height * 0.7) / toFloat mem.height)
+
+        dx =
+            (cellSize - (cellSize * toFloat mem.width)) / 2
+
+        dy =
+            (cellSize - (cellSize * toFloat mem.height)) / 2
+
+        toScreenPos ( gx, gy ) =
+            ( (toFloat gx * cellSize) + dx, (toFloat gy * cellSize) + dy )
     in
     [ rectangle black (cellSize * toFloat mem.width) (cellSize * toFloat mem.height)
+    , mapAllPos
+        (\pos ->
+            let
+                ( x, y ) =
+                    toScreenPos pos
+            in
+            circle white (cellSize * 0.9)
+                |> move x y
+        )
+        mem
+        |> group
     ]
+
+
+mapAllPos : (Pos -> b) -> { a | width : Int, height : Int } -> List b
+mapAllPos func mem =
+    List.map func (allPos mem)
+
+
+allPos : { a | width : b, height : Int } -> List Pos
+allPos { width, height } =
+    List.range 0 (height - 1)
+        |> List.concatMap
+            (\y ->
+                List.range 0 (width - 1)
+                    |> List.map (\x -> ( x, y ))
+            )
 
 
 

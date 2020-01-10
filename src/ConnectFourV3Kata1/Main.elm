@@ -289,7 +289,8 @@ view computer mem =
         topIndicatorShape =
             case state of
                 Board.Turn player ->
-                    indicatorShape computer.time cfg.cellDim player
+                    cellPlayerShape cfg.cellDim player
+                        |> blink computer.time
                         |> translateCell cfg ( mem.selectedColumn, mem.dim.height )
 
                 _ ->

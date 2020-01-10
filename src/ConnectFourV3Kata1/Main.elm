@@ -105,7 +105,7 @@ update computer mem =
             if computer.mouse.click then
                 let
                     column =
-                        ((computer.mouse.x + cfg.dx) / cfg.cDim.width)
+                        ((computer.mouse.x + cfg.dx) / cfg.cellDim.width)
                             |> round
                             |> flip Board.clampColumn mem.board
                 in
@@ -131,8 +131,8 @@ update computer mem =
 
 
 type alias Config =
-    { dim : FloatDim
-    , cDim : FloatDim
+    { boardDim : FloatDim
+    , cellDim : FloatDim
     , dx : Float
     , dy : Float
     }
@@ -158,8 +158,8 @@ toConfig computer mem =
         boardScreenDim =
             scaleDim cellSize gDim
     in
-    { dim = boardScreenDim
-    , cDim = FloatDim cellSize cellSize
+    { boardDim = boardScreenDim
+    , cellDim = FloatDim cellSize cellSize
     , dx = (widthPx - cellSize) / 2
     , dy = (heightPx - cellSize) / 2
     }
@@ -220,7 +220,7 @@ view computer mem =
         topIndicatorShape =
             case state of
                 Board.Turn player ->
-                    indicatorShape computer.time cfg.cDim player
+                    indicatorShape computer.time cfg.cellDim player
                         |> translateTopIndicator cfg mem
 
                 _ ->
@@ -230,11 +230,11 @@ view computer mem =
             Dict.get pos cellDict
     in
     [ rectangle2 gray computer.screen
-    , rectangle2 black cfg.dim
+    , rectangle2 black cfg.boardDim
     , Board.allPositions mem.board
         |> List.indexedMap
             (\idx pos ->
-                [ toCellShape computer.time cfg.cDim (cellAt pos)
+                [ toCellShape computer.time cfg.cellDim (cellAt pos)
 
                 --, words black (Debug.toString pos)
                 , words black (Debug.toString idx)
@@ -283,10 +283,10 @@ translateTopIndicator c mem =
 
 
 translateCell : Config -> ( Int, Int ) -> Shape -> Shape
-translateCell { cDim, dx, dy } ( gx, gy ) =
+translateCell { cellDim, dx, dy } ( gx, gy ) =
     move
-        ( toFloat gx * cDim.width - dx
-        , toFloat gy * cDim.height - dy
+        ( toFloat gx * cellDim.width - dx
+        , toFloat gy * cellDim.height - dy
         )
 
 

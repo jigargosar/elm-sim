@@ -304,6 +304,7 @@ translateCell cfg pos =
     move (toScreenPos cfg pos)
 
 
+move : ( Number, Number ) -> Shape -> Shape
 move ( x, y ) =
     Playground.move x y
 

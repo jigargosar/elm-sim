@@ -235,7 +235,7 @@ type alias Config =
     }
 
 
-toConfig : { a | width : Float, height : Float } -> { b | width : Int, height : Int } -> Config
+toConfig : Screen -> Mem -> Config
 toConfig screen mem =
     let
         cellSize =
@@ -247,6 +247,9 @@ toConfig screen mem =
 
         dy =
             (cellSize - (cellSize * toFloat mem.height)) / 2
+
+        ( px, py ) =
+            mem.pan
 
         toScreen ( gx, gy ) =
             ( (toFloat gx * cellSize) + dx, (toFloat gy * cellSize) + dy )

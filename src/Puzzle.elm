@@ -191,18 +191,21 @@ view { screen, mouse } mem =
                 Nothing ->
                     noShape
     in
-    [ rectangle black cfg.width cfg.height
-    , mapAllPos
-        (\pos ->
-            [ circle white (cfg.cellRadius * 0.9)
-            , tokenShapeAt pos
-            ]
-                |> group
-                |> moveCell cfg pos
-        )
-        mem
+    [ [ rectangle black cfg.width cfg.height
+      , mapAllPos
+            (\pos ->
+                [ circle white (cfg.cellRadius * 0.9)
+                , tokenShapeAt pos
+                ]
+                    |> group
+                    |> moveCell cfg pos
+            )
+            mem
+            |> group
+      , draggingShape
+      ]
         |> group
-    , draggingShape
+        |> move mem.pan
     ]
 
 

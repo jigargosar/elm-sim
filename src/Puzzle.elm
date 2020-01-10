@@ -64,12 +64,39 @@ insertTokenAt pos token mem =
 
 update : Computer -> Mem -> Mem
 update computer mem =
-    updateInner computer mem
+    let
+        { screen, mouse } =
+            computer
+
+        worldMouse =
+            let
+                ( x, y ) =
+                    cfg.screenToWorldPos ( mouse.x, mouse.y )
+            in
+            { mouse | x = x, y = y }
+
+        prevWorldMouse =
+            let
+                prevMouse =
+                    mem.prevMouse
+
+                ( x, y ) =
+                    cfg.screenToWorldPos ( prevMouse.x, prevMouse.y )
+            in
+            { prevMouse | x = x, y = y }
+
+        cfg =
+            toConfig screen mem
+
+        worldComputer =
+            { computer | mouse = worldMouse }
+    in
+    updateWorld worldComputer { mem | prevMouse = prevWorldMouse }
         |> (\m -> { m | prevMouse = computer.mouse })
 
 
-updateInner : Computer -> Mem -> Mem
-updateInner computer mem =
+updateWorld : Computer -> Mem -> Mem
+updateWorld computer mem =
     let
         { screen, mouse, keyboard } =
             computer
@@ -88,7 +115,7 @@ updateInner computer mem =
             else if mouse.down && not prevMouse.down then
                 let
                     pos =
-                        cfg.screenToGridPos ( mouse.x, mouse.y )
+                        cfg.worldToGridPos ( mouse.x, mouse.y )
                 in
                 case Dict.get pos mem.dict of
                     Just token ->
@@ -107,7 +134,7 @@ updateInner computer mem =
             if not mouse.down then
                 let
                     dropPos =
-                        cfg.screenToGridPos ( mouse.x, mouse.y )
+                        cfg.worldToGridPos ( mouse.x, mouse.y )
 
                     newDict =
                         if isPositionValid dropPos mem then
@@ -272,7 +299,6 @@ type alias Config =
     { cellSize : Float
     , cellRadius : Float
     , gridToWorldPos : Pos -> ( Float, Float )
-    , screenToGridPos : ( Float, Float ) -> Pos
     , screenToWorldPos : ( Float, Float ) -> ( Float, Float )
     , worldToGridPos : ( Float, Float ) -> Pos
     , width : Float
@@ -299,10 +325,6 @@ toConfig screen mem =
         gridToWorldPos ( gx, gy ) =
             ( (toFloat gx * cellSize) + dx, (toFloat gy * cellSize) + dy )
 
-        screenToGridPos =
-            -- ( round ((x - dx - px) / cellSize), round ((y - dy - py) / cellSize) )
-            screenToWorldPos >> worldToGridPos
-
         screenToWorldPos ( x, y ) =
             ( x - px, y - py )
 
@@ -312,7 +334,6 @@ toConfig screen mem =
     { cellSize = cellSize
     , cellRadius = cellSize / 2
     , gridToWorldPos = gridToWorldPos
-    , screenToGridPos = screenToGridPos
     , worldToGridPos = worldToGridPos
     , screenToWorldPos = screenToWorldPos
     , width = cellSize * toFloat mem.width

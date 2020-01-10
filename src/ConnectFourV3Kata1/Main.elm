@@ -202,35 +202,6 @@ toConfig computer mem =
     }
 
 
-type Cell
-    = Cell Bool Board.Player
-
-
-highlightCell : Cell -> Cell
-highlightCell (Cell _ p) =
-    Cell True p
-
-
-highlightCells : Set Pos -> Dict Pos Cell -> Dict Pos Cell
-highlightCells =
-    Set.foldl (\pos -> Dict.update pos (Maybe.map highlightCell))
-        |> flip
-
-
-insertIndicatorCell : Board.Player -> Mem -> Dict Pos Cell -> Dict Pos Cell
-insertIndicatorCell player mem =
-    case Board.insertPositionFromColumn mem.selectedColumn mem.board of
-        Just pos ->
-            Dict.insert pos (Cell True player)
-
-        Nothing ->
-            identity
-
-
-
--- View
-
-
 type Transform
     = Translate Float Float
     | Scale Float Float
@@ -261,6 +232,35 @@ applyInverse t ( x, y ) =
 
         Transform list ->
             List.foldr applyInverse ( x, y ) list
+
+
+type Cell
+    = Cell Bool Board.Player
+
+
+highlightCell : Cell -> Cell
+highlightCell (Cell _ p) =
+    Cell True p
+
+
+highlightCells : Set Pos -> Dict Pos Cell -> Dict Pos Cell
+highlightCells =
+    Set.foldl (\pos -> Dict.update pos (Maybe.map highlightCell))
+        |> flip
+
+
+insertIndicatorCell : Board.Player -> Mem -> Dict Pos Cell -> Dict Pos Cell
+insertIndicatorCell player mem =
+    case Board.insertPositionFromColumn mem.selectedColumn mem.board of
+        Just pos ->
+            Dict.insert pos (Cell True player)
+
+        Nothing ->
+            identity
+
+
+
+-- View
 
 
 view : Computer -> Mem -> List Shape

@@ -16,6 +16,7 @@ type alias Mem =
     , height : Int
     , dict : Dict Pos Token
     , drag : Drag
+    , pan : ( Float, Float )
     }
 
 
@@ -35,6 +36,7 @@ init =
     , height = 10
     , dict = Dict.empty
     , drag = NotDragging
+    , pan = ( 0, 0 )
     }
         |> insertTokenAt ( 0, 0 ) RedCircle
         |> insertTokenAt ( 0, 1 ) RedCircle

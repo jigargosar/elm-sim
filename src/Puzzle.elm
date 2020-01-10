@@ -254,6 +254,7 @@ type alias Config =
     , cellRadius : Float
     , gridToWorldPos : Pos -> ( Float, Float )
     , screenToGridPos : ( Float, Float ) -> Pos
+    , worldToGridPos : ( Float, Float ) -> Pos
     , width : Float
     , height : Float
     }
@@ -278,13 +279,21 @@ toConfig screen mem =
         gridToWorldPos ( gx, gy ) =
             ( (toFloat gx * cellSize) + dx, (toFloat gy * cellSize) + dy )
 
-        screenToGridPos ( x, y ) =
-            ( round ((x - dx - px) / cellSize), round ((y - dy - py) / cellSize) )
+        screenToGridPos =
+            -- ( round ((x - dx - px) / cellSize), round ((y - dy - py) / cellSize) )
+            screenToWorldPos >> worldToGridPos
+
+        screenToWorldPos ( x, y ) =
+            ( x - px, y - py )
+
+        worldToGridPos ( x, y ) =
+            ( round ((x - dx) / cellSize), round ((y - dy) / cellSize) )
     in
     { cellSize = cellSize
     , cellRadius = cellSize / 2
     , gridToWorldPos = gridToWorldPos
     , screenToGridPos = screenToGridPos
+    , worldToGridPos = worldToGridPos
     , width = cellSize * toFloat mem.width
     , height = cellSize * toFloat mem.height
     }

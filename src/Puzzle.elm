@@ -63,6 +63,12 @@ insertTokenAt pos token mem =
 
 update : Computer -> Mem -> Mem
 update computer mem =
+    updateInner computer mem
+        |> (\m -> { m | prevMouse = computer.mouse })
+
+
+updateInner : Computer -> Mem -> Mem
+updateInner computer mem =
     let
         { screen, mouse, keyboard } =
             computer

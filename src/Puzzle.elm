@@ -255,7 +255,7 @@ toConfig screen mem =
             ( (toFloat gx * cellSize) + dx, (toFloat gy * cellSize) + dy )
 
         toGrid ( x, y ) =
-            ( round ((x - dx) / cellSize), round ((y - dy) / cellSize) )
+            ( round ((x - dx - px) / cellSize), round ((y - dy - py) / cellSize) )
     in
     { cellSize = cellSize
     , cellRadius = cellSize / 2

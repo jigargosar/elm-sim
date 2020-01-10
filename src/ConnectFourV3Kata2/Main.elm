@@ -48,6 +48,7 @@ init =
     , selectedColumn = width // 2
     }
         |> insertInColumns [ 0, 1, 0, 1, 0, 1, 0, 1, 0 ]
+        |> Debug.log "mem"
 
 
 

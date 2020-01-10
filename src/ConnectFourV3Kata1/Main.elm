@@ -32,6 +32,11 @@ toFloatDim { width, height } =
     { width = toFloat width, height = toFloat height }
 
 
+scaleDim : number -> { a | width : number, height : number } -> { width : number, height : number }
+scaleDim sc { width, height } =
+    { width = width * sc, height = height * sc }
+
+
 
 -- MEM
 

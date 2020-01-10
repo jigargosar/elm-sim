@@ -192,8 +192,8 @@ toConfig : { a | width : Float, height : Float } -> { b | width : Int, height : 
 toConfig screen mem =
     let
         cellSize =
-            min ((screen.width * 0.9) / toFloat mem.width)
-                ((screen.height * 0.7) / toFloat mem.height)
+            min (screen.width / (toFloat mem.width + 1))
+                (screen.height / (toFloat mem.height + 2))
 
         dx =
             (cellSize - (cellSize * toFloat mem.width)) / 2

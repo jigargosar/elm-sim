@@ -179,7 +179,7 @@ view computer mem =
             toConfig screen mem
 
         _ =
-            viewWorld computer cfg
+            viewWorld computer cfg mem
 
         draggingPos : Maybe Pos
         draggingPos =

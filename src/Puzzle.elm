@@ -2,6 +2,7 @@ module Puzzle exposing (main)
 
 -- MAIN
 
+import Dict exposing (Dict)
 import Playground exposing (..)
 
 
@@ -12,14 +13,30 @@ import Playground exposing (..)
 type alias Mem =
     { width : Int
     , height : Int
+    , dict : Dict Pos Token
     }
+
+
+type Token
+    = RedCircle
 
 
 init : Mem
 init =
     { width = 10
     , height = 10
+    , dict = Dict.empty
     }
+        |> insertTokenAt ( 0, 0 ) RedCircle
+
+
+insertTokenAt : Pos -> Token -> Mem -> Mem
+insertTokenAt pos token mem =
+    if isPositionValid pos mem then
+        { mem | dict = Dict.insert pos token mem.dict }
+
+    else
+        mem
 
 
 
@@ -130,3 +147,13 @@ allPos { width, height } =
                 List.range 0 (width - 1)
                     |> List.map (\x -> ( x, y ))
             )
+
+
+isValidIdx : Int -> Int -> Bool
+isValidIdx idx len =
+    idx >= 0 && idx < len
+
+
+isPositionValid : Pos -> { a | width : Int, height : Int } -> Bool
+isPositionValid ( x, y ) mem =
+    isValidIdx x mem.width && isValidIdx y mem.height

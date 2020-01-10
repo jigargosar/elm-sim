@@ -94,7 +94,7 @@ updateInner computer mem =
                         { mem | drag = Dragging pos token }
 
                     Nothing ->
-                        mem
+                        { mem | drag = Panning mouse.x mouse.y }
 
             else
                 mem
@@ -136,7 +136,7 @@ updateInner computer mem =
             in
             { mem
                 | drag =
-                    if not mouse.down || not keyboard.shift then
+                    if not mouse.down then
                         NotDragging
 
                     else

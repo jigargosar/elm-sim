@@ -299,12 +299,9 @@ indicatorShape time cellSize player =
         |> blink time
 
 
-translateCell : Config -> ( Int, Int ) -> Shape -> Shape
-translateCell { cellDim, dx, dy } ( gx, gy ) =
-    move
-        ( toFloat gx * cellDim.width - dx
-        , toFloat gy * cellDim.height - dy
-        )
+translateCell : Config -> Pos -> Shape -> Shape
+translateCell cfg pos =
+    move (toScreenPos cfg pos)
 
 
 move ( x, y ) =

@@ -132,7 +132,7 @@ updateInner computer mem =
                     mem.pan
 
                 ( dx, dy ) =
-                    ( mouse.x - sx, mouse.y - sy )
+                    ( mouse.x - prevMouse.x, mouse.y - prevMouse.y )
             in
             { mem
                 | drag =
@@ -140,7 +140,7 @@ updateInner computer mem =
                         NotDragging
 
                     else
-                        Panning mouse.x mouse.y
+                        mem.drag
                 , pan = ( px + dx, py + dy )
             }
 

@@ -67,11 +67,13 @@ makeMoves moves =
 
 expectPlayerWon : Board.Player -> Set.Set ( Int, Int ) -> Board.Board -> Expectation
 expectPlayerWon expectedPlayer expectedWinningPositions =
-    Board.transformState
-        { playerWon =
-            \player wp ->
-                ( player, wp )
-                    |> Expect.equal ( expectedPlayer, expectedWinningPositions )
-        , playerTurn = \player -> Expect.fail "player turn"
-        , gameDraw = \() -> Expect.fail "game draw"
-        }
+    {- Board.transformState
+       { playerWon =
+           \player wp ->
+               ( player, wp )
+                   |> Expect.equal ( expectedPlayer, expectedWinningPositions )
+       , playerTurn = \player -> Expect.fail "player turn"
+       , gameDraw = \() -> Expect.fail "game draw"
+       }
+    -}
+    Board.state >> Expect.equal (Board.Victory expectedPlayer expectedWinningPositions)

@@ -161,12 +161,26 @@ flipCoin coin =
 update : Computer -> Mem -> Mem
 update computer mem =
     let
-        { mouse } =
+        { mouse, screen } =
             computer
+
+        cfg =
+            toConfig screen mem
     in
     case mem.state of
         Turn _ ->
-            mem
+            let
+                column =
+                    cfg.toGrid ( mouse.x, 1 ) |> Tuple.first
+
+                newMem =
+                    insertInColumn column mem
+            in
+            if newMem == mem then
+                { mem | selectedColumn = clamp 0 (mem.width - 1) column }
+
+            else
+                newMem
 
         _ ->
             if mouse.click then

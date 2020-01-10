@@ -199,7 +199,7 @@ insertIndicatorCell player mem =
 view : Computer -> Mem -> List Shape
 view computer mem =
     let
-        c =
+        cfg =
             toConfig computer mem
 
         cellDict =
@@ -222,8 +222,8 @@ view computer mem =
         topIndicatorShape =
             case state of
                 Board.Turn player ->
-                    indicatorShape computer.time c.cellSize player
-                        |> translateTopIndicator c mem
+                    indicatorShape computer.time cfg.cellSize player
+                        |> translateTopIndicator cfg mem
 
                 _ ->
                     noShape
@@ -232,17 +232,17 @@ view computer mem =
             Dict.get pos cellDict
     in
     [ rectangle gray computer.screen.width computer.screen.height
-    , rectangle black c.width c.height
+    , rectangle black cfg.width cfg.height
     , Board.allPositions mem.board
         |> List.indexedMap
             (\idx pos ->
-                [ toCellShape computer.time c.cellSize (cellAt pos)
+                [ toCellShape computer.time cfg.cellSize (cellAt pos)
 
                 --, words black (Debug.toString pos)
                 , words black (Debug.toString idx)
                 ]
                     |> group
-                    |> translateCell c pos
+                    |> translateCell cfg pos
             )
         |> group
     , topIndicatorShape

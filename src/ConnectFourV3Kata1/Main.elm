@@ -146,6 +146,7 @@ type alias Config =
     , cellDim : FloatDim
     , dx : Float
     , dy : Float
+    , cellT : Transform
     }
 
 
@@ -183,11 +184,18 @@ toConfig computer mem =
 
         translateDim =
             subDim dim cellDim |> scaleDim 0.5
+
+        dx =
+            translateDim.width
+
+        dy =
+            translateDim.height
     in
     { dim = dim
     , cellDim = cellDim
     , dx = translateDim.width
     , dy = translateDim.height
+    , cellT = Transform [ Scale cellDim.width cellDim.height, Translate -dx -dy ]
     }
 
 

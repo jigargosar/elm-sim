@@ -133,6 +133,7 @@ update computer mem =
 type alias Config =
     { cellSize : Float
     , dim : FloatDim
+    , cDim : FloatDim
     , dx : Float
     , dy : Float
     }
@@ -160,6 +161,7 @@ toConfig computer mem =
     in
     { cellSize = cellSize
     , dim = boardScreenDim
+    , cDim = FloatDim cellSize cellSize
     , dx = (widthPx - cellSize) / 2
     , dy = (heightPx - cellSize) / 2
     }

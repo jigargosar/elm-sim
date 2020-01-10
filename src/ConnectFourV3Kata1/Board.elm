@@ -41,6 +41,25 @@ type alias Rec =
     }
 
 
+type State
+    = Turn Player
+    | Victory Player (Set Pos)
+    | Draw
+
+
+fromInternalState : InternalState -> State
+fromInternalState iState =
+    case iState of
+        I_Turn p ->
+            Turn p
+
+        I_Victory player set ->
+            Victory player set
+
+        I_Draw ->
+            Draw
+
+
 init : { a | width : Int, height : Int } -> Board
 init { width, height } =
     { width = width

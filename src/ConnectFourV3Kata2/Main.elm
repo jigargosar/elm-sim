@@ -172,15 +172,9 @@ update computer mem =
             let
                 column =
                     cfg.toGrid ( mouse.x, 1 ) |> Tuple.first
-
-                newMem =
-                    insertInColumn column mem
             in
-            if newMem == mem then
-                { mem | selectedColumn = clamp 0 (mem.width - 1) column }
-
-            else
-                newMem
+            { mem | selectedColumn = clamp 0 (mem.width - 1) column }
+                |> whenTrue mouse.click (insertInColumn column)
 
         _ ->
             if mouse.click then

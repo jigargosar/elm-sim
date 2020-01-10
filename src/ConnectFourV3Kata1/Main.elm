@@ -74,8 +74,7 @@ dimFromTuple ( width, height ) =
 
 
 type alias Mem =
-    { dim : Dim
-    , board : Board
+    { board : Board
     , selectedColumn : Int
     }
 
@@ -89,8 +88,9 @@ init =
         board =
             Board.init dim
     in
-    { dim = dim
-    , board = [ 0, 1, 0, 1, 0, 1, 0, 1 ] |> List.foldl Board.insertInColumn board
+    { board =
+        [ 0, 1, 0, 1, 0, 1, 0, 1 ]
+            |> List.foldl Board.insertInColumn board
     , selectedColumn = Board.centerColumn board
     }
 
@@ -286,12 +286,15 @@ view computer mem =
         state =
             toBoardState mem.board
 
+        dim =
+            Board.dimensions mem.board
+
         topIndicatorShape =
             case state of
                 Board.Turn player ->
                     cellPlayerShape cfg.cellDim player
                         |> blink computer.time
-                        |> translateCell cfg ( mem.selectedColumn, mem.dim.height )
+                        |> translateCell cfg ( mem.selectedColumn, dim.height )
 
                 _ ->
                     noShape

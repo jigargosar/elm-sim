@@ -4,6 +4,7 @@ module Puzzle exposing (main)
 
 import Dict exposing (Dict)
 import Playground exposing (..)
+import PointFree exposing (whenTrue)
 
 
 
@@ -106,10 +107,24 @@ view { screen } mem =
         cfg =
             toConfig screen mem
 
+        draggingPos : Maybe Pos
+        draggingPos =
+            case mem.drag of
+                Dragging pos ->
+                    Just pos
+
+                _ ->
+                    Nothing
+
+        dimIfDragging pos =
+            whenTrue (Just pos == draggingPos)
+                (fade 0.5)
+
         tokenShapeAt pos =
             case Dict.get pos mem.dict of
                 Just token ->
                     tokenShape cfg token
+                        |> dimIfDragging pos
 
                 Nothing ->
                     noShape

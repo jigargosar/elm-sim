@@ -5,6 +5,7 @@ module Puzzle exposing (main)
 import Dict exposing (Dict)
 import Playground exposing (..)
 import PointFree exposing (whenTrue)
+import Set
 
 
 
@@ -136,13 +137,17 @@ updateInner computer mem =
             in
             { mem
                 | drag =
-                    if not mouse.down then
+                    if not mouse.down || esc keyboard then
                         NotDragging
 
                     else
                         mem.drag
                 , pan = ( px + dx, py + dy )
             }
+
+
+esc { keys } =
+    Set.member "Escape" keys
 
 
 

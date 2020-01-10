@@ -15,6 +15,10 @@ type alias Pos =
     ( Int, Int )
 
 
+type alias ScreenPos =
+    ( Number, Number )
+
+
 
 -- DIMENSIONS
 
@@ -150,7 +154,7 @@ toBoardX cfg x =
     round ((x + cfg.dx) / cfg.cellDim.width)
 
 
-toScreenPos : Config -> Pos -> ( Float, Float )
+toScreenPos : Config -> Pos -> ScreenPos
 toScreenPos { cellDim, dx, dy } ( gx, gy ) =
     ( toFloat gx * cellDim.width - dx
     , toFloat gy * cellDim.height - dy
@@ -304,7 +308,7 @@ translateCell cfg pos =
     move (toScreenPos cfg pos)
 
 
-move : ( Number, Number ) -> Shape -> Shape
+move : ScreenPos -> Shape -> Shape
 move ( x, y ) =
     Playground.move x y
 

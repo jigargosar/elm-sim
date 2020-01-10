@@ -284,11 +284,14 @@ translateTopIndicator c mem =
 
 translateCell : Config -> ( Int, Int ) -> Shape -> Shape
 translateCell { cDim, dx, dy } ( gx, gy ) =
-    let
-        ( x, y ) =
-            ( toFloat gx * cDim.width - dx, toFloat gy * cDim.height - dy )
-    in
-    move x y
+    move
+        ( toFloat gx * cDim.width - dx
+        , toFloat gy * cDim.height - dy
+        )
+
+
+move ( x, y ) =
+    Playground.move x y
 
 
 oval2 c { width, height } =

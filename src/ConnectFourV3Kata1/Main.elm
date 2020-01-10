@@ -136,15 +136,20 @@ toConfig computer mem =
             Board.dimensions mem.board
                 |> toFloatDim
 
+        sDim : { width : Float, height : Float }
         sDim =
-            { width = computer.screen.width, height = computer.screen.height }
+            computer.screen
+                |> scaleDim 0.7
 
         cellSize =
-            min (sDim.width * 0.7 / gDim.width)
-                (sDim.height * 0.7 / gDim.height)
+            min (sDim.width / gDim.width)
+                (sDim.height / gDim.height)
 
         ( widthPx, heightPx ) =
-            ( gDim.width * cellSize, gDim.height * cellSize )
+            ( boardScreenDim.width, boardScreenDim.height )
+
+        boardScreenDim =
+            scaleDim cellSize gDim
     in
     { cellSize = cellSize
     , width = widthPx

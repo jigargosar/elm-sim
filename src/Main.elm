@@ -1,6 +1,6 @@
 module Main exposing (main)
 
-import ConnectFour as Main
+import Puzzle as Main
 
 
 main =

@@ -175,10 +175,20 @@ view computer mem =
         { screen, mouse } =
             computer
 
+        worldMouse =
+            let
+                ( x, y ) =
+                    cfg.screenToWorldPos ( mouse.x, mouse.y )
+            in
+            { mouse | x = x, y = y }
+
         cfg =
             toConfig screen mem
+
+        worldComputer =
+            { computer | mouse = worldMouse }
     in
-    [ viewWorld computer cfg mem
+    [ viewWorld worldComputer cfg mem
         |> group
         |> move mem.pan
     ]
@@ -213,7 +223,7 @@ viewWorld { mouse } cfg mem =
             case draggingToken of
                 Just token ->
                     tokenShape cfg token
-                        |> move (cfg.screenToWorldPos ( mouse.x, mouse.y ))
+                        |> move ( mouse.x, mouse.y )
 
                 Nothing ->
                     noShape

@@ -93,7 +93,7 @@ updateState : Pos -> Coin -> Mem -> Mem
 updateState pos coin mem =
     let
         nextState =
-            if mem.width * mem.height >= Dict.size mem.dict then
+            if mem.width * mem.height <= Dict.size mem.dict then
                 Draw
 
             else
@@ -116,23 +116,34 @@ getWPS sp coin mem =
         negateStep ( dx, dy ) =
             ( -dx, -dy )
 
-        connectedWithStep step pos acc =
-            let
-                nextPos =
-                    stepPos step pos
-            in
-            if Dict.get nextPos mem.dict == Just coin then
-                connectedWithStep step nextPos (Set.insert nextPos acc)
+        connectedWithStep ct step pos acc =
+            if ct == 0 then
+                let
+                    _ =
+                        Debug.log "crash" ( step, pos, acc )
+                in
+                Debug.todo "max count reached"
 
             else
-                acc
+                let
+                    nextPos =
+                        stepPos step pos
+                in
+                if Dict.get nextPos mem.dict == Just coin then
+                    connectedWithStep (ct - 1)
+                        step
+                        nextPos
+                        (Set.insert nextPos acc)
+
+                else
+                    acc
 
         connectedPositions step =
-            connectedWithStep step sp Set.empty
-                |> Set.union (connectedWithStep (negateStep step) sp Set.empty)
+            connectedWithStep 10 step sp Set.empty
+                |> Set.union (connectedWithStep 10 (negateStep step) sp Set.empty)
                 |> Set.insert sp
     in
-    [ ( 0, 0 ), ( 1, 1 ), ( 0, 1 ), ( -1, 1 ) ]
+    [ ( 1, 0 ), ( 1, 1 ), ( 0, 1 ), ( -1, 1 ) ]
         |> List.map connectedPositions
         |> List.Extra.find (Set.size >> is 4)
 

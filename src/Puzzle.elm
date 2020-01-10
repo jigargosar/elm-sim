@@ -21,7 +21,7 @@ type alias Mem =
 
 type Drag
     = NotDragging
-    | Dragging Pos
+    | Dragging Pos Token
 
 
 type Token
@@ -73,8 +73,8 @@ update computer mem =
                         cfg.toGrid ( mouse.x, mouse.y )
                 in
                 case Dict.get pos mem.dict of
-                    Just _ ->
-                        { mem | drag = Dragging pos }
+                    Just token ->
+                        { mem | drag = Dragging pos token }
 
                     Nothing ->
                         mem
@@ -82,9 +82,16 @@ update computer mem =
             else
                 mem
 
-        Dragging _ ->
+        Dragging pos token ->
             if not mouse.down then
-                { mem | drag = NotDragging }
+                let
+                    newDict =
+                        mem.dict
+                in
+                { mem
+                    | drag = NotDragging
+                    , dict = newDict
+                }
 
             else
                 mem
@@ -110,8 +117,17 @@ view { screen, mouse } mem =
         draggingPos : Maybe Pos
         draggingPos =
             case mem.drag of
-                Dragging pos ->
+                Dragging pos _ ->
                     Just pos
+
+                _ ->
+                    Nothing
+
+        draggingToken : Maybe Token
+        draggingToken =
+            case mem.drag of
+                Dragging _ token ->
+                    Just token
 
                 _ ->
                     Nothing
@@ -119,9 +135,6 @@ view { screen, mouse } mem =
         dimIfDragging pos =
             whenTrue (Just pos == draggingPos)
                 (fade 0.5)
-
-        draggingToken =
-            Maybe.andThen (\pos -> Dict.get pos mem.dict) draggingPos
 
         draggingShape =
             case draggingToken of

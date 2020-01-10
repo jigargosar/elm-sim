@@ -16,11 +16,20 @@ type alias Pos =
 
 
 
--- GRID DIMENSION
+-- DIMENSIONS
 
 
-type alias GDim =
+type alias IntDim =
     { width : Int, height : Int }
+
+
+type alias FloatDim =
+    { width : Float, height : Float }
+
+
+toFloatDim : { a | width : Int, height : Int } -> FloatDim
+toFloatDim { width, height } =
+    { width = toFloat width, height = toFloat height }
 
 
 
@@ -28,7 +37,7 @@ type alias GDim =
 
 
 type alias Mem =
-    { dim : GDim
+    { dim : IntDim
     , board : Board
     , selectedColumn : Int
     }
@@ -118,15 +127,19 @@ type alias Config =
 toConfig : Computer -> Mem -> Config
 toConfig computer mem =
     let
-        dim =
+        gDim =
             Board.dimensions mem.board
+                |> toFloatDim
+
+        sDim =
+            { width = computer.screen.width, height = computer.screen.height }
 
         cellSize =
-            min (computer.screen.width * 0.7 / toFloat dim.width)
-                (computer.screen.height * 0.7 / toFloat dim.height)
+            min (sDim.width * 0.7 / gDim.width)
+                (sDim.height * 0.7 / gDim.height)
 
         ( widthPx, heightPx ) =
-            ( toFloat dim.width * cellSize, toFloat dim.height * cellSize )
+            ( gDim.width * cellSize, gDim.height * cellSize )
     in
     { cellSize = cellSize
     , width = widthPx

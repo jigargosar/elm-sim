@@ -19,7 +19,7 @@ type alias Pos =
 -- DIMENSIONS
 
 
-type alias IntDim =
+type alias Dim =
     { width : Int, height : Int }
 
 
@@ -60,7 +60,7 @@ subDim a b =
 
 
 type alias Mem =
-    { dim : IntDim
+    { dim : Dim
     , board : Board
     , selectedColumn : Int
     }

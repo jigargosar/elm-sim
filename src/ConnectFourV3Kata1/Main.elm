@@ -105,7 +105,7 @@ update computer mem =
             if computer.mouse.click then
                 let
                     column =
-                        ((computer.mouse.x + cfg.dx) / cfg.cellSize)
+                        ((computer.mouse.x + cfg.dx) / cfg.cDim.width)
                             |> round
                             |> flip Board.clampColumn mem.board
                 in
@@ -222,7 +222,7 @@ view computer mem =
         topIndicatorShape =
             case state of
                 Board.Turn player ->
-                    indicatorShape computer.time cfg.cellSize player
+                    indicatorShape computer.time cfg.cDim player
                         |> translateTopIndicator cfg mem
 
                 _ ->
@@ -236,7 +236,7 @@ view computer mem =
     , Board.allPositions mem.board
         |> List.indexedMap
             (\idx pos ->
-                [ toCellShape computer.time cfg.cellSize (cellAt pos)
+                [ toCellShape computer.time cfg.cDim (cellAt pos)
 
                 --, words black (Debug.toString pos)
                 , words black (Debug.toString idx)
@@ -254,7 +254,7 @@ rectangle2 color { width, height } =
     rectangle color width height
 
 
-toCellShape : Time -> Float -> Maybe Cell -> Shape
+toCellShape : Time -> FloatDim -> Maybe Cell -> Shape
 toCellShape time cellSize maybeCell =
     case maybeCell of
         Just (Cell bool player) ->
@@ -273,7 +273,7 @@ noShape =
     group []
 
 
-indicatorShape : Time -> Float -> Board.Player -> Shape
+indicatorShape : Time -> FloatDim -> Board.Player -> Shape
 indicatorShape time cellSize player =
     cellPlayerShape cellSize player
         |> blink time
@@ -293,16 +293,16 @@ translateCell { cellSize, dx, dy } ( gx, gy ) =
     move x y
 
 
-oval2 c wh =
-    Playground.oval c wh wh
+oval2 c { width, height } =
+    Playground.oval c width height
 
 
-cellBgShape : Float -> Shape
+cellBgShape : FloatDim -> Shape
 cellBgShape cellSize =
-    oval2 white (cellSize * 0.9)
+    oval2 white (cellSize |> scaleDim 0.9)
 
 
-cellPlayerShape : Float -> Board.Player -> Shape
+cellPlayerShape : FloatDim -> Board.Player -> Shape
 cellPlayerShape cellSize player =
     oval2
         (case player of
@@ -312,7 +312,7 @@ cellPlayerShape cellSize player =
             Board.P2 ->
                 red
         )
-        (cellSize * 0.75)
+        (cellSize |> scaleDim 0.75)
 
 
 blink : Time -> Shape -> Shape

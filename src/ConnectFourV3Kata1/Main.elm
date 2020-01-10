@@ -220,6 +220,38 @@ insertIndicatorCell player mem =
 -- View
 
 
+type Transform
+    = Translate Float Float
+    | Scale Float Float
+    | Transform (List Transform)
+
+
+applyTransform : Transform -> ( Float, Float ) -> ( Float, Float )
+applyTransform t ( x, y ) =
+    case t of
+        Translate dx dy ->
+            ( x + dx, y + dy )
+
+        Scale sx sy ->
+            ( x * sx, y * sy )
+
+        Transform list ->
+            List.foldl applyTransform ( x, y ) list
+
+
+applyInverse : Transform -> ( Float, Float ) -> ( Float, Float )
+applyInverse t ( x, y ) =
+    case t of
+        Translate dx dy ->
+            ( x - dx, y - dy )
+
+        Scale sx sy ->
+            ( x / sx, y / sy )
+
+        Transform list ->
+            List.foldr applyInverse ( x, y ) list
+
+
 view : Computer -> Mem -> List Shape
 view computer mem =
     let

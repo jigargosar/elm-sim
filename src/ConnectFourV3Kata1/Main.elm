@@ -150,6 +150,13 @@ toBoardX cfg x =
     round ((x + cfg.dx) / cfg.cellDim.width)
 
 
+toScreenPos : Config -> Pos -> ( Float, Float )
+toScreenPos { cellDim, dx, dy } ( gx, gy ) =
+    ( toFloat gx * cellDim.width - dx
+    , toFloat gy * cellDim.height - dy
+    )
+
+
 toConfig : Computer -> Mem -> Config
 toConfig computer mem =
     let

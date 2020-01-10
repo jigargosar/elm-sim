@@ -17,6 +17,7 @@ type alias Mem =
     , dict : Dict Pos Token
     , drag : Drag
     , pan : ( Float, Float )
+    , prevMouse : Mouse
     }
 
 
@@ -37,6 +38,7 @@ init =
     , dict = Dict.empty
     , drag = NotDragging
     , pan = ( 0, 0 )
+    , prevMouse = Mouse 0 0 False False
     }
         |> insertTokenAt ( 0, 0 ) RedCircle
         |> insertTokenAt ( 0, 1 ) RedCircle
@@ -65,6 +67,9 @@ update computer mem =
         { screen, mouse, keyboard } =
             computer
 
+        prevMouse =
+            mem.prevMouse
+
         cfg =
             toConfig screen mem
     in
@@ -73,7 +78,7 @@ update computer mem =
             if mouse.down && keyboard.shift then
                 { mem | drag = Panning mouse.x mouse.y }
 
-            else if mouse.down then
+            else if mouse.down && not prevMouse.down then
                 let
                     pos =
                         cfg.toGrid ( mouse.x, mouse.y )

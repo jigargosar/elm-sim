@@ -2,7 +2,10 @@ module ConnectFourV3Kata1.Board exposing
     ( Board
     , Player(..)
     , State(..)
+    , allPositions
     , centerColumn
+    , clampColumn
+    , dimensions
     , init
     , insertInColumn
     , insertPositionFromColumn
@@ -73,6 +76,18 @@ clampColumn column (Board { width }) =
 centerColumn : Board -> Int
 centerColumn (Board { width }) =
     width // 2
+
+
+dimensions : Board -> { width : Int, height : Int }
+dimensions (Board { width, height }) =
+    { width = width, height = height }
+
+
+allPositions : Board -> List ( Int, Int )
+allPositions (Board { width, height }) =
+    List.range 0 (height - 1)
+        |> List.concatMap
+            (\y -> List.range 0 (width - 1) |> List.map (\x -> ( x, y )))
 
 
 insertInColumn : Int -> Board -> Board

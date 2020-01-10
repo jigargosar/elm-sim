@@ -23,18 +23,6 @@ type alias GDim =
     { width : Int, height : Int }
 
 
-centerColumn : GDim -> Int
-centerColumn { width } =
-    width // 2
-
-
-gridPositions : GDim -> List Pos
-gridPositions { width, height } =
-    List.range 0 (height - 1)
-        |> List.concatMap
-            (\y -> List.range 0 (width - 1) |> List.map (\x -> ( x, y )))
-
-
 
 -- MEM
 
@@ -57,7 +45,7 @@ init =
     in
     { dim = dim
     , board = [ 0, 1, 0, 1, 0, 1, 0, 1 ] |> List.foldl Board.insertInColumn board
-    , selectedColumn = centerColumn dim
+    , selectedColumn = Board.centerColumn board
     }
 
 
@@ -95,7 +83,7 @@ update computer mem =
                     column =
                         ((computer.mouse.x + cfg.dx) / cfg.cellSize)
                             |> round
-                            |> clamp 0 (mem.dim.width - 1)
+                            |> flip Board.clampColumn mem.board
                 in
                 if column == mem.selectedColumn then
                     { mem | board = Board.insertInColumn column mem.board }
@@ -130,12 +118,15 @@ type alias Config =
 toConfig : Computer -> Mem -> Config
 toConfig computer mem =
     let
+        dim =
+            Board.dimensions mem.board
+
         cellSize =
-            min (computer.screen.width * 0.7 / toFloat mem.dim.width)
-                (computer.screen.height * 0.7 / toFloat mem.dim.height)
+            min (computer.screen.width * 0.7 / toFloat dim.width)
+                (computer.screen.height * 0.7 / toFloat dim.height)
 
         ( widthPx, heightPx ) =
-            ( toFloat mem.dim.width * cellSize, toFloat mem.dim.height * cellSize )
+            ( toFloat dim.width * cellSize, toFloat dim.height * cellSize )
     in
     { cellSize = cellSize
     , width = widthPx
@@ -211,7 +202,7 @@ view computer mem =
     in
     [ rectangle gray computer.screen.width computer.screen.height
     , rectangle black c.width c.height
-    , gridPositions mem.dim
+    , Board.allPositions mem.board
         |> List.indexedMap
             (\idx pos ->
                 [ toCellShape computer.time c.cellSize (cellAt pos)

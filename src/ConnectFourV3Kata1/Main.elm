@@ -286,16 +286,6 @@ view computer mem =
         state =
             toBoardState mem.board
 
-        topIndicatorShape =
-            case state of
-                Board.Turn player ->
-                    indicatorShape computer.time cfg.cellDim player
-                        |> translateCell cfg
-                            ( mem.selectedColumn, (Board.dimensions mem.board).height )
-
-                _ ->
-                    noShape
-
         cellAt pos =
             Dict.get pos cellDict
     in
@@ -313,8 +303,24 @@ view computer mem =
                     |> translateCell cfg pos
             )
         |> group
-    , topIndicatorShape
+    , topIndicatorShape computer cfg mem
     ]
+
+
+topIndicatorShape : Computer -> Config -> Mem -> Shape
+topIndicatorShape computer cfg mem =
+    let
+        state =
+            toBoardState mem.board
+    in
+    case state of
+        Board.Turn player ->
+            indicatorShape computer.time cfg.cellDim player
+                |> translateCell cfg
+                    ( mem.selectedColumn, (Board.dimensions mem.board).height )
+
+        _ ->
+            noShape
 
 
 rectangle2 : Color -> { a | width : Number, height : Number } -> Shape

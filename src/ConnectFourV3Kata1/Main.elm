@@ -113,8 +113,7 @@ update computer mem =
             if computer.mouse.click then
                 let
                     column =
-                        ((computer.mouse.x + cfg.dx) / cfg.cellDim.width)
-                            |> round
+                        toBoardX cfg computer.mouse.x
                             |> flip Board.clampColumn mem.board
                 in
                 if column == mem.selectedColumn then
@@ -146,6 +145,11 @@ type alias Config =
     }
 
 
+toBoardX : Config -> Float -> Int
+toBoardX cfg x =
+    round ((x + cfg.dx) / cfg.cellDim.width)
+
+
 toConfig : Computer -> Mem -> Config
 toConfig computer mem =
     let
@@ -160,16 +164,19 @@ toConfig computer mem =
         cellSize =
             fDivDim sDim gDim |> minDim
 
-        ( widthPx, heightPx ) =
-            ( dim.width, dim.height )
-
         dim =
             scaleDim cellSize gDim
+
+        cellDim =
+            FloatDim cellSize cellSize
+
+        translateDim =
+            subDim dim cellDim |> scaleDim 0.5
     in
     { dim = dim
-    , cellDim = FloatDim cellSize cellSize
-    , dx = (widthPx - cellSize) / 2
-    , dy = (heightPx - cellSize) / 2
+    , cellDim = cellDim
+    , dx = translateDim.width
+    , dy = translateDim.height
     }
 
 

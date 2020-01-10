@@ -7,7 +7,6 @@ module ConnectFourV3Kata1.Board exposing
     , insertPositionFromColumn
     , state
     , toDict
-    , transformState
     )
 
 import Dict exposing (Dict)
@@ -87,25 +86,6 @@ insertPositionFromColumn column (Board { width, height, dict }) =
 isIdxValid : number -> number -> Bool
 isIdxValid len idx =
     idx >= 0 && idx < len
-
-
-transformState :
-    { playerWon : Player -> Set ( Int, Int ) -> a
-    , playerTurn : Player -> a
-    , gameDraw : () -> a
-    }
-    -> Board
-    -> a
-transformState cb (Board rec) =
-    case rec.state of
-        I_Victory player winningPositions ->
-            cb.playerWon player winningPositions
-
-        I_Turn player ->
-            cb.playerTurn player
-
-        I_Draw ->
-            cb.gameDraw ()
 
 
 state : Board -> State

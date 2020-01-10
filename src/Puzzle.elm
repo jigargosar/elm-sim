@@ -97,6 +97,9 @@ updateInner computer mem =
                     Nothing ->
                         { mem | drag = Panning mem.pan }
 
+            else if keyboard.space then
+                { mem | pan = ( 0, 0 ) }
+
             else
                 mem
 

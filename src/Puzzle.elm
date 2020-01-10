@@ -115,12 +115,23 @@ update computer mem =
             else
                 mem
 
-        Panning sx xy ->
-            if not mouse.down || not keyboard.shift then
-                { mem | drag = NotDragging }
+        Panning sx sy ->
+            let
+                ( px, py ) =
+                    mem.pan
 
-            else
-                mem
+                ( dx, dy ) =
+                    ( mouse.x - sx, mouse.y - sy )
+            in
+            { mem
+                | drag =
+                    if not mouse.down || not keyboard.shift then
+                        NotDragging
+
+                    else
+                        mem.drag
+                , pan = ( px + dx, py + dy )
+            }
 
 
 

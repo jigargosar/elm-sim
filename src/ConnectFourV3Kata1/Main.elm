@@ -122,7 +122,7 @@ update computer mem =
 
 
 
--- VIEW
+-- VIEW MODEL
 
 
 type alias Config =
@@ -175,6 +175,10 @@ insertIndicatorCell player mem =
 
         Nothing ->
             identity
+
+
+
+-- View
 
 
 view : Computer -> Mem -> List Shape

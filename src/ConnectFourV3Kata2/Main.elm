@@ -115,31 +115,23 @@ getWPS sp coin mem =
         negateStep ( dx, dy ) =
             ( -dx, -dy )
 
-        connectedWithStep ct step pos acc =
-            if ct == 0 then
-                let
-                    _ =
-                        Debug.log "crash" ( step, pos, acc )
-                in
-                Debug.todo "max count reached"
+        connectedWithStep step pos acc =
+            let
+                nextPos =
+                    stepPos step pos
+            in
+            if Dict.get nextPos mem.dict == Just coin then
+                connectedWithStep
+                    step
+                    nextPos
+                    (Set.insert nextPos acc)
 
             else
-                let
-                    nextPos =
-                        stepPos step pos
-                in
-                if Dict.get nextPos mem.dict == Just coin then
-                    connectedWithStep (ct - 1)
-                        step
-                        nextPos
-                        (Set.insert nextPos acc)
-
-                else
-                    acc
+                acc
 
         connectedPositions step =
-            connectedWithStep 10 step sp Set.empty
-                |> Set.union (connectedWithStep 10 (negateStep step) sp Set.empty)
+            connectedWithStep step sp Set.empty
+                |> Set.union (connectedWithStep (negateStep step) sp Set.empty)
                 |> Set.insert sp
     in
     [ ( 1, 0 ), ( 1, 1 ), ( 0, 1 ), ( -1, 1 ) ]

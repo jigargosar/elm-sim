@@ -70,11 +70,6 @@ resetBoard mem =
     { mem | board = Board.init dim, selectedColumn = centerColumn dim }
 
 
-insertPosition : Mem -> Maybe Pos
-insertPosition mem =
-    Board.insertPositionFromColumn mem.selectedColumn mem.board
-
-
 
 -- UPDATE
 
@@ -174,7 +169,7 @@ highlightCells =
 
 insertIndicatorCell : Board.Player -> Mem -> Dict Pos Cell -> Dict Pos Cell
 insertIndicatorCell player mem =
-    case insertPosition mem of
+    case Board.insertPositionFromColumn mem.selectedColumn mem.board of
         Just pos ->
             Dict.insert pos (Cell True player)
 

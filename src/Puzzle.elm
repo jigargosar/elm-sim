@@ -25,7 +25,7 @@ type alias Mem =
 type Drag
     = NotDragging
     | Dragging Pos Token
-    | Panning Float Float
+    | Panning ( Float, Float )
 
 
 type Token
@@ -83,7 +83,7 @@ updateInner computer mem =
     case mem.drag of
         NotDragging ->
             if mouse.down && keyboard.shift then
-                { mem | drag = Panning mouse.x mouse.y }
+                { mem | drag = Panning mem.pan }
 
             else if mouse.down && not prevMouse.down then
                 let
@@ -95,7 +95,7 @@ updateInner computer mem =
                         { mem | drag = Dragging pos token }
 
                     Nothing ->
-                        { mem | drag = Panning mouse.x mouse.y }
+                        { mem | drag = Panning mem.pan }
 
             else
                 mem
@@ -127,7 +127,7 @@ updateInner computer mem =
             else
                 mem
 
-        Panning sx sy ->
+        Panning orignalPan ->
             let
                 ( px, py ) =
                     mem.pan
@@ -142,7 +142,12 @@ updateInner computer mem =
 
                     else
                         mem.drag
-                , pan = ( px + dx, py + dy )
+                , pan =
+                    if esc keyboard then
+                        orignalPan
+
+                    else
+                        ( px + dx, py + dy )
             }
 
 

@@ -88,7 +88,7 @@ updateInner computer mem =
             else if mouse.down && not prevMouse.down then
                 let
                     pos =
-                        cfg.toGrid ( mouse.x, mouse.y )
+                        cfg.screenToGridPos ( mouse.x, mouse.y )
                 in
                 case Dict.get pos mem.dict of
                     Just token ->
@@ -107,7 +107,7 @@ updateInner computer mem =
             if not mouse.down then
                 let
                     dropPos =
-                        cfg.toGrid ( mouse.x, mouse.y )
+                        cfg.screenToGridPos ( mouse.x, mouse.y )
 
                     newDict =
                         if isPositionValid dropPos mem then
@@ -252,8 +252,8 @@ type alias Pos =
 type alias Config =
     { cellSize : Float
     , cellRadius : Float
-    , toScreen : Pos -> ( Float, Float )
-    , toGrid : ( Float, Float ) -> Pos
+    , gridToWorldPos : Pos -> ( Float, Float )
+    , screenToGridPos : ( Float, Float ) -> Pos
     , width : Float
     , height : Float
     }
@@ -275,24 +275,24 @@ toConfig screen mem =
         ( px, py ) =
             mem.pan
 
-        toScreen ( gx, gy ) =
+        gridToWorldPos ( gx, gy ) =
             ( (toFloat gx * cellSize) + dx, (toFloat gy * cellSize) + dy )
 
-        toGrid ( x, y ) =
+        screenToGridPos ( x, y ) =
             ( round ((x - dx - px) / cellSize), round ((y - dy - py) / cellSize) )
     in
     { cellSize = cellSize
     , cellRadius = cellSize / 2
-    , toScreen = toScreen
-    , toGrid = toGrid
+    , gridToWorldPos = gridToWorldPos
+    , screenToGridPos = screenToGridPos
     , width = cellSize * toFloat mem.width
     , height = cellSize * toFloat mem.height
     }
 
 
-moveCell : { a | toScreen : b -> ( Number, Number ) } -> b -> Shape -> Shape
+moveCell : Config -> Pos -> Shape -> Shape
 moveCell cfg pos =
-    move (cfg.toScreen pos)
+    move (cfg.gridToWorldPos pos)
 
 
 move : ( Number, Number ) -> Shape -> Shape

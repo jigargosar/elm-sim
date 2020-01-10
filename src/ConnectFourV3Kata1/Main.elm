@@ -118,13 +118,14 @@ update computer mem =
                 let
                     column =
                         toBoardX cfg computer.mouse.x
-                            |> flip Board.clampColumn mem.board
+
+                    -- |> flip Board.clampColumn mem.board
                 in
                 if column == mem.selectedColumn then
                     { mem | board = Board.insertInColumn column mem.board }
 
                 else
-                    { mem | selectedColumn = column }
+                    { mem | selectedColumn = Board.clampColumn column mem.board }
 
             else
                 mem
@@ -152,14 +153,12 @@ type alias Config =
 
 toBoardX : Config -> Float -> Int
 toBoardX cfg x =
-    round ((x + cfg.dx) / cfg.cellDim.width)
+    applyInverse cfg.cellT ( x, 1 ) |> Tuple.first |> round
 
 
 toScreenPos : Config -> Pos -> ScreenPos
-toScreenPos { cellDim, dx, dy } ( gx, gy ) =
-    ( toFloat gx * cellDim.width - dx
-    , toFloat gy * cellDim.height - dy
-    )
+toScreenPos { cellT, cellDim, dx, dy } ( gx, gy ) =
+    applyTransform cellT ( toFloat gx, toFloat gy )
 
 
 toConfig : Computer -> Mem -> Config

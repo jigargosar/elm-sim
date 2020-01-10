@@ -179,12 +179,13 @@ update computer mem =
 -- View
 
 
-view : Computer -> Mem -> List Shape
-view computer mem =
-    let
-        { screen, time } =
-            computer
+type alias Config =
+    { cellSize : Float, dx : Float, dy : Float }
 
+
+toConfig : { a | width : Float, height : Float } -> { b | width : Int, height : Int } -> Config
+toConfig screen mem =
+    let
         cellSize =
             min ((screen.width * 0.7) / toFloat mem.width)
                 ((screen.height * 0.7) / toFloat mem.height)
@@ -194,6 +195,21 @@ view computer mem =
 
         dy =
             (cellSize - (cellSize * toFloat mem.height)) / 2
+    in
+    { cellSize = cellSize
+    , dx = dx
+    , dy = dy
+    }
+
+
+view : Computer -> Mem -> List Shape
+view computer mem =
+    let
+        { screen, time } =
+            computer
+
+        { cellSize, dx, dy } =
+            toConfig screen mem
 
         toScreenPos ( gx, gy ) =
             ( (toFloat gx * cellSize) + dx, (toFloat gy * cellSize) + dy )

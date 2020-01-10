@@ -177,63 +177,8 @@ view computer mem =
 
         cfg =
             toConfig screen mem
-
-        _ =
-            viewWorld computer cfg mem
-
-        draggingPos : Maybe Pos
-        draggingPos =
-            case mem.drag of
-                Dragging pos _ ->
-                    Just pos
-
-                _ ->
-                    Nothing
-
-        draggingToken : Maybe Token
-        draggingToken =
-            case mem.drag of
-                Dragging _ token ->
-                    Just token
-
-                _ ->
-                    Nothing
-
-        dimIfDragging pos =
-            whenTrue (Just pos == draggingPos)
-                (fade 0.5)
-
-        draggingShape =
-            case draggingToken of
-                Just token ->
-                    tokenShape cfg token
-                        |> move (cfg.screenToWorldPos ( mouse.x, mouse.y ))
-
-                Nothing ->
-                    noShape
-
-        tokenShapeAt pos =
-            case Dict.get pos mem.dict of
-                Just token ->
-                    tokenShape cfg token
-                        |> dimIfDragging pos
-
-                Nothing ->
-                    noShape
     in
-    [ [ rectangle black cfg.width cfg.height
-      , mapAllPos
-            (\pos ->
-                [ circle white (cfg.cellRadius * 0.9)
-                , tokenShapeAt pos
-                ]
-                    |> group
-                    |> moveCell cfg pos
-            )
-            mem
-            |> group
-      , draggingShape
-      ]
+    [ viewWorld computer cfg mem
         |> group
         |> move mem.pan
     ]

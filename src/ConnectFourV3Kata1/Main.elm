@@ -47,6 +47,14 @@ minDim { width, height } =
     min width height
 
 
+subDim :
+    { a | width : number, height : number }
+    -> { b | width : number, height : number }
+    -> { width : number, height : number }
+subDim a b =
+    { width = a.width - b.width, height = a.height - b.height }
+
+
 
 -- MEM
 
@@ -131,7 +139,7 @@ update computer mem =
 
 
 type alias Config =
-    { boardDim : FloatDim
+    { dim : FloatDim
     , cellDim : FloatDim
     , dx : Float
     , dy : Float
@@ -153,12 +161,12 @@ toConfig computer mem =
             fDivDim sDim gDim |> minDim
 
         ( widthPx, heightPx ) =
-            ( boardScreenDim.width, boardScreenDim.height )
+            ( dim.width, dim.height )
 
-        boardScreenDim =
+        dim =
             scaleDim cellSize gDim
     in
-    { boardDim = boardScreenDim
+    { dim = dim
     , cellDim = FloatDim cellSize cellSize
     , dx = (widthPx - cellSize) / 2
     , dy = (heightPx - cellSize) / 2
@@ -221,7 +229,7 @@ view computer mem =
             case state of
                 Board.Turn player ->
                     indicatorShape computer.time cfg.cellDim player
-                        |> translateTopIndicator cfg mem
+                        |> translateCell cfg ( mem.selectedColumn, mem.dim.height )
 
                 _ ->
                     noShape
@@ -230,7 +238,7 @@ view computer mem =
             Dict.get pos cellDict
     in
     [ rectangle2 gray computer.screen
-    , rectangle2 black cfg.boardDim
+    , rectangle2 black cfg.dim
     , Board.allPositions mem.board
         |> List.indexedMap
             (\idx pos ->
@@ -275,11 +283,6 @@ indicatorShape : Time -> FloatDim -> Board.Player -> Shape
 indicatorShape time cellSize player =
     cellPlayerShape cellSize player
         |> blink time
-
-
-translateTopIndicator : Config -> Mem -> Shape -> Shape
-translateTopIndicator c mem =
-    translateCell c ( mem.selectedColumn, mem.dim.height )
 
 
 translateCell : Config -> ( Int, Int ) -> Shape -> Shape

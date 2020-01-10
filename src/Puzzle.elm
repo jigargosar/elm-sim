@@ -28,6 +28,11 @@ init =
     , dict = Dict.empty
     }
         |> insertTokenAt ( 0, 0 ) RedCircle
+        |> insertTokenAt ( 0, 1 ) RedCircle
+        |> insertTokenAt ( 0, 2 ) RedCircle
+        |> insertTokenAt ( 3, 0 ) RedCircle
+        |> insertTokenAt ( 3, 1 ) RedCircle
+        |> insertTokenAt ( 3, 2 ) RedCircle
 
 
 insertTokenAt : Pos -> Token -> Mem -> Mem

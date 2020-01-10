@@ -22,6 +22,7 @@ type alias Mem =
 type Drag
     = NotDragging
     | Dragging Pos Token
+    | Panning Float Float
 
 
 type Token
@@ -59,7 +60,7 @@ insertTokenAt pos token mem =
 update : Computer -> Mem -> Mem
 update computer mem =
     let
-        { screen, mouse } =
+        { screen, mouse, keyboard } =
             computer
 
         cfg =
@@ -67,7 +68,10 @@ update computer mem =
     in
     case mem.drag of
         NotDragging ->
-            if mouse.down then
+            if mouse.down && keyboard.shift then
+                { mem | drag = Panning mouse.x mouse.y }
+
+            else if mouse.down then
                 let
                     pos =
                         cfg.toGrid ( mouse.x, mouse.y )
@@ -105,6 +109,13 @@ update computer mem =
                     | drag = NotDragging
                     , dict = newDict
                 }
+
+            else
+                mem
+
+        Panning sx xy ->
+            if not mouse.down || not keyboard.shift then
+                { mem | drag = NotDragging }
 
             else
                 mem

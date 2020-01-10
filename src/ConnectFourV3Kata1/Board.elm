@@ -63,23 +63,22 @@ insertInColumn x ((Board rec) as board) =
             board
 
 
-insertPositionFromColumn : Int -> Board -> Maybe ( Int, Int )
-insertPositionFromColumn x (Board { width, height, dict }) =
+insertPositionFromColumn : Int -> Board -> Maybe Pos
+insertPositionFromColumn column (Board { width, height, dict }) =
     let
-        y =
-            dict |> Dict.keys >> List.Extra.count (Tuple.first >> is x)
-
-        pos =
-            ( x, y )
-
-        isPositionWithinBounds =
-            x >= 0 && x < width && y >= 0 && y < height
+        row =
+            dict |> Dict.keys >> List.Extra.count (Tuple.first >> is column)
     in
-    if isPositionWithinBounds then
-        Just pos
+    if isIdxValid width column && isIdxValid height row then
+        ( column, row ) |> Just
 
     else
         Nothing
+
+
+isIdxValid : number -> number -> Bool
+isIdxValid len idx =
+    idx >= 0 && idx < len
 
 
 transformState :
@@ -120,24 +119,6 @@ updateState pos player rec =
                     Nothing ->
                         Turn (flipPlayer player)
     }
-
-
-columnToDictPosition : Int -> Board -> Maybe Pos
-columnToDictPosition column (Board { width, height, dict }) =
-    let
-        row =
-            dict |> Dict.keys >> List.Extra.count (Tuple.first >> is column)
-    in
-    if isIdxValid width column && isIdxValid height row then
-        ( column, row ) |> Just
-
-    else
-        Nothing
-
-
-isIdxValid : number -> number -> Bool
-isIdxValid len idx =
-    idx >= 0 && idx < len
 
 
 getWinningPositions : ( Int, Int ) -> Player -> Dict Pos Player -> Maybe (Set ( Int, Int ))

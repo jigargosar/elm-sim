@@ -182,8 +182,25 @@ type Cell
     = Cell Bool Board.Player
 
 
+highlightCell : Cell -> Cell
 highlightCell (Cell _ p) =
     Cell True p
+
+
+highlightCells : Set Pos -> Dict Pos Cell -> Dict Pos Cell
+highlightCells =
+    Set.foldl (\pos -> Dict.update pos (Maybe.map highlightCell))
+        |> flip
+
+
+insertIndicatorCell : Board.Player -> Mem -> Dict Pos Cell -> Dict Pos Cell
+insertIndicatorCell player mem =
+    case insertPosition mem of
+        Just pos ->
+            Dict.insert pos (Cell True player)
+
+        Nothing ->
+            identity
 
 
 view : Computer -> Mem -> List Shape
@@ -197,16 +214,10 @@ view computer mem =
                 |> Dict.map (\_ -> Cell False)
                 |> (case state of
                         Turn player ->
-                            case insertPosition mem of
-                                Just pos ->
-                                    Dict.insert pos (Cell True player)
-
-                                Nothing ->
-                                    identity
+                            insertIndicatorCell player mem
 
                         Victory _ wps ->
-                            wps
-                                |> flip (Set.foldl (\pos -> Dict.update pos (Maybe.map highlightCell)))
+                            highlightCells wps
 
                         Draw ->
                             identity

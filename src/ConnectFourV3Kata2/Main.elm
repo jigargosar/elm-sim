@@ -58,7 +58,7 @@ insertInColumns columns mem =
     List.foldl insertInColumn mem columns
 
 
-insertInColumn : Int -> { width : Int, height : Int, dict : Dict Pos Coin, state : State, selectedColumn : Int } -> Mem
+insertInColumn : Int -> Mem -> Mem
 insertInColumn column mem =
     case ( mem.state, insertPosition column mem ) of
         ( Turn coin, Just pos ) ->

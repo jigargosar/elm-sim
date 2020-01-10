@@ -37,18 +37,19 @@ type State
 
 init : Mem
 init =
-    let
-        width =
-            7
-    in
+    initWithDim { width = 7, height = 6 }
+        |> insertInColumns [ 0, 1, 0, 1, 0, 1, 0, 1, 0 ]
+        |> Debug.log "mem"
+
+
+initWithDim : { a | width : Int, height : Int } -> Mem
+initWithDim { width, height } =
     { width = width
-    , height = 6
+    , height = height
     , dict = Dict.empty
     , state = Turn Blue
     , selectedColumn = width // 2
     }
-        |> insertInColumns [ 0, 1, 0, 1, 0, 1, 0, 1, 0 ]
-        |> Debug.log "mem"
 
 
 

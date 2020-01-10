@@ -14,7 +14,13 @@ type alias Mem =
     { width : Int
     , height : Int
     , dict : Dict Pos Token
+    , drag : Drag
     }
+
+
+type Drag
+    = NotDragging
+    | Dragging Pos
 
 
 type Token
@@ -26,6 +32,7 @@ init =
     { width = 10
     , height = 10
     , dict = Dict.empty
+    , drag = NotDragging
     }
         |> insertTokenAt ( 0, 0 ) RedCircle
         |> insertTokenAt ( 0, 1 ) RedCircle
@@ -50,7 +57,36 @@ insertTokenAt pos token mem =
 
 update : Computer -> Mem -> Mem
 update computer mem =
-    mem
+    let
+        { screen, mouse } =
+            computer
+
+        cfg =
+            toConfig screen mem
+    in
+    case mem.drag of
+        NotDragging ->
+            if mouse.down then
+                let
+                    pos =
+                        cfg.toGrid ( mouse.x, mouse.y )
+                in
+                case Dict.get pos mem.dict of
+                    Just _ ->
+                        { mem | drag = Dragging pos }
+
+                    Nothing ->
+                        mem
+
+            else
+                mem
+
+        Dragging _ ->
+            if not mouse.down then
+                { mem | drag = NotDragging }
+
+            else
+                mem
 
 
 

@@ -3,7 +3,7 @@ module ConnectFourV3Kata2.Main exposing (main)
 import Dict exposing (Dict)
 import List.Extra
 import Playground exposing (..)
-import PointFree exposing (is)
+import PointFree exposing (is, whenTrue)
 import Set exposing (Set)
 
 
@@ -169,7 +169,7 @@ update computer mem =
 view : Computer -> Mem -> List Shape
 view computer mem =
     let
-        { screen } =
+        { screen, time } =
             computer
 
         cellSize =
@@ -184,20 +184,97 @@ view computer mem =
 
         toScreenPos ( gx, gy ) =
             ( (toFloat gx * cellSize) + dx, (toFloat gy * cellSize) + dy )
+
+        moveCell pos =
+            move (toScreenPos pos)
+
+        cellAt pos =
+            Dict.get pos mem.dict
+
+        selectedInsertPos : Maybe Pos
+        selectedInsertPos =
+            insertPosition mem.selectedColumn mem
+
+        coinToShape coin =
+            circle (coin2Color coin) (cellSize * 0.75)
+
+        wps =
+            case mem.state of
+                Victory _ wps ->
+                    wps
+
+                _ ->
+                    Set.empty
+
+        blink : Shape -> Shape
+        blink =
+            fade (zigzag 0.5 1 1 time)
+
+        highlightIfWP : Pos -> Shape -> Shape
+        highlightIfWP pos =
+            whenTrue (Set.member pos wps) blink
+
+        viewCellAt : Pos -> Shape
+        viewCellAt pos =
+            case cellAt pos of
+                Just coin ->
+                    coinToShape coin
+                        |> highlightIfWP pos
+
+                Nothing ->
+                    noShape
+
+        indicatorShape : Shape
+        indicatorShape =
+            case mem.state of
+                Turn coin ->
+                    let
+                        sh =
+                            coinToShape coin |> blink
+                    in
+                    [ case selectedInsertPos of
+                        Just pos ->
+                            sh |> moveCell pos
+
+                        Nothing ->
+                            noShape
+                    , sh |> moveCell ( mem.selectedColumn, mem.height )
+                    ]
+                        |> group
+
+                _ ->
+                    noShape
     in
     [ rectangle black (cellSize * toFloat mem.width) (cellSize * toFloat mem.height)
     , mapAllPos
         (\pos ->
-            let
-                ( x, y ) =
-                    toScreenPos pos
-            in
-            circle white (cellSize * 0.9)
-                |> move x y
+            [ circle white (cellSize * 0.9)
+            , viewCellAt pos
+            ]
+                |> group
+                |> moveCell pos
         )
         mem
         |> group
+    , indicatorShape
     ]
+
+
+move ( x, y ) =
+    Playground.move x y
+
+
+noShape =
+    group []
+
+
+coin2Color coin =
+    case coin of
+        Red ->
+            red
+
+        Blue ->
+            blue
 
 
 mapAllPos : (Pos -> b) -> { a | width : Int, height : Int } -> List b

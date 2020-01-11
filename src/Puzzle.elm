@@ -347,6 +347,9 @@ toConfig screen mem =
 
         worldToGridPos ( x, y ) =
             ( round ((x - dx) / cellSize), round ((y - dy) / cellSize) )
+
+        screenToGridPos =
+            screenToWorldPos >> worldToGridPos
     in
     { cellSize = cellSize
     , cellRadius = cellSize / 2

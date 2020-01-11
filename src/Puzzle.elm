@@ -348,10 +348,8 @@ toConfig screen mem =
             ( (x - px) / mem.zoom, (y - py) / mem.zoom )
 
         worldToGridCell ( x, y ) =
-            ( (x - dx) / cellSize, (y - dy) / cellSize )
-                |> mapEach round
+            ( (x - dx) / cellSize, (y - dy) / cellSize ) |> mapEach round
 
-        screenToGridCell : ( Float, Float ) -> Pos
         screenToGridCell =
             screenToWorld >> worldToGridCell
     in

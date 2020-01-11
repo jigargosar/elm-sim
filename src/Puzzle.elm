@@ -357,6 +357,7 @@ type alias Pos =
 type alias Config =
     { cellSize : Float
     , cellRadius : Float
+    , worldT : Transform
     , screenToWorldPos : ( Float, Float ) -> ( Float, Float )
     , worldToGridPos : ( Float, Float ) -> Pos
     , gridToWorldPos : Pos -> ( Float, Float )
@@ -394,6 +395,7 @@ toConfig screen mem =
     , cellRadius = cellSize / 2
     , gridToWorldPos = gridToWorldPos
     , worldToGridPos = worldToGridPos
+    , worldT = composeT [ translateT px py, scaleT mem.zoom ]
     , screenToWorldPos = screenToWorldPos
     , width = cellSize * toFloat mem.width
     , height = cellSize * toFloat mem.height

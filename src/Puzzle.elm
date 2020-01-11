@@ -17,8 +17,6 @@ type alias Mem =
     , height : Int
     , dict : Dict Pos Token
     , drag : Drag
-    , pan : ( Float, Float )
-    , zoom : Float
     , worldT : Transform
     , prevMouse : Mouse
     }
@@ -27,7 +25,7 @@ type alias Mem =
 type Drag
     = NotDragging
     | Dragging Pos Token
-    | Panning ( Float, Float )
+    | Panning Transform
 
 
 type Token
@@ -40,8 +38,6 @@ init =
     , height = 10
     , dict = Dict.empty
     , drag = NotDragging
-    , pan = ( 0, 0 )
-    , zoom = 1.5
     , worldT = noneT
     , prevMouse = Mouse 0 0 False False
     }
@@ -114,7 +110,7 @@ updateWorld computer mem =
     case mem.drag of
         NotDragging ->
             if mouse.down && keyboard.shift then
-                { mem | drag = Panning mem.pan }
+                { mem | drag = Panning mem.worldT }
 
             else if mouse.down && not prevMouse.down then
                 let
@@ -126,16 +122,18 @@ updateWorld computer mem =
                         { mem | drag = Dragging pos token }
 
                     Nothing ->
-                        { mem | drag = Panning mem.pan }
+                        { mem | drag = Panning mem.worldT }
 
             else if keyboard.space then
-                { mem | pan = ( 0, 0 ), zoom = 1 }
+                { mem | worldT = noneT }
 
             else if plusDown keyboard || Set.member "]" keyboard.keys then
-                { mem | zoom = clamp 0.1 3 (mem.zoom + (0.05 * mem.zoom)) }
+                -- { mem | zoom = clamp 0.1 3 (mem.zoom + (0.05 * mem.zoom)) }
+                mem
 
             else if minusDown keyboard || Set.member "[" keyboard.keys then
-                { mem | zoom = clamp 0.1 3 (mem.zoom - (0.05 * mem.zoom)) }
+                -- { mem | zoom = clamp 0.1 3 (mem.zoom - (0.05 * mem.zoom)) }
+                mem
 
             else
                 mem
@@ -167,11 +165,8 @@ updateWorld computer mem =
             else
                 mem
 
-        Panning orignalPan ->
+        Panning orignalWorldT ->
             let
-                ( px, py ) =
-                    mem.pan
-
                 ( dx, dy ) =
                     ( mouse.x - prevMouse.x, mouse.y - prevMouse.y )
             in
@@ -182,12 +177,12 @@ updateWorld computer mem =
 
                     else
                         mem.drag
-                , pan =
+                , worldT =
                     if escDown keyboard then
-                        orignalPan
+                        orignalWorldT
 
                     else
-                        ( px + dx, py + dy )
+                        mem.worldT
             }
 
 
@@ -375,7 +370,6 @@ type alias Config =
     , cellRadius : Float
     , worldT : Transform
     , cellT : Transform
-    , screenToWorldPos : ( Float, Float ) -> ( Float, Float )
     , worldToGridPos : ( Float, Float ) -> Pos
     , gridToWorldPos : Pos -> ( Float, Float )
     , width : Float
@@ -396,14 +390,8 @@ toConfig screen mem =
         dy =
             (cellSize - (cellSize * toFloat mem.height)) / 2
 
-        ( px, py ) =
-            mem.pan
-
         gridToWorldPos ( gx, gy ) =
             ( (toFloat gx * cellSize) + dx, (toFloat gy * cellSize) + dy )
-
-        screenToWorldPos ( x, y ) =
-            ( (x - px) / mem.zoom, (y - py) / mem.zoom )
 
         worldToGridPos ( x, y ) =
             ( round ((x - dx) / cellSize), round ((y - dy) / cellSize) )
@@ -414,7 +402,6 @@ toConfig screen mem =
     , cellT = composeT [ translateT dx dy, scaleT cellSize ]
     , gridToWorldPos = gridToWorldPos
     , worldToGridPos = worldToGridPos
-    , screenToWorldPos = screenToWorldPos
     , width = cellSize * toFloat mem.width
     , height = cellSize * toFloat mem.height
     }

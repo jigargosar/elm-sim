@@ -350,6 +350,11 @@ transformVec2 (Transform dx dy s) ( x, y ) =
     ( (x + dx) * s, (y + dy) * s )
 
 
+transformIntVec2 : Transform -> ( Float, Float ) -> ( Float, Float )
+transformIntVec2 (Transform dx dy s) ( x, y ) =
+    ( (x + dx) * s, (y + dy) * s )
+
+
 
 -- Common
 

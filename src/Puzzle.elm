@@ -40,7 +40,7 @@ init =
     , dict = Dict.empty
     , drag = NotDragging
     , pan = ( 0, 0 )
-    , zoom = 0.5
+    , zoom = 1.5
     , prevMouse = Mouse 0 0 False False
     }
         |> insertTokenAt ( 0, 0 ) RedCircle

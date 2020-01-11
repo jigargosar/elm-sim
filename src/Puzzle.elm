@@ -332,11 +332,10 @@ toConfig screen mem =
             min (screen.width / (toFloat mem.width + 1))
                 (screen.height / (toFloat mem.height + 2))
 
-        dx =
-            (cellSize - (cellSize * toFloat mem.width)) / 2
-
-        dy =
-            (cellSize - (cellSize * toFloat mem.height)) / 2
+        ( dx, dy ) =
+            ( (cellSize - (cellSize * toFloat mem.width)) / 2
+            , (cellSize - (cellSize * toFloat mem.height)) / 2
+            )
 
         gridCellToWorld =
             mapEach toFloat

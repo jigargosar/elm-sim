@@ -194,8 +194,8 @@ view computer mem =
     in
     [ viewWorld computer cfg mem
         |> group
-        |> move mem.pan
         |> scale mem.zoom
+        |> move mem.pan
     ]
 
 

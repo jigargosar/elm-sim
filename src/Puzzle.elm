@@ -335,7 +335,7 @@ composeT : List Transform -> Transform
 composeT list =
     let
         reducer (Transform dx0 dy0 s0) (Transform dx1 dy1 s1) =
-            Transform (dx0 + dx1) (dy0 + dy1) (s0 * s1)
+            Transform (dx0 * s0 + dx1 * s1) (dy0 * s0 + dy1 * s1) (s0 * s1)
     in
     List.foldl reducer noneT list
 
@@ -409,7 +409,7 @@ toConfig screen mem =
     { cellSize = cellSize
     , cellRadius = cellSize / 2
     , worldT = composeT [ translateT px py, scaleT mem.zoom ]
-    , cellT = composeT [ scaleT cellSize, translateT dx dy ]
+    , cellT = composeT [ translateT dx dy, scaleT cellSize ]
     , gridToWorldPos = gridToWorldPos
     , worldToGridPos = worldToGridPos
     , screenToWorldPos = screenToWorldPos
@@ -420,6 +420,16 @@ toConfig screen mem =
 
 moveCell : Config -> Pos -> Shape -> Shape
 moveCell cfg pos =
+    let
+        _ =
+            ( transformToFloatVec2 cfg.cellT pos, cfg.gridToWorldPos pos )
+                |> (if pos == ( 0, 0 ) then
+                        Debug.log "cp"
+
+                    else
+                        identity
+                   )
+    in
     move (cfg.gridToWorldPos pos)
 
 

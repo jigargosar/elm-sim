@@ -134,10 +134,10 @@ updateWorld computer mem =
                 { mem | pan = ( 0, 0 ) }
 
             else if plusDown keyboard then
-                { mem | zoom = max 0 (mem.zoom + 0.01) }
+                { mem | zoom = max 0 (mem.zoom + (0.05 * mem.zoom)) }
 
             else if minusDown keyboard then
-                { mem | zoom = max 0 (mem.zoom - 0.01) }
+                { mem | zoom = max 0 (mem.zoom - (0.05 * mem.zoom)) }
 
             else
                 mem

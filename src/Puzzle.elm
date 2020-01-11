@@ -142,9 +142,6 @@ updateWorld computer mem =
             let
                 ( px, py ) =
                     mem.pan
-
-                ( dx, dy ) =
-                    ( mouse.x - prevMouse.x, mouse.y - prevMouse.y )
             in
             { mem
                 | drag =
@@ -158,7 +155,7 @@ updateWorld computer mem =
                         orignalPan
 
                     else
-                        ( px + dx, py + dy )
+                        ( px + (mouse.x - prevMouse.x), py + (mouse.y - prevMouse.y) )
             }
 
 

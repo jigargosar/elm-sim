@@ -165,7 +165,7 @@ updateWorld computer mem =
                     mem.pan
 
                 ( dx, dy ) =
-                    ( mouse.x - prevMouse.x, mouse.y - prevMouse.y )
+                    ( (mouse.x - prevMouse.x) * mem.zoom, (mouse.y - prevMouse.y) * mem.zoom )
             in
             { mem
                 | drag =

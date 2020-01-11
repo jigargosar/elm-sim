@@ -218,7 +218,11 @@ view computer mem =
         cfg =
             toConfig computer.screen mem
     in
-    viewWorld computer cfg mem
+    [ viewWorld computer cfg mem
+        |> group
+        |> scale mem.zoom
+        |> move mem.pan
+    ]
 
 
 viewWorld : Computer -> Config -> Mem -> List Shape
@@ -250,7 +254,7 @@ viewWorld { mouse } cfg mem =
             case draggingToken of
                 Just token ->
                     tokenShape cfg token
-                        |> move ( mouse.x, mouse.y )
+                        |> move (cfg.screenToWorld ( mouse.x, mouse.y ))
 
                 Nothing ->
                     noShape
@@ -271,7 +275,7 @@ viewWorld { mouse } cfg mem =
             , tokenShapeAt pos
             ]
                 |> group
-                |> move (cfg.gridCellToScreen pos)
+                |> move (cfg.gridCellToWorld pos)
         )
         mem
         |> group
@@ -299,6 +303,7 @@ type alias Config =
     { cellSize : Float
     , cellRadius : Float
     , screenToWorld : ( Float, Float ) -> ( Float, Float )
+    , worldToScreen : ( Float, Float ) -> ( Float, Float )
     , worldToGridCell : ( Float, Float ) -> Pos
     , screenToGridCell : ( Float, Float ) -> Pos
     , gridCellToWorld : Pos -> ( Float, Float )
@@ -347,6 +352,7 @@ toConfig screen mem =
     , gridCellToWorld = gridCellToWorld
     , worldToGridCell = worldToGridCell
     , screenToWorld = screenToWorld
+    , worldToScreen = worldToScreen
     , screenToGridCell = screenToGridCell
     , gridCellToScreen = gridCellToScreen
     , width = cellSize * toFloat mem.width

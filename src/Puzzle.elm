@@ -19,6 +19,7 @@ type alias Mem =
     , drag : Drag
     , pan : ( Float, Float )
     , zoom : Float
+    , worldT : Transform
     , prevMouse : Mouse
     }
 
@@ -41,6 +42,7 @@ init =
     , drag = NotDragging
     , pan = ( 0, 0 )
     , zoom = 1.5
+    , worldT = noneT
     , prevMouse = Mouse 0 0 False False
     }
         |> insertTokenAt ( 0, 0 ) RedCircle
@@ -408,7 +410,7 @@ toConfig screen mem =
     in
     { cellSize = cellSize
     , cellRadius = cellSize / 2
-    , worldT = composeT [ translateT px py, scaleT mem.zoom ]
+    , worldT = mem.worldT
     , cellT = composeT [ translateT dx dy, scaleT cellSize ]
     , gridToWorldPos = gridToWorldPos
     , worldToGridPos = worldToGridPos

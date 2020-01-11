@@ -155,14 +155,9 @@ updateWorld computer mem =
             }
 
 
-subXY : { a | x : number, y : number } -> { b | x : number, y : number } -> ( number, number )
-subXY r1 r2 =
-    ( r1.x - r2.x, r1.y - r2.y )
-
-
 vecFromTo : { b | x : number, y : number } -> { a | x : number, y : number } -> ( number, number )
-vecFromTo from to =
-    subXY to from
+vecFromTo r1 r2 =
+    ( r2.x - r1.x, r2.y - r1.y )
 
 
 addVec : ( number, number ) -> ( number, number ) -> ( number, number )

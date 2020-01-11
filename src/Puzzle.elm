@@ -432,7 +432,7 @@ moveCell cfg pos =
                         identity
                    )
     in
-    move (cfg.gridToWorldPos pos)
+    move (transformToFloatVec2 cfg.cellT pos)
 
 
 move : ( Number, Number ) -> Shape -> Shape

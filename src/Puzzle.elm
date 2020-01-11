@@ -4,7 +4,7 @@ module Puzzle exposing (main)
 
 import Dict exposing (Dict)
 import Playground exposing (..)
-import PointFree exposing (whenTrue)
+import PointFree exposing (mapEach, whenTrue)
 import Set
 
 
@@ -353,6 +353,11 @@ transformVec2 (Transform dx dy s) ( x, y ) =
 transformToFloatVec2 : Transform -> ( Int, Int ) -> ( Float, Float )
 transformToFloatVec2 t ( x, y ) =
     transformVec2 t ( toFloat x, toFloat y )
+
+
+transformToIntVec2 : Transform -> ( Float, Float ) -> ( Int, Int )
+transformToIntVec2 t v =
+    transformVec2 t v |> mapEach round
 
 
 

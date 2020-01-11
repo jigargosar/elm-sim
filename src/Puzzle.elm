@@ -335,6 +335,10 @@ translateT dx dy =
     Transform { dx = dx, dy = dy, scale = 1 }
 
 
+scaleT s =
+    Transform { dx = 0, dy = 0, scale = s }
+
+
 toConfig : Screen -> Mem -> Config
 toConfig screen mem =
     let

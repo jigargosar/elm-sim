@@ -65,36 +65,9 @@ insertTokenAt pos token mem =
 
 
 update : Computer -> Mem -> Mem
-update computer mem =
-    let
-        { screen, mouse } =
-            computer
-
-        worldMouse =
-            let
-                ( x, y ) =
-                    cfg.screenToWorld ( mouse.x, mouse.y )
-            in
-            { mouse | x = x, y = y }
-
-        prevWorldMouse =
-            let
-                prevMouse =
-                    mem.prevMouse
-
-                ( x, y ) =
-                    cfg.screenToWorld ( prevMouse.x, prevMouse.y )
-            in
-            { prevMouse | x = x, y = y }
-
-        cfg =
-            toConfig screen mem
-
-        worldComputer =
-            { computer | mouse = worldMouse }
-    in
-    updateWorld worldComputer { mem | prevMouse = prevWorldMouse }
-        |> (\m -> { m | prevMouse = computer.mouse })
+update computer =
+    updateWorld computer
+        >> (\mem -> { mem | prevMouse = computer.mouse })
 
 
 updateWorld : Computer -> Mem -> Mem
@@ -117,7 +90,7 @@ updateWorld computer mem =
             else if mouse.down && not prevMouse.down then
                 let
                     pos =
-                        cfg.worldToGridCell ( mouse.x, mouse.y )
+                        cfg.screenToGridCell ( mouse.x, mouse.y )
                 in
                 case Dict.get pos mem.dict of
                     Just token ->

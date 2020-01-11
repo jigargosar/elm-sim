@@ -127,11 +127,7 @@ updateWorld computer mem =
                         { mem | drag = Panning mem.pan }
 
             else if keyboard.space then
-                let
-                    _ =
-                        Debug.log "keys" keyboard.keys
-                in
-                { mem | pan = ( 0, 0 ) }
+                { mem | pan = ( 0, 0 ), zoom = 1 }
 
             else if plusDown keyboard then
                 { mem | zoom = max 0 (mem.zoom + (0.05 * mem.zoom)) }

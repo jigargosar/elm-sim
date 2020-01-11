@@ -38,7 +38,7 @@ init =
     , height = 10
     , dict = Dict.empty
     , drag = NotDragging
-    , worldT = noneT
+    , worldT = composeT [ noneT, scaleT 0.5 ]
     , prevMouse = Mouse 0 0 False False
     }
         |> insertTokenAt ( 0, 0 ) RedCircle
@@ -67,31 +67,8 @@ update computer mem =
     let
         { screen, mouse } =
             computer
-
-        worldMouse =
-            let
-                ( x, y ) =
-                    transformVec2 (inverseT cfg.worldT) ( mouse.x, mouse.y )
-            in
-            { mouse | x = x, y = y }
-
-        prevWorldMouse =
-            let
-                prevMouse =
-                    mem.prevMouse
-
-                ( x, y ) =
-                    transformVec2 (inverseT cfg.worldT) ( prevMouse.x, prevMouse.y )
-            in
-            { prevMouse | x = x, y = y }
-
-        cfg =
-            toConfig screen mem
-
-        worldComputer =
-            { computer | mouse = worldMouse }
     in
-    updateWorld worldComputer { mem | prevMouse = prevWorldMouse }
+    updateWorld computer mem
         |> (\m -> { m | prevMouse = computer.mouse })
 
 

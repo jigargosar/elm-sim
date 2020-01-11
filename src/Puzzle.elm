@@ -335,7 +335,7 @@ composeT : List Transform -> Transform
 composeT list =
     let
         reducer (Transform dx0 dy0 s0) (Transform dx1 dy1 s1) =
-            Transform (dx0 * s0 + dx1 * s1) (dy0 * s0 + dy1 * s1) (s0 * s1)
+            Transform ((dx0 * s0 + dx1 * s1) / s0 * s1) ((dy0 * s0 + dy1 * s1) / s0 * s1) (s0 * s1)
     in
     List.foldl reducer noneT list
 

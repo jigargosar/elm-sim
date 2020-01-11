@@ -323,6 +323,18 @@ type alias Config =
     }
 
 
+type Transform
+    = Transform { dx : Float, dy : Float, scale : Float }
+
+
+noTransform =
+    Transform { dx = 0, dy = 0, scale = 1 }
+
+
+translateT dx dy =
+    Transform { dx = dx, dy = dy, scale = 1 }
+
+
 toConfig : Screen -> Mem -> Config
 toConfig screen mem =
     let

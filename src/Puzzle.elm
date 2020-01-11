@@ -139,10 +139,6 @@ updateWorld computer mem =
                 mem
 
         Panning orignalPan ->
-            let
-                ( px, py ) =
-                    mem.pan
-            in
             { mem
                 | drag =
                     if not mouse.down || escDown keyboard then
@@ -155,8 +151,17 @@ updateWorld computer mem =
                         orignalPan
 
                     else
-                        ( px + (mouse.x - prevMouse.x), py + (mouse.y - prevMouse.y) )
+                        let
+                            mouseVec =
+                                ( mouse.x - prevMouse.x, mouse.y - prevMouse.y )
+                        in
+                        addVec mem.pan ( mouse.x - prevMouse.x, mouse.y - prevMouse.y )
             }
+
+
+addVec : ( number, number ) -> ( number, number ) -> ( number, number )
+addVec ( a, b ) ( c, d ) =
+    ( a + c, b + d )
 
 
 escDown { keys } =

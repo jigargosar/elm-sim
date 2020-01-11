@@ -115,7 +115,7 @@ updateWorld computer mem =
             if not mouse.down then
                 let
                     dropPos =
-                        cfg.worldToGridCell ( mouse.x, mouse.y )
+                        cfg.screenToGridCell ( mouse.x, mouse.y )
 
                     newDict =
                         if isPositionValid dropPos mem then
@@ -144,7 +144,8 @@ updateWorld computer mem =
                     mem.pan
 
                 ( dx, dy ) =
-                    ( (mouse.x - prevMouse.x) * mem.zoom, (mouse.y - prevMouse.y) * mem.zoom )
+                    ( mouse.x - prevMouse.x, mouse.y - prevMouse.y )
+                        |> cfg.screenToWorld
             in
             { mem
                 | drag =

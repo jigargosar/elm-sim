@@ -221,7 +221,7 @@ view computer mem =
         worldMouse =
             let
                 ( x, y ) =
-                    cfg.screenToWorldPos ( mouse.x, mouse.y )
+                    transformVec2 (inverseT cfg.worldT) ( mouse.x, mouse.y )
             in
             { mouse | x = x, y = y }
 
@@ -372,6 +372,7 @@ type alias Config =
     { cellSize : Float
     , cellRadius : Float
     , worldT : Transform
+    , cellT : Transform
     , screenToWorldPos : ( Float, Float ) -> ( Float, Float )
     , worldToGridPos : ( Float, Float ) -> Pos
     , gridToWorldPos : Pos -> ( Float, Float )
@@ -407,9 +408,10 @@ toConfig screen mem =
     in
     { cellSize = cellSize
     , cellRadius = cellSize / 2
+    , worldT = composeT [ translateT px py, scaleT mem.zoom ]
+    , cellT = composeT [ scaleT cellSize, translateT dx dy ]
     , gridToWorldPos = gridToWorldPos
     , worldToGridPos = worldToGridPos
-    , worldT = composeT [ translateT px py, scaleT mem.zoom ]
     , screenToWorldPos = screenToWorldPos
     , width = cellSize * toFloat mem.width
     , height = cellSize * toFloat mem.height

@@ -73,7 +73,7 @@ update computer mem =
         worldMouse =
             let
                 ( x, y ) =
-                    cfg.screenToWorldPos ( mouse.x, mouse.y )
+                    transformVec2 (inverseT cfg.worldT) ( mouse.x, mouse.y )
             in
             { mouse | x = x, y = y }
 
@@ -83,7 +83,7 @@ update computer mem =
                     mem.prevMouse
 
                 ( x, y ) =
-                    cfg.screenToWorldPos ( prevMouse.x, prevMouse.y )
+                    transformVec2 (inverseT cfg.worldT) ( prevMouse.x, prevMouse.y )
             in
             { prevMouse | x = x, y = y }
 
@@ -171,7 +171,7 @@ updateWorld computer mem =
                     mem.pan
 
                 ( dx, dy ) =
-                    ( (mouse.x - prevMouse.x) * mem.zoom, (mouse.y - prevMouse.y) * mem.zoom )
+                    ( mouse.x - prevMouse.x, mouse.y - prevMouse.y )
             in
             { mem
                 | drag =

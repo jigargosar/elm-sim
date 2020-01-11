@@ -145,7 +145,6 @@ updateWorld computer mem =
 
                 ( dx, dy ) =
                     ( mouse.x - prevMouse.x, mouse.y - prevMouse.y )
-                        |> mapEach (mulBy mem.zoom)
             in
             { mem
                 | drag =

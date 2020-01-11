@@ -129,11 +129,11 @@ updateWorld computer mem =
             else if keyboard.space then
                 { mem | pan = ( 0, 0 ), zoom = 1 }
 
-            else if plusDown keyboard then
-                { mem | zoom = max 0 (mem.zoom + (0.05 * mem.zoom)) }
+            else if plusDown keyboard || Set.member "]" keyboard.keys then
+                { mem | zoom = clamp 0.1 3 (mem.zoom + (0.05 * mem.zoom)) }
 
-            else if minusDown keyboard then
-                { mem | zoom = max 0 (mem.zoom - (0.05 * mem.zoom)) }
+            else if minusDown keyboard || Set.member "[" keyboard.keys then
+                { mem | zoom = clamp 0.1 3 (mem.zoom - (0.05 * mem.zoom)) }
 
             else
                 mem

@@ -155,7 +155,7 @@ updateWorld computer mem =
                             mouseVec =
                                 ( mouse.x - prevMouse.x, mouse.y - prevMouse.y )
                         in
-                        addVec mem.pan ( mouse.x - prevMouse.x, mouse.y - prevMouse.y )
+                        addVec mem.pan mouseVec
             }
 
 

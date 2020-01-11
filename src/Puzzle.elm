@@ -171,11 +171,17 @@ updateWorld computer mem =
                     ( mouse.x - prevMouse.x, mouse.y - prevMouse.y )
 
                 ( newDrag, newWorldT ) =
-                    if not mouse.down || escDown keyboard then
+                    if escDown keyboard then
                         ( NotDragging, orignalWorldT )
 
                     else
-                        ( mem.drag, mem.worldT )
+                        ( if not mouse.down then
+                            NotDragging
+
+                          else
+                            mem.drag
+                        , composeT [ mem.worldT, translateT dx dy ]
+                        )
             in
             { mem
                 | drag = newDrag

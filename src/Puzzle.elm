@@ -336,6 +336,15 @@ composeT list =
     List.foldl reducer noneT list
 
 
+inverseT : Transform -> Transform
+inverseT (Transform dx dy s) =
+    Transform -dx -dy (1 / s)
+
+
+transformVec2 (Transform dx dy s) ( x, y ) =
+    ( (x + dx) * s, (y + dy) * s )
+
+
 
 -- Common
 

@@ -233,9 +233,13 @@ view computer mem =
     in
     [ viewWorld worldComputer cfg mem
         |> group
-        |> move mem.pan
-        |> scale mem.zoom
+        |> transformShape cfg.worldT
     ]
+
+
+transformShape : Transform -> Shape -> Shape
+transformShape (Transform dx dy s) =
+    Playground.move dx dy >> Playground.scale s
 
 
 viewWorld : Computer -> Config -> Mem -> List Shape
@@ -331,7 +335,7 @@ composeT : List Transform -> Transform
 composeT list =
     let
         reducer (Transform dx0 dy0 s0) (Transform dx1 dy1 s1) =
-            Transform (dx0 + dx1) (dy0 + dy1) (s0 + s1)
+            Transform (dx0 + dx1) (dy0 + dy1) (s0 * s1)
     in
     List.foldl reducer noneT list
 

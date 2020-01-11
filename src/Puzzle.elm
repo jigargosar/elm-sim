@@ -305,6 +305,38 @@ main =
 
 
 
+-- Transform
+
+
+type Transform
+    = Transform Float Float Float
+
+
+noneT : Transform
+noneT =
+    Transform 0 0 1
+
+
+translateT : Float -> Float -> Transform
+translateT dx dy =
+    Transform dx dy 1
+
+
+scaleT : Float -> Transform
+scaleT s =
+    Transform 0 0 s
+
+
+composeT : List Transform -> Transform
+composeT list =
+    let
+        reducer (Transform dx0 dy0 s0) (Transform dx1 dy1 s1) =
+            Transform (dx0 + dx1) (dy0 + dy1) (s0 + s1)
+    in
+    List.foldl reducer noneT list
+
+
+
 -- Common
 
 
@@ -321,22 +353,6 @@ type alias Config =
     , width : Float
     , height : Float
     }
-
-
-type Transform
-    = Transform { dx : Float, dy : Float, scale : Float }
-
-
-noTransform =
-    Transform { dx = 0, dy = 0, scale = 1 }
-
-
-translateT dx dy =
-    Transform { dx = dx, dy = dy, scale = 1 }
-
-
-scaleT s =
-    Transform { dx = 0, dy = 0, scale = s }
 
 
 toConfig : Screen -> Mem -> Config

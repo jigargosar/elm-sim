@@ -151,12 +151,13 @@ updateWorld computer mem =
                         orignalPan
 
                     else
-                        let
-                            mouseVec =
-                                ( mouse.x - prevMouse.x, mouse.y - prevMouse.y )
-                        in
-                        addVec mem.pan mouseVec
+                        addVec mem.pan (subXY mouse prevMouse)
             }
+
+
+subXY : { a | x : number, y : number } -> { b | x : number, y : number } -> ( number, number )
+subXY r1 r2 =
+    ( r1.x - r2.x, r1.y - r2.y )
 
 
 addVec : ( number, number ) -> ( number, number ) -> ( number, number )

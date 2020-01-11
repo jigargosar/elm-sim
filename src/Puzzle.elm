@@ -151,13 +151,18 @@ updateWorld computer mem =
                         orignalPan
 
                     else
-                        addVec mem.pan (subXY mouse prevMouse)
+                        addVec mem.pan (vecFromTo prevMouse mouse)
             }
 
 
 subXY : { a | x : number, y : number } -> { b | x : number, y : number } -> ( number, number )
 subXY r1 r2 =
     ( r1.x - r2.x, r1.y - r2.y )
+
+
+vecFromTo : { b | x : number, y : number } -> { a | x : number, y : number } -> ( number, number )
+vecFromTo from to =
+    subXY to from
 
 
 addVec : ( number, number ) -> ( number, number ) -> ( number, number )

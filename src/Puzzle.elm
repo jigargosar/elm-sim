@@ -220,6 +220,7 @@ view computer mem =
     [ viewWorld worldComputer cfg mem
         |> group
         |> move mem.pan
+        |> scale mem.zoom
     ]
 
 

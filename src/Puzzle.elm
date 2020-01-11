@@ -127,7 +127,17 @@ updateWorld computer mem =
                         { mem | drag = Panning mem.pan }
 
             else if keyboard.space then
+                let
+                    _ =
+                        Debug.log "keys" keyboard.keys
+                in
                 { mem | pan = ( 0, 0 ) }
+
+            else if plusDown keyboard then
+                { mem | zoom = max 0 (mem.zoom + 0.01) }
+
+            else if minusDown keyboard then
+                { mem | zoom = max 0 (mem.zoom - 0.01) }
 
             else
                 mem
@@ -169,13 +179,13 @@ updateWorld computer mem =
             in
             { mem
                 | drag =
-                    if not mouse.down || esc keyboard then
+                    if not mouse.down || escDown keyboard then
                         NotDragging
 
                     else
                         mem.drag
                 , pan =
-                    if esc keyboard then
+                    if escDown keyboard then
                         orignalPan
 
                     else
@@ -183,8 +193,16 @@ updateWorld computer mem =
             }
 
 
-esc { keys } =
+escDown { keys } =
     Set.member "Escape" keys
+
+
+plusDown { keys } =
+    Set.member "+" keys
+
+
+minusDown { keys } =
+    Set.member "-" keys
 
 
 

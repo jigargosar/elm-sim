@@ -4,7 +4,7 @@ module Puzzle exposing (main)
 
 import Dict exposing (Dict)
 import Playground exposing (..)
-import PointFree exposing (mapEach, whenTrue)
+import PointFree exposing (whenTrue)
 import Set
 
 
@@ -17,7 +17,8 @@ type alias Mem =
     , height : Int
     , dict : Dict Pos Token
     , drag : Drag
-    , worldT : Transform
+    , pan : ( Float, Float )
+    , zoom : Float
     , prevMouse : Mouse
     }
 
@@ -25,7 +26,7 @@ type alias Mem =
 type Drag
     = NotDragging
     | Dragging Pos Token
-    | Panning Transform
+    | Panning ( Float, Float )
 
 
 type Token
@@ -38,7 +39,8 @@ init =
     , height = 10
     , dict = Dict.empty
     , drag = NotDragging
-    , worldT = composeT [ noneT, scaleT 0.5 ]
+    , pan = ( 0, 0 )
+    , zoom = 1.5
     , prevMouse = Mouse 0 0 False False
     }
         |> insertTokenAt ( 0, 0 ) RedCircle
@@ -67,8 +69,31 @@ update computer mem =
     let
         { screen, mouse } =
             computer
+
+        worldMouse =
+            let
+                ( x, y ) =
+                    cfg.screenToWorldPos ( mouse.x, mouse.y )
+            in
+            { mouse | x = x, y = y }
+
+        prevWorldMouse =
+            let
+                prevMouse =
+                    mem.prevMouse
+
+                ( x, y ) =
+                    cfg.screenToWorldPos ( prevMouse.x, prevMouse.y )
+            in
+            { prevMouse | x = x, y = y }
+
+        cfg =
+            toConfig screen mem
+
+        worldComputer =
+            { computer | mouse = worldMouse }
     in
-    updateWorld computer mem
+    updateWorld worldComputer { mem | prevMouse = prevWorldMouse }
         |> (\m -> { m | prevMouse = computer.mouse })
 
 
@@ -87,7 +112,7 @@ updateWorld computer mem =
     case mem.drag of
         NotDragging ->
             if mouse.down && keyboard.shift then
-                { mem | drag = Panning mem.worldT }
+                { mem | drag = Panning mem.pan }
 
             else if mouse.down && not prevMouse.down then
                 let
@@ -99,18 +124,16 @@ updateWorld computer mem =
                         { mem | drag = Dragging pos token }
 
                     Nothing ->
-                        { mem | drag = Panning mem.worldT }
+                        { mem | drag = Panning mem.pan }
 
             else if keyboard.space then
-                { mem | worldT = noneT }
+                { mem | pan = ( 0, 0 ), zoom = 1 }
 
             else if plusDown keyboard || Set.member "]" keyboard.keys then
-                -- { mem | zoom = clamp 0.1 3 (mem.zoom + (0.05 * mem.zoom)) }
-                mem
+                { mem | zoom = clamp 0.1 3 (mem.zoom + (0.05 * mem.zoom)) }
 
             else if minusDown keyboard || Set.member "[" keyboard.keys then
-                -- { mem | zoom = clamp 0.1 3 (mem.zoom - (0.05 * mem.zoom)) }
-                mem
+                { mem | zoom = clamp 0.1 3 (mem.zoom - (0.05 * mem.zoom)) }
 
             else
                 mem
@@ -142,27 +165,27 @@ updateWorld computer mem =
             else
                 mem
 
-        Panning orignalWorldT ->
+        Panning orignalPan ->
             let
+                ( px, py ) =
+                    mem.pan
+
                 ( dx, dy ) =
-                    ( mouse.x - prevMouse.x, mouse.y - prevMouse.y )
-
-                ( newDrag, newWorldT ) =
-                    if escDown keyboard then
-                        ( NotDragging, orignalWorldT )
-
-                    else
-                        ( if not mouse.down then
-                            NotDragging
-
-                          else
-                            mem.drag
-                        , composeT [ mem.worldT, translateT dx dy ]
-                        )
+                    ( (mouse.x - prevMouse.x) * mem.zoom, (mouse.y - prevMouse.y) * mem.zoom )
             in
             { mem
-                | drag = newDrag
-                , worldT = newWorldT
+                | drag =
+                    if not mouse.down || escDown keyboard then
+                        NotDragging
+
+                    else
+                        mem.drag
+                , pan =
+                    if escDown keyboard then
+                        orignalPan
+
+                    else
+                        ( px + dx, py + dy )
             }
 
 
@@ -198,7 +221,7 @@ view computer mem =
         worldMouse =
             let
                 ( x, y ) =
-                    transformVec2 (inverseT cfg.worldT) ( mouse.x, mouse.y )
+                    cfg.screenToWorldPos ( mouse.x, mouse.y )
             in
             { mouse | x = x, y = y }
 
@@ -210,13 +233,9 @@ view computer mem =
     in
     [ viewWorld worldComputer cfg mem
         |> group
-        |> transformShape cfg.worldT
+        |> move mem.pan
+        |> scale mem.zoom
     ]
-
-
-transformShape : Transform -> Shape -> Shape
-transformShape (Transform dx dy s) =
-    Playground.move dx dy >> Playground.scale s
 
 
 viewWorld : Computer -> Config -> Mem -> List Shape
@@ -286,58 +305,6 @@ main =
 
 
 
--- Transform
-
-
-type Transform
-    = Transform Float Float Float
-
-
-noneT : Transform
-noneT =
-    Transform 0 0 1
-
-
-translateT : Float -> Float -> Transform
-translateT dx dy =
-    Transform dx dy 1
-
-
-scaleT : Float -> Transform
-scaleT s =
-    Transform 0 0 s
-
-
-composeT : List Transform -> Transform
-composeT list =
-    let
-        reducer (Transform dx0 dy0 s0) (Transform dx1 dy1 s1) =
-            Transform ((dx0 * s0 + dx1 * s1) / s0 * s1) ((dy0 * s0 + dy1 * s1) / s0 * s1) (s0 * s1)
-    in
-    List.foldl reducer noneT list
-
-
-inverseT : Transform -> Transform
-inverseT (Transform dx dy s) =
-    Transform -dx -dy (1 / s)
-
-
-transformVec2 : Transform -> ( Float, Float ) -> ( Float, Float )
-transformVec2 (Transform dx dy s) ( x, y ) =
-    ( (x + dx) * s, (y + dy) * s )
-
-
-transformToFloatVec2 : Transform -> ( Int, Int ) -> ( Float, Float )
-transformToFloatVec2 t ( x, y ) =
-    transformVec2 t ( toFloat x, toFloat y )
-
-
-transformToIntVec2 : Transform -> ( Float, Float ) -> ( Int, Int )
-transformToIntVec2 t v =
-    transformVec2 t v |> mapEach round
-
-
-
 -- Common
 
 
@@ -348,8 +315,7 @@ type alias Pos =
 type alias Config =
     { cellSize : Float
     , cellRadius : Float
-    , worldT : Transform
-    , cellT : Transform
+    , screenToWorldPos : ( Float, Float ) -> ( Float, Float )
     , worldToGridPos : ( Float, Float ) -> Pos
     , gridToWorldPos : Pos -> ( Float, Float )
     , width : Float
@@ -370,18 +336,23 @@ toConfig screen mem =
         dy =
             (cellSize - (cellSize * toFloat mem.height)) / 2
 
+        ( px, py ) =
+            mem.pan
+
         gridToWorldPos ( gx, gy ) =
             ( (toFloat gx * cellSize) + dx, (toFloat gy * cellSize) + dy )
+
+        screenToWorldPos ( x, y ) =
+            ( (x - px) / mem.zoom, (y - py) / mem.zoom )
 
         worldToGridPos ( x, y ) =
             ( round ((x - dx) / cellSize), round ((y - dy) / cellSize) )
     in
     { cellSize = cellSize
     , cellRadius = cellSize / 2
-    , worldT = mem.worldT
-    , cellT = composeT [ translateT dx dy, scaleT cellSize ]
     , gridToWorldPos = gridToWorldPos
     , worldToGridPos = worldToGridPos
+    , screenToWorldPos = screenToWorldPos
     , width = cellSize * toFloat mem.width
     , height = cellSize * toFloat mem.height
     }
@@ -389,17 +360,7 @@ toConfig screen mem =
 
 moveCell : Config -> Pos -> Shape -> Shape
 moveCell cfg pos =
-    let
-        _ =
-            ( transformToFloatVec2 cfg.cellT pos, cfg.gridToWorldPos pos )
-                |> (if pos == ( 0, 0 ) then
-                        Debug.log "cp"
-
-                    else
-                        identity
-                   )
-    in
-    move (transformToFloatVec2 cfg.cellT pos)
+    move (cfg.gridToWorldPos pos)
 
 
 move : ( Number, Number ) -> Shape -> Shape

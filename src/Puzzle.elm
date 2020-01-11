@@ -4,7 +4,7 @@ module Puzzle exposing (main)
 
 import Dict exposing (Dict)
 import Playground exposing (..)
-import PointFree exposing (mapEach, whenTrue)
+import PointFree exposing (mapEach, mulBy, whenTrue)
 import Set
 
 
@@ -145,7 +145,7 @@ updateWorld computer mem =
 
                 ( dx, dy ) =
                     ( mouse.x - prevMouse.x, mouse.y - prevMouse.y )
-                        |> cfg.screenToWorld
+                        |> mapEach (mulBy mem.zoom)
             in
             { mem
                 | drag =

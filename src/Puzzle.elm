@@ -341,6 +341,7 @@ inverseT (Transform dx dy s) =
     Transform -dx -dy (1 / s)
 
 
+transformVec2 : Transform -> ( Float, Float ) -> ( Float, Float )
 transformVec2 (Transform dx dy s) ( x, y ) =
     ( (x + dx) * s, (y + dy) * s )
 

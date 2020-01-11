@@ -350,8 +350,8 @@ transformVec2 (Transform dx dy s) ( x, y ) =
     ( (x + dx) * s, (y + dy) * s )
 
 
-transformIntVec2 : Transform -> ( Int, Int ) -> ( Float, Float )
-transformIntVec2 t ( x, y ) =
+transformToFloatVec2 : Transform -> ( Int, Int ) -> ( Float, Float )
+transformToFloatVec2 t ( x, y ) =
     transformVec2 t ( toFloat x, toFloat y )
 
 

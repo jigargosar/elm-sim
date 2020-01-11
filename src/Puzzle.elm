@@ -4,7 +4,7 @@ module Puzzle exposing (main)
 
 import Dict exposing (Dict)
 import Playground exposing (..)
-import PointFree exposing (whenTrue)
+import PointFree exposing (mapEach, whenTrue)
 import Set
 
 
@@ -340,14 +340,16 @@ toConfig screen mem =
         ( px, py ) =
             mem.pan
 
-        gridCellToWorld ( gx, gy ) =
-            ( (toFloat gx * cellSize) + dx, (toFloat gy * cellSize) + dy )
+        gridCellToWorld =
+            mapEach toFloat
+                >> (\( gx, gy ) -> ( (gx * cellSize) + dx, (gy * cellSize) + dy ))
 
         screenToWorld ( x, y ) =
             ( (x - px) / mem.zoom, (y - py) / mem.zoom )
 
         worldToGridCell ( x, y ) =
-            ( round ((x - dx) / cellSize), round ((y - dy) / cellSize) )
+            ( (x - dx) / cellSize, (y - dy) / cellSize )
+                |> mapEach round
 
         screenToGridCell : ( Float, Float ) -> Pos
         screenToGridCell =

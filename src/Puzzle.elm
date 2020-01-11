@@ -18,6 +18,7 @@ type alias Mem =
     , dict : Dict Pos Token
     , drag : Drag
     , pan : ( Float, Float )
+    , zoom : Float
     , prevMouse : Mouse
     }
 
@@ -39,6 +40,7 @@ init =
     , dict = Dict.empty
     , drag = NotDragging
     , pan = ( 0, 0 )
+    , zoom = 1
     , prevMouse = Mouse 0 0 False False
     }
         |> insertTokenAt ( 0, 0 ) RedCircle
@@ -298,9 +300,9 @@ type alias Pos =
 type alias Config =
     { cellSize : Float
     , cellRadius : Float
-    , gridToWorldPos : Pos -> ( Float, Float )
     , screenToWorldPos : ( Float, Float ) -> ( Float, Float )
     , worldToGridPos : ( Float, Float ) -> Pos
+    , gridToWorldPos : Pos -> ( Float, Float )
     , width : Float
     , height : Float
     }

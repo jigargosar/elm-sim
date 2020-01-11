@@ -215,27 +215,10 @@ tokenShape cfg token =
 view : Computer -> Mem -> List Shape
 view computer mem =
     let
-        { screen, mouse } =
-            computer
-
-        worldMouse =
-            let
-                ( x, y ) =
-                    cfg.screenToWorld ( mouse.x, mouse.y )
-            in
-            { mouse | x = x, y = y }
-
         cfg =
-            toConfig screen mem
-
-        worldComputer =
-            { computer | mouse = worldMouse }
+            toConfig computer.screen mem
     in
-    [ viewWorld worldComputer cfg mem
-        |> group
-        |> move mem.pan
-        |> scale mem.zoom
-    ]
+    viewWorld computer cfg mem
 
 
 viewWorld : Computer -> Config -> Mem -> List Shape
@@ -288,7 +271,7 @@ viewWorld { mouse } cfg mem =
             , tokenShapeAt pos
             ]
                 |> group
-                |> moveCell cfg pos
+                |> move (cfg.gridCellToScreen pos)
         )
         mem
         |> group

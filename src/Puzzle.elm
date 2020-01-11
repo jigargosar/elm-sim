@@ -40,7 +40,7 @@ init =
     , dict = Dict.empty
     , drag = NotDragging
     , pan = ( 0, 0 )
-    , zoom = 1
+    , zoom = 0.5
     , prevMouse = Mouse 0 0 False False
     }
         |> insertTokenAt ( 0, 0 ) RedCircle
@@ -329,7 +329,7 @@ toConfig screen mem =
             ( (toFloat gx * cellSize) + dx, (toFloat gy * cellSize) + dy )
 
         screenToWorldPos ( x, y ) =
-            ( x - px, y - py )
+            ( (x - px) / mem.zoom, (y - py) / mem.zoom )
 
         worldToGridPos ( x, y ) =
             ( round ((x - dx) / cellSize), round ((y - dy) / cellSize) )

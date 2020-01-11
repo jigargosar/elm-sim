@@ -319,6 +319,7 @@ type alias Config =
     , worldToGridCell : ( Float, Float ) -> Pos
     , screenToGridCell : ( Float, Float ) -> Pos
     , gridCellToWorld : Pos -> ( Float, Float )
+    , gridCellToScreen : Pos -> ( Float, Float )
     , width : Float
     , height : Float
     }
@@ -337,21 +338,27 @@ toConfig screen mem =
         dy =
             (cellSize - (cellSize * toFloat mem.height)) / 2
 
-        ( px, py ) =
-            mem.pan
-
         gridCellToWorld =
             mapEach toFloat
                 >> (\( gx, gy ) -> ( (gx * cellSize) + dx, (gy * cellSize) + dy ))
 
-        screenToWorld ( x, y ) =
-            ( (x - px) / mem.zoom, (y - py) / mem.zoom )
-
         worldToGridCell ( x, y ) =
             ( (x - dx) / cellSize, (y - dy) / cellSize ) |> mapEach round
 
+        ( px, py ) =
+            mem.pan
+
+        screenToWorld ( x, y ) =
+            ( (x - px) / mem.zoom, (y - py) / mem.zoom )
+
+        worldToScreen ( x, y ) =
+            ( (x * mem.zoom) + px, (y * mem.zoom) + py )
+
         screenToGridCell =
             screenToWorld >> worldToGridCell
+
+        gridCellToScreen =
+            gridCellToWorld >> worldToScreen
     in
     { cellSize = cellSize
     , cellRadius = cellSize / 2
@@ -359,6 +366,7 @@ toConfig screen mem =
     , worldToGridCell = worldToGridCell
     , screenToWorld = screenToWorld
     , screenToGridCell = screenToGridCell
+    , gridCellToScreen = gridCellToScreen
     , width = cellSize * toFloat mem.width
     , height = cellSize * toFloat mem.height
     }

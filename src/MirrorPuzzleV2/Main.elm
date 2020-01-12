@@ -84,6 +84,7 @@ initialGrid =
     Grid 5 5 Dict.empty
         |> insert ( 1, 2 ) (SourceWithMirror (initDir 1))
         |> insert ( 2, 3 ) (initMirror 7)
+        |> insert ( 3, 2 ) Destination
 
 
 insert : ( Int, Int ) -> Cell -> Grid -> Grid

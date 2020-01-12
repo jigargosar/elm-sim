@@ -68,9 +68,26 @@ gridToListAllPos (Grid w h dict) =
 viewGrid : Grid -> Shape
 viewGrid grid =
     let
+        cz =
+            100
+
+        ( w, h ) =
+            let
+                (Grid iw ih _) =
+                    grid
+            in
+            ( toFloat iw * cz, toFloat ih * cz )
+
+        ( dy, dx ) =
+            ( (cz - w) / 2, (cz - h) / 2 )
+
+        scaledRect color s =
+            rectangle color cz cz |> scale s
+
         bgShape =
             group
-                [ rectangle white 100 100 |> scale 0.9
+                [ scaledRect black 0.95
+                , scaledRect white 0.9
                 ]
 
         cellToShape cell =
@@ -78,31 +95,24 @@ viewGrid grid =
                 [ bgShape
                 , (case cell of
                     Source ->
-                        rectangle orange 100 100
+                        scaledRect orange
 
                     _ ->
-                        noShape
+                        always noShape
                   )
-                    |> scale 0.7
+                    0.7
                 ]
 
         viewCell ( ( x, y ), cell ) =
             Maybe.map cellToShape cell
                 |> Maybe.withDefault bgShape
-                |> move (toFloat x * 100) (toFloat y * 100)
-                |> move ((-w / 2) + 50) ((-h / 2) + 50)
-
-        ( w, h ) =
-            ( toFloat gw * 100, toFloat gh * 100 )
-
-        (Grid gw gh _) =
-            grid
+                |> move (toFloat x * cz) (toFloat y * cz)
     in
     group
-        [ rectangle black w h
-        , gridToListAllPos grid
+        [ gridToListAllPos grid
             |> List.map viewCell
             |> group
+            |> move dx dy
         ]
         |> scale 1.5
 

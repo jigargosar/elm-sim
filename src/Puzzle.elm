@@ -30,25 +30,22 @@ type Drag
 
 
 type Token
-    = RedCircle
+    = Source
+    | Mirror Int Int
 
 
 init : Mem
 init =
-    { width = 10
-    , height = 10
+    { width = 5
+    , height = 5
     , dict = Dict.empty
     , drag = NotDragging
     , pan = ( 0, 0 )
-    , zoom = 1.5
+    , zoom = 1
     , prevMouse = Mouse 0 0 False False
     }
-        |> insertTokenAt ( 0, 0 ) RedCircle
-        |> insertTokenAt ( 0, 1 ) RedCircle
-        |> insertTokenAt ( 0, 2 ) RedCircle
-        |> insertTokenAt ( 3, 0 ) RedCircle
-        |> insertTokenAt ( 3, 1 ) RedCircle
-        |> insertTokenAt ( 3, 2 ) RedCircle
+        |> insertTokenAt ( 1, 3 ) Source
+        |> insertTokenAt ( 3, 3 ) (Mirror 1 1)
 
 
 insertTokenAt : Pos -> Token -> Mem -> Mem
@@ -184,8 +181,12 @@ minusDown { keys } =
 tokenShape : { a | cellRadius : Float } -> Token -> Shape
 tokenShape cfg token =
     case token of
-        RedCircle ->
-            circle red (cfg.cellRadius * 0.75)
+        Source ->
+            rectangle orange cfg.cellRadius cfg.cellRadius
+
+        Mirror _ _ ->
+            oval lightGreen (cfg.cellRadius / 1.8) (cfg.cellRadius * 1.5)
+                |> moveLeft ((cfg.cellRadius / 1.8) / 2)
 
 
 view : Computer -> Mem -> List Shape

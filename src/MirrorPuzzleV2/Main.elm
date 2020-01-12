@@ -20,7 +20,7 @@ type Direction
 
 initDir : Int -> Direction
 initDir ct =
-    Direction (remainderBy 8 ct)
+    Direction (modBy 8 ct)
 
 
 dirToDeg : Direction -> Float
@@ -85,6 +85,7 @@ initialGrid =
         |> insert ( 1, 2 ) (SourceWithMirror (initDir 1))
         |> insert ( 2, 3 ) (initMirror 7)
         |> insert ( 3, 2 ) Destination
+        |> insert ( 4, 4 ) (SourceWithMirror (initDir -3))
 
 
 insert : ( Int, Int ) -> Cell -> Grid -> Grid

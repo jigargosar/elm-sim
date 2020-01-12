@@ -217,24 +217,30 @@ viewGrid grid =
             in
             ( (cz - w) / 2, (cz - h) / 2 )
 
-        viewLightPath path =
-            List.map2 pathCordsToShape path (List.drop 1 path)
-                |> group
+        viewLightPath =
+            List.map (mapEach (toFloat >> mulBy cz))
+                >> (\path -> List.map2 pathCordsToShape path (List.drop 1 path))
+                >> group
     in
     group
         [ gridToMaybeCellList grid
             |> List.map (viewMaybeCell cz)
             |> group
             |> move dx dy
-        , gridToLightPath grid
-            |> List.map (mapEach (toFloat >> mulBy cz))
-            |> viewLightPath
+        , gridToLightPaths grid
+            |> List.map viewLightPath
+            |> group
             |> move dx dy
         ]
         |> scale 1.5
 
 
-gridToLightPath ((Grid _ _ dict) as grid) =
+type alias LightPath =
+    List Pos
+
+
+gridToLightPaths : Grid -> List LightPath
+gridToLightPaths ((Grid _ _ dict) as grid) =
     Dict.foldl
         (\pos cell ->
             case cell of
@@ -247,11 +253,10 @@ gridToLightPath ((Grid _ _ dict) as grid) =
         Dict.empty
         dict
         |> Dict.toList
-        |> List.head
-        |> Maybe.map (posDirToLightPath grid)
-        |> Maybe.withDefault []
+        |> List.map (posDirToLightPath grid)
 
 
+posDirToLightPath : Grid -> ( Pos, Direction ) -> LightPath
 posDirToLightPath ((Grid _ _ dict) as grid) ( startPos, startDir ) =
     let
         collectWithStep dir pos acc =

@@ -118,6 +118,21 @@ gridToMaybeCellList (Grid w h dict) =
             )
 
 
+allGridPositions : Grid -> List ( Int, Int )
+allGridPositions (Grid w h _) =
+    List.range 0 (h - 1)
+        |> List.concatMap
+            (\y ->
+                List.range 0 (w - 1)
+                    |> List.map (\x -> ( x, y ))
+            )
+
+
+gridToDict : Grid -> Dict ( Int, Int ) Cell
+gridToDict (Grid _ _ dict) =
+    dict
+
+
 
 -- Puzzle Grid View
 

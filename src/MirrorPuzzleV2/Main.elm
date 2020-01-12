@@ -262,15 +262,18 @@ posDirToLightPath ((Grid _ _ dict) as grid) ( startPos, startDir ) =
             if isPositionInGrid nextPos grid then
                 case Dict.get nextPos dict of
                     Just (Mirror newMD) ->
-                        collectWithStep newMD nextPos (pos :: acc)
+                        collectWithStep newMD nextPos (nextPos :: acc)
+
+                    Just Destination ->
+                        nextPos :: acc
 
                     _ ->
-                        collectWithStep dir nextPos (pos :: acc)
+                        collectWithStep dir nextPos (nextPos :: acc)
 
             else
-                pos :: acc
+                acc
     in
-    collectWithStep startDir startPos []
+    collectWithStep startDir startPos [ startPos ]
 
 
 

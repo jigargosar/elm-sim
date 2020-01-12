@@ -170,8 +170,8 @@ viewGrid grid =
 
         viewLightPath : List ( Int, Int ) -> Shape
         viewLightPath path =
-            Maybe.map2 (pathCordsToShape cz) (List.head path) (List.drop 1 path |> List.head)
-                |> Maybe.withDefault noShape
+            List.map2 (pathCordsToShape cz) path (List.drop 1 path)
+                |> group
     in
     group
         [ gridToMaybeCellList grid

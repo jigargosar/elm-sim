@@ -122,14 +122,14 @@ viewMaybeCell cz ( ( x, y ), maybeCell ) =
         |> move (toFloat x * cz) (toFloat y * cz)
 
 
-pathCordsToShape : Float -> ( Int, Int ) -> ( Int, Int ) -> Shape
-pathCordsToShape cz p1 p2 =
+pathCordsToShape : ( Float, Float ) -> ( Float, Float ) -> Shape
+pathCordsToShape p1 p2 =
     let
         ( x1, y1 ) =
-            p1 |> mapEach (toFloat >> mulBy cz)
+            p1
 
         ( x2, y2 ) =
-            p2 |> mapEach (toFloat >> mulBy cz)
+            p2
 
         ( dx, dy ) =
             ( x2 - x1, y2 - y1 )
@@ -166,11 +166,10 @@ viewGrid grid =
             ( (cz - w) / 2, (cz - h) / 2 )
 
         gridToLightPath _ =
-            [ ( 1, 1 ), ( 3, 3 ) ]
+            [ ( 1, 3 ), ( 3, 3 ) ]
 
-        viewLightPath : List ( Int, Int ) -> Shape
         viewLightPath path =
-            List.map2 (pathCordsToShape cz) path (List.drop 1 path)
+            List.map2 pathCordsToShape path (List.drop 1 path)
                 |> group
     in
     group
@@ -179,6 +178,7 @@ viewGrid grid =
             |> group
             |> move dx dy
         , gridToLightPath grid
+            |> List.map (mapEach (toFloat >> mulBy cz))
             |> viewLightPath
             |> move dx dy
         ]

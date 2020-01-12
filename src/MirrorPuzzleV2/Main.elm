@@ -35,6 +35,7 @@ initialGrid =
         |> insert ( 3, 3 ) initialMirror
 
 
+insert : ( Int, Int ) -> Cell -> Grid -> Grid
 insert pos cell ((Grid w h dict) as grid) =
     if isPositionInGrid pos grid then
         Dict.insert pos cell dict |> Grid w h
@@ -43,10 +44,12 @@ insert pos cell ((Grid w h dict) as grid) =
         grid
 
 
+isPositionInGrid : ( Int, Int ) -> Grid -> Bool
 isPositionInGrid ( x, y ) (Grid w h _) =
     isValidIdx w x && isValidIdx h y
 
 
+isValidIdx : number -> number -> Bool
 isValidIdx len idx =
     idx >= 0 && idx < len
 
@@ -81,8 +84,8 @@ cellToShape cz cell =
             Source ->
                 rectangle orange cz cz
 
-            _ ->
-                noShape
+            Mirror _ ->
+                oval green (cz / 2.5) cz |> moveLeft (cz / 5)
           )
             |> scale 0.8
         ]

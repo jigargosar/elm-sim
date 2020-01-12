@@ -133,6 +133,12 @@ gridToDict (Grid _ _ dict) =
     dict
 
 
+gridFoldl : (( Int, Int ) -> Maybe Cell -> b -> b) -> b -> Grid -> b
+gridFoldl func acc ((Grid _ _ dict) as grid) =
+    allGridPositions grid
+        |> List.foldl (\p -> func p (Dict.get p dict)) acc
+
+
 
 -- Puzzle Grid View
 

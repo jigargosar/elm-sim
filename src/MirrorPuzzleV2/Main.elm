@@ -95,17 +95,18 @@ viewGrid grid =
                 ]
 
         cellToShape cell =
-            case cell of
-                Source ->
-                    cellRect orange
+            bgWith <|
+                case cell of
+                    Source ->
+                        cellRect orange
 
-                _ ->
-                    noShape
+                    _ ->
+                        noShape
 
         maybeCellToShape maybeCell =
             case maybeCell of
                 Just cell ->
-                    bgWith (cellToShape cell)
+                    cellToShape cell
 
                 Nothing ->
                     bgWith noShape

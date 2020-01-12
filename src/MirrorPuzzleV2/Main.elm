@@ -10,15 +10,64 @@ import PointFree exposing (mapEach, mulBy)
 -- Puzzle Data Model
 
 
-type alias MirrorDirection =
-    Float
+type alias Pos =
+    ( Int, Int )
+
+
+type Direction
+    = Direction Int
+
+
+initDir : Int -> Direction
+initDir ct =
+    Direction (remainderBy 8 ct)
+
+
+dirToDeg : Direction -> Float
+dirToDeg (Direction ct) =
+    45 * ct |> toFloat
+
+
+stepPosInDir : Direction -> Pos -> Pos
+stepPosInDir (Direction ct) ( x, y ) =
+    let
+        ( dx, dy ) =
+            case ct of
+                0 ->
+                    ( 1, 0 )
+
+                1 ->
+                    ( 1, 1 )
+
+                2 ->
+                    ( 0, 1 )
+
+                3 ->
+                    ( -1, 1 )
+
+                4 ->
+                    ( -1, 0 )
+
+                5 ->
+                    ( -1, -1 )
+
+                6 ->
+                    ( 0, -1 )
+
+                7 ->
+                    ( 1, -1 )
+
+                _ ->
+                    ( 1, 0 )
+    in
+    ( x + dx, y + dy )
 
 
 type Cell
     = Source
       --| Destination
-    | SourceWithMirror MirrorDirection
-    | Mirror MirrorDirection
+    | SourceWithMirror Direction
+    | Mirror Direction
 
 
 type Grid
@@ -27,13 +76,13 @@ type Grid
 
 initialMirror : Cell
 initialMirror =
-    Mirror (45 * 1)
+    Mirror (initDir 1)
 
 
 initialGrid : Grid
 initialGrid =
     Grid 5 5 Dict.empty
-        |> insert ( 1, 2 ) (SourceWithMirror (45 * 0))
+        |> insert ( 1, 2 ) (SourceWithMirror (initDir 0))
         |> insert ( 3, 3 ) initialMirror
 
 
@@ -83,11 +132,11 @@ sourceShape cz =
     rectangle orange cz cz
 
 
-mirrorShape : Number -> MirrorDirection -> Shape
-mirrorShape cz angDeg =
+mirrorShape : Number -> Direction -> Shape
+mirrorShape cz dir =
     group
         [ group [ oval green (cz / 2) cz |> moveLeft (cz / 6) ]
-            |> rotate angDeg
+            |> rotate (dirToDeg dir)
         , circle lightPurple 10
         ]
 
@@ -204,7 +253,7 @@ posDirToLightPath ((Grid _ _ dict) as grid) ( startPos, startDir ) =
         collectWithStep dir pos acc =
             let
                 nextPos =
-                    stepPos dir pos
+                    stepPosInDir dir pos
             in
             if isPositionInGrid nextPos grid then
                 case Dict.get nextPos dict of
@@ -218,10 +267,6 @@ posDirToLightPath ((Grid _ _ dict) as grid) ( startPos, startDir ) =
                 pos :: acc
     in
     collectWithStep startDir startPos []
-
-
-stepPos _ ( x, y ) =
-    ( x + 1, y )
 
 
 
@@ -245,6 +290,10 @@ update _ mem =
 view : Computer -> Mem -> List Shape
 view _ mem =
     [ viewGrid mem.grid ]
+
+
+
+--noinspection ElmUnusedSymbol
 
 
 noShape =

@@ -16,7 +16,7 @@ type Cell
     = Source
       --| Destination
       --| SourceWithMirror MirrorDirection
-    | Mirror MirrorDirection
+    | Mirror Float
 
 
 type Grid
@@ -25,7 +25,7 @@ type Grid
 
 initialMirror : Cell
 initialMirror =
-    Mirror MirrorDirection
+    Mirror 90
 
 
 initialGrid : Grid
@@ -85,7 +85,11 @@ cellToShape cz cell =
                 rectangle orange cz cz
 
             Mirror _ ->
-                oval green (cz / 2.5) cz |> moveLeft (cz / 5)
+                group
+                    [ group [ oval green (cz / 2) cz |> moveLeft (cz / 6) ]
+                        |> rotate 45
+                    , circle lightPurple 10
+                    ]
           )
             |> scale 0.8
         ]

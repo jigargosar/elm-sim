@@ -33,8 +33,7 @@ initialMirror =
 initialGrid : Grid
 initialGrid =
     Grid 5 5 Dict.empty
-        |> insert ( 1, 3 ) Source
-        |> insert ( 1, 3 ) (SourceWithMirror (45 * 0))
+        |> insert ( 1, 2 ) (SourceWithMirror (45 * 0))
         |> insert ( 3, 3 ) initialMirror
 
 
@@ -200,8 +199,29 @@ gridToLightPath ((Grid _ _ dict) as grid) =
         |> Maybe.withDefault []
 
 
-posDirToLightPath grid ( pos, md ) =
-    []
+posDirToLightPath ((Grid _ _ dict) as grid) ( startPos, startMD ) =
+    let
+        collectWithStep md pos acc =
+            let
+                nextPos =
+                    stepPos md pos
+            in
+            if isPositionInGrid nextPos grid then
+                case Dict.get nextPos dict of
+                    Just (Mirror newMD) ->
+                        collectWithStep newMD nextPos (pos :: acc)
+
+                    _ ->
+                        collectWithStep md nextPos (pos :: acc)
+
+            else
+                pos :: acc
+    in
+    collectWithStep startMD startPos []
+
+
+stepPos _ ( x, y ) =
+    ( x + 1, y )
 
 
 

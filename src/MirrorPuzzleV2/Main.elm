@@ -86,6 +86,13 @@ cellToShape cz cell =
         ]
 
 
+viewMaybeCell cz ( ( x, y ), maybeCell ) =
+    maybeCell
+        |> Maybe.map (cellToShape cz)
+        |> Maybe.withDefault (bgShape cz)
+        |> move (toFloat x * cz) (toFloat y * cz)
+
+
 viewGrid : Grid -> Shape
 viewGrid grid =
     let
@@ -102,16 +109,10 @@ viewGrid grid =
                     ( toFloat iw * cz, toFloat ih * cz )
             in
             ( (cz - w) / 2, (cz - h) / 2 )
-
-        viewMaybeCell ( ( x, y ), maybeCell ) =
-            maybeCell
-                |> Maybe.map (cellToShape cz)
-                |> Maybe.withDefault (bgShape cz)
-                |> move (toFloat x * cz) (toFloat y * cz)
     in
     group
         [ gridToListAllPos grid
-            |> List.map viewMaybeCell
+            |> List.map (viewMaybeCell cz)
             |> group
             |> move dx dy
         ]

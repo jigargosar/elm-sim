@@ -25,7 +25,7 @@ type Grid
 
 initialMirror : Cell
 initialMirror =
-    Mirror 90
+    Mirror (45 * 1)
 
 
 initialGrid : Grid
@@ -84,10 +84,10 @@ cellToShape cz cell =
             Source ->
                 rectangle orange cz cz
 
-            Mirror _ ->
+            Mirror angDeg ->
                 group
                     [ group [ oval green (cz / 2) cz |> moveLeft (cz / 6) ]
-                        |> rotate 45
+                        |> rotate angDeg
                     , circle lightPurple 10
                     ]
           )

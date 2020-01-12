@@ -199,12 +199,12 @@ gridToLightPath ((Grid _ _ dict) as grid) =
         |> Maybe.withDefault []
 
 
-posDirToLightPath ((Grid _ _ dict) as grid) ( startPos, startMD ) =
+posDirToLightPath ((Grid _ _ dict) as grid) ( startPos, startDir ) =
     let
-        collectWithStep md pos acc =
+        collectWithStep dir pos acc =
             let
                 nextPos =
-                    stepPos md pos
+                    stepPos dir pos
             in
             if isPositionInGrid nextPos grid then
                 case Dict.get nextPos dict of
@@ -212,12 +212,12 @@ posDirToLightPath ((Grid _ _ dict) as grid) ( startPos, startMD ) =
                         collectWithStep newMD nextPos (pos :: acc)
 
                     _ ->
-                        collectWithStep md nextPos (pos :: acc)
+                        collectWithStep dir nextPos (pos :: acc)
 
             else
                 pos :: acc
     in
-    collectWithStep startMD startPos []
+    collectWithStep startDir startPos []
 
 
 stepPos _ ( x, y ) =

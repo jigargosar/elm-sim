@@ -51,8 +51,8 @@ isValidIdx len idx =
     idx >= 0 && idx < len
 
 
-gridToListAllPos : Grid -> List ( ( Int, Int ), Maybe Cell )
-gridToListAllPos (Grid w h dict) =
+gridToAllCells : Grid -> List ( ( Int, Int ), Maybe Cell )
+gridToAllCells (Grid w h dict) =
     List.range 0 (h - 1)
         |> List.concatMap
             (\y ->
@@ -111,7 +111,7 @@ viewGrid grid =
             ( (cz - w) / 2, (cz - h) / 2 )
     in
     group
-        [ gridToListAllPos grid
+        [ gridToAllCells grid
             |> List.map (viewMaybeCell cz)
             |> group
             |> move dx dy

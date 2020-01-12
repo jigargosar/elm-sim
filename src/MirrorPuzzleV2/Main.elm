@@ -65,6 +65,7 @@ gridToMaybeCellList (Grid w h dict) =
 -- Puzzle Grid View
 
 
+bgShape : Number -> Shape
 bgShape cz =
     group
         [ rectangle black cz cz |> scale 0.95
@@ -72,6 +73,7 @@ bgShape cz =
         ]
 
 
+cellToShape : Number -> Cell -> Shape
 cellToShape cz cell =
     group
         [ bgShape cz
@@ -86,6 +88,7 @@ cellToShape cz cell =
         ]
 
 
+viewMaybeCell : Number -> ( ( Int, Int ), Maybe Cell ) -> Shape
 viewMaybeCell cz ( ( x, y ), maybeCell ) =
     maybeCell
         |> Maybe.map (cellToShape cz)

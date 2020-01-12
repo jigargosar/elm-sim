@@ -165,9 +165,6 @@ viewGrid grid =
             in
             ( (cz - w) / 2, (cz - h) / 2 )
 
-        gridToLightPath _ =
-            [ ( 1, 3 ), ( 3, 3 ) ]
-
         viewLightPath path =
             List.map2 pathCordsToShape path (List.drop 1 path)
                 |> group
@@ -183,6 +180,24 @@ viewGrid grid =
             |> move dx dy
         ]
         |> scale 1.5
+
+
+gridToLightPath (Grid w h dict) =
+    let
+        _ =
+            Dict.foldl
+                (\pos cell ->
+                    case cell of
+                        SourceWithMirror md ->
+                            Dict.insert pos md
+
+                        _ ->
+                            identity
+                )
+                Dict.empty
+                dict
+    in
+    []
 
 
 

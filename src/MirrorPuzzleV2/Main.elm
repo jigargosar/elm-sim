@@ -8,15 +8,15 @@ import Playground exposing (..)
 -- Puzzle Data Model
 
 
-type MirrorDirection
-    = MirrorDirection
+type alias MirrorDirection =
+    Float
 
 
 type Cell
     = Source
       --| Destination
-      --| SourceWithMirror MirrorDirection
-    | Mirror Float
+    | SourceWithMirror MirrorDirection
+    | Mirror MirrorDirection
 
 
 type Grid
@@ -76,19 +76,35 @@ bgShape cz =
         ]
 
 
+sourceShape : Number -> Shape
+sourceShape cz =
+    rectangle orange cz cz
+
+
+mirrorShape : Number -> MirrorDirection -> Shape
+mirrorShape cz angDeg =
+    group
+        [ group [ oval green (cz / 2) cz |> moveLeft (cz / 6) ]
+            |> rotate angDeg
+        , circle lightPurple 10
+        ]
+
+
 cellToShape : Number -> Cell -> Shape
 cellToShape cz cell =
     group
         [ bgShape cz
         , (case cell of
             Source ->
-                rectangle orange cz cz
+                sourceShape cz
 
             Mirror angDeg ->
+                mirrorShape cz angDeg
+
+            SourceWithMirror angDeg ->
                 group
-                    [ group [ oval green (cz / 2) cz |> moveLeft (cz / 6) ]
-                        |> rotate angDeg
-                    , circle lightPurple 10
+                    [ sourceShape cz
+                    , mirrorShape cz angDeg
                     ]
           )
             |> scale 0.8

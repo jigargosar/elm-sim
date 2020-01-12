@@ -87,33 +87,36 @@ viewGrid grid =
         scaledCellRect color s =
             cellRect color |> scale s
 
-        bgShape =
+        bgWith shape =
             group
                 [ scaledCellRect black 0.95
                 , scaledCellRect white 0.9
+                , shape |> scale 0.8
                 ]
 
         cellToShape cell =
-            group
-                [ bgShape
-                , (case cell of
-                    Source ->
-                        scaledCellRect orange
+            case cell of
+                Source ->
+                    cellRect orange
 
-                    _ ->
-                        always noShape
-                  )
-                    0.7
-                ]
+                _ ->
+                    noShape
 
-        viewCell ( ( x, y ), cell ) =
-            Maybe.map cellToShape cell
-                |> Maybe.withDefault bgShape
+        maybeCellToShape maybeCell =
+            case maybeCell of
+                Just cell ->
+                    bgWith (cellToShape cell)
+
+                Nothing ->
+                    bgWith noShape
+
+        viewMaybeCell ( ( x, y ), maybeCell ) =
+            maybeCellToShape maybeCell
                 |> move (toFloat x * cz) (toFloat y * cz)
     in
     group
         [ gridToListAllPos grid
-            |> List.map viewCell
+            |> List.map viewMaybeCell
             |> group
             |> move dx dy
         ]

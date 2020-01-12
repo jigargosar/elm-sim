@@ -14,8 +14,8 @@ type MirrorDirection
 
 type Cell
     = Source
-    | Destination
-    | SourceWithMirror MirrorDirection
+      --| Destination
+      --| SourceWithMirror MirrorDirection
     | Mirror MirrorDirection
 
 
@@ -65,6 +65,20 @@ gridToListAllPos (Grid w h dict) =
 -- Puzzle Grid View
 
 
+cellToShape bgShape cz cell =
+    group
+        [ bgShape
+        , (case cell of
+            Source ->
+                rectangle orange cz cz
+
+            _ ->
+                noShape
+          )
+            |> scale 0.8
+        ]
+
+
 viewGrid : Grid -> Shape
 viewGrid grid =
     let
@@ -87,22 +101,9 @@ viewGrid grid =
                 , rectangle white cz cz |> scale 0.9
                 ]
 
-        cellToShape cell =
-            group
-                [ bgShape
-                , (case cell of
-                    Source ->
-                        rectangle orange cz cz
-
-                    _ ->
-                        noShape
-                  )
-                    |> scale 0.8
-                ]
-
         viewMaybeCell ( ( x, y ), maybeCell ) =
             maybeCell
-                |> Maybe.map cellToShape
+                |> Maybe.map (cellToShape bgShape cz)
                 |> Maybe.withDefault bgShape
                 |> move (toFloat x * cz) (toFloat y * cz)
     in
@@ -133,12 +134,12 @@ init =
 
 
 update : Computer -> Mem -> Mem
-update computer mem =
+update _ mem =
     mem
 
 
 view : Computer -> Mem -> List Shape
-view computer mem =
+view _ mem =
     [ viewGrid mem.grid ]
 
 

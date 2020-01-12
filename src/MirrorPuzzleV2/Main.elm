@@ -32,6 +32,7 @@ initialGrid : Grid
 initialGrid =
     Grid 5 5 Dict.empty
         |> insert ( 1, 3 ) Source
+        |> insert ( 1, 3 ) (SourceWithMirror (45 * 0))
         |> insert ( 3, 3 ) initialMirror
 
 

@@ -122,7 +122,8 @@ viewMaybeCell cz ( ( x, y ), maybeCell ) =
         |> move (toFloat x * cz) (toFloat y * cz)
 
 
-pathShape cz p1 p2 =
+pathToShape : Float -> ( Int, Int ) -> ( Int, Int ) -> Shape
+pathToShape cz p1 p2 =
     let
         ( x1, y1 ) =
             p1 |> mapEach (toFloat >> mulBy cz)
@@ -169,7 +170,7 @@ viewGrid grid =
 
         viewLightPath : List ( Int, Int ) -> Shape
         viewLightPath path =
-            Maybe.map2 (pathShape cz) (List.head path) (List.drop 1 path |> List.head)
+            Maybe.map2 (pathToShape cz) (List.head path) (List.drop 1 path |> List.head)
                 |> Maybe.withDefault noShape
     in
     group

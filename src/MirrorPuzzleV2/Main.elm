@@ -182,21 +182,25 @@ viewGrid grid =
         |> scale 1.5
 
 
-gridToLightPath (Grid w h dict) =
-    let
-        _ =
-            Dict.foldl
-                (\pos cell ->
-                    case cell of
-                        SourceWithMirror md ->
-                            Dict.insert pos md
+gridToLightPath ((Grid _ _ dict) as grid) =
+    Dict.foldl
+        (\pos cell ->
+            case cell of
+                SourceWithMirror md ->
+                    Dict.insert pos md
 
-                        _ ->
-                            identity
-                )
-                Dict.empty
-                dict
-    in
+                _ ->
+                    identity
+        )
+        Dict.empty
+        dict
+        |> Dict.toList
+        |> List.head
+        |> Maybe.map (posDirToLightPath grid)
+        |> Maybe.withDefault []
+
+
+posDirToLightPath grid ( pos, md ) =
     []
 
 

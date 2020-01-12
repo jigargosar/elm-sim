@@ -31,7 +31,7 @@ type Drag
 
 type Token
     = Source
-    | Mirror Int Int
+    | Mirror
 
 
 init : Mem
@@ -45,7 +45,7 @@ init =
     , prevMouse = Mouse 0 0 False False
     }
         |> insertTokenAt ( 1, 3 ) Source
-        |> insertTokenAt ( 3, 3 ) (Mirror 1 1)
+        |> insertTokenAt ( 3, 3 ) Mirror
 
 
 insertTokenAt : Pos -> Token -> Mem -> Mem
@@ -90,10 +90,10 @@ updateWorld computer mem =
                         cfg.screenToGridCell ( mouse.x, mouse.y )
                 in
                 case Dict.get pos mem.dict of
-                    Just token ->
-                        { mem | drag = Dragging pos token }
+                    Just Mirror ->
+                        { mem | drag = Dragging pos Mirror }
 
-                    Nothing ->
+                    _ ->
                         { mem | drag = Panning mem.pan }
 
             else if keyboard.space then
@@ -184,7 +184,7 @@ tokenShape cfg token =
         Source ->
             rectangle orange cfg.cellRadius cfg.cellRadius
 
-        Mirror _ _ ->
+        Mirror ->
             oval lightGreen (cfg.cellRadius / 1.8) (cfg.cellRadius * 1.5)
                 |> moveLeft ((cfg.cellRadius / 1.8) / 2)
 

@@ -168,14 +168,6 @@ cellToShape cz cell =
         ]
 
 
-viewMaybeCell : Number -> ( ( Int, Int ), Maybe Cell ) -> Shape
-viewMaybeCell cz ( ( x, y ), maybeCell ) =
-    maybeCell
-        |> Maybe.map (cellToShape cz)
-        |> Maybe.withDefault (bgShape cz)
-        |> move (toFloat x * cz) (toFloat y * cz)
-
-
 pathCordsToShape : ( Float, Float ) -> ( Float, Float ) -> Shape
 pathCordsToShape p1 p2 =
     let
@@ -219,6 +211,13 @@ viewGrid grid =
             in
             ( (cz - w) / 2, (cz - h) / 2 )
 
+        viewMaybeCell : ( ( Int, Int ), Maybe Cell ) -> Shape
+        viewMaybeCell ( ( x, y ), maybeCell ) =
+            maybeCell
+                |> Maybe.map (cellToShape cz)
+                |> Maybe.withDefault (bgShape cz)
+                |> move (toFloat x * cz) (toFloat y * cz)
+
         viewLightPath =
             List.map (mapEach (toFloat >> mulBy cz))
                 >> (\path -> List.map2 pathCordsToShape path (List.drop 1 path))
@@ -226,7 +225,7 @@ viewGrid grid =
     in
     group
         [ gridToMaybeCellList grid
-            |> List.map (viewMaybeCell cz)
+            |> List.map viewMaybeCell
             |> group
             |> move dx dy
         , gridToLightPaths grid

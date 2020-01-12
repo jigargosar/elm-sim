@@ -65,7 +65,7 @@ stepPosInDir (Direction ct) ( x, y ) =
 
 type Cell
     = Source
-      --| Destination
+    | Destination
     | SourceWithMirror Direction
     | Mirror Direction
 
@@ -157,6 +157,9 @@ cellToShape cz cell =
                     [ sourceShape cz
                     , mirrorShape cz angDeg
                     ]
+
+            Destination ->
+                circle blue (cz / 2)
           )
             |> scale 0.8
         ]

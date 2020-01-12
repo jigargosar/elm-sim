@@ -1,7 +1,9 @@
 module MirrorPuzzleV2.Main exposing (main)
 
+import Basics.Extra exposing (inDegrees)
 import Dict exposing (Dict)
 import Playground exposing (..)
+import PointFree exposing (mapEach, mulBy)
 
 
 
@@ -120,12 +122,29 @@ viewMaybeCell cz ( ( x, y ), maybeCell ) =
         |> move (toFloat x * cz) (toFloat y * cz)
 
 
-pathShape cz ( x1, y1 ) ( x2, y2 ) =
+pathShape cz p1 p2 =
     let
+        ( x1, y1 ) =
+            p1 |> mapEach (toFloat >> mulBy cz)
+
+        ( x2, y2 ) =
+            p2 |> mapEach (toFloat >> mulBy cz)
+
         ( dx, dy ) =
             ( x2 - x1, y2 - y1 )
+
+        len =
+            sqrt (dx ^ 2 + dy ^ 2)
+
+        angRad =
+            atan2 dy dx
+
+        angDeg =
+            inDegrees angRad
     in
-    noShape
+    rectangle red len 5
+        |> rotate angDeg
+        |> move (x1 + dx / 2) (y1 + dy / 2)
 
 
 viewGrid : Grid -> Shape
@@ -146,7 +165,7 @@ viewGrid grid =
             ( (cz - w) / 2, (cz - h) / 2 )
 
         gridToLightPath _ =
-            [ ( 0, 0 ), ( 1, 1 ), ( 3, 5 ) ]
+            [ ( 1, 1 ), ( 3, 3 ) ]
 
         viewLightPath : List ( Int, Int ) -> Shape
         viewLightPath path =
@@ -160,6 +179,7 @@ viewGrid grid =
             |> move dx dy
         , gridToLightPath grid
             |> viewLightPath
+            |> move dx dy
         ]
         |> scale 1.5
 

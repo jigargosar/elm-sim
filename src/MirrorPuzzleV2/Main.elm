@@ -120,6 +120,14 @@ viewMaybeCell cz ( ( x, y ), maybeCell ) =
         |> move (toFloat x * cz) (toFloat y * cz)
 
 
+pathShape cz ( x1, y1 ) ( x2, y2 ) =
+    let
+        ( dx, dy ) =
+            ( x2 - x1, y2 - y1 )
+    in
+    noShape
+
+
 viewGrid : Grid -> Shape
 viewGrid grid =
     let
@@ -136,12 +144,22 @@ viewGrid grid =
                     ( toFloat iw * cz, toFloat ih * cz )
             in
             ( (cz - w) / 2, (cz - h) / 2 )
+
+        gridToLightPath _ =
+            [ ( 0, 0 ), ( 1, 1 ), ( 3, 5 ) ]
+
+        viewLightPath : List ( Int, Int ) -> Shape
+        viewLightPath path =
+            Maybe.map2 (pathShape cz) (List.head path) (List.drop 1 path |> List.head)
+                |> Maybe.withDefault noShape
     in
     group
         [ gridToMaybeCellList grid
             |> List.map (viewMaybeCell cz)
             |> group
             |> move dx dy
+        , gridToLightPath grid
+            |> viewLightPath
         ]
         |> scale 1.5
 

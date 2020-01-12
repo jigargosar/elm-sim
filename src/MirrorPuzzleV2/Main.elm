@@ -70,8 +70,7 @@ viewGrid grid =
     let
         bgShape =
             group
-                [ rectangle black 100 100
-                , rectangle white 100 100 |> scale 0.8
+                [ rectangle white 100 100 |> scale 0.9
                 ]
 
         cellToShape cell =

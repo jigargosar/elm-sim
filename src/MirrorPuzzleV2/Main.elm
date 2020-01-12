@@ -65,9 +65,16 @@ gridToListAllPos (Grid w h dict) =
 -- Puzzle Grid View
 
 
-cellToShape bgShape cz cell =
+bgShape cz =
     group
-        [ bgShape
+        [ rectangle black cz cz |> scale 0.95
+        , rectangle white cz cz |> scale 0.9
+        ]
+
+
+cellToShape cz cell =
+    group
+        [ bgShape cz
         , (case cell of
             Source ->
                 rectangle orange cz cz
@@ -85,26 +92,21 @@ viewGrid grid =
         cz =
             100
 
-        ( w, h ) =
-            let
-                (Grid iw ih _) =
-                    grid
-            in
-            ( toFloat iw * cz, toFloat ih * cz )
-
         ( dy, dx ) =
+            let
+                ( w, h ) =
+                    let
+                        (Grid iw ih _) =
+                            grid
+                    in
+                    ( toFloat iw * cz, toFloat ih * cz )
+            in
             ( (cz - w) / 2, (cz - h) / 2 )
-
-        bgShape =
-            group
-                [ rectangle black cz cz |> scale 0.95
-                , rectangle white cz cz |> scale 0.9
-                ]
 
         viewMaybeCell ( ( x, y ), maybeCell ) =
             maybeCell
-                |> Maybe.map (cellToShape bgShape cz)
-                |> Maybe.withDefault bgShape
+                |> Maybe.map (cellToShape cz)
+                |> Maybe.withDefault (bgShape cz)
                 |> move (toFloat x * cz) (toFloat y * cz)
     in
     group

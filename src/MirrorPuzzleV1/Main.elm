@@ -1,4 +1,4 @@
-module Puzzle exposing (main)
+module MirrorPuzzleV1.Main exposing (main)
 
 -- MAIN
 

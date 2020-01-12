@@ -1,6 +1,6 @@
 module Main exposing (main)
 
-import Puzzle as Main
+import MirrorPuzzle as Main
 
 
 main =

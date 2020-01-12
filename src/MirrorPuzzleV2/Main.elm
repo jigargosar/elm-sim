@@ -144,28 +144,31 @@ mirrorShape cz dir =
         ]
 
 
-cellToShape : Number -> Cell -> Shape
-cellToShape cz cell =
+cellToShapeWithBG : Number -> Cell -> Shape
+cellToShapeWithBG cz cell =
     group
         [ bgShape cz
-        , (case cell of
-            Source ->
-                sourceShape cz
-
-            Mirror angDeg ->
-                mirrorShape cz angDeg
-
-            SourceWithMirror angDeg ->
-                group
-                    [ sourceShape cz
-                    , mirrorShape cz angDeg
-                    ]
-
-            Destination ->
-                circle blue (cz / 2)
-          )
-            |> scale 0.8
+        , cellToShape cz cell |> scale 0.8
         ]
+
+
+cellToShape : Number -> Cell -> Shape
+cellToShape cz cell =
+    case cell of
+        Source ->
+            sourceShape cz
+
+        Mirror angDeg ->
+            mirrorShape cz angDeg
+
+        SourceWithMirror angDeg ->
+            group
+                [ sourceShape cz
+                , mirrorShape cz angDeg
+                ]
+
+        Destination ->
+            circle blue (cz / 2)
 
 
 pathCordsToShape : ( Float, Float ) -> ( Float, Float ) -> Shape
@@ -214,7 +217,7 @@ viewGrid grid =
         viewMaybeCell : ( ( Int, Int ), Maybe Cell ) -> Shape
         viewMaybeCell ( ( x, y ), maybeCell ) =
             maybeCell
-                |> Maybe.map (cellToShape cz)
+                |> Maybe.map (cellToShapeWithBG cz)
                 |> Maybe.withDefault (bgShape cz)
                 |> move (toFloat x * cz) (toFloat y * cz)
 

@@ -91,17 +91,20 @@ viewGrid grid =
             Maybe.map cellToShape cell
                 |> Maybe.withDefault bgShape
                 |> move (toFloat x * 100) (toFloat y * 100)
-                |> move ((-w * 100 / 2) + 50) ((-h * 100 / 2) + 50)
+                |> move ((-w / 2) + 50) ((-h / 2) + 50)
 
         ( w, h ) =
-            ( toFloat gw, toFloat gh )
+            ( toFloat gw * 100, toFloat gh * 100 )
 
         (Grid gw gh _) =
             grid
     in
-    gridToListAllPos grid
-        |> List.map viewCell
-        |> group
+    group
+        [ rectangle black w h
+        , gridToListAllPos grid
+            |> List.map viewCell
+            |> group
+        ]
         |> scale 1.5
 
 

@@ -74,16 +74,16 @@ type Grid
     = Grid Int Int (Dict ( Int, Int ) Cell)
 
 
-initialMirror : Cell
-initialMirror =
-    Mirror (initDir 1)
+initMirror : Int -> Cell
+initMirror =
+    initDir >> Mirror
 
 
 initialGrid : Grid
 initialGrid =
     Grid 5 5 Dict.empty
-        |> insert ( 1, 2 ) (SourceWithMirror (initDir 0))
-        |> insert ( 3, 3 ) initialMirror
+        |> insert ( 1, 2 ) (SourceWithMirror (initDir 1))
+        |> insert ( 2, 3 ) (initMirror 7)
 
 
 insert : ( Int, Int ) -> Cell -> Grid -> Grid

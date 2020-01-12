@@ -81,13 +81,16 @@ viewGrid grid =
         ( dy, dx ) =
             ( (cz - w) / 2, (cz - h) / 2 )
 
-        scaledRect color s =
-            rectangle color cz cz |> scale s
+        cellRect color =
+            rectangle color cz cz
+
+        scaledCellRect color s =
+            cellRect color |> scale s
 
         bgShape =
             group
-                [ scaledRect black 0.95
-                , scaledRect white 0.9
+                [ scaledCellRect black 0.95
+                , scaledCellRect white 0.9
                 ]
 
         cellToShape cell =
@@ -95,7 +98,7 @@ viewGrid grid =
                 [ bgShape
                 , (case cell of
                     Source ->
-                        scaledRect orange
+                        scaledCellRect orange
 
                     _ ->
                         always noShape

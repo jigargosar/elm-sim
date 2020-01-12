@@ -122,10 +122,6 @@ viewGrid grid =
         |> scale 1.5
 
 
-noShape =
-    group []
-
-
 
 -- Game Scaffold
 
@@ -147,6 +143,10 @@ update _ mem =
 view : Computer -> Mem -> List Shape
 view _ mem =
     [ viewGrid mem.grid ]
+
+
+noShape =
+    group []
 
 
 main =

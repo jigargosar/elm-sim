@@ -295,5 +295,9 @@ noShape =
     group []
 
 
+moveTo ( x, y ) =
+    move x y
+
+
 main =
     game view update init

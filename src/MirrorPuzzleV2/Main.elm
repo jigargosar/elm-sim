@@ -110,6 +110,24 @@ isValidIdx len idx =
     idx >= 0 && idx < len
 
 
+computeLitDestinationPosSet grid =
+    let
+        dict =
+            gridToDict grid
+    in
+    gridToLightPaths grid
+        |> List.filterMap List.head
+        |> List.foldl
+            (\pos ->
+                if Dict.get pos dict == Just Destination then
+                    Set.insert pos
+
+                else
+                    identity
+            )
+            Set.empty
+
+
 gridToMaybeCellList : Grid -> List ( ( Int, Int ), Maybe Cell )
 gridToMaybeCellList (Grid w h dict) =
     List.range 0 (h - 1)
@@ -263,9 +281,12 @@ viewGrid time grid =
         blink =
             fade (zigzag 0.5 1 1 time)
 
+        litDestinationsPosSet =
+            computeLitDestinationPosSet grid
+
         renderCellAt ( pos, cell ) =
             cellToShape cz cell
-                |> (if Set.member pos litDestinationPosSet then
+                |> (if Set.member pos litDestinationsPosSet then
                         blink
 
                     else
@@ -288,23 +309,6 @@ viewGrid time grid =
         lightPaths : List LightPath
         lightPaths =
             gridToLightPaths grid
-
-        litDestinationPosSet =
-            let
-                (Grid _ _ dict) =
-                    grid
-            in
-            lightPaths
-                |> List.filterMap List.head
-                |> List.foldl
-                    (\pos ->
-                        if Dict.get pos dict == Just Destination then
-                            Set.insert pos
-
-                        else
-                            identity
-                    )
-                    Set.empty
     in
     group
         [ group

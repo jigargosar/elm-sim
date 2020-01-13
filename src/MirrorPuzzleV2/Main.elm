@@ -24,20 +24,25 @@ type alias Grid =
     Grid.Grid Cell
 
 
-initMirror : Int -> Cell
-initMirror =
+mirror : Int -> Cell
+mirror =
     Dir.fromInt >> Mirror
+
+
+sourceWithMirror : Int -> Cell
+sourceWithMirror =
+    Dir.fromInt >> SourceWithMirror
 
 
 initialGrid : Grid
 initialGrid =
     Grid.filled 5 5 Empty
-        |> insert ( 1, 2 ) (SourceWithMirror (Dir.fromInt 1))
-        |> insert ( 2, 3 ) (initMirror 7)
+        |> insert ( 1, 2 ) (sourceWithMirror 1)
+        |> insert ( 2, 3 ) (mirror 7)
         |> insert ( 3, 2 ) Destination
-        |> insert ( 4, 4 ) (SourceWithMirror (Dir.fromInt -3))
+        |> insert ( 4, 4 ) (sourceWithMirror -3)
         |> insert ( 0, 0 ) Destination
-        |> insert ( 1, 1 ) (SourceWithMirror (Dir.fromInt 1))
+        |> insert ( 1, 1 ) (sourceWithMirror 1)
         |> insert ( 1, 1 ) Source
 
 

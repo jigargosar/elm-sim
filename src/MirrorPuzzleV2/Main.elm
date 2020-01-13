@@ -224,9 +224,18 @@ viewLevelSelect =
         total =
             10
 
+        button w h =
+            let
+                thickness =
+                    3
+            in
+            [ rectangle black w h
+            , rectangle white (w - thickness) (h - thickness)
+            ]
+                |> group
+
         levelShape n =
-            [ rectangle black (100 - lh * 0.2) (lh - lh * 0.2)
-            , rectangle white (100 - lh * 0.3) (lh - lh * 0.3)
+            [ button 150 (lh * 0.8)
             , words black ("Level " ++ String.fromInt n)
             ]
                 |> group

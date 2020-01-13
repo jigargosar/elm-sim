@@ -116,11 +116,6 @@ computeLitDestinationPosSet grid =
             Set.empty
 
 
-mapAllGridPositions : (Pos -> a) -> Grid -> List a
-mapAllGridPositions func =
-    Grid.map (\pos _ -> func pos) >> Grid.values
-
-
 type alias LightPath =
     List Pos
 

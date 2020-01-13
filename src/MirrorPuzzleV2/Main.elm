@@ -1,10 +1,10 @@
 module MirrorPuzzleV2.Main exposing (main)
 
-import Basics.Extra exposing (inDegrees)
 import Dict exposing (Dict)
 import MirrorPuzzleV2.Direction8 as Dir exposing (Direction8)
 import MirrorPuzzleV2.Grid as Grid
 import Playground exposing (..)
+import Playground.Extra exposing (..)
 import PointFree exposing (mapEach, mulBy)
 import Set exposing (Set)
 
@@ -261,26 +261,6 @@ view { time } mem =
 
 
 --noinspection ElmUnusedSymbol
-
-
-noShape =
-    group []
-
-
-line : Color -> Number -> ( Number, Number ) -> ( Number, Number ) -> Shape
-line color thickness ( x1, y1 ) ( x2, y2 ) =
-    let
-        ( dx, dy ) =
-            ( x2 - x1, y2 - y1 )
-
-        ( len, degrees ) =
-            -- ( sqrt (dx ^ 2 + dy ^ 2), atan2 dy dx )
-            toPolar ( dx, dy )
-                |> Tuple.mapSecond inDegrees
-    in
-    rectangle color len thickness
-        |> rotate degrees
-        |> move (x1 + dx / 2) (y1 + dy / 2)
 
 
 main =

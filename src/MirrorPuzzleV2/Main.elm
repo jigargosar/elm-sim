@@ -216,6 +216,15 @@ type Scene
     | LevelSelect
 
 
+type UI
+    = Button Number Number Number Number String
+
+
+levelButtons lh total =
+    List.range 1 total
+        |> List.map (\n -> Button 0 (toFloat n * lh) 150 (lh * 0.8) ("Level " ++ String.fromInt n))
+
+
 viewLevelSelect =
     let
         lh =

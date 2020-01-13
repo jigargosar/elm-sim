@@ -279,11 +279,10 @@ viewGrid grid =
                 |> Dict.toList
                 |> List.map renderCellAt
                 |> group
+            , gridToLightPaths grid
+                |> List.map viewLightPath
+                |> group
             ]
-            |> move dx dy
-        , gridToLightPaths grid
-            |> List.map viewLightPath
-            |> group
             |> move dx dy
         ]
         |> scale 1.5

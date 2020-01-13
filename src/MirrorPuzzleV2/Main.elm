@@ -217,7 +217,33 @@ type Scene
 
 
 viewLevelSelect =
-    [ words black "Select Level" ]
+    let
+        lh =
+            40
+
+        total =
+            10
+
+        levelShape n =
+            [ rectangle black (100 - lh * 0.2) (lh - lh * 0.2)
+            , rectangle white (100 - lh * 0.3) (lh - lh * 0.3)
+            , words black ("Level " ++ String.fromInt n)
+            ]
+                |> group
+                |> moveDown (toFloat n * lh)
+
+        top =
+            toFloat total * lh / 2
+    in
+    [ words black "Select Level"
+        |> scale 1.5
+        |> moveUp top
+        |> moveUp lh
+    , List.range 1 total
+        |> List.map levelShape
+        |> group
+        |> moveUp (toFloat total * lh / 2)
+    ]
 
 
 

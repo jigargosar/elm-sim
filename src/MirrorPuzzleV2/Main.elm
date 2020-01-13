@@ -224,11 +224,15 @@ levelButtons lh total =
     LevelButtons { lh = lh, total = total, width = 150, hScale = 0.8 }
 
 
+lbsTop (LevelButtons { total, lh }) =
+    toFloat total * lh / 2
+
+
 renderLevelButtons : LevelButtons -> Shape
-renderLevelButtons (LevelButtons { total, lh, width, hScale }) =
+renderLevelButtons ((LevelButtons { total, lh, width, hScale }) as lbs) =
     let
         top =
-            toFloat total * lh / 2
+            lbsTop lbs
 
         y n =
             top - (toFloat n * lh)

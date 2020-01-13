@@ -1,5 +1,6 @@
 module MirrorPuzzleV2.Main exposing (main)
 
+import List.Extra
 import MirrorPuzzleV2.Direction8 as Dir exposing (Direction8)
 import MirrorPuzzleV2.Grid as Grid exposing (Pos)
 import MirrorPuzzleV2.GridShape as GS
@@ -268,6 +269,22 @@ renderLevelButtons mouse ((LevelButtons { total, lh, width, hScale }) as lbs) =
         |> group
 
 
+levelIdxFromMouse mouse ((LevelButtons { total, lh, width, hScale }) as lbs) =
+    let
+        top =
+            lbsTop lbs
+
+        toY n =
+            top - (toFloat n * lh)
+
+        height =
+            lh * hScale
+    in
+    List.range 0 (total - 1)
+        |> List.Extra.find
+            (\n -> hitTest ( mouse.x, mouse.y ) ( ( 0, toY n ), ( width, height ) ))
+
+
 buttonShape hover w h text =
     let
         thickness =
@@ -320,8 +337,18 @@ init =
 
 
 update : Computer -> Mem -> Mem
-update _ mem =
-    mem
+update { mouse } mem =
+    case mem.scene of
+        LevelSelect lbs ->
+            case levelIdxFromMouse mouse lbs of
+                Just _ ->
+                    { mem | scene = initialPuzzle }
+
+                Nothing ->
+                    mem
+
+        _ ->
+            mem
 
 
 view : Computer -> Mem -> List Shape

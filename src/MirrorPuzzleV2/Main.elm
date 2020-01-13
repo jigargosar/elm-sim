@@ -260,7 +260,7 @@ viewGrid grid =
         renderBgAt pos =
             renderShapeAt pos bgShape
 
-        viewLightPath =
+        pathToShape =
             List.map (mapEach (toFloat >> mulBy cz))
                 >> (\path -> List.map2 pathCordsToShape path (List.drop 1 path))
                 >> group
@@ -280,7 +280,7 @@ viewGrid grid =
                 |> List.map renderCellAt
                 |> group
             , gridToLightPaths grid
-                |> List.map viewLightPath
+                |> List.map pathToShape
                 |> group
             ]
             |> move dx dy

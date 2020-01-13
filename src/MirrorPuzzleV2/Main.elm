@@ -213,6 +213,11 @@ viewGrid time grid =
 type Scene
     = Puzzle Grid
     | Intro
+    | LevelSelect
+
+
+viewLevelSelect =
+    [ words black "Select Level" ]
 
 
 
@@ -223,9 +228,13 @@ type alias Mem =
     { scene : Scene }
 
 
+initialPuzzle =
+    Puzzle initialGrid
+
+
 init : Mem
 init =
-    { scene = Puzzle initialGrid }
+    { scene = LevelSelect }
 
 
 update : Computer -> Mem -> Mem
@@ -241,6 +250,9 @@ view { time } mem =
 
         Intro ->
             [ words black "Tap To Start" ]
+
+        LevelSelect ->
+            viewLevelSelect
 
 
 

@@ -17,16 +17,6 @@ type alias Pos =
     ( Int, Int )
 
 
-dirToDeg : Direction -> Float
-dirToDeg =
-    Dir.toDegrees
-
-
-stepPosInDir : Direction -> Pos -> Pos
-stepPosInDir =
-    Dir.stepPos
-
-
 type Cell
     = Source
     | Destination
@@ -56,6 +46,7 @@ initialGrid =
         |> insert ( 3, 2 ) Destination
         |> insert ( 4, 4 ) (SourceWithMirror (Dir.fromInt -3))
         |> insert ( 0, 0 ) Destination
+        |> insert ( 1, 1 ) (SourceWithMirror (Dir.fromInt 1))
 
 
 insert : ( Int, Int ) -> Cell -> Grid -> Grid
@@ -89,20 +80,31 @@ gridToLightPaths grid =
         accumLightPos dir pos acc =
             let
                 nextPos =
-                    stepPosInDir dir pos
+                    Dir.stepPos dir pos
+
+                accumInDir newDir =
+                    accumLightPos newDir nextPos (nextPos :: acc)
             in
             case Grid.get nextPos grid of
-                Just (Mirror newMD) ->
-                    accumLightPos newMD nextPos (nextPos :: acc)
-
-                Just Destination ->
-                    nextPos :: acc
-
                 Nothing ->
                     acc
 
-                _ ->
-                    accumLightPos dir nextPos (nextPos :: acc)
+                Just cell ->
+                    case cell of
+                        Source ->
+                            accumInDir dir
+
+                        SourceWithMirror _ ->
+                            acc
+
+                        Destination ->
+                            nextPos :: acc
+
+                        Mirror direction ->
+                            accumInDir direction
+
+                        Empty ->
+                            accumInDir dir
     in
     Grid.foldl
         (\pos cell ->
@@ -139,7 +141,7 @@ mirrorShape : Number -> Direction -> Shape
 mirrorShape cz dir =
     group
         [ group [ oval green (cz / 2) cz |> moveLeft (cz / 6) ]
-            |> rotate (dirToDeg dir)
+            |> rotate (Dir.toDegrees dir)
         , circle lightPurple 10
         ]
 

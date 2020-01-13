@@ -177,6 +177,59 @@ mapAllGridPositions func (Grid w h _) =
 {- allGridPositions grid
    |> List.foldl (\p -> func p (Dict.get p dict)) acc
 -}
+
+
+type alias LightPath =
+    List Pos
+
+
+gridToLightPaths : Grid -> List LightPath
+gridToLightPaths grid =
+    let
+        dict =
+            gridToDict grid
+    in
+    Dict.foldl
+        (\pos cell ->
+            case cell of
+                SourceWithMirror md ->
+                    Dict.insert pos md
+
+                _ ->
+                    identity
+        )
+        Dict.empty
+        dict
+        |> Dict.toList
+        |> List.map (posDirToLightPath grid)
+
+
+posDirToLightPath : Grid -> ( Pos, Direction ) -> LightPath
+posDirToLightPath ((Grid _ _ dict) as grid) ( startPos, startDir ) =
+    let
+        collectWithStep dir pos acc =
+            let
+                nextPos =
+                    stepPosInDir dir pos
+            in
+            if isPositionInGrid nextPos grid then
+                case Dict.get nextPos dict of
+                    Just (Mirror newMD) ->
+                        collectWithStep newMD nextPos (nextPos :: acc)
+
+                    Just Destination ->
+                        nextPos :: acc
+
+                    _ ->
+                        collectWithStep dir nextPos (nextPos :: acc)
+
+            else
+                acc
+    in
+    collectWithStep startDir startPos [ startPos ]
+
+
+
 -- Puzzle Grid View
 
 
@@ -325,52 +378,6 @@ viewGrid time grid =
             |> move dx dy
         ]
         |> scale 1.5
-
-
-type alias LightPath =
-    List Pos
-
-
-gridToLightPaths : Grid -> List LightPath
-gridToLightPaths ((Grid _ _ dict) as grid) =
-    Dict.foldl
-        (\pos cell ->
-            case cell of
-                SourceWithMirror md ->
-                    Dict.insert pos md
-
-                _ ->
-                    identity
-        )
-        Dict.empty
-        dict
-        |> Dict.toList
-        |> List.map (posDirToLightPath grid)
-
-
-posDirToLightPath : Grid -> ( Pos, Direction ) -> LightPath
-posDirToLightPath ((Grid _ _ dict) as grid) ( startPos, startDir ) =
-    let
-        collectWithStep dir pos acc =
-            let
-                nextPos =
-                    stepPosInDir dir pos
-            in
-            if isPositionInGrid nextPos grid then
-                case Dict.get nextPos dict of
-                    Just (Mirror newMD) ->
-                        collectWithStep newMD nextPos (nextPos :: acc)
-
-                    Just Destination ->
-                        nextPos :: acc
-
-                    _ ->
-                        collectWithStep dir nextPos (nextPos :: acc)
-
-            else
-                acc
-    in
-    collectWithStep startDir startPos [ startPos ]
 
 
 

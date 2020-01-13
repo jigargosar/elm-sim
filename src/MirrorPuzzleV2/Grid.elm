@@ -1,6 +1,7 @@
-module MirrorPuzzleV2.Grid exposing (Grid, Pos, filled, get)
+module MirrorPuzzleV2.Grid exposing (Grid, Pos, filled, get, insert)
 
 import Dict exposing (Dict)
+import PointFree exposing (when)
 
 
 type alias Pos =
@@ -19,6 +20,27 @@ filled w h a =
 get : Pos -> Grid v -> Maybe v
 get pos =
     toDict >> Dict.get pos
+
+
+insert : Pos -> b -> Grid b -> Grid b
+insert pos a =
+    when (isValid pos)
+        (mapDict (Dict.insert pos a))
+
+
+isValid : Pos -> Grid a -> Bool
+isValid ( x, y ) (Grid w h _) =
+    isValidIdx w x && isValidIdx h y
+
+
+isValidIdx : number -> number -> Bool
+isValidIdx len idx =
+    idx >= 0 && idx < len
+
+
+mapDict : (Dict Pos a -> Dict Pos b) -> Grid a -> Grid b
+mapDict func (Grid w h dict) =
+    func dict |> Grid w h
 
 
 toDict : Grid a -> Dict Pos a

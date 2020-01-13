@@ -152,6 +152,29 @@ gridToLightPaths grid =
     let
         dict =
             gridToDict grid
+
+        collectWithStep ( pos, dir ) acc =
+            let
+                nextPos =
+                    stepPosInDir dir pos
+            in
+            if isPositionInGrid nextPos grid then
+                case Dict.get nextPos dict of
+                    Just (Mirror newMD) ->
+                        collectWithStep ( nextPos, newMD ) (nextPos :: acc)
+
+                    Just Destination ->
+                        nextPos :: acc
+
+                    _ ->
+                        collectWithStep ( nextPos, dir ) (nextPos :: acc)
+
+            else
+                acc
+
+        posDirToLightPath : ( Pos, Direction ) -> List Pos
+        posDirToLightPath posDir =
+            collectWithStep posDir [ Tuple.first posDir ]
     in
     Dict.foldl
         (\pos cell ->
@@ -165,32 +188,7 @@ gridToLightPaths grid =
         Dict.empty
         dict
         |> Dict.toList
-        |> List.map (posDirToLightPath grid)
-
-
-posDirToLightPath : Grid -> ( Pos, Direction ) -> LightPath
-posDirToLightPath ((Grid _ _ dict) as grid) ( startPos, startDir ) =
-    let
-        collectWithStep dir pos acc =
-            let
-                nextPos =
-                    stepPosInDir dir pos
-            in
-            if isPositionInGrid nextPos grid then
-                case Dict.get nextPos dict of
-                    Just (Mirror newMD) ->
-                        collectWithStep newMD nextPos (nextPos :: acc)
-
-                    Just Destination ->
-                        nextPos :: acc
-
-                    _ ->
-                        collectWithStep dir nextPos (nextPos :: acc)
-
-            else
-                acc
-    in
-    collectWithStep startDir startPos [ startPos ]
+        |> List.map posDirToLightPath
 
 
 

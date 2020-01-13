@@ -72,7 +72,7 @@ type Cell
 
 
 type Grid
-    = Grid Int Int (Dict ( Int, Int ) Cell)
+    = Grid Int Int (Dict Pos Cell)
 
 
 initMirror : Int -> Cell
@@ -128,7 +128,7 @@ computeLitDestinationPosSet grid =
             Set.empty
 
 
-gridToDict : Grid -> Dict ( Int, Int ) Cell
+gridToDict : Grid -> Dict Pos Cell
 gridToDict (Grid _ _ dict) =
     dict
 

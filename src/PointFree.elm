@@ -190,3 +190,8 @@ ignoreNothing func val =
 
 mapBoth2 func ( a1, b1 ) ( a2, b2 ) =
     ( func a1 a2, func b1 b2 )
+
+
+vecFromTo : ( number, number ) -> ( number, number ) -> ( number, number )
+vecFromTo ( x1, y1 ) ( x2, y2 ) =
+    ( x2 - x1, y2 - y1 )

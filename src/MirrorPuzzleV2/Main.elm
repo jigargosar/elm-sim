@@ -118,33 +118,50 @@ gridToMaybeCellList (Grid w h dict) =
             )
 
 
-allGridPositions : Grid -> List ( Int, Int )
-allGridPositions (Grid w h _) =
-    List.range 0 (h - 1)
-        |> List.concatMap
-            (\y ->
-                List.range 0 (w - 1)
-                    |> List.map (\x -> ( x, y ))
-            )
-
-
 gridToDict : Grid -> Dict ( Int, Int ) Cell
 gridToDict (Grid _ _ dict) =
     dict
 
 
 gridFoldl : (( Int, Int ) -> Maybe Cell -> b -> b) -> b -> Grid -> b
-gridFoldl func acc ((Grid _ _ dict) as grid) =
-    allGridPositions grid
-        |> List.foldl (\p -> func p (Dict.get p dict)) acc
+gridFoldl func acc ((Grid w h dict) as grid) =
+    List.range 0 (h - 1)
+        |> List.foldl
+            (\y acc1 ->
+                List.range 0 (w - 1)
+                    |> List.foldl (\x -> func ( x, y ) (Dict.get ( x, y ) dict)) acc1
+            )
+            acc
+
+
+mapAllGridPositions : (( Int, Int ) -> a) -> Grid -> List a
+mapAllGridPositions func (Grid w h _) =
+    List.range 0 (h - 1)
+        |> List.concatMap
+            (\y ->
+                List.range 0 (w - 1)
+                    |> List.map (\x -> func ( x, y ))
+            )
 
 
 
+--allGridPositions : Grid -> List ( Int, Int )
+--allGridPositions (Grid w h _) =
+--       List.range 0 (h - 1)
+--           |> List.concatMap
+--               (\y ->
+--                   List.range 0 (w - 1)
+--                       |> List.map (\x -> ( x, y ))
+--               )
+--
+{- allGridPositions grid
+   |> List.foldl (\p -> func p (Dict.get p dict)) acc
+-}
 -- Puzzle Grid View
 
 
-bgShape : Number -> Shape
-bgShape cz =
+toBGShape : Number -> Shape
+toBGShape cz =
     group
         [ rectangle black cz cz |> scale 0.95
         , rectangle white cz cz |> scale 0.9
@@ -168,7 +185,7 @@ mirrorShape cz dir =
 cellToShapeWithBG : Number -> Cell -> Shape
 cellToShapeWithBG cz cell =
     group
-        [ bgShape cz
+        [ toBGShape cz
         , cellToShape cz cell |> scale 0.8
         ]
 
@@ -235,22 +252,33 @@ viewGrid grid =
             in
             ( (cz - w) / 2, (cz - h) / 2 )
 
-        viewMaybeCell : ( ( Int, Int ), Maybe Cell ) -> Shape
-        viewMaybeCell ( ( x, y ), maybeCell ) =
-            maybeCell
-                |> Maybe.map (cellToShapeWithBG cz)
-                |> Maybe.withDefault (bgShape cz)
-                |> move (toFloat x * cz) (toFloat y * cz)
+        viewCell ( pos, cell ) =
+            group
+                [ toBGShape cz
+                , cellToShape cz cell |> scale 0.8
+                ]
+                |> renderShapeAt pos
 
         viewLightPath =
             List.map (mapEach (toFloat >> mulBy cz))
                 >> (\path -> List.map2 pathCordsToShape path (List.drop 1 path))
                 >> group
+
+        renderShapeAt ( x, y ) =
+            move (toFloat x * cz) (toFloat y * cz)
+
+        bgShape =
+            toBGShape cz
     in
     group
-        [ gridToMaybeCellList grid
-            |> List.map viewMaybeCell
-            |> group
+        [ group
+            [ mapAllGridPositions (\pos -> renderShapeAt pos bgShape) grid
+                |> group
+            , gridToDict grid
+                |> Dict.toList
+                |> List.map viewCell
+                |> group
+            ]
             |> move dx dy
         , gridToLightPaths grid
             |> List.map viewLightPath

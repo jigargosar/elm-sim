@@ -263,20 +263,14 @@ buttonShape w h text =
 
 viewLevelSelect =
     let
-        lh =
-            40
-
-        total =
-            10
-
-        top =
-            toFloat total * lh / 2
+        lbs =
+            levelButtons 40 10
     in
     [ words black "Select Level"
         |> scale 1.5
-        |> moveUp top
-        |> moveUp lh
-    , levelButtons lh 10
+        |> moveUp (lbsTop lbs)
+        |> moveUp 60
+    , lbs
         |> renderLevelButtons
     ]
 

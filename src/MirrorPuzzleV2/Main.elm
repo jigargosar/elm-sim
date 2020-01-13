@@ -238,6 +238,7 @@ cellToShape cz cell =
             circle blue (cz / 2)
 
 
+pathToShape : Float -> List Pos -> Shape
 pathToShape cz =
     let
         cordsToShape : ( Float, Float ) -> ( Float, Float ) -> Shape

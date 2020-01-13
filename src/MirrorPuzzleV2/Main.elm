@@ -338,7 +338,7 @@ type Scene
 
 
 
--- Game Scaffold
+-- Game
 
 
 type alias Mem =
@@ -369,8 +369,19 @@ update { mouse } mem =
                 _ ->
                     mem
 
-        _ ->
-            mem
+        Intro ->
+            if mouse.click then
+                { mem | scene = initialLevelSelect }
+
+            else
+                mem
+
+        Puzzle _ ->
+            if mouse.click then
+                { mem | scene = Intro }
+
+            else
+                mem
 
 
 view : Computer -> Mem -> List Shape
@@ -384,10 +395,6 @@ view { time, mouse } mem =
 
         LevelSelect lbs ->
             viewLevelSelect mouse lbs
-
-
-
---noinspection ElmUnusedSymbol
 
 
 main =

@@ -224,6 +224,7 @@ levelButtons lh total =
     LevelButtons { lh = lh, total = total, width = 150, hScale = 0.8 }
 
 
+renderLevelButtons : LevelButtons -> Shape
 renderLevelButtons (LevelButtons { total, lh, width, hScale }) =
     let
         top =
@@ -241,6 +242,7 @@ renderLevelButtons (LevelButtons { total, lh, width, hScale }) =
                 buttonShape width height ("Level " ++ String.fromInt (n + 1))
                     |> moveY (y n)
             )
+        |> group
 
 
 buttonShape w h text =
@@ -272,7 +274,6 @@ viewLevelSelect =
         |> moveUp lh
     , levelButtons lh 10
         |> renderLevelButtons
-        |> group
     ]
 
 

@@ -2,6 +2,7 @@ module MirrorPuzzleV2.Main exposing (main)
 
 import Basics.Extra exposing (inDegrees)
 import Dict exposing (Dict)
+import MirrorPuzzleV2.Grid as Grid
 import Playground exposing (..)
 import PointFree exposing (mapEach, mulBy)
 import Set exposing (Set)
@@ -76,8 +77,8 @@ type alias CellDict =
     Dict Pos Cell
 
 
-type Grid
-    = Grid Int Int CellDict
+type alias Grid =
+    Grid.Grid Cell
 
 
 initMirror : Int -> Cell
@@ -87,7 +88,7 @@ initMirror =
 
 initialGrid : Grid
 initialGrid =
-    Grid 5 5 Dict.empty
+    Grid.filled 5 5 Empty
         |> insert ( 1, 2 ) (SourceWithMirror (initDir 1))
         |> insert ( 2, 3 ) (initMirror 7)
         |> insert ( 3, 2 ) Destination
@@ -96,22 +97,13 @@ initialGrid =
 
 
 insert : ( Int, Int ) -> Cell -> Grid -> Grid
-insert pos cell ((Grid w h dict) as grid) =
-    if isPositionInGrid pos grid then
-        Dict.insert pos cell dict |> Grid w h
-
-    else
-        grid
+insert =
+    Grid.insert
 
 
 isPositionInGrid : ( Int, Int ) -> Grid -> Bool
-isPositionInGrid ( x, y ) (Grid w h _) =
-    isValidIdx w x && isValidIdx h y
-
-
-isValidIdx : number -> number -> Bool
-isValidIdx len idx =
-    idx >= 0 && idx < len
+isPositionInGrid =
+    Grid.isValid
 
 
 computeLitDestinationPosSet : Grid -> Set Pos
@@ -129,34 +121,14 @@ computeLitDestinationPosSet grid =
             Set.empty
 
 
-toCellDict : Grid -> CellDict
-toCellDict (Grid _ _ dict) =
-    dict
-
-
 cellAt : Pos -> Grid -> Maybe Cell
-cellAt pos grid =
-    let
-        dict =
-            toCellDict grid
-    in
-    if isPositionInGrid pos grid then
-        Dict.get pos dict
-            |> Maybe.withDefault Empty
-            |> Just
-
-    else
-        Nothing
+cellAt =
+    Grid.get
 
 
-mapAllGridPositions : (( Int, Int ) -> a) -> Grid -> List a
-mapAllGridPositions func (Grid w h _) =
-    List.range 0 (h - 1)
-        |> List.concatMap
-            (\y ->
-                List.range 0 (w - 1)
-                    |> List.map (\x -> func ( x, y ))
-            )
+mapAllGridPositions : (Pos -> a) -> Grid -> List a
+mapAllGridPositions func =
+    Grid.map (\pos _ -> func pos) >> Grid.values
 
 
 type alias LightPath =
@@ -186,7 +158,7 @@ gridToLightPaths grid =
             else
                 acc
     in
-    Dict.foldl
+    Grid.foldl
         (\pos cell ->
             case cell of
                 SourceWithMirror dir ->
@@ -197,7 +169,7 @@ gridToLightPaths grid =
                     identity
         )
         []
-        (toCellDict grid)
+        grid
 
 
 
@@ -290,11 +262,7 @@ viewGrid time grid =
         ( dy, dx ) =
             let
                 ( w, h ) =
-                    let
-                        (Grid iw ih _) =
-                            grid
-                    in
-                    ( toFloat iw * cz, toFloat ih * cz )
+                    Grid.viewDimensions cz grid
             in
             ( (cz - w) / 2, (cz - h) / 2 )
 
@@ -332,8 +300,7 @@ viewGrid time grid =
         [ group
             [ mapAllGridPositions renderBgAt grid
                 |> group
-            , toCellDict grid
-                |> Dict.toList
+            , Grid.toList grid
                 |> List.map renderCellAt
                 |> group
             , lightPaths

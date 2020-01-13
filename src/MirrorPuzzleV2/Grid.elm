@@ -1,4 +1,4 @@
-module MirrorPuzzleV2.Grid exposing (Grid, Pos, filled, get, insert, toDict, viewDimensions)
+module MirrorPuzzleV2.Grid exposing (Grid, Pos, filled, foldl, get, insert, isValid, map, toDict, toList, values, viewDimensions)
 
 import Dict exposing (Dict)
 import PointFree exposing (mapEach, mulBy, when)
@@ -41,6 +41,26 @@ viewDimensions cellSize (Grid w h _) =
 isValid : Pos -> Grid a -> Bool
 isValid ( x, y ) (Grid w h _) =
     isValidIdx w x && isValidIdx h y
+
+
+map : (Pos -> a -> b) -> Grid a -> Grid b
+map func =
+    mapDict (Dict.map func)
+
+
+values : Grid a -> List a
+values =
+    toDict >> Dict.values
+
+
+foldl : (Pos -> a -> b -> b) -> b -> Grid a -> b
+foldl func acc =
+    toDict >> Dict.foldl func acc
+
+
+toList : Grid a -> List ( Pos, a )
+toList =
+    toDict >> Dict.toList
 
 
 isValidIdx : number -> number -> Bool

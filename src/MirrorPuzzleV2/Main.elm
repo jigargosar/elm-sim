@@ -1,6 +1,5 @@
 module MirrorPuzzleV2.Main exposing (main)
 
-import List.Extra
 import MirrorPuzzleV2.Direction8 as Dir exposing (Direction8)
 import MirrorPuzzleV2.Grid as Grid exposing (Pos)
 import MirrorPuzzleV2.GridShape as GS

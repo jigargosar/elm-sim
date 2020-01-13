@@ -253,10 +253,8 @@ viewGrid grid =
             ( (cz - w) / 2, (cz - h) / 2 )
 
         viewCell ( pos, cell ) =
-            group
-                [ bgShape
-                , cellToShape cz cell |> scale 0.8
-                ]
+            cellToShape cz cell
+                |> scale 0.8
                 |> renderShapeAt pos
 
         viewBg pos =

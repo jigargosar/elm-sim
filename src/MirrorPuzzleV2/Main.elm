@@ -289,16 +289,13 @@ viewGrid time grid =
         lightPaths =
             gridToLightPaths grid
 
-        lightPathEndPositions : List Pos
-        lightPathEndPositions =
-            lightPaths |> List.filterMap List.head
-
         litDestinationPosSet =
             let
                 (Grid _ _ dict) =
                     grid
             in
-            lightPathEndPositions
+            lightPaths
+                |> List.filterMap List.head
                 |> List.foldl
                     (\pos ->
                         if Dict.get pos dict == Just Destination then

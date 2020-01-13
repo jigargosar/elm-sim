@@ -42,6 +42,7 @@ rect color (GS cz _) =
     rectangle color cz cz
 
 
+fill : Shape -> GridShape a -> Shape
 fill shape ((GS _ grid) as gs) =
     Grid.positions grid
         |> List.map (\pos -> moveCell pos gs shape)

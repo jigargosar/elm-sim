@@ -268,8 +268,8 @@ viewGrid grid =
                 >> (\path -> List.map2 pathCordsToShape path (List.drop 1 path))
                 >> group
 
-        renderShapeAt ( x, y ) =
-            move (toFloat x * cz) (toFloat y * cz)
+        renderShapeAt =
+            toViewPos >> (\( x, y ) -> move x y)
 
         bgShape =
             toBgShape cz

@@ -171,36 +171,8 @@ cellToShape cz cell =
 
 pathToShape : Float -> List Pos -> Shape
 pathToShape cz =
-    let
-        cordsToShape : ( Float, Float ) -> ( Float, Float ) -> Shape
-        cordsToShape p1 p2 =
-            let
-                ( x1, y1 ) =
-                    p1
-
-                ( x2, y2 ) =
-                    p2
-
-                ( dx, dy ) =
-                    ( x2 - x1, y2 - y1 )
-
-                ( len, degrees ) =
-                    -- ( sqrt (dx ^ 2 + dy ^ 2), atan2 dy dx )
-                    toPolar ( dx, dy )
-                        |> Tuple.mapSecond inDegrees
-
-                h =
-                    5
-
-                w =
-                    len
-            in
-            rectangle red w h
-                |> rotate degrees
-                |> move (x1 + dx / 2) (y1 + dy / 2)
-    in
     List.map (mapEach (toFloat >> mulBy cz))
-        >> (\path -> List.map2 cordsToShape path (List.drop 1 path))
+        >> (\path -> List.map2 (line red 5) path (List.drop 1 path))
         >> group
 
 
@@ -299,7 +271,7 @@ moveTo ( x, y ) =
     move x y
 
 
-line color ( x1, y1 ) ( x2, y2 ) =
+line color thickness ( x1, y1 ) ( x2, y2 ) =
     let
         ( dx, dy ) =
             ( x2 - x1, y2 - y1 )
@@ -308,14 +280,8 @@ line color ( x1, y1 ) ( x2, y2 ) =
             -- ( sqrt (dx ^ 2 + dy ^ 2), atan2 dy dx )
             toPolar ( dx, dy )
                 |> Tuple.mapSecond inDegrees
-
-        h =
-            5
-
-        w =
-            len
     in
-    rectangle color w h
+    rectangle color len thickness
         |> rotate degrees
         |> move (x1 + dx / 2) (y1 + dy / 2)
 

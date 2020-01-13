@@ -117,7 +117,7 @@ computeLitDestinationPosSet : Grid -> Set Pos
 computeLitDestinationPosSet grid =
     let
         dict =
-            gridToCellDict grid
+            toCellDict grid
     in
     gridToLightPaths grid
         |> List.filterMap List.head
@@ -132,8 +132,8 @@ computeLitDestinationPosSet grid =
             Set.empty
 
 
-gridToCellDict : Grid -> CellDict
-gridToCellDict (Grid _ _ dict) =
+toCellDict : Grid -> CellDict
+toCellDict (Grid _ _ dict) =
     dict
 
 
@@ -155,7 +155,7 @@ gridToLightPaths : Grid -> List LightPath
 gridToLightPaths grid =
     let
         dict =
-            gridToCellDict grid
+            toCellDict grid
 
         accumLightPos : Direction -> Pos -> List Pos -> List Pos
         accumLightPos dir pos acc =
@@ -195,7 +195,7 @@ gridToDestinationPosSet : Grid -> Set Pos
 gridToDestinationPosSet grid =
     let
         dict =
-            gridToCellDict grid
+            toCellDict grid
     in
     Dict.foldl
         (\pos cell ->
@@ -342,7 +342,7 @@ viewGrid time grid =
         [ group
             [ mapAllGridPositions renderBgAt grid
                 |> group
-            , gridToCellDict grid
+            , toCellDict grid
                 |> Dict.toList
                 |> List.map renderCellAt
                 |> group

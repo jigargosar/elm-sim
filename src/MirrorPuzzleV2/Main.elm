@@ -216,14 +216,43 @@ type Scene
     | LevelSelect
 
 
-type UI
-    = Button Number Number Number Number String
+type LevelButtons
+    = LevelButtons { total : Int, width : Number, lh : Number, hScale : Number }
 
 
-levelButtons : Float -> Int -> List UI
 levelButtons lh total =
-    List.range 1 total
-        |> List.map (\n -> Button 0 -(toFloat n * lh) 150 (lh * 0.8) ("Level " ++ String.fromInt n))
+    LevelButtons { lh = lh, total = total, width = 150, hScale = 0.8 }
+
+
+renderLevelButtons (LevelButtons { total, lh, width, hScale }) =
+    let
+        top =
+            toFloat total * lh / 2
+
+        y n =
+            top - (toFloat n * lh)
+
+        height =
+            lh * hScale
+    in
+    List.range 0 (total - 1)
+        |> List.map
+            (\n ->
+                buttonShape width height ("Level " ++ String.fromInt (n + 1))
+                    |> moveY (y n)
+            )
+
+
+buttonShape w h text =
+    let
+        thickness =
+            3
+    in
+    [ rectangle black w h
+    , rectangle white (w - thickness) (h - thickness)
+    , words black text
+    ]
+        |> group
 
 
 viewLevelSelect =
@@ -234,22 +263,6 @@ viewLevelSelect =
         total =
             10
 
-        button w h text =
-            let
-                thickness =
-                    3
-            in
-            [ rectangle black w h
-            , rectangle white (w - thickness) (h - thickness)
-            , words black text
-            ]
-                |> group
-
-        uiToShape ui =
-            case ui of
-                Button x y w h text ->
-                    button w h text |> move x y
-
         top =
             toFloat total * lh / 2
     in
@@ -258,9 +271,8 @@ viewLevelSelect =
         |> moveUp top
         |> moveUp lh
     , levelButtons lh 10
-        |> List.map uiToShape
+        |> renderLevelButtons
         |> group
-        |> moveUp (toFloat total * lh / 2)
     ]
 
 

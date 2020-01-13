@@ -5,6 +5,7 @@ import MirrorPuzzleV2.Grid as Grid exposing (Pos)
 import MirrorPuzzleV2.GridShape as GS
 import Playground exposing (..)
 import Playground.Extra exposing (..)
+import PointFree exposing (whenTrue)
 import Set exposing (Set)
 
 
@@ -187,12 +188,7 @@ viewGrid time grid =
 
         renderCell pos cell =
             cellToShape cz cell
-                |> (if Set.member pos litDestinationsPosSet then
-                        blink time
-
-                    else
-                        identity
-                   )
+                |> whenTrue (Set.member pos litDestinationsPosSet) (blink time)
                 |> scale 0.85
 
         lightPaths : List LightPath

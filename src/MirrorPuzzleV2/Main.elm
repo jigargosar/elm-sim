@@ -2,8 +2,10 @@ module MirrorPuzzleV2.Main exposing (main)
 
 import Basics.Extra exposing (inDegrees)
 import Dict exposing (Dict)
+import List.Extra
 import Playground exposing (..)
 import PointFree exposing (mapEach, mulBy)
+import Set
 
 
 
@@ -273,6 +275,30 @@ viewGrid grid =
 
         bgShape =
             toBgShape cz
+
+        lightPaths : List LightPath
+        lightPaths =
+            gridToLightPaths grid
+
+        lightPathEndPositions : List Pos
+        lightPathEndPositions =
+            lightPaths |> List.filterMap List.head
+
+        litDestinationPos =
+            let
+                (Grid _ _ dict) =
+                    grid
+            in
+            lightPathEndPositions
+                |> List.foldl
+                    (\pos ->
+                        if Dict.get pos dict == Just Destination then
+                            Set.insert pos
+
+                        else
+                            identity
+                    )
+                    Set.empty
     in
     group
         [ group
@@ -282,7 +308,7 @@ viewGrid grid =
                 |> Dict.toList
                 |> List.map renderCellAt
                 |> group
-            , gridToLightPaths grid
+            , lightPaths
                 |> List.map pathToShape
                 |> group
             ]

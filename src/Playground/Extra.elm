@@ -1,4 +1,4 @@
-module Playground.Extra exposing (inDegrees, line, noShape)
+module Playground.Extra exposing (blink, inDegrees, line, noShape)
 
 import Playground exposing (..)
 
@@ -27,3 +27,8 @@ line color thickness ( x1, y1 ) ( x2, y2 ) =
 inDegrees : Float -> Float
 inDegrees angle =
     angle / degrees 1
+
+
+blink : Time -> Shape -> Shape
+blink time =
+    fade (zigzag 0.5 1 1 time)

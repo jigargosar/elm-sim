@@ -191,16 +191,13 @@ viewGrid time grid =
         renderShapeAt =
             toViewPos >> (\( x, y ) -> move x y)
 
-        blink =
-            fade (zigzag 0.5 1 1 time)
-
         litDestinationsPosSet =
             computeLitDestinationPosSet grid
 
         renderCellAt pos cell =
             cellToShape cz cell
                 |> (if Set.member pos litDestinationsPosSet then
-                        blink
+                        blink time
 
                     else
                         identity

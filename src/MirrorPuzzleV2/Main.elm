@@ -2,6 +2,7 @@ module MirrorPuzzleV2.Main exposing (main)
 
 import MirrorPuzzleV2.Direction8 as Dir exposing (Direction8)
 import MirrorPuzzleV2.Grid as Grid exposing (Pos)
+import MirrorPuzzleV2.GridShape as GS
 import Playground exposing (..)
 import Playground.Extra exposing (..)
 import PointFree exposing (mapEach, mulBy)
@@ -178,12 +179,8 @@ viewGrid time grid =
         cz =
             100
 
-        ( dy, dx ) =
-            let
-                ( w, h ) =
-                    Grid.viewDimensions cz grid
-            in
-            ( (cz - w) / 2, (cz - h) / 2 )
+        gs =
+            GS.init cz grid
 
         toViewPos =
             mapEach (toFloat >> mulBy cz)
@@ -224,7 +221,7 @@ viewGrid time grid =
                 |> List.map (pathToShape cz)
                 |> group
             ]
-            |> move dx dy
+            |> GS.move gs
         ]
         |> scale 1.5
 

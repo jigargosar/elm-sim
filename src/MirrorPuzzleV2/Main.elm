@@ -299,5 +299,26 @@ moveTo ( x, y ) =
     move x y
 
 
+line color ( x1, y1 ) ( x2, y2 ) =
+    let
+        ( dx, dy ) =
+            ( x2 - x1, y2 - y1 )
+
+        ( len, degrees ) =
+            -- ( sqrt (dx ^ 2 + dy ^ 2), atan2 dy dx )
+            toPolar ( dx, dy )
+                |> Tuple.mapSecond inDegrees
+
+        h =
+            5
+
+        w =
+            len
+    in
+    rectangle color w h
+        |> rotate degrees
+        |> move (x1 + dx / 2) (y1 + dy / 2)
+
+
 main =
     game view update init

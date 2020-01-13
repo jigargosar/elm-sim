@@ -207,16 +207,25 @@ viewGrid time grid =
 
 
 
+-- Scene
+
+
+type Scene
+    = Puzzle Grid
+    | Intro
+
+
+
 -- Game Scaffold
 
 
 type alias Mem =
-    { grid : Grid }
+    { scene : Scene }
 
 
 init : Mem
 init =
-    { grid = initialGrid }
+    { scene = Puzzle initialGrid }
 
 
 update : Computer -> Mem -> Mem
@@ -226,7 +235,12 @@ update _ mem =
 
 view : Computer -> Mem -> List Shape
 view { time } mem =
-    [ viewGrid time mem.grid ]
+    case mem.scene of
+        Puzzle grid ->
+            [ viewGrid time grid ]
+
+        Intro ->
+            [ words black "Tap To Start" ]
 
 
 

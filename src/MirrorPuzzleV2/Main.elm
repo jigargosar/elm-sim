@@ -71,8 +71,12 @@ type Cell
     | Mirror Direction
 
 
+type alias CellDict =
+    Dict Pos Cell
+
+
 type Grid
-    = Grid Int Int (Dict Pos Cell)
+    = Grid Int Int CellDict
 
 
 initMirror : Int -> Cell
@@ -113,7 +117,7 @@ computeLitDestinationPosSet : Grid -> Set Pos
 computeLitDestinationPosSet grid =
     let
         dict =
-            gridToDict grid
+            gridToCellDict grid
     in
     gridToLightPaths grid
         |> List.filterMap List.head
@@ -128,8 +132,8 @@ computeLitDestinationPosSet grid =
             Set.empty
 
 
-gridToDict : Grid -> Dict Pos Cell
-gridToDict (Grid _ _ dict) =
+gridToCellDict : Grid -> CellDict
+gridToCellDict (Grid _ _ dict) =
     dict
 
 
@@ -151,7 +155,7 @@ gridToLightPaths : Grid -> List LightPath
 gridToLightPaths grid =
     let
         dict =
-            gridToDict grid
+            gridToCellDict grid
 
         accumLightPos : Direction -> Pos -> List Pos -> List Pos
         accumLightPos dir pos acc =
@@ -191,7 +195,7 @@ gridToDestinationPosSet : Grid -> Set Pos
 gridToDestinationPosSet grid =
     let
         dict =
-            gridToDict grid
+            gridToCellDict grid
     in
     Dict.foldl
         (\pos cell ->
@@ -338,7 +342,7 @@ viewGrid time grid =
         [ group
             [ mapAllGridPositions renderBgAt grid
                 |> group
-            , gridToDict grid
+            , gridToCellDict grid
                 |> Dict.toList
                 |> List.map renderCellAt
                 |> group

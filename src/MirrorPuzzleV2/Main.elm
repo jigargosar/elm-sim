@@ -187,6 +187,25 @@ gridToLightPaths grid =
         dict
 
 
+gridToDestinationPosSet : Grid -> Set Pos
+gridToDestinationPosSet grid =
+    let
+        dict =
+            gridToDict grid
+    in
+    Dict.foldl
+        (\pos cell ->
+            case cell of
+                Destination ->
+                    Set.insert pos
+
+                _ ->
+                    identity
+        )
+        Set.empty
+        dict
+
+
 
 -- Puzzle Grid View
 

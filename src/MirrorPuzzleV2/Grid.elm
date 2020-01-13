@@ -1,4 +1,4 @@
-module MirrorPuzzleV2.Grid exposing (Grid, Pos, filled, get, insert, toDict)
+module MirrorPuzzleV2.Grid exposing (Grid, Pos, filled, get, insert, toDict, viewDimensions)
 
 import Dict exposing (Dict)
 import PointFree exposing (mapEach, mulBy, when)
@@ -33,8 +33,8 @@ toDict (Grid _ _ dict) =
     dict
 
 
-toViewDimension : Float -> Grid a -> ( Float, Float )
-toViewDimension scale (Grid w h _) =
+viewDimensions : Float -> Grid a -> ( Float, Float )
+viewDimensions scale (Grid w h _) =
     ( w, h ) |> mapEach (toFloat >> mulBy scale)
 
 

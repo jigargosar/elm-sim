@@ -2,7 +2,6 @@ module MirrorPuzzleV2.Main exposing (main)
 
 import Basics.Extra exposing (inDegrees)
 import Dict exposing (Dict)
-import List.Extra
 import Playground exposing (..)
 import PointFree exposing (mapEach, mulBy)
 import Set exposing (Set)

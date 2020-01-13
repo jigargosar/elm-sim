@@ -101,29 +101,19 @@ insert =
     Grid.insert
 
 
-isPositionInGrid : ( Int, Int ) -> Grid -> Bool
-isPositionInGrid =
-    Grid.isValid
-
-
 computeLitDestinationPosSet : Grid -> Set Pos
 computeLitDestinationPosSet grid =
     gridToLightPaths grid
         |> List.filterMap List.head
         |> List.foldl
             (\pos ->
-                if cellAt pos grid == Just Destination then
+                if Grid.get pos grid == Just Destination then
                     Set.insert pos
 
                 else
                     identity
             )
             Set.empty
-
-
-cellAt : Pos -> Grid -> Maybe Cell
-cellAt =
-    Grid.get
 
 
 mapAllGridPositions : (Pos -> a) -> Grid -> List a
@@ -144,19 +134,18 @@ gridToLightPaths grid =
                 nextPos =
                     stepPosInDir dir pos
             in
-            if isPositionInGrid nextPos grid then
-                case cellAt nextPos grid of
-                    Just (Mirror newMD) ->
-                        accumLightPos newMD nextPos (nextPos :: acc)
+            case Grid.get nextPos grid of
+                Just (Mirror newMD) ->
+                    accumLightPos newMD nextPos (nextPos :: acc)
 
-                    Just Destination ->
-                        nextPos :: acc
+                Just Destination ->
+                    nextPos :: acc
 
-                    _ ->
-                        accumLightPos dir nextPos (nextPos :: acc)
+                Nothing ->
+                    acc
 
-            else
-                acc
+                _ ->
+                    accumLightPos dir nextPos (nextPos :: acc)
     in
     Grid.foldl
         (\pos cell ->

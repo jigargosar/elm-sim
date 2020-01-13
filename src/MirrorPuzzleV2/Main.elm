@@ -238,30 +238,36 @@ cellToShape cz cell =
             circle blue (cz / 2)
 
 
-pathCordsToShape : ( Float, Float ) -> ( Float, Float ) -> Shape
-pathCordsToShape p1 p2 =
+pathToShape cz =
     let
-        ( x1, y1 ) =
-            p1
+        cordsToShape : ( Float, Float ) -> ( Float, Float ) -> Shape
+        cordsToShape p1 p2 =
+            let
+                ( x1, y1 ) =
+                    p1
 
-        ( x2, y2 ) =
-            p2
+                ( x2, y2 ) =
+                    p2
 
-        ( dx, dy ) =
-            ( x2 - x1, y2 - y1 )
+                ( dx, dy ) =
+                    ( x2 - x1, y2 - y1 )
 
-        len =
-            sqrt (dx ^ 2 + dy ^ 2)
+                len =
+                    sqrt (dx ^ 2 + dy ^ 2)
 
-        angRad =
-            atan2 dy dx
+                angRad =
+                    atan2 dy dx
 
-        angDeg =
-            inDegrees angRad
+                angDeg =
+                    inDegrees angRad
+            in
+            rectangle red len 5
+                |> rotate angDeg
+                |> move (x1 + dx / 2) (y1 + dy / 2)
     in
-    rectangle red len 5
-        |> rotate angDeg
-        |> move (x1 + dx / 2) (y1 + dy / 2)
+    List.map (mapEach (toFloat >> mulBy cz))
+        >> (\path -> List.map2 cordsToShape path (List.drop 1 path))
+        >> group
 
 
 viewGrid : Time -> Grid -> Shape
@@ -307,11 +313,6 @@ viewGrid time grid =
         renderBgAt pos =
             renderShapeAt pos bgShape
 
-        pathToShape =
-            List.map toViewPos
-                >> (\path -> List.map2 pathCordsToShape path (List.drop 1 path))
-                >> group
-
         bgShape =
             toBgShape cz
 
@@ -328,7 +329,7 @@ viewGrid time grid =
                 |> List.map renderCellAt
                 |> group
             , lightPaths
-                |> List.map pathToShape
+                |> List.map (pathToShape cz)
                 |> group
             ]
             |> move dx dy

@@ -149,13 +149,13 @@ cellToShape cz cell =
         Source ->
             sourceShape cz
 
-        Mirror angDeg ->
-            mirrorShape cz angDeg
+        Mirror dir ->
+            mirrorShape cz dir
 
-        SourceWithMirror angDeg ->
+        SourceWithMirror dir ->
             group
                 [ sourceShape cz
-                , mirrorShape cz angDeg
+                , mirrorShape cz dir
                 ]
 
         Destination ->

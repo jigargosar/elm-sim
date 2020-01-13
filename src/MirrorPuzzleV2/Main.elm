@@ -160,8 +160,8 @@ mapAllGridPositions func (Grid w h _) =
 -- Puzzle Grid View
 
 
-toBGShape : Number -> Shape
-toBGShape cz =
+toBgShape : Number -> Shape
+toBgShape cz =
     group
         [ rectangle black cz cz |> scale 0.95
         , rectangle white cz cz |> scale 0.9
@@ -185,7 +185,7 @@ mirrorShape cz dir =
 cellToShapeWithBG : Number -> Cell -> Shape
 cellToShapeWithBG cz cell =
     group
-        [ toBGShape cz
+        [ toBgShape cz
         , cellToShape cz cell |> scale 0.8
         ]
 
@@ -254,10 +254,13 @@ viewGrid grid =
 
         viewCell ( pos, cell ) =
             group
-                [ toBGShape cz
+                [ bgShape
                 , cellToShape cz cell |> scale 0.8
                 ]
                 |> renderShapeAt pos
+
+        viewBg pos =
+            renderShapeAt pos bgShape
 
         viewLightPath =
             List.map (mapEach (toFloat >> mulBy cz))
@@ -268,11 +271,11 @@ viewGrid grid =
             move (toFloat x * cz) (toFloat y * cz)
 
         bgShape =
-            toBGShape cz
+            toBgShape cz
     in
     group
         [ group
-            [ mapAllGridPositions (\pos -> renderShapeAt pos bgShape) grid
+            [ mapAllGridPositions viewBg grid
                 |> group
             , gridToDict grid
                 |> Dict.toList

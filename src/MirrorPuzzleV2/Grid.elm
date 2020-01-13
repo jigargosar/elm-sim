@@ -7,7 +7,6 @@ module MirrorPuzzleV2.Grid exposing
     , insert
     , isValid
     , map
-    , toDict
     , toList
     , values
     , viewDimensions
@@ -41,11 +40,6 @@ insert pos a =
         (mapDict (Dict.insert pos a))
 
 
-toDict : Grid a -> Dict Pos a
-toDict (Grid _ _ dict) =
-    dict
-
-
 viewDimensions : Float -> Grid a -> ( Float, Float )
 viewDimensions cellSize (Grid w h _) =
     ( w, h ) |> mapEach (toFloat >> mulBy cellSize)
@@ -74,6 +68,11 @@ foldl func acc =
 toList : Grid a -> List ( Pos, a )
 toList =
     toDict >> Dict.toList
+
+
+toDict : Grid a -> Dict Pos a
+toDict (Grid _ _ dict) =
+    dict
 
 
 isValidIdx : number -> number -> Bool

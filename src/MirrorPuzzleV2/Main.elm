@@ -2,6 +2,7 @@ module MirrorPuzzleV2.Main exposing (main)
 
 import Basics.Extra exposing (inDegrees)
 import Dict exposing (Dict)
+import MirrorPuzzleV2.Direction8 as Dir exposing (Direction)
 import MirrorPuzzleV2.Grid as Grid
 import Playground exposing (..)
 import PointFree exposing (mapEach, mulBy)
@@ -16,53 +17,14 @@ type alias Pos =
     ( Int, Int )
 
 
-type Direction
-    = Direction Int
-
-
-initDir : Int -> Direction
-initDir ct =
-    Direction (modBy 8 ct)
-
-
 dirToDeg : Direction -> Float
-dirToDeg (Direction ct) =
-    45 * ct |> toFloat
+dirToDeg =
+    Dir.toDegrees
 
 
 stepPosInDir : Direction -> Pos -> Pos
-stepPosInDir (Direction ct) ( x, y ) =
-    let
-        ( dx, dy ) =
-            case ct of
-                0 ->
-                    ( 1, 0 )
-
-                1 ->
-                    ( 1, 1 )
-
-                2 ->
-                    ( 0, 1 )
-
-                3 ->
-                    ( -1, 1 )
-
-                4 ->
-                    ( -1, 0 )
-
-                5 ->
-                    ( -1, -1 )
-
-                6 ->
-                    ( 0, -1 )
-
-                7 ->
-                    ( 1, -1 )
-
-                _ ->
-                    ( 1, 0 )
-    in
-    ( x + dx, y + dy )
+stepPosInDir =
+    Dir.stepPos
 
 
 type Cell
@@ -83,16 +45,16 @@ type alias Grid =
 
 initMirror : Int -> Cell
 initMirror =
-    initDir >> Mirror
+    Dir.fromInt >> Mirror
 
 
 initialGrid : Grid
 initialGrid =
     Grid.filled 5 5 Empty
-        |> insert ( 1, 2 ) (SourceWithMirror (initDir 1))
+        |> insert ( 1, 2 ) (SourceWithMirror (Dir.fromInt 1))
         |> insert ( 2, 3 ) (initMirror 7)
         |> insert ( 3, 2 ) Destination
-        |> insert ( 4, 4 ) (SourceWithMirror (initDir -3))
+        |> insert ( 4, 4 ) (SourceWithMirror (Dir.fromInt -3))
         |> insert ( 0, 0 ) Destination
 
 

@@ -340,11 +340,11 @@ update : Computer -> Mem -> Mem
 update { mouse } mem =
     case mem.scene of
         LevelSelect lbs ->
-            case levelIdxFromMouse mouse lbs of
-                Just _ ->
+            case ( mouse.click, levelIdxFromMouse mouse lbs ) of
+                ( True, Just _ ) ->
                     { mem | scene = initialPuzzle }
 
-                Nothing ->
+                _ ->
                     mem
 
         _ ->

@@ -1,4 +1,4 @@
-module MirrorPuzzleV2.Grid exposing (Grid, Pos, filled)
+module MirrorPuzzleV2.Grid exposing (Grid, Pos, filled, get)
 
 import Dict exposing (Dict)
 
@@ -14,6 +14,16 @@ type Grid a
 filled : Int -> Int -> a -> Grid a
 filled w h a =
     foldWH (\pos -> Dict.insert pos a) Dict.empty w h |> Grid w h
+
+
+get : Pos -> Grid v -> Maybe v
+get pos =
+    toDict >> Dict.get pos
+
+
+toDict : Grid a -> Dict Pos a
+toDict (Grid _ _ dict) =
+    dict
 
 
 foldWH : (Pos -> b -> b) -> b -> Int -> Int -> b

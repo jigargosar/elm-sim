@@ -184,14 +184,10 @@ pathToShape cz =
                 ( dx, dy ) =
                     ( x2 - x1, y2 - y1 )
 
-                len =
-                    sqrt (dx ^ 2 + dy ^ 2)
-
-                angRad =
-                    atan2 dy dx
-
-                angDeg =
-                    inDegrees angRad
+                ( len, degrees ) =
+                    -- ( sqrt (dx ^ 2 + dy ^ 2), atan2 dy dx )
+                    toPolar ( dx, dy )
+                        |> Tuple.mapSecond inDegrees
 
                 h =
                     5
@@ -200,7 +196,7 @@ pathToShape cz =
                     len
             in
             rectangle red w h
-                |> rotate angDeg
+                |> rotate degrees
                 |> move (x1 + dx / 2) (y1 + dy / 2)
     in
     List.map (mapEach (toFloat >> mulBy cz))

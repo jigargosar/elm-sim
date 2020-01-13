@@ -1,4 +1,4 @@
-module MirrorPuzzleV2.GridShape exposing (GridShape, init, move, moveCell, posToScreen)
+module MirrorPuzzleV2.GridShape exposing (GridShape, init, move, moveCell, posToScreen, rect)
 
 import MirrorPuzzleV2.Grid as Grid exposing (Grid, Pos)
 import Playground exposing (..)
@@ -35,3 +35,8 @@ mv ( x, y ) =
 posToScreen : GridShape a -> Pos -> ( Number, Number )
 posToScreen (GS cz _) ( x, y ) =
     ( toFloat x * cz, toFloat y * cz )
+
+
+rect : Color -> GridShape a -> Shape
+rect color (GS cz _) =
+    rectangle color cz cz

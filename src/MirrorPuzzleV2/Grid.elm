@@ -7,6 +7,7 @@ module MirrorPuzzleV2.Grid exposing
     , insert
     , isValid
     , map
+    , positions
     , toList
     , values
     , viewDimensions

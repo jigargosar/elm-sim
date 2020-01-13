@@ -34,8 +34,8 @@ toDict (Grid _ _ dict) =
 
 
 viewDimensions : Float -> Grid a -> ( Float, Float )
-viewDimensions scale (Grid w h _) =
-    ( w, h ) |> mapEach (toFloat >> mulBy scale)
+viewDimensions cellSize (Grid w h _) =
+    ( w, h ) |> mapEach (toFloat >> mulBy cellSize)
 
 
 isValid : Pos -> Grid a -> Bool

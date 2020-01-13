@@ -224,21 +224,19 @@ viewLevelSelect =
         total =
             10
 
-        button w h =
+        button w h text =
             let
                 thickness =
                     3
             in
             [ rectangle black w h
             , rectangle white (w - thickness) (h - thickness)
+            , words black text
             ]
                 |> group
 
-        levelShape n =
-            [ button 150 (lh * 0.8)
-            , words black ("Level " ++ String.fromInt n)
-            ]
-                |> group
+        levelButtonShape n =
+            button 150 (lh * 0.8) ("Level " ++ String.fromInt n)
                 |> moveDown (toFloat n * lh)
 
         top =
@@ -249,7 +247,7 @@ viewLevelSelect =
         |> moveUp top
         |> moveUp lh
     , List.range 1 total
-        |> List.map levelShape
+        |> List.map levelButtonShape
         |> group
         |> moveUp (toFloat total * lh / 2)
     ]

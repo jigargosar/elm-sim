@@ -47,6 +47,7 @@ initialGrid =
         |> insert ( 4, 4 ) (SourceWithMirror (Dir.fromInt -3))
         |> insert ( 0, 0 ) Destination
         |> insert ( 1, 1 ) (SourceWithMirror (Dir.fromInt 1))
+        |> insert ( 1, 1 ) Source
 
 
 insert : ( Int, Int ) -> Cell -> Grid -> Grid

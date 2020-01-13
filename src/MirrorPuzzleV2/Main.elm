@@ -141,6 +141,7 @@ mirrorShape cz dir =
             |> rotate (Dir.toDegrees dir)
         , circle lightPurple 10
         ]
+        |> scale 0.9
 
 
 cellToShape : Number -> Cell -> Shape
@@ -192,7 +193,7 @@ viewGrid time grid =
                     else
                         identity
                    )
-                |> scale 0.8
+                |> scale 0.85
 
         lightPaths : List LightPath
         lightPaths =

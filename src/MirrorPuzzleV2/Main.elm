@@ -204,9 +204,7 @@ viewGrid time grid =
     in
     group
         [ group
-            [ Grid.positions grid
-                |> List.map renderBgAt
-                |> group
+            [ GS.fill (toBgShape cz) gs
             , Grid.map renderCellAt grid
                 |> Grid.values
                 |> group

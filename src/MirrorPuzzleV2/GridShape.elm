@@ -47,6 +47,7 @@ fill shape ((GS _ grid) as gs) =
     Grid.positions grid
         |> List.map (\pos -> moveCell pos gs shape)
         |> group
+        |> move gs
 
 
 render : (Pos -> a -> Shape) -> GridShape a -> Shape
@@ -54,3 +55,4 @@ render func ((GS _ grid) as gs) =
     Grid.map (\pos cell -> moveCell pos gs (func pos cell)) grid
         |> Grid.values
         |> group
+        |> move gs

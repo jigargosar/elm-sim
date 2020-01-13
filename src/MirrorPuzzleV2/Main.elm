@@ -199,13 +199,11 @@ viewGrid time grid =
             gridToLightPaths grid
     in
     group
-        [ group
-            [ GS.fill (toBgShape cz) gs
-            , GS.render renderCell gs
-            , lightPaths
-                |> List.map (pathToShape gs)
-                |> group
-            ]
+        [ GS.fill (toBgShape cz) gs
+        , GS.render renderCell gs
+        , lightPaths
+            |> List.map (pathToShape gs)
+            |> group
             |> GS.move gs
         ]
         |> scale 1.5

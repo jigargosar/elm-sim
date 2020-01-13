@@ -260,8 +260,11 @@ viewGrid grid =
         renderBgAt pos =
             renderShapeAt pos bgShape
 
+        toViewPos =
+            mapEach (toFloat >> mulBy cz)
+
         pathToShape =
-            List.map (mapEach (toFloat >> mulBy cz))
+            List.map toViewPos
                 >> (\path -> List.map2 pathCordsToShape path (List.drop 1 path))
                 >> group
 

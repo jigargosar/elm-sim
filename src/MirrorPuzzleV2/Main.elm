@@ -252,6 +252,12 @@ viewGrid grid =
             in
             ( (cz - w) / 2, (cz - h) / 2 )
 
+        toViewPos =
+            mapEach (toFloat >> mulBy cz)
+
+        renderShapeAt =
+            toViewPos >> (\( x, y ) -> move x y)
+
         renderCellAt ( pos, cell ) =
             cellToShape cz cell
                 |> scale 0.8
@@ -260,16 +266,10 @@ viewGrid grid =
         renderBgAt pos =
             renderShapeAt pos bgShape
 
-        toViewPos =
-            mapEach (toFloat >> mulBy cz)
-
         pathToShape =
             List.map toViewPos
                 >> (\path -> List.map2 pathCordsToShape path (List.drop 1 path))
                 >> group
-
-        renderShapeAt =
-            toViewPos >> (\( x, y ) -> move x y)
 
         bgShape =
             toBgShape cz

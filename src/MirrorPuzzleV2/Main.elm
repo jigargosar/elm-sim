@@ -5,7 +5,7 @@ import Dict exposing (Dict)
 import List.Extra
 import Playground exposing (..)
 import PointFree exposing (mapEach, mulBy)
-import Set
+import Set exposing (Set)
 
 
 
@@ -110,6 +110,7 @@ isValidIdx len idx =
     idx >= 0 && idx < len
 
 
+computeLitDestinationPosSet : Grid -> Set Pos
 computeLitDestinationPosSet grid =
     let
         dict =
@@ -128,30 +129,9 @@ computeLitDestinationPosSet grid =
             Set.empty
 
 
-gridToMaybeCellList : Grid -> List ( ( Int, Int ), Maybe Cell )
-gridToMaybeCellList (Grid w h dict) =
-    List.range 0 (h - 1)
-        |> List.concatMap
-            (\y ->
-                List.range 0 (w - 1)
-                    |> List.map (\x -> ( ( x, y ), Dict.get ( x, y ) dict ))
-            )
-
-
 gridToDict : Grid -> Dict ( Int, Int ) Cell
 gridToDict (Grid _ _ dict) =
     dict
-
-
-gridFoldl : (( Int, Int ) -> Maybe Cell -> b -> b) -> b -> Grid -> b
-gridFoldl func acc ((Grid w h dict) as grid) =
-    List.range 0 (h - 1)
-        |> List.foldl
-            (\y acc1 ->
-                List.range 0 (w - 1)
-                    |> List.foldl (\x -> func ( x, y ) (Dict.get ( x, y ) dict)) acc1
-            )
-            acc
 
 
 mapAllGridPositions : (( Int, Int ) -> a) -> Grid -> List a
@@ -162,21 +142,6 @@ mapAllGridPositions func (Grid w h _) =
                 List.range 0 (w - 1)
                     |> List.map (\x -> func ( x, y ))
             )
-
-
-
---allGridPositions : Grid -> List ( Int, Int )
---allGridPositions (Grid w h _) =
---       List.range 0 (h - 1)
---           |> List.concatMap
---               (\y ->
---                   List.range 0 (w - 1)
---                       |> List.map (\x -> ( x, y ))
---               )
---
-{- allGridPositions grid
-   |> List.foldl (\p -> func p (Dict.get p dict)) acc
--}
 
 
 type alias LightPath =

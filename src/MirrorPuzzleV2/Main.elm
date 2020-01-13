@@ -252,12 +252,12 @@ viewGrid grid =
             in
             ( (cz - w) / 2, (cz - h) / 2 )
 
-        viewCell ( pos, cell ) =
+        renderCellAt ( pos, cell ) =
             cellToShape cz cell
                 |> scale 0.8
                 |> renderShapeAt pos
 
-        viewBg pos =
+        renderBgAt pos =
             renderShapeAt pos bgShape
 
         viewLightPath =
@@ -273,11 +273,11 @@ viewGrid grid =
     in
     group
         [ group
-            [ mapAllGridPositions viewBg grid
+            [ mapAllGridPositions renderBgAt grid
                 |> group
             , gridToDict grid
                 |> Dict.toList
-                |> List.map viewCell
+                |> List.map renderCellAt
                 |> group
             ]
             |> move dx dy

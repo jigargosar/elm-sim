@@ -184,7 +184,7 @@ viewGrid time grid =
         litDestinationsPosSet =
             computeLitDestinationPosSet grid
 
-        renderCellAt pos cell =
+        renderCell pos cell =
             cellToShape cz cell
                 |> (if Set.member pos litDestinationsPosSet then
                         blink time
@@ -193,10 +193,6 @@ viewGrid time grid =
                         identity
                    )
                 |> scale 0.8
-                |> GS.moveCell pos gs
-
-        renderBgAt pos =
-            GS.moveCell pos gs (toBgShape cz)
 
         lightPaths : List LightPath
         lightPaths =
@@ -205,9 +201,7 @@ viewGrid time grid =
     group
         [ group
             [ GS.fill (toBgShape cz) gs
-            , Grid.map renderCellAt grid
-                |> Grid.values
-                |> group
+            , GS.render renderCell gs
             , lightPaths
                 |> List.map (pathToShape gs)
                 |> group

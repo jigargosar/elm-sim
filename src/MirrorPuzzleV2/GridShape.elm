@@ -1,4 +1,4 @@
-module MirrorPuzzleV2.GridShape exposing (GridShape, fill, init, move, moveCell, posToScreen, rect)
+module MirrorPuzzleV2.GridShape exposing (GridShape, fill, init, move, moveCell, posToScreen, rect, render)
 
 import MirrorPuzzleV2.Grid as Grid exposing (Grid, Pos)
 import Playground exposing (..)
@@ -23,7 +23,7 @@ move (GS cz grid) =
     mv ( (cz - w) / 2, (cz - h) / 2 )
 
 
-moveCell : ( Int, Int ) -> GridShape a -> Shape -> Shape
+moveCell : Pos -> GridShape a -> Shape -> Shape
 moveCell pos =
     flip posToScreen pos >> mv
 
@@ -46,4 +46,11 @@ fill : Shape -> GridShape a -> Shape
 fill shape ((GS _ grid) as gs) =
     Grid.positions grid
         |> List.map (\pos -> moveCell pos gs shape)
+        |> group
+
+
+render : (Pos -> a -> Shape) -> GridShape a -> Shape
+render func ((GS _ grid) as gs) =
+    Grid.map (\pos cell -> moveCell pos gs (func pos cell)) grid
+        |> Grid.values
         |> group

@@ -219,14 +219,6 @@ mirrorShape cz dir =
         ]
 
 
-cellToShapeWithBG : Number -> Cell -> Shape
-cellToShapeWithBG cz cell =
-    group
-        [ toBgShape cz
-        , cellToShape cz cell |> scale 0.8
-        ]
-
-
 cellToShape : Number -> Cell -> Shape
 cellToShape cz cell =
     case cell of

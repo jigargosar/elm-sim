@@ -192,8 +192,14 @@ pathToShape cz =
 
                 angDeg =
                     inDegrees angRad
+
+                h =
+                    5
+
+                w =
+                    len
             in
-            rectangle red len 5
+            rectangle red w h
                 |> rotate angDeg
                 |> move (x1 + dx / 2) (y1 + dy / 2)
     in

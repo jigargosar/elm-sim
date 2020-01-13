@@ -5,7 +5,6 @@ import MirrorPuzzleV2.Grid as Grid exposing (Pos)
 import MirrorPuzzleV2.GridShape as GS
 import Playground exposing (..)
 import Playground.Extra exposing (..)
-import PointFree exposing (mapEach, mulBy)
 import Set exposing (Set)
 
 
@@ -166,9 +165,9 @@ cellToShape cz cell =
             noShape
 
 
-pathToShape : Float -> List Pos -> Shape
-pathToShape cz =
-    List.map (mapEach (toFloat >> mulBy cz))
+pathToShape : GS.GridShape a -> List Pos -> Shape
+pathToShape gs =
+    List.map (GS.posToScreen gs)
         >> (\path -> List.map2 (line red 5) path (List.drop 1 path))
         >> group
 
@@ -212,7 +211,7 @@ viewGrid time grid =
                 |> Grid.values
                 |> group
             , lightPaths
-                |> List.map (pathToShape cz)
+                |> List.map (pathToShape gs)
                 |> group
             ]
             |> GS.move gs

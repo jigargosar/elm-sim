@@ -1,7 +1,8 @@
-module MirrorPuzzleV2.GridShape exposing (GridShape, init, move, moveCell)
+module MirrorPuzzleV2.GridShape exposing (GridShape, init, move, moveCell, posToScreen)
 
-import MirrorPuzzleV2.Grid as Grid exposing (Grid)
+import MirrorPuzzleV2.Grid as Grid exposing (Grid, Pos)
 import Playground exposing (..)
+import PointFree exposing (flip)
 
 
 type GridShape a
@@ -19,9 +20,18 @@ move (GS cz grid) =
         ( w, h ) =
             Grid.viewDimensions cz grid
     in
-    Playground.move ((cz - w) / 2) ((cz - h) / 2)
+    mv ( (cz - w) / 2, (cz - h) / 2 )
 
 
 moveCell : ( Int, Int ) -> GridShape a -> Shape -> Shape
-moveCell ( x, y ) (GS cz _) =
-    Playground.move (toFloat x * cz) (toFloat y * cz)
+moveCell pos =
+    flip posToScreen pos >> mv
+
+
+mv ( x, y ) =
+    Playground.move x y
+
+
+posToScreen : GridShape a -> Pos -> ( Number, Number )
+posToScreen (GS cz _) ( x, y ) =
+    ( toFloat x * cz, toFloat y * cz )

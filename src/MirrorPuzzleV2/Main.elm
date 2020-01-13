@@ -183,12 +183,12 @@ viewGrid time grid =
         gs =
             GS.init cz grid
 
-        litDestinationsPosSet =
+        litDestinationPosSet =
             computeLitDestinationPosSet grid
 
         renderCell pos cell =
             cellToShape cz cell
-                |> whenTrue (Set.member pos litDestinationsPosSet) (blink time)
+                |> whenTrue (Set.member pos litDestinationPosSet) (blink time)
                 |> scale 0.85
 
         lightPaths : List LightPath

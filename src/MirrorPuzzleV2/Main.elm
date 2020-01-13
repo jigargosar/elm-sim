@@ -242,7 +242,28 @@ hitTest ( px, py ) ( ( x, y ), ( w, h ) ) =
 
 
 renderLevelButtons : Mouse -> LevelButtons -> Shape
-renderLevelButtons mouse ((LevelButtons { total, lh, width, hScale }) as lbs) =
+renderLevelButtons mouse lbs =
+    mapLevelButtons mouse
+        (\{ x, y, width, height, hover, levelIdx } ->
+            buttonShape hover width height ("Level " ++ String.fromInt (levelIdx + 1))
+                |> move x y
+        )
+        lbs
+        |> group
+
+
+type alias LevelButton =
+    { x : Float
+    , y : Float
+    , hover : Bool
+    , width : Number
+    , height : Number
+    , levelIdx : Int
+    }
+
+
+mapLevelButtons : Mouse -> (LevelButton -> b) -> LevelButtons -> List b
+mapLevelButtons mouse func ((LevelButtons { total, lh, width, hScale }) as lbs) =
     let
         top =
             lbsTop lbs
@@ -263,26 +284,23 @@ renderLevelButtons mouse ((LevelButtons { total, lh, width, hScale }) as lbs) =
                     isHovered =
                         hitTest ( mouse.x, mouse.y ) ( ( 0, y ), ( width, height ) )
                 in
-                buttonShape isHovered width height ("Level " ++ String.fromInt (n + 1))
-                    |> moveY (toY n)
+                func { x = 0, y = y, hover = isHovered, width = width, height = height, levelIdx = n }
             )
-        |> group
 
 
+levelIdxFromMouse : Mouse -> LevelButtons -> Maybe Int
 levelIdxFromMouse mouse ((LevelButtons { total, lh, width, hScale }) as lbs) =
-    let
-        top =
-            lbsTop lbs
+    mapLevelButtons mouse
+        (\{ hover, levelIdx } ->
+            if hover then
+                Just levelIdx
 
-        toY n =
-            top - (toFloat n * lh)
-
-        height =
-            lh * hScale
-    in
-    List.range 0 (total - 1)
-        |> List.Extra.find
-            (\n -> hitTest ( mouse.x, mouse.y ) ( ( 0, toY n ), ( width, height ) ))
+            else
+                Nothing
+        )
+        lbs
+        |> List.filterMap identity
+        |> List.head
 
 
 buttonShape hover w h text =

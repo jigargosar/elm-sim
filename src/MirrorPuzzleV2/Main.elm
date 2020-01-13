@@ -237,8 +237,8 @@ pathCordsToShape p1 p2 =
         |> move (x1 + dx / 2) (y1 + dy / 2)
 
 
-viewGrid : Grid -> Shape
-viewGrid grid =
+viewGrid : Time -> Grid -> Shape
+viewGrid time grid =
     let
         cz =
             100
@@ -260,8 +260,17 @@ viewGrid grid =
         renderShapeAt =
             toViewPos >> (\( x, y ) -> move x y)
 
+        blink =
+            fade (zigzag 0.5 1 1 time)
+
         renderCellAt ( pos, cell ) =
             cellToShape cz cell
+                |> (if Set.member pos litDestinationPosSet then
+                        blink
+
+                    else
+                        identity
+                   )
                 |> scale 0.8
                 |> renderShapeAt pos
 
@@ -284,7 +293,7 @@ viewGrid grid =
         lightPathEndPositions =
             lightPaths |> List.filterMap List.head
 
-        litDestinationPos =
+        litDestinationPosSet =
             let
                 (Grid _ _ dict) =
                     grid
@@ -382,8 +391,8 @@ update _ mem =
 
 
 view : Computer -> Mem -> List Shape
-view _ mem =
-    [ viewGrid mem.grid ]
+view { time } mem =
+    [ viewGrid time mem.grid ]
 
 
 

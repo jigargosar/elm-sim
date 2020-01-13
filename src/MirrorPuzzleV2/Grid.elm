@@ -1,4 +1,17 @@
-module MirrorPuzzleV2.Grid exposing (Grid, Pos, filled, foldl, get, insert, isValid, map, toDict, toList, values, viewDimensions)
+module MirrorPuzzleV2.Grid exposing
+    ( Grid
+    , Pos
+    , filled
+    , foldl
+    , get
+    , insert
+    , isValid
+    , map
+    , toDict
+    , toList
+    , values
+    , viewDimensions
+    )
 
 import Dict exposing (Dict)
 import PointFree exposing (mapEach, mulBy, when)

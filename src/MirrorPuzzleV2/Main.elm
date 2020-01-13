@@ -328,11 +328,11 @@ viewGrid time grid =
                 |> scale 0.8
                 |> renderShapeAt pos
 
-        renderBgAt pos =
-            renderShapeAt pos bgShape
-
         bgShape =
             toBgShape cz
+
+        renderBgAt pos =
+            renderShapeAt pos bgShape
 
         lightPaths : List LightPath
         lightPaths =

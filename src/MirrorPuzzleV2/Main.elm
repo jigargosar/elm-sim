@@ -213,7 +213,7 @@ viewGrid time grid =
 type Scene
     = Puzzle Grid
     | Intro
-    | LevelSelect
+    | LevelSelect LevelButtons
 
 
 type LevelButtons
@@ -261,17 +261,12 @@ buttonShape w h text =
         |> group
 
 
-viewLevelSelect =
-    let
-        lbs =
-            levelButtons 40 10
-    in
+viewLevelSelect lbs =
     [ words black "Select Level"
         |> scale 1.5
         |> moveUp (lbsTop lbs)
         |> moveUp 60
-    , lbs
-        |> renderLevelButtons
+    , renderLevelButtons lbs
     ]
 
 
@@ -287,9 +282,13 @@ initialPuzzle =
     Puzzle initialGrid
 
 
+initialLevelSelect =
+    LevelSelect (levelButtons 40 10)
+
+
 init : Mem
 init =
-    { scene = LevelSelect }
+    { scene = initialLevelSelect }
 
 
 update : Computer -> Mem -> Mem
@@ -306,8 +305,8 @@ view { time } mem =
         Intro ->
             [ words black "Tap To Start" ]
 
-        LevelSelect ->
-            viewLevelSelect
+        LevelSelect lbs ->
+            viewLevelSelect lbs
 
 
 

@@ -69,6 +69,7 @@ type Cell
     | Destination
     | SourceWithMirror Direction
     | Mirror Direction
+    | Empty
 
 
 type alias CellDict =
@@ -115,15 +116,11 @@ isValidIdx len idx =
 
 computeLitDestinationPosSet : Grid -> Set Pos
 computeLitDestinationPosSet grid =
-    let
-        dict =
-            toCellDict grid
-    in
     gridToLightPaths grid
         |> List.filterMap List.head
         |> List.foldl
             (\pos ->
-                if Dict.get pos dict == Just Destination then
+                if cellAt pos grid == Just Destination then
                     Set.insert pos
 
                 else
@@ -135,6 +132,21 @@ computeLitDestinationPosSet grid =
 toCellDict : Grid -> CellDict
 toCellDict (Grid _ _ dict) =
     dict
+
+
+cellAt : Pos -> Grid -> Maybe Cell
+cellAt pos grid =
+    let
+        dict =
+            toCellDict grid
+    in
+    if isPositionInGrid pos grid then
+        Dict.get pos dict
+            |> Maybe.withDefault Empty
+            |> Just
+
+    else
+        Nothing
 
 
 mapAllGridPositions : (( Int, Int ) -> a) -> Grid -> List a
@@ -154,9 +166,6 @@ type alias LightPath =
 gridToLightPaths : Grid -> List LightPath
 gridToLightPaths grid =
     let
-        dict =
-            toCellDict grid
-
         accumLightPos : Direction -> Pos -> List Pos -> List Pos
         accumLightPos dir pos acc =
             let
@@ -164,7 +173,7 @@ gridToLightPaths grid =
                     stepPosInDir dir pos
             in
             if isPositionInGrid nextPos grid then
-                case Dict.get nextPos dict of
+                case cellAt nextPos grid of
                     Just (Mirror newMD) ->
                         accumLightPos newMD nextPos (nextPos :: acc)
 
@@ -188,26 +197,7 @@ gridToLightPaths grid =
                     identity
         )
         []
-        dict
-
-
-gridToDestinationPosSet : Grid -> Set Pos
-gridToDestinationPosSet grid =
-    let
-        dict =
-            toCellDict grid
-    in
-    Dict.foldl
-        (\pos cell ->
-            case cell of
-                Destination ->
-                    Set.insert pos
-
-                _ ->
-                    identity
-        )
-        Set.empty
-        dict
+        (toCellDict grid)
 
 
 
@@ -253,6 +243,9 @@ cellToShape cz cell =
 
         Destination ->
             circle blue (cz / 2)
+
+        Empty ->
+            noShape
 
 
 pathToShape : Float -> List Pos -> Shape

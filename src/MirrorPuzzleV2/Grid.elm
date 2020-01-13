@@ -17,7 +17,7 @@ filled w h a =
     foldWH (\pos -> Dict.insert pos a) Dict.empty w h |> Grid w h
 
 
-get : Pos -> Grid v -> Maybe v
+get : Pos -> Grid a -> Maybe a
 get pos =
     toDict >> Dict.get pos
 

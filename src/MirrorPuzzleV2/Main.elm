@@ -220,9 +220,10 @@ type UI
     = Button Number Number Number Number String
 
 
+levelButtons : Float -> Int -> List UI
 levelButtons lh total =
     List.range 1 total
-        |> List.map (\n -> Button 0 (toFloat n * lh) 150 (lh * 0.8) ("Level " ++ String.fromInt n))
+        |> List.map (\n -> Button 0 -(toFloat n * lh) 150 (lh * 0.8) ("Level " ++ String.fromInt n))
 
 
 viewLevelSelect =
@@ -244,9 +245,10 @@ viewLevelSelect =
             ]
                 |> group
 
-        levelButtonShape n =
-            button 150 (lh * 0.8) ("Level " ++ String.fromInt n)
-                |> moveDown (toFloat n * lh)
+        uiToShape ui =
+            case ui of
+                Button x y w h text ->
+                    button w h text |> move x y
 
         top =
             toFloat total * lh / 2
@@ -255,8 +257,8 @@ viewLevelSelect =
         |> scale 1.5
         |> moveUp top
         |> moveUp lh
-    , List.range 1 total
-        |> List.map levelButtonShape
+    , levelButtons lh 10
+        |> List.map uiToShape
         |> group
         |> moveUp (toFloat total * lh / 2)
     ]

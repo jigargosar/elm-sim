@@ -20,3 +20,7 @@ move (GS cz grid) =
             Grid.viewDimensions cz grid
     in
     Playground.move ((cz - w) / 2) ((cz - h) / 2)
+
+
+moveCell ( x, y ) (GS cz _) =
+    Playground.move (toFloat x * cz) (toFloat y * cz)

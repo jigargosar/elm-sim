@@ -40,3 +40,9 @@ posToScreen (GS cz _) ( x, y ) =
 rect : Color -> GridShape a -> Shape
 rect color (GS cz _) =
     rectangle color cz cz
+
+
+fill shape ((GS _ grid) as gs) =
+    Grid.positions grid
+        |> List.map (\pos -> moveCell pos gs shape)
+        |> group

@@ -208,13 +208,7 @@ viewGrid time grid =
 
 
 
--- Scene
-
-
-type Scene
-    = Puzzle Grid
-    | Intro
-    | LevelSelect LevelButtons
+-- LevelSelect
 
 
 type LevelButtons
@@ -331,6 +325,16 @@ viewLevelSelect mouse lbs =
         |> moveUp 60
     , renderLevelButtons mouse lbs
     ]
+
+
+
+-- Scene
+
+
+type Scene
+    = Puzzle Grid
+    | Intro
+    | LevelSelect LevelButtons
 
 
 

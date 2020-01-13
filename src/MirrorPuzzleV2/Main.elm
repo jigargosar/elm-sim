@@ -228,13 +228,25 @@ lbsTop (LevelButtons { total, lh }) =
     toFloat total * lh / 2
 
 
-renderLevelButtons : LevelButtons -> Shape
-renderLevelButtons ((LevelButtons { total, lh, width, hScale }) as lbs) =
+hitTest : ( Float, Float ) -> ( ( Float, Float ), ( Float, Float ) ) -> Bool
+hitTest ( px, py ) ( ( x, y ), ( w, h ) ) =
+    let
+        ( minX, maxX ) =
+            ( x - w / 2, x + w / 2 )
+
+        ( minY, maxY ) =
+            ( y - h / 2, y + h / 2 )
+    in
+    px > minX && px < maxX && py > minY && py < maxY
+
+
+renderLevelButtons : Mouse -> LevelButtons -> Shape
+renderLevelButtons mouse ((LevelButtons { total, lh, width, hScale }) as lbs) =
     let
         top =
             lbsTop lbs
 
-        y n =
+        toY n =
             top - (toFloat n * lh)
 
         height =
@@ -243,30 +255,46 @@ renderLevelButtons ((LevelButtons { total, lh, width, hScale }) as lbs) =
     List.range 0 (total - 1)
         |> List.map
             (\n ->
-                buttonShape width height ("Level " ++ String.fromInt (n + 1))
-                    |> moveY (y n)
+                let
+                    y =
+                        toY n
+
+                    isHovered =
+                        hitTest ( mouse.x, mouse.y ) ( ( 0, y ), ( width, height ) )
+                in
+                buttonShape isHovered width height ("Level " ++ String.fromInt (n + 1))
+                    |> moveY (toY n)
             )
         |> group
 
 
-buttonShape w h text =
+buttonShape hover w h text =
     let
         thickness =
             3
     in
     [ rectangle black w h
-    , rectangle white (w - thickness) (h - thickness)
+    , rectangle
+        (if hover then
+            lightPurple
+
+         else
+            white
+        )
+        (w - thickness)
+        (h - thickness)
     , words black text
     ]
         |> group
 
 
-viewLevelSelect lbs =
+viewLevelSelect : Mouse -> LevelButtons -> List Shape
+viewLevelSelect mouse lbs =
     [ words black "Select Level"
         |> scale 1.5
         |> moveUp (lbsTop lbs)
         |> moveUp 60
-    , renderLevelButtons lbs
+    , renderLevelButtons mouse lbs
     ]
 
 
@@ -297,7 +325,7 @@ update _ mem =
 
 
 view : Computer -> Mem -> List Shape
-view { time } mem =
+view { time, mouse } mem =
     case mem.scene of
         Puzzle grid ->
             [ viewGrid time grid ]
@@ -306,7 +334,7 @@ view { time } mem =
             [ words black "Tap To Start" ]
 
         LevelSelect lbs ->
-            viewLevelSelect lbs
+            viewLevelSelect mouse lbs
 
 
 

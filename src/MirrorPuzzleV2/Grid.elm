@@ -1,7 +1,7 @@
-module MirrorPuzzleV2.Grid exposing (Grid, Pos, filled, get, insert)
+module MirrorPuzzleV2.Grid exposing (Grid, Pos, filled, get, insert, toDict)
 
 import Dict exposing (Dict)
-import PointFree exposing (when)
+import PointFree exposing (mapEach, mulBy, when)
 
 
 type alias Pos =
@@ -28,6 +28,16 @@ insert pos a =
         (mapDict (Dict.insert pos a))
 
 
+toDict : Grid a -> Dict Pos a
+toDict (Grid _ _ dict) =
+    dict
+
+
+toViewDimension : Float -> Grid a -> ( Float, Float )
+toViewDimension scale (Grid w h _) =
+    ( w, h ) |> mapEach (toFloat >> mulBy scale)
+
+
 isValid : Pos -> Grid a -> Bool
 isValid ( x, y ) (Grid w h _) =
     isValidIdx w x && isValidIdx h y
@@ -41,11 +51,6 @@ isValidIdx len idx =
 mapDict : (Dict Pos a -> Dict Pos b) -> Grid a -> Grid b
 mapDict func (Grid w h dict) =
     func dict |> Grid w h
-
-
-toDict : Grid a -> Dict Pos a
-toDict (Grid _ _ dict) =
-    dict
 
 
 foldWH : (Pos -> b -> b) -> b -> Int -> Int -> b

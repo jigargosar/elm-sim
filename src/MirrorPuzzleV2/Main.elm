@@ -267,10 +267,6 @@ noShape =
     group []
 
 
-moveTo ( x, y ) =
-    move x y
-
-
 line color thickness ( x1, y1 ) ( x2, y2 ) =
     let
         ( dx, dy ) =

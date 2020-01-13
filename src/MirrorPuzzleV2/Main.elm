@@ -182,12 +182,6 @@ viewGrid time grid =
         gs =
             GS.init cz grid
 
-        toViewPos =
-            mapEach (toFloat >> mulBy cz)
-
-        renderShapeAt =
-            toViewPos >> (\( x, y ) -> move x y)
-
         litDestinationsPosSet =
             computeLitDestinationPosSet grid
 
@@ -200,10 +194,10 @@ viewGrid time grid =
                         identity
                    )
                 |> scale 0.8
-                |> renderShapeAt pos
+                |> GS.moveCell pos gs
 
         renderBgAt pos =
-            renderShapeAt pos (toBgShape cz)
+            GS.moveCell pos gs (toBgShape cz)
 
         lightPaths : List LightPath
         lightPaths =

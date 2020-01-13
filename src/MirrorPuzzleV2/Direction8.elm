@@ -1,26 +1,26 @@
-module MirrorPuzzleV2.Direction8 exposing (Direction, fromInt, stepPos, toDegrees)
+module MirrorPuzzleV2.Direction8 exposing (Direction8, fromInt, stepPos, toDegrees)
 
 
 type alias Pos =
     ( Int, Int )
 
 
-type Direction
-    = Direction Int
+type Direction8
+    = Dir Int
 
 
-fromInt : Int -> Direction
+fromInt : Int -> Direction8
 fromInt ct =
-    Direction (modBy 8 ct)
+    Dir (modBy 8 ct)
 
 
-toDegrees : Direction -> Float
-toDegrees (Direction ct) =
+toDegrees : Direction8 -> Float
+toDegrees (Dir ct) =
     45 * ct |> toFloat
 
 
-stepPos : Direction -> Pos -> Pos
-stepPos (Direction ct) ( x, y ) =
+stepPos : Direction8 -> Pos -> Pos
+stepPos (Dir ct) ( x, y ) =
     let
         ( dx, dy ) =
             case ct of

@@ -2,7 +2,7 @@ module MirrorPuzzleV2.Main exposing (main)
 
 import Basics.Extra exposing (inDegrees)
 import Dict exposing (Dict)
-import MirrorPuzzleV2.Direction8 as Dir exposing (Direction)
+import MirrorPuzzleV2.Direction8 as Dir exposing (Direction8)
 import MirrorPuzzleV2.Grid as Grid
 import Playground exposing (..)
 import PointFree exposing (mapEach, mulBy)
@@ -20,8 +20,8 @@ type alias Pos =
 type Cell
     = Source
     | Destination
-    | SourceWithMirror Direction
-    | Mirror Direction
+    | SourceWithMirror Direction8
+    | Mirror Direction8
     | Empty
 
 
@@ -77,7 +77,7 @@ type alias LightPath =
 gridToLightPaths : Grid -> List LightPath
 gridToLightPaths grid =
     let
-        accumLightPos : Direction -> Pos -> List Pos -> List Pos
+        accumLightPos : Direction8 -> Pos -> List Pos -> List Pos
         accumLightPos dir pos acc =
             let
                 nextPos =
@@ -138,7 +138,7 @@ sourceShape cz =
     rectangle orange cz cz
 
 
-mirrorShape : Number -> Direction -> Shape
+mirrorShape : Number -> Direction8 -> Shape
 mirrorShape cz dir =
     group
         [ group [ oval green (cz / 2) cz |> moveLeft (cz / 6) ]

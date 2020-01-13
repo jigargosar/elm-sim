@@ -60,6 +60,11 @@ values =
     toDict >> Dict.values
 
 
+positions : Grid a -> List Pos
+positions =
+    toDict >> Dict.keys
+
+
 foldl : (Pos -> a -> b -> b) -> b -> Grid a -> b
 foldl func acc =
     toDict >> Dict.foldl func acc

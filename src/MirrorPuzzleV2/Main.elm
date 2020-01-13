@@ -267,6 +267,7 @@ noShape =
     group []
 
 
+line : Color -> Number -> ( Number, Number ) -> ( Number, Number ) -> Shape
 line color thickness ( x1, y1 ) ( x2, y2 ) =
     let
         ( dx, dy ) =

@@ -1,8 +1,7 @@
 module MirrorPuzzleV2.Main exposing (main)
 
-import Dict exposing (Dict)
 import MirrorPuzzleV2.Direction8 as Dir exposing (Direction8)
-import MirrorPuzzleV2.Grid as Grid
+import MirrorPuzzleV2.Grid as Grid exposing (Pos)
 import Playground exposing (..)
 import Playground.Extra exposing (..)
 import PointFree exposing (mapEach, mulBy)
@@ -13,20 +12,12 @@ import Set exposing (Set)
 -- Puzzle Data Model
 
 
-type alias Pos =
-    ( Int, Int )
-
-
 type Cell
     = Source
     | Destination
     | SourceWithMirror Direction8
     | Mirror Direction8
     | Empty
-
-
-type alias CellDict =
-    Dict Pos Cell
 
 
 type alias Grid =

@@ -25,7 +25,7 @@ fromCellSize cz =
 
 
 cellWidth : GridShape a -> Number
-cellWidth (GS cw _ grid) =
+cellWidth (GS cw _ _) =
     cw
 
 

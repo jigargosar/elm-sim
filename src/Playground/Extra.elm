@@ -1,4 +1,4 @@
-module Playground.Extra exposing (blink, inDegrees, line, noShape)
+module Playground.Extra exposing (blink, enhancedGame, inDegrees, line, noShape)
 
 import Playground exposing (..)
 
@@ -32,3 +32,19 @@ inDegrees angle =
 blink : Time -> Shape -> Shape
 blink time =
     fade (zigzag 0.5 1 1 time)
+
+
+enhancedGame view0 update0 init0 =
+    let
+        view c =
+            Maybe.map (view0 c) >> Maybe.withDefault [ noShape ]
+
+        update c mem =
+            case mem of
+                Just a ->
+                    update0 c a |> Just
+
+                Nothing ->
+                    update0 c (init0 c) |> Just
+    in
+    Playground.game view update Nothing

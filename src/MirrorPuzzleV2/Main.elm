@@ -331,8 +331,8 @@ initialLevelSelect =
     LevelSelect 10
 
 
-init : Mem
-init =
+init : Computer -> Mem
+init _ =
     { scene = initialPuzzle }
 
 
@@ -439,4 +439,4 @@ view computer mem =
 
 
 main =
-    game view update init
+    enhancedGame view update init

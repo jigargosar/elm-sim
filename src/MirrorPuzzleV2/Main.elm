@@ -218,6 +218,7 @@ type LevelButtons
         , height : Number
         , lh : Number
         , hScale : Number
+        , toY : Int -> Number
         }
 
 
@@ -225,14 +226,25 @@ levelButtons lh count =
     let
         hScale =
             0.8
+
+        top =
+            toFloat count * lh / 2
+
+        toY : Int -> Number
+        toY n =
+            top - (toFloat n * lh)
+
+        height =
+            lh * hScale
     in
     LevelButtons
         { lh = lh
         , count = count
-        , top = toFloat count * lh / 2
+        , top = top
         , width = 150
-        , height = lh * hScale
+        , height = height
         , hScale = hScale
+        , toY = toY
         }
 
 
@@ -276,6 +288,7 @@ type alias LevelButton =
 mapLevelButtons : Mouse -> (LevelButton -> b) -> LevelButtons -> List b
 mapLevelButtons mouse func (LevelButtons { count, top, lh, width, hScale }) =
     let
+        toY : Int -> Number
         toY n =
             top - (toFloat n * lh)
 

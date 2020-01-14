@@ -211,6 +211,10 @@ viewGrid time grid =
 -- LevelSelect
 
 
+type Box
+    = Box Number Number Number Number
+
+
 type alias LevelButtons =
     { count : Int
     , top : Number
@@ -249,11 +253,8 @@ levelButtons lh count =
         List.range 0 (count - 1)
             |> List.map
                 (\n ->
-                    { x = 0
-                    , y = toY n
-                    , width = width
-                    , height = height
-                    , levelIdx = n
+                    { levelIdx = n
+                    , box = Box 0 (toY n) width height
                     }
                 )
     }
@@ -262,12 +263,11 @@ levelButtons lh count =
 levelButtonIdxFromMouse : Mouse -> LevelButtons -> Maybe Int
 levelButtonIdxFromMouse { x, y } lbs =
     lbs.list
-        |> List.Extra.find (\lb -> hitTest ( x, y ) ( ( lb.x, lb.y ), ( lb.width, lb.height ) ))
-        |> Maybe.map .levelIdx
+        |> List.Extra.findIndex (\lb -> hitTest ( x, y ) lb.box)
 
 
-hitTest : ( Float, Float ) -> ( ( Float, Float ), ( Float, Float ) ) -> Bool
-hitTest ( px, py ) ( ( x, y ), ( w, h ) ) =
+hitTest : ( Float, Float ) -> Box -> Bool
+hitTest ( px, py ) (Box x y w h) =
     let
         ( minX, maxX ) =
             ( x - w / 2, x + w / 2 )
@@ -288,34 +288,22 @@ renderLevelButtons mouse lbs =
             Just levelIdx == maybeHoveredIdx
     in
     lbs.list
-        |> List.map
-            (\{ x, y, width, height, levelIdx } ->
-                buttonShape (isHovered levelIdx) width height ("Level " ++ String.fromInt (levelIdx + 1))
+        |> List.indexedMap
+            (\levelIdx { box } ->
+                let
+                    (Box x y w h) =
+                        box
+                in
+                buttonShape (isHovered levelIdx) w h ("Level " ++ String.fromInt (levelIdx + 1))
                     |> move x y
             )
         |> group
 
 
 type alias LevelButton =
-    { x : Float
-    , y : Float
-    , width : Number
-    , height : Number
+    { box : Box
     , levelIdx : Int
     }
-
-
-mapLevelButtons : Mouse -> (LevelButton -> b) -> LevelButtons -> List b
-mapLevelButtons mouse func { count, toY, width, height } =
-    List.range 0 (count - 1)
-        |> List.map
-            (\n ->
-                let
-                    y =
-                        toY n
-                in
-                func { x = 0, y = y, width = width, height = height, levelIdx = n }
-            )
 
 
 buttonShape hover w h text =

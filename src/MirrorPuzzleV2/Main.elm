@@ -346,6 +346,13 @@ init =
 update : Computer -> Mem -> Mem
 update { mouse, screen } mem =
     case mem.scene of
+        Intro ->
+            if mouse.click then
+                { mem | scene = initialLevelSelect }
+
+            else
+                mem
+
         LevelSelect levelCount ->
             let
                 lbs =
@@ -357,13 +364,6 @@ update { mouse, screen } mem =
 
                 _ ->
                     mem
-
-        Intro ->
-            if mouse.click then
-                { mem | scene = initialLevelSelect }
-
-            else
-                mem
 
         Puzzle _ ->
             if mouse.click && mouseInRect mouse (initBackButtonRect screen) then

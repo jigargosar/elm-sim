@@ -221,7 +221,7 @@ type alias LevelButtons =
     , width : Number
     , height : Number
     , toY : Int -> Number
-    , list : List LevelButton
+    , list : List Box
     }
 
 
@@ -253,9 +253,7 @@ levelButtons lh count =
         List.range 0 (count - 1)
             |> List.map
                 (\n ->
-                    { levelIdx = n
-                    , box = Box 0 (toY n) width height
-                    }
+                    Box 0 (toY n) width height
                 )
     }
 
@@ -263,7 +261,7 @@ levelButtons lh count =
 levelButtonIdxFromMouse : Mouse -> LevelButtons -> Maybe Int
 levelButtonIdxFromMouse { x, y } lbs =
     lbs.list
-        |> List.Extra.findIndex (\lb -> hitTest ( x, y ) lb.box)
+        |> List.Extra.findIndex (hitTest ( x, y ))
 
 
 hitTest : ( Float, Float ) -> Box -> Bool
@@ -289,21 +287,11 @@ renderLevelButtons mouse lbs =
     in
     lbs.list
         |> List.indexedMap
-            (\levelIdx { box } ->
-                let
-                    (Box x y w h) =
-                        box
-                in
+            (\levelIdx (Box x y w h) ->
                 buttonShape (isHovered levelIdx) w h ("Level " ++ String.fromInt (levelIdx + 1))
                     |> move x y
             )
         |> group
-
-
-type alias LevelButton =
-    { box : Box
-    , levelIdx : Int
-    }
 
 
 buttonShape hover w h text =

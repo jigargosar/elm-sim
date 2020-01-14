@@ -274,19 +274,17 @@ renderLevelButtons mouse lbs =
         |> List.indexedMap
             (\levelIdx rect ->
                 let
-                    ( w, h ) =
-                        Rect.dimensions rect
-
                     ( x, y ) =
                         Rect.center rect
                 in
-                buttonShape (isHovered levelIdx) w h ("Level " ++ String.fromInt (levelIdx + 1))
+                buttonShape (isHovered levelIdx) (Rect.dimensions rect) ("Level " ++ String.fromInt (levelIdx + 1))
                     |> move x y
             )
         |> group
 
 
-buttonShape hover w h text =
+buttonShape : Bool -> ( Number, Number ) -> String -> Shape
+buttonShape hover ( w, h ) text =
     let
         thickness =
             3

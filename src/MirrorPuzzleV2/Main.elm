@@ -249,16 +249,8 @@ levelButtons lh count =
         List.range 0 (count - 1)
             |> List.map
                 (\n ->
-                    let
-                        y =
-                            toY n
-
-                        isHovered =
-                            False
-                    in
                     { x = 0
-                    , y = y
-                    , hover = isHovered
+                    , y = toY n
                     , width = width
                     , height = height
                     , levelIdx = n
@@ -288,19 +280,25 @@ hitTest ( px, py ) ( ( x, y ), ( w, h ) ) =
 
 renderLevelButtons : Mouse -> LevelButtons -> Shape
 renderLevelButtons mouse lbs =
-    mapLevelButtons mouse
-        (\{ x, y, width, height, hover, levelIdx } ->
-            buttonShape hover width height ("Level " ++ String.fromInt (levelIdx + 1))
-                |> move x y
-        )
-        lbs
+    let
+        maybeHoveredIdx =
+            levelButtonIdxFromMouse mouse lbs
+
+        isHovered levelIdx =
+            Just levelIdx == maybeHoveredIdx
+    in
+    lbs.list
+        |> List.map
+            (\{ x, y, width, height, levelIdx } ->
+                buttonShape (isHovered levelIdx) width height ("Level " ++ String.fromInt (levelIdx + 1))
+                    |> move x y
+            )
         |> group
 
 
 type alias LevelButton =
     { x : Float
     , y : Float
-    , hover : Bool
     , width : Number
     , height : Number
     , levelIdx : Int
@@ -315,27 +313,9 @@ mapLevelButtons mouse func { count, toY, width, height } =
                 let
                     y =
                         toY n
-
-                    isHovered =
-                        hitTest ( mouse.x, mouse.y ) ( ( 0, y ), ( width, height ) )
                 in
-                func { x = 0, y = y, hover = isHovered, width = width, height = height, levelIdx = n }
+                func { x = 0, y = y, width = width, height = height, levelIdx = n }
             )
-
-
-levelIdxFromMouse : Mouse -> LevelButtons -> Maybe Int
-levelIdxFromMouse mouse lbs =
-    mapLevelButtons mouse
-        (\{ hover, levelIdx } ->
-            if hover then
-                Just levelIdx
-
-            else
-                Nothing
-        )
-        lbs
-        |> List.filterMap identity
-        |> List.head
 
 
 buttonShape hover w h text =
@@ -403,7 +383,7 @@ update : Computer -> Mem -> Mem
 update { mouse } mem =
     case mem.scene of
         LevelSelect lbs ->
-            case ( mouse.click, levelIdxFromMouse mouse lbs ) of
+            case ( mouse.click, levelButtonIdxFromMouse mouse lbs ) of
                 ( True, Just _ ) ->
                     { mem | scene = initialPuzzle }
 

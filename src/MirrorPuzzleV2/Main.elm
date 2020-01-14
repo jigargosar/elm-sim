@@ -380,6 +380,7 @@ viewPuzzle { mouse, time, screen } grid =
     ]
 
 
+backButtonRectFromScreen : Screen -> Rect
 backButtonRectFromScreen screen =
     Rect.fromXYWH (screen.left + 100) (screen.top - 50) 100 30
 

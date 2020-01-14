@@ -1,6 +1,7 @@
 module MirrorPuzzleV2.Grid exposing
     ( Grid
     , Pos
+    , dimensions
     , filled
     , foldl
     , get
@@ -10,7 +11,6 @@ module MirrorPuzzleV2.Grid exposing
     , positions
     , toList
     , values
-    , viewDimensions
     )
 
 import Dict exposing (Dict)
@@ -41,9 +41,9 @@ insert pos a =
         (mapDict (Dict.insert pos a))
 
 
-viewDimensions : Float -> Grid a -> ( Float, Float )
-viewDimensions cellSize (Grid w h _) =
-    ( w, h ) |> mapEach (toFloat >> mulBy cellSize)
+dimensions : Grid a -> ( Int, Int )
+dimensions (Grid w h _) =
+    ( w, h )
 
 
 isValid : Pos -> Grid a -> Bool

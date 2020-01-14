@@ -10,25 +10,25 @@ module MirrorPuzzleV2.GridShape exposing
 
 import MirrorPuzzleV2.Grid as Grid exposing (Grid, Pos)
 import Playground exposing (..)
-import PointFree exposing (flip)
+import PointFree exposing (flip, mapEach)
 
 
 type GridShape a
-    = GS Number (Grid a)
+    = GS Number Number (Grid a)
 
 
-init : Number -> Grid a -> GridShape a
+init : Number -> Number -> Grid a -> GridShape a
 init =
     GS
 
 
 move : GridShape a -> Shape -> Shape
-move (GS cz grid) =
+move (GS cw ch grid) =
     let
-        ( w, h ) =
-            Grid.viewDimensions cz grid
+        ( gw, gh ) =
+            Grid.dimensions grid |> mapEach toFloat
     in
-    mv ( (cz - w) / 2, (cz - h) / 2 )
+    mv ( (cw - gw) / 2, (ch - gh) / 2 )
 
 
 moveCell : Pos -> GridShape a -> Shape -> Shape
@@ -41,12 +41,12 @@ mv ( x, y ) =
 
 
 posToScreen : GridShape a -> Pos -> ( Number, Number )
-posToScreen (GS cz _) ( x, y ) =
-    ( toFloat x * cz, toFloat y * cz )
+posToScreen (GS cw ch _) ( x, y ) =
+    ( toFloat x * cw, toFloat y * ch )
 
 
 fill : Shape -> GridShape a -> Shape
-fill shape ((GS _ grid) as gs) =
+fill shape ((GS _ _ grid) as gs) =
     Grid.positions grid
         |> List.map (\pos -> moveCell pos gs shape)
         |> group
@@ -54,7 +54,7 @@ fill shape ((GS _ grid) as gs) =
 
 
 render : (Pos -> a -> Shape) -> GridShape a -> Shape
-render func ((GS _ grid) as gs) =
+render func ((GS _ _ grid) as gs) =
     Grid.map (\pos cell -> moveCell pos gs (func pos cell)) grid
         |> Grid.values
         |> group

@@ -183,7 +183,7 @@ viewGrid time grid =
             100
 
         gs =
-            GS.init cz grid
+            GS.init cz cz grid
 
         litDestinationPosSet =
             computeLitDestinationPosSet grid

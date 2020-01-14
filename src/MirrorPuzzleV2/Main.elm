@@ -256,9 +256,9 @@ levelButtons lh count =
 
 
 levelButtonIdxFromMouse : Mouse -> LevelButtons -> Maybe Int
-levelButtonIdxFromMouse { x, y } lbs =
+levelButtonIdxFromMouse mouse lbs =
     lbs.list
-        |> List.Extra.findIndex (Rect.contains ( x, y ))
+        |> List.Extra.findIndex (mouseInRect mouse)
 
 
 renderLevelButtons : Mouse -> LevelButtons -> Shape
@@ -280,7 +280,7 @@ renderButton mouse text rect =
         ( x, y ) =
             Rect.center rect
     in
-    buttonShape (Rect.contains ( mouse.x, mouse.y ) rect)
+    buttonShape (mouseInRect mouse rect)
         (Rect.dimensions rect)
         text
         |> move x y
@@ -379,6 +379,11 @@ viewPuzzle { mouse, time, screen } grid =
     [ viewGrid time grid
     , renderButton mouse "Back" (backButtonRectFromScreen screen)
     ]
+
+
+mouseInRect : { a | x : Float, y : Float } -> Rect -> Bool
+mouseInRect mouse rect =
+    Rect.contains ( mouse.x, mouse.y ) rect
 
 
 backButtonRectFromScreen screen =

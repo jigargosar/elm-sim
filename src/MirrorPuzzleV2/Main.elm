@@ -7,7 +7,7 @@ import MirrorPuzzleV2.GridShape as GS
 import MirrorPuzzleV2.Rect as Rect exposing (Rect)
 import Playground exposing (..)
 import Playground.Extra exposing (..)
-import PointFree exposing (whenTrue)
+import PointFree exposing (mapEach, mulBy, whenTrue)
 import Set exposing (Set)
 
 
@@ -378,17 +378,21 @@ update { mouse, screen } mem =
                     { mem | scene = initialLevelSelect }
 
                 else
-                    case GS.get ( mouse.x, mouse.y ) gs of
+                    case GS.get (( mouse.x, mouse.y ) |> mapEach (mulBy (1 / 1.5))) gs of
                         Just ( pos, cell ) ->
                             { mem
                                 | scene =
+                                    let
+                                        ins a =
+                                            Grid.insert pos a grid
+                                    in
                                     Puzzle
                                         (case cell of
                                             Mirror dir ->
-                                                Grid.insert pos (Mirror dir) grid
+                                                ins (Mirror (Dir.rotate 1 dir))
 
                                             SourceWithMirror dir ->
-                                                Grid.insert pos (Mirror dir) grid
+                                                ins (SourceWithMirror (Dir.rotate 1 dir))
 
                                             _ ->
                                                 grid

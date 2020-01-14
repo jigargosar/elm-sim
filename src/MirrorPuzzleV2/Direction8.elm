@@ -1,4 +1,4 @@
-module MirrorPuzzleV2.Direction8 exposing (Direction8, fromInt, stepPos, toDegrees)
+module MirrorPuzzleV2.Direction8 exposing (Direction8, fromInt, rotate, stepPos, toDegrees)
 
 
 type alias Pos =
@@ -12,6 +12,11 @@ type Direction8
 fromInt : Int -> Direction8
 fromInt ct =
     Dir (modBy 8 ct)
+
+
+rotate : Int -> Direction8 -> Direction8
+rotate ct (Dir org) =
+    fromInt (org + ct)
 
 
 toDegrees : Direction8 -> Float

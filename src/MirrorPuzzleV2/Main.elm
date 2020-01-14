@@ -176,14 +176,22 @@ pathToShape gs =
         >> group
 
 
-viewGrid : Time -> Grid -> Shape
-viewGrid time grid =
+initGS _ grid =
     let
         cz =
             100
+    in
+    GS.init cz cz grid
 
+
+viewGrid : Computer -> Grid -> Shape
+viewGrid { time, screen } grid =
+    let
         gs =
-            GS.init cz cz grid
+            initGS screen grid
+
+        cz =
+            GS.cellWidth gs
 
         litDestinationPosSet =
             computeLitDestinationPosSet grid
@@ -411,8 +419,12 @@ update { mouse, screen } mem =
 
 
 viewPuzzle : Computer -> Grid -> List Shape
-viewPuzzle { mouse, time, screen } grid =
-    [ viewGrid time grid
+viewPuzzle computer grid =
+    let
+        { mouse, time, screen } =
+            computer
+    in
+    [ viewGrid computer grid
     , renderButton mouse "Back" (initBackButtonRect screen)
     ]
 

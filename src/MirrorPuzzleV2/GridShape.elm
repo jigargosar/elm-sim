@@ -1,5 +1,6 @@
 module MirrorPuzzleV2.GridShape exposing
     ( GridShape
+    , cellWidth
     , fill
     , get
     , init
@@ -22,6 +23,11 @@ type GridShape a
 init : Number -> Number -> Grid a -> GridShape a
 init =
     GS
+
+
+cellWidth : GridShape a -> Number
+cellWidth (GS cw _ grid) =
+    cw
 
 
 move : GridShape a -> Shape -> Shape

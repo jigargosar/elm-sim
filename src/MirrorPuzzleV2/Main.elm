@@ -381,13 +381,13 @@ viewPuzzle { mouse, time, screen } grid =
     ]
 
 
-mouseInRect : { a | x : Float, y : Float } -> Rect -> Bool
-mouseInRect mouse rect =
-    Rect.contains ( mouse.x, mouse.y ) rect
-
-
 backButtonRectFromScreen screen =
     Rect.fromXYWH (screen.left + 100) (screen.top - 50) 100 30
+
+
+mouseInRect : Mouse -> Rect -> Bool
+mouseInRect mouse rect =
+    Rect.contains ( mouse.x, mouse.y ) rect
 
 
 view : Computer -> Mem -> List Shape

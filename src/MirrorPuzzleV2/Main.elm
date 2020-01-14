@@ -37,8 +37,8 @@ sourceWithMirror =
     Dir.fromInt >> SourceWithMirror
 
 
-initialGrid : Grid
-initialGrid =
+initialGrid : Computer -> Grid
+initialGrid _ =
     Grid.filled 5 5 Empty
         |> Grid.insert ( 1, 2 ) (sourceWithMirror 1)
         |> Grid.insert ( 2, 3 ) (mirror 7)
@@ -47,7 +47,7 @@ initialGrid =
         |> Grid.insert ( 0, 0 ) Destination
         |> Grid.insert ( 1, 1 ) (sourceWithMirror 1)
         |> Grid.insert ( 1, 1 ) Source
-        |> GS.fromGrid
+        |> GS.fromCellSize 100
 
 
 computeLitDestinationPosSet : Grid -> Set Pos
@@ -323,25 +323,31 @@ type alias Mem =
     { scene : Scene }
 
 
-initialPuzzle =
-    Puzzle initialGrid
+initPuzzle : Computer -> Scene
+initPuzzle computer =
+    Puzzle (initialGrid computer)
 
 
-initialLevelSelect =
+initLevelSelect : Computer -> Scene
+initLevelSelect _ =
     LevelSelect 10
 
 
 init : Computer -> Mem
-init _ =
-    { scene = initialPuzzle }
+init computer =
+    { scene = initPuzzle computer }
 
 
 update : Computer -> Mem -> Mem
-update { mouse, screen } mem =
+update computer mem =
+    let
+        { mouse, screen } =
+            computer
+    in
     case mem.scene of
         Intro ->
             if mouse.click then
-                { mem | scene = initialLevelSelect }
+                { mem | scene = initLevelSelect computer }
 
             else
                 mem
@@ -353,7 +359,7 @@ update { mouse, screen } mem =
             in
             case ( mouse.click, levelButtonIdxFromMouse mouse lbs ) of
                 ( True, Just _ ) ->
-                    { mem | scene = initialPuzzle }
+                    { mem | scene = initPuzzle computer }
 
                 _ ->
                     mem
@@ -365,7 +371,7 @@ update { mouse, screen } mem =
             in
             if mouse.click then
                 if mouseInRect mouse (initBackButtonRect screen) then
-                    { mem | scene = initialLevelSelect }
+                    { mem | scene = initLevelSelect computer }
 
                 else
                     let

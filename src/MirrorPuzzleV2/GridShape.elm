@@ -4,7 +4,6 @@ module MirrorPuzzleV2.GridShape exposing
     , fill
     , foldl
     , fromCellSize
-    , fromGrid
     , get
     , insert
     , move
@@ -27,11 +26,6 @@ type GridShape a
 fromCellSize : Number -> Grid a -> GridShape a
 fromCellSize cz =
     GS cz cz
-
-
-fromGrid : Grid a -> GridShape a
-fromGrid =
-    GS 100 100
 
 
 setCellSize : Number -> GridShape a -> GridShape a

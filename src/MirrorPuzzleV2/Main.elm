@@ -210,7 +210,6 @@ viewGrid { time, screen } grid =
             |> group
             |> GS.move gs
         ]
-        |> scale 1.5
 
 
 

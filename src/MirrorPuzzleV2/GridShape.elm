@@ -2,8 +2,8 @@ module MirrorPuzzleV2.GridShape exposing
     ( GridShape
     , cellWidth
     , fill
+    , fromCellSize
     , get
-    , init
     , move
     , moveCell
     , posFromScreen
@@ -20,9 +20,9 @@ type GridShape a
     = GS Number Number (Grid a)
 
 
-init : Number -> Number -> Grid a -> GridShape a
-init =
-    GS
+fromCellSize : Number -> Grid a -> GridShape a
+fromCellSize cz =
+    GS cz cz
 
 
 cellWidth : GridShape a -> Number

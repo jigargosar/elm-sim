@@ -177,11 +177,7 @@ pathToShape gs =
 
 
 initGS _ grid =
-    let
-        cz =
-            100
-    in
-    GS.init cz cz grid
+    GS.fromCellSize 100 grid
 
 
 viewGrid : Computer -> Grid -> Shape

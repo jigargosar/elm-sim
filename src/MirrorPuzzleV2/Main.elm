@@ -263,26 +263,27 @@ levelButtonIdxFromMouse { x, y } lbs =
 
 renderLevelButtons : Mouse -> LevelButtons -> Shape
 renderLevelButtons mouse lbs =
-    let
-        maybeHoveredIdx =
-            levelButtonIdxFromMouse mouse lbs
-
-        isHovered levelIdx =
-            Just levelIdx == maybeHoveredIdx
-    in
     lbs.list
         |> List.indexedMap
             (\levelIdx rect ->
-                let
-                    ( x, y ) =
-                        Rect.center rect
-                in
-                buttonShape (isHovered levelIdx)
-                    (Rect.dimensions rect)
+                renderButton
+                    mouse
                     ("Level " ++ String.fromInt (levelIdx + 1))
-                    |> move x y
+                    rect
             )
         |> group
+
+
+renderButton : Mouse -> String -> Rect -> Shape
+renderButton mouse text rect =
+    let
+        ( x, y ) =
+            Rect.center rect
+    in
+    buttonShape (Rect.contains ( mouse.x, mouse.y ) rect)
+        (Rect.dimensions rect)
+        text
+        |> move x y
 
 
 buttonShape : Bool -> ( Number, Number ) -> String -> Shape
@@ -373,9 +374,15 @@ update { mouse } mem =
                 mem
 
 
-viewPuzzle { mouse, time } grid =
+viewPuzzle : Computer -> Grid -> List Shape
+viewPuzzle { mouse, time, screen } grid =
     [ viewGrid time grid
+    , renderButton mouse "Back" (backButtonRectFromScreen screen)
     ]
+
+
+backButtonRectFromScreen screen =
+    Rect.fromXYWH (screen.left + 100) (screen.top - 50) 100 30
 
 
 view : Computer -> Mem -> List Shape

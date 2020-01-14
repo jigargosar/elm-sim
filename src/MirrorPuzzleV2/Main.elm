@@ -344,7 +344,7 @@ initialLevelSelect =
 
 init : Mem
 init =
-    { scene = initialLevelSelect }
+    { scene = initialPuzzle }
 
 
 update : Computer -> Mem -> Mem
@@ -373,17 +373,22 @@ update { mouse } mem =
                 mem
 
 
+viewPuzzle { mouse, time } grid =
+    [ viewGrid time grid
+    ]
+
+
 view : Computer -> Mem -> List Shape
-view { time, mouse } mem =
+view computer mem =
     case mem.scene of
         Puzzle grid ->
-            [ viewGrid time grid ]
+            viewPuzzle computer grid
 
         Intro ->
             [ words black "Tap To Start" ]
 
         LevelSelect lbs ->
-            viewLevelSelect mouse lbs
+            viewLevelSelect computer.mouse lbs
 
 
 main =

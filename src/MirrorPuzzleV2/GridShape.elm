@@ -28,7 +28,7 @@ move (GS cw ch grid) =
         ( gw, gh ) =
             Grid.dimensions grid |> mapEach toFloat
     in
-    mv ( (cw - gw) / 2, (ch - gh) / 2 )
+    mv ( (cw - (gw * cw)) / 2, (ch - (gh * ch)) / 2 )
 
 
 moveCell : Pos -> GridShape a -> Shape -> Shape

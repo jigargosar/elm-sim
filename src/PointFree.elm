@@ -87,6 +87,11 @@ toFloat2 =
     mapEach toFloat
 
 
+scaleBoth : ( number, number ) -> ( number, number ) -> ( number, number )
+scaleBoth =
+    mapBoth2 mulBy
+
+
 scaleEach : number -> ( number, number ) -> ( number, number )
 scaleEach =
     mulBy >> mapEach

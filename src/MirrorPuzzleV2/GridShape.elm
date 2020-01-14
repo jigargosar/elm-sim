@@ -12,7 +12,7 @@ module MirrorPuzzleV2.GridShape exposing
 
 import MirrorPuzzleV2.Grid as Grid exposing (Grid, Pos)
 import Playground exposing (..)
-import PointFree exposing (flip, mapEach)
+import PointFree exposing (flip, mapEach, scaleBoth, toFloat2)
 
 
 type GridShape a
@@ -48,15 +48,15 @@ mv ( x, y ) =
 
 
 posToScreen : GridShape a -> Pos -> ( Number, Number )
-posToScreen (GS cw ch _) ( x, y ) =
-    ( toFloat x * cw, toFloat y * ch )
+posToScreen (GS cw ch _) =
+    toFloat2 >> scaleBoth ( cw, ch )
 
 
 posFromScreen : GridShape a -> ( Number, Number ) -> Pos
 posFromScreen (GS cw ch grid) ( sx, sy ) =
     let
         ( gw, gh ) =
-            Grid.dimensions grid |> mapEach toFloat
+            Grid.dimensions grid |> toFloat2
 
         ( dx, dy ) =
             ( (cw - (gw * cw)) / 2, (ch - (gh * ch)) / 2 )

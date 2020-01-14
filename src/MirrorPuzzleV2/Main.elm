@@ -177,8 +177,15 @@ pathToShape gs =
 
 
 initGS : Screen -> Grid -> GridShape Cell
-initGS _ grid =
-    GS.fromCellSize 100 grid
+initGS screen grid =
+    let
+        ( gw, gh ) =
+            Grid.dimensions grid
+
+        cellSize =
+            min (screen.width * 0.8 / toFloat gw) (screen.height * 0.8 / toFloat gh)
+    in
+    GS.fromCellSize cellSize grid
 
 
 viewGrid : Computer -> Grid -> Shape

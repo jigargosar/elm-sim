@@ -340,7 +340,7 @@ initialLevelSelect =
 
 init : Mem
 init =
-    { scene = initialLevelSelect }
+    { scene = initialPuzzle }
 
 
 update : Computer -> Mem -> Mem
@@ -366,8 +366,12 @@ update { mouse, screen } mem =
                     mem
 
         Puzzle _ ->
-            if mouse.click && mouseInRect mouse (initBackButtonRect screen) then
-                { mem | scene = initialLevelSelect }
+            if mouse.click then
+                if mouseInRect mouse (initBackButtonRect screen) then
+                    { mem | scene = initialLevelSelect }
+
+                else
+                    mem
 
             else
                 mem

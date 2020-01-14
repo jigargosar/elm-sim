@@ -82,6 +82,26 @@ mapEach func =
     Tuple.mapBoth func func
 
 
+toFloat2 : ( Int, Int ) -> ( Float, Float )
+toFloat2 =
+    mapEach toFloat
+
+
+scaleEach : number -> ( number, number ) -> ( number, number )
+scaleEach =
+    mulBy >> mapEach
+
+
+unScaleEach : Float -> ( Float, Float ) -> ( Float, Float )
+unScaleEach =
+    reciprocal >> scaleEach
+
+
+reciprocal : Float -> Float
+reciprocal n =
+    1 / n
+
+
 subAB : number -> number -> number
 subAB =
     (-)

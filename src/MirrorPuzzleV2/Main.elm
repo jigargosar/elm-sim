@@ -24,7 +24,7 @@ type Cell
 
 
 type alias Grid =
-    GridShape Cell
+    Grid.Grid Cell
 
 
 mirror : Int -> Cell
@@ -37,17 +37,21 @@ sourceWithMirror =
     Dir.fromInt >> SourceWithMirror
 
 
-initialGrid : Computer -> Grid
-initialGrid _ =
+initialGrid : Grid
+initialGrid =
     Grid.filled 5 5 Empty
-        |> Grid.insert ( 1, 2 ) (sourceWithMirror 1)
-        |> Grid.insert ( 2, 3 ) (mirror 7)
-        |> Grid.insert ( 3, 2 ) Destination
-        |> Grid.insert ( 4, 4 ) (sourceWithMirror -3)
-        |> Grid.insert ( 0, 0 ) Destination
-        |> Grid.insert ( 1, 1 ) (sourceWithMirror 1)
-        |> Grid.insert ( 1, 1 ) Source
-        |> GS.fromCellSize 100
+        |> insert ( 1, 2 ) (sourceWithMirror 1)
+        |> insert ( 2, 3 ) (mirror 7)
+        |> insert ( 3, 2 ) Destination
+        |> insert ( 4, 4 ) (sourceWithMirror -3)
+        |> insert ( 0, 0 ) Destination
+        |> insert ( 1, 1 ) (sourceWithMirror 1)
+        |> insert ( 1, 1 ) Source
+
+
+insert : ( Int, Int ) -> Cell -> Grid -> Grid
+insert =
+    Grid.insert
 
 
 computeLitDestinationPosSet : Grid -> Set Pos
@@ -56,7 +60,7 @@ computeLitDestinationPosSet grid =
         |> List.filterMap List.head
         |> List.foldl
             (\pos ->
-                if GS.get pos grid == Just Destination then
+                if Grid.get pos grid == Just Destination then
                     Set.insert pos
 
                 else
@@ -81,7 +85,7 @@ gridToLightPaths grid =
                 accumInDir newDir =
                     accumLightPos newDir nextPos (nextPos :: acc)
             in
-            case GS.get nextPos grid of
+            case Grid.get nextPos grid of
                 Nothing ->
                     acc
 
@@ -102,7 +106,7 @@ gridToLightPaths grid =
                         Empty ->
                             accumInDir dir
     in
-    GS.foldl
+    Grid.foldl
         (\pos cell ->
             case cell of
                 SourceWithMirror dir ->
@@ -172,11 +176,19 @@ pathToShape gs =
         >> group
 
 
+initGS : Screen -> Grid -> GridShape Cell
+initGS _ grid =
+    GS.fromCellSize 100 grid
+
+
 viewGrid : Computer -> Grid -> Shape
 viewGrid { time, screen } grid =
     let
+        gs =
+            initGS screen grid
+
         cz =
-            GS.cellWidth grid
+            GS.cellWidth gs
 
         litDestinationPosSet =
             computeLitDestinationPosSet grid
@@ -191,12 +203,12 @@ viewGrid { time, screen } grid =
             gridToLightPaths grid
     in
     group
-        [ GS.fill (toBgShape cz) grid
-        , GS.render renderCell grid
+        [ GS.fill (toBgShape cz) gs
+        , GS.render renderCell gs
         , lightPaths
-            |> List.map (pathToShape grid)
+            |> List.map (pathToShape gs)
             |> group
-            |> GS.move grid
+            |> GS.move gs
         ]
         |> scale 1.5
 
@@ -310,7 +322,7 @@ viewLevelSelect mouse lbs =
 
 
 type Scene
-    = Puzzle (GridShape Cell)
+    = Puzzle Grid
     | Intro
     | LevelSelect Int
 
@@ -323,31 +335,25 @@ type alias Mem =
     { scene : Scene }
 
 
-initPuzzle : Computer -> Scene
-initPuzzle computer =
-    Puzzle (initialGrid computer)
+initialPuzzle =
+    Puzzle initialGrid
 
 
-initLevelSelect : Computer -> Scene
-initLevelSelect _ =
+initialLevelSelect =
     LevelSelect 10
 
 
-init : Computer -> Mem
-init computer =
-    { scene = initPuzzle computer }
+init : Mem
+init =
+    { scene = initialPuzzle }
 
 
 update : Computer -> Mem -> Mem
-update computer mem =
-    let
-        { mouse, screen } =
-            computer
-    in
+update { mouse, screen } mem =
     case mem.scene of
         Intro ->
             if mouse.click then
-                { mem | scene = initLevelSelect computer }
+                { mem | scene = initialLevelSelect }
 
             else
                 mem
@@ -359,32 +365,32 @@ update computer mem =
             in
             case ( mouse.click, levelButtonIdxFromMouse mouse lbs ) of
                 ( True, Just _ ) ->
-                    { mem | scene = initPuzzle computer }
+                    { mem | scene = initialPuzzle }
 
                 _ ->
                     mem
 
-        Puzzle gs_ ->
+        Puzzle grid ->
             let
                 gs =
-                    GS.setCellSize 100 gs_
+                    initGS screen grid
             in
             if mouse.click then
                 if mouseInRect mouse (initBackButtonRect screen) then
-                    { mem | scene = initLevelSelect computer }
+                    { mem | scene = initialLevelSelect }
 
                 else
                     let
                         pos =
                             GS.posFromScreen gs (( mouse.x, mouse.y ) |> mapEach (mulBy (1 / 1.5)))
                     in
-                    case GS.get pos gs of
+                    case Grid.get pos grid of
                         Just cell ->
                             { mem
                                 | scene =
                                     let
                                         ins a =
-                                            GS.insert pos a gs
+                                            Grid.insert pos a grid
                                     in
                                     Puzzle
                                         (case cell of
@@ -395,7 +401,7 @@ update computer mem =
                                                 ins (SourceWithMirror (Dir.rotate 1 dir))
 
                                             _ ->
-                                                gs
+                                                grid
                                         )
                             }
 
@@ -445,4 +451,4 @@ view computer mem =
 
 
 main =
-    enhancedGame view update init
+    game view update init

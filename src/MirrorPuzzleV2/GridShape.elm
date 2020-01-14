@@ -2,13 +2,17 @@ module MirrorPuzzleV2.GridShape exposing
     ( GridShape
     , cellWidth
     , fill
+    , foldl
     , fromCellSize
+    , fromGrid
     , get
+    , insert
     , move
     , moveCell
     , posFromScreen
     , posToScreen
     , render
+    , setCellSize
     )
 
 import MirrorPuzzleV2.Grid as Grid exposing (Grid, Pos)
@@ -23,6 +27,16 @@ type GridShape a
 fromCellSize : Number -> Grid a -> GridShape a
 fromCellSize cz =
     GS cz cz
+
+
+fromGrid : Grid a -> GridShape a
+fromGrid =
+    GS 100 100
+
+
+setCellSize : Number -> GridShape a -> GridShape a
+setCellSize cz (GS _ _ grid) =
+    fromCellSize cz grid
 
 
 cellWidth : GridShape a -> Number
@@ -81,10 +95,26 @@ render func ((GS _ _ grid) as gs) =
         |> move gs
 
 
-get : ( Float, Float ) -> GridShape a -> Maybe ( Pos, a )
-get sp ((GS _ _ grid) as gs) =
-    let
-        pos =
-            posFromScreen gs sp
-    in
-    Grid.get pos grid |> Maybe.map (Tuple.pair pos)
+get : Pos -> GridShape a -> Maybe a
+get pos (GS _ _ grid) =
+    Grid.get pos grid
+
+
+mapGrid : (Grid b -> Grid a) -> GridShape b -> GridShape a
+mapGrid func (GS cw ch grid) =
+    func grid |> GS cw ch
+
+
+insert : Pos -> a -> GridShape a -> GridShape a
+insert pos a =
+    mapGrid (Grid.insert pos a)
+
+
+foldl : (Pos -> a -> b -> b) -> b -> GridShape a -> b
+foldl a b =
+    toGrid >> Grid.foldl a b
+
+
+toGrid : GridShape a -> Grid a
+toGrid (GS _ _ grid) =
+    grid

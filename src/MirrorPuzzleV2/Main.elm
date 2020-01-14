@@ -24,7 +24,7 @@ type Cell
 
 
 type alias Grid =
-    Grid.Grid Cell
+    GridShape Cell
 
 
 mirror : Int -> Cell
@@ -40,18 +40,14 @@ sourceWithMirror =
 initialGrid : Grid
 initialGrid =
     Grid.filled 5 5 Empty
-        |> insert ( 1, 2 ) (sourceWithMirror 1)
-        |> insert ( 2, 3 ) (mirror 7)
-        |> insert ( 3, 2 ) Destination
-        |> insert ( 4, 4 ) (sourceWithMirror -3)
-        |> insert ( 0, 0 ) Destination
-        |> insert ( 1, 1 ) (sourceWithMirror 1)
-        |> insert ( 1, 1 ) Source
-
-
-insert : ( Int, Int ) -> Cell -> Grid -> Grid
-insert =
-    Grid.insert
+        |> Grid.insert ( 1, 2 ) (sourceWithMirror 1)
+        |> Grid.insert ( 2, 3 ) (mirror 7)
+        |> Grid.insert ( 3, 2 ) Destination
+        |> Grid.insert ( 4, 4 ) (sourceWithMirror -3)
+        |> Grid.insert ( 0, 0 ) Destination
+        |> Grid.insert ( 1, 1 ) (sourceWithMirror 1)
+        |> Grid.insert ( 1, 1 ) Source
+        |> GS.fromGrid
 
 
 computeLitDestinationPosSet : Grid -> Set Pos
@@ -60,7 +56,7 @@ computeLitDestinationPosSet grid =
         |> List.filterMap List.head
         |> List.foldl
             (\pos ->
-                if Grid.get pos grid == Just Destination then
+                if GS.get pos grid == Just Destination then
                     Set.insert pos
 
                 else
@@ -85,7 +81,7 @@ gridToLightPaths grid =
                 accumInDir newDir =
                     accumLightPos newDir nextPos (nextPos :: acc)
             in
-            case Grid.get nextPos grid of
+            case GS.get nextPos grid of
                 Nothing ->
                     acc
 
@@ -106,7 +102,7 @@ gridToLightPaths grid =
                         Empty ->
                             accumInDir dir
     in
-    Grid.foldl
+    GS.foldl
         (\pos cell ->
             case cell of
                 SourceWithMirror dir ->
@@ -176,19 +172,11 @@ pathToShape gs =
         >> group
 
 
-initGS : Screen -> Grid -> GridShape Cell
-initGS _ grid =
-    GS.fromCellSize 100 grid
-
-
 viewGrid : Computer -> Grid -> Shape
 viewGrid { time, screen } grid =
     let
-        gs =
-            initGS screen grid
-
         cz =
-            GS.cellWidth gs
+            GS.cellWidth grid
 
         litDestinationPosSet =
             computeLitDestinationPosSet grid
@@ -203,12 +191,12 @@ viewGrid { time, screen } grid =
             gridToLightPaths grid
     in
     group
-        [ GS.fill (toBgShape cz) gs
-        , GS.render renderCell gs
+        [ GS.fill (toBgShape cz) grid
+        , GS.render renderCell grid
         , lightPaths
-            |> List.map (pathToShape gs)
+            |> List.map (pathToShape grid)
             |> group
-            |> GS.move gs
+            |> GS.move grid
         ]
         |> scale 1.5
 
@@ -322,7 +310,7 @@ viewLevelSelect mouse lbs =
 
 
 type Scene
-    = Puzzle Grid
+    = Puzzle (GridShape Cell)
     | Intro
     | LevelSelect Int
 
@@ -370,10 +358,10 @@ update { mouse, screen } mem =
                 _ ->
                     mem
 
-        Puzzle grid ->
+        Puzzle gs_ ->
             let
                 gs =
-                    initGS screen grid
+                    GS.setCellSize 100 gs_
             in
             if mouse.click then
                 if mouseInRect mouse (initBackButtonRect screen) then
@@ -384,13 +372,13 @@ update { mouse, screen } mem =
                         pos =
                             GS.posFromScreen gs (( mouse.x, mouse.y ) |> mapEach (mulBy (1 / 1.5)))
                     in
-                    case Grid.get pos grid of
+                    case GS.get pos gs of
                         Just cell ->
                             { mem
                                 | scene =
                                     let
                                         ins a =
-                                            Grid.insert pos a grid
+                                            GS.insert pos a gs
                                     in
                                     Puzzle
                                         (case cell of
@@ -401,7 +389,7 @@ update { mouse, screen } mem =
                                                 ins (SourceWithMirror (Dir.rotate 1 dir))
 
                                             _ ->
-                                                grid
+                                                gs
                                         )
                             }
 

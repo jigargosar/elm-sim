@@ -375,11 +375,8 @@ update { mouse, screen } mem =
 
         Puzzle grid ->
             let
-                cz =
-                    100
-
                 gs =
-                    GS.init cz cz grid
+                    initGS screen grid
             in
             if mouse.click then
                 if mouseInRect mouse (initBackButtonRect screen) then

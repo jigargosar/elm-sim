@@ -210,16 +210,15 @@ viewGrid time grid =
 -- LevelSelect
 
 
-type LevelButtons
-    = LevelButtons
-        { count : Int
-        , top : Number
-        , width : Number
-        , height : Number
-        , lh : Number
-        , hScale : Number
-        , toY : Int -> Number
-        }
+type alias LevelButtons =
+    { count : Int
+    , top : Number
+    , width : Number
+    , height : Number
+    , lh : Number
+    , hScale : Number
+    , toY : Int -> Number
+    }
 
 
 levelButtons : Float -> Int -> LevelButtons
@@ -238,19 +237,14 @@ levelButtons lh count =
         height =
             lh * hScale
     in
-    LevelButtons
-        { lh = lh
-        , count = count
-        , top = top
-        , width = 150
-        , height = height
-        , hScale = hScale
-        , toY = toY
-        }
-
-
-lbsTop (LevelButtons { top }) =
-    top
+    { lh = lh
+    , count = count
+    , top = top
+    , width = 150
+    , height = height
+    , hScale = hScale
+    , toY = toY
+    }
 
 
 hitTest : ( Float, Float ) -> ( ( Float, Float ), ( Float, Float ) ) -> Bool
@@ -287,7 +281,7 @@ type alias LevelButton =
 
 
 mapLevelButtons : Mouse -> (LevelButton -> b) -> LevelButtons -> List b
-mapLevelButtons mouse func (LevelButtons { count, toY, width, height }) =
+mapLevelButtons mouse func { count, toY, width, height } =
     List.range 0 (count - 1)
         |> List.map
             (\n ->
@@ -303,7 +297,7 @@ mapLevelButtons mouse func (LevelButtons { count, toY, width, height }) =
 
 
 levelIdxFromMouse : Mouse -> LevelButtons -> Maybe Int
-levelIdxFromMouse mouse ((LevelButtons { count, lh, width, hScale }) as lbs) =
+levelIdxFromMouse mouse lbs =
     mapLevelButtons mouse
         (\{ hover, levelIdx } ->
             if hover then
@@ -341,7 +335,7 @@ viewLevelSelect : Mouse -> LevelButtons -> List Shape
 viewLevelSelect mouse lbs =
     [ words black "Select Level"
         |> scale 1.5
-        |> moveUp (lbsTop lbs)
+        |> moveUp lbs.top
         |> moveUp 60
     , renderLevelButtons mouse lbs
     ]

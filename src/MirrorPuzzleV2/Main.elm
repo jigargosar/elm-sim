@@ -218,14 +218,17 @@ type alias LevelButtons =
     }
 
 
-levelButtons : Float -> Int -> LevelButtons
-levelButtons lh count =
+initLevelButtons : Screen -> Int -> LevelButtons
+initLevelButtons screen count =
     let
+        lh =
+            (screen.height * 0.7) / toFloat count
+
         hScale =
             0.8
 
         top =
-            toFloat count * lh / 2
+            (toFloat count * lh - lh) / 2
 
         toY : Int -> Number
         toY n =
@@ -316,7 +319,7 @@ viewLevelSelect mouse lbs =
 type Scene
     = Puzzle Grid
     | Intro
-    | LevelSelect LevelButtons
+    | LevelSelect Int
 
 
 
@@ -332,18 +335,22 @@ initialPuzzle =
 
 
 initialLevelSelect =
-    LevelSelect (levelButtons 40 10)
+    LevelSelect 10
 
 
 init : Mem
 init =
-    { scene = initialPuzzle }
+    { scene = initialLevelSelect }
 
 
 update : Computer -> Mem -> Mem
 update { mouse, screen } mem =
     case mem.scene of
-        LevelSelect lbs ->
+        LevelSelect levelCount ->
+            let
+                lbs =
+                    initLevelButtons screen levelCount
+            in
             case ( mouse.click, levelButtonIdxFromMouse mouse lbs ) of
                 ( True, Just _ ) ->
                     { mem | scene = initialPuzzle }
@@ -391,7 +398,11 @@ view computer mem =
         Intro ->
             [ words black "Tap To Start" ]
 
-        LevelSelect lbs ->
+        LevelSelect levelCount ->
+            let
+                lbs =
+                    initLevelButtons computer.screen levelCount
+            in
             viewLevelSelect computer.mouse lbs
 
 

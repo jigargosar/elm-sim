@@ -366,7 +366,7 @@ update { mouse, screen } mem =
                 mem
 
         Puzzle _ ->
-            if mouse.click && mouseInRect mouse (backButtonRectFromScreen screen) then
+            if mouse.click && mouseInRect mouse (initBackButtonRect screen) then
                 { mem | scene = Intro }
 
             else
@@ -376,12 +376,12 @@ update { mouse, screen } mem =
 viewPuzzle : Computer -> Grid -> List Shape
 viewPuzzle { mouse, time, screen } grid =
     [ viewGrid time grid
-    , renderButton mouse "Back" (backButtonRectFromScreen screen)
+    , renderButton mouse "Back" (initBackButtonRect screen)
     ]
 
 
-backButtonRectFromScreen : Screen -> Rect
-backButtonRectFromScreen screen =
+initBackButtonRect : Screen -> Rect
+initBackButtonRect screen =
     Rect.fromXYWH (screen.left + 100) (screen.top - 50) 100 30
 
 

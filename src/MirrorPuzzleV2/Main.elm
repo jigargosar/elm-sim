@@ -3,7 +3,7 @@ module MirrorPuzzleV2.Main exposing (main)
 import List.Extra
 import MirrorPuzzleV2.Direction8 as Dir exposing (Direction8)
 import MirrorPuzzleV2.Grid as Grid exposing (Pos)
-import MirrorPuzzleV2.GridShape as GS
+import MirrorPuzzleV2.GridShape as GS exposing (GridShape)
 import MirrorPuzzleV2.Rect as Rect exposing (Rect)
 import Playground exposing (..)
 import Playground.Extra exposing (..)
@@ -176,6 +176,7 @@ pathToShape gs =
         >> group
 
 
+initGS : Screen -> Grid -> GridShape Cell
 initGS _ grid =
     GS.fromCellSize 100 grid
 

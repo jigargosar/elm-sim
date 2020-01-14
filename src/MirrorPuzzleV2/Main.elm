@@ -349,7 +349,7 @@ init =
 
 
 update : Computer -> Mem -> Mem
-update { mouse } mem =
+update { mouse, screen } mem =
     case mem.scene of
         LevelSelect lbs ->
             case ( mouse.click, levelButtonIdxFromMouse mouse lbs ) of
@@ -367,7 +367,7 @@ update { mouse } mem =
                 mem
 
         Puzzle _ ->
-            if mouse.click then
+            if mouse.click && mouseInRect mouse (backButtonRectFromScreen screen) then
                 { mem | scene = Intro }
 
             else

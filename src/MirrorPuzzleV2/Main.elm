@@ -380,7 +380,20 @@ update { mouse, screen } mem =
                 else
                     case GS.get ( mouse.x, mouse.y ) gs of
                         Just ( pos, cell ) ->
-                            mem
+                            { mem
+                                | scene =
+                                    Puzzle
+                                        (case cell of
+                                            Mirror dir ->
+                                                Grid.insert pos (Mirror dir) grid
+
+                                            SourceWithMirror dir ->
+                                                Grid.insert pos (Mirror dir) grid
+
+                                            _ ->
+                                                grid
+                                        )
+                            }
 
                         Nothing ->
                             mem

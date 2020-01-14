@@ -4,6 +4,7 @@ import List.Extra
 import MirrorPuzzleV2.Direction8 as Dir exposing (Direction8)
 import MirrorPuzzleV2.Grid as Grid exposing (Pos)
 import MirrorPuzzleV2.GridShape as GS
+import MirrorPuzzleV2.Rect as Rect exposing (Rect)
 import Playground exposing (..)
 import Playground.Extra exposing (..)
 import PointFree exposing (whenTrue)
@@ -211,17 +212,13 @@ viewGrid time grid =
 -- LevelSelect
 
 
-type Box
-    = Box Number Number Number Number
-
-
 type alias LevelButtons =
     { count : Int
     , top : Number
     , width : Number
     , height : Number
     , toY : Int -> Number
-    , list : List Box
+    , list : List Rect
     }
 
 
@@ -253,7 +250,7 @@ levelButtons lh count =
         List.range 0 (count - 1)
             |> List.map
                 (\n ->
-                    Box 0 (toY n) width height
+                    Rect.fromXYWH 0 (toY n) width height
                 )
     }
 
@@ -261,19 +258,7 @@ levelButtons lh count =
 levelButtonIdxFromMouse : Mouse -> LevelButtons -> Maybe Int
 levelButtonIdxFromMouse { x, y } lbs =
     lbs.list
-        |> List.Extra.findIndex (hitTest ( x, y ))
-
-
-hitTest : ( Float, Float ) -> Box -> Bool
-hitTest ( px, py ) (Box x y w h) =
-    let
-        ( minX, maxX ) =
-            ( x - w / 2, x + w / 2 )
-
-        ( minY, maxY ) =
-            ( y - h / 2, y + h / 2 )
-    in
-    px > minX && px < maxX && py > minY && py < maxY
+        |> List.Extra.findIndex (Rect.contains ( x, y ))
 
 
 renderLevelButtons : Mouse -> LevelButtons -> Shape
@@ -287,7 +272,14 @@ renderLevelButtons mouse lbs =
     in
     lbs.list
         |> List.indexedMap
-            (\levelIdx (Box x y w h) ->
+            (\levelIdx rect ->
+                let
+                    ( w, h ) =
+                        Rect.dimensions rect
+
+                    ( x, y ) =
+                        Rect.center rect
+                in
                 buttonShape (isHovered levelIdx) w h ("Level " ++ String.fromInt (levelIdx + 1))
                     |> move x y
             )

@@ -277,7 +277,9 @@ renderLevelButtons mouse lbs =
                     ( x, y ) =
                         Rect.center rect
                 in
-                buttonShape (isHovered levelIdx) (Rect.dimensions rect) ("Level " ++ String.fromInt (levelIdx + 1))
+                buttonShape (isHovered levelIdx)
+                    (Rect.dimensions rect)
+                    ("Level " ++ String.fromInt (levelIdx + 1))
                     |> move x y
             )
         |> group

@@ -215,8 +215,6 @@ type alias LevelButtons =
     , top : Number
     , width : Number
     , height : Number
-    , lh : Number
-    , hScale : Number
     , toY : Int -> Number
     }
 
@@ -237,12 +235,10 @@ levelButtons lh count =
         height =
             lh * hScale
     in
-    { lh = lh
-    , count = count
+    { count = count
     , top = top
     , width = 150
     , height = height
-    , hScale = hScale
     , toY = toY
     }
 

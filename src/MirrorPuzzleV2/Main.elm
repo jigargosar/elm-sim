@@ -216,6 +216,7 @@ type alias LevelButtons =
     , width : Number
     , height : Number
     , toY : Int -> Number
+    , list : List LevelButton
     }
 
 
@@ -234,12 +235,34 @@ levelButtons lh count =
 
         height =
             lh * hScale
+
+        width =
+            150
     in
     { count = count
     , top = top
-    , width = 150
+    , width = width
     , height = height
     , toY = toY
+    , list =
+        List.range 0 (count - 1)
+            |> List.map
+                (\n ->
+                    let
+                        y =
+                            toY n
+
+                        isHovered =
+                            False
+                    in
+                    { x = 0
+                    , y = y
+                    , hover = isHovered
+                    , width = width
+                    , height = height
+                    , levelIdx = n
+                    }
+                )
     }
 
 

@@ -378,8 +378,12 @@ update { mouse, screen } mem =
                     { mem | scene = initialLevelSelect }
 
                 else
-                    case GS.get (( mouse.x, mouse.y ) |> mapEach (mulBy (1 / 1.5))) gs of
-                        Just ( pos, cell ) ->
+                    let
+                        pos =
+                            GS.posFromScreen gs (( mouse.x, mouse.y ) |> mapEach (mulBy (1 / 1.5)))
+                    in
+                    case Grid.get pos grid of
+                        Just cell ->
                             { mem
                                 | scene =
                                     let

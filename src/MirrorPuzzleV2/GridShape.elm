@@ -5,6 +5,7 @@ module MirrorPuzzleV2.GridShape exposing
     , init
     , move
     , moveCell
+    , posFromScreen
     , posToScreen
     , render
     )

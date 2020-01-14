@@ -102,16 +102,6 @@ reciprocal n =
     1 / n
 
 
-subAB : number -> number -> number
-subAB =
-    (-)
-
-
-subBA : number -> number -> number
-subBA =
-    flip subAB
-
-
 mod : Int -> Int -> Int
 mod =
     flip modBy

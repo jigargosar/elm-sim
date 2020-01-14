@@ -5,7 +5,6 @@ module MirrorPuzzleV2.GridShape exposing
     , move
     , moveCell
     , posToScreen
-    , rect
     , render
     )
 
@@ -44,11 +43,6 @@ mv ( x, y ) =
 posToScreen : GridShape a -> Pos -> ( Number, Number )
 posToScreen (GS cz _) ( x, y ) =
     ( toFloat x * cz, toFloat y * cz )
-
-
-rect : Color -> GridShape a -> Shape
-rect color (GS cz _) =
-    rectangle color cz cz
 
 
 fill : Shape -> GridShape a -> Shape

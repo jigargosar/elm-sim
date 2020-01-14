@@ -211,15 +211,33 @@ viewGrid time grid =
 
 
 type LevelButtons
-    = LevelButtons { total : Int, width : Number, lh : Number, hScale : Number }
+    = LevelButtons
+        { count : Int
+        , top : Number
+        , width : Number
+        , height : Number
+        , lh : Number
+        , hScale : Number
+        }
 
 
-levelButtons lh total =
-    LevelButtons { lh = lh, total = total, width = 150, hScale = 0.8 }
+levelButtons lh count =
+    let
+        hScale =
+            0.8
+    in
+    LevelButtons
+        { lh = lh
+        , count = count
+        , top = toFloat count * lh / 2
+        , width = 150
+        , height = lh * hScale
+        , hScale = hScale
+        }
 
 
-lbsTop (LevelButtons { total, lh }) =
-    toFloat total * lh / 2
+lbsTop (LevelButtons { top }) =
+    top
 
 
 hitTest : ( Float, Float ) -> ( ( Float, Float ), ( Float, Float ) ) -> Bool
@@ -256,18 +274,15 @@ type alias LevelButton =
 
 
 mapLevelButtons : Mouse -> (LevelButton -> b) -> LevelButtons -> List b
-mapLevelButtons mouse func ((LevelButtons { total, lh, width, hScale }) as lbs) =
+mapLevelButtons mouse func (LevelButtons { count, top, lh, width, hScale }) =
     let
-        top =
-            lbsTop lbs
-
         toY n =
             top - (toFloat n * lh)
 
         height =
             lh * hScale
     in
-    List.range 0 (total - 1)
+    List.range 0 (count - 1)
         |> List.map
             (\n ->
                 let
@@ -282,7 +297,7 @@ mapLevelButtons mouse func ((LevelButtons { total, lh, width, hScale }) as lbs) 
 
 
 levelIdxFromMouse : Mouse -> LevelButtons -> Maybe Int
-levelIdxFromMouse mouse ((LevelButtons { total, lh, width, hScale }) as lbs) =
+levelIdxFromMouse mouse ((LevelButtons { count, lh, width, hScale }) as lbs) =
     mapLevelButtons mouse
         (\{ hover, levelIdx } ->
             if hover then

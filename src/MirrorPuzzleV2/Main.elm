@@ -367,7 +367,7 @@ update { mouse, screen } mem =
 
         Puzzle _ ->
             if mouse.click && mouseInRect mouse (initBackButtonRect screen) then
-                { mem | scene = Intro }
+                { mem | scene = initialLevelSelect }
 
             else
                 mem

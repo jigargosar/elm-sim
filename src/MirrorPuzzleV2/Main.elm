@@ -171,7 +171,7 @@ cellToShape cz cell =
 
 pathToShape : GS.GridShape a -> List Pos -> Shape
 pathToShape gs =
-    List.map (GS.applyCellTransformToPos gs)
+    List.map (GS.transformCellPos gs)
         >> (\path -> List.map2 (line red 5) path (List.drop 1 path))
         >> group
 
@@ -215,7 +215,7 @@ viewGrid { time, screen } grid =
         , lightPaths
             |> List.map (pathToShape gs)
             |> group
-            |> GS.applyGridTransformToShape gs
+            |> GS.transformCellGridShape gs
         ]
 
 
@@ -388,7 +388,7 @@ update { mouse, screen } mem =
                 else
                     let
                         pos =
-                            GS.transformGridCordinatesToPos gs ( mouse.x, mouse.y )
+                            GS.gridCordinatesToCellPos gs ( mouse.x, mouse.y )
                     in
                     case Grid.get pos grid of
                         Just cell ->

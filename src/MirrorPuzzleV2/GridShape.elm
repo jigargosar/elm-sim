@@ -3,7 +3,6 @@ module MirrorPuzzleV2.GridShape exposing
     , cellWidth
     , fill
     , fromCellSize
-    , get
     , move
     , moveCell
     , posFromScreen
@@ -79,12 +78,3 @@ render func ((GS _ _ grid) as gs) =
         |> Grid.values
         |> group
         |> move gs
-
-
-get : ( Float, Float ) -> GridShape a -> Maybe ( Pos, a )
-get sp ((GS _ _ grid) as gs) =
-    let
-        pos =
-            posFromScreen gs sp
-    in
-    Grid.get pos grid |> Maybe.map (Tuple.pair pos)

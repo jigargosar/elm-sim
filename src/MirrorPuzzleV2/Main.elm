@@ -1,5 +1,6 @@
 module MirrorPuzzleV2.Main exposing (main)
 
+import List.Extra
 import MirrorPuzzleV2.Direction8 as Dir exposing (Direction8)
 import MirrorPuzzleV2.Grid as Grid exposing (Pos)
 import MirrorPuzzleV2.GridShape as GS
@@ -264,6 +265,13 @@ levelButtons lh count =
                     }
                 )
     }
+
+
+levelButtonIdxFromMouse : Mouse -> LevelButtons -> Maybe Int
+levelButtonIdxFromMouse { x, y } lbs =
+    lbs.list
+        |> List.Extra.find (\lb -> hitTest ( x, y ) ( ( lb.x, lb.y ), ( lb.width, lb.height ) ))
+        |> Maybe.map .levelIdx
 
 
 hitTest : ( Float, Float ) -> ( ( Float, Float ), ( Float, Float ) ) -> Bool

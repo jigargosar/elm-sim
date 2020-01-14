@@ -365,13 +365,25 @@ update { mouse, screen } mem =
                 _ ->
                     mem
 
-        Puzzle _ ->
+        Puzzle grid ->
+            let
+                cz =
+                    100
+
+                gs =
+                    GS.init cz cz grid
+            in
             if mouse.click then
                 if mouseInRect mouse (initBackButtonRect screen) then
                     { mem | scene = initialLevelSelect }
 
                 else
-                    mem
+                    case GS.get ( mouse.x, mouse.y ) gs of
+                        Just ( pos, cell ) ->
+                            mem
+
+                        Nothing ->
+                            mem
 
             else
                 mem

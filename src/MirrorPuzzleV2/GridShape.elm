@@ -1,6 +1,7 @@
 module MirrorPuzzleV2.GridShape exposing
     ( GridShape
     , fill
+    , get
     , init
     , move
     , moveCell
@@ -45,6 +46,18 @@ posToScreen (GS cw ch _) ( x, y ) =
     ( toFloat x * cw, toFloat y * ch )
 
 
+posFromScreen : GridShape a -> ( Number, Number ) -> Pos
+posFromScreen (GS cw ch grid) ( sx, sy ) =
+    let
+        ( gw, gh ) =
+            Grid.dimensions grid |> mapEach toFloat
+
+        ( dx, dy ) =
+            ( (cw - (gw * cw)) / 2, (ch - (gh * ch)) / 2 )
+    in
+    ( (sx - dx) / cw, (sy - dy) / ch ) |> mapEach round
+
+
 fill : Shape -> GridShape a -> Shape
 fill shape ((GS _ _ grid) as gs) =
     Grid.positions grid
@@ -59,3 +72,12 @@ render func ((GS _ _ grid) as gs) =
         |> Grid.values
         |> group
         |> move gs
+
+
+get : ( Float, Float ) -> GridShape a -> Maybe ( Pos, a )
+get sp ((GS _ _ grid) as gs) =
+    let
+        pos =
+            posFromScreen gs sp
+    in
+    Grid.get pos grid |> Maybe.map (Tuple.pair pos)

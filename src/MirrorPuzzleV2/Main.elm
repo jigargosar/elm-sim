@@ -222,6 +222,7 @@ type LevelButtons
         }
 
 
+levelButtons : Float -> Int -> LevelButtons
 levelButtons lh count =
     let
         hScale =
@@ -286,15 +287,7 @@ type alias LevelButton =
 
 
 mapLevelButtons : Mouse -> (LevelButton -> b) -> LevelButtons -> List b
-mapLevelButtons mouse func (LevelButtons { count, top, lh, width, hScale }) =
-    let
-        toY : Int -> Number
-        toY n =
-            top - (toFloat n * lh)
-
-        height =
-            lh * hScale
-    in
+mapLevelButtons mouse func (LevelButtons { count, toY, width, height }) =
     List.range 0 (count - 1)
         |> List.map
             (\n ->

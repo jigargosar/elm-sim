@@ -381,7 +381,7 @@ update { mouse, screen } mem =
                 else
                     let
                         pos =
-                            GS.posFromScreen gs (( mouse.x, mouse.y ) |> mapEach (mulBy (1 / 1.5)))
+                            GS.posFromScreen gs ( mouse.x, mouse.y )
                     in
                     case Grid.get pos grid of
                         Just cell ->

@@ -213,11 +213,7 @@ viewGrid time grid =
 
 
 type alias LevelButtons =
-    { count : Int
-    , top : Number
-    , width : Number
-    , height : Number
-    , toY : Int -> Number
+    { top : Number
     , list : List Rect
     }
 
@@ -241,11 +237,7 @@ levelButtons lh count =
         width =
             150
     in
-    { count = count
-    , top = top
-    , width = width
-    , height = height
-    , toY = toY
+    { top = top
     , list =
         List.range 0 (count - 1)
             |> List.map

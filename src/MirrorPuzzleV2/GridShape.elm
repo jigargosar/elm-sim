@@ -1,4 +1,13 @@
-module MirrorPuzzleV2.GridShape exposing (GridShape, fill, init, move, moveCell, posToScreen, rect, render)
+module MirrorPuzzleV2.GridShape exposing
+    ( GridShape
+    , fill
+    , init
+    , move
+    , moveCell
+    , posToScreen
+    , rect
+    , render
+    )
 
 import MirrorPuzzleV2.Grid as Grid exposing (Grid, Pos)
 import Playground exposing (..)

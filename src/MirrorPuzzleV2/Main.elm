@@ -217,16 +217,13 @@ renderCells time ct grid =
         cz =
             CT.width ct
 
-        bgShape =
-            toBgShape cz
-
         toCellShapeHelp pos cell =
             case cell of
                 Empty ->
-                    bgShape
+                    toBgShape cz
 
                 _ ->
-                    [ bgShape
+                    [ toBgShape cz
                     , toCellShape cz cell
                         |> blinkIfLitDest pos
                         |> scale 0.85

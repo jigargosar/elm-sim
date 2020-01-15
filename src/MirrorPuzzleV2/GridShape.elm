@@ -66,7 +66,7 @@ toGrid =
 
 
 transformGrid : GridShape a -> Shape -> Shape
-transformGrid (GridShape { grid, cellD, cellT, gridT }) =
+transformGrid (GridShape { cellD, cellT, gridT }) =
     T.transformOrigin gridT |> mv
 
 

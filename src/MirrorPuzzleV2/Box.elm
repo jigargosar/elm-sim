@@ -17,7 +17,7 @@ import NumberTuple as NT
 
 
 type Box
-    = Box NT.Float Float Float
+    = Box NT.Float NT.Float
 
 
 fromWH : Float -> Float -> Box
@@ -26,8 +26,8 @@ fromWH w h =
 
 
 move : NT.Float -> Box -> Box
-move by (Box pos w h) =
-    Box (NT.add pos by) w h
+move by (Box pos dim) =
+    Box (NT.add pos by) dim
 
 
 moveX : Float -> Box -> Box
@@ -52,25 +52,22 @@ moveY dy =
 
 fromXYWH : Float -> Float -> Float -> Float -> Box
 fromXYWH x y w h =
-    Box ( x, y ) w h
+    Box ( x, y ) ( w, h )
 
 
 center : Box -> NT.Float
-center (Box pos _ _) =
+center (Box pos _) =
     pos
 
 
 dimensions : Box -> ( Float, Float )
-dimensions (Box _ w h) =
-    ( w, h )
+dimensions (Box _ dim) =
+    dim
 
 
-contains : ( Float, Float ) -> Box -> Bool
-contains pt (Box pos w h) =
+contains : NT.Float -> Box -> Bool
+contains pt (Box pos dim) =
     let
-        dim =
-            ( w, h )
-
         halfDim =
             NT.scale 0.5 dim
 

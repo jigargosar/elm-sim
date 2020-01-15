@@ -11,18 +11,17 @@ import NumberTuple as NT
 import Transform as T exposing (Transform)
 
 
-type GridShape a
-    = GridShape (Model a)
+type GridShape
+    = GridShape Model
 
 
-type alias Model a =
+type alias Model =
     { cellD : NT.Float
     , cellT : List Transform
-    , grid : Grid a
     }
 
 
-unwrap : GridShape a -> Model a
+unwrap : GridShape -> Model
 unwrap (GridShape model) =
     model
 
@@ -31,7 +30,7 @@ map func =
     unwrap >> func >> GridShape
 
 
-fromCellSize : Float -> Grid a -> GridShape a
+fromCellSize : Float -> Grid a -> GridShape
 fromCellSize cz grid =
     let
         cellD =
@@ -42,7 +41,6 @@ fromCellSize cz grid =
     in
     Model cellD
         [ T.scale2 cellD, T.translate (NT.sub cellD gridD |> NT.scale 0.5) ]
-        grid
         |> GridShape
 
 
@@ -50,17 +48,17 @@ cellWidth =
     cellDimensions >> Tuple.first
 
 
-cellDimensions : GridShape a -> NT.Float
+cellDimensions : GridShape -> NT.Float
 cellDimensions =
     unwrap >> .cellD
 
 
-transformCellPos : GridShape a -> Pos -> NT.Float
+transformCellPos : GridShape -> Pos -> NT.Float
 transformCellPos (GridShape gs) pos =
     T.transformI gs.cellT pos
 
 
-gridCordinatesToCellPos : GridShape a -> NT.Float -> Pos
+gridCordinatesToCellPos : GridShape -> NT.Float -> Pos
 gridCordinatesToCellPos gs cord =
     let
         (GridShape { cellT }) =

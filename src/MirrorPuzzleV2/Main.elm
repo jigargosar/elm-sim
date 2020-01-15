@@ -169,14 +169,14 @@ cellToShape cz cell =
             noShape
 
 
-pathToShape : GS.GridShape a -> List Pos -> Shape
+pathToShape : GS.GridShape -> List Pos -> Shape
 pathToShape gs =
     List.map (GS.transformCellPos gs)
         >> (\path -> List.map2 (line red 5) path (List.drop 1 path))
         >> group
 
 
-initGS : Screen -> Grid -> GridShape Cell
+initGS : Screen -> Grid -> GridShape
 initGS screen grid =
     let
         ( gw, gh ) =

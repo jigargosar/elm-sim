@@ -220,7 +220,7 @@ renderCells time ct grid =
         bgShape =
             toBgShape cz
 
-        cellToShape pos cell =
+        toCellShapeWithBG pos cell =
             case cell of
                 Empty ->
                     bgShape
@@ -234,7 +234,7 @@ renderCells time ct grid =
                         |> group
 
         renderCell pos cell =
-            cellToShape pos cell |> move2 (CT.toPos ct pos)
+            toCellShapeWithBG pos cell |> move2 (CT.toPos ct pos)
     in
     grid
         |> Grid.map renderCell

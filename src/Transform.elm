@@ -29,9 +29,6 @@ transform =
     List.foldl
         (\t ->
             case t of
-                Scale2 ( 1, 1 ) ->
-                    identity
-
                 Scale2 s ->
                     NT.mul s
 
@@ -45,12 +42,6 @@ inverse =
     List.foldr
         (\t ->
             case t of
-                Scale2 ( 1, 1 ) ->
-                    identity
-
-                Translate ( 0, 0 ) ->
-                    identity
-
                 Scale2 s ->
                     flip NT.div s
 

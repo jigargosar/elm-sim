@@ -87,26 +87,6 @@ toFloat2 =
     mapEach toFloat
 
 
-scaleBoth : ( number, number ) -> ( number, number ) -> ( number, number )
-scaleBoth =
-    mapEach2 mulBy
-
-
-scaleEach : number -> ( number, number ) -> ( number, number )
-scaleEach =
-    mulBy >> mapEach
-
-
-unScaleEach : Float -> ( Float, Float ) -> ( Float, Float )
-unScaleEach =
-    reciprocal >> scaleEach
-
-
-reciprocal : Float -> Float
-reciprocal n =
-    1 / n
-
-
 mod : Int -> Int -> Int
 mod =
     flip modBy

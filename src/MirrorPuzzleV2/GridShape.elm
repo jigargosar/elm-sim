@@ -13,16 +13,35 @@ module MirrorPuzzleV2.GridShape exposing
 import MirrorPuzzleV2.Grid as Grid exposing (Grid, Pos)
 import NumberTuple as NT
 import Playground exposing (..)
-import PointFree exposing (flip, mapEach, scaleBoth, toFloat2)
+import PointFree exposing (flip, mapEach, toFloat2)
+import Transform exposing (Transform)
 
 
 type GridShape a
-    = GS ( Number, Number ) (Grid a)
+    = GridShape (Model a)
+
+
+type alias Model a =
+    { cellD : NT.Float
+    , cellT : List Transform
+    , gridT : List Transform
+    , grid : Grid a
+    }
+
+
+unwrap : GridShape a -> Model a
+unwrap (GridShape model) =
+    model
+
+
+map func =
+    unwrap >> func >> GridShape
 
 
 fromCellSize : Number -> Grid a -> GridShape a
 fromCellSize cz =
-    GS ( cz, cz )
+    Model ( cz, cz ) [ Transform.scale2 ( cz, cz ) ] [ Transform.scale2 ( cz, cz ) ]
+        >> GridShape
 
 
 cellWidth =
@@ -30,18 +49,24 @@ cellWidth =
 
 
 cellDimensions : GridShape a -> ( Number, Number )
-cellDimensions (GS cellD _) =
-    cellD
+cellDimensions =
+    unwrap >> .cellD
 
 
 toGrid : GridShape a -> Grid a
-toGrid (GS _ grid) =
-    grid
+toGrid =
+    unwrap >> .grid
 
 
 applyGridTransform : GridShape a -> Shape -> Shape
-applyGridTransform (GS ( cw, ch ) grid) =
+applyGridTransform gs =
     let
+        grid =
+            toGrid gs
+
+        ( cw, ch ) =
+            cellDimensions gs
+
         ( gw, gh ) =
             Grid.dimensions grid |> mapEach toFloat
     in
@@ -58,18 +83,18 @@ mv ( x, y ) =
 
 
 transformCellPos : GridShape a -> Pos -> ( Number, Number )
-transformCellPos (GS ( cw, ch ) _) =
-    toFloat2 >> scaleBoth ( cw, ch )
+transformCellPos gs =
+    toFloat2 >> NT.mul (cellDimensions gs)
 
 
 gridCordinatesToCellPos : GridShape a -> ( Number, Number ) -> Pos
-gridCordinatesToCellPos (GS ( cw, ch ) grid) cord =
+gridCordinatesToCellPos gs cord =
     let
         gridD =
-            Grid.dimensions grid |> NT.toFloat
+            Grid.dimensions (toGrid gs) |> NT.toFloat
 
         cellD =
-            ( cw, ch )
+            cellDimensions gs
 
         leftBottom =
             NT.mul gridD cellD

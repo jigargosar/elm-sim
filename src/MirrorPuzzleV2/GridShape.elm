@@ -3,9 +3,7 @@ module MirrorPuzzleV2.GridShape exposing
     , cellWidth
     , fromCellSize
     , gridCordinatesToCellPos
-    , render
     , transformCellPos
-    , transformGrid
     )
 
 import MirrorPuzzleV2.Grid as Grid exposing (Grid, Pos)
@@ -21,7 +19,6 @@ type GridShape a
 type alias Model a =
     { cellD : NT.Float
     , cellT : List Transform
-    , gridT : List Transform
     , grid : Grid a
     }
 
@@ -46,7 +43,6 @@ fromCellSize cz grid =
     in
     Model cellD
         [ T.scale2 cellD, T.translate (NT.sub cellD gridD |> NT.scale 0.5) ]
-        []
         grid
         |> GridShape
 
@@ -63,11 +59,6 @@ cellDimensions =
 toGrid : GridShape a -> Grid a
 toGrid =
     unwrap >> .grid
-
-
-transformGrid : GridShape a -> Shape -> Shape
-transformGrid (GridShape { cellD, cellT, gridT }) =
-    T.transformOrigin gridT |> mv
 
 
 transformCell : GridShape a -> Pos -> Shape -> Shape
@@ -87,16 +78,7 @@ transformCellPos (GridShape gs) pos =
 gridCordinatesToCellPos : GridShape a -> ( Number, Number ) -> Pos
 gridCordinatesToCellPos gs cord =
     let
-        (GridShape { cellT, gridT }) =
+        (GridShape { cellT }) =
             gs
     in
-    cord |> T.inverse gridT |> T.inverseRound cellT
-
-
-render : (Pos -> a -> Shape) -> GridShape a -> Shape
-render func gs =
-    toGrid gs
-        |> Grid.map (\pos cell -> transformCell gs pos (func pos cell))
-        |> Grid.values
-        |> group
-        |> transformGrid gs
+    cord |> T.inverseRound cellT

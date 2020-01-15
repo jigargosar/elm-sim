@@ -7,7 +7,7 @@ import MirrorPuzzleV2.GridShape as GS exposing (GridShape)
 import MirrorPuzzleV2.Rect as Rect exposing (Rect)
 import Playground exposing (..)
 import Playground.Extra exposing (..)
-import PointFree exposing (flip, whenTrue)
+import PointFree exposing (whenTrue)
 import Set exposing (Set)
 
 
@@ -218,12 +218,18 @@ viewGrid { time, screen } grid =
             gridToLightPaths grid
     in
     group
-        [ GS.render renderCell gs
+        [ grid
+            |> Grid.map (\pos cell -> renderCell pos cell |> move2 (GS.transformCellPos gs pos))
+            |> Grid.values
+            |> group
         , lightPaths
             |> List.map (pathToShape gs)
             |> group
-            |> GS.transformGrid gs
         ]
+
+
+move2 ( x, y ) =
+    move x y
 
 
 

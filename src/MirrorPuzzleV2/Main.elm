@@ -2,6 +2,7 @@ module MirrorPuzzleV2.Main exposing (main)
 
 import List.Extra
 import MirrorPuzzleV2.Rect as Rect exposing (Rect)
+import NumberTuple as NT
 import Playground exposing (..)
 import Playground.CellTransform as CT exposing (CellTransform)
 import Playground.Direction8 as Dir exposing (Direction8)
@@ -411,7 +412,7 @@ update { mouse, screen } mem =
                             initCellTransform screen grid
 
                         pos =
-                            CT.toPos ct ( mouse.x, mouse.y )
+                            CT.toPos ct (NT.fromXY mouse)
                     in
                     case Grid.get pos grid of
                         Just cell ->

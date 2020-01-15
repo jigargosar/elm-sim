@@ -49,3 +49,8 @@ round =
 negate : ( number, number ) -> ( number, number )
 negate =
     mapEach Basics.negate
+
+
+fromXY : { a | x : number, y : number } -> ( number, number )
+fromXY { x, y } =
+    ( x, y )

@@ -292,7 +292,7 @@ initLevelButtons screen count =
 levelButtonIdxFromMouse : Mouse -> LevelButtons -> Maybe Int
 levelButtonIdxFromMouse mouse lbs =
     lbs.list
-        |> List.Extra.findIndex (mouseInRect mouse)
+        |> List.Extra.findIndex (Box.containsXY mouse)
 
 
 renderLevelButtons : Mouse -> LevelButtons -> Shape
@@ -310,7 +310,7 @@ renderLevelButtons mouse lbs =
 
 renderButton : Mouse -> String -> Box -> Shape
 renderButton mouse text rect =
-    buttonShape (mouseInRect mouse rect)
+    buttonShape (Box.containsXY mouse rect)
         (Box.dimensions rect)
         text
         |> move2 (Box.center rect)
@@ -410,7 +410,7 @@ update computer mem =
 
         PuzzleScreen puzzle ->
             if mouse.click then
-                if mouseInRect mouse (initBackButtonRect screen) then
+                if Box.containsXY mouse (initBackButtonBox screen) then
                     { mem | scene = initialLevelSelect }
 
                 else
@@ -459,21 +459,16 @@ viewPuzzle computer { grid } =
             computer
     in
     [ viewGrid computer grid
-    , renderButton mouse "Back" (initBackButtonRect screen)
+    , renderButton mouse "Back" (initBackButtonBox screen)
     ]
 
 
-initBackButtonRect : Screen -> Box
-initBackButtonRect screen =
+initBackButtonBox : Screen -> Box
+initBackButtonBox screen =
     Box.fromWH 100 30
         |> Box.move screen.left screen.top
         |> Box.moveDown 50
         |> Box.moveRight 100
-
-
-mouseInRect : Mouse -> Box -> Bool
-mouseInRect mouse rect =
-    Box.contains ( mouse.x, mouse.y ) rect
 
 
 view : Computer -> Mem -> List Shape

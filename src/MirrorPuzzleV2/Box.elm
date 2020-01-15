@@ -2,6 +2,7 @@ module MirrorPuzzleV2.Box exposing
     ( Box
     , center
     , contains
+    , containsXY
     , dimensions
     , fromWH
     , fromXYWH
@@ -72,3 +73,8 @@ contains ( px, py ) (Box x y w h) =
             ( y - h / 2, y + h / 2 )
     in
     px > minX && px < maxX && py > minY && py < maxY
+
+
+containsXY : { a | x : Float, y : Float } -> Box -> Bool
+containsXY { x, y } =
+    contains ( x, y )

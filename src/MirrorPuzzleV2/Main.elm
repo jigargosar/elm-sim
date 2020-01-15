@@ -171,7 +171,7 @@ toCellShape cz cell =
 
 renderPath : CellTransform -> List Pos -> Shape
 renderPath ct =
-    List.map (CT.toPos ct)
+    List.map (CT.fromPos ct)
         >> (\path -> List.map2 (line red 5) path (List.drop 1 path))
         >> group
 
@@ -231,7 +231,7 @@ renderCells time ct grid =
                         |> group
 
         renderCell pos cell =
-            toCellShapeHelp pos cell |> move2 (CT.toPos ct pos)
+            toCellShapeHelp pos cell |> move2 (CT.fromPos ct pos)
     in
     grid
         |> Grid.map renderCell
@@ -411,7 +411,7 @@ update { mouse, screen } mem =
                             initCellTransform screen grid
 
                         pos =
-                            CT.fromPos ct ( mouse.x, mouse.y )
+                            CT.toPos ct ( mouse.x, mouse.y )
                     in
                     case Grid.get pos grid of
                         Just cell ->

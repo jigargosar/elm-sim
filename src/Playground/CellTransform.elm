@@ -50,13 +50,13 @@ width (CT m) =
     m.cellD |> Tuple.first
 
 
-toPos : CellTransform -> Pos -> NT.Float
-toPos (CT gs) pos =
+fromPos : CellTransform -> Pos -> NT.Float
+fromPos (CT gs) pos =
     T.transformI gs.cellT pos
 
 
-fromPos : CellTransform -> NT.Float -> Pos
-fromPos gs cord =
+toPos : CellTransform -> NT.Float -> Pos
+toPos gs cord =
     let
         (CT { cellT }) =
             gs

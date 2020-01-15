@@ -444,8 +444,15 @@ update { mouse, screen } mem =
                 mem
 
 
-onGridTap : Pos -> Grid -> Grid
-onGridTap pos grid =
+updateGrid : Computer -> Grid -> Grid
+updateGrid { screen, mouse } grid =
+    let
+        ct =
+            initCellTransform screen grid
+
+        pos =
+            CT.xyToPos ct mouse
+    in
     case Grid.get pos grid of
         Just cell ->
             let

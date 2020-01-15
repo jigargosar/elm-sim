@@ -176,8 +176,8 @@ pathToShape ct =
         >> group
 
 
-initGS : Screen -> Grid -> CellTransform
-initGS screen grid =
+initCellTransform : Screen -> Grid -> CellTransform
+initCellTransform screen grid =
     let
         ( gw, gh ) =
             Grid.dimensions grid
@@ -192,7 +192,7 @@ viewGrid : Computer -> Grid -> Shape
 viewGrid { time, screen } grid =
     let
         ct =
-            initGS screen grid
+            initCellTransform screen grid
 
         cz =
             CT.width ct
@@ -390,16 +390,15 @@ update { mouse, screen } mem =
                     mem
 
         Puzzle grid ->
-            let
-                ct =
-                    initGS screen grid
-            in
             if mouse.click then
                 if mouseInRect mouse (initBackButtonRect screen) then
                     { mem | scene = initialLevelSelect }
 
                 else
                     let
+                        ct =
+                            initCellTransform screen grid
+
                         pos =
                             CT.fromPos ct ( mouse.x, mouse.y )
                     in

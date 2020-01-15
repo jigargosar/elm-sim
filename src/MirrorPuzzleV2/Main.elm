@@ -1,7 +1,7 @@
 module MirrorPuzzleV2.Main exposing (main)
 
 import List.Extra
-import MirrorPuzzleV2.CellTransform as GS exposing (CellTransform)
+import MirrorPuzzleV2.CellTransform as CT exposing (CellTransform)
 import MirrorPuzzleV2.Direction8 as Dir exposing (Direction8)
 import MirrorPuzzleV2.Grid as Grid exposing (Pos)
 import MirrorPuzzleV2.Rect as Rect exposing (Rect)
@@ -169,9 +169,9 @@ cellToShape cz cell =
             noShape
 
 
-pathToShape : GS.CellTransform -> List Pos -> Shape
+pathToShape : CT.CellTransform -> List Pos -> Shape
 pathToShape gs =
-    List.map (GS.toPos gs)
+    List.map (CT.toPos gs)
         >> (\path -> List.map2 (line red 5) path (List.drop 1 path))
         >> group
 
@@ -185,7 +185,7 @@ initGS screen grid =
         cellSize =
             min (screen.width * 0.8 / toFloat gw) (screen.height * 0.8 / toFloat gh)
     in
-    GS.square cellSize grid
+    CT.square cellSize grid
 
 
 viewGrid : Computer -> Grid -> Shape
@@ -195,7 +195,7 @@ viewGrid { time, screen } grid =
             initGS screen grid
 
         cz =
-            GS.width gs
+            CT.width gs
 
         litDestinationPosSet =
             computeLitDestinationPosSet grid
@@ -219,7 +219,7 @@ viewGrid { time, screen } grid =
     in
     group
         [ grid
-            |> Grid.map (\pos cell -> renderCell pos cell |> move2 (GS.toPos gs pos))
+            |> Grid.map (\pos cell -> renderCell pos cell |> move2 (CT.toPos gs pos))
             |> Grid.values
             |> group
         , lightPaths
@@ -401,7 +401,7 @@ update { mouse, screen } mem =
                 else
                     let
                         pos =
-                            GS.fromPos gs ( mouse.x, mouse.y )
+                            CT.fromPos gs ( mouse.x, mouse.y )
                     in
                     case Grid.get pos grid of
                         Just cell ->

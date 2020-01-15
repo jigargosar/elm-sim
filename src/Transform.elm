@@ -15,13 +15,13 @@ import PointFree exposing (flip)
 
 
 type Transform
-    = Scale2 NT.Float
+    = Scale NT.Float
     | Translate NT.Float
 
 
 scale2 : NT.Float -> Transform
 scale2 =
-    Scale2
+    Scale
 
 
 scale : Float -> Transform
@@ -49,7 +49,7 @@ transform =
     List.foldl
         (\t ->
             case t of
-                Scale2 s ->
+                Scale s ->
                     NT.mul s
 
                 Translate dt ->
@@ -68,7 +68,7 @@ inverse =
     List.foldr
         (\t ->
             case t of
-                Scale2 s ->
+                Scale s ->
                     flip NT.div s
 
                 Translate dt ->

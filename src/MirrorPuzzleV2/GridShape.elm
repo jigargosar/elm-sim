@@ -8,7 +8,6 @@ module MirrorPuzzleV2.GridShape exposing
 
 import MirrorPuzzleV2.Grid as Grid exposing (Grid, Pos)
 import NumberTuple as NT
-import Playground exposing (..)
 import Transform as T exposing (Transform)
 
 
@@ -32,7 +31,7 @@ map func =
     unwrap >> func >> GridShape
 
 
-fromCellSize : Number -> Grid a -> GridShape a
+fromCellSize : Float -> Grid a -> GridShape a
 fromCellSize cz grid =
     let
         cellD =
@@ -51,31 +50,17 @@ cellWidth =
     cellDimensions >> Tuple.first
 
 
-cellDimensions : GridShape a -> ( Number, Number )
+cellDimensions : GridShape a -> NT.Float
 cellDimensions =
     unwrap >> .cellD
 
 
-toGrid : GridShape a -> Grid a
-toGrid =
-    unwrap >> .grid
-
-
-transformCell : GridShape a -> Pos -> Shape -> Shape
-transformCell pos =
-    transformCellPos pos >> mv
-
-
-mv ( x, y ) =
-    Playground.move x y
-
-
-transformCellPos : GridShape a -> Pos -> ( Number, Number )
+transformCellPos : GridShape a -> Pos -> NT.Float
 transformCellPos (GridShape gs) pos =
     T.transformI gs.cellT pos
 
 
-gridCordinatesToCellPos : GridShape a -> ( Number, Number ) -> Pos
+gridCordinatesToCellPos : GridShape a -> NT.Float -> Pos
 gridCordinatesToCellPos gs cord =
     let
         (GridShape { cellT }) =

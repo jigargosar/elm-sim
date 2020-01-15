@@ -194,42 +194,45 @@ viewGrid { time, screen } grid =
         ct =
             initCellTransform screen grid
 
-        cz =
-            CT.width ct
-
-        litDestinationPosSet =
-            computeLitDestinationPosSet grid
-
         viewLightPaths =
             gridToLightPaths grid
                 |> List.map (renderPath ct)
                 |> group
-
-        renderCells =
-            grid
-                |> Grid.map
-                    (\pos cell ->
-                        (case cell of
-                            Empty ->
-                                toBgShape cz
-
-                            _ ->
-                                [ toBgShape cz
-                                , toCellShape cz cell
-                                    |> whenTrue (Set.member pos litDestinationPosSet) (blink time)
-                                    |> scale 0.85
-                                ]
-                                    |> group
-                        )
-                            |> move2 (CT.toPos ct pos)
-                    )
-                |> Grid.values
-                |> group
     in
     group
-        [ renderCells
+        [ renderCells time ct grid
         , viewLightPaths
         ]
+
+
+renderCells : Time -> CellTransform -> Grid -> Shape
+renderCells time ct grid =
+    let
+        litDestinationPosSet =
+            computeLitDestinationPosSet grid
+
+        cz =
+            CT.width ct
+    in
+    grid
+        |> Grid.map
+            (\pos cell ->
+                (case cell of
+                    Empty ->
+                        toBgShape cz
+
+                    _ ->
+                        [ toBgShape cz
+                        , toCellShape cz cell
+                            |> whenTrue (Set.member pos litDestinationPosSet) (blink time)
+                            |> scale 0.85
+                        ]
+                            |> group
+                )
+                    |> move2 (CT.toPos ct pos)
+            )
+        |> Grid.values
+        |> group
 
 
 move2 ( x, y ) =

@@ -1,4 +1,14 @@
-module Transform exposing (Transform, inverse, inverseRound, scale, scale2, transform, transformI, transformOrigin, translate)
+module Transform exposing
+    ( Transform
+    , inverse
+    , inverseRound
+    , scale
+    , scale2
+    , transform
+    , transformI
+    , transformOrigin
+    , translate
+    )
 
 import NumberTuple as NT
 import PointFree exposing (flip)

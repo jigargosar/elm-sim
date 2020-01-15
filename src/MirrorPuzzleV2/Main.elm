@@ -169,9 +169,9 @@ cellToShape cz cell =
             noShape
 
 
-pathToShape : CT.CellTransform -> List Pos -> Shape
-pathToShape gs =
-    List.map (CT.toPos gs)
+pathToShape : CellTransform -> List Pos -> Shape
+pathToShape ct =
+    List.map (CT.toPos ct)
         >> (\path -> List.map2 (line red 5) path (List.drop 1 path))
         >> group
 
@@ -191,11 +191,11 @@ initGS screen grid =
 viewGrid : Computer -> Grid -> Shape
 viewGrid { time, screen } grid =
     let
-        gs =
+        ct =
             initGS screen grid
 
         cz =
-            CT.width gs
+            CT.width ct
 
         litDestinationPosSet =
             computeLitDestinationPosSet grid
@@ -219,11 +219,11 @@ viewGrid { time, screen } grid =
     in
     group
         [ grid
-            |> Grid.map (\pos cell -> renderCell pos cell |> move2 (CT.toPos gs pos))
+            |> Grid.map (\pos cell -> renderCell pos cell |> move2 (CT.toPos ct pos))
             |> Grid.values
             |> group
         , lightPaths
-            |> List.map (pathToShape gs)
+            |> List.map (pathToShape ct)
             |> group
         ]
 
@@ -391,7 +391,7 @@ update { mouse, screen } mem =
 
         Puzzle grid ->
             let
-                gs =
+                ct =
                     initGS screen grid
             in
             if mouse.click then
@@ -401,7 +401,7 @@ update { mouse, screen } mem =
                 else
                     let
                         pos =
-                            CT.fromPos gs ( mouse.x, mouse.y )
+                            CT.fromPos ct ( mouse.x, mouse.y )
                     in
                     case Grid.get pos grid of
                         Just cell ->

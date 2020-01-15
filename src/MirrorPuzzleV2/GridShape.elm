@@ -1,20 +1,20 @@
 module MirrorPuzzleV2.GridShape exposing
     ( GridShape
-    , applyCellTransform
-    , applyGridTransform
     , cellWidth
     , fill
     , fromCellSize
     , gridCordinatesToCellPos
     , render
+    , transformCell
     , transformCellPos
+    , transformGrid
     )
 
 import MirrorPuzzleV2.Grid as Grid exposing (Grid, Pos)
 import NumberTuple as NT
 import Playground exposing (..)
 import PointFree exposing (flip, mapEach, toFloat2)
-import Transform exposing (Transform)
+import Transform as T exposing (Transform)
 
 
 type GridShape a
@@ -39,9 +39,19 @@ map func =
 
 
 fromCellSize : Number -> Grid a -> GridShape a
-fromCellSize cz =
-    Model ( cz, cz ) [ Transform.scale2 ( cz, cz ) ] [ Transform.scale2 ( cz, cz ) ]
-        >> GridShape
+fromCellSize cz grid =
+    let
+        cellD =
+            ( cz, cz )
+
+        gridD =
+            Grid.dimensions grid |> NT.toFloat |> NT.mul cellD
+    in
+    Model cellD
+        [ T.scale2 cellD ]
+        [ T.translate cellD, T.translate (NT.negate gridD), T.scale 0.5 ]
+        grid
+        |> GridShape
 
 
 cellWidth =
@@ -58,23 +68,13 @@ toGrid =
     unwrap >> .grid
 
 
-applyGridTransform : GridShape a -> Shape -> Shape
-applyGridTransform gs =
-    let
-        grid =
-            toGrid gs
-
-        ( cw, ch ) =
-            cellDimensions gs
-
-        ( gw, gh ) =
-            Grid.dimensions grid |> mapEach toFloat
-    in
-    mv ( (cw - (gw * cw)) / 2, (ch - (gh * ch)) / 2 )
+transformGrid : GridShape a -> Shape -> Shape
+transformGrid (GridShape { grid, cellD, cellT, gridT }) =
+    T.transformOrigin gridT |> mv
 
 
-applyCellTransform : Pos -> GridShape a -> Shape -> Shape
-applyCellTransform pos =
+transformCell : Pos -> GridShape a -> Shape -> Shape
+transformCell pos =
     flip transformCellPos pos >> mv
 
 
@@ -110,15 +110,15 @@ fill : Shape -> GridShape a -> Shape
 fill shape gs =
     toGrid gs
         |> Grid.positions
-        |> List.map (\pos -> applyCellTransform pos gs shape)
+        |> List.map (\pos -> transformCell pos gs shape)
         |> group
-        |> applyGridTransform gs
+        |> transformGrid gs
 
 
 render : (Pos -> a -> Shape) -> GridShape a -> Shape
 render func gs =
     toGrid gs
-        |> Grid.map (\pos cell -> applyCellTransform pos gs (func pos cell))
+        |> Grid.map (\pos cell -> transformCell pos gs (func pos cell))
         |> Grid.values
         |> group
-        |> applyGridTransform gs
+        |> transformGrid gs

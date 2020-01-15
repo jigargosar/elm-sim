@@ -1,4 +1,4 @@
-module Transform exposing (Transform, inverse, scale, scale2, transform, translate)
+module Transform exposing (Transform, inverse, scale, scale2, transform, transformOrigin, translate)
 
 import NumberTuple as NT
 import PointFree exposing (flip)
@@ -22,6 +22,11 @@ scale s =
 translate : NT.Float -> Transform
 translate =
     Translate
+
+
+transformOrigin : List Transform -> NT.Float
+transformOrigin =
+    transform ( 0, 0 )
 
 
 transform : NT.Float -> List Transform -> NT.Float

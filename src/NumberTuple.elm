@@ -44,3 +44,8 @@ toFloat =
 round : Float -> Int
 round =
     mapEach Basics.round
+
+
+negate : ( number, number ) -> ( number, number )
+negate =
+    mapEach Basics.negate

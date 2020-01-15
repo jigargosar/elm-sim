@@ -1,7 +1,7 @@
 module MirrorPuzzleV2.Main exposing (main)
 
 import List.Extra
-import MirrorPuzzleV2.Rect as Rect exposing (Rect)
+import MirrorPuzzleV2.Rect as Box exposing (Box)
 import Playground exposing (..)
 import Playground.CellTransform as CT exposing (CellTransform)
 import Playground.Direction8 as Dir exposing (Direction8)
@@ -252,7 +252,7 @@ move2 ( x, y ) =
 
 type alias LevelButtons =
     { top : Number
-    , list : List Rect
+    , list : List Box
     }
 
 
@@ -283,7 +283,7 @@ initLevelButtons screen count =
         List.range 0 (count - 1)
             |> List.map
                 (\n ->
-                    Rect.fromXYWH 0 (toY n) width height
+                    Box.fromXYWH 0 (toY n) width height
                 )
     }
 
@@ -307,14 +307,14 @@ renderLevelButtons mouse lbs =
         |> group
 
 
-renderButton : Mouse -> String -> Rect -> Shape
+renderButton : Mouse -> String -> Box -> Shape
 renderButton mouse text rect =
     let
         ( x, y ) =
-            Rect.center rect
+            Box.center rect
     in
     buttonShape (mouseInRect mouse rect)
-        (Rect.dimensions rect)
+        (Box.dimensions rect)
         text
         |> move x y
 
@@ -466,14 +466,14 @@ viewPuzzle computer { grid } =
     ]
 
 
-initBackButtonRect : Screen -> Rect
+initBackButtonRect : Screen -> Box
 initBackButtonRect screen =
-    Rect.fromXYWH (screen.left + 100) (screen.top - 50) 100 30
+    Box.fromXYWH (screen.left + 100) (screen.top - 50) 100 30
 
 
-mouseInRect : Mouse -> Rect -> Bool
+mouseInRect : Mouse -> Box -> Bool
 mouseInRect mouse rect =
-    Rect.contains ( mouse.x, mouse.y ) rect
+    Box.contains ( mouse.x, mouse.y ) rect
 
 
 view : Computer -> Mem -> List Shape

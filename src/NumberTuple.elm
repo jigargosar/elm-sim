@@ -4,11 +4,11 @@ import PointFree exposing (mapEach, mapEach2, mulBy)
 
 
 type alias Int =
-    ( Int, Int )
+    ( Basics.Int, Basics.Int )
 
 
 type alias Float =
-    ( Float, Float )
+    ( Basics.Float, Basics.Float )
 
 
 scale : number -> ( number, number ) -> ( number, number )
@@ -29,6 +29,11 @@ sub =
 mul : ( number, number ) -> ( number, number ) -> ( number, number )
 mul =
     mapEach2 (*)
+
+
+div : Float -> Float -> Float
+div =
+    mapEach2 (/)
 
 
 toFloat : Int -> Float

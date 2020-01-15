@@ -11,6 +11,7 @@ module MirrorPuzzleV2.GridShape exposing
     )
 
 import MirrorPuzzleV2.Grid as Grid exposing (Grid, Pos)
+import NumberTuple as NT
 import Playground exposing (..)
 import PointFree exposing (flip, mapEach, scaleBoth, toFloat2)
 
@@ -53,15 +54,22 @@ transformCellPos (GS cw ch _) =
 
 
 gridCordinatesToCellPos : GridShape a -> ( Number, Number ) -> Pos
-gridCordinatesToCellPos (GS cw ch grid) ( sx, sy ) =
+gridCordinatesToCellPos (GS cw ch grid) cord =
     let
-        ( gw, gh ) =
-            Grid.dimensions grid |> toFloat2
+        gridD =
+            Grid.dimensions grid |> NT.toFloat
 
-        ( dx, dy ) =
-            ( (cw - (gw * cw)) / 2, (ch - (gh * ch)) / 2 )
+        cellD =
+            ( cw, ch )
+
+        leftBottom =
+            NT.mul gridD cellD
+                |> NT.sub cellD
+                |> NT.scale 0.5
     in
-    ( (sx - dx) / cw, (sy - dy) / ch ) |> mapEach round
+    NT.sub cord leftBottom
+        |> flip NT.div cellD
+        |> NT.round
 
 
 fill : Shape -> GridShape a -> Shape

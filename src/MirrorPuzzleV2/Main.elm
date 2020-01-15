@@ -357,7 +357,11 @@ viewLevelSelect mouse lbs =
 type Scene
     = Intro
     | LevelSelect Int
-    | Puzzle Grid
+    | PuzzleScreen Puzzle
+
+
+type alias Puzzle =
+    { grid : Grid }
 
 
 
@@ -369,7 +373,7 @@ type alias Mem =
 
 
 initialPuzzle =
-    Puzzle initialGrid
+    PuzzleScreen { grid = initialGrid }
 
 
 initialLevelSelect =
@@ -407,21 +411,24 @@ update computer mem =
                 _ ->
                     mem
 
-        Puzzle grid ->
+        PuzzleScreen puzzle ->
             if mouse.click then
                 if mouseInRect mouse (initBackButtonRect screen) then
                     { mem | scene = initialLevelSelect }
 
                 else
-                    { mem | scene = Puzzle (updateGrid computer grid) }
+                    { mem | scene = PuzzleScreen (updatePuzzle computer puzzle) }
 
             else
                 mem
 
 
-updateGrid : Computer -> Grid -> Grid
-updateGrid { screen, mouse } grid =
+updatePuzzle : Computer -> Puzzle -> Puzzle
+updatePuzzle { screen, mouse } model =
     let
+        grid =
+            model.grid
+
         ct =
             initCellTransform screen grid
 
@@ -432,7 +439,7 @@ updateGrid { screen, mouse } grid =
         Just cell ->
             let
                 ins a =
-                    Grid.insert pos a grid
+                    { model | grid = Grid.insert pos a grid }
             in
             case cell of
                 Mirror dir ->
@@ -442,14 +449,14 @@ updateGrid { screen, mouse } grid =
                     ins (SourceWithMirror (Dir.rotate 1 dir))
 
                 _ ->
-                    grid
+                    model
 
         Nothing ->
-            grid
+            model
 
 
-viewPuzzle : Computer -> Grid -> List Shape
-viewPuzzle computer grid =
+viewPuzzle : Computer -> Puzzle -> List Shape
+viewPuzzle computer { grid } =
     let
         { mouse, time, screen } =
             computer
@@ -472,8 +479,8 @@ mouseInRect mouse rect =
 view : Computer -> Mem -> List Shape
 view computer mem =
     case mem.scene of
-        Puzzle grid ->
-            viewPuzzle computer grid
+        PuzzleScreen puzzle ->
+            viewPuzzle computer puzzle
 
         Intro ->
             [ words black "Tap To Start" ]

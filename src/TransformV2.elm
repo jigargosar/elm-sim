@@ -3,6 +3,11 @@ module TransformV2 exposing
     , identity
     , inverse
     , inverseRound
+    , move
+    , moveDown
+    , moveRight
+    , moveX
+    , moveY
     , scale
     , scale2
     , transform
@@ -101,3 +106,28 @@ inverseRound t =
 transformI : Transform -> NT.Int -> NT.Float
 transformI t =
     NT.toFloat >> transform t
+
+
+move : NT.Float -> Transform -> Transform
+move =
+    translate
+
+
+moveX : Float -> Transform -> Transform
+moveX dx =
+    move ( dx, 0 )
+
+
+moveY : Float -> Transform -> Transform
+moveY dy =
+    move ( 0, dy )
+
+
+moveDown : Float -> Transform -> Transform
+moveDown dy =
+    moveY -dy
+
+
+moveRight : Float -> Transform -> Transform
+moveRight =
+    moveX

@@ -17,21 +17,30 @@ import PointFree exposing (flip, mapEach, scaleBoth, toFloat2)
 
 
 type GridShape a
-    = GS Number Number (Grid a)
+    = GS ( Number, Number ) (Grid a)
 
 
 fromCellSize : Number -> Grid a -> GridShape a
 fromCellSize cz =
-    GS cz cz
+    GS ( cz, cz )
 
 
-cellWidth : GridShape a -> Number
-cellWidth (GS cw _ _) =
-    cw
+cellWidth =
+    cellDimensions >> Tuple.first
+
+
+cellDimensions : GridShape a -> ( Number, Number )
+cellDimensions (GS cellD _) =
+    cellD
+
+
+toGrid : GridShape a -> Grid a
+toGrid (GS _ grid) =
+    grid
 
 
 applyGridTransform : GridShape a -> Shape -> Shape
-applyGridTransform (GS cw ch grid) =
+applyGridTransform (GS ( cw, ch ) grid) =
     let
         ( gw, gh ) =
             Grid.dimensions grid |> mapEach toFloat
@@ -49,12 +58,12 @@ mv ( x, y ) =
 
 
 transformCellPos : GridShape a -> Pos -> ( Number, Number )
-transformCellPos (GS cw ch _) =
+transformCellPos (GS ( cw, ch ) _) =
     toFloat2 >> scaleBoth ( cw, ch )
 
 
 gridCordinatesToCellPos : GridShape a -> ( Number, Number ) -> Pos
-gridCordinatesToCellPos (GS cw ch grid) cord =
+gridCordinatesToCellPos (GS ( cw, ch ) grid) cord =
     let
         gridD =
             Grid.dimensions grid |> NT.toFloat
@@ -73,16 +82,18 @@ gridCordinatesToCellPos (GS cw ch grid) cord =
 
 
 fill : Shape -> GridShape a -> Shape
-fill shape ((GS _ _ grid) as gs) =
-    Grid.positions grid
+fill shape gs =
+    toGrid gs
+        |> Grid.positions
         |> List.map (\pos -> applyCellTransform pos gs shape)
         |> group
         |> applyGridTransform gs
 
 
 render : (Pos -> a -> Shape) -> GridShape a -> Shape
-render func ((GS _ _ grid) as gs) =
-    Grid.map (\pos cell -> applyCellTransform pos gs (func pos cell)) grid
+render func gs =
+    toGrid gs
+        |> Grid.map (\pos cell -> applyCellTransform pos gs (func pos cell))
         |> Grid.values
         |> group
         |> applyGridTransform gs

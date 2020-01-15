@@ -1,7 +1,7 @@
 module Playground.CellTransform exposing
     ( CellTransform
     , fromPos
-    , square
+    , init
     , toPos
     , width
     )
@@ -32,12 +32,9 @@ map func =
     unwrap >> func >> CT
 
 
-square : Float -> Grid a -> CellTransform
-square cz grid =
+init : ( Float, Float ) -> Grid a -> CellTransform
+init cellD grid =
     let
-        cellD =
-            ( cz, cz )
-
         gridD =
             Grid.dimensions grid |> NT.toFloat |> NT.mul cellD
     in

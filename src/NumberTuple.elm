@@ -24,3 +24,18 @@ add =
 sub : ( number, number ) -> ( number, number ) -> ( number, number )
 sub =
     mapEach2 (-)
+
+
+mul : ( number, number ) -> ( number, number ) -> ( number, number )
+mul =
+    mapEach2 (*)
+
+
+toFloat : Int -> Float
+toFloat =
+    mapEach Basics.toFloat
+
+
+round : Float -> Int
+round =
+    mapEach Basics.round

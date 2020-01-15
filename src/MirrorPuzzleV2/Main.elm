@@ -169,8 +169,8 @@ cellToShape cz cell =
             noShape
 
 
-pathToShape : CellTransform -> List Pos -> Shape
-pathToShape ct =
+renderPath : CellTransform -> List Pos -> Shape
+renderPath ct =
     List.map (CT.toPos ct)
         >> (\path -> List.map2 (line red 5) path (List.drop 1 path))
         >> group
@@ -201,7 +201,7 @@ viewGrid { time, screen } grid =
             computeLitDestinationPosSet grid
 
         renderCell pos cell =
-            case cell of
+            (case cell of
                 Empty ->
                     toBgShape cz
 
@@ -212,19 +212,23 @@ viewGrid { time, screen } grid =
                         |> scale 0.85
                     ]
                         |> group
+            )
+                |> move2 (CT.toPos ct pos)
 
-        lightPaths : List LightPath
-        lightPaths =
+        viewLightPaths =
             gridToLightPaths grid
+                |> List.map (renderPath ct)
+                |> group
+
+        renderCells =
+            grid
+                |> Grid.map renderCell
+                |> Grid.values
+                |> group
     in
     group
-        [ grid
-            |> Grid.map (\pos cell -> renderCell pos cell |> move2 (CT.toPos ct pos))
-            |> Grid.values
-            |> group
-        , lightPaths
-            |> List.map (pathToShape ct)
-            |> group
+        [ renderCells
+        , viewLightPaths
         ]
 
 

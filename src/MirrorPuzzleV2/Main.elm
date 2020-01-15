@@ -382,7 +382,11 @@ init =
 
 
 update : Computer -> Mem -> Mem
-update { mouse, screen } mem =
+update computer mem =
+    let
+        { mouse, screen } =
+            computer
+    in
     case mem.scene of
         Intro ->
             if mouse.click then
@@ -409,36 +413,7 @@ update { mouse, screen } mem =
                     { mem | scene = initialLevelSelect }
 
                 else
-                    let
-                        ct =
-                            initCellTransform screen grid
-
-                        pos =
-                            CT.xyToPos ct mouse
-                    in
-                    case Grid.get pos grid of
-                        Just cell ->
-                            { mem
-                                | scene =
-                                    let
-                                        ins a =
-                                            Grid.insert pos a grid
-                                    in
-                                    Puzzle
-                                        (case cell of
-                                            Mirror dir ->
-                                                ins (Mirror (Dir.rotate 1 dir))
-
-                                            SourceWithMirror dir ->
-                                                ins (SourceWithMirror (Dir.rotate 1 dir))
-
-                                            _ ->
-                                                grid
-                                        )
-                            }
-
-                        Nothing ->
-                            mem
+                    { mem | scene = Puzzle (updateGrid computer grid) }
 
             else
                 mem

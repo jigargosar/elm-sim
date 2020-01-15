@@ -1,4 +1,4 @@
-module Transform exposing (Transform, inverse, scale, scale2, transform, transformIntTuple, transformOrigin, translate)
+module Transform exposing (Transform, inverse, inverseRound, scale, scale2, transform, transformI, transformOrigin, translate)
 
 import NumberTuple as NT
 import PointFree exposing (flip)
@@ -25,16 +25,16 @@ translate =
 
 
 transformOrigin : List Transform -> NT.Float
-transformOrigin =
-    transform ( 0, 0 )
+transformOrigin t =
+    transform t ( 0, 0 )
 
 
-transformIntTuple : NT.Int -> List Transform -> NT.Float
-transformIntTuple it =
-    NT.toFloat it |> transform
+transformI : List Transform -> NT.Int -> NT.Float
+transformI t =
+    NT.toFloat >> transform t
 
 
-transform : NT.Float -> List Transform -> NT.Float
+transform : List Transform -> NT.Float -> NT.Float
 transform =
     List.foldl
         (\t ->
@@ -45,9 +45,15 @@ transform =
                 Translate dt ->
                     NT.add dt
         )
+        |> flip
 
 
-inverse : NT.Float -> List Transform -> NT.Float
+inverseRound : List Transform -> NT.Float -> NT.Int
+inverseRound t =
+    inverse t >> NT.round
+
+
+inverse : List Transform -> NT.Float -> NT.Float
 inverse =
     List.foldr
         (\t ->
@@ -58,3 +64,4 @@ inverse =
                 Translate dt ->
                     flip NT.sub dt
         )
+        |> flip

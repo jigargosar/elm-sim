@@ -171,7 +171,7 @@ cellToShape cz cell =
 
 pathToShape : GS.GridShape a -> List Pos -> Shape
 pathToShape gs =
-    List.map (flip GS.transformCellPos gs)
+    List.map (GS.transformCellPos gs)
         >> (\path -> List.map2 (line red 5) path (List.drop 1 path))
         >> group
 

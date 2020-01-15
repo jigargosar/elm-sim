@@ -208,11 +208,11 @@ viewGrid { time, screen } grid =
 renderCells : Time -> CellTransform -> Grid -> Shape
 renderCells time ct grid =
     let
-        litDestinationPosSet =
+        litDest =
             computeLitDestinationPosSet grid
 
-        isLit pos =
-            Set.member pos litDestinationPosSet
+        blinkIfLitDest pos =
+            whenTrue (Set.member pos litDest) (blink time)
 
         cz =
             CT.width ct
@@ -220,7 +220,7 @@ renderCells time ct grid =
         bgShape =
             toBgShape cz
 
-        toCellShapeWithBG pos cell =
+        toCellShapeHelp pos cell =
             case cell of
                 Empty ->
                     bgShape
@@ -228,13 +228,13 @@ renderCells time ct grid =
                 _ ->
                     [ bgShape
                     , toCellShape cz cell
-                        |> whenTrue (isLit pos) (blink time)
+                        |> blinkIfLitDest pos
                         |> scale 0.85
                     ]
                         |> group
 
         renderCell pos cell =
-            toCellShapeWithBG pos cell |> move2 (CT.toPos ct pos)
+            toCellShapeHelp pos cell |> move2 (CT.toPos ct pos)
     in
     grid
         |> Grid.map renderCell

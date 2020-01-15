@@ -1,9 +1,9 @@
-module MirrorPuzzleV2.GridShape exposing
-    ( GridShape
-    , cellWidth
-    , fromCellSize
-    , gridCordinatesToCellPos
-    , transformCellPos
+module MirrorPuzzleV2.CellTransform exposing
+    ( CellTransform
+    , fromPos
+    , square
+    , toPos
+    , width
     )
 
 import MirrorPuzzleV2.Grid as Grid exposing (Grid, Pos)
@@ -11,8 +11,8 @@ import NumberTuple as NT
 import Transform as T exposing (Transform)
 
 
-type GridShape
-    = GridShape Model
+type CellTransform
+    = CT Model
 
 
 type alias Model =
@@ -21,17 +21,18 @@ type alias Model =
     }
 
 
-unwrap : GridShape -> Model
-unwrap (GridShape model) =
+unwrap : CellTransform -> Model
+unwrap (CT model) =
     model
 
 
+map : (Model -> Model) -> CellTransform -> CellTransform
 map func =
-    unwrap >> func >> GridShape
+    unwrap >> func >> CT
 
 
-fromCellSize : Float -> Grid a -> GridShape
-fromCellSize cz grid =
+square : Float -> Grid a -> CellTransform
+square cz grid =
     let
         cellD =
             ( cz, cz )
@@ -41,27 +42,28 @@ fromCellSize cz grid =
     in
     Model cellD
         [ T.scale2 cellD, T.translate (NT.sub cellD gridD |> NT.scale 0.5) ]
-        |> GridShape
+        |> CT
 
 
-cellWidth =
+width : CellTransform -> Float
+width =
     cellDimensions >> Tuple.first
 
 
-cellDimensions : GridShape -> NT.Float
+cellDimensions : CellTransform -> NT.Float
 cellDimensions =
     unwrap >> .cellD
 
 
-transformCellPos : GridShape -> Pos -> NT.Float
-transformCellPos (GridShape gs) pos =
+toPos : CellTransform -> Pos -> NT.Float
+toPos (CT gs) pos =
     T.transformI gs.cellT pos
 
 
-gridCordinatesToCellPos : GridShape -> NT.Float -> Pos
-gridCordinatesToCellPos gs cord =
+fromPos : CellTransform -> NT.Float -> Pos
+fromPos gs cord =
     let
-        (GridShape { cellT }) =
+        (CT { cellT }) =
             gs
     in
     cord |> T.inverseRound cellT

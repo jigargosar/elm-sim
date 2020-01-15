@@ -1,9 +1,9 @@
 module MirrorPuzzleV2.Main exposing (main)
 
 import List.Extra
+import MirrorPuzzleV2.CellTransform as GS exposing (CellTransform)
 import MirrorPuzzleV2.Direction8 as Dir exposing (Direction8)
 import MirrorPuzzleV2.Grid as Grid exposing (Pos)
-import MirrorPuzzleV2.GridShape as GS exposing (GridShape)
 import MirrorPuzzleV2.Rect as Rect exposing (Rect)
 import Playground exposing (..)
 import Playground.Extra exposing (..)
@@ -169,14 +169,14 @@ cellToShape cz cell =
             noShape
 
 
-pathToShape : GS.GridShape -> List Pos -> Shape
+pathToShape : GS.CellTransform -> List Pos -> Shape
 pathToShape gs =
-    List.map (GS.transformCellPos gs)
+    List.map (GS.toPos gs)
         >> (\path -> List.map2 (line red 5) path (List.drop 1 path))
         >> group
 
 
-initGS : Screen -> Grid -> GridShape
+initGS : Screen -> Grid -> CellTransform
 initGS screen grid =
     let
         ( gw, gh ) =
@@ -185,7 +185,7 @@ initGS screen grid =
         cellSize =
             min (screen.width * 0.8 / toFloat gw) (screen.height * 0.8 / toFloat gh)
     in
-    GS.fromCellSize cellSize grid
+    GS.square cellSize grid
 
 
 viewGrid : Computer -> Grid -> Shape
@@ -195,7 +195,7 @@ viewGrid { time, screen } grid =
             initGS screen grid
 
         cz =
-            GS.cellWidth gs
+            GS.width gs
 
         litDestinationPosSet =
             computeLitDestinationPosSet grid
@@ -219,7 +219,7 @@ viewGrid { time, screen } grid =
     in
     group
         [ grid
-            |> Grid.map (\pos cell -> renderCell pos cell |> move2 (GS.transformCellPos gs pos))
+            |> Grid.map (\pos cell -> renderCell pos cell |> move2 (GS.toPos gs pos))
             |> Grid.values
             |> group
         , lightPaths
@@ -401,7 +401,7 @@ update { mouse, screen } mem =
                 else
                     let
                         pos =
-                            GS.gridCordinatesToCellPos gs ( mouse.x, mouse.y )
+                            GS.fromPos gs ( mouse.x, mouse.y )
                     in
                     case Grid.get pos grid of
                         Just cell ->

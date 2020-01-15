@@ -147,8 +147,8 @@ mirrorShape cz dir =
         |> scale 0.9
 
 
-cellToShape : Number -> Cell -> Shape
-cellToShape cz cell =
+toCellShape : Number -> Cell -> Shape
+toCellShape cz cell =
     case cell of
         Source ->
             sourceShape cz
@@ -200,21 +200,6 @@ viewGrid { time, screen } grid =
         litDestinationPosSet =
             computeLitDestinationPosSet grid
 
-        renderCell pos cell =
-            (case cell of
-                Empty ->
-                    toBgShape cz
-
-                _ ->
-                    [ toBgShape cz
-                    , cellToShape cz cell
-                        |> whenTrue (Set.member pos litDestinationPosSet) (blink time)
-                        |> scale 0.85
-                    ]
-                        |> group
-            )
-                |> move2 (CT.toPos ct pos)
-
         viewLightPaths =
             gridToLightPaths grid
                 |> List.map (renderPath ct)
@@ -222,7 +207,22 @@ viewGrid { time, screen } grid =
 
         renderCells =
             grid
-                |> Grid.map renderCell
+                |> Grid.map
+                    (\pos cell ->
+                        (case cell of
+                            Empty ->
+                                toBgShape cz
+
+                            _ ->
+                                [ toBgShape cz
+                                , toCellShape cz cell
+                                    |> whenTrue (Set.member pos litDestinationPosSet) (blink time)
+                                    |> scale 0.85
+                                ]
+                                    |> group
+                        )
+                            |> move2 (CT.toPos ct pos)
+                    )
                 |> Grid.values
                 |> group
     in

@@ -46,7 +46,7 @@ fromCellSize cz grid =
     in
     Model cellD
         [ T.scale2 cellD ]
-        [ T.translate cellD, T.translate (NT.negate gridD), T.scale 0.5 ]
+        [ T.translate (NT.sub cellD gridD |> NT.scale 0.5) ]
         grid
         |> GridShape
 

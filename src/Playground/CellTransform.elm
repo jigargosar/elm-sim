@@ -9,7 +9,11 @@ module Playground.CellTransform exposing
 
 import NumberTuple as NT
 import Playground.Grid as Grid exposing (Grid, Pos)
-import TransformV2 as T exposing (Transform)
+import PointFree exposing (flip)
+
+
+type alias Transform =
+    { scale : NT.Float, translate : NT.Float }
 
 
 type CellTransform
@@ -19,7 +23,7 @@ type CellTransform
 type alias Model =
     { cellD : NT.Float
     , gridD : NT.Float
-    , cellT : Transform
+    , cellT : NT.Float
     }
 
 
@@ -41,7 +45,7 @@ init cellD grid =
     in
     CT
         { cellD = cellD
-        , cellT = T.identity |> T.scale2 cellD |> T.translate (NT.sub cellD gridD |> NT.scale 0.5)
+        , cellT = NT.sub cellD gridD |> NT.scale 0.5
         , gridD = gridD
         }
 
@@ -52,17 +56,16 @@ width (CT m) =
 
 
 fromPos : CellTransform -> Pos -> NT.Float
-fromPos (CT gs) pos =
-    T.transformI gs.cellT pos
+fromPos (CT { cellD, cellT }) pos =
+    pos |> NT.toFloat |> NT.mul cellD |> NT.add cellT
 
 
 toPos : CellTransform -> NT.Float -> Pos
-toPos gs cord =
-    let
-        (CT { cellT }) =
-            gs
-    in
-    cord |> T.inverseRound cellT
+toPos (CT { cellT, cellD }) cord =
+    cord
+        |> flip NT.sub cellT
+        |> flip NT.div cellD
+        |> NT.round
 
 
 xyToPos : CellTransform -> { a | x : Float, y : Float } -> Pos

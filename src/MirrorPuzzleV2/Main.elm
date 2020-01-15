@@ -215,7 +215,7 @@ viewGrid { time, screen } grid =
         , lightPaths
             |> List.map (pathToShape gs)
             |> group
-            |> GS.transformCellGridShape gs
+            |> GS.applyGridTransform gs
         ]
 
 

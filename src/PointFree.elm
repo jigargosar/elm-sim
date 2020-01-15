@@ -89,7 +89,7 @@ toFloat2 =
 
 scaleBoth : ( number, number ) -> ( number, number ) -> ( number, number )
 scaleBoth =
-    mapBoth2 mulBy
+    mapEach2 mulBy
 
 
 scaleEach : number -> ( number, number ) -> ( number, number )
@@ -203,7 +203,7 @@ ignoreNothing func val =
     func val |> Maybe.withDefault val
 
 
-mapBoth2 func ( a1, b1 ) ( a2, b2 ) =
+mapEach2 func ( a1, b1 ) ( a2, b2 ) =
     ( func a1 a2, func b1 b2 )
 
 

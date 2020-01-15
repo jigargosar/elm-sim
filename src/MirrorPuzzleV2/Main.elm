@@ -213,24 +213,24 @@ renderCells time ct grid =
 
         cz =
             CT.width ct
+
+        renderCell pos cell =
+            (case cell of
+                Empty ->
+                    toBgShape cz
+
+                _ ->
+                    [ toBgShape cz
+                    , toCellShape cz cell
+                        |> whenTrue (Set.member pos litDestinationPosSet) (blink time)
+                        |> scale 0.85
+                    ]
+                        |> group
+            )
+                |> move2 (CT.toPos ct pos)
     in
     grid
-        |> Grid.map
-            (\pos cell ->
-                (case cell of
-                    Empty ->
-                        toBgShape cz
-
-                    _ ->
-                        [ toBgShape cz
-                        , toCellShape cz cell
-                            |> whenTrue (Set.member pos litDestinationPosSet) (blink time)
-                            |> scale 0.85
-                        ]
-                            |> group
-                )
-                    |> move2 (CT.toPos ct pos)
-            )
+        |> Grid.map renderCell
         |> Grid.values
         |> group
 

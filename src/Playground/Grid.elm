@@ -1,4 +1,4 @@
-module MirrorPuzzleV2.Grid exposing
+module Playground.Grid exposing
     ( Grid
     , Pos
     , dimensions

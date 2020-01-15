@@ -1,4 +1,4 @@
-module MirrorPuzzleV2.CellTransform exposing
+module Playground.CellTransform exposing
     ( CellTransform
     , fromPos
     , square
@@ -6,8 +6,8 @@ module MirrorPuzzleV2.CellTransform exposing
     , width
     )
 
-import MirrorPuzzleV2.Grid as Grid exposing (Grid, Pos)
 import NumberTuple as NT
+import Playground.Grid as Grid exposing (Grid, Pos)
 import Transform as T exposing (Transform)
 
 

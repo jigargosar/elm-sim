@@ -1,4 +1,4 @@
-module MirrorPuzzleV2.Direction8 exposing (Direction8, fromInt, rotate, stepPos, toDegrees)
+module Playground.Direction8 exposing (Direction8, fromInt, rotate, stepPos, toDegrees)
 
 
 type alias Pos =

@@ -1,12 +1,12 @@
 module MirrorPuzzleV2.Main exposing (main)
 
 import List.Extra
-import MirrorPuzzleV2.CellTransform as CT exposing (CellTransform)
-import MirrorPuzzleV2.Direction8 as Dir exposing (Direction8)
-import MirrorPuzzleV2.Grid as Grid exposing (Pos)
 import MirrorPuzzleV2.Rect as Rect exposing (Rect)
 import Playground exposing (..)
+import Playground.CellTransform as CT exposing (CellTransform)
+import Playground.Direction8 as Dir exposing (Direction8)
 import Playground.Extra exposing (..)
+import Playground.Grid as Grid exposing (Pos)
 import PointFree exposing (whenTrue)
 import Set exposing (Set)
 

@@ -80,8 +80,7 @@ contains pt (Box pos w h) =
         pMax =
             NT.add pos halfDim
     in
-    (NT.lt pt pMin || NT.gt pt pMax)
-        |> not
+    (NT.lt pt pMin || NT.gt pt pMax) |> not
 
 
 containsXY : { a | x : Float, y : Float } -> Box -> Bool

@@ -190,3 +190,7 @@ mapEach2 func ( a1, b1 ) ( a2, b2 ) =
 vecFromTo : ( number, number ) -> ( number, number ) -> ( number, number )
 vecFromTo ( x1, y1 ) ( x2, y2 ) =
     ( x2 - x1, y2 - y1 )
+
+
+apply2 func ( a, b ) =
+    func a b

@@ -13,9 +13,11 @@ module MirrorPuzzleV2.Box exposing
     , moveY
     )
 
+import NumberTuple as NT
+
 
 type Box
-    = Box Float Float Float Float
+    = Box NT.Float Float Float
 
 
 fromWH : Float -> Float -> Box
@@ -23,14 +25,14 @@ fromWH w h =
     fromXYWH 0 0 w h
 
 
-move : Float -> Float -> Box -> Box
-move dx dy (Box x y w h) =
-    Box (x + dx) (y + dy) w h
+move : NT.Float -> Box -> Box
+move by (Box pos w h) =
+    Box (NT.add pos by) w h
 
 
 moveX : Float -> Box -> Box
 moveX dx =
-    move dx 0
+    move ( dx, 0 )
 
 
 moveDown : Float -> Box -> Box
@@ -45,34 +47,41 @@ moveRight =
 
 moveY : Float -> Box -> Box
 moveY dy =
-    move 0 dy
+    move ( 0, dy )
 
 
 fromXYWH : Float -> Float -> Float -> Float -> Box
 fromXYWH x y w h =
-    Box x y w h
+    Box ( x, y ) w h
 
 
-center : Box -> ( Float, Float )
-center (Box x y _ _) =
-    ( x, y )
+center : Box -> NT.Float
+center (Box pos _ _) =
+    pos
 
 
 dimensions : Box -> ( Float, Float )
-dimensions (Box _ _ w h) =
+dimensions (Box _ w h) =
     ( w, h )
 
 
 contains : ( Float, Float ) -> Box -> Bool
-contains ( px, py ) (Box x y w h) =
+contains pt (Box pos w h) =
     let
-        ( minX, maxX ) =
-            ( x - w / 2, x + w / 2 )
+        dim =
+            ( w, h )
 
-        ( minY, maxY ) =
-            ( y - h / 2, y + h / 2 )
+        halfDim =
+            NT.scale 0.5 dim
+
+        pMin =
+            NT.sub pos halfDim
+
+        pMax =
+            NT.add pos halfDim
     in
-    px > minX && px < maxX && py > minY && py < maxY
+    (NT.lt pt pMin || NT.gt pt pMax)
+        |> not
 
 
 containsXY : { a | x : Float, y : Float } -> Box -> Bool

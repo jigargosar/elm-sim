@@ -466,7 +466,7 @@ viewPuzzle computer { grid } =
 initBackButtonBox : Screen -> Box
 initBackButtonBox screen =
     Box.fromWH 100 30
-        |> Box.move screen.left screen.top
+        |> Box.move ( screen.left, screen.top )
         |> Box.moveDown 50
         |> Box.moveRight 100
 

@@ -1,6 +1,6 @@
 module NumberTuple exposing (..)
 
-import PointFree exposing (mapEach, mapEach2, mulBy)
+import PointFree exposing (apply2, mapEach, mapEach2, mulBy)
 
 
 type alias Int =
@@ -54,3 +54,13 @@ negate =
 fromXY : { a | x : number, y : number } -> ( number, number )
 fromXY { x, y } =
     ( x, y )
+
+
+lt : ( comparable, comparable ) -> ( comparable, comparable ) -> Bool
+lt a b =
+    mapEach2 (<) a b |> apply2 (||)
+
+
+gt : ( comparable, comparable ) -> ( comparable, comparable ) -> Bool
+gt a b =
+    mapEach2 (>) a b |> apply2 (||)

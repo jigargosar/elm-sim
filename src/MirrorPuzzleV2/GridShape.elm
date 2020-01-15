@@ -13,7 +13,7 @@ module MirrorPuzzleV2.GridShape exposing
 import MirrorPuzzleV2.Grid as Grid exposing (Grid, Pos)
 import NumberTuple as NT
 import Playground exposing (..)
-import PointFree exposing (flip, mapEach, toFloat2)
+import PointFree exposing (flip)
 import Transform as T exposing (Transform)
 
 

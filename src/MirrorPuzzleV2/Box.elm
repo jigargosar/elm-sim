@@ -1,4 +1,4 @@
-module MirrorPuzzleV2.Rect exposing
+module MirrorPuzzleV2.Box exposing
     ( Box
     , center
     , contains

@@ -1,7 +1,7 @@
 module MirrorPuzzleV2.Main exposing (main)
 
 import List.Extra
-import MirrorPuzzleV2.Rect as Box exposing (Box)
+import MirrorPuzzleV2.Box as Box exposing (Box)
 import Playground exposing (..)
 import Playground.CellTransform as CT exposing (CellTransform)
 import Playground.Direction8 as Dir exposing (Direction8)

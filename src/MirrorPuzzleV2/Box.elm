@@ -66,18 +66,18 @@ dimensions (Box _ dim) =
 
 
 contains : NT.Float -> Box -> Bool
-contains pt (Box pos dim) =
+contains ( x, y ) (Box pos dim) =
     let
         halfDim =
             NT.scale 0.5 dim
 
-        pMin =
+        ( minX, minY ) =
             NT.sub pos halfDim
 
-        pMax =
+        ( maxX, maxY ) =
             NT.add pos halfDim
     in
-    (NT.lt pt pMin || NT.gt pt pMax) |> not
+    NT.contains x ( minX, maxX ) && NT.contains y ( minY, maxY )
 
 
 containsXY : { a | x : Float, y : Float } -> Box -> Bool

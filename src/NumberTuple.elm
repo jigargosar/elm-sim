@@ -56,11 +56,7 @@ fromXY { x, y } =
     ( x, y )
 
 
-lt : ( comparable, comparable ) -> ( comparable, comparable ) -> Bool
-lt a b =
-    mapEach2 (<) a b |> apply2 (||)
-
-
-gt : ( comparable, comparable ) -> ( comparable, comparable ) -> Bool
-gt a b =
-    mapEach2 (>) a b |> apply2 (||)
+contains : comparable -> ( comparable, comparable ) -> Bool
+contains a ( minA, maxA ) =
+    (a < minA || a > maxA)
+        |> not

@@ -283,7 +283,8 @@ initLevelButtons screen count =
         List.range 0 (count - 1)
             |> List.map
                 (\n ->
-                    Box.fromXYWH 0 (toY n) width height
+                    Box.fromWH width height
+                        |> Box.moveY (toY n)
                 )
     }
 
@@ -309,14 +310,10 @@ renderLevelButtons mouse lbs =
 
 renderButton : Mouse -> String -> Box -> Shape
 renderButton mouse text rect =
-    let
-        ( x, y ) =
-            Box.center rect
-    in
     buttonShape (mouseInRect mouse rect)
         (Box.dimensions rect)
         text
-        |> move x y
+        |> move2 (Box.center rect)
 
 
 buttonShape : Bool -> ( Number, Number ) -> String -> Shape
@@ -468,7 +465,10 @@ viewPuzzle computer { grid } =
 
 initBackButtonRect : Screen -> Box
 initBackButtonRect screen =
-    Box.fromXYWH (screen.left + 100) (screen.top - 50) 100 30
+    Box.fromWH 100 30
+        |> Box.move screen.left screen.top
+        |> Box.moveDown 50
+        |> Box.moveRight 100
 
 
 mouseInRect : Mouse -> Box -> Bool

@@ -5,6 +5,11 @@ module MirrorPuzzleV2.Box exposing
     , dimensions
     , fromWH
     , fromXYWH
+    , move
+    , moveDown
+    , moveRight
+    , moveX
+    , moveY
     )
 
 
@@ -15,6 +20,31 @@ type Box
 fromWH : Float -> Float -> Box
 fromWH w h =
     fromXYWH 0 0 w h
+
+
+move : Float -> Float -> Box -> Box
+move dx dy (Box x y w h) =
+    Box (x + dx) (y + dy) w h
+
+
+moveX : Float -> Box -> Box
+moveX dx =
+    move dx 0
+
+
+moveDown : Float -> Box -> Box
+moveDown dy =
+    moveY -dy
+
+
+moveRight : Float -> Box -> Box
+moveRight =
+    moveX
+
+
+moveY : Float -> Box -> Box
+moveY dy =
+    move 0 dy
 
 
 fromXYWH : Float -> Float -> Float -> Float -> Box

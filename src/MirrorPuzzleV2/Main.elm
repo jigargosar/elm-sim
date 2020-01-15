@@ -185,8 +185,11 @@ initCellTransform screen grid =
 
         cellSize =
             min (screen.width * 0.8 / toFloat gw) (screen.height * 0.8 / toFloat gh)
+
+        cellD =
+            ( cellSize, cellSize )
     in
-    CT.init ( cellSize, cellSize ) grid
+    CT.init cellD grid
 
 
 viewGrid : Computer -> Grid -> Shape

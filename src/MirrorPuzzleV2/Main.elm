@@ -355,9 +355,9 @@ viewLevelSelect mouse lbs =
 
 
 type Scene
-    = Puzzle Grid
-    | Intro
+    = Intro
     | LevelSelect Int
+    | Puzzle Grid
 
 
 

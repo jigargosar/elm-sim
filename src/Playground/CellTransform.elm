@@ -9,7 +9,7 @@ module Playground.CellTransform exposing
 
 import NumberTuple as NT
 import Playground.Grid as Grid exposing (Grid, Pos)
-import Transform as T exposing (Transform)
+import TransformV2 as T exposing (Transform)
 
 
 type CellTransform
@@ -19,7 +19,7 @@ type CellTransform
 type alias Model =
     { cellD : NT.Float
     , gridD : NT.Float
-    , cellT : List Transform
+    , cellT : Transform
     }
 
 
@@ -41,7 +41,7 @@ init cellD grid =
     in
     CT
         { cellD = cellD
-        , cellT = [ T.scale2 cellD, T.translate (NT.sub cellD gridD |> NT.scale 0.5) ]
+        , cellT = T.identity |> T.scale2 cellD |> T.translate (NT.sub cellD gridD |> NT.scale 0.5)
         , gridD = gridD
         }
 

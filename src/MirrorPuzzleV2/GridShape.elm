@@ -1,7 +1,6 @@
 module MirrorPuzzleV2.GridShape exposing
     ( GridShape
     , cellWidth
-    , fill
     , fromCellSize
     , gridCordinatesToCellPos
     , render
@@ -92,15 +91,6 @@ gridCordinatesToCellPos gs cord =
             gs
     in
     cord |> T.inverse gridT |> T.inverseRound cellT
-
-
-fill : Shape -> GridShape a -> Shape
-fill shape gs =
-    toGrid gs
-        |> Grid.positions
-        |> List.map (\pos -> transformCell gs pos shape)
-        |> group
-        |> transformGrid gs
 
 
 render : (Pos -> a -> Shape) -> GridShape a -> Shape

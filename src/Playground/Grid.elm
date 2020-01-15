@@ -14,7 +14,7 @@ module Playground.Grid exposing
     )
 
 import Dict exposing (Dict)
-import PointFree exposing (mapEach, mulBy, when)
+import PointFree exposing (when)
 
 
 type alias Pos =

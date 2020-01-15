@@ -4,6 +4,7 @@ module Playground.CellTransform exposing
     , init
     , toPos
     , width
+    , xyToPos
     )
 
 import NumberTuple as NT
@@ -62,3 +63,8 @@ toPos gs cord =
             gs
     in
     cord |> T.inverseRound cellT
+
+
+xyToPos : CellTransform -> { a | x : Float, y : Float } -> Pos
+xyToPos ct xy =
+    toPos ct (NT.fromXY xy)

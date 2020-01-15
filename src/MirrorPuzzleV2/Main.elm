@@ -412,7 +412,7 @@ update { mouse, screen } mem =
                             initCellTransform screen grid
 
                         pos =
-                            CT.toPos ct (NT.fromXY mouse)
+                            CT.xyToPos ct mouse
                     in
                     case Grid.get pos grid of
                         Just cell ->

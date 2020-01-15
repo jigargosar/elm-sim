@@ -220,23 +220,21 @@ renderCells time ct grid =
         bgShape =
             toBgShape cz
 
-        renderCellHelp pos cell =
-            toCellShape cz cell
-                |> whenTrue (isLit pos) (blink time)
-                |> scale 0.85
-
-        renderCell pos cell =
-            (case cell of
+        cellToShape pos cell =
+            case cell of
                 Empty ->
                     bgShape
 
                 _ ->
                     [ bgShape
-                    , renderCellHelp pos cell
+                    , toCellShape cz cell
+                        |> whenTrue (isLit pos) (blink time)
+                        |> scale 0.85
                     ]
                         |> group
-            )
-                |> move2 (CT.toPos ct pos)
+
+        renderCell pos cell =
+            cellToShape pos cell |> move2 (CT.toPos ct pos)
     in
     grid
         |> Grid.map renderCell

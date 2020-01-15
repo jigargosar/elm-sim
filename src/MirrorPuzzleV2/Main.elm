@@ -201,17 +201,24 @@ viewGrid { time, screen } grid =
             computeLitDestinationPosSet grid
 
         renderCell pos cell =
-            cellToShape cz cell
-                |> whenTrue (Set.member pos litDestinationPosSet) (blink time)
-                |> scale 0.85
+            case cell of
+                Empty ->
+                    toBgShape cz
+
+                _ ->
+                    [ toBgShape cz
+                    , cellToShape cz cell
+                        |> whenTrue (Set.member pos litDestinationPosSet) (blink time)
+                        |> scale 0.85
+                    ]
+                        |> group
 
         lightPaths : List LightPath
         lightPaths =
             gridToLightPaths grid
     in
     group
-        [ GS.fill (toBgShape cz) gs
-        , GS.render renderCell gs
+        [ GS.render renderCell gs
         , lightPaths
             |> List.map (pathToShape gs)
             |> group

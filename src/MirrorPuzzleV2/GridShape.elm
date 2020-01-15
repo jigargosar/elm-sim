@@ -75,16 +75,16 @@ transformGrid (GridShape { grid, cellD, cellT, gridT }) =
 
 transformCell : Pos -> GridShape a -> Shape -> Shape
 transformCell pos =
-    flip transformCellPos pos >> mv
+    transformCellPos pos >> mv
 
 
 mv ( x, y ) =
     Playground.move x y
 
 
-transformCellPos : GridShape a -> Pos -> ( Number, Number )
-transformCellPos gs =
-    toFloat2 >> NT.mul (cellDimensions gs)
+transformCellPos : Pos -> GridShape a -> ( Number, Number )
+transformCellPos pos (GridShape gs) =
+    T.transformIntTuple pos gs.cellT
 
 
 gridCordinatesToCellPos : GridShape a -> ( Number, Number ) -> Pos

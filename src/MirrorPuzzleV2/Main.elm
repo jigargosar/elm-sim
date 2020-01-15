@@ -7,7 +7,7 @@ import MirrorPuzzleV2.GridShape as GS exposing (GridShape)
 import MirrorPuzzleV2.Rect as Rect exposing (Rect)
 import Playground exposing (..)
 import Playground.Extra exposing (..)
-import PointFree exposing (mapEach, mulBy, whenTrue)
+import PointFree exposing (flip, whenTrue)
 import Set exposing (Set)
 
 
@@ -171,7 +171,7 @@ cellToShape cz cell =
 
 pathToShape : GS.GridShape a -> List Pos -> Shape
 pathToShape gs =
-    List.map (GS.transformCellPos gs)
+    List.map (flip GS.transformCellPos gs)
         >> (\path -> List.map2 (line red 5) path (List.drop 1 path))
         >> group
 

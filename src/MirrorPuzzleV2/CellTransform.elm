@@ -17,6 +17,7 @@ type CellTransform
 
 type alias Model =
     { cellD : NT.Float
+    , gridD : NT.Float
     , cellT : List Transform
     }
 
@@ -40,19 +41,16 @@ square cz grid =
         gridD =
             Grid.dimensions grid |> NT.toFloat |> NT.mul cellD
     in
-    Model cellD
-        [ T.scale2 cellD, T.translate (NT.sub cellD gridD |> NT.scale 0.5) ]
-        |> CT
+    CT
+        { cellD = cellD
+        , cellT = [ T.scale2 cellD, T.translate (NT.sub cellD gridD |> NT.scale 0.5) ]
+        , gridD = gridD
+        }
 
 
 width : CellTransform -> Float
-width =
-    cellDimensions >> Tuple.first
-
-
-cellDimensions : CellTransform -> NT.Float
-cellDimensions =
-    unwrap >> .cellD
+width (CT m) =
+    m.cellD |> Tuple.first
 
 
 toPos : CellTransform -> Pos -> NT.Float

@@ -194,14 +194,14 @@ viewGrid { time, screen } grid =
         ct =
             initCellTransform screen grid
 
-        viewLightPaths =
+        renderLightPaths =
             gridToLightPaths grid
                 |> List.map (renderPath ct)
                 |> group
     in
     group
         [ renderCells time ct grid
-        , viewLightPaths
+        , renderLightPaths
         ]
 
 
@@ -211,19 +211,28 @@ renderCells time ct grid =
         litDestinationPosSet =
             computeLitDestinationPosSet grid
 
+        isLit pos =
+            Set.member pos litDestinationPosSet
+
         cz =
             CT.width ct
+
+        bgShape =
+            toBgShape cz
+
+        renderCellHelp pos cell =
+            toCellShape cz cell
+                |> whenTrue (isLit pos) (blink time)
+                |> scale 0.85
 
         renderCell pos cell =
             (case cell of
                 Empty ->
-                    toBgShape cz
+                    bgShape
 
                 _ ->
-                    [ toBgShape cz
-                    , toCellShape cz cell
-                        |> whenTrue (Set.member pos litDestinationPosSet) (blink time)
-                        |> scale 0.85
+                    [ bgShape
+                    , renderCellHelp pos cell
                     ]
                         |> group
             )

@@ -45,8 +45,8 @@ fromCellSize cz grid =
             Grid.dimensions grid |> NT.toFloat |> NT.mul cellD
     in
     Model cellD
-        [ T.scale2 cellD ]
-        [ T.translate (NT.sub cellD gridD |> NT.scale 0.5) ]
+        [ T.scale2 cellD, T.translate (NT.sub cellD gridD |> NT.scale 0.5) ]
+        []
         grid
         |> GridShape
 

@@ -444,6 +444,28 @@ update { mouse, screen } mem =
                 mem
 
 
+onGridTap : Pos -> Grid -> Grid
+onGridTap pos grid =
+    case Grid.get pos grid of
+        Just cell ->
+            let
+                ins a =
+                    Grid.insert pos a grid
+            in
+            case cell of
+                Mirror dir ->
+                    ins (Mirror (Dir.rotate 1 dir))
+
+                SourceWithMirror dir ->
+                    ins (SourceWithMirror (Dir.rotate 1 dir))
+
+                _ ->
+                    grid
+
+        Nothing ->
+            grid
+
+
 viewPuzzle : Computer -> Grid -> List Shape
 viewPuzzle computer grid =
     let

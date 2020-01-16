@@ -57,8 +57,8 @@ fromPos (CT { cellD, cellT }) pos =
 toPos : CellTransform -> NT.Float2 -> Pos
 toPos (CT { cellT, cellD }) cord =
     cord
-        |> flip NT.sub cellT
-        |> flip NT.div cellD
+        |> NT.subBy cellT
+        |> NT.divBy cellD
         |> NT.round
 
 

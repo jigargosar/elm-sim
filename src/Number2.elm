@@ -1,6 +1,6 @@
 module Number2 exposing (..)
 
-import PointFree exposing (mapEach, mapEach2, mulBy)
+import PointFree exposing (flip, mapEach, mapEach2, mulBy)
 
 
 type alias Int2 =
@@ -36,6 +36,11 @@ sub =
     mapEach2 (-)
 
 
+subBy : ( number, number ) -> ( number, number ) -> ( number, number )
+subBy =
+    flip sub
+
+
 mul : ( number, number ) -> ( number, number ) -> ( number, number )
 mul =
     mapEach2 (*)
@@ -44,6 +49,11 @@ mul =
 div : Float2 -> Float2 -> Float2
 div =
     mapEach2 (/)
+
+
+divBy : Float2 -> Float2 -> Float2
+divBy =
+    flip div
 
 
 toFloat : Int2 -> Float2

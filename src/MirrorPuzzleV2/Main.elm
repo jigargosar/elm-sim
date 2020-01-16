@@ -54,6 +54,17 @@ insert =
     Grid.insert
 
 
+allDestinationPos : Grid -> Set Pos
+allDestinationPos =
+    Grid.foldl (\pos cell -> whenTrue (cell == Destination) (Set.insert pos))
+        Set.empty
+
+
+isSolved : Grid -> Bool
+isSolved grid =
+    allDestinationPos grid == computeLitDestinationPosSet grid
+
+
 computeLitDestinationPosSet : Grid -> Set Pos
 computeLitDestinationPosSet grid =
     gridToLightPaths grid
@@ -459,9 +470,13 @@ viewPuzzle computer { grid } =
             computer
     in
     [ viewGrid computer grid
-    , words black "puzzle solved"
-        |> moveY screen.top
-        |> moveDown 50
+    , if isSolved grid then
+        words black "puzzle solved"
+            |> moveY screen.top
+            |> moveDown 50
+
+      else
+        noShape
     , renderButton mouse "Back" (initBackButtonBox screen)
     ]
 

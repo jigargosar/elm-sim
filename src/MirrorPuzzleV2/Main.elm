@@ -148,8 +148,8 @@ type alias CellT =
     }
 
 
-initCellT : Float2 -> Int2 -> CellT
-initCellT viewD gridD =
+cellTFromViewD : Float2 -> Int2 -> CellT
+cellTFromViewD viewD gridD =
     let
         cellSize =
             viewD |> NT.divBy (toFloat2 gridD) |> NT.apply min
@@ -157,29 +157,29 @@ initCellT viewD gridD =
         cellD =
             ( cellSize, cellSize )
 
-        cellT =
+        dxy =
             gridD |> NT.toFloat |> NT.mul cellD |> NT.sub cellD |> NT.scale 0.5
     in
     { cellSize = cellSize
-    , toView = NT.toFloat >> NT.mul cellD >> NT.add cellT
-    , fromView = NT.subBy cellT >> NT.divBy cellD >> NT.round
+    , toView = NT.toFloat >> NT.mul cellD >> NT.add dxy
+    , fromView = NT.subBy dxy >> NT.divBy cellD >> NT.round
     }
 
 
-initCellTransform : Screen -> PuzzleGrid -> CellT
-initCellTransform screen grid =
+initCellT : Screen -> PuzzleGrid -> CellT
+initCellT screen grid =
     let
         viewD =
             ( screen.width, screen.height ) |> NT.scale 0.8
     in
-    initCellT viewD (Grid.dimensions grid)
+    cellTFromViewD viewD (Grid.dimensions grid)
 
 
 viewPuzzleGrid : Computer -> PuzzleGrid -> Shape
 viewPuzzleGrid { time, screen } grid =
     let
         ct =
-            initCellTransform screen grid
+            initCellT screen grid
 
         lightPathsShape =
             grid
@@ -446,7 +446,7 @@ updatePuzzleScene { screen, mouse } model =
             model.grid
 
         ct =
-            initCellTransform screen grid
+            initCellT screen grid
 
         pos =
             ct.fromView ( mouse.x, mouse.y )

@@ -170,7 +170,7 @@ initCellT : Screen -> PuzzleGrid -> CellT
 initCellT screen grid =
     let
         viewD =
-            ( screen.width, screen.height ) |> NT.scale 0.8
+            NT.scale 0.8 ( screen.width, screen.height )
     in
     cellTFromViewD viewD (Grid.dimensions grid)
 

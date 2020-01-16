@@ -393,6 +393,11 @@ init =
     { scene = initialPuzzle }
 
 
+updateWrapper : Playground.Computer -> Mem -> Mem
+updateWrapper computer mem =
+    update computer mem
+
+
 update : Computer -> Mem -> Mem
 update computer mem =
     let
@@ -507,4 +512,4 @@ view computer mem =
 
 
 main =
-    game view update init
+    game view updateWrapper init

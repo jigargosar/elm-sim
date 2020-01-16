@@ -399,7 +399,7 @@ type alias Mouse =
     , y : Number
     , dx : Number
     , dy : Number
-    , lastDownAt : NT.Float
+    , downAt : NT.Float
     , onDown : Bool
     , onUp : Bool
     , onClick : Bool
@@ -415,7 +415,7 @@ initialMouse =
     , dx = 0
     , dy = 0
     , onDown = False
-    , lastDownAt = ( 0, 0 )
+    , downAt = ( 0, 0 )
     , onUp = False
     , down = False
     , click = False
@@ -431,31 +431,27 @@ updateMouse { x, y, down, click } prev =
 
         onDown =
             down && not prev.down
-
-        lastDownAt =
-            if onDown then
-                ( x, y )
-
-            else
-                prev.lastDownAt
-
-        onClick =
-            if click then
-                NT.equalWithin 2 ( x, y ) prev.lastDownAt
-
-            else
-                False
     in
     { x = x
     , y = y
     , dx = dx
     , dy = dy
     , onDown = onDown
-    , lastDownAt = lastDownAt
+    , downAt =
+        if onDown then
+            ( x, y )
+
+        else
+            prev.downAt
     , onUp = not down && prev.down
     , down = down
     , click = click
-    , onClick = onClick
+    , onClick =
+        if click then
+            NT.equalWithin 2 ( x, y ) prev.downAt
+
+        else
+            False
     }
 
 

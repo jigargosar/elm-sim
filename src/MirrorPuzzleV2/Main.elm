@@ -2,6 +2,7 @@ module MirrorPuzzleV2.Main exposing (main)
 
 import List.Extra
 import MirrorPuzzleV2.Box as Box exposing (Box)
+import NumberTuple as NT
 import Playground exposing (..)
 import Playground.CellTransform as CT exposing (CellTransform)
 import Playground.Direction8 as Dir exposing (Direction8)
@@ -398,6 +399,7 @@ type alias Mouse =
     , y : Number
     , dx : Number
     , dy : Number
+    , lastDownAt : NT.Float
     , onDown : Bool
     , onUp : Bool
     , onClick : Bool
@@ -413,6 +415,7 @@ initialMouse =
     , dx = 0
     , dy = 0
     , onDown = False
+    , lastDownAt = ( 0, 0 )
     , onUp = False
     , down = False
     , click = False
@@ -422,16 +425,37 @@ initialMouse =
 
 updateMouse : Playground.Mouse -> Mouse -> Mouse
 updateMouse { x, y, down, click } prev =
-    { prev
-        | x = x
-        , y = y
-        , dx = x - prev.x
-        , dy = y - prev.y
-        , onDown = down && not prev.down
-        , onUp = not down && prev.down
-        , down = down
-        , click = click
-        , onClick = click && not prev.down
+    let
+        ( dx, dy ) =
+            ( x - prev.x, y - prev.y )
+
+        onDown =
+            down && not prev.down
+
+        lastDownAt =
+            if onDown then
+                ( x, y )
+
+            else
+                prev.lastDownAt
+
+        onClick =
+            if click then
+                NT.equalWithin 2 ( x, y ) prev.lastDownAt
+
+            else
+                False
+    in
+    { x = x
+    , y = y
+    , dx = dx
+    , dy = dy
+    , onDown = onDown
+    , lastDownAt = lastDownAt
+    , onUp = not down && prev.down
+    , down = down
+    , click = click
+    , onClick = onClick
     }
 
 

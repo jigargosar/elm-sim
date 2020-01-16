@@ -1,5 +1,6 @@
 module NumberTuple exposing (..)
 
+import Float.Extra
 import PointFree exposing (apply2, mapEach, mapEach2, mulBy)
 
 
@@ -24,6 +25,11 @@ add =
 sub : ( number, number ) -> ( number, number ) -> ( number, number )
 sub =
     mapEach2 (-)
+
+
+equalWithin : Basics.Float -> Float -> Float -> Bool
+equalWithin tol ( x1, y1 ) ( x2, y2 ) =
+    Float.Extra.equalWithin tol x1 x2 && Float.Extra.equalWithin tol y1 y2
 
 
 mul : ( number, number ) -> ( number, number ) -> ( number, number )

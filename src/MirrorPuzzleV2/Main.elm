@@ -135,8 +135,8 @@ gridToLightPaths grid =
 -- Puzzle Grid View
 
 
-renderPath : CellTransform -> List Pos -> Shape
-renderPath ct =
+viewPath : CellTransform -> List Pos -> Shape
+viewPath ct =
     List.map (CT.fromPos ct)
         >> (\path -> List.map2 (line red 5) path (List.drop 1 path))
         >> group
@@ -166,7 +166,7 @@ viewPuzzleGrid { time, screen } grid =
         renderLightPaths =
             grid
                 |> gridToLightPaths
-                |> List.map (renderPath ct)
+                |> List.map (viewPath ct)
                 |> group
 
         renderGridCells =

@@ -396,6 +396,8 @@ init =
 type alias Mouse =
     { x : Number
     , y : Number
+    , dx : Number
+    , dy : Number
     , onDown : Bool
     , onUp : Bool
     , onClick : Bool
@@ -408,6 +410,8 @@ initialMouse : Mouse
 initialMouse =
     { x = 0
     , y = 0
+    , dx = 0
+    , dy = 0
     , onDown = False
     , onUp = False
     , down = False
@@ -417,15 +421,17 @@ initialMouse =
 
 
 updateMouse : Playground.Mouse -> Mouse -> Mouse
-updateMouse { x, y, down, click } mouse =
-    { mouse
+updateMouse { x, y, down, click } prev =
+    { prev
         | x = x
         , y = y
-        , onDown = False
-        , onUp = False
+        , dx = x - prev.x
+        , dy = y - prev.y
+        , onDown = down && not prev.down
+        , onUp = not down && prev.down
         , down = down
         , click = click
-        , onClick = False
+        , onClick = click && not prev.click
     }
 
 

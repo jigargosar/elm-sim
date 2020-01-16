@@ -4,11 +4,10 @@ import List.Extra
 import MirrorPuzzleV2.Box as Box exposing (Box)
 import Number2 as NT exposing (Float2, Int2)
 import Playground exposing (..)
-import Playground.CellTransform as CT exposing (CellTransform)
 import Playground.Direction8 as Dir exposing (Direction8)
 import Playground.Extra exposing (..)
 import Playground.Grid as Grid exposing (Pos)
-import PointFree exposing (whenTrue)
+import PointFree exposing (toFloat2, whenTrue)
 import Set exposing (Set)
 
 
@@ -135,29 +134,45 @@ gridToLightPaths grid =
 -- Puzzle Grid View
 
 
-viewPath : CellTransform -> List Pos -> Shape
+viewPath : CellT -> List Pos -> Shape
 viewPath ct =
-    List.map (CT.fromPos ct)
+    List.map ct.toView
         >> (\path -> List.map2 (line red 5) path (List.drop 1 path))
         >> group
 
 
-initCellTransform : Screen -> PuzzleGrid -> CellTransform
-initCellTransform screen grid =
+type alias CellT =
+    { toView : Int2 -> Float2
+    , fromView : Float2 -> Int2
+    , cellSize : Float
+    }
+
+
+initCellT : Float2 -> Int2 -> CellT
+initCellT viewD gridD =
     let
-        gd =
-            Grid.dimensions grid |> NT.toFloat
-
-        viewport =
-            ( screen.width, screen.height ) |> NT.scale 0.8
-
-        cz =
-            viewport |> NT.divBy gd |> NT.apply min
+        cellSize =
+            viewD |> NT.divBy (toFloat2 gridD) |> NT.apply min
 
         cellD =
-            ( cz, cz )
+            ( cellSize, cellSize )
+
+        cellT =
+            gridD |> NT.toFloat |> NT.mul cellD |> NT.sub cellD |> NT.scale 0.5
     in
-    CT.init cellD grid
+    { cellSize = cellSize
+    , toView = NT.toFloat >> NT.mul cellD >> NT.add cellT
+    , fromView = NT.subBy cellT >> NT.divBy cellD >> NT.round
+    }
+
+
+initCellTransform : Screen -> PuzzleGrid -> CellT
+initCellTransform screen grid =
+    let
+        viewD =
+            ( screen.width, screen.height ) |> NT.scale 0.8
+    in
+    initCellT viewD (Grid.dimensions grid)
 
 
 viewPuzzleGrid : Computer -> PuzzleGrid -> Shape
@@ -175,7 +190,7 @@ viewPuzzleGrid { time, screen } grid =
         gridCellsShape =
             grid
                 |> gridToCellViewList ct
-                |> List.map (viewCell time ct)
+                |> List.map (viewCell time ct.cellSize)
                 |> group
     in
     group [ gridCellsShape, lightPathsShape ]
@@ -206,7 +221,7 @@ cellFormToShape time cz form =
                 |> whenTrue lit (blink time)
 
 
-gridToCellViewList : CellTransform -> PuzzleGrid -> List ( Float2, List CellForm )
+gridToCellViewList : CellT -> PuzzleGrid -> List ( Float2, List CellForm )
 gridToCellViewList ct grid =
     let
         litDest =
@@ -229,21 +244,15 @@ gridToCellViewList ct grid =
                 Empty ->
                     []
 
-        toViewPos =
-            CT.fromPos ct
-
         toCellView ( pos, cell ) =
-            ( toViewPos pos, cellToForm pos cell )
+            ( ct.toView pos, cellToForm pos cell )
     in
     grid |> Grid.toList |> List.map toCellView
 
 
-viewCell : Time -> CellTransform -> ( Float2, List CellForm ) -> Shape
-viewCell time ct ( pos, cellForms ) =
+viewCell : Time -> Float -> ( Float2, List CellForm ) -> Shape
+viewCell time width ( pos, cellForms ) =
     let
-        width =
-            CT.width ct
-
         bg =
             group
                 [ rectangle black width width |> scale 0.95
@@ -440,7 +449,7 @@ updatePuzzleScene { screen, mouse } model =
             initCellTransform screen grid
 
         pos =
-            CT.xyToPos ct mouse
+            ct.fromView ( mouse.x, mouse.y )
     in
     case Grid.get pos grid of
         Just cell ->

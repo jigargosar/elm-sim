@@ -1,13 +1,13 @@
-module NumberTuple exposing (..)
+module Number2 exposing (..)
 
-import PointFree exposing (apply2, mapEach, mapEach2, mulBy)
+import PointFree exposing (mapEach, mapEach2, mulBy)
 
 
-type alias Int =
+type alias Int2 =
     ( Basics.Int, Basics.Int )
 
 
-type alias Float =
+type alias Float2 =
     ( Basics.Float, Basics.Float )
 
 
@@ -31,17 +31,17 @@ mul =
     mapEach2 (*)
 
 
-div : Float -> Float -> Float
+div : Float2 -> Float2 -> Float2
 div =
     mapEach2 (/)
 
 
-toFloat : Int -> Float
+toFloat : Int2 -> Float2
 toFloat =
     mapEach Basics.toFloat
 
 
-round : Float -> Int
+round : Float2 -> Int2
 round =
     mapEach Basics.round
 

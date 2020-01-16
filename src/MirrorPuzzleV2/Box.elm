@@ -12,11 +12,11 @@ module MirrorPuzzleV2.Box exposing
     , withWH
     )
 
-import NumberTuple as NT
+import Number2 as NT
 
 
 type Box
-    = Box NT.Float NT.Float
+    = Box NT.Float2 NT.Float2
 
 
 withWH : Float -> Float -> Box
@@ -24,7 +24,7 @@ withWH w h =
     Box ( 0, 0 ) ( w, h )
 
 
-move : NT.Float -> Box -> Box
+move : NT.Float2 -> Box -> Box
 move by (Box pos dim) =
     Box (NT.add pos by) dim
 
@@ -49,7 +49,7 @@ moveY dy =
     move ( 0, dy )
 
 
-center : Box -> NT.Float
+center : Box -> NT.Float2
 center (Box pos _) =
     pos
 
@@ -59,7 +59,7 @@ dimensions (Box _ dim) =
     dim
 
 
-contains : NT.Float -> Box -> Bool
+contains : NT.Float2 -> Box -> Bool
 contains ( x, y ) (Box pos dim) =
     let
         halfDim =

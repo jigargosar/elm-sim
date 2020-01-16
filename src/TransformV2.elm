@@ -15,7 +15,7 @@ module TransformV2 exposing
     , translate
     )
 
-import NumberTuple as NT
+import Number2 as NT
 import PointFree exposing (flip)
 
 
@@ -24,8 +24,8 @@ type Transform
 
 
 type Type
-    = Scale NT.Float
-    | Translate NT.Float
+    = Scale NT.Float2
+    | Translate NT.Float2
 
 
 compose : Type -> Transform -> Transform
@@ -53,7 +53,7 @@ identity =
     Transform []
 
 
-scale2 : NT.Float -> Transform -> Transform
+scale2 : NT.Float2 -> Transform -> Transform
 scale2 =
     Scale >> compose
 
@@ -63,12 +63,12 @@ scale s =
     scale2 ( s, s )
 
 
-translate : NT.Float -> Transform -> Transform
+translate : NT.Float2 -> Transform -> Transform
 translate =
     Translate >> compose
 
 
-transform : Transform -> NT.Float -> NT.Float
+transform : Transform -> NT.Float2 -> NT.Float2
 transform (Transform list) point =
     List.foldr
         (\t ->
@@ -83,7 +83,7 @@ transform (Transform list) point =
         list
 
 
-inverse : Transform -> NT.Float -> NT.Float
+inverse : Transform -> NT.Float2 -> NT.Float2
 inverse (Transform list) point =
     List.foldl
         (\t ->
@@ -98,17 +98,17 @@ inverse (Transform list) point =
         list
 
 
-inverseRound : Transform -> NT.Float -> NT.Int
+inverseRound : Transform -> NT.Float2 -> NT.Int2
 inverseRound t =
     inverse t >> NT.round
 
 
-transformI : Transform -> NT.Int -> NT.Float
+transformI : Transform -> NT.Int2 -> NT.Float2
 transformI t =
     NT.toFloat >> transform t
 
 
-move : NT.Float -> Transform -> Transform
+move : NT.Float2 -> Transform -> Transform
 move =
     translate
 

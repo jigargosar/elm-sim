@@ -2,6 +2,7 @@ module MirrorPuzzleV2.Main exposing (main)
 
 import List.Extra
 import MirrorPuzzleV2.Box as Box exposing (Box)
+import Number2 as NT exposing (Float2, Int2)
 import Playground exposing (..)
 import Playground.CellTransform as CT exposing (CellTransform)
 import Playground.Direction8 as Dir exposing (Direction8)
@@ -218,37 +219,84 @@ viewGrid { time, screen } grid =
         ]
 
 
-renderCells : Time -> CellTransform -> Grid -> Shape
-renderCells time ct grid =
+type CellForm
+    = SRC
+    | MIR Direction8
+    | DEST Bool
+
+
+cellFormToShape : Time -> Number -> CellForm -> Shape
+cellFormToShape time cz form =
+    case form of
+        SRC ->
+            rectangle orange cz cz
+
+        MIR dir ->
+            group
+                [ group [ oval green (cz / 2) cz |> moveLeft (cz / 6) ]
+                    |> rotate (Dir.toDegrees dir)
+                , circle lightPurple 10
+                ]
+                |> scale 0.9
+
+        DEST lit ->
+            circle blue (cz / 2)
+                |> whenTrue lit (blink time)
+
+
+toCellFormGrid : Grid -> Grid.Grid (List CellForm)
+toCellFormGrid grid =
     let
         litDest =
             listDestinations grid
 
-        blinkIfLitDest pos =
-            whenTrue (Set.member pos litDest) (blink time)
+        cellToForm pos cell =
+            case cell of
+                Source ->
+                    [ SRC ]
 
-        cz =
+                Destination ->
+                    [ DEST (Set.member pos litDest) ]
+
+                SourceWithMirror dir ->
+                    [ SRC, MIR dir ]
+
+                Mirror dir ->
+                    [ MIR dir ]
+
+                Empty ->
+                    []
+
+        cellToFormWithBG pos cell =
+            cellToForm pos cell
+    in
+    Grid.map cellToFormWithBG grid
+
+
+renderCells : Time -> CellTransform -> Grid -> Shape
+renderCells time ct grid =
+    let
+        width =
             CT.width ct
 
-        toCellShapeHelp pos cell =
-            case cell of
-                Empty ->
-                    toBgShape cz
+        bgShape =
+            group
+                [ rectangle black width width |> scale 0.95
+                , rectangle white width width |> scale 0.9
+                ]
 
-                _ ->
-                    [ toBgShape cz
-                    , toCellShape cz cell
-                        |> blinkIfLitDest pos
-                        |> scale 0.85
-                    ]
-                        |> group
+        moveCell =
+            CT.fromPos ct >> move2
 
-        renderCell pos cell =
-            toCellShapeHelp pos cell |> move2 (CT.fromPos ct pos)
+        renderCellForms ( pos, forms ) =
+            List.map (cellFormToShape time width >> scale 0.8) forms
+                |> (::) bgShape
+                |> group
+                |> moveCell pos
     in
-    grid
-        |> Grid.map renderCell
-        |> Grid.values
+    toCellFormGrid grid
+        |> Grid.toList
+        |> List.map renderCellForms
         |> group
 
 

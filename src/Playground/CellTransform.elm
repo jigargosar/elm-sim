@@ -42,7 +42,6 @@ init cellD grid =
         { cellD = cellD
         , cellT = Grid.dimensions grid |> NT.toFloat |> NT.mul cellD |> NT.sub cellD |> NT.scale 0.5
         }
-        |> Debug.log "ct"
 
 
 width : CellTransform -> Float

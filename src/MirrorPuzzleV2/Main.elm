@@ -459,6 +459,9 @@ viewPuzzle computer { grid } =
             computer
     in
     [ viewGrid computer grid
+    , words black "puzzle solved"
+        |> moveY screen.top
+        |> moveDown 50
     , renderButton mouse "Back" (initBackButtonBox screen)
     ]
 

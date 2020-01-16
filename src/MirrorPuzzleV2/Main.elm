@@ -224,8 +224,7 @@ toCellViewList grid =
                 Empty ->
                     []
     in
-    Grid.map cellToForm grid
-        |> Grid.toList
+    Grid.map cellToForm grid |> Grid.toList
 
 
 type alias CellConfig =

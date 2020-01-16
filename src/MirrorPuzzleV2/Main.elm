@@ -167,11 +167,15 @@ viewPuzzleGrid { time, screen } grid =
             gridToLightPaths grid
                 |> List.map (renderPath ct)
                 |> group
+
+        renderGridCells =
+            grid
+                |> toCellViewList ct
+                |> List.map (viewCell time ct)
+                |> group
     in
     group
-        [ toCellViewList ct grid
-            |> List.map (viewCell time (CT.width ct))
-            |> group
+        [ renderGridCells
         , renderLightPaths
         ]
 
@@ -240,9 +244,12 @@ type alias CellConfig =
     }
 
 
-viewCell : Time -> Float -> ( Float2, List CellForm ) -> Shape
-viewCell time width ( pos, cellForms ) =
+viewCell : Time -> CellTransform -> ( Float2, List CellForm ) -> Shape
+viewCell time ct ( pos, cellForms ) =
     let
+        width =
+            CT.width ct
+
         bg =
             group
                 [ rectangle black width width |> scale 0.95

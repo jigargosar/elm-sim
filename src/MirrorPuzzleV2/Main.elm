@@ -169,9 +169,8 @@ viewPuzzleGrid { time, screen } grid =
                 |> group
     in
     group
-        [ toCellViewGrid grid
-            |> Grid.toList
-            |> List.map (renderCell (toCellConfig time ct))
+        [ toCellViewList grid
+            |> List.map (viewCell (toCellConfig time ct))
             |> group
         , renderLightPaths
         ]
@@ -202,8 +201,8 @@ cellFormToShape time cz form =
                 |> whenTrue lit (blink time)
 
 
-toCellViewGrid : PuzzleGrid -> Grid.Grid (List CellForm)
-toCellViewGrid grid =
+toCellViewList : PuzzleGrid -> List ( Pos, List CellForm )
+toCellViewList grid =
     let
         litDest =
             listDestinations grid
@@ -226,6 +225,7 @@ toCellViewGrid grid =
                     []
     in
     Grid.map cellToForm grid
+        |> Grid.toList
 
 
 type alias CellConfig =
@@ -257,8 +257,8 @@ toCellConfig time ct =
     }
 
 
-renderCell : CellConfig -> ( Int2, List CellForm ) -> Shape
-renderCell { time, width, bg, toViewPos } ( pos, cellForms ) =
+viewCell : CellConfig -> ( Int2, List CellForm ) -> Shape
+viewCell { time, width, bg, toViewPos } ( pos, cellForms ) =
     List.map (cellFormToShape time width >> scale 0.8) cellForms
         |> (::) bg
         |> group

@@ -12,7 +12,7 @@ import Set exposing (Set)
 
 
 
--- Puzzle Data Model
+-- Puzzle Grid Model
 
 
 type Cell
@@ -39,6 +39,10 @@ sourceWithMirror =
 
 initialGrid : Grid
 initialGrid =
+    let
+        insert =
+            Grid.insert
+    in
     Grid.filled 5 5 Empty
         |> insert ( 1, 2 ) (sourceWithMirror 1)
         |> insert ( 2, 3 ) (mirror 7)
@@ -49,24 +53,19 @@ initialGrid =
         |> insert ( 1, 1 ) Source
 
 
-insert : ( Int, Int ) -> Cell -> Grid -> Grid
-insert =
-    Grid.insert
-
-
-allDestinationPos : Grid -> Set Pos
-allDestinationPos =
+destinationSet : Grid -> Set Pos
+destinationSet =
     Grid.foldl (\pos cell -> whenTrue (cell == Destination) (Set.insert pos))
         Set.empty
 
 
 isSolved : Grid -> Bool
 isSolved grid =
-    allDestinationPos grid == computeLitDestinationPosSet grid
+    destinationSet grid == listDestinations grid
 
 
-computeLitDestinationPosSet : Grid -> Set Pos
-computeLitDestinationPosSet grid =
+listDestinations : Grid -> Set Pos
+listDestinations grid =
     gridToLightPaths grid
         |> List.filterMap List.head
         |> List.foldl
@@ -223,7 +222,7 @@ renderCells : Time -> CellTransform -> Grid -> Shape
 renderCells time ct grid =
     let
         litDest =
-            computeLitDestinationPosSet grid
+            listDestinations grid
 
         blinkIfLitDest pos =
             whenTrue (Set.member pos litDest) (blink time)
@@ -365,7 +364,7 @@ viewLevelSelect mouse lbs =
 type Scene
     = Intro
     | LevelSelect Int
-    | PuzzleScreen Puzzle
+    | PuzzleScene Puzzle
 
 
 type alias Puzzle =
@@ -380,8 +379,8 @@ type alias Mem =
     { scene : Scene }
 
 
-initialPuzzle =
-    PuzzleScreen { grid = initialGrid }
+initialPuzzleScene =
+    PuzzleScene { grid = initialGrid }
 
 
 initialLevelSelect =
@@ -390,11 +389,11 @@ initialLevelSelect =
 
 init : Mem
 init =
-    { scene = initialPuzzle }
+    { scene = initialPuzzleScene }
 
 
-update : Computer -> Mem -> Mem
-update computer mem =
+updateMem : Computer -> Mem -> Mem
+updateMem computer mem =
     let
         { mouse, screen } =
             computer
@@ -414,25 +413,25 @@ update computer mem =
             in
             case ( mouse.click, levelButtonIdxFromMouse mouse lbs ) of
                 ( True, Just _ ) ->
-                    { mem | scene = initialPuzzle }
+                    { mem | scene = initialPuzzleScene }
 
                 _ ->
                     mem
 
-        PuzzleScreen puzzle ->
+        PuzzleScene puzzle ->
             if mouse.click then
                 if Box.containsXY mouse (initBackButtonBox screen) then
                     { mem | scene = initialLevelSelect }
 
                 else
-                    { mem | scene = PuzzleScreen (updatePuzzle computer puzzle) }
+                    { mem | scene = PuzzleScene (updatePuzzleScene computer puzzle) }
 
             else
                 mem
 
 
-updatePuzzle : Computer -> Puzzle -> Puzzle
-updatePuzzle { screen, mouse } model =
+updatePuzzleScene : Computer -> Puzzle -> Puzzle
+updatePuzzleScene { screen, mouse } model =
     let
         grid =
             model.grid
@@ -492,7 +491,7 @@ initBackButtonBox screen =
 view : Computer -> Mem -> List Shape
 view computer mem =
     case mem.scene of
-        PuzzleScreen puzzle ->
+        PuzzleScene puzzle ->
             viewPuzzle computer puzzle
 
         Intro ->
@@ -507,4 +506,4 @@ view computer mem =
 
 
 main =
-    game view update init
+    game view updateMem init

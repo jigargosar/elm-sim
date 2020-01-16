@@ -2,7 +2,6 @@ module MirrorPuzzleV2.Main exposing (main)
 
 import List.Extra
 import MirrorPuzzleV2.Box as Box exposing (Box)
-import NumberTuple as NT
 import Playground exposing (..)
 import Playground.CellTransform as CT exposing (CellTransform)
 import Playground.Direction8 as Dir exposing (Direction8)
@@ -394,124 +393,15 @@ init =
     { scene = initialPuzzle }
 
 
-type alias Mouse =
-    { x : Number
-    , y : Number
-    , dx : Number
-    , dy : Number
-    , downAt : NT.Float
-    , onDown : Bool
-    , onUp : Bool
-    , onClick : Bool
-    , down : Bool
-    , click : Bool
-    }
-
-
-initialMouse : Mouse
-initialMouse =
-    { x = 0
-    , y = 0
-    , dx = 0
-    , dy = 0
-    , onDown = False
-    , downAt = ( 0, 0 )
-    , onUp = False
-    , down = False
-    , click = False
-    , onClick = False
-    }
-
-
-updateMouse : Playground.Mouse -> Mouse -> Mouse
-updateMouse { x, y, down, click } prev =
-    let
-        ( dx, dy ) =
-            ( x - prev.x, y - prev.y )
-
-        onDown =
-            down && not prev.down
-    in
-    { x = x
-    , y = y
-    , dx = dx
-    , dy = dy
-    , onDown = onDown
-    , downAt =
-        if onDown then
-            ( x, y )
-
-        else
-            prev.downAt
-    , onUp = not down && prev.down
-    , down = down
-    , click = click
-    , onClick =
-        if click then
-            NT.equalWithin 2 ( x, y ) prev.downAt
-
-        else
-            False
-    }
-
-
-type alias Computer =
-    { mouse : Mouse
-    , keyboard : Keyboard
-    , screen : Screen
-    , time : Time
-    }
-
-
-type EnhancedMem
-    = EnhancedMem Mouse Mem
-
-
-enhancedInit =
-    EnhancedMem initialMouse init
-
-
-enhancedUpdate : Playground.Computer -> EnhancedMem -> EnhancedMem
-enhancedUpdate { mouse, keyboard, screen, time } (EnhancedMem eMouse mem) =
-    let
-        nextMouse =
-            updateMouse mouse eMouse
-
-        nextComp =
-            { mouse = nextMouse
-            , keyboard = keyboard
-            , screen = screen
-            , time = time
-            }
-    in
-    update nextComp mem |> EnhancedMem nextMouse
-
-
-enhancedView : Playground.Computer -> EnhancedMem -> List Shape
-enhancedView { mouse, keyboard, screen, time } (EnhancedMem eMouse mem) =
-    let
-        computer =
-            { mouse = eMouse
-            , keyboard = keyboard
-            , screen = screen
-            , time = time
-            }
-    in
-    view computer mem
-
-
 update : Computer -> Mem -> Mem
 update computer mem =
     let
         { mouse, screen } =
             computer
-
-        onClick =
-            mouse.onClick
     in
     case mem.scene of
         Intro ->
-            if onClick then
+            if mouse.click then
                 { mem | scene = initialLevelSelect }
 
             else
@@ -522,7 +412,7 @@ update computer mem =
                 lbs =
                     initLevelButtons screen levelCount
             in
-            case ( onClick, levelButtonIdxFromMouse mouse lbs ) of
+            case ( mouse.click, levelButtonIdxFromMouse mouse lbs ) of
                 ( True, Just _ ) ->
                     { mem | scene = initialPuzzle }
 
@@ -530,7 +420,7 @@ update computer mem =
                     mem
 
         PuzzleScreen puzzle ->
-            if onClick then
+            if mouse.click then
                 if Box.containsXY mouse (initBackButtonBox screen) then
                     { mem | scene = initialLevelSelect }
 
@@ -617,4 +507,4 @@ view computer mem =
 
 
 main =
-    game enhancedView enhancedUpdate enhancedInit
+    game view update init

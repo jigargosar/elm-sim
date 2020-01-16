@@ -1,17 +1,17 @@
-module Playground.CellT exposing (..)
+module Playground.CellTransform exposing (..)
 
 import Number2 as NT exposing (Float2, Int2)
 import PointFree exposing (toFloat2)
 
 
-type alias CellT =
+type alias CellTransform =
     { toView : Int2 -> Float2
     , fromView : Float2 -> Int2
     , cellSize : Float
     }
 
 
-fromViewD : Float2 -> Int2 -> CellT
+fromViewD : Float2 -> Int2 -> CellTransform
 fromViewD viewD gridD =
     let
         cellSize =

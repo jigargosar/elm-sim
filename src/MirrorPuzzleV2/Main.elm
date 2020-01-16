@@ -4,7 +4,7 @@ import List.Extra
 import MirrorPuzzleV2.Box as Box exposing (Box)
 import Number2 as NT exposing (Float2, Int2)
 import Playground exposing (..)
-import Playground.CellT as CellT exposing (CellT)
+import Playground.CellTransform as CT exposing (CellTransform)
 import Playground.Direction8 as Dir exposing (Direction8)
 import Playground.Extra exposing (..)
 import Playground.Grid as Grid exposing (Pos)
@@ -135,20 +135,20 @@ gridToLightPaths grid =
 -- Puzzle Grid View
 
 
-viewPath : CellT -> List Pos -> Shape
+viewPath : CellTransform -> List Pos -> Shape
 viewPath ct =
     List.map ct.toView
         >> (\path -> List.map2 (line red 5) path (List.drop 1 path))
         >> group
 
 
-initCellT : Screen -> PuzzleGrid -> CellT
+initCellT : Screen -> PuzzleGrid -> CellTransform
 initCellT screen grid =
     let
         viewD =
             NT.scale 0.8 ( screen.width, screen.height )
     in
-    CellT.fromViewD viewD (Grid.dimensions grid)
+    CT.fromViewD viewD (Grid.dimensions grid)
 
 
 viewPuzzleGrid : Computer -> PuzzleGrid -> Shape
@@ -197,7 +197,7 @@ cellFormToShape time cz form =
                 |> whenTrue lit (blink time)
 
 
-gridToCellViewList : CellT -> PuzzleGrid -> List ( Float2, List CellForm )
+gridToCellViewList : CellTransform -> PuzzleGrid -> List ( Float2, List CellForm )
 gridToCellViewList ct grid =
     let
         litDest =

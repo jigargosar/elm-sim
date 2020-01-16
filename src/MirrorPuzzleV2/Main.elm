@@ -4,6 +4,7 @@ import List.Extra
 import MirrorPuzzleV2.Box as Box exposing (Box)
 import Number2 as NT exposing (Float2, Int2)
 import Playground exposing (..)
+import Playground.CellT as CellT exposing (CellT)
 import Playground.Direction8 as Dir exposing (Direction8)
 import Playground.Extra exposing (..)
 import Playground.Grid as Grid exposing (Pos)
@@ -141,38 +142,13 @@ viewPath ct =
         >> group
 
 
-type alias CellT =
-    { toView : Int2 -> Float2
-    , fromView : Float2 -> Int2
-    , cellSize : Float
-    }
-
-
-cellTFromViewD : Float2 -> Int2 -> CellT
-cellTFromViewD viewD gridD =
-    let
-        cellSize =
-            viewD |> NT.divBy (toFloat2 gridD) |> NT.apply min
-
-        cellD =
-            ( cellSize, cellSize )
-
-        dxy =
-            gridD |> NT.toFloat |> NT.mul cellD |> NT.sub cellD |> NT.scale 0.5
-    in
-    { cellSize = cellSize
-    , toView = NT.toFloat >> NT.mul cellD >> NT.add dxy
-    , fromView = NT.subBy dxy >> NT.divBy cellD >> NT.round
-    }
-
-
 initCellT : Screen -> PuzzleGrid -> CellT
 initCellT screen grid =
     let
         viewD =
             NT.scale 0.8 ( screen.width, screen.height )
     in
-    cellTFromViewD viewD (Grid.dimensions grid)
+    CellT.fromViewD viewD (Grid.dimensions grid)
 
 
 viewPuzzleGrid : Computer -> PuzzleGrid -> Shape

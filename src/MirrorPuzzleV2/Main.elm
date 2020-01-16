@@ -164,13 +164,14 @@ viewPuzzleGrid { time, screen } grid =
             initCellTransform screen grid
 
         renderLightPaths =
-            gridToLightPaths grid
+            grid
+                |> gridToLightPaths
                 |> List.map (renderPath ct)
                 |> group
 
         renderGridCells =
             grid
-                |> toCellViewList ct
+                |> gridToCellViewList ct
                 |> List.map (viewCell time ct)
                 |> group
     in
@@ -205,8 +206,8 @@ cellFormToShape time cz form =
                 |> whenTrue lit (blink time)
 
 
-toCellViewList : CellTransform -> PuzzleGrid -> List ( Float2, List CellForm )
-toCellViewList ct grid =
+gridToCellViewList : CellTransform -> PuzzleGrid -> List ( Float2, List CellForm )
+gridToCellViewList ct grid =
     let
         litDest =
             listDestinations grid

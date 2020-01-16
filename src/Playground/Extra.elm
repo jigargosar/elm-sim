@@ -1,4 +1,4 @@
-module Playground.Extra exposing (blink, inDegrees, line, noShape)
+module Playground.Extra exposing (blink, inDegrees, line, move2, noShape)
 
 import Playground exposing (..)
 
@@ -32,3 +32,8 @@ inDegrees angle =
 blink : Time -> Shape -> Shape
 blink time =
     fade (zigzag 0.5 1 1 time)
+
+
+move2 : ( Number, Number ) -> Shape -> Shape
+move2 ( x, y ) =
+    move x y

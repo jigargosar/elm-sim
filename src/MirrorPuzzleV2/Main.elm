@@ -2,7 +2,7 @@ module MirrorPuzzleV2.Main exposing (main)
 
 import List.Extra
 import MirrorPuzzleV2.Box as Box exposing (Box)
-import Number2 as NT exposing (Float2, Int2)
+import Number2 exposing (Float2, Int2)
 import Playground exposing (..)
 import Playground.CellTransform as CT exposing (CellTransform)
 import Playground.Direction8 as Dir exposing (Direction8)
@@ -135,51 +135,6 @@ gridToLightPaths grid =
 -- Puzzle Grid View
 
 
-toBgShape : Number -> Shape
-toBgShape cz =
-    group
-        [ rectangle black cz cz |> scale 0.95
-        , rectangle white cz cz |> scale 0.9
-        ]
-
-
-sourceShape : Number -> Shape
-sourceShape cz =
-    rectangle orange cz cz
-
-
-mirrorShape : Number -> Direction8 -> Shape
-mirrorShape cz dir =
-    group
-        [ group [ oval green (cz / 2) cz |> moveLeft (cz / 6) ]
-            |> rotate (Dir.toDegrees dir)
-        , circle lightPurple 10
-        ]
-        |> scale 0.9
-
-
-toCellShape : Number -> Cell -> Shape
-toCellShape cz cell =
-    case cell of
-        Source ->
-            sourceShape cz
-
-        Mirror dir ->
-            mirrorShape cz dir
-
-        SourceWithMirror dir ->
-            group
-                [ sourceShape cz
-                , mirrorShape cz dir
-                ]
-
-        Destination ->
-            circle blue (cz / 2)
-
-        Empty ->
-            noShape
-
-
 renderPath : CellTransform -> List Pos -> Shape
 renderPath ct =
     List.map (CT.fromPos ct)
@@ -273,6 +228,33 @@ toCellFormGrid grid =
     Grid.map cellToFormWithBG grid
 
 
+type alias CellConfig =
+    { bg : Shape
+    , width : Float
+    , scale : Float
+    , toViewPos : Int2 -> Float2
+    }
+
+
+toCellConfig : CellTransform -> CellConfig
+toCellConfig ct =
+    let
+        width =
+            CT.width ct
+
+        bgShape =
+            group
+                [ rectangle black width width |> scale 0.95
+                , rectangle white width width |> scale 0.9
+                ]
+    in
+    { bg = bgShape
+    , width = width
+    , scale = 0.8
+    , toViewPos = CT.fromPos ct
+    }
+
+
 renderCells : Time -> CellTransform -> Grid -> Shape
 renderCells time ct grid =
     let
@@ -298,10 +280,6 @@ renderCells time ct grid =
         |> Grid.toList
         |> List.map renderCellForms
         |> group
-
-
-move2 ( x, y ) =
-    move x y
 
 
 

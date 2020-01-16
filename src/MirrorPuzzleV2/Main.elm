@@ -157,8 +157,8 @@ initCellTransform screen grid =
     CT.init cellD grid
 
 
-viewGrid : Computer -> Grid -> Shape
-viewGrid { time, screen } grid =
+viewPuzzleGrid : Computer -> Grid -> Shape
+viewPuzzleGrid { time, screen } grid =
     let
         ct =
             initCellTransform screen grid
@@ -477,7 +477,7 @@ viewPuzzleScene computer { grid } =
         { mouse, time, screen } =
             computer
     in
-    [ viewGrid computer grid
+    [ viewPuzzleGrid computer grid
     , if isSolved grid then
         words black "puzzle solved"
             |> moveY screen.top

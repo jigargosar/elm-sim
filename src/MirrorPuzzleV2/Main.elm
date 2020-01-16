@@ -393,9 +393,85 @@ init =
     { scene = initialPuzzle }
 
 
-updateWrapper : Playground.Computer -> Mem -> Mem
-updateWrapper computer mem =
-    update computer mem
+type alias Mouse =
+    { x : Number
+    , y : Number
+    , onDown : Bool
+    , onUp : Bool
+    , onClick : Bool
+    , down : Bool
+    , click : Bool
+    }
+
+
+initialMouse : Mouse
+initialMouse =
+    { x = 0
+    , y = 0
+    , onDown = False
+    , onUp = False
+    , down = False
+    , click = False
+    , onClick = False
+    }
+
+
+updateMouse : Playground.Mouse -> Mouse -> Mouse
+updateMouse { x, y, down, click } mouse =
+    { mouse
+        | x = x
+        , y = y
+        , onDown = False
+        , onUp = False
+        , down = down
+        , click = click
+        , onClick = False
+    }
+
+
+type alias Computer =
+    { mouse : Mouse
+    , keyboard : Keyboard
+    , screen : Screen
+    , time : Time
+    }
+
+
+type EnhancedMem
+    = EnhancedMem Mouse Mem
+
+
+enhancedInit =
+    EnhancedMem initialMouse init
+
+
+enhancedUpdate : Playground.Computer -> EnhancedMem -> EnhancedMem
+enhancedUpdate { mouse, keyboard, screen, time } (EnhancedMem eMouse mem) =
+    let
+        nextMouse =
+            updateMouse mouse eMouse
+
+        nextComp =
+            { mouse = nextMouse
+            , keyboard = keyboard
+            , screen = screen
+            , time = time
+            }
+    in
+    update nextComp mem |> EnhancedMem nextMouse
+
+
+enhancedView : Playground.Computer -> EnhancedMem -> List Shape
+enhancedView { mouse, keyboard, screen, time } (EnhancedMem eMouse mem) =
+    let
+        computer =
+            { mouse = eMouse
+            , keyboard = keyboard
+            , screen = screen
+            , time = time
+            }
+    in
+    view computer mem
 
 
 update : Computer -> Mem -> Mem
@@ -512,4 +588,4 @@ view computer mem =
 
 
 main =
-    game view updateWrapper init
+    game enhancedView enhancedUpdate enhancedInit

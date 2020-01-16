@@ -283,7 +283,7 @@ initLevelButtons screen count =
         List.range 0 (count - 1)
             |> List.map
                 (\n ->
-                    Box.fromWH width height
+                    Box.withWH width height
                         |> Box.moveY (toY n)
                 )
     }
@@ -465,7 +465,7 @@ viewPuzzle computer { grid } =
 
 initBackButtonBox : Screen -> Box
 initBackButtonBox screen =
-    Box.fromWH 100 30
+    Box.withWH 100 30
         |> Box.move ( screen.left, screen.top )
         |> Box.moveDown 50
         |> Box.moveRight 100

@@ -4,13 +4,12 @@ module MirrorPuzzleV2.Box exposing
     , contains
     , containsXY
     , dimensions
-    , fromWH
-    , fromXYWH
     , move
     , moveDown
     , moveRight
     , moveX
     , moveY
+    , withWH
     )
 
 import NumberTuple as NT
@@ -20,9 +19,9 @@ type Box
     = Box NT.Float NT.Float
 
 
-fromWH : Float -> Float -> Box
-fromWH w h =
-    fromXYWH 0 0 w h
+withWH : Float -> Float -> Box
+withWH w h =
+    Box ( 0, 0 ) ( w, h )
 
 
 move : NT.Float -> Box -> Box
@@ -48,11 +47,6 @@ moveRight =
 moveY : Float -> Box -> Box
 moveY dy =
     move ( 0, dy )
-
-
-fromXYWH : Float -> Float -> Float -> Float -> Box
-fromXYWH x y w h =
-    Box ( x, y ) ( w, h )
 
 
 center : Box -> NT.Float

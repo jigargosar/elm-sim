@@ -471,8 +471,8 @@ updatePuzzleScene { screen, mouse } model =
             model
 
 
-viewPuzzle : Computer -> Puzzle -> List Shape
-viewPuzzle computer { grid } =
+viewPuzzleScene : Computer -> Puzzle -> List Shape
+viewPuzzleScene computer { grid } =
     let
         { mouse, time, screen } =
             computer
@@ -501,7 +501,7 @@ view : Computer -> Mem -> List Shape
 view computer mem =
     case mem.scene of
         PuzzleScene puzzle ->
-            viewPuzzle computer puzzle
+            viewPuzzleScene computer puzzle
 
         Intro ->
             [ words black "Tap To Start" ]

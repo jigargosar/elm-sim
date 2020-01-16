@@ -24,7 +24,7 @@ type Cell
     | Empty
 
 
-type alias Grid =
+type alias PuzzleGrid =
     Grid.Grid Cell
 
 
@@ -38,7 +38,7 @@ sourceWithMirror =
     Dir.fromInt >> SourceWithMirror
 
 
-initialGrid : Grid
+initialGrid : PuzzleGrid
 initialGrid =
     let
         insert =
@@ -54,18 +54,18 @@ initialGrid =
         |> insert ( 1, 1 ) Source
 
 
-destinationSet : Grid -> Set Pos
+destinationSet : PuzzleGrid -> Set Pos
 destinationSet =
     Grid.foldl (\pos cell -> whenTrue (cell == Destination) (Set.insert pos))
         Set.empty
 
 
-isSolved : Grid -> Bool
+isSolved : PuzzleGrid -> Bool
 isSolved grid =
     destinationSet grid == listDestinations grid
 
 
-listDestinations : Grid -> Set Pos
+listDestinations : PuzzleGrid -> Set Pos
 listDestinations grid =
     gridToLightPaths grid
         |> List.filterMap List.head
@@ -84,7 +84,7 @@ type alias LightPath =
     List Pos
 
 
-gridToLightPaths : Grid -> List LightPath
+gridToLightPaths : PuzzleGrid -> List LightPath
 gridToLightPaths grid =
     let
         accumLightPos : Direction8 -> Pos -> List Pos -> List Pos
@@ -142,7 +142,7 @@ renderPath ct =
         >> group
 
 
-initCellTransform : Screen -> Grid -> CellTransform
+initCellTransform : Screen -> PuzzleGrid -> CellTransform
 initCellTransform screen grid =
     let
         ( gw, gh ) =
@@ -157,7 +157,7 @@ initCellTransform screen grid =
     CT.init cellD grid
 
 
-viewPuzzleGrid : Computer -> Grid -> Shape
+viewPuzzleGrid : Computer -> PuzzleGrid -> Shape
 viewPuzzleGrid { time, screen } grid =
     let
         ct =
@@ -202,7 +202,7 @@ cellFormToShape time cz form =
                 |> whenTrue lit (blink time)
 
 
-toCellViewGrid : Grid -> Grid.Grid (List CellForm)
+toCellViewGrid : PuzzleGrid -> Grid.Grid (List CellForm)
 toCellViewGrid grid =
     let
         litDest =
@@ -377,7 +377,7 @@ type Scene
 
 
 type alias Puzzle =
-    { grid : Grid }
+    { grid : PuzzleGrid }
 
 
 

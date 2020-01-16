@@ -21,6 +21,16 @@ add =
     mapEach2 (+)
 
 
+inc : number -> ( number, number ) -> ( number, number )
+inc offset =
+    mapEach ((+) offset)
+
+
+dec : number -> ( number, number ) -> ( number, number )
+dec offset =
+    inc -offset
+
+
 sub : ( number, number ) -> ( number, number ) -> ( number, number )
 sub =
     mapEach2 (-)

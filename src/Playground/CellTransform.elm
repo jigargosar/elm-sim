@@ -22,8 +22,8 @@ type CellTransform
 
 type alias Model =
     { cellD : NT.Float2
-    , gridD : NT.Float2
     , cellT : NT.Float2
+    , cellT2 : NT.Float2
     }
 
 
@@ -46,8 +46,9 @@ init cellD grid =
     CT
         { cellD = cellD
         , cellT = NT.sub cellD gridD |> NT.scale 0.5
-        , gridD = gridD
+        , cellT2 = Grid.dimensions grid |> NT.dec 1 |> NT.toFloat |> NT.scale 0.5 |> NT.mul cellD
         }
+        |> Debug.log "ct"
 
 
 width : CellTransform -> Float

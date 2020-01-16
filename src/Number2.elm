@@ -16,6 +16,11 @@ scale factor =
     mapEach (mulBy factor)
 
 
+apply : (a -> b -> c) -> ( a, b ) -> c
+apply func ( a, b ) =
+    func a b
+
+
 add : ( number, number ) -> ( number, number ) -> ( number, number )
 add =
     mapEach2 (+)

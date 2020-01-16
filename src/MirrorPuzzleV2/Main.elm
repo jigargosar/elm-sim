@@ -2,7 +2,7 @@ module MirrorPuzzleV2.Main exposing (main)
 
 import List.Extra
 import MirrorPuzzleV2.Box as Box exposing (Box)
-import Number2 exposing (Float2, Int2)
+import Number2 as NT exposing (Float2, Int2)
 import Playground exposing (..)
 import Playground.CellTransform as CT exposing (CellTransform)
 import Playground.Direction8 as Dir exposing (Direction8)
@@ -145,14 +145,17 @@ viewPath ct =
 initCellTransform : Screen -> PuzzleGrid -> CellTransform
 initCellTransform screen grid =
     let
-        ( gw, gh ) =
-            Grid.dimensions grid
+        gd =
+            Grid.dimensions grid |> NT.toFloat
 
-        cellSize =
-            min (screen.width * 0.8 / toFloat gw) (screen.height * 0.8 / toFloat gh)
+        viewport =
+            ( screen.width, screen.height ) |> NT.scale 0.8
+
+        cz =
+            viewport |> NT.divBy gd |> NT.apply min
 
         cellD =
-            ( cellSize, cellSize )
+            ( cz, cz )
     in
     CT.init cellD grid
 

@@ -169,7 +169,10 @@ viewGrid { time, screen } grid =
                 |> group
     in
     group
-        [ renderCells time ct grid
+        [ toCellViewGrid grid
+            |> Grid.toList
+            |> List.map (renderCell (toCellConfig time ct))
+            |> group
         , renderLightPaths
         ]
 
@@ -199,8 +202,8 @@ cellFormToShape time cz form =
                 |> whenTrue lit (blink time)
 
 
-toCellFormGrid : Grid -> Grid.Grid (List CellForm)
-toCellFormGrid grid =
+toCellViewGrid : Grid -> Grid.Grid (List CellForm)
+toCellViewGrid grid =
     let
         litDest =
             listDestinations grid
@@ -221,11 +224,8 @@ toCellFormGrid grid =
 
                 Empty ->
                     []
-
-        cellToFormWithBG pos cell =
-            cellToForm pos cell
     in
-    Grid.map cellToFormWithBG grid
+    Grid.map cellToForm grid
 
 
 type alias CellConfig =
@@ -233,11 +233,12 @@ type alias CellConfig =
     , width : Float
     , scale : Float
     , toViewPos : Int2 -> Float2
+    , time : Time
     }
 
 
-toCellConfig : CellTransform -> CellConfig
-toCellConfig ct =
+toCellConfig : Time -> CellTransform -> CellConfig
+toCellConfig time ct =
     let
         width =
             CT.width ct
@@ -252,34 +253,16 @@ toCellConfig ct =
     , width = width
     , scale = 0.8
     , toViewPos = CT.fromPos ct
+    , time = time
     }
 
 
-renderCells : Time -> CellTransform -> Grid -> Shape
-renderCells time ct grid =
-    let
-        width =
-            CT.width ct
-
-        bgShape =
-            group
-                [ rectangle black width width |> scale 0.95
-                , rectangle white width width |> scale 0.9
-                ]
-
-        moveCell =
-            CT.fromPos ct >> move2
-
-        renderCellForms ( pos, forms ) =
-            List.map (cellFormToShape time width >> scale 0.8) forms
-                |> (::) bgShape
-                |> group
-                |> moveCell pos
-    in
-    toCellFormGrid grid
-        |> Grid.toList
-        |> List.map renderCellForms
+renderCell : CellConfig -> ( Int2, List CellForm ) -> Shape
+renderCell { time, width, bg, toViewPos } ( pos, cellForms ) =
+    List.map (cellFormToShape time width >> scale 0.8) cellForms
+        |> (::) bg
         |> group
+        |> move2 (toViewPos pos)
 
 
 

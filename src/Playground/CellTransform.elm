@@ -9,11 +9,6 @@ module Playground.CellTransform exposing
 
 import Number2 as NT
 import Playground.Grid as Grid exposing (Grid, Pos)
-import PointFree exposing (flip)
-
-
-type alias Transform =
-    { scale : NT.Float2, translate : NT.Float2 }
 
 
 type CellTransform

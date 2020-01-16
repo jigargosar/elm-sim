@@ -163,22 +163,19 @@ viewPuzzleGrid { time, screen } grid =
         ct =
             initCellTransform screen grid
 
-        renderLightPaths =
+        lightPathsShape =
             grid
                 |> gridToLightPaths
                 |> List.map (viewPath ct)
                 |> group
 
-        renderGridCells =
+        gridCellsShape =
             grid
                 |> gridToCellViewList ct
                 |> List.map (viewCell time ct)
                 |> group
     in
-    group
-        [ renderGridCells
-        , renderLightPaths
-        ]
+    group [ gridCellsShape, lightPathsShape ]
 
 
 type CellForm
@@ -236,13 +233,6 @@ gridToCellViewList ct grid =
             ( toViewPos pos, cellToForm pos cell )
     in
     grid |> Grid.toList |> List.map toCellView
-
-
-type alias CellConfig =
-    { bg : Shape
-    , width : Float
-    , time : Time
-    }
 
 
 viewCell : Time -> CellTransform -> ( Float2, List CellForm ) -> Shape

@@ -431,7 +431,7 @@ updateMouse { x, y, down, click } prev =
         , onUp = not down && prev.down
         , down = down
         , click = click
-        , onClick = click && not prev.click
+        , onClick = click && not prev.down
     }
 
 
@@ -485,10 +485,13 @@ update computer mem =
     let
         { mouse, screen } =
             computer
+
+        onClick =
+            mouse.onClick
     in
     case mem.scene of
         Intro ->
-            if mouse.click then
+            if onClick then
                 { mem | scene = initialLevelSelect }
 
             else
@@ -499,7 +502,7 @@ update computer mem =
                 lbs =
                     initLevelButtons screen levelCount
             in
-            case ( mouse.click, levelButtonIdxFromMouse mouse lbs ) of
+            case ( onClick, levelButtonIdxFromMouse mouse lbs ) of
                 ( True, Just _ ) ->
                     { mem | scene = initialPuzzle }
 
@@ -507,7 +510,7 @@ update computer mem =
                     mem
 
         PuzzleScreen puzzle ->
-            if mouse.click then
+            if onClick then
                 if Box.containsXY mouse (initBackButtonBox screen) then
                     { mem | scene = initialLevelSelect }
 

@@ -1,4 +1,11 @@
-module MirrorPuzzleV2.PuzzleGrid exposing (..)
+module MirrorPuzzleV2.PuzzleGrid exposing
+    ( PuzzleGrid
+    , initCellT
+    , initialGrid
+    , isSolved
+    , updatePuzzleGrid
+    , viewPuzzleGrid
+    )
 
 import Number2 as NT exposing (Int2)
 import Playground exposing (..)

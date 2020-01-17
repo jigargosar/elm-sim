@@ -20,19 +20,6 @@ initialPuzzleScene =
     PuzzleScene { grid = PuzzleGrid.initialGrid }
 
 
-
--- Scenes: Puzzle Update
-
-
-updatePuzzleScene : Computer -> PuzzleSceneModel -> PuzzleSceneModel
-updatePuzzleScene computer model =
-    { model | grid = PuzzleGrid.updatePuzzleGrid computer model.grid }
-
-
-
--- Scenes: Puzzle View
-
-
 viewPuzzleScene : Computer -> PuzzleSceneModel -> List Shape
 viewPuzzleScene computer { grid } =
     let

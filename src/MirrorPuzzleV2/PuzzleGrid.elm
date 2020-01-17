@@ -10,13 +10,13 @@ module MirrorPuzzleV2.PuzzleGrid exposing
     )
 
 import List.Extra
-import Number2 as NT exposing (Int2)
+import Number2 as NT exposing (Float2, Int2)
 import Playground exposing (..)
 import Playground.CellTransform as CT exposing (CellTransform)
 import Playground.Direction8 as Dir exposing (Direction8)
 import Playground.Extra exposing (..)
 import Playground.Grid as Grid exposing (Grid)
-import PointFree exposing (is, whenTrue)
+import PointFree exposing (is, mapEach, whenTrue)
 import Set exposing (Set)
 
 
@@ -29,7 +29,9 @@ type Cell
 
 
 type alias Model =
-    { grid : PuzzleGrid }
+    { grid : PuzzleGrid
+    , mouseState : MouseState
+    }
 
 
 type alias PuzzleGrid =
@@ -88,7 +90,7 @@ encoded =
 
 fromGrid : PuzzleGrid -> Model
 fromGrid grid =
-    { grid = grid }
+    { grid = grid, mouseState = Up }
 
 
 fromString =
@@ -217,7 +219,51 @@ update { screen, mouse } model =
                     model
 
         _ ->
-            model
+            case model.mouseState of
+                DownStart start ->
+                    if mouse.down then
+                        let
+                            ( dx, dy ) =
+                                NT.sub ( mouse.x, mouse.y ) start
+                                    |> mapEach abs
+                        in
+                        case ( dx > 2 || dy > 2, Grid.get (ct.fromView start) grid ) of
+                            ( True, Just cell ) ->
+                                case cell of
+                                    Mirror dir ->
+                                        { model | mouseState = Dragging pos dir }
+
+                                    SourceWithMirror dir ->
+                                        { model | mouseState = Dragging pos dir }
+
+                                    _ ->
+                                        model
+
+                            _ ->
+                                model
+
+                    else
+                        { model | mouseState = Up }
+
+                Dragging int2 direction8 ->
+                    if mouse.down then
+                        model
+
+                    else
+                        { model | mouseState = Up }
+
+                Up ->
+                    if mouse.down then
+                        { model | mouseState = DownStart ( mouse.x, mouse.y ) }
+
+                    else
+                        model
+
+
+type MouseState
+    = DownStart Float2
+    | Dragging Int2 Direction8
+    | Up
 
 
 destinationPositions : PuzzleGrid -> Set Int2

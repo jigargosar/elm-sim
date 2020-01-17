@@ -52,9 +52,7 @@ viewPuzzleScene computer { grid, levelIdx } =
         )
         |> moveY screen.top
         |> moveDown 50
-    , renderButton mouse "Select Level" (initBackButtonBox screen)
-    , renderButton mouse "Next" (initNextButtonBox screen)
-    , renderButton mouse "Prev" (initPrevButtonBox screen)
+    , viewPuzzleSceneButtons mouse screen
     ]
 
 
@@ -65,6 +63,41 @@ caseBool bool true false =
 
     else
         false
+
+
+type PuzzleButton
+    = SelectLevel
+    | NextLevel
+    | PrevLevel
+
+
+puzzleBtnData : Screen -> PuzzleButton -> ( String, Box )
+puzzleBtnData screen puzzleButton =
+    case puzzleButton of
+        SelectLevel ->
+            ( "Select Level", initBackButtonBox screen )
+
+        NextLevel ->
+            ( "Next", initNextButtonBox screen )
+
+        PrevLevel ->
+            ( "Prev", initPrevButtonBox screen )
+
+
+viewPuzzleSceneButton : Mouse -> Screen -> PuzzleButton -> Shape
+viewPuzzleSceneButton mouse screen btn =
+    let
+        ( text, box ) =
+            puzzleBtnData screen btn
+    in
+    renderButton mouse text box
+
+
+viewPuzzleSceneButtons : Mouse -> Screen -> Shape
+viewPuzzleSceneButtons mouse screen =
+    [ SelectLevel, NextLevel, PrevLevel ]
+        |> List.map (viewPuzzleSceneButton mouse screen)
+        |> group
 
 
 initBackButtonBox : Screen -> Box

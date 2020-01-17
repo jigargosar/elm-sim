@@ -248,13 +248,17 @@ update { screen, mouse } model =
                 _ ->
                     noOp
 
-        Dragging _ _ ->
-            if mouse.down then
-                model
+        Dragging dragPos _ ->
+            let
+                dropPos =
+                    ct.fromView ( mouse.x, mouse.y )
+            in
+            case ( mouse.down, Grid.get dragPos model.grid, Grid.get dropPos model.grid ) of
+                ( False, Just dragCell, Just dropCell ) ->
+                    { model | mouseState = Up, grid = dndGrid dragPos dragCell dropPos dropCell model.grid }
 
-            else
-                { model | mouseState = Up }
-                    |> Debug.log "onup"
+                _ ->
+                    model
 
         Up ->
             if mouse.down then
@@ -263,6 +267,29 @@ update { screen, mouse } model =
 
             else
                 model
+
+
+dndGrid : Grid.Pos -> Cell -> Grid.Pos -> Cell -> Grid Cell -> Grid Cell
+dndGrid dragPos dragCell dropPos dropCell grid =
+    let
+        ( newDragCell, newDropCell ) =
+            case ( dragCell, dropCell ) of
+                ( SourceWithMirror dir, Empty ) ->
+                    ( Source, Mirror dir )
+
+                ( SourceWithMirror dir, Source ) ->
+                    ( Source, SourceWithMirror dir )
+
+                ( Mirror dir, Empty ) ->
+                    ( Empty, Mirror dir )
+
+                ( Mirror dir, Source ) ->
+                    ( Empty, SourceWithMirror dir )
+
+                _ ->
+                    ( dragCell, dropCell )
+    in
+    grid |> Grid.insert dragPos newDragCell |> Grid.insert dropPos newDropCell
 
 
 type MouseState

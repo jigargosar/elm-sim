@@ -12,12 +12,12 @@ import Playground exposing (..)
 import Playground.CellTransform as CT exposing (CellTransform)
 import Playground.Direction8 as Dir exposing (Direction8)
 import Playground.Extra exposing (..)
-import Playground.Grid as Grid
+import Playground.Grid as Grid exposing (Grid)
 import PointFree exposing (whenTrue)
 import Set exposing (Set)
 
 
-type PuzzleCell
+type Cell
     = Source
     | Destination
     | SourceWithMirror Direction8
@@ -26,15 +26,15 @@ type PuzzleCell
 
 
 type alias PuzzleGrid =
-    Grid.Grid PuzzleCell
+    Grid Cell
 
 
-mirror : Int -> PuzzleCell
+mirror : Int -> Cell
 mirror =
     Dir.fromInt >> Mirror
 
 
-sourceWithMirror : Int -> PuzzleCell
+sourceWithMirror : Int -> Cell
 sourceWithMirror =
     Dir.fromInt >> SourceWithMirror
 
@@ -216,7 +216,7 @@ gridCellShapes time ct grid =
     grid |> Grid.toList |> List.map toCellView
 
 
-cellShape : Time -> CellTransform -> Set Int2 -> Int2 -> PuzzleCell -> Shape
+cellShape : Time -> CellTransform -> Set Int2 -> Int2 -> Cell -> Shape
 cellShape time ct litDest pos cell =
     let
         bg : Shape
@@ -236,7 +236,7 @@ cellShape time ct litDest pos cell =
         |> move2 (ct.toView pos)
 
 
-cellContentShapes : Time -> Number -> Set comparable -> comparable -> PuzzleCell -> List Shape
+cellContentShapes : Time -> Number -> Set comparable -> comparable -> Cell -> List Shape
 cellContentShapes time width litDest pos cell =
     case cell of
         Source ->

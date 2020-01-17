@@ -1,10 +1,9 @@
 module MirrorPuzzleV2.PuzzleGrid exposing
     ( PuzzleGrid
-    , initCellT
-    , initialGrid
+    , initial
     , isSolved
-    , updatePuzzleGrid
-    , viewPuzzleGrid
+    , update
+    , view
     )
 
 import Number2 as NT exposing (Int2)
@@ -39,8 +38,8 @@ sourceWithMirror =
     Dir.fromInt >> SourceWithMirror
 
 
-initialGrid : PuzzleGrid
-initialGrid =
+initial : PuzzleGrid
+initial =
     let
         insert =
             Grid.insert
@@ -55,8 +54,8 @@ initialGrid =
         |> insert ( 1, 1 ) Source
 
 
-updatePuzzleGrid : Computer -> PuzzleGrid -> PuzzleGrid
-updatePuzzleGrid { screen, mouse } grid =
+update : Computer -> PuzzleGrid -> PuzzleGrid
+update { screen, mouse } grid =
     let
         ct =
             initCellT screen grid
@@ -174,8 +173,8 @@ initCellT screen grid =
     CT.fromViewD viewD (Grid.dimensions grid)
 
 
-viewPuzzleGrid : Computer -> PuzzleGrid -> Shape
-viewPuzzleGrid { time, screen } grid =
+view : Computer -> PuzzleGrid -> Shape
+view { time, screen } grid =
     let
         ct =
             initCellT screen grid

@@ -17,7 +17,7 @@ type alias PuzzleSceneModel =
 
 initialPuzzleScene : Scene
 initialPuzzleScene =
-    PuzzleScene { grid = PuzzleGrid.initialGrid }
+    PuzzleScene { grid = PuzzleGrid.initial }
 
 
 viewPuzzleScene : Computer -> PuzzleSceneModel -> List Shape
@@ -26,7 +26,7 @@ viewPuzzleScene computer { grid } =
         { mouse, time, screen } =
             computer
     in
-    [ PuzzleGrid.viewPuzzleGrid computer grid
+    [ PuzzleGrid.view computer grid
     , if PuzzleGrid.isSolved grid then
         words black "puzzle solved"
             |> moveY screen.top
@@ -209,7 +209,7 @@ updateMem computer mem =
                             initialLevelSelect
 
                         else
-                            PuzzleScene { model | grid = PuzzleGrid.updatePuzzleGrid computer model.grid }
+                            PuzzleScene { model | grid = PuzzleGrid.update computer model.grid }
 
                     else
                         mem.scene

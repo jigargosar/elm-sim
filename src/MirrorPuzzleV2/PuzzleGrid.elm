@@ -10,6 +10,7 @@ module MirrorPuzzleV2.PuzzleGrid exposing
     )
 
 import List.Extra
+import MirrorPuzzleV2.MouseEvent as MouseEvent
 import Number2 as NT exposing (Float2, Int2)
 import Playground exposing (..)
 import Playground.CellTransform as CT exposing (CellTransform)
@@ -31,6 +32,7 @@ type Cell
 type alias Model =
     { grid : PuzzleGrid
     , mouseButton : MouseButton
+    , mouseEventModel : MouseEvent.Model
     }
 
 
@@ -92,6 +94,7 @@ fromGrid : PuzzleGrid -> Model
 fromGrid grid =
     { grid = grid
     , mouseButton = ButtonNoChange
+    , mouseEventModel = MouseEvent.init
     }
 
 
@@ -217,8 +220,16 @@ update computer model =
 
                 ( False, ButtonUp _ _ _ ) ->
                     ButtonNoChange
+
+        ( mouseEventModel, mouseEvent ) =
+            MouseEvent.update computer.mouse model.mouseEventModel
     in
-    updateHelp computer { model | mouseButton = newMouseButton }
+    updateHelp computer
+        mouseEvent
+        { model
+            | mouseButton = newMouseButton
+            , mouseEventModel = mouseEventModel
+        }
 
 
 type MouseEvent
@@ -249,8 +260,8 @@ toMouseEvent mouseButton =
             NoEvent
 
 
-updateHelp : Computer -> Model -> Model
-updateHelp { screen, mouse } model =
+updateHelp : Computer -> MouseEvent.Event -> Model -> Model
+updateHelp { screen, mouse } event model =
     let
         grid =
             model.grid
@@ -258,8 +269,8 @@ updateHelp { screen, mouse } model =
         ct =
             initCellT screen grid
     in
-    case toMouseEvent model.mouseButton of
-        OnClick mp ->
+    case event of
+        MouseEvent.OnClick mp ->
             let
                 pos =
                     ct.fromView mp
@@ -280,7 +291,7 @@ updateHelp { screen, mouse } model =
             in
             { model | grid = newGrid }
 
-        OnDrop start current ->
+        MouseEvent.OnDrop start current ->
             let
                 dragPos =
                     ct.fromView start

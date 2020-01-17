@@ -1,4 +1,4 @@
-module MirrorPuzzleV2.MouseEvent exposing (Event, Model, update)
+module MirrorPuzzleV2.MouseEvent exposing (Event(..), Model, init, update)
 
 import Number2 as NT exposing (Float2)
 import Playground exposing (Mouse)
@@ -14,6 +14,11 @@ type Event
     | OnDrag Float2 Float2
     | OnDrop Float2 Float2
     | NoEvent
+
+
+init : Model
+init =
+    Up
 
 
 update : Mouse -> Model -> ( Model, Event )

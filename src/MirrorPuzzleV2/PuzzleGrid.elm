@@ -31,8 +31,8 @@ type Cell
 
 type alias Model =
     { grid : PuzzleGrid
-    , mouseButton : MouseButton
     , mouseEventModel : MouseEvent.Model
+    , dragStartViewPosition : Maybe Float2
     }
 
 
@@ -93,8 +93,8 @@ encoded =
 fromGrid : PuzzleGrid -> Model
 fromGrid grid =
     { grid = grid
-    , mouseButton = ButtonNoChange
     , mouseEventModel = MouseEvent.init
+    , dragStartViewPosition = Nothing
     }
 
 
@@ -198,66 +198,21 @@ initialGrid =
 update : Computer -> Model -> Model
 update computer model =
     let
-        mp =
-            ( computer.mouse.x, computer.mouse.y )
-
-        newMouseButton =
-            case ( computer.mouse.down, model.mouseButton ) of
-                ( True, ButtonNoChange ) ->
-                    ButtonDown 0 mp mp
-
-                ( True, ButtonDown elapsed start _ ) ->
-                    ButtonDown (elapsed + 1) start mp
-
-                ( True, ButtonUp _ _ _ ) ->
-                    ButtonDown 0 mp mp
-
-                ( False, ButtonNoChange ) ->
-                    ButtonNoChange
-
-                ( False, ButtonDown elapsed start _ ) ->
-                    ButtonUp elapsed start mp
-
-                ( False, ButtonUp _ _ _ ) ->
-                    ButtonNoChange
-
         ( mouseEventModel, mouseEvent ) =
             MouseEvent.update computer.mouse model.mouseEventModel
     in
     updateHelp computer
         mouseEvent
         { model
-            | mouseButton = newMouseButton
-            , mouseEventModel = mouseEventModel
+            | mouseEventModel = mouseEventModel
+            , dragStartViewPosition =
+                case mouseEvent of
+                    MouseEvent.OnDrag start _ ->
+                        Just start
+
+                    _ ->
+                        Nothing
         }
-
-
-type MouseEvent
-    = OnClick Float2
-    | OnDrop Float2 Float2
-    | OnDrag Float2 Float2
-    | NoEvent
-
-
-toMouseEvent : MouseButton -> MouseEvent
-toMouseEvent mouseButton =
-    case mouseButton of
-        ButtonDown elapsed start current ->
-            if elapsed < 60 && NT.equalWithin 3 start current then
-                NoEvent
-
-            else
-                OnDrag start current
-
-        ButtonUp elapsed start current ->
-            if elapsed < 60 && NT.equalWithin 3 start current then
-                OnClick start
-
-            else
-                OnDrop start current
-
-        ButtonNoChange ->
-            NoEvent
 
 
 updateHelp : Computer -> MouseEvent.Event -> Model -> Model
@@ -334,12 +289,6 @@ dndGrid dragPos dragCell dropPos dropCell grid =
                     ( dragCell, dropCell )
     in
     grid |> Grid.insert dragPos newDragCell |> Grid.insert dropPos newDropCell
-
-
-type MouseButton
-    = ButtonDown Int Float2 Float2
-    | ButtonUp Int Float2 Float2
-    | ButtonNoChange
 
 
 destinationPositions : PuzzleGrid -> Set Int2
@@ -432,23 +381,6 @@ initCellT screen grid =
     CT.fromViewD viewD (Grid.dimensions grid)
 
 
-dragStartPosition : MouseButton -> Maybe Float2
-dragStartPosition mouseButton =
-    case mouseButton of
-        ButtonDown elapsed start current ->
-            if elapsed < 60 && NT.equalWithin 3 start current then
-                Nothing
-
-            else
-                Just start
-
-        ButtonUp _ _ _ ->
-            Nothing
-
-        ButtonNoChange ->
-            Nothing
-
-
 view : Computer -> Model -> Shape
 view { time, screen, mouse } model =
     let
@@ -465,7 +397,7 @@ view { time, screen, mouse } model =
                 |> group
 
         dimPos =
-            dragStartPosition model.mouseButton
+            model.dragStartViewPosition
                 |> Maybe.andThen
                     (\mp ->
                         let
@@ -496,7 +428,7 @@ view { time, screen, mouse } model =
         [ gridCellShapes time ct dimPos grid |> group
         , lightPathsShape
         , case
-            dragStartPosition model.mouseButton
+            model.dragStartViewPosition
                 |> Maybe.andThen (ct.fromView >> flip Grid.get model.grid)
           of
             Just (Mirror dir) ->

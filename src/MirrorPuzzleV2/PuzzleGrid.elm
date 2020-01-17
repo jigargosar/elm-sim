@@ -31,6 +31,7 @@ type Cell
 type alias Model =
     { grid : PuzzleGrid
     , mouseState : MouseState
+    , mouseButton : MouseButton
     }
 
 
@@ -90,7 +91,10 @@ encoded =
 
 fromGrid : PuzzleGrid -> Model
 fromGrid grid =
-    { grid = grid, mouseState = Up }
+    { grid = grid
+    , mouseState = Up
+    , mouseButton = ButtonNoChange
+    }
 
 
 fromString =
@@ -191,7 +195,36 @@ initialGrid =
 
 
 update : Computer -> Model -> Model
-update { screen, mouse } model =
+update computer model =
+    let
+        mp =
+            ( computer.mouse.x, computer.mouse.y )
+
+        newMouseButton =
+            case ( computer.mouse.down, model.mouseButton ) of
+                ( True, ButtonNoChange ) ->
+                    ButtonDown 0 mp mp
+
+                ( True, ButtonDown elapsed start _ ) ->
+                    ButtonDown (elapsed + 1) start mp
+
+                ( True, ButtonUp _ _ _ ) ->
+                    ButtonDown 0 mp mp
+
+                ( False, ButtonNoChange ) ->
+                    ButtonNoChange
+
+                ( False, ButtonDown elapsed start _ ) ->
+                    ButtonUp elapsed start mp
+
+                ( False, ButtonUp _ _ _ ) ->
+                    ButtonNoChange
+    in
+    updateHelp computer { model | mouseButton = newMouseButton }
+
+
+updateHelp : Computer -> Model -> Model
+updateHelp { screen, mouse } model =
     let
         grid =
             model.grid
@@ -395,6 +428,23 @@ initCellT screen grid =
             NT.scale 0.8 ( screen.width, screen.height )
     in
     CT.fromViewD viewD (Grid.dimensions grid)
+
+
+dragStartPosition : MouseButton -> Maybe Float2
+dragStartPosition mouseButton =
+    case mouseButton of
+        ButtonDown elapsed start _ ->
+            if elapsed > 60 then
+                Just start
+
+            else
+                Nothing
+
+        ButtonUp _ _ _ ->
+            Nothing
+
+        ButtonNoChange ->
+            Nothing
 
 
 view : Computer -> Model -> Shape

@@ -202,69 +202,62 @@ update { screen, mouse } model =
         pos =
             ct.fromView ( mouse.x, mouse.y )
     in
-    case ( mouse.click, Grid.get pos grid ) of
-        ( True, Just cell ) ->
+    case model.mouseState of
+        DownStart start ->
             let
-                ins a =
-                    { model | grid = Grid.insert pos a grid, mouseState = Up }
-                        |> Debug.log "onup"
+                ( dx, dy ) =
+                    NT.sub ( mouse.x, mouse.y ) start
+                        |> mapEach abs
             in
-            case cell of
-                Mirror dir ->
-                    ins (Mirror (Dir.rotate 1 dir))
+            case ( mouse.down, dx > 2 || dy > 2, Grid.get (ct.fromView start) grid ) of
+                ( True, True, Just cell ) ->
+                    case cell of
+                        Mirror dir ->
+                            { model | mouseState = Dragging pos dir }
 
-                SourceWithMirror dir ->
-                    ins (SourceWithMirror (Dir.rotate 1 dir))
+                        SourceWithMirror dir ->
+                            { model | mouseState = Dragging pos dir }
+
+                        _ ->
+                            model
+
+                ( False, False, Just cell ) ->
+                    let
+                        ins a =
+                            { model | grid = Grid.insert pos a grid, mouseState = Up }
+                                |> Debug.log "onup"
+                    in
+                    case cell of
+                        Mirror dir ->
+                            ins (Mirror (Dir.rotate 1 dir))
+
+                        SourceWithMirror dir ->
+                            ins (SourceWithMirror (Dir.rotate 1 dir))
+
+                        _ ->
+                            model
+
+                ( False, _, _ ) ->
+                    { model | mouseState = Up }
 
                 _ ->
                     model
 
-        ( False, _ ) ->
-            case model.mouseState of
-                DownStart start ->
-                    if mouse.down then
-                        let
-                            ( dx, dy ) =
-                                NT.sub ( mouse.x, mouse.y ) start
-                                    |> mapEach abs
-                        in
-                        case ( dx > 2 || dy > 2, Grid.get (ct.fromView start) grid ) of
-                            ( True, Just cell ) ->
-                                case cell of
-                                    Mirror dir ->
-                                        { model | mouseState = Dragging pos dir }
+        Dragging int2 direction8 ->
+            if mouse.down then
+                model
 
-                                    SourceWithMirror dir ->
-                                        { model | mouseState = Dragging pos dir }
+            else
+                { model | mouseState = Up }
+                    |> Debug.log "onup"
 
-                                    _ ->
-                                        model
+        Up ->
+            if mouse.down then
+                { model | mouseState = DownStart ( mouse.x, mouse.y ) }
+                    |> Debug.log "ondown"
 
-                            _ ->
-                                model
-
-                    else
-                        { model | mouseState = Up }
-                            |> Debug.log "onup"
-
-                Dragging int2 direction8 ->
-                    if mouse.down then
-                        model
-
-                    else
-                        { model | mouseState = Up }
-                            |> Debug.log "onup"
-
-                Up ->
-                    if mouse.down then
-                        { model | mouseState = DownStart ( mouse.x, mouse.y ) }
-                            |> Debug.log "ondown"
-
-                    else
-                        model
-
-        _ ->
-            model
+            else
+                model
 
 
 type MouseState

@@ -16,7 +16,7 @@ import Playground.CellTransform as CT exposing (CellTransform)
 import Playground.Direction8 as Dir exposing (Direction8)
 import Playground.Extra exposing (..)
 import Playground.Grid as Grid exposing (Grid)
-import PointFree exposing (flip, is, mapEach, whenTrue)
+import PointFree exposing (flip, is, whenTrue)
 import Set exposing (Set)
 
 
@@ -224,23 +224,25 @@ update computer model =
 type MouseEvent
     = OnClick Float2
     | OnDrop Float2 Float2
+    | OnDrag Float2 Float2
+    | NoEvent
 
 
-toMouseEvent : MouseButton -> Maybe MouseEvent
+toMouseEvent : MouseButton -> MouseEvent
 toMouseEvent mouseButton =
     case mouseButton of
         ButtonDown _ _ _ ->
-            Nothing
+            NoEvent
 
         ButtonUp elapsed start current ->
             if elapsed < 60 && NT.equalWithin 3 start current then
-                Just (OnClick start)
+                OnClick start
 
             else
-                Just (OnDrop start current)
+                OnDrop start current
 
         ButtonNoChange ->
-            Nothing
+            NoEvent
 
 
 updateHelp : Computer -> Model -> Model
@@ -253,7 +255,7 @@ updateHelp { screen, mouse } model =
             initCellT screen grid
     in
     case toMouseEvent model.mouseButton of
-        Just (OnClick mp) ->
+        OnClick mp ->
             let
                 pos =
                     ct.fromView mp
@@ -274,7 +276,7 @@ updateHelp { screen, mouse } model =
             in
             { model | grid = newGrid }
 
-        Just (OnDrop start current) ->
+        OnDrop start current ->
             let
                 dragPos =
                     ct.fromView start

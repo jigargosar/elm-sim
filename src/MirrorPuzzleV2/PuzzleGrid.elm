@@ -1,7 +1,9 @@
 module MirrorPuzzleV2.PuzzleGrid exposing
     ( PuzzleGrid
+    , fromString
     , initial
     , isSolved
+    , levels
     , update
     , view
     )
@@ -52,6 +54,16 @@ sourceWithMirror =
    O<0-7> -> double mirror
    X -> wall
 -}
+
+
+levels : List String
+levels =
+    [ """
+      __,__,__,__,__,__,__,__
+      __,SS,M0,__,__,__,DD,__
+      __,__,__,__,__,__,__,__
+      """
+    ]
 
 
 encoded =

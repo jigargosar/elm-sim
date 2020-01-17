@@ -15,9 +15,19 @@ type alias PuzzleSceneModel =
     { grid : PuzzleGrid }
 
 
-initialPuzzleScene : Scene
-initialPuzzleScene =
+initialPuzzleScene_ : Scene
+initialPuzzleScene_ =
     PuzzleScene { grid = PuzzleGrid.initial }
+
+
+initPuzzleScene : Int -> Scene
+initPuzzleScene levelIdx =
+    case List.drop levelIdx PuzzleGrid.levels |> List.head of
+        Just levelStr ->
+            PuzzleScene { grid = PuzzleGrid.fromString levelStr }
+
+        Nothing ->
+            initialPuzzleScene_
 
 
 viewPuzzleScene : Computer -> PuzzleSceneModel -> List Shape
@@ -52,7 +62,7 @@ initBackButtonBox screen =
 
 initialLevelSelect : Scene
 initialLevelSelect =
-    LevelSelect 10
+    LevelSelect (PuzzleGrid.levels |> List.length)
 
 
 type alias LevelButtons =
@@ -65,7 +75,7 @@ initLevelButtons : Screen -> Int -> LevelButtons
 initLevelButtons screen count =
     let
         lh =
-            (screen.height * 0.7) / toFloat count
+            min 40 (screen.height * 0.7) / toFloat count
 
         hScale =
             0.8
@@ -172,7 +182,7 @@ type alias Mem =
 
 init : Mem
 init =
-    { scene = initialPuzzleScene }
+    { scene = initPuzzleScene 0 }
 
 
 updateMem : Computer -> Mem -> Mem
@@ -195,8 +205,8 @@ updateMem computer mem =
                     initLevelButtons screen levelCount
             in
             case ( mouse.click, levelButtonIdxFromMouse mouse lbs ) of
-                ( True, Just _ ) ->
-                    { mem | scene = initialPuzzleScene }
+                ( True, Just i ) ->
+                    { mem | scene = initPuzzleScene i }
 
                 _ ->
                     mem

@@ -206,7 +206,8 @@ update { screen, mouse } model =
         ( True, Just cell ) ->
             let
                 ins a =
-                    { model | grid = Grid.insert pos a grid }
+                    { model | grid = Grid.insert pos a grid, mouseState = Up }
+                        |> Debug.log "onup"
             in
             case cell of
                 Mirror dir ->
@@ -218,7 +219,7 @@ update { screen, mouse } model =
                 _ ->
                     model
 
-        _ ->
+        ( False, _ ) ->
             case model.mouseState of
                 DownStart start ->
                     if mouse.down then
@@ -244,6 +245,7 @@ update { screen, mouse } model =
 
                     else
                         { model | mouseState = Up }
+                            |> Debug.log "onup"
 
                 Dragging int2 direction8 ->
                     if mouse.down then
@@ -251,13 +253,18 @@ update { screen, mouse } model =
 
                     else
                         { model | mouseState = Up }
+                            |> Debug.log "onup"
 
                 Up ->
                     if mouse.down then
                         { model | mouseState = DownStart ( mouse.x, mouse.y ) }
+                            |> Debug.log "ondown"
 
                     else
                         model
+
+        _ ->
+            model
 
 
 type MouseState
@@ -370,8 +377,16 @@ view { time, screen } model =
                 |> gridToLightPaths
                 |> List.map (viewPath ct)
                 |> group
+
+        dimPos =
+            case model.mouseState of
+                Dragging int2 direction8 ->
+                    Set.singleton int2
+
+                _ ->
+                    Set.empty
     in
-    group [ gridCellShapes time ct grid |> group, lightPathsShape ]
+    group [ gridCellShapes time ct dimPos grid |> group, lightPathsShape ]
 
 
 
@@ -389,20 +404,20 @@ viewPath ct =
 -- Puzzle Cell View
 
 
-gridCellShapes : Time -> CellTransform -> PuzzleGrid -> List Shape
-gridCellShapes time ct grid =
+gridCellShapes : Time -> CellTransform -> Set Int2 -> PuzzleGrid -> List Shape
+gridCellShapes time ct dimPos grid =
     let
         litDest =
             litDestinationPositions grid
 
         toCellView ( pos, cell ) =
-            cellShape time ct litDest pos cell
+            cellShape time ct dimPos litDest pos cell
     in
     grid |> Grid.toList |> List.map toCellView
 
 
-cellShape : Time -> CellTransform -> Set Int2 -> Int2 -> Cell -> Shape
-cellShape time ct litDest pos cell =
+cellShape : Time -> CellTransform -> Set Int2 -> Set Int2 -> Int2 -> Cell -> Shape
+cellShape time ct dimPos litDest pos cell =
     let
         bg : Shape
         bg =
@@ -415,7 +430,7 @@ cellShape time ct litDest pos cell =
             ct.cellSize
     in
     cellContentShapes time width litDest pos cell
-        |> List.map (scale 0.8)
+        |> List.map (scale 0.8 >> whenTrue (Set.member pos dimPos) (fade 0.5))
         |> (::) bg
         |> group
         |> move2 (ct.toView pos)

@@ -300,24 +300,20 @@ updateMem computer mem =
         PuzzleScene model ->
             let
                 nextScene =
-                    if mouse.click then
-                        case puzzleSceneBtnAt mouse screen of
-                            Just btn ->
-                                case btn of
-                                    SelectLevel ->
-                                        initialLevelSelect
+                    case ( mouse.click, puzzleSceneBtnAt mouse screen ) of
+                        ( True, Just btn ) ->
+                            case btn of
+                                SelectLevel ->
+                                    initialLevelSelect
 
-                                    NextLevel ->
-                                        goToLevelBy 1 model
+                                NextLevel ->
+                                    goToLevelBy 1 model
 
-                                    PrevLevel ->
-                                        goToLevelBy -1 model
+                                PrevLevel ->
+                                    goToLevelBy -1 model
 
-                            Nothing ->
-                                PuzzleScene { model | grid = PuzzleGrid.update computer model.grid }
-
-                    else
-                        mem.scene
+                        _ ->
+                            PuzzleScene { model | grid = PuzzleGrid.update computer model.grid }
             in
             { mem | scene = nextScene }
 

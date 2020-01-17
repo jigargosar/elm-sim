@@ -384,7 +384,10 @@ view { time, screen } model =
                 _ ->
                     Set.empty
     in
-    group [ gridCellShapes time ct dimPos grid |> group, lightPathsShape ]
+    group
+        [ gridCellShapes time ct dimPos grid |> group
+        , lightPathsShape
+        ]
 
 
 

@@ -255,7 +255,10 @@ update { screen, mouse } model =
             in
             case ( mouse.down, Grid.get dragPos model.grid, Grid.get dropPos model.grid ) of
                 ( False, Just dragCell, Just dropCell ) ->
-                    { model | mouseState = Up, grid = dndGrid dragPos dragCell dropPos dropCell model.grid }
+                    { model
+                        | mouseState = Up
+                        , grid = dndGrid dragPos dragCell dropPos dropCell model.grid
+                    }
 
                 _ ->
                     model

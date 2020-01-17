@@ -1,4 +1,4 @@
-module MirrorPuzzleV2.MouseEvent exposing (..)
+module MirrorPuzzleV2.MouseEvent exposing (Event, Model, update)
 
 import Number2 as NT exposing (Float2)
 import Playground exposing (Mouse)
@@ -16,8 +16,8 @@ type Event
     | NoEvent
 
 
-toEvent : Mouse -> Model -> ( Model, Event )
-toEvent mouse model =
+update : Mouse -> Model -> ( Model, Event )
+update mouse model =
     let
         current =
             ( mouse.x, mouse.y )

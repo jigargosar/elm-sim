@@ -65,6 +65,18 @@ caseBool bool true false =
         false
 
 
+puzzleSceneButtons =
+    [ SelectLevel, NextLevel, PrevLevel ]
+
+
+puzzleSceneBtnAt : Mouse -> Screen -> Maybe PuzzleButton
+puzzleSceneBtnAt mouse screen =
+    puzzleSceneButtons
+        |> List.map (puzzleBtnData screen)
+        |> List.Extra.findIndex (Tuple.second >> Box.containsXY mouse)
+        |> Maybe.andThen (\idx -> List.Extra.getAt idx puzzleSceneButtons)
+
+
 type PuzzleButton
     = SelectLevel
     | NextLevel
@@ -95,7 +107,7 @@ viewPuzzleSceneButton mouse screen btn =
 
 viewPuzzleSceneButtons : Mouse -> Screen -> Shape
 viewPuzzleSceneButtons mouse screen =
-    [ SelectLevel, NextLevel, PrevLevel ]
+    puzzleSceneButtons
         |> List.map (viewPuzzleSceneButton mouse screen)
         |> group
 
@@ -283,11 +295,12 @@ updateMem computer mem =
             let
                 nextScene =
                     if mouse.click then
-                        if Box.containsXY mouse (initBackButtonBox screen) then
-                            initialLevelSelect
+                        case puzzleSceneBtnAt mouse screen of
+                            Just btn ->
+                                initialLevelSelect
 
-                        else
-                            PuzzleScene { model | grid = PuzzleGrid.update computer model.grid }
+                            Nothing ->
+                                PuzzleScene { model | grid = PuzzleGrid.update computer model.grid }
 
                     else
                         mem.scene

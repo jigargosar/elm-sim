@@ -30,7 +30,6 @@ type Cell
 
 type alias Model =
     { grid : PuzzleGrid
-    , mouseState : MouseState
     , mouseButton : MouseButton
     }
 
@@ -92,7 +91,6 @@ encoded =
 fromGrid : PuzzleGrid -> Model
 fromGrid grid =
     { grid = grid
-    , mouseState = Up
     , mouseButton = ButtonNoChange
     }
 
@@ -321,12 +319,6 @@ dndGrid dragPos dragCell dropPos dropCell grid =
     grid |> Grid.insert dragPos newDragCell |> Grid.insert dropPos newDropCell
 
 
-type MouseState
-    = DownStart Int Float2
-    | Dragging Int2 Direction8
-    | Up
-
-
 type MouseButton
     = ButtonDown Int Float2 Float2
     | ButtonUp Int Float2 Float2
@@ -456,12 +448,32 @@ view { time, screen, mouse } model =
                 |> group
 
         dimPos =
-            case model.mouseState of
-                Dragging int2 _ ->
-                    Set.singleton int2
+            dragStartPosition model.mouseButton
+                |> Maybe.andThen
+                    (\mp ->
+                        let
+                            pos =
+                                ct.fromView mp
 
-                _ ->
-                    Set.empty
+                            bool =
+                                case Grid.get pos model.grid of
+                                    Just (Mirror _) ->
+                                        True
+
+                                    Just (SourceWithMirror _) ->
+                                        True
+
+                                    _ ->
+                                        False
+                        in
+                        if bool then
+                            Just pos
+
+                        else
+                            Nothing
+                    )
+                |> Maybe.map Set.singleton
+                |> Maybe.withDefault Set.empty
     in
     group
         [ gridCellShapes time ct dimPos grid |> group

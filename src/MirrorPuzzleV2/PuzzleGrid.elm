@@ -6,6 +6,7 @@ module MirrorPuzzleV2.PuzzleGrid exposing
     , view
     )
 
+import List.Extra
 import Number2 as NT exposing (Int2)
 import Playground exposing (..)
 import Playground.CellTransform as CT exposing (CellTransform)
@@ -61,6 +62,71 @@ encoded =
     __,SS,__,__,__
     DD,__,__,__,__
     """
+
+
+fromString : String -> PuzzleGrid
+fromString str =
+    let
+        lines : List String
+        lines =
+            String.lines str
+    in
+    case lines of
+        first :: _ ->
+            let
+                height : Int
+                height =
+                    List.length lines
+
+                width : Int
+                width =
+                    String.split "," first |> List.length
+
+                updateFromCellString : Int2 -> String -> PuzzleGrid -> PuzzleGrid
+                updateFromCellString pos cellStr =
+                    let
+                        ins =
+                            Grid.insert pos
+
+                        charToDir : Char -> Direction8
+                        charToDir =
+                            String.fromChar
+                                >> String.toInt
+                                >> Maybe.withDefault 0
+                                >> Dir.fromInt
+                    in
+                    case String.trim cellStr of
+                        "SS" ->
+                            ins Source
+
+                        "DD" ->
+                            ins Destination
+
+                        chars ->
+                            case String.toList chars of
+                                'M' :: [ char ] ->
+                                    ins (Mirror (charToDir char))
+
+                                'N' :: [ char ] ->
+                                    ins (SourceWithMirror (charToDir char))
+
+                                _ ->
+                                    identity
+
+                updateFromRowString : Int -> String -> PuzzleGrid -> PuzzleGrid
+                updateFromRowString y rowString grid =
+                    String.split "," rowString
+                        |> List.Extra.indexedFoldl (\x cellStr -> updateFromCellString ( x, y ) cellStr) grid
+
+                updateFromRowStrings : PuzzleGrid -> PuzzleGrid
+                updateFromRowStrings grid =
+                    List.Extra.indexedFoldl updateFromRowString grid lines
+            in
+            Grid.filled width height Empty
+                |> updateFromRowStrings
+
+        _ ->
+            Grid.filled 0 0 Empty
 
 
 initial : PuzzleGrid

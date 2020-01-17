@@ -433,12 +433,12 @@ initCellT screen grid =
 dragStartPosition : MouseButton -> Maybe Float2
 dragStartPosition mouseButton =
     case mouseButton of
-        ButtonDown elapsed start _ ->
-            if elapsed > 60 then
-                Just start
+        ButtonDown elapsed start current ->
+            if elapsed < 60 && NT.equalWithin 3 start current then
+                Nothing
 
             else
-                Nothing
+                Just start
 
         ButtonUp _ _ _ ->
             Nothing
@@ -473,22 +473,21 @@ view { time, screen, mouse } model =
     group
         [ gridCellShapes time ct dimPos grid |> group
         , lightPathsShape
-        , case model.mouseState of
-            Dragging _ dir ->
+        , case
+            dragStartPosition model.mouseButton
+                |> Maybe.andThen (ct.fromView >> flip Grid.get model.grid)
+          of
+            Just (Mirror dir) ->
+                mirrorShape ct.cellSize dir
+                    |> scale 0.8
+                    |> move mouse.x mouse.y
+
+            Just (SourceWithMirror dir) ->
                 mirrorShape ct.cellSize dir
                     |> scale 0.8
                     |> move mouse.x mouse.y
 
             _ ->
-                noShape
-        , case
-            dragStartPosition model.mouseButton
-                |> Maybe.andThen (ct.fromView >> flip Grid.get model.grid)
-          of
-            Just _ ->
-                noShape
-
-            Nothing ->
                 noShape
         ]
 

@@ -75,3 +75,12 @@ contains : comparable -> ( comparable, comparable ) -> Bool
 contains a ( minA, maxA ) =
     (a < minA || a > maxA)
         |> not
+
+
+equalWithin : number -> ( number, number ) -> ( number, number ) -> Bool
+equalWithin tol a b =
+    let
+        ( dx, dy ) =
+            sub a b |> mapEach abs
+    in
+    dx < tol && dy < tol

@@ -301,6 +301,12 @@ type MouseState
     | Up
 
 
+type MouseButton
+    = ButtonDown Int Float2 Float2
+    | ButtonUp Int Float2 Float2
+    | ButtonNoChange
+
+
 destinationPositions : PuzzleGrid -> Set Int2
 destinationPositions =
     Grid.foldl (\pos cell -> whenTrue (cell == Destination) (Set.insert pos))

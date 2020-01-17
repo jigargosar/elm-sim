@@ -92,11 +92,11 @@ fromGrid grid =
 
 
 fromString =
-    fromString_ >> fromGrid
+    gridFromString >> fromGrid
 
 
-fromString_ : String -> PuzzleGrid
-fromString_ str =
+gridFromString : String -> PuzzleGrid
+gridFromString str =
     let
         lines : List String
         lines =
@@ -163,11 +163,11 @@ fromString_ str =
 
 initial : Model
 initial =
-    fromGrid initial_
+    fromGrid initialGrid
 
 
-initial_ : PuzzleGrid
-initial_ =
+initialGrid : PuzzleGrid
+initialGrid =
     let
         insert =
             Grid.insert
@@ -182,10 +182,10 @@ initial_ =
                     |> insert ( 0, 0 ) Destination
                     |> insert ( 1, 1 ) (sourceWithMirror 1)
                     |> insert ( 1, 1 ) Source
-                    |> is (fromString_ encoded)
+                    |> is (gridFromString encoded)
                 )
     in
-    fromString_ encoded
+    gridFromString encoded
 
 
 update : Computer -> Model -> Model

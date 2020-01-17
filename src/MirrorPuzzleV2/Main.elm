@@ -217,14 +217,21 @@ type CellForm
     | DEST Bool
 
 
-gridToCellShape time ct grid =
+gridCellsShape : Time -> CellTransform -> PuzzleGrid -> List Shape
+gridCellsShape time ct grid =
     let
-        width =
-            ct.cellSize
-
         litDest =
             listDestinations grid
 
+        toCellView ( pos, cell ) =
+            cellShape time ct litDest pos cell
+    in
+    grid |> Grid.toList |> List.map toCellView
+
+
+cellShape : Time -> CellTransform -> Set Int2 -> Int2 -> Cell -> Shape
+cellShape time ct litDest pos cell =
+    let
         bg : Shape
         bg =
             group
@@ -232,18 +239,18 @@ gridToCellShape time ct grid =
                 , rectangle white width width |> scale 0.9
                 ]
 
-        toCellView ( pos, cell ) =
-            cellToShape time width litDest pos cell
-                |> List.map (scale 0.8)
-                |> (::) bg
-                |> group
-                |> move2 (ct.toView pos)
+        width =
+            ct.cellSize
     in
-    grid |> Grid.toList |> List.map toCellView
+    cellContentShapes time width litDest pos cell
+        |> List.map (scale 0.8)
+        |> (::) bg
+        |> group
+        |> move2 (ct.toView pos)
 
 
-cellToShape : Time -> Number -> Set comparable -> comparable -> Cell -> List Shape
-cellToShape time width litDest pos cell =
+cellContentShapes : Time -> Number -> Set comparable -> comparable -> Cell -> List Shape
+cellContentShapes time width litDest pos cell =
     case cell of
         Source ->
             [ srcShape width ]

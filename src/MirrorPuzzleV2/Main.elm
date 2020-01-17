@@ -93,7 +93,7 @@ initLevelButtons : Screen -> Int -> LevelButtons
 initLevelButtons screen count =
     let
         lh =
-            min 40 (screen.height * 0.7) / toFloat count
+            min 40 ((screen.height * 0.7) / toFloat count)
 
         hScale =
             0.8

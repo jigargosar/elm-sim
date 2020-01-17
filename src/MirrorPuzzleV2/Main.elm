@@ -217,8 +217,8 @@ type CellForm
     | DEST Bool
 
 
-gridCellsShape : Time -> CellTransform -> PuzzleGrid -> List Shape
-gridCellsShape time ct grid =
+gridCellShapes : Time -> CellTransform -> PuzzleGrid -> List Shape
+gridCellShapes time ct grid =
     let
         litDest =
             listDestinations grid

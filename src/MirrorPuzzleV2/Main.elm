@@ -53,11 +53,8 @@ viewPuzzleScene computer { grid, levelIdx } =
         |> moveY screen.top
         |> moveDown 50
     , renderButton mouse "Select Level" (initBackButtonBox screen)
-    , if isSolved then
-        renderButton mouse "Next" (initNextButtonBox screen)
-
-      else
-        noShape
+    , renderButton mouse "Next" (initNextButtonBox screen)
+    , renderButton mouse "Prev" (initPrevButtonBox screen)
     ]
 
 
@@ -72,16 +69,26 @@ caseBool bool true false =
 
 initBackButtonBox : Screen -> Box
 initBackButtonBox screen =
-    Box.atTopLeft 150 30
+    Box.atTopLeft 150 40
         |> Box.move ( screen.left, screen.top )
+        |> Box.moveRight 20
+        |> Box.moveDown 20
 
 
 initNextButtonBox : Screen -> Box
 initNextButtonBox screen =
-    Box.atOrigin 100 30
+    Box.atTopRight 100 40
         |> Box.move ( screen.right, screen.top )
-        |> Box.moveDown 50
-        |> Box.moveLeft 100
+        |> Box.moveDown 20
+        |> Box.moveLeft 20
+
+
+initPrevButtonBox : Screen -> Box
+initPrevButtonBox screen =
+    Box.atTopRight 100 40
+        |> Box.move ( screen.right, screen.top )
+        |> Box.moveDown 20
+        |> Box.moveLeft (100 + 20 + 20)
 
 
 

@@ -2,6 +2,7 @@ module MirrorPuzzleV2.Box exposing
     ( Box
     , atOrigin
     , atTopLeft
+    , atTopRight
     , center
     , contains
     , containsXY
@@ -30,6 +31,13 @@ atTopLeft : Float -> Float -> Box
 atTopLeft w h =
     atOrigin w h
         |> moveRight (w / 2)
+        |> moveDown (h / 2)
+
+
+atTopRight : Float -> Float -> Box
+atTopRight w h =
+    atOrigin w h
+        |> moveLeft (w / 2)
         |> moveDown (h / 2)
 
 

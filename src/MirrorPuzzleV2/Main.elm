@@ -214,16 +214,20 @@ updateMem computer mem =
                 _ ->
                     mem
 
-        PuzzleScene puzzle ->
-            if mouse.click then
-                if Box.containsXY mouse (initBackButtonBox screen) then
-                    { mem | scene = initialLevelSelect }
+        PuzzleScene model ->
+            let
+                nextScene =
+                    if mouse.click then
+                        if Box.containsXY mouse (initBackButtonBox screen) then
+                            initialLevelSelect
 
-                else
-                    { mem | scene = PuzzleScene (updatePuzzleScene computer puzzle) }
+                        else
+                            PuzzleScene { model | grid = PuzzleGrid.updatePuzzleGrid computer model.grid }
 
-            else
-                mem
+                    else
+                        mem.scene
+            in
+            { mem | scene = nextScene }
 
 
 view : Computer -> Mem -> List Shape

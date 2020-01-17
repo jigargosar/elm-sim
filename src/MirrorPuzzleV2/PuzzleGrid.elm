@@ -48,6 +48,7 @@ initialGrid =
         |> insert ( 1, 1 ) Source
 
 
+updatePuzzleGrid : Computer -> PuzzleGrid -> PuzzleGrid
 updatePuzzleGrid { screen, mouse } grid =
     let
         ct =
@@ -56,8 +57,8 @@ updatePuzzleGrid { screen, mouse } grid =
         pos =
             ct.fromView ( mouse.x, mouse.y )
     in
-    case Grid.get pos grid of
-        Just cell ->
+    case ( mouse.click, Grid.get pos grid ) of
+        ( True, Just cell ) ->
             let
                 ins a =
                     Grid.insert pos a grid
@@ -72,7 +73,7 @@ updatePuzzleGrid { screen, mouse } grid =
                 _ ->
                     grid
 
-        Nothing ->
+        _ ->
             grid
 
 

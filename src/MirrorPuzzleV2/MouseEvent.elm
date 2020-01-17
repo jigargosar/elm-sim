@@ -21,7 +21,7 @@ init =
     Up
 
 
-update : Mouse -> Model -> ( Model, Event )
+update : Playground.Mouse -> Model -> ( Model, Event )
 update mouse model =
     let
         current =

@@ -198,35 +198,40 @@ update { screen, mouse } model =
 
         ct =
             initCellT screen grid
-
-        pos =
-            ct.fromView ( mouse.x, mouse.y )
     in
     case model.mouseState of
-        DownStart start ->
+        DownStart elapsed start ->
             let
                 ( dx, dy ) =
                     NT.sub ( mouse.x, mouse.y ) start
                         |> mapEach abs
+
+                noOp =
+                    { model | mouseState = DownStart (elapsed + 1) start }
+
+                startPos =
+                    ct.fromView start
+
+                dragStart dir =
+                    { model | mouseState = Dragging startPos dir }
+
+                ins a =
+                    { model | grid = Grid.insert startPos a grid, mouseState = Up }
+                        |> Debug.log "onup"
             in
-            case ( mouse.down, dx > 2 || dy > 2, Grid.get (ct.fromView start) grid ) of
+            case ( mouse.down, dx > 2 || dy > 2, Grid.get startPos grid ) of
                 ( True, True, Just cell ) ->
                     case cell of
                         Mirror dir ->
-                            { model | mouseState = Dragging pos dir }
+                            dragStart dir
 
                         SourceWithMirror dir ->
-                            { model | mouseState = Dragging pos dir }
+                            dragStart dir
 
                         _ ->
-                            model
+                            noOp
 
                 ( False, False, Just cell ) ->
-                    let
-                        ins a =
-                            { model | grid = Grid.insert pos a grid, mouseState = Up }
-                                |> Debug.log "onup"
-                    in
                     case cell of
                         Mirror dir ->
                             ins (Mirror (Dir.rotate 1 dir))
@@ -243,7 +248,7 @@ update { screen, mouse } model =
                 _ ->
                     model
 
-        Dragging int2 direction8 ->
+        Dragging _ _ ->
             if mouse.down then
                 model
 
@@ -253,7 +258,7 @@ update { screen, mouse } model =
 
         Up ->
             if mouse.down then
-                { model | mouseState = DownStart ( mouse.x, mouse.y ) }
+                { model | mouseState = DownStart 0 ( mouse.x, mouse.y ) }
                     |> Debug.log "ondown"
 
             else
@@ -261,7 +266,7 @@ update { screen, mouse } model =
 
 
 type MouseState
-    = DownStart Float2
+    = DownStart Int Float2
     | Dragging Int2 Direction8
     | Up
 
@@ -373,7 +378,7 @@ view { time, screen } model =
 
         dimPos =
             case model.mouseState of
-                Dragging int2 direction8 ->
+                Dragging int2 _ ->
                     Set.singleton int2
 
                 _ ->

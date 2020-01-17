@@ -12,7 +12,7 @@ import Playground.Extra exposing (..)
 
 
 type alias PuzzleSceneModel =
-    { grid : PuzzleGrid
+    { grid : PuzzleGrid.Model
     , levelIdx : Int
     }
 

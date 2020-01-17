@@ -1,5 +1,6 @@
 module MirrorPuzzleV2.PuzzleGrid exposing
-    ( PuzzleGrid
+    ( Model
+    , PuzzleGrid
     , fromString
     , initial
     , isSolved
@@ -25,6 +26,10 @@ type Cell
     | SourceWithMirror Direction8
     | Mirror Direction8
     | Empty
+
+
+type alias Model =
+    { grid : PuzzleGrid }
 
 
 type alias PuzzleGrid =
@@ -81,8 +86,17 @@ encoded =
     """
 
 
-fromString : String -> PuzzleGrid
-fromString str =
+fromGrid : PuzzleGrid -> Model
+fromGrid grid =
+    { grid = grid }
+
+
+fromString =
+    fromString_ >> fromGrid
+
+
+fromString_ : String -> PuzzleGrid
+fromString_ str =
     let
         lines : List String
         lines =
@@ -147,8 +161,13 @@ fromString str =
             Grid.filled 0 0 Empty
 
 
-initial : PuzzleGrid
+initial : Model
 initial =
+    fromGrid initial_
+
+
+initial_ : PuzzleGrid
+initial_ =
     let
         insert =
             Grid.insert
@@ -163,15 +182,18 @@ initial =
                     |> insert ( 0, 0 ) Destination
                     |> insert ( 1, 1 ) (sourceWithMirror 1)
                     |> insert ( 1, 1 ) Source
-                    |> is (fromString encoded)
+                    |> is (fromString_ encoded)
                 )
     in
-    fromString encoded
+    fromString_ encoded
 
 
-update : Computer -> PuzzleGrid -> PuzzleGrid
-update { screen, mouse } grid =
+update : Computer -> Model -> Model
+update { screen, mouse } model =
     let
+        grid =
+            model.grid
+
         ct =
             initCellT screen grid
 
@@ -182,7 +204,7 @@ update { screen, mouse } grid =
         ( True, Just cell ) ->
             let
                 ins a =
-                    Grid.insert pos a grid
+                    { model | grid = Grid.insert pos a grid }
             in
             case cell of
                 Mirror dir ->
@@ -192,10 +214,10 @@ update { screen, mouse } grid =
                     ins (SourceWithMirror (Dir.rotate 1 dir))
 
                 _ ->
-                    grid
+                    model
 
         _ ->
-            grid
+            model
 
 
 destinationPositions : PuzzleGrid -> Set Int2
@@ -204,9 +226,9 @@ destinationPositions =
         Set.empty
 
 
-isSolved : PuzzleGrid -> Bool
-isSolved grid =
-    destinationPositions grid == litDestinationPositions grid
+isSolved : Model -> Bool
+isSolved =
+    .grid >> (\grid -> destinationPositions grid == litDestinationPositions grid)
 
 
 litDestinationPositions : PuzzleGrid -> Set Int2
@@ -288,9 +310,12 @@ initCellT screen grid =
     CT.fromViewD viewD (Grid.dimensions grid)
 
 
-view : Computer -> PuzzleGrid -> Shape
-view { time, screen } grid =
+view : Computer -> Model -> Shape
+view { time, screen } model =
     let
+        grid =
+            model.grid
+
         ct =
             initCellT screen grid
 

@@ -8,7 +8,7 @@ import Playground.CellTransform as CT exposing (CellTransform)
 import Playground.Direction8 as Dir exposing (Direction8)
 import Playground.Extra exposing (..)
 import Playground.Grid as Grid exposing (Pos)
-import PointFree exposing (toFloat2, whenTrue)
+import PointFree exposing (whenTrue)
 import Set exposing (Set)
 
 
@@ -217,59 +217,51 @@ type CellForm
     | DEST Bool
 
 
-gridToCellShape : CellTransform -> PuzzleGrid -> List ( Float2, List CellForm )
-gridToCellShape ct grid =
+gridToCellShape time ct grid =
     let
+        width =
+            ct.cellSize
+
         litDest =
             listDestinations grid
 
-        cellToForm pos cell =
-            case cell of
-                Source ->
-                    [ SRC ]
-
-                Destination ->
-                    [ DEST (Set.member pos litDest) ]
-
-                SourceWithMirror dir ->
-                    [ SRC, MIR dir ]
-
-                Mirror dir ->
-                    [ MIR dir ]
-
-                Empty ->
-                    []
+        bg : Shape
+        bg =
+            group
+                [ rectangle black width width |> scale 0.95
+                , rectangle white width width |> scale 0.9
+                ]
 
         toCellView ( pos, cell ) =
-            ( ct.toView pos, cellToForm pos cell )
+            cellToShape time width litDest pos cell
+                |> List.map (scale 0.8)
+                |> (::) bg
+                |> group
+                |> move2 (ct.toView pos)
     in
     grid |> Grid.toList |> List.map toCellView
 
 
-cellToShape : Time -> CellTransform -> comparable -> Set comparable -> Cell -> Shape
-cellToShape time ct litDest pos cell =
-    let
-        width =
-            ct.cellSize
-    in
+cellToShape : Time -> Number -> Set comparable -> comparable -> Cell -> List Shape
+cellToShape time width litDest pos cell =
     case cell of
         Source ->
-            srcShape width
+            [ srcShape width ]
 
         Destination ->
-            destinationShape time width (Set.member litDest pos)
+            [ destinationShape time width (Set.member pos litDest) ]
 
         SourceWithMirror dir ->
             [ srcShape width, mirrorShape width dir ]
-                |> group
 
         Mirror dir ->
-            mirrorShape width dir
+            [ mirrorShape width dir ]
 
         Empty ->
-            noShape
+            []
 
 
+srcShape : Number -> Shape
 srcShape width =
     rectangle orange width width
 

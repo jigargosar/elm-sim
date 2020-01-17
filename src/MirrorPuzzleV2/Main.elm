@@ -217,6 +217,24 @@ type CellForm
     | DEST Bool
 
 
+srcShape width =
+    rectangle orange width width
+
+
+mirrorShape width dir =
+    group
+        [ group [ oval green (width / 2) width |> moveLeft (width / 6) ]
+            |> rotate (Dir.toDegrees dir)
+        , circle lightPurple 10
+        ]
+        |> scale 0.9
+
+
+destinationShape time width isLit =
+    circle blue (width / 2)
+        |> whenTrue isLit (blink time)
+
+
 cellFormToShape : Time -> Number -> CellForm -> Shape
 cellFormToShape time cz form =
     case form of

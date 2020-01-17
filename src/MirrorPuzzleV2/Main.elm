@@ -217,6 +217,59 @@ type CellForm
     | DEST Bool
 
 
+gridToCellShape : CellTransform -> PuzzleGrid -> List ( Float2, List CellForm )
+gridToCellShape ct grid =
+    let
+        litDest =
+            listDestinations grid
+
+        cellToForm pos cell =
+            case cell of
+                Source ->
+                    [ SRC ]
+
+                Destination ->
+                    [ DEST (Set.member pos litDest) ]
+
+                SourceWithMirror dir ->
+                    [ SRC, MIR dir ]
+
+                Mirror dir ->
+                    [ MIR dir ]
+
+                Empty ->
+                    []
+
+        toCellView ( pos, cell ) =
+            ( ct.toView pos, cellToForm pos cell )
+    in
+    grid |> Grid.toList |> List.map toCellView
+
+
+cellToShape : Time -> CellTransform -> comparable -> Set comparable -> Cell -> Shape
+cellToShape time ct litDest pos cell =
+    let
+        width =
+            ct.cellSize
+    in
+    case cell of
+        Source ->
+            srcShape width
+
+        Destination ->
+            destinationShape time width (Set.member litDest pos)
+
+        SourceWithMirror dir ->
+            [ srcShape width, mirrorShape width dir ]
+                |> group
+
+        Mirror dir ->
+            mirrorShape width dir
+
+        Empty ->
+            noShape
+
+
 srcShape width =
     rectangle orange width width
 

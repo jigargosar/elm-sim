@@ -135,13 +135,6 @@ gridToLightPaths grid =
 -- Puzzle Grid View
 
 
-viewPath : CellTransform -> List Pos -> Shape
-viewPath ct =
-    List.map ct.toView
-        >> (\path -> List.map2 (line red 5) path (List.drop 1 path))
-        >> group
-
-
 initCellT : Screen -> PuzzleGrid -> CellTransform
 initCellT screen grid =
     let
@@ -162,39 +155,31 @@ viewPuzzleGrid { time, screen } grid =
                 |> gridToLightPaths
                 |> List.map (viewPath ct)
                 |> group
-
-        gridCellsShape =
-            grid
-                |> gridToCellViewList ct
-                |> List.map (viewCell time ct.cellSize)
-                |> group
     in
-    group [ gridCellsShape, lightPathsShape ]
+    group [ viewPuzzleCells time ct grid, lightPathsShape ]
 
 
-type CellForm
-    = SRC
-    | MIR Direction8
-    | DEST Bool
+
+-- Puzzle Ligh Path View
 
 
-cellFormToShape : Time -> Number -> CellForm -> Shape
-cellFormToShape time cz form =
-    case form of
-        SRC ->
-            rectangle orange cz cz
+viewPath : CellTransform -> List Pos -> Shape
+viewPath ct =
+    List.map ct.toView
+        >> (\path -> List.map2 (line red 5) path (List.drop 1 path))
+        >> group
 
-        MIR dir ->
-            group
-                [ group [ oval green (cz / 2) cz |> moveLeft (cz / 6) ]
-                    |> rotate (Dir.toDegrees dir)
-                , circle lightPurple 10
-                ]
-                |> scale 0.9
 
-        DEST lit ->
-            circle blue (cz / 2)
-                |> whenTrue lit (blink time)
+
+-- Puzzle Cell View
+
+
+viewPuzzleCells : Time -> CellTransform -> PuzzleGrid -> Shape
+viewPuzzleCells time ct grid =
+    grid
+        |> gridToCellViewList ct
+        |> List.map (viewCell time ct.cellSize)
+        |> group
 
 
 gridToCellViewList : CellTransform -> PuzzleGrid -> List ( Float2, List CellForm )
@@ -224,6 +209,31 @@ gridToCellViewList ct grid =
             ( ct.toView pos, cellToForm pos cell )
     in
     grid |> Grid.toList |> List.map toCellView
+
+
+type CellForm
+    = SRC
+    | MIR Direction8
+    | DEST Bool
+
+
+cellFormToShape : Time -> Number -> CellForm -> Shape
+cellFormToShape time cz form =
+    case form of
+        SRC ->
+            rectangle orange cz cz
+
+        MIR dir ->
+            group
+                [ group [ oval green (cz / 2) cz |> moveLeft (cz / 6) ]
+                    |> rotate (Dir.toDegrees dir)
+                , circle lightPurple 10
+                ]
+                |> scale 0.9
+
+        DEST lit ->
+            circle blue (cz / 2)
+                |> whenTrue lit (blink time)
 
 
 viewCell : Time -> Float -> ( Float2, List CellForm ) -> Shape

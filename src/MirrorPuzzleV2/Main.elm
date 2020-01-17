@@ -16,7 +16,7 @@ import Set exposing (Set)
 -- Puzzle Grid Model
 
 
-type Cell
+type PuzzleCell
     = Source
     | Destination
     | SourceWithMirror Direction8
@@ -25,15 +25,15 @@ type Cell
 
 
 type alias PuzzleGrid =
-    Grid.Grid Cell
+    Grid.Grid PuzzleCell
 
 
-mirror : Int -> Cell
+mirror : Int -> PuzzleCell
 mirror =
     Dir.fromInt >> Mirror
 
 
-sourceWithMirror : Int -> Cell
+sourceWithMirror : Int -> PuzzleCell
 sourceWithMirror =
     Dir.fromInt >> SourceWithMirror
 
@@ -186,7 +186,7 @@ gridCellShapes time ct grid =
     grid |> Grid.toList |> List.map toCellView
 
 
-cellShape : Time -> CellTransform -> Set Int2 -> Int2 -> Cell -> Shape
+cellShape : Time -> CellTransform -> Set Int2 -> Int2 -> PuzzleCell -> Shape
 cellShape time ct litDest pos cell =
     let
         bg : Shape
@@ -206,7 +206,7 @@ cellShape time ct litDest pos cell =
         |> move2 (ct.toView pos)
 
 
-cellContentShapes : Time -> Number -> Set comparable -> comparable -> Cell -> List Shape
+cellContentShapes : Time -> Number -> Set comparable -> comparable -> PuzzleCell -> List Shape
 cellContentShapes time width litDest pos cell =
     case cell of
         Source ->
@@ -254,6 +254,7 @@ type alias PuzzleSceneModel =
     { grid : PuzzleGrid }
 
 
+initialPuzzleScene : Scene
 initialPuzzleScene =
     PuzzleScene { grid = initialGrid }
 

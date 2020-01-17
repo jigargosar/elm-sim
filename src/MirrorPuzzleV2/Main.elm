@@ -37,13 +37,12 @@ viewPuzzleScene computer { grid, levelIdx } =
     let
         { mouse, time, screen } =
             computer
-    in
-    [ PuzzleGrid.view computer grid
-    , let
+
         isSolved =
             PuzzleGrid.isSolved grid
-      in
-      words
+    in
+    [ PuzzleGrid.view computer grid
+    , words
         black
         ([ "Level "
          , String.fromInt (levelIdx + 1)
@@ -53,7 +52,12 @@ viewPuzzleScene computer { grid, levelIdx } =
         )
         |> moveY screen.top
         |> moveDown 50
-    , renderButton mouse "Back" (initBackButtonBox screen)
+    , renderButton mouse "Select Level" (initBackButtonBox screen)
+    , if isSolved then
+        renderButton mouse "Next" (initNextButtonBox screen)
+
+      else
+        noShape
     ]
 
 
@@ -68,10 +72,16 @@ caseBool bool true false =
 
 initBackButtonBox : Screen -> Box
 initBackButtonBox screen =
-    Box.withWH 100 30
+    Box.atTopLeft 150 30
         |> Box.move ( screen.left, screen.top )
+
+
+initNextButtonBox : Screen -> Box
+initNextButtonBox screen =
+    Box.atOrigin 100 30
+        |> Box.move ( screen.right, screen.top )
         |> Box.moveDown 50
-        |> Box.moveRight 100
+        |> Box.moveLeft 100
 
 
 
@@ -116,7 +126,7 @@ initLevelButtons screen count =
         List.range 0 (count - 1)
             |> List.map
                 (\n ->
-                    Box.withWH width height
+                    Box.atOrigin width height
                         |> Box.moveY (toY n)
                 )
     }

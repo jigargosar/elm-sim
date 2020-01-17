@@ -1,15 +1,17 @@
 module MirrorPuzzleV2.Box exposing
     ( Box
+    , atOrigin
+    , atTopLeft
     , center
     , contains
     , containsXY
     , dimensions
     , move
     , moveDown
+    , moveLeft
     , moveRight
     , moveX
     , moveY
-    , withWH
     )
 
 import Number2 as NT
@@ -19,9 +21,16 @@ type Box
     = Box NT.Float2 NT.Float2
 
 
-withWH : Float -> Float -> Box
-withWH w h =
+atOrigin : Float -> Float -> Box
+atOrigin w h =
     Box ( 0, 0 ) ( w, h )
+
+
+atTopLeft : Float -> Float -> Box
+atTopLeft w h =
+    atOrigin w h
+        |> moveRight (w / 2)
+        |> moveDown (h / 2)
 
 
 move : NT.Float2 -> Box -> Box
@@ -42,6 +51,11 @@ moveDown dy =
 moveRight : Float -> Box -> Box
 moveRight =
     moveX
+
+
+moveLeft : Float -> Box -> Box
+moveLeft =
+    negate >> moveX
 
 
 moveY : Float -> Box -> Box

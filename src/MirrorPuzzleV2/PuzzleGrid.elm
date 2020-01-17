@@ -84,19 +84,19 @@ updatePuzzleGrid { screen, mouse } grid =
             grid
 
 
-destinationSet : PuzzleGrid -> Set Int2
-destinationSet =
+destinationPositions : PuzzleGrid -> Set Int2
+destinationPositions =
     Grid.foldl (\pos cell -> whenTrue (cell == Destination) (Set.insert pos))
         Set.empty
 
 
 isSolved : PuzzleGrid -> Bool
 isSolved grid =
-    destinationSet grid == listDestinations grid
+    destinationPositions grid == litDestinationPositions grid
 
 
-listDestinations : PuzzleGrid -> Set Int2
-listDestinations grid =
+litDestinationPositions : PuzzleGrid -> Set Int2
+litDestinationPositions grid =
     gridToLightPaths grid
         |> List.filterMap List.head
         |> List.foldl
@@ -208,7 +208,7 @@ gridCellShapes : Time -> CellTransform -> PuzzleGrid -> List Shape
 gridCellShapes time ct grid =
     let
         litDest =
-            listDestinations grid
+            litDestinationPositions grid
 
         toCellView ( pos, cell ) =
             cellShape time ct litDest pos cell

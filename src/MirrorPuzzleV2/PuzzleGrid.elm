@@ -219,7 +219,7 @@ update { screen, mouse } model =
                     { model | grid = Grid.insert startPos a grid, mouseState = Up }
                         |> Debug.log "onup"
             in
-            case ( mouse.down, dx > 2 || dy > 2, Grid.get startPos grid ) of
+            case ( mouse.down, dx > 2 || dy > 2 || elapsed > 60, Grid.get startPos grid ) of
                 ( True, True, Just cell ) ->
                     case cell of
                         Mirror dir ->
@@ -240,13 +240,13 @@ update { screen, mouse } model =
                             ins (SourceWithMirror (Dir.rotate 1 dir))
 
                         _ ->
-                            model
+                            noOp
 
                 ( False, _, _ ) ->
                     { model | mouseState = Up }
 
                 _ ->
-                    model
+                    noOp
 
         Dragging _ _ ->
             if mouse.down then

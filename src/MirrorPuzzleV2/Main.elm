@@ -354,19 +354,11 @@ viewLevelSelect mouse lbs =
 type Scene
     = Intro
     | LevelSelect Int
-    | PuzzleScene Puzzle
+    | PuzzleScene PuzzleSceneModel
 
 
-type alias Puzzle =
+type alias PuzzleSceneModel =
     { grid : PuzzleGrid }
-
-
-
--- Game
-
-
-type alias Mem =
-    { scene : Scene }
 
 
 initialPuzzleScene =
@@ -375,6 +367,14 @@ initialPuzzleScene =
 
 initialLevelSelect =
     LevelSelect 10
+
+
+
+-- Game
+
+
+type alias Mem =
+    { scene : Scene }
 
 
 init : Mem
@@ -420,7 +420,7 @@ updateMem computer mem =
                 mem
 
 
-updatePuzzleScene : Computer -> Puzzle -> Puzzle
+updatePuzzleScene : Computer -> PuzzleSceneModel -> PuzzleSceneModel
 updatePuzzleScene { screen, mouse } model =
     let
         grid =
@@ -452,7 +452,7 @@ updatePuzzleScene { screen, mouse } model =
             model
 
 
-viewPuzzleScene : Computer -> Puzzle -> List Shape
+viewPuzzleScene : Computer -> PuzzleSceneModel -> List Shape
 viewPuzzleScene computer { grid } =
     let
         { mouse, time, screen } =

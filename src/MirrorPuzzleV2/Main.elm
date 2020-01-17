@@ -476,9 +476,6 @@ initBackButtonBox screen =
 view : Computer -> Mem -> List Shape
 view computer mem =
     case mem.scene of
-        PuzzleScene puzzle ->
-            viewPuzzleScene computer puzzle
-
         Intro ->
             [ words black "Tap To Start" ]
 
@@ -488,6 +485,9 @@ view computer mem =
                     initLevelButtons computer.screen levelCount
             in
             viewLevelSelect computer.mouse lbs
+
+        PuzzleScene puzzle ->
+            viewPuzzleScene computer puzzle
 
 
 main =

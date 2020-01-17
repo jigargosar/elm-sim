@@ -12,19 +12,21 @@ import Playground.Extra exposing (..)
 
 
 type alias PuzzleSceneModel =
-    { grid : PuzzleGrid }
+    { grid : PuzzleGrid
+    , levelIdx : Int
+    }
 
 
 initialPuzzleScene_ : Scene
 initialPuzzleScene_ =
-    PuzzleScene { grid = PuzzleGrid.initial }
+    PuzzleScene { grid = PuzzleGrid.initial, levelIdx = 0 }
 
 
 initPuzzleScene : Int -> Scene
 initPuzzleScene levelIdx =
     case List.drop levelIdx PuzzleGrid.levels |> List.head of
         Just levelStr ->
-            PuzzleScene { grid = PuzzleGrid.fromString levelStr }
+            PuzzleScene { grid = PuzzleGrid.fromString levelStr, levelIdx = levelIdx }
 
         Nothing ->
             initialPuzzleScene_

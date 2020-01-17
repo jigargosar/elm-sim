@@ -10,7 +10,7 @@ module MirrorPuzzleV2.PuzzleGrid exposing
     )
 
 import List.Extra
-import MirrorPuzzleV2.MouseEvent as MouseEvent
+import MirrorPuzzleV2.Mouse2 as Mouse2
 import Number2 as NT exposing (Float2, Int2)
 import Playground exposing (..)
 import Playground.CellTransform as CT exposing (CellTransform)
@@ -31,8 +31,7 @@ type Cell
 
 type alias Model =
     { grid : PuzzleGrid
-    , mouseEventModel : MouseEvent.Model
-    , dragStartViewPosition : Maybe Float2
+    , mouse2 : Mouse2.Model
     }
 
 
@@ -93,8 +92,7 @@ encoded =
 fromGrid : PuzzleGrid -> Model
 fromGrid grid =
     { grid = grid
-    , mouseEventModel = MouseEvent.init
-    , dragStartViewPosition = Nothing
+    , mouse2 = Mouse2.initial
     }
 
 
@@ -197,26 +195,11 @@ initialGrid =
 
 update : Computer -> Model -> Model
 update computer model =
-    let
-        ( mouseEventModel, mouseEvent ) =
-            MouseEvent.update computer.mouse model.mouseEventModel
-    in
-    updateHelp computer
-        mouseEvent
-        { model
-            | mouseEventModel = mouseEventModel
-            , dragStartViewPosition =
-                case mouseEvent of
-                    MouseEvent.OnDrag start _ ->
-                        Just start
-
-                    _ ->
-                        Nothing
-        }
+    updateHelp computer { model | mouse2 = Mouse2.update computer.mouse model.mouse2 }
 
 
-updateHelp : Computer -> MouseEvent.Event -> Model -> Model
-updateHelp { screen, mouse } mouseEvent model =
+updateHelp : Computer -> Model -> Model
+updateHelp { screen, mouse } model =
     let
         grid =
             model.grid
@@ -224,8 +207,8 @@ updateHelp { screen, mouse } mouseEvent model =
         ct =
             initCellT screen grid
     in
-    case mouseEvent of
-        MouseEvent.OnClick mp ->
+    case Mouse2.event model.mouse2 of
+        Mouse2.OnClick mp ->
             let
                 pos =
                     ct.fromView mp
@@ -246,7 +229,7 @@ updateHelp { screen, mouse } mouseEvent model =
             in
             { model | grid = newGrid }
 
-        MouseEvent.OnDrop start current ->
+        Mouse2.OnDrop start current ->
             let
                 dragPos =
                     ct.fromView start
@@ -397,7 +380,7 @@ view { time, screen, mouse } model =
                 |> group
 
         dimPos =
-            model.dragStartViewPosition
+            Mouse2.dragStartPosition model.mouse2
                 |> Maybe.andThen
                     (\mp ->
                         let
@@ -428,7 +411,7 @@ view { time, screen, mouse } model =
         [ gridCellShapes time ct dimPos grid |> group
         , lightPathsShape
         , case
-            model.dragStartViewPosition
+            Mouse2.dragStartPosition model.mouse2
                 |> Maybe.andThen (ct.fromView >> flip Grid.get model.grid)
           of
             Just (Mirror dir) ->

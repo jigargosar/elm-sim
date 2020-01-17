@@ -32,6 +32,12 @@ initPuzzleScene levelIdx =
             initialPuzzleScene_
 
 
+goToLevelBy : Int -> PuzzleSceneModel -> Scene
+goToLevelBy offset model =
+    clamp 0 ((PuzzleGrid.levels |> List.length) - 1) (model.levelIdx + offset)
+        |> initPuzzleScene
+
+
 viewPuzzleScene : Computer -> PuzzleSceneModel -> List Shape
 viewPuzzleScene computer { grid, levelIdx } =
     let
@@ -297,7 +303,15 @@ updateMem computer mem =
                     if mouse.click then
                         case puzzleSceneBtnAt mouse screen of
                             Just btn ->
-                                initialLevelSelect
+                                case btn of
+                                    SelectLevel ->
+                                        initialLevelSelect
+
+                                    NextLevel ->
+                                        goToLevelBy 1 model
+
+                                    PrevLevel ->
+                                        goToLevelBy -1 model
 
                             Nothing ->
                                 PuzzleScene { model | grid = PuzzleGrid.update computer model.grid }

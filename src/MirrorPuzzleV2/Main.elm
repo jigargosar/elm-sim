@@ -322,6 +322,28 @@ updateMem computer mem =
             { mem | scene = nextScene }
 
 
+updatePuzzleScene : Computer -> PuzzleSceneModel -> Scene
+updatePuzzleScene ({ mouse, screen } as computer) model =
+    if mouse.click then
+        case puzzleSceneBtnAt mouse screen of
+            Just btn ->
+                case btn of
+                    SelectLevel ->
+                        initialLevelSelect
+
+                    NextLevel ->
+                        goToLevelBy 1 model
+
+                    PrevLevel ->
+                        goToLevelBy -1 model
+
+            Nothing ->
+                PuzzleScene { model | grid = PuzzleGrid.update computer model.grid }
+
+    else
+        PuzzleScene model
+
+
 view : Computer -> Mem -> List Shape
 view computer mem =
     case mem.scene of

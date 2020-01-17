@@ -230,6 +230,7 @@ srcShape width =
     rectangle orange width width
 
 
+mirrorShape : Float -> Direction8 -> Shape
 mirrorShape width dir =
     group
         [ group [ oval green (width / 2) width |> moveLeft (width / 6) ]
@@ -239,6 +240,7 @@ mirrorShape width dir =
         |> scale 0.9
 
 
+destinationShape : Time -> Float -> Bool -> Shape
 destinationShape time width isLit =
     circle blue (width / 2)
         |> whenTrue isLit (blink time)

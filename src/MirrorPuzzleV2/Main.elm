@@ -156,7 +156,7 @@ viewPuzzleGrid { time, screen } grid =
                 |> List.map (viewPath ct)
                 |> group
     in
-    group [ viewPuzzleCells time ct grid, lightPathsShape ]
+    group [ gridCellShapes time ct grid |> group, lightPathsShape ]
 
 
 
@@ -172,49 +172,6 @@ viewPath ct =
 
 
 -- Puzzle Cell View
-
-
-viewPuzzleCells : Time -> CellTransform -> PuzzleGrid -> Shape
-viewPuzzleCells time ct grid =
-    grid
-        |> gridToCellViewList ct
-        |> List.map (viewCell time ct.cellSize)
-        |> group
-
-
-gridToCellViewList : CellTransform -> PuzzleGrid -> List ( Float2, List CellForm )
-gridToCellViewList ct grid =
-    let
-        litDest =
-            listDestinations grid
-
-        cellToForm pos cell =
-            case cell of
-                Source ->
-                    [ SRC ]
-
-                Destination ->
-                    [ DEST (Set.member pos litDest) ]
-
-                SourceWithMirror dir ->
-                    [ SRC, MIR dir ]
-
-                Mirror dir ->
-                    [ MIR dir ]
-
-                Empty ->
-                    []
-
-        toCellView ( pos, cell ) =
-            ( ct.toView pos, cellToForm pos cell )
-    in
-    grid |> Grid.toList |> List.map toCellView
-
-
-type CellForm
-    = SRC
-    | MIR Direction8
-    | DEST Bool
 
 
 gridCellShapes : Time -> CellTransform -> PuzzleGrid -> List Shape
@@ -285,40 +242,6 @@ mirrorShape width dir =
 destinationShape time width isLit =
     circle blue (width / 2)
         |> whenTrue isLit (blink time)
-
-
-cellFormToShape : Time -> Number -> CellForm -> Shape
-cellFormToShape time cz form =
-    case form of
-        SRC ->
-            rectangle orange cz cz
-
-        MIR dir ->
-            group
-                [ group [ oval green (cz / 2) cz |> moveLeft (cz / 6) ]
-                    |> rotate (Dir.toDegrees dir)
-                , circle lightPurple 10
-                ]
-                |> scale 0.9
-
-        DEST lit ->
-            circle blue (cz / 2)
-                |> whenTrue lit (blink time)
-
-
-viewCell : Time -> Float -> ( Float2, List CellForm ) -> Shape
-viewCell time width ( pos, cellForms ) =
-    let
-        bg =
-            group
-                [ rectangle black width width |> scale 0.95
-                , rectangle white width width |> scale 0.9
-                ]
-    in
-    List.map (cellFormToShape time width >> scale 0.8) cellForms
-        |> (::) bg
-        |> group
-        |> move2 pos
 
 
 

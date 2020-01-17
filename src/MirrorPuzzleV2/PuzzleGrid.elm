@@ -261,7 +261,7 @@ toMouseEvent mouseButton =
 
 
 updateHelp : Computer -> MouseEvent.Event -> Model -> Model
-updateHelp { screen, mouse } event model =
+updateHelp { screen, mouse } mouseEvent model =
     let
         grid =
             model.grid
@@ -269,7 +269,7 @@ updateHelp { screen, mouse } event model =
         ct =
             initCellT screen grid
     in
-    case event of
+    case mouseEvent of
         MouseEvent.OnClick mp ->
             let
                 pos =

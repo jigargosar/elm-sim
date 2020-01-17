@@ -223,6 +223,28 @@ update computer model =
     updateHelp computer { model | mouseButton = newMouseButton }
 
 
+type MouseEvent
+    = OnClick Float2
+    | OnDrop Float2 Float2
+
+
+toMouseEvent : MouseButton -> Maybe MouseEvent
+toMouseEvent mouseButton =
+    case mouseButton of
+        ButtonDown _ _ _ ->
+            Nothing
+
+        ButtonUp elapsed start current ->
+            if elapsed < 60 && NT.equalWithin 3 start current then
+                Just (OnClick start)
+
+            else
+                Just (OnDrop start current)
+
+        ButtonNoChange ->
+            Nothing
+
+
 updateHelp : Computer -> Model -> Model
 updateHelp { screen, mouse } model =
     let
@@ -232,77 +254,48 @@ updateHelp { screen, mouse } model =
         ct =
             initCellT screen grid
     in
-    case model.mouseState of
-        DownStart elapsed start ->
+    case toMouseEvent model.mouseButton of
+        Just (OnClick mp) ->
             let
-                ( dx, dy ) =
-                    NT.sub ( mouse.x, mouse.y ) start
-                        |> mapEach abs
-
-                noOp =
-                    { model | mouseState = DownStart (elapsed + 1) start }
-
-                startPos =
-                    ct.fromView start
-
-                dragStart dir =
-                    { model | mouseState = Dragging startPos dir }
+                pos =
+                    ct.fromView mp
 
                 ins a =
-                    { model | grid = Grid.insert startPos a grid, mouseState = Up }
-                        |> Debug.log "onup"
-            in
-            case ( mouse.down, dx > 2 || dy > 2 || elapsed > 60, Grid.get startPos grid ) of
-                ( True, True, Just cell ) ->
-                    case cell of
-                        Mirror dir ->
-                            dragStart dir
+                    Grid.insert pos a grid
 
-                        SourceWithMirror dir ->
-                            dragStart dir
-
-                        _ ->
-                            noOp
-
-                ( False, False, Just cell ) ->
-                    case cell of
-                        Mirror dir ->
-                            ins (Mirror (Dir.rotate 1 dir))
-
-                        SourceWithMirror dir ->
+                newGrid =
+                    case Grid.get pos model.grid of
+                        Just (SourceWithMirror dir) ->
                             ins (SourceWithMirror (Dir.rotate 1 dir))
 
+                        Just (Mirror dir) ->
+                            ins (Mirror (Dir.rotate 1 dir))
+
                         _ ->
-                            noOp
-
-                ( False, _, _ ) ->
-                    { model | mouseState = Up }
-
-                _ ->
-                    noOp
-
-        Dragging dragPos _ ->
-            let
-                dropPos =
-                    ct.fromView ( mouse.x, mouse.y )
+                            grid
             in
-            case ( mouse.down, Grid.get dragPos model.grid, Grid.get dropPos model.grid ) of
-                ( False, Just dragCell, Just dropCell ) ->
-                    { model
-                        | mouseState = Up
-                        , grid = dndGrid dragPos dragCell dropPos dropCell model.grid
-                    }
+            { model | grid = newGrid }
 
-                _ ->
-                    model
+        Just (OnDrop start current) ->
+            let
+                dragPos =
+                    ct.fromView start
 
-        Up ->
-            if mouse.down then
-                { model | mouseState = DownStart 0 ( mouse.x, mouse.y ) }
-                    |> Debug.log "ondown"
+                dropPos =
+                    ct.fromView current
+            in
+            { model
+                | grid =
+                    case ( Grid.get dragPos grid, Grid.get dropPos grid ) of
+                        ( Just dragCell, Just dropCell ) ->
+                            dndGrid dragPos dragCell dropPos dropCell grid
 
-            else
-                model
+                        _ ->
+                            grid
+            }
+
+        _ ->
+            model
 
 
 dndGrid : Grid.Pos -> Cell -> Grid.Pos -> Cell -> Grid Cell -> Grid Cell

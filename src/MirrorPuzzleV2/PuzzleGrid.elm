@@ -13,7 +13,7 @@ import Playground.CellTransform as CT exposing (CellTransform)
 import Playground.Direction8 as Dir exposing (Direction8)
 import Playground.Extra exposing (..)
 import Playground.Grid as Grid exposing (Grid)
-import PointFree exposing (whenTrue)
+import PointFree exposing (is, whenTrue)
 import Set exposing (Set)
 
 
@@ -56,9 +56,9 @@ sourceWithMirror =
 
 encoded =
     """
-    __,__,__,__,N3
-    __,__,M1,__,__
-    __,N7,__,DD,__
+    __,__,__,__,N5
+    __,__,M7,__,__
+    __,N1,__,DD,__
     __,SS,__,__,__
     DD,__,__,__,__
     """
@@ -69,7 +69,8 @@ fromString str =
     let
         lines : List String
         lines =
-            String.lines str
+            String.lines (String.trim str)
+                |> List.reverse
     in
     case lines of
         first :: _ ->
@@ -134,15 +135,21 @@ initial =
     let
         insert =
             Grid.insert
+
+        _ =
+            Debug.log "e"
+                (Grid.filled 5 5 Empty
+                    |> insert ( 1, 2 ) (sourceWithMirror 1)
+                    |> insert ( 2, 3 ) (mirror 7)
+                    |> insert ( 3, 2 ) Destination
+                    |> insert ( 4, 4 ) (sourceWithMirror -3)
+                    |> insert ( 0, 0 ) Destination
+                    |> insert ( 1, 1 ) (sourceWithMirror 1)
+                    |> insert ( 1, 1 ) Source
+                    |> is (fromString encoded)
+                )
     in
-    Grid.filled 5 5 Empty
-        |> insert ( 1, 2 ) (sourceWithMirror 1)
-        |> insert ( 2, 3 ) (mirror 7)
-        |> insert ( 3, 2 ) Destination
-        |> insert ( 4, 4 ) (sourceWithMirror -3)
-        |> insert ( 0, 0 ) Destination
-        |> insert ( 1, 1 ) (sourceWithMirror 1)
-        |> insert ( 1, 1 ) Source
+    fromString encoded
 
 
 update : Computer -> PuzzleGrid -> PuzzleGrid

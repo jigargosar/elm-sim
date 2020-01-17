@@ -16,7 +16,7 @@ import Playground.CellTransform as CT exposing (CellTransform)
 import Playground.Direction8 as Dir exposing (Direction8)
 import Playground.Extra exposing (..)
 import Playground.Grid as Grid exposing (Grid)
-import PointFree exposing (is, mapEach, whenTrue)
+import PointFree exposing (flip, is, mapEach, whenTrue)
 import Set exposing (Set)
 
 
@@ -480,6 +480,15 @@ view { time, screen, mouse } model =
                     |> move mouse.x mouse.y
 
             _ ->
+                noShape
+        , case
+            dragStartPosition model.mouseButton
+                |> Maybe.andThen (ct.fromView >> flip Grid.get model.grid)
+          of
+            Just _ ->
+                noShape
+
+            Nothing ->
                 noShape
         ]
 

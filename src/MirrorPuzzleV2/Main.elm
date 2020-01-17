@@ -247,7 +247,90 @@ destinationShape time width isLit =
 
 
 
--- LevelSelect
+-- Scenes: Puzzle Model
+
+
+type alias PuzzleSceneModel =
+    { grid : PuzzleGrid }
+
+
+initialPuzzleScene =
+    PuzzleScene { grid = initialGrid }
+
+
+
+-- Scenes: Puzzle Update
+
+
+updatePuzzleScene : Computer -> PuzzleSceneModel -> PuzzleSceneModel
+updatePuzzleScene { screen, mouse } model =
+    let
+        grid =
+            model.grid
+
+        ct =
+            initCellT screen grid
+
+        pos =
+            ct.fromView ( mouse.x, mouse.y )
+    in
+    case Grid.get pos grid of
+        Just cell ->
+            let
+                ins a =
+                    { model | grid = Grid.insert pos a grid }
+            in
+            case cell of
+                Mirror dir ->
+                    ins (Mirror (Dir.rotate 1 dir))
+
+                SourceWithMirror dir ->
+                    ins (SourceWithMirror (Dir.rotate 1 dir))
+
+                _ ->
+                    model
+
+        Nothing ->
+            model
+
+
+
+-- Scenes: Puzzle View
+
+
+viewPuzzleScene : Computer -> PuzzleSceneModel -> List Shape
+viewPuzzleScene computer { grid } =
+    let
+        { mouse, time, screen } =
+            computer
+    in
+    [ viewPuzzleGrid computer grid
+    , if isSolved grid then
+        words black "puzzle solved"
+            |> moveY screen.top
+            |> moveDown 50
+
+      else
+        noShape
+    , renderButton mouse "Back" (initBackButtonBox screen)
+    ]
+
+
+initBackButtonBox : Screen -> Box
+initBackButtonBox screen =
+    Box.withWH 100 30
+        |> Box.move ( screen.left, screen.top )
+        |> Box.moveDown 50
+        |> Box.moveRight 100
+
+
+
+-- Scenes : Level Select
+
+
+initialLevelSelect : Scene
+initialLevelSelect =
+    LevelSelect 10
 
 
 type alias LevelButtons =
@@ -357,18 +440,6 @@ type Scene
     | PuzzleScene PuzzleSceneModel
 
 
-type alias PuzzleSceneModel =
-    { grid : PuzzleGrid }
-
-
-initialPuzzleScene =
-    PuzzleScene { grid = initialGrid }
-
-
-initialLevelSelect =
-    LevelSelect 10
-
-
 
 -- Game
 
@@ -418,64 +489,6 @@ updateMem computer mem =
 
             else
                 mem
-
-
-updatePuzzleScene : Computer -> PuzzleSceneModel -> PuzzleSceneModel
-updatePuzzleScene { screen, mouse } model =
-    let
-        grid =
-            model.grid
-
-        ct =
-            initCellT screen grid
-
-        pos =
-            ct.fromView ( mouse.x, mouse.y )
-    in
-    case Grid.get pos grid of
-        Just cell ->
-            let
-                ins a =
-                    { model | grid = Grid.insert pos a grid }
-            in
-            case cell of
-                Mirror dir ->
-                    ins (Mirror (Dir.rotate 1 dir))
-
-                SourceWithMirror dir ->
-                    ins (SourceWithMirror (Dir.rotate 1 dir))
-
-                _ ->
-                    model
-
-        Nothing ->
-            model
-
-
-viewPuzzleScene : Computer -> PuzzleSceneModel -> List Shape
-viewPuzzleScene computer { grid } =
-    let
-        { mouse, time, screen } =
-            computer
-    in
-    [ viewPuzzleGrid computer grid
-    , if isSolved grid then
-        words black "puzzle solved"
-            |> moveY screen.top
-            |> moveDown 50
-
-      else
-        noShape
-    , renderButton mouse "Back" (initBackButtonBox screen)
-    ]
-
-
-initBackButtonBox : Screen -> Box
-initBackButtonBox screen =
-    Box.withWH 100 30
-        |> Box.move ( screen.left, screen.top )
-        |> Box.moveDown 50
-        |> Box.moveRight 100
 
 
 view : Computer -> Mem -> List Shape

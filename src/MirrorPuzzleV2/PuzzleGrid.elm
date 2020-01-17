@@ -362,7 +362,7 @@ initCellT screen grid =
 
 
 view : Computer -> Model -> Shape
-view { time, screen } model =
+view { time, screen, mouse } model =
     let
         grid =
             model.grid
@@ -387,6 +387,14 @@ view { time, screen } model =
     group
         [ gridCellShapes time ct dimPos grid |> group
         , lightPathsShape
+        , case model.mouseState of
+            Dragging _ dir ->
+                mirrorShape ct.cellSize dir
+                    |> scale 0.8
+                    |> move mouse.x mouse.y
+
+            _ ->
+                noShape
         ]
 
 

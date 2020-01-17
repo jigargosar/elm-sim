@@ -231,8 +231,12 @@ type MouseEvent
 toMouseEvent : MouseButton -> MouseEvent
 toMouseEvent mouseButton =
     case mouseButton of
-        ButtonDown _ _ _ ->
-            NoEvent
+        ButtonDown elapsed start current ->
+            if elapsed < 60 && NT.equalWithin 3 start current then
+                NoEvent
+
+            else
+                OnDrag start current
 
         ButtonUp elapsed start current ->
             if elapsed < 60 && NT.equalWithin 3 start current then

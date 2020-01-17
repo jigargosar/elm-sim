@@ -38,6 +38,31 @@ sourceWithMirror =
     Dir.fromInt >> SourceWithMirror
 
 
+
+{-
+   SS       -> source
+   DD       -> destination
+   M<0-7>   -> mirror angle
+   N<0-7>   -> source with mirror
+   __       -> empty cell
+
+
+   -- Later
+   O<0-7> -> double mirror
+   X -> wall
+-}
+
+
+encoded =
+    """
+    __,__,__,__,N3
+    __,__,M1,__,__
+    __,N7,__,DD,__
+    __,SS,__,__,__
+    DD,__,__,__,__
+    """
+
+
 initial : PuzzleGrid
 initial =
     let

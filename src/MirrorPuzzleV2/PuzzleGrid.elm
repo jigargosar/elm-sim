@@ -199,7 +199,7 @@ update computer model =
 
 
 updateHelp : Computer -> Model -> Model
-updateHelp { screen, mouse } model =
+updateHelp { screen } model =
     let
         grid =
             model.grid
@@ -365,7 +365,7 @@ initCellT screen grid =
 
 
 view : Computer -> Model -> Shape
-view { time, screen, mouse } model =
+view { time, screen } model =
     let
         grid =
             model.grid
@@ -410,19 +410,21 @@ view { time, screen, mouse } model =
     group
         [ gridCellShapes time ct dimPos grid |> group
         , lightPathsShape
-        , case
-            Mouse2.dragStartPosition model.mouse2
-                |> Maybe.andThen (ct.fromView >> flip Grid.get model.grid)
-          of
-            Just (Mirror dir) ->
-                mirrorShape ct.cellSize dir
-                    |> scale 0.8
-                    |> move mouse.x mouse.y
+        , case Mouse2.event model.mouse2 of
+            Mouse2.OnDrag start current ->
+                case Grid.get (ct.fromView start) model.grid of
+                    Just (Mirror dir) ->
+                        mirrorShape ct.cellSize dir
+                            |> scale 0.8
+                            |> move2 current
 
-            Just (SourceWithMirror dir) ->
-                mirrorShape ct.cellSize dir
-                    |> scale 0.8
-                    |> move mouse.x mouse.y
+                    Just (SourceWithMirror dir) ->
+                        mirrorShape ct.cellSize dir
+                            |> scale 0.8
+                            |> move2 current
+
+                    _ ->
+                        noShape
 
             _ ->
                 noShape

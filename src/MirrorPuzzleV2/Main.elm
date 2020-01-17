@@ -33,21 +33,37 @@ initPuzzleScene levelIdx =
 
 
 viewPuzzleScene : Computer -> PuzzleSceneModel -> List Shape
-viewPuzzleScene computer { grid } =
+viewPuzzleScene computer { grid, levelIdx } =
     let
         { mouse, time, screen } =
             computer
     in
     [ PuzzleGrid.view computer grid
-    , if PuzzleGrid.isSolved grid then
-        words black "puzzle solved"
-            |> moveY screen.top
-            |> moveDown 50
-
-      else
-        noShape
+    , let
+        isSolved =
+            PuzzleGrid.isSolved grid
+      in
+      words
+        black
+        ([ "Level "
+         , String.fromInt (levelIdx + 1)
+         , caseBool isSolved " solved" ""
+         ]
+            |> String.concat
+        )
+        |> moveY screen.top
+        |> moveDown 50
     , renderButton mouse "Back" (initBackButtonBox screen)
     ]
+
+
+caseBool : Bool -> c -> c -> c
+caseBool bool true false =
+    if bool then
+        true
+
+    else
+        false
 
 
 initBackButtonBox : Screen -> Box

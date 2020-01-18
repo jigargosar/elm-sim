@@ -168,12 +168,12 @@ update computer (Model mouse2 grid) =
         newMouse2 =
             Mouse2.update computer.mouse mouse2
     in
-    updateHelp computer newMouse2 grid
+    updateGrid computer newMouse2 grid
         |> Model newMouse2
 
 
-updateHelp : Computer -> Mouse2 -> Grid -> Grid
-updateHelp { screen } mouse2 grid =
+updateGrid : Computer -> Mouse2 -> Grid -> Grid
+updateGrid { screen } mouse2 grid =
     let
         ct =
             initCellT screen grid
@@ -255,6 +255,7 @@ destinationPositions =
         Set.empty
 
 
+toGrid : Model -> Grid
 toGrid (Model _ grid) =
     grid
 

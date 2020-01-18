@@ -324,7 +324,7 @@ updateGrid ct mouse2 grid =
             )
         , Mouse2.onDrop
             (\dragPt dropPt ->
-                Grid.map2Cells cellsOnDnd
+                Grid.mapCellAt2 cellsOnDnd
                     (ct.fromView dragPt)
                     (ct.fromView dropPt)
                     |> ignoreNothing

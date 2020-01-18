@@ -8,7 +8,7 @@ module Playground.Grid exposing
     , insert
     , isValid
     , map
-    , map2Cells
+    , mapCellAt2
     , positions
     , toList
     , values
@@ -77,8 +77,8 @@ toList =
     toDict >> Dict.toList
 
 
-map2Cells : (b -> b -> Maybe ( b, b )) -> Pos -> Pos -> Grid b -> Maybe (Grid b)
-map2Cells func p1 p2 grid =
+mapCellAt2 : (b -> b -> Maybe ( b, b )) -> Pos -> Pos -> Grid b -> Maybe (Grid b)
+mapCellAt2 func p1 p2 grid =
     Maybe.map2 func (get p1 grid) (get p2 grid)
         |> Maybe.andThen identity
         |> Maybe.map (\( c1, c2 ) -> grid |> insert p1 c1 |> insert p2 c2)

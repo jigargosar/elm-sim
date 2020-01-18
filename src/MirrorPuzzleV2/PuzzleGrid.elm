@@ -10,14 +10,14 @@ module MirrorPuzzleV2.PuzzleGrid exposing
     )
 
 import List.Extra
-import MirrorPuzzleV2.Mouse2 as Mouse2
+import MirrorPuzzleV2.Mouse2 as Mouse2 exposing (Mouse2)
 import Number2 as NT exposing (Float2, Int2)
 import Playground exposing (..)
 import Playground.CellTransform as CT exposing (CellTransform)
 import Playground.Direction8 as Dir exposing (Direction8)
 import Playground.Extra exposing (..)
 import Playground.Grid as Grid exposing (Grid)
-import PointFree exposing (flip, is, whenTrue)
+import PointFree exposing (is, whenTrue)
 import Set exposing (Set)
 
 
@@ -31,7 +31,7 @@ type Cell
 
 type alias Model =
     { grid : PuzzleGrid
-    , mouse2 : Mouse2.Mouse2
+    , mouse2 : Mouse2
     }
 
 

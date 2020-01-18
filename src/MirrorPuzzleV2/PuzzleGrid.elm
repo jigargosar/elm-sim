@@ -207,14 +207,13 @@ updateGrid { screen } mouse2 grid =
         ct =
             initCellT screen grid
 
-        d : Mouse2.Config a
         d =
             Mouse2.defaultTransformer
     in
     Mouse2.transformEvent
         { d
             | click = \pt -> rotateMirrorAt (ct.fromView pt) grid
-            , drop = \dragPt dropPt -> onDrop (ct.fromView dragPt) (ct.fromView dropPt) grid
+            , drop = \dragPt dropPt -> updateCellAt2 cellDnd (ct.fromView dragPt) (ct.fromView dropPt) grid
         }
         mouse2
         |> Maybe.withDefault grid

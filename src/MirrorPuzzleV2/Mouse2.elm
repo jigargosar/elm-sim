@@ -30,7 +30,7 @@ update : Playground.Mouse -> Mouse2 -> Mouse2
 update mouse (Mouse2 state _) =
     let
         ( a, b ) =
-            computeState2 ( mouse.x, mouse.y )
+            nextStateAndEvent ( mouse.x, mouse.y )
                 (if mouse.down then
                     IsDown
 
@@ -53,8 +53,8 @@ type MouseButton
     | IsUp
 
 
-computeState2 : Float2 -> MouseButton -> State -> ( State, Event )
-computeState2 currentPosition button previousState =
+nextStateAndEvent : Float2 -> MouseButton -> State -> ( State, Event )
+nextStateAndEvent currentPosition button previousState =
     let
         tooFarFrom : Float2 -> Bool
         tooFarFrom =

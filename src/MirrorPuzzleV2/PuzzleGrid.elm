@@ -370,8 +370,8 @@ type alias DndView =
     }
 
 
-mirrorDirectionAtCell : Int2 -> Grid -> Maybe Direction8
-mirrorDirectionAtCell pos grid =
+getMirrorDirection : Int2 -> Grid -> Maybe Direction8
+getMirrorDirection pos grid =
     case Grid.get pos grid of
         Just cell ->
             case cell of
@@ -396,7 +396,7 @@ toDndView ct mouse2 grid =
                 pos =
                     ct.fromView start
             in
-            case mirrorDirectionAtCell pos grid of
+            case getMirrorDirection pos grid of
                 Just dir ->
                     Just { dragPpos = pos, dropViewPos = current, mirrorDir = dir }
 

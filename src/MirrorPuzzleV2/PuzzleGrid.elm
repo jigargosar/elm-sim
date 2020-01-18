@@ -50,8 +50,8 @@ toGrid (Model _ grid) =
 
 
 isSolved : Model -> Bool
-isSolved =
-    toGrid >> (\grid -> destinations grid == litDestinations grid)
+isSolved (Model _ grid) =
+    destinations grid == litDestinations grid
 
 
 initCellT : Screen -> Grid -> CellTransform

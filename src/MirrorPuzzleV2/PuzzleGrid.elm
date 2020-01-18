@@ -189,11 +189,6 @@ rotateMirrorAt pos grid =
             Nothing
 
 
-onDrop : Int2 -> Int2 -> Grid -> Maybe Grid
-onDrop dragPos dropPos grid =
-    map2Cells cellDnd dragPos dropPos grid
-
-
 map2Cells : (b -> b -> Maybe ( b, b )) -> Grid.Pos -> Grid.Pos -> Grid.Grid b -> Maybe (Grid.Grid b)
 map2Cells func p1 p2 grid =
     Maybe.map2 func (Grid.get p1 grid) (Grid.get p2 grid)
@@ -213,13 +208,14 @@ updateGrid { screen } mouse2 grid =
     Mouse2.transformEvent
         { d
             | click = \pt -> rotateMirrorAt (ct.fromView pt) grid
-            , drop = \dragPt dropPt -> map2Cells cellDnd (ct.fromView dragPt) (ct.fromView dropPt) grid
+            , drop = \dragPt dropPt -> map2Cells updateCellsOnDnd (ct.fromView dragPt) (ct.fromView dropPt) grid
         }
         mouse2
         |> Maybe.withDefault grid
 
 
-cellDnd dragCell dropCell =
+updateCellsOnDnd : Cell -> Cell -> Maybe ( Cell, Cell )
+updateCellsOnDnd dragCell dropCell =
     case ( dragCell, dropCell ) of
         ( SourceWithMirror dir, Empty ) ->
             Just ( Source, Mirror dir )

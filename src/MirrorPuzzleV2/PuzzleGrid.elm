@@ -208,14 +208,14 @@ updateGrid { screen } mouse2 grid =
     Mouse2.transformEvent
         { d
             | click = \pt -> rotateMirrorAt (ct.fromView pt) grid
-            , drop = \dragPt dropPt -> map2Cells updateCellsOnDnd (ct.fromView dragPt) (ct.fromView dropPt) grid
+            , drop = \dragPt dropPt -> map2Cells getNewCellsOnDnd (ct.fromView dragPt) (ct.fromView dropPt) grid
         }
         mouse2
         |> Maybe.withDefault grid
 
 
-updateCellsOnDnd : Cell -> Cell -> Maybe ( Cell, Cell )
-updateCellsOnDnd dragCell dropCell =
+getNewCellsOnDnd : Cell -> Cell -> Maybe ( Cell, Cell )
+getNewCellsOnDnd dragCell dropCell =
     case ( dragCell, dropCell ) of
         ( SourceWithMirror dir, Empty ) ->
             Just ( Source, Mirror dir )

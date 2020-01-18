@@ -172,58 +172,53 @@ update computer (Model mouse2 grid) =
         |> Model newMouse2
 
 
+onClick : Int2 -> Grid -> Grid
+onClick pos grid =
+    let
+        ins a =
+            Grid.insert pos a grid
+
+        newGrid =
+            case Grid.get pos grid of
+                Just (SourceWithMirror dir) ->
+                    ins (SourceWithMirror (Dir.rotate 1 dir))
+
+                Just (Mirror dir) ->
+                    ins (Mirror (Dir.rotate 1 dir))
+
+                _ ->
+                    grid
+    in
+    newGrid
+
+
+onDrop : Int2 -> Int2 -> Grid -> Grid
+onDrop dragPos dropPos grid =
+    case ( Grid.get dragPos grid, Grid.get dropPos grid ) of
+        ( Just dragCell, Just dropCell ) ->
+            updateGridOnDrop dragPos dragCell dropPos dropCell grid
+
+        _ ->
+            grid
+
+
 updateGrid : Computer -> Mouse2 -> Grid -> Grid
 updateGrid { screen } mouse2 grid =
     let
         ct =
             initCellT screen grid
+
+        d : Mouse2.Config a
+        d =
+            Mouse2.defaultConfig
     in
-    case Mouse2.event mouse2 of
-        Mouse2.OnClick mp ->
-            let
-                pos =
-                    ct.fromView mp
-
-                ins a =
-                    Grid.insert pos a grid
-
-                newGrid =
-                    case Grid.get pos grid of
-                        Just (SourceWithMirror dir) ->
-                            ins (SourceWithMirror (Dir.rotate 1 dir))
-
-                        Just (Mirror dir) ->
-                            ins (Mirror (Dir.rotate 1 dir))
-
-                        _ ->
-                            grid
-            in
-            newGrid
-
-        Mouse2.OnDragStart start ->
-            let
-                _ =
-                    Debug.log "start" start
-            in
-            grid
-
-        Mouse2.OnDrop start current ->
-            let
-                dragPos =
-                    ct.fromView start
-
-                dropPos =
-                    ct.fromView current
-            in
-            case ( Grid.get dragPos grid, Grid.get dropPos grid ) of
-                ( Just dragCell, Just dropCell ) ->
-                    updateGridOnDrop dragPos dragCell dropPos dropCell grid
-
-                _ ->
-                    grid
-
-        _ ->
-            grid
+    Mouse2.on
+        { d
+            | click = \pt -> onClick (ct.fromView pt) grid |> Just
+            , drop = \dragPt dropPt -> onDrop (ct.fromView dragPt) (ct.fromView dropPt) grid |> Just
+        }
+        mouse2
+        |> Maybe.withDefault grid
 
 
 updateGridOnDrop : Grid.Pos -> Cell -> Grid.Pos -> Cell -> Grid -> Grid

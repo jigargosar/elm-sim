@@ -2,7 +2,7 @@ module MirrorPuzzleV2.Main exposing (main)
 
 import List.Extra
 import MirrorPuzzleV2.Box as Box exposing (Box)
-import MirrorPuzzleV2.Mouse2 exposing (Mouse2)
+import MirrorPuzzleV2.Mouse2 as Mouse2 exposing (Mouse2)
 import MirrorPuzzleV2.PuzzleGrid as PuzzleGrid
 import MirrorPuzzleV2.WithMouseEvent as WithMouse2
 import Playground exposing (..)
@@ -40,7 +40,7 @@ goToLevelBy offset model =
         |> initPuzzleScene
 
 
-viewPuzzleScene : Computer -> Mouse2 -> PuzzleSceneModel -> List Shape
+viewPuzzleScene : Computer -> Mouse2.Event -> PuzzleSceneModel -> List Shape
 viewPuzzleScene computer mouse2 { grid, levelIdx } =
     let
         { mouse, time, screen } =
@@ -273,7 +273,7 @@ init =
     { scene = initPuzzleScene 0 }
 
 
-updateMem : Computer -> Mouse2 -> Mem -> Mem
+updateMem : Computer -> Mouse2.Event -> Mem -> Mem
 updateMem computer mouse2 mem =
     let
         { mouse, screen } =
@@ -345,7 +345,7 @@ updateMem computer mouse2 mem =
 -}
 
 
-view : Computer -> Mouse2 -> Mem -> List Shape
+view : Computer -> Mouse2.Event -> Mem -> List Shape
 view computer mouse2 mem =
     case mem.scene of
         Intro ->

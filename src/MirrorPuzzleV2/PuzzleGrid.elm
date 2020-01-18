@@ -162,19 +162,19 @@ initialGrid =
     decodeGrid encoded
 
 
-update : Computer -> Mouse2 -> Model -> Model
+update : Computer -> Mouse2.Event -> Model -> Model
 update computer mouse2 (Model grid) =
     updateGrid computer mouse2 grid
         |> Model
 
 
-updateGrid : Computer -> Mouse2 -> Grid -> Grid
+updateGrid : Computer -> Mouse2.Event -> Grid -> Grid
 updateGrid { screen } mouse2 grid =
     let
         ct =
             initCellT screen grid
     in
-    case Mouse2.event mouse2 of
+    case mouse2 of
         Mouse2.OnClick mp ->
             let
                 pos =
@@ -358,7 +358,7 @@ initCellT screen grid =
     CT.fromViewD viewD (Grid.dimensions grid)
 
 
-view : Computer -> Mouse2 -> Model -> Shape
+view : Computer -> Mouse2.Event -> Model -> Shape
 view { time, screen } mouse2 (Model grid) =
     let
         ct =
@@ -391,9 +391,9 @@ type alias DndView =
     }
 
 
-toDndView : CellTransform -> Mouse2 -> Grid -> Maybe DndView
+toDndView : CellTransform -> Mouse2.Event -> Grid -> Maybe DndView
 toDndView ct mouse2 grid =
-    case Mouse2.event mouse2 of
+    case mouse2 of
         Mouse2.OnDrag start current ->
             let
                 pos =
@@ -410,7 +410,7 @@ toDndView ct mouse2 grid =
             Nothing
 
 
-getDragPosAndShape : CellTransform -> Mouse2 -> Grid -> ( Set Int2, Shape )
+getDragPosAndShape : CellTransform -> Mouse2.Event -> Grid -> ( Set Int2, Shape )
 getDragPosAndShape ct mouse2 grid =
     case toDndView ct mouse2 grid of
         Just { dragPos, dropViewPos, mirrorDir } ->

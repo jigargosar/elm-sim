@@ -9,16 +9,16 @@ type Model mem
 
 
 type alias View mem =
-    Computer -> Mouse2 -> mem -> List Shape
+    Computer -> Mouse2.Event -> mem -> List Shape
 
 
 type alias Update mem =
-    Computer -> Mouse2 -> mem -> mem
+    Computer -> Mouse2.Event -> mem -> mem
 
 
 view : View mem -> Computer -> Model mem -> List Shape
 view func computer (Model mouse2 mem) =
-    func computer mouse2 mem
+    func computer (Mouse2.event mouse2) mem
 
 
 update : Update mem -> Computer -> Model mem -> Model mem
@@ -27,7 +27,7 @@ update func computer (Model mouse2 mem) =
         newMouse2 =
             Mouse2.update computer.mouse mouse2
     in
-    func computer newMouse2 mem
+    func computer (Mouse2.event newMouse2) mem
         |> Model newMouse2
 
 

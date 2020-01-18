@@ -172,24 +172,6 @@ initial =
 
 initialGrid : Grid
 initialGrid =
-    let
-        insert =
-            Grid.insert
-
-        {- _ =
-           Debug.log "e"
-               (Grid.filled 5 5 Empty
-                   |> insert ( 1, 2 ) (sourceWithMirror 1)
-                   |> insert ( 2, 3 ) (mirror 7)
-                   |> insert ( 3, 2 ) Destination
-                   |> insert ( 4, 4 ) (sourceWithMirror -3)
-                   |> insert ( 0, 0 ) Destination
-                   |> insert ( 1, 1 ) (sourceWithMirror 1)
-                   |> insert ( 1, 1 ) Source
-                   |> is (gridFromString encoded)
-               )
-        -}
-    in
     gridFromString encoded
 
 

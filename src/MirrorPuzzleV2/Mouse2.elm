@@ -4,6 +4,15 @@ import Number2 as NT exposing (Float2)
 import Playground exposing (Mouse)
 
 
+type alias Config a =
+    { onClick : Float2 -> a
+    , onDragStart : Float2 -> a
+    , onDrag : Float2 -> Float2 -> a
+    , onDrop : Float2 -> Float2 -> a
+    , noEvent : a
+    }
+
+
 type Mouse2
     = Mouse2 State Event
 

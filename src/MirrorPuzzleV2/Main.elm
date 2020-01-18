@@ -4,7 +4,7 @@ import List.Extra
 import MirrorPuzzleV2.Box as Box exposing (Box)
 import MirrorPuzzleV2.Mouse2 exposing (Mouse2)
 import MirrorPuzzleV2.PuzzleGrid as PuzzleGrid
-import MirrorPuzzleV2.WithMouse2 as WithMouse2
+import MirrorPuzzleV2.WithMouseEvent as WithMouse2
 import Playground exposing (..)
 import Playground.Extra exposing (..)
 

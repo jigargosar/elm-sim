@@ -1,4 +1,4 @@
-module MirrorPuzzleV2.WithMouse2 exposing (game2)
+module MirrorPuzzleV2.WithMouseEvent exposing (game2)
 
 import MirrorPuzzleV2.Mouse2 as Mouse2 exposing (Mouse2)
 import Playground exposing (Computer, Shape, game)

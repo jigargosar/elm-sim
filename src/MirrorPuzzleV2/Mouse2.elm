@@ -1,4 +1,4 @@
-module MirrorPuzzleV2.Mouse2 exposing (Config, Mouse2, defaultConfig, event, initial, on, update)
+module MirrorPuzzleV2.Mouse2 exposing (Config, Mouse2, defaultTransformer, event, initial, transformEvent, update)
 
 import Number2 as NT exposing (Float2)
 import Playground exposing (Mouse)
@@ -12,8 +12,8 @@ type alias Config a =
     }
 
 
-defaultConfig : Config a
-defaultConfig =
+defaultTransformer : Config a
+defaultTransformer =
     { click = \_ -> Nothing
     , dragStart = \_ -> Nothing
     , drag = \_ -> \_ -> Nothing
@@ -21,8 +21,8 @@ defaultConfig =
     }
 
 
-on : Config a -> Mouse2 -> Maybe a
-on cfg (Mouse2 _ event_) =
+transformEvent : Config a -> Mouse2 -> Maybe a
+transformEvent cfg (Mouse2 _ event_) =
     case event_ of
         OnClick s ->
             cfg.click s

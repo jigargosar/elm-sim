@@ -210,9 +210,9 @@ updateGrid { screen } mouse2 grid =
 
         d : Mouse2.Config a
         d =
-            Mouse2.defaultConfig
+            Mouse2.defaultTransformer
     in
-    Mouse2.on
+    Mouse2.transformEvent
         { d
             | click = \pt -> onClick (ct.fromView pt) grid |> Just
             , drop = \dragPt dropPt -> onDrop (ct.fromView dragPt) (ct.fromView dropPt) grid |> Just
@@ -394,9 +394,9 @@ toDndView : CellTransform -> Mouse2 -> Grid -> Maybe DndView
 toDndView ct mouse2 grid =
     let
         d =
-            Mouse2.defaultConfig
+            Mouse2.defaultTransformer
     in
-    Mouse2.on
+    Mouse2.transformEvent
         { d
             | drag =
                 \dragPt dropPt ->

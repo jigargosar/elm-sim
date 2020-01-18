@@ -8,6 +8,7 @@ module Playground.Grid exposing
     , insert
     , isValid
     , map
+    , map2Cells
     , positions
     , toList
     , values
@@ -74,6 +75,13 @@ foldl func acc =
 toList : Grid a -> List ( Pos, a )
 toList =
     toDict >> Dict.toList
+
+
+map2Cells : (b -> b -> Maybe ( b, b )) -> Pos -> Pos -> Grid b -> Maybe (Grid b)
+map2Cells func p1 p2 grid =
+    Maybe.map2 func (get p1 grid) (get p2 grid)
+        |> Maybe.andThen identity
+        |> Maybe.map (\( c1, c2 ) -> grid |> insert p1 c1 |> insert p2 c2)
 
 
 toDict : Grid a -> Dict Pos a

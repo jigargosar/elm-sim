@@ -44,8 +44,8 @@ update mouse (Mouse2 state _) =
 
 type State
     = Up
-    | DownAndNotDragging Int Float2
-    | DownAndDragging Float2
+    | Down Int Float2
+    | Dragging Float2
 
 
 type MouseButton
@@ -68,17 +68,21 @@ nextStateAndEvent currentPosition button previousState =
         IsDown ->
             case previousState of
                 Up ->
-                    ( DownAndNotDragging 0 currentPosition, NoEvent )
+                    ( Down 0 currentPosition, NoEvent )
 
-                DownAndNotDragging elapsed startPosition ->
+                Down elapsed startPosition ->
+                    let
+                        continue =
+                            Down (elapsed + 1) startPosition
+                    in
                     if tooLong elapsed || tooFarFrom startPosition then
-                        ( DownAndDragging startPosition, OnDragStart startPosition )
+                        ( Dragging startPosition, OnDragStart startPosition )
 
                     else
-                        ( DownAndNotDragging (elapsed + 1) startPosition, NoEvent )
+                        ( continue, NoEvent )
 
-                DownAndDragging startPosition ->
-                    ( DownAndDragging startPosition, OnDrag startPosition currentPosition )
+                Dragging startPosition ->
+                    ( Dragging startPosition, OnDrag startPosition currentPosition )
 
         IsUp ->
             ( Up
@@ -86,13 +90,13 @@ nextStateAndEvent currentPosition button previousState =
                 Up ->
                     NoEvent
 
-                DownAndNotDragging elapsed startPosition ->
+                Down elapsed startPosition ->
                     if tooLong elapsed || tooFarFrom startPosition then
                         NoEvent
 
                     else
                         OnClick startPosition
 
-                DownAndDragging startPosition ->
+                Dragging startPosition ->
                     OnDrop startPosition currentPosition
             )

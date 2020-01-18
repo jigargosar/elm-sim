@@ -1,4 +1,14 @@
-module MirrorPuzzleV2.Mouse2 exposing (Config, Mouse2, defaultTransformer, event, initial, onClick, onDrag, onDrop, oneOf, transformEvent, update)
+module MirrorPuzzleV2.Mouse2 exposing
+    ( Config
+    , Mouse2
+    , event
+    , initial
+    , onClick
+    , onDrag
+    , onDrop
+    , oneOf
+    , update
+    )
 
 import Maybe.Extra
 import Number2 as NT exposing (Float2)

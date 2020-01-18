@@ -2,9 +2,7 @@ module MirrorPuzzleV2.Main exposing (main)
 
 import List.Extra
 import MirrorPuzzleV2.Box as Box exposing (Box)
-import MirrorPuzzleV2.Mouse2 as Mouse2 exposing (Mouse2)
 import MirrorPuzzleV2.PuzzleGrid as PuzzleGrid
-import MirrorPuzzleV2.WithMouseEvent as WithMouse2
 import Playground exposing (..)
 import Playground.Extra exposing (..)
 
@@ -40,8 +38,8 @@ goToLevelBy offset model =
         |> initPuzzleScene
 
 
-viewPuzzleScene : Computer -> Mouse2.Event -> PuzzleSceneModel -> List Shape
-viewPuzzleScene computer mouse2 { grid, levelIdx } =
+viewPuzzleScene : Computer -> PuzzleSceneModel -> List Shape
+viewPuzzleScene computer { grid, levelIdx } =
     let
         { mouse, time, screen } =
             computer
@@ -49,7 +47,7 @@ viewPuzzleScene computer mouse2 { grid, levelIdx } =
         isSolved =
             PuzzleGrid.isSolved grid
     in
-    [ PuzzleGrid.view computer mouse2 grid
+    [ PuzzleGrid.view computer grid
     , words
         black
         ([ "Level "
@@ -273,8 +271,8 @@ init =
     { scene = initPuzzleScene 0 }
 
 
-updateMem : Computer -> Mouse2.Event -> Mem -> Mem
-updateMem computer mouse2 mem =
+updateMem : Computer -> Mem -> Mem
+updateMem computer mem =
     let
         { mouse, screen } =
             computer
@@ -315,38 +313,35 @@ updateMem computer mouse2 mem =
                                     goToLevelBy -1 model
 
                         _ ->
-                            PuzzleScene { model | grid = PuzzleGrid.update computer mouse2 model.grid }
+                            PuzzleScene { model | grid = PuzzleGrid.update computer model.grid }
             in
             { mem | scene = nextScene }
 
 
+updatePuzzleScene : Computer -> PuzzleSceneModel -> Scene
+updatePuzzleScene ({ mouse, screen } as computer) model =
+    if mouse.click then
+        case puzzleSceneBtnAt mouse screen of
+            Just btn ->
+                case btn of
+                    SelectLevel ->
+                        initialLevelSelect
 
-{-
-   updatePuzzleScene : Computer -> PuzzleSceneModel -> Scene
-   updatePuzzleScene ({ mouse, screen } as computer) model =
-       if mouse.click then
-           case puzzleSceneBtnAt mouse screen of
-               Just btn ->
-                   case btn of
-                       SelectLevel ->
-                           initialLevelSelect
+                    NextLevel ->
+                        goToLevelBy 1 model
 
-                       NextLevel ->
-                           goToLevelBy 1 model
+                    PrevLevel ->
+                        goToLevelBy -1 model
 
-                       PrevLevel ->
-                           goToLevelBy -1 model
+            Nothing ->
+                PuzzleScene { model | grid = PuzzleGrid.update computer model.grid }
 
-               Nothing ->
-                   PuzzleScene { model | grid = PuzzleGrid.update computer model.grid }
-
-       else
-           PuzzleScene model
--}
+    else
+        PuzzleScene model
 
 
-view : Computer -> Mouse2.Event -> Mem -> List Shape
-view computer mouse2 mem =
+view : Computer -> Mem -> List Shape
+view computer mem =
     case mem.scene of
         Intro ->
             [ words black "Tap To Start" ]
@@ -359,8 +354,8 @@ view computer mouse2 mem =
             viewLevelSelect computer.mouse lbs
 
         PuzzleScene puzzle ->
-            viewPuzzleScene computer mouse2 puzzle
+            viewPuzzleScene computer puzzle
 
 
 main =
-    WithMouse2.game2 view updateMem init
+    game view updateMem init

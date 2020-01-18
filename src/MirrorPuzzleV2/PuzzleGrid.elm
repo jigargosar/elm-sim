@@ -284,6 +284,24 @@ isSolved =
     .grid >> (\grid -> destinationPositions grid == litDestinationPositions grid)
 
 
+getMirrorDirection : Int2 -> Grid -> Maybe Direction8
+getMirrorDirection pos grid =
+    case Grid.get pos grid of
+        Just cell ->
+            case cell of
+                SourceWithMirror dir ->
+                    Just dir
+
+                Mirror dir ->
+                    Just dir
+
+                _ ->
+                    Nothing
+
+        Nothing ->
+            Nothing
+
+
 litDestinationPositions : Grid -> Set Int2
 litDestinationPositions grid =
     gridToLightPaths grid
@@ -368,24 +386,6 @@ type alias DndView =
     , dropViewPos : Float2
     , mirrorDir : Direction8
     }
-
-
-getMirrorDirection : Int2 -> Grid -> Maybe Direction8
-getMirrorDirection pos grid =
-    case Grid.get pos grid of
-        Just cell ->
-            case cell of
-                SourceWithMirror dir ->
-                    Just dir
-
-                Mirror dir ->
-                    Just dir
-
-                _ ->
-                    Nothing
-
-        Nothing ->
-            Nothing
 
 
 toDndView : CellTransform -> Mouse2 -> Grid -> Maybe DndView

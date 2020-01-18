@@ -410,7 +410,7 @@ toDndView ct mouse2 grid =
 view : Computer -> Model -> Shape
 view { time, screen } model =
     let
-        { grid, mouse2 } =
+        { mouse2, grid } =
             model
 
         ct =
@@ -423,20 +423,25 @@ view { time, screen } model =
                 |> group
 
         ( dimPos, draggedShape ) =
-            case toDndView ct mouse2 grid of
-                Just { dragPos, dropViewPos, mirrorDir } ->
-                    ( Set.singleton dragPos
-                    , draggedMirrorShape ct.cellSize mirrorDir dropViewPos
-                    )
-
-                Nothing ->
-                    ( Set.empty, noShape )
+            getDragPosAndIndicatorShape ct mouse2 grid
     in
     group
         [ gridCellShapes time ct dimPos grid |> group
         , lightPathsShape
         , draggedShape
         ]
+
+
+getDragPosAndIndicatorShape : CellTransform -> Mouse2 -> Grid -> ( Set Int2, Shape )
+getDragPosAndIndicatorShape ct mouse2 grid =
+    case toDndView ct mouse2 grid of
+        Just { dragPos, dropViewPos, mirrorDir } ->
+            ( Set.singleton dragPos
+            , draggedMirrorShape ct.cellSize mirrorDir dropViewPos
+            )
+
+        Nothing ->
+            ( Set.empty, noShape )
 
 
 

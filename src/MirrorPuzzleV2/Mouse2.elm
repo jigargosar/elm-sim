@@ -1,4 +1,4 @@
-module MirrorPuzzleV2.Mouse2 exposing (Config, Event(..), Mouse2, config, defaultConfig, event, initial, on, update)
+module MirrorPuzzleV2.Mouse2 exposing (Config, Mouse2, defaultConfig, event, initial, on, update)
 
 import Number2 as NT exposing (Float2)
 import Playground exposing (Mouse)
@@ -19,16 +19,6 @@ defaultConfig =
     , drag = \_ -> \_ -> Nothing
     , drop = \_ -> \_ -> Nothing
     }
-
-
-onF : (Config a -> Config a) -> Mouse2 -> Maybe a
-onF func =
-    on (func defaultConfig)
-
-
-config : (Config a -> Config a) -> Config a
-config func =
-    func defaultConfig
 
 
 on : Config a -> Mouse2 -> Maybe a

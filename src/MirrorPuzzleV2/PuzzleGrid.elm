@@ -392,21 +392,26 @@ type alias DndView =
 
 toDndView : CellTransform -> Mouse2 -> Grid -> Maybe DndView
 toDndView ct mouse2 grid =
-    case Mouse2.event mouse2 of
-        Mouse2.OnDrag start current ->
-            let
-                pos =
-                    ct.fromView start
-            in
-            case getMirrorDirection pos grid of
-                Just dir ->
-                    Just { dragPos = pos, dropViewPos = current, mirrorDir = dir }
+    let
+        d =
+            Mouse2.defaultConfig
+    in
+    Mouse2.on
+        { d
+            | drag =
+                \dragPt dropPt ->
+                    let
+                        pos =
+                            ct.fromView dragPt
+                    in
+                    case getMirrorDirection pos grid of
+                        Just dir ->
+                            Just { dragPos = pos, dropViewPos = dropPt, mirrorDir = dir }
 
-                Nothing ->
-                    Nothing
-
-        _ ->
-            Nothing
+                        Nothing ->
+                            Nothing
+        }
+        mouse2
 
 
 getDragPosAndShape : CellTransform -> Mouse2 -> Grid -> ( Set Int2, Shape )

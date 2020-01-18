@@ -78,15 +78,16 @@ encoded =
     """
 
 
+fromString : String -> Model
+fromString =
+    gridFromString >> fromGrid
+
+
 fromGrid : Grid -> Model
 fromGrid grid =
     { grid = grid
     , mouse2 = Mouse2.initial
     }
-
-
-fromString =
-    gridFromString >> fromGrid
 
 
 gridFromString : String -> Grid

@@ -363,41 +363,42 @@ initCellT screen grid =
     CT.fromViewD viewD (Grid.dimensions grid)
 
 
-type alias DragView =
-    { startCellPos : Int2
-    , currentViewPos : Float2
+type alias DndView =
+    { dragPpos : Int2
+    , dropViewPos : Float2
     , mirrorDir : Direction8
     }
 
 
-toDragView : CellTransform -> Model -> Maybe DragView
-toDragView ct model =
-    case Mouse2.event model.mouse2 of
+mirrorDirectionAtCell : Int2 -> Grid -> Maybe Direction8
+mirrorDirectionAtCell pos grid =
+    case Grid.get pos grid of
+        Just cell ->
+            case cell of
+                SourceWithMirror dir ->
+                    Just dir
+
+                Mirror dir ->
+                    Just dir
+
+                _ ->
+                    Nothing
+
+        Nothing ->
+            Nothing
+
+
+toDndView : CellTransform -> Mouse2 -> Grid -> Maybe DndView
+toDndView ct mouse2 grid =
+    case Mouse2.event mouse2 of
         Mouse2.OnDrag start current ->
             let
                 pos =
                     ct.fromView start
-
-                mirrorDir : Maybe Direction8
-                mirrorDir =
-                    case Grid.get pos model.grid of
-                        Just cell ->
-                            case cell of
-                                SourceWithMirror dir ->
-                                    Just dir
-
-                                Mirror dir ->
-                                    Just dir
-
-                                _ ->
-                                    Nothing
-
-                        Nothing ->
-                            Nothing
             in
-            case mirrorDir of
+            case mirrorDirectionAtCell pos grid of
                 Just dir ->
-                    Just { startCellPos = pos, currentViewPos = current, mirrorDir = dir }
+                    Just { dragPpos = pos, dropViewPos = current, mirrorDir = dir }
 
                 Nothing ->
                     Nothing
@@ -409,11 +410,14 @@ toDragView ct model =
 view : Computer -> Model -> Shape
 view { time, screen } model =
     let
-        grid =
-            model.grid
+        { grid, mouse2 } =
+            model
 
         ct =
             initCellT screen grid
+
+        dndView =
+            toDndView ct mouse2 grid
 
         lightPathsShape =
             grid
@@ -421,55 +425,22 @@ view { time, screen } model =
                 |> List.map (viewPath ct)
                 |> group
 
-        dimPos =
-            Mouse2.dragStartPosition model.mouse2
-                |> Maybe.andThen
-                    (\mp ->
-                        let
-                            pos =
-                                ct.fromView mp
-
-                            bool =
-                                case Grid.get pos model.grid of
-                                    Just (Mirror _) ->
-                                        True
-
-                                    Just (SourceWithMirror _) ->
-                                        True
-
-                                    _ ->
-                                        False
-                        in
-                        if bool then
-                            Just pos
-
-                        else
-                            Nothing
+        ( dimPos, draggedShape ) =
+            case dndView of
+                Just { dragPpos, dropViewPos, mirrorDir } ->
+                    ( Set.singleton dragPpos
+                    , mirrorShape ct.cellSize mirrorDir
+                        |> scale 0.8
+                        |> move2 dropViewPos
                     )
-                |> Maybe.map Set.singleton
-                |> Maybe.withDefault Set.empty
+
+                Nothing ->
+                    ( Set.empty, noShape )
     in
     group
         [ gridCellShapes time ct dimPos grid |> group
         , lightPathsShape
-        , case Mouse2.event model.mouse2 of
-            Mouse2.OnDrag start current ->
-                case Grid.get (ct.fromView start) model.grid of
-                    Just (Mirror dir) ->
-                        mirrorShape ct.cellSize dir
-                            |> scale 0.8
-                            |> move2 current
-
-                    Just (SourceWithMirror dir) ->
-                        mirrorShape ct.cellSize dir
-                            |> scale 0.8
-                            |> move2 current
-
-                    _ ->
-                        noShape
-
-            _ ->
-                noShape
+        , draggedShape
         ]
 
 

@@ -1,5 +1,6 @@
-module MirrorPuzzleV2.Mouse2 exposing (Config, Mouse2, defaultTransformer, event, initial, onClick, onDrag, onDrop, transformEvent, update)
+module MirrorPuzzleV2.Mouse2 exposing (Config, Mouse2, defaultTransformer, event, initial, onClick, onDrag, onDrop, oneOf, transformEvent, update)
 
+import Maybe.Extra
 import Number2 as NT exposing (Float2)
 import Playground exposing (Mouse)
 
@@ -38,6 +39,11 @@ transformEvent cfg (Mouse2 _ event_) =
 
         NoEvent ->
             Nothing
+
+
+oneOf : List (Mouse2 -> Maybe a) -> Mouse2 -> Maybe a
+oneOf list mouse2 =
+    Maybe.Extra.oneOf list mouse2
 
 
 onClick : (Float2 -> Maybe a) -> Mouse2 -> Maybe a

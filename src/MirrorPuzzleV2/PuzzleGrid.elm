@@ -9,6 +9,7 @@ module MirrorPuzzleV2.PuzzleGrid exposing
     )
 
 import List.Extra
+import Maybe.Extra
 import MirrorPuzzleV2.Mouse2 as Mouse2 exposing (Mouse2)
 import Number2 as NT exposing (Float2, Int2)
 import Playground exposing (..)
@@ -194,23 +195,21 @@ updateGrid { screen } mouse2 grid =
     let
         ct =
             initCellT screen grid
-
-        d =
-            Mouse2.defaultTransformer
     in
-    Mouse2.transformEvent
-        { d
-            | click =
-                \pt ->
+    mouse2
+        |> Mouse2.oneOf
+            [ Mouse2.onClick
+                (\pt ->
                     rotateMirrorAt (ct.fromView pt) grid
-            , drop =
-                \dragPt dropPt ->
+                )
+            , Mouse2.onDrop
+                (\dragPt dropPt ->
                     Grid.map2Cells getNewCellsOnDnd
                         (ct.fromView dragPt)
                         (ct.fromView dropPt)
                         grid
-        }
-        mouse2
+                )
+            ]
         |> Maybe.withDefault grid
 
 

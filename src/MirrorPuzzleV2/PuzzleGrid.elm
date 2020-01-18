@@ -221,25 +221,6 @@ decodeGrid str =
             Grid.filled 0 0 Empty
 
 
-cellsOnDnd : Cell -> Cell -> Maybe ( Cell, Cell )
-cellsOnDnd dragCell dropCell =
-    case ( dragCell, dropCell ) of
-        ( SourceWithMirror dir, Empty ) ->
-            Just ( Source, Mirror dir )
-
-        ( SourceWithMirror dir, Source ) ->
-            Just ( Source, SourceWithMirror dir )
-
-        ( Mirror dir, Empty ) ->
-            Just ( Empty, Mirror dir )
-
-        ( Mirror dir, Source ) ->
-            Just ( Empty, SourceWithMirror dir )
-
-        _ ->
-            Nothing
-
-
 destinations : Grid -> Set Int2
 destinations =
     Grid.foldl (\pos cell -> whenTrue (cell == Destination) (Set.insert pos))
@@ -351,6 +332,25 @@ updateGrid ct mouse2 grid =
         ]
         mouse2
         |> Maybe.map (callWith grid)
+
+
+cellsOnDnd : Cell -> Cell -> Maybe ( Cell, Cell )
+cellsOnDnd dragCell dropCell =
+    case ( dragCell, dropCell ) of
+        ( SourceWithMirror dir, Empty ) ->
+            Just ( Source, Mirror dir )
+
+        ( SourceWithMirror dir, Source ) ->
+            Just ( Source, SourceWithMirror dir )
+
+        ( Mirror dir, Empty ) ->
+            Just ( Empty, Mirror dir )
+
+        ( Mirror dir, Source ) ->
+            Just ( Empty, SourceWithMirror dir )
+
+        _ ->
+            Nothing
 
 
 rotateMirrorAt : Int2 -> Grid -> Grid

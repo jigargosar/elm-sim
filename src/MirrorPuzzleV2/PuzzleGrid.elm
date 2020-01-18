@@ -238,8 +238,8 @@ mirrorDirectionAtCellPos pos grid =
             Nothing
 
 
-foldSourceWithMirrors : (Int2 -> Direction8 -> a -> a) -> a -> Grid -> a
-foldSourceWithMirrors func =
+foldlSourceWithMirrors : (Int2 -> Direction8 -> a -> a) -> a -> Grid -> a
+foldlSourceWithMirrors func =
     Grid.foldl
         (\pos cell ->
             case cell of

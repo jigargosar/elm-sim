@@ -240,7 +240,7 @@ updateHelp { screen } model =
                 | grid =
                     case ( Grid.get dragPos grid, Grid.get dropPos grid ) of
                         ( Just dragCell, Just dropCell ) ->
-                            dndGrid dragPos dragCell dropPos dropCell grid
+                            updateGridOnDrop dragPos dragCell dropPos dropCell grid
 
                         _ ->
                             grid
@@ -250,8 +250,8 @@ updateHelp { screen } model =
             model
 
 
-dndGrid : Grid.Pos -> Cell -> Grid.Pos -> Cell -> Grid -> Grid
-dndGrid dragPos dragCell dropPos dropCell grid =
+updateGridOnDrop : Grid.Pos -> Cell -> Grid.Pos -> Cell -> Grid -> Grid
+updateGridOnDrop dragPos dragCell dropPos dropCell grid =
     let
         ( newDragCell, newDropCell ) =
             case ( dragCell, dropCell ) of

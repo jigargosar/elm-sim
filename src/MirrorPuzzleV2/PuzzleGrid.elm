@@ -426,7 +426,7 @@ view { time, screen } model =
             case toDndView ct mouse2 grid of
                 Just { dragPos, dropViewPos, mirrorDir } ->
                     ( Set.singleton dragPos
-                    , viewDraggedMirror ct.cellSize mirrorDir dropViewPos
+                    , draggedMirrorShape ct.cellSize mirrorDir dropViewPos
                     )
 
                 Nothing ->
@@ -441,13 +441,6 @@ view { time, screen } model =
 
 
 -- Puzzle Ligh Path View
-
-
-viewDraggedMirror : Float -> Direction8 -> Float2 -> Shape
-viewDraggedMirror width dir viewPos =
-    mirrorShape width dir
-        |> scale 0.8
-        |> move2 viewPos
 
 
 viewPath : CellTransform -> List Int2 -> Shape
@@ -491,6 +484,13 @@ cellShape time ct dimPos litDest pos cell =
         |> (::) bg
         |> group
         |> move2 (ct.toView pos)
+
+
+draggedMirrorShape : Float -> Direction8 -> Float2 -> Shape
+draggedMirrorShape width dir viewPos =
+    mirrorShape width dir
+        |> scale 0.8
+        |> move2 viewPos
 
 
 cellContentShapes : Time -> Number -> Set comparable -> comparable -> Cell -> List Shape

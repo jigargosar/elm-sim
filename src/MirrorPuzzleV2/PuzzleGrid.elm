@@ -1,6 +1,5 @@
 module MirrorPuzzleV2.PuzzleGrid exposing
     ( Model
-    , PuzzleGrid
     , fromString
     , initial
     , isSolved

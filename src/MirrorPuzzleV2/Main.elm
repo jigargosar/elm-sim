@@ -2,7 +2,7 @@ module MirrorPuzzleV2.Main exposing (main)
 
 import List.Extra
 import MirrorPuzzleV2.Box as Box exposing (Box)
-import MirrorPuzzleV2.PuzzleGrid as PuzzleGrid exposing (PuzzleGrid)
+import MirrorPuzzleV2.PuzzleGrid as PuzzleGrid
 import Playground exposing (..)
 import Playground.Extra exposing (..)
 

@@ -1,11 +1,11 @@
-module MirrorPuzzleV2.Mouse2 exposing (Event(..), Model, dragStartPosition, event, initial, update)
+module MirrorPuzzleV2.Mouse2 exposing (Event(..), Mouse2, dragStartPosition, event, initial, update)
 
 import Number2 as NT exposing (Float2)
 import Playground exposing (Mouse)
 
 
-type Model
-    = Model State Event
+type Mouse2
+    = Mouse2 State Event
 
 
 type State
@@ -20,17 +20,17 @@ type Event
     | NoEvent
 
 
-initial : Model
+initial : Mouse2
 initial =
-    Model Up NoEvent
+    Mouse2 Up NoEvent
 
 
-event : Model -> Event
-event (Model _ e) =
+event : Mouse2 -> Event
+event (Mouse2 _ e) =
     e
 
 
-dragStartPosition : Model -> Maybe Float2
+dragStartPosition : Mouse2 -> Maybe Float2
 dragStartPosition =
     event
         >> (\e ->
@@ -43,8 +43,8 @@ dragStartPosition =
            )
 
 
-update : Playground.Mouse -> Model -> Model
-update mouse (Model state _) =
+update : Playground.Mouse -> Mouse2 -> Mouse2
+update mouse (Mouse2 state _) =
     let
         current =
             ( mouse.x, mouse.y )
@@ -83,4 +83,4 @@ update mouse (Model state _) =
                     in
                     ( newModel, newEvent )
     in
-    Model nextState nextEvent
+    Mouse2 nextState nextEvent

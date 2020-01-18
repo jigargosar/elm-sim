@@ -31,7 +31,7 @@ type Cell
 
 type alias Model =
     { grid : PuzzleGrid
-    , mouse2 : Mouse2.Model
+    , mouse2 : Mouse2.Mouse2
     }
 
 

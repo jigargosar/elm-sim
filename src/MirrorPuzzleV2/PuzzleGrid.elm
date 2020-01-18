@@ -172,30 +172,36 @@ update computer (Model mouse2 grid) =
         |> Model newMouse2
 
 
-onClick : Int2 -> Grid -> Grid
-onClick pos grid =
+rotateMirrorAt : Int2 -> Grid -> Maybe Grid
+rotateMirrorAt pos grid =
     let
         ins a =
-            Grid.insert pos a grid
-
-        newGrid =
-            case Grid.get pos grid of
-                Just (SourceWithMirror dir) ->
-                    ins (SourceWithMirror (Dir.rotate 1 dir))
-
-                Just (Mirror dir) ->
-                    ins (Mirror (Dir.rotate 1 dir))
-
-                _ ->
-                    grid
+            Grid.insert pos a grid |> Just
     in
-    newGrid
+    case Grid.get pos grid of
+        Just (SourceWithMirror dir) ->
+            ins (SourceWithMirror (Dir.rotate 1 dir))
+
+        Just (Mirror dir) ->
+            ins (Mirror (Dir.rotate 1 dir))
+
+        _ ->
+            Nothing
 
 
 onDrop : Int2 -> Int2 -> Grid -> Grid
 onDrop dragPos dropPos grid =
     case ( Grid.get dragPos grid, Grid.get dropPos grid ) of
         ( Just dragCell, Just dropCell ) ->
+            let
+                _ =
+                    cellDnd dragCell dropCell
+                        |> Maybe.map f
+                        |> Maybe.withDefault grid
+
+                f ( newDragCell, newDropCell ) =
+                    grid |> Grid.insert dragPos newDragCell |> Grid.insert dropPos newDropCell
+            in
             updateGridOnDrop dragPos dragCell dropPos dropCell grid
 
         _ ->
@@ -214,11 +220,29 @@ updateGrid { screen } mouse2 grid =
     in
     Mouse2.transformEvent
         { d
-            | click = \pt -> onClick (ct.fromView pt) grid |> Just
+            | click = \pt -> rotateMirrorAt (ct.fromView pt) grid
             , drop = \dragPt dropPt -> onDrop (ct.fromView dragPt) (ct.fromView dropPt) grid |> Just
         }
         mouse2
         |> Maybe.withDefault grid
+
+
+cellDnd dragCell dropCell =
+    case ( dragCell, dropCell ) of
+        ( SourceWithMirror dir, Empty ) ->
+            Just ( Source, Mirror dir )
+
+        ( SourceWithMirror dir, Source ) ->
+            Just ( Source, SourceWithMirror dir )
+
+        ( Mirror dir, Empty ) ->
+            Just ( Empty, Mirror dir )
+
+        ( Mirror dir, Source ) ->
+            Just ( Empty, SourceWithMirror dir )
+
+        _ ->
+            Nothing
 
 
 updateGridOnDrop : Grid.Pos -> Cell -> Grid.Pos -> Cell -> Grid -> Grid

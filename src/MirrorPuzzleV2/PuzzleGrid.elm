@@ -220,8 +220,8 @@ destinations =
         Set.empty
 
 
-getMirrorDirection : Int2 -> Grid -> Maybe Direction8
-getMirrorDirection pos grid =
+mirrorDirectionAtCellPos : Int2 -> Grid -> Maybe Direction8
+mirrorDirectionAtCellPos pos grid =
     case Grid.get pos grid of
         Just cell ->
             case cell of
@@ -236,6 +236,19 @@ getMirrorDirection pos grid =
 
         Nothing ->
             Nothing
+
+
+foldSourceWithMirrors : (Int2 -> Direction8 -> a -> a) -> a -> Grid -> a
+foldSourceWithMirrors func =
+    Grid.foldl
+        (\pos cell ->
+            case cell of
+                SourceWithMirror dir ->
+                    func pos dir
+
+                _ ->
+                    identity
+        )
 
 
 type alias LightPath =
@@ -407,7 +420,7 @@ toDndView ct mouse2 grid =
                 pos =
                     ct.fromView dragPt
             in
-            case getMirrorDirection pos grid of
+            case mirrorDirectionAtCellPos pos grid of
                 Just dir ->
                     Just { dragPos = pos, dropViewPos = dropPt, mirrorDir = dir }
 

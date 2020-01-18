@@ -189,23 +189,16 @@ rotateMirrorAt pos grid =
             Nothing
 
 
-onDrop : Int2 -> Int2 -> Grid -> Grid
+onDrop : Int2 -> Int2 -> Grid -> Maybe Grid
 onDrop dragPos dropPos grid =
-    case ( Grid.get dragPos grid, Grid.get dropPos grid ) of
-        ( Just dragCell, Just dropCell ) ->
-            let
-                _ =
-                    cellDnd dragCell dropCell
-                        |> Maybe.map f
-                        |> Maybe.withDefault grid
+    updateCellAt2 cellDnd dragPos dropPos grid
 
-                f ( newDragCell, newDropCell ) =
-                    grid |> Grid.insert dragPos newDragCell |> Grid.insert dropPos newDropCell
-            in
-            updateGridOnDrop dragPos dragCell dropPos dropCell grid
 
-        _ ->
-            grid
+updateCellAt2 : (b -> b -> Maybe ( b, b )) -> Grid.Pos -> Grid.Pos -> Grid.Grid b -> Maybe (Grid.Grid b)
+updateCellAt2 func p1 p2 grid =
+    Maybe.map2 func (Grid.get p1 grid) (Grid.get p2 grid)
+        |> Maybe.andThen identity
+        |> Maybe.map (\( c1, c2 ) -> grid |> Grid.insert p1 c1 |> Grid.insert p2 c2)
 
 
 updateGrid : Computer -> Mouse2 -> Grid -> Grid
@@ -221,7 +214,7 @@ updateGrid { screen } mouse2 grid =
     Mouse2.transformEvent
         { d
             | click = \pt -> rotateMirrorAt (ct.fromView pt) grid
-            , drop = \dragPt dropPt -> onDrop (ct.fromView dragPt) (ct.fromView dropPt) grid |> Just
+            , drop = \dragPt dropPt -> onDrop (ct.fromView dragPt) (ct.fromView dropPt) grid
         }
         mouse2
         |> Maybe.withDefault grid

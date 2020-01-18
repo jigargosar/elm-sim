@@ -29,7 +29,7 @@ type Cell
 
 
 type Model
-    = Model Mouse2 Grid
+    = Model Grid
 
 
 type alias Grid =
@@ -83,7 +83,7 @@ fromString =
 
 fromGrid : Grid -> Model
 fromGrid grid =
-    Model Mouse2.initial grid
+    Model grid
 
 
 decodeGrid : String -> Grid
@@ -163,13 +163,9 @@ initialGrid =
 
 
 update : Computer -> Mouse2 -> Model -> Model
-update computer mouse2 (Model _ grid) =
-    let
-        newMouse2 =
-            Mouse2.update computer.mouse mouse2
-    in
-    updateGrid computer newMouse2 grid
-        |> Model newMouse2
+update computer mouse2 (Model grid) =
+    updateGrid computer mouse2 grid
+        |> Model
 
 
 updateGrid : Computer -> Mouse2 -> Grid -> Grid
@@ -256,7 +252,7 @@ destinationPositions =
 
 
 toGrid : Model -> Grid
-toGrid (Model _ grid) =
+toGrid (Model grid) =
     grid
 
 
@@ -363,7 +359,7 @@ initCellT screen grid =
 
 
 view : Computer -> Mouse2 -> Model -> Shape
-view { time, screen } mouse2 (Model _ grid) =
+view { time, screen } mouse2 (Model grid) =
     let
         ct =
             initCellT screen grid

@@ -1,4 +1,4 @@
-module MirrorPuzzleV2.Mouse2 exposing (Event(..), Mouse2, dragStartPosition, event, initial, update)
+module MirrorPuzzleV2.Mouse2 exposing (Event(..), Mouse2, event, initial, update)
 
 import Number2 as NT exposing (Float2)
 import Playground exposing (Mouse)
@@ -15,6 +15,7 @@ type State
 
 type Event
     = OnClick Float2
+    | OnDragStart Float2
     | OnDrag Float2 Float2
     | OnDrop Float2 Float2
     | NoEvent
@@ -28,19 +29,6 @@ initial =
 event : Mouse2 -> Event
 event (Mouse2 _ e) =
     e
-
-
-dragStartPosition : Mouse2 -> Maybe Float2
-dragStartPosition =
-    event
-        >> (\e ->
-                case e of
-                    OnDrag start _ ->
-                        Just start
-
-                    _ ->
-                        Nothing
-           )
 
 
 update : Playground.Mouse -> Mouse2 -> Mouse2
@@ -76,7 +64,11 @@ update mouse (Mouse2 state _) =
                                     OnClick startPosition
 
                             else if mouse.down then
-                                OnDrag startPosition current
+                                if elapsed == 0 then
+                                    OnDragStart startPosition
+
+                                else
+                                    OnDrag startPosition current
 
                             else
                                 OnDrop startPosition current

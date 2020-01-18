@@ -162,8 +162,8 @@ initialGrid =
     decodeGrid encoded
 
 
-update : Computer -> Model -> Model
-update computer (Model mouse2 grid) =
+update : Computer -> Mouse2 -> Model -> Model
+update computer mouse2 (Model _ grid) =
     let
         newMouse2 =
             Mouse2.update computer.mouse mouse2
@@ -362,8 +362,8 @@ initCellT screen grid =
     CT.fromViewD viewD (Grid.dimensions grid)
 
 
-view : Computer -> Model -> Shape
-view { time, screen } (Model mouse2 grid) =
+view : Computer -> Mouse2 -> Model -> Shape
+view { time, screen } mouse2 (Model _ grid) =
     let
         ct =
             initCellT screen grid

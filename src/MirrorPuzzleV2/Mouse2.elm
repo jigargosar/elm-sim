@@ -1,16 +1,34 @@
-module MirrorPuzzleV2.Mouse2 exposing (Event(..), Mouse2, event, initial, update)
+module MirrorPuzzleV2.Mouse2 exposing (Config, Event(..), Mouse2, event, initial, on, update)
 
 import Number2 as NT exposing (Float2)
 import Playground exposing (Mouse)
 
 
 type alias Config a =
-    { onClick : Float2 -> a
-    , onDragStart : Float2 -> a
-    , onDrag : Float2 -> Float2 -> a
-    , onDrop : Float2 -> Float2 -> a
-    , noEvent : a
+    { click : Float2 -> Maybe a
+    , dragStart : Float2 -> Maybe a
+    , drag : Float2 -> Float2 -> Maybe a
+    , drop : Float2 -> Float2 -> Maybe a
     }
+
+
+on : Config a -> Mouse2 -> Maybe a
+on config (Mouse2 _ event_) =
+    case event_ of
+        OnClick s ->
+            config.click s
+
+        OnDragStart s ->
+            config.dragStart s
+
+        OnDrag s e ->
+            config.drag s e
+
+        OnDrop s e ->
+            config.drop s e
+
+        NoEvent ->
+            Nothing
 
 
 type Mouse2

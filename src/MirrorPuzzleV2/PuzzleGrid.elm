@@ -38,16 +38,6 @@ type alias Grid =
     Grid.Grid Cell
 
 
-mirror : Int -> Cell
-mirror =
-    Dir.fromInt >> Mirror
-
-
-sourceWithMirror : Int -> Cell
-sourceWithMirror =
-    Dir.fromInt >> SourceWithMirror
-
-
 
 {-
    SS       -> source

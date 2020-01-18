@@ -1,11 +1,10 @@
 module MirrorPuzzleV2.Mouse2 exposing
-    ( Config
-    , Mouse2
+    ( Mouse2
+    , handleEvents
     , initial
     , onClick
     , onDrag
     , onDrop
-    , oneOf
     , update
     )
 
@@ -14,60 +13,39 @@ import Number2 as NT exposing (Float2)
 import Playground exposing (Mouse)
 
 
-type alias Config a =
-    { click : Float2 -> Maybe a
-    , dragStart : Float2 -> Maybe a
-    , drag : Float2 -> Float2 -> Maybe a
-    , drop : Float2 -> Float2 -> Maybe a
-    }
+handleEvents : List (Mouse2 -> Maybe a) -> Mouse2 -> Maybe a
+handleEvents list0 mouse2 =
+    Maybe.Extra.oneOf list0 mouse2
 
 
-defaultTransformer : Config a
-defaultTransformer =
-    { click = \_ -> Nothing
-    , dragStart = \_ -> Nothing
-    , drag = \_ -> \_ -> Nothing
-    , drop = \_ -> \_ -> Nothing
-    }
+onClick : (Float2 -> a) -> Mouse2 -> Maybe a
+onClick func (Mouse2 _ e) =
+    case e of
+        OnClick p ->
+            func p |> Just
 
-
-transformEvent : Config a -> Mouse2 -> Maybe a
-transformEvent cfg (Mouse2 _ event_) =
-    case event_ of
-        OnClick s ->
-            cfg.click s
-
-        OnDragStart s ->
-            cfg.dragStart s
-
-        OnDrag s e ->
-            cfg.drag s e
-
-        OnDrop s e ->
-            cfg.drop s e
-
-        NoEvent ->
+        _ ->
             Nothing
 
 
-oneOf : List (Mouse2 -> Maybe a) -> Mouse2 -> Maybe a
-oneOf list mouse2 =
-    Maybe.Extra.oneOf list mouse2
+onDrop : (Float2 -> Float2 -> a) -> Mouse2 -> Maybe a
+onDrop func (Mouse2 _ e) =
+    case e of
+        OnDrop p1 p2 ->
+            func p1 p2 |> Just
+
+        _ ->
+            Nothing
 
 
-onClick : (Float2 -> Maybe a) -> Mouse2 -> Maybe a
-onClick func =
-    transformEvent { defaultTransformer | click = func }
+onDrag : (Float2 -> Float2 -> a) -> Mouse2 -> Maybe a
+onDrag func (Mouse2 _ e) =
+    case e of
+        OnDrag p1 p2 ->
+            func p1 p2 |> Just
 
-
-onDrop : (Float2 -> Float2 -> Maybe a) -> Mouse2 -> Maybe a
-onDrop func =
-    transformEvent { defaultTransformer | drop = func }
-
-
-onDrag : (Float2 -> Float2 -> Maybe a) -> Mouse2 -> Maybe a
-onDrag func =
-    transformEvent { defaultTransformer | drag = func }
+        _ ->
+            Nothing
 
 
 type Mouse2

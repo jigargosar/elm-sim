@@ -17,7 +17,7 @@ import Playground.CellTransform as CT exposing (CellTransform)
 import Playground.Direction8 as Dir exposing (Direction8)
 import Playground.Extra exposing (..)
 import Playground.Grid as Grid
-import PointFree exposing (whenTrue)
+import PointFree exposing (callWith, ignoreNothing, whenTrue)
 import Set exposing (Set)
 
 
@@ -168,16 +168,20 @@ update computer (Model mouse2 grid) =
     let
         newMouse2 =
             Mouse2.update computer.mouse mouse2
+
+        ct =
+            initCellT computer.screen grid
     in
-    updateGrid computer newMouse2 grid
+    updateGrid ct newMouse2 grid
+        |> Maybe.withDefault grid
         |> Model newMouse2
 
 
-rotateMirrorAt : Int2 -> Grid -> Maybe Grid
+rotateMirrorAt : Int2 -> Grid -> Grid
 rotateMirrorAt pos grid =
     let
         ins a =
-            Grid.insert pos a grid |> Just
+            Grid.insert pos a grid
     in
     case Grid.get pos grid of
         Just (SourceWithMirror dir) ->
@@ -187,30 +191,26 @@ rotateMirrorAt pos grid =
             ins (Mirror (Dir.rotate 1 dir))
 
         _ ->
-            Nothing
+            grid
 
 
-updateGrid : Computer -> Mouse2 -> Grid -> Grid
-updateGrid { screen } mouse2 grid =
-    let
-        ct =
-            initCellT screen grid
-    in
-    mouse2
-        |> Mouse2.oneOf
-            [ Mouse2.onClick
-                (\pt ->
-                    rotateMirrorAt (ct.fromView pt) grid
-                )
-            , Mouse2.onDrop
-                (\dragPt dropPt ->
-                    Grid.map2Cells getNewCellsOnDnd
-                        (ct.fromView dragPt)
-                        (ct.fromView dropPt)
-                        grid
-                )
-            ]
-        |> Maybe.withDefault grid
+updateGrid : CellTransform -> Mouse2 -> Grid -> Maybe Grid
+updateGrid ct mouse2 grid =
+    Mouse2.handleEvents
+        [ Mouse2.onClick
+            (\pt ->
+                rotateMirrorAt (ct.fromView pt)
+            )
+        , Mouse2.onDrop
+            (\dragPt dropPt ->
+                Grid.map2Cells getNewCellsOnDnd
+                    (ct.fromView dragPt)
+                    (ct.fromView dropPt)
+                    |> ignoreNothing
+            )
+        ]
+        mouse2
+        |> Maybe.map (callWith grid)
 
 
 getNewCellsOnDnd : Cell -> Cell -> Maybe ( Cell, Cell )
@@ -394,6 +394,7 @@ toDndView ct mouse2 grid =
                     Nothing
         )
         mouse2
+        |> Maybe.Extra.join
 
 
 getDragPosAndShape : CellTransform -> Mouse2 -> Grid -> ( Set Int2, Shape )

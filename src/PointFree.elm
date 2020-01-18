@@ -194,3 +194,8 @@ vecFromTo ( x1, y1 ) ( x2, y2 ) =
 
 apply2 func ( a, b ) =
     func a b
+
+
+callWith : a -> (a -> b) -> b
+callWith a func =
+    func a

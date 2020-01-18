@@ -51,7 +51,7 @@ toGrid (Model _ grid) =
 
 isSolved : Model -> Bool
 isSolved =
-    toGrid >> (\grid -> destinationPositions grid == litDestinations grid)
+    toGrid >> (\grid -> destinations grid == litDestinations grid)
 
 
 initCellT : Screen -> Grid -> CellTransform
@@ -221,8 +221,8 @@ decodeGrid str =
             Grid.filled 0 0 Empty
 
 
-getNewCellsOnDnd : Cell -> Cell -> Maybe ( Cell, Cell )
-getNewCellsOnDnd dragCell dropCell =
+cellsOnDnd : Cell -> Cell -> Maybe ( Cell, Cell )
+cellsOnDnd dragCell dropCell =
     case ( dragCell, dropCell ) of
         ( SourceWithMirror dir, Empty ) ->
             Just ( Source, Mirror dir )
@@ -240,8 +240,8 @@ getNewCellsOnDnd dragCell dropCell =
             Nothing
 
 
-destinationPositions : Grid -> Set Int2
-destinationPositions =
+destinations : Grid -> Set Int2
+destinations =
     Grid.foldl (\pos cell -> whenTrue (cell == Destination) (Set.insert pos))
         Set.empty
 
@@ -343,7 +343,7 @@ updateGrid ct mouse2 grid =
             )
         , Mouse2.onDrop
             (\dragPt dropPt ->
-                Grid.map2Cells getNewCellsOnDnd
+                Grid.map2Cells cellsOnDnd
                     (ct.fromView dragPt)
                     (ct.fromView dropPt)
                     |> ignoreNothing

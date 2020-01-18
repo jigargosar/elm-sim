@@ -1,7 +1,6 @@
 module MirrorPuzzleV2.Mouse2 exposing
     ( Config
     , Mouse2
-    , event
     , initial
     , onClick
     , onDrag
@@ -86,11 +85,6 @@ type Event
 initial : Mouse2
 initial =
     Mouse2 Up NoEvent
-
-
-event : Mouse2 -> Event
-event (Mouse2 _ e) =
-    e
 
 
 update : Playground.Mouse -> Mouse2 -> Mouse2

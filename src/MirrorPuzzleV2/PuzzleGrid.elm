@@ -238,29 +238,6 @@ cellDnd dragCell dropCell =
             Nothing
 
 
-updateGridOnDrop : Grid.Pos -> Cell -> Grid.Pos -> Cell -> Grid -> Grid
-updateGridOnDrop dragPos dragCell dropPos dropCell grid =
-    let
-        ( newDragCell, newDropCell ) =
-            case ( dragCell, dropCell ) of
-                ( SourceWithMirror dir, Empty ) ->
-                    ( Source, Mirror dir )
-
-                ( SourceWithMirror dir, Source ) ->
-                    ( Source, SourceWithMirror dir )
-
-                ( Mirror dir, Empty ) ->
-                    ( Empty, Mirror dir )
-
-                ( Mirror dir, Source ) ->
-                    ( Empty, SourceWithMirror dir )
-
-                _ ->
-                    ( dragCell, dropCell )
-    in
-    grid |> Grid.insert dragPos newDragCell |> Grid.insert dropPos newDropCell
-
-
 destinationPositions : Grid -> Set Int2
 destinationPositions =
     Grid.foldl (\pos cell -> whenTrue (cell == Destination) (Set.insert pos))
@@ -409,7 +386,7 @@ type alias DndView =
 
 toDndView : CellTransform -> Mouse2 -> Grid -> Maybe DndView
 toDndView ct mouse2 grid =
-    Mouse2.onDrop
+    Mouse2.onDrag
         (\dragPt dropPt ->
             let
                 pos =

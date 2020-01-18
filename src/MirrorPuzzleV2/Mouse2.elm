@@ -1,4 +1,4 @@
-module MirrorPuzzleV2.Mouse2 exposing (Config, Mouse2, defaultTransformer, event, initial, onDrop, transformEvent, update)
+module MirrorPuzzleV2.Mouse2 exposing (Config, Mouse2, defaultTransformer, event, initial, onDrag, onDrop, transformEvent, update)
 
 import Number2 as NT exposing (Float2)
 import Playground exposing (Mouse)
@@ -43,6 +43,11 @@ transformEvent cfg (Mouse2 _ event_) =
 onDrop : (Float2 -> Float2 -> Maybe a) -> Mouse2 -> Maybe a
 onDrop func =
     transformEvent { defaultTransformer | drop = func }
+
+
+onDrag : (Float2 -> Float2 -> Maybe a) -> Mouse2 -> Maybe a
+onDrag func =
+    transformEvent { defaultTransformer | drag = func }
 
 
 type Mouse2

@@ -238,21 +238,6 @@ getMirrorDirection pos grid =
             Nothing
 
 
-litDestinations : Grid -> Set Int2
-litDestinations grid =
-    lightPaths grid
-        |> List.filterMap List.head
-        |> List.foldl
-            (\pos ->
-                if Grid.get pos grid == Just Destination then
-                    Set.insert pos
-
-                else
-                    identity
-            )
-            Set.empty
-
-
 type alias LightPath =
     List Int2
 
@@ -302,6 +287,21 @@ lightPaths grid =
         )
         []
         grid
+
+
+litDestinations : Grid -> Set Int2
+litDestinations grid =
+    lightPaths grid
+        |> List.filterMap List.head
+        |> List.foldl
+            (\pos ->
+                if Grid.get pos grid == Just Destination then
+                    Set.insert pos
+
+                else
+                    identity
+            )
+            Set.empty
 
 
 

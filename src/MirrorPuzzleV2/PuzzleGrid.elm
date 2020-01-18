@@ -363,6 +363,49 @@ initCellT screen grid =
     CT.fromViewD viewD (Grid.dimensions grid)
 
 
+type alias DragView =
+    { startCellPos : Int2
+    , currentViewPos : Float2
+    , mirrorDir : Direction8
+    }
+
+
+toDragView : CellTransform -> Model -> Maybe DragView
+toDragView ct model =
+    case Mouse2.event model.mouse2 of
+        Mouse2.OnDrag start current ->
+            let
+                pos =
+                    ct.fromView start
+
+                mirrorDir : Maybe Direction8
+                mirrorDir =
+                    case Grid.get pos model.grid of
+                        Just cell ->
+                            case cell of
+                                SourceWithMirror dir ->
+                                    Just dir
+
+                                Mirror dir ->
+                                    Just dir
+
+                                _ ->
+                                    Nothing
+
+                        Nothing ->
+                            Nothing
+            in
+            case mirrorDir of
+                Just dir ->
+                    Just { startCellPos = pos, currentViewPos = current, mirrorDir = dir }
+
+                Nothing ->
+                    Nothing
+
+        _ ->
+            Nothing
+
+
 view : Computer -> Model -> Shape
 view { time, screen } model =
     let

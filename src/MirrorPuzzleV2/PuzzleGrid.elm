@@ -28,10 +28,8 @@ type Cell
     | Empty
 
 
-type alias Model =
-    { grid : Grid
-    , mouse2 : Mouse2
-    }
+type Model
+    = Model Mouse2 Grid
 
 
 type alias Grid =
@@ -85,9 +83,7 @@ fromString =
 
 fromGrid : Grid -> Model
 fromGrid grid =
-    { grid = grid
-    , mouse2 = Mouse2.initial
-    }
+    Model Mouse2.initial grid
 
 
 decodeGrid : String -> Grid
@@ -167,20 +163,22 @@ initialGrid =
 
 
 update : Computer -> Model -> Model
-update computer model =
-    updateHelp computer { model | mouse2 = Mouse2.update computer.mouse model.mouse2 }
-
-
-updateHelp : Computer -> Model -> Model
-updateHelp { screen } model =
+update computer (Model mouse2 grid) =
     let
-        grid =
-            model.grid
+        newMouse2 =
+            Mouse2.update computer.mouse mouse2
+    in
+    updateHelp computer newMouse2 grid
+        |> Model newMouse2
 
+
+updateHelp : Computer -> Mouse2 -> Grid -> Grid
+updateHelp { screen } mouse2 grid =
+    let
         ct =
             initCellT screen grid
     in
-    case Mouse2.event model.mouse2 of
+    case Mouse2.event mouse2 of
         Mouse2.OnClick mp ->
             let
                 pos =
@@ -190,7 +188,7 @@ updateHelp { screen } model =
                     Grid.insert pos a grid
 
                 newGrid =
-                    case Grid.get pos model.grid of
+                    case Grid.get pos grid of
                         Just (SourceWithMirror dir) ->
                             ins (SourceWithMirror (Dir.rotate 1 dir))
 
@@ -200,14 +198,14 @@ updateHelp { screen } model =
                         _ ->
                             grid
             in
-            { model | grid = newGrid }
+            newGrid
 
         Mouse2.OnDragStart start ->
             let
                 _ =
                     Debug.log "start" start
             in
-            model
+            grid
 
         Mouse2.OnDrop start current ->
             let
@@ -217,18 +215,15 @@ updateHelp { screen } model =
                 dropPos =
                     ct.fromView current
             in
-            { model
-                | grid =
-                    case ( Grid.get dragPos grid, Grid.get dropPos grid ) of
-                        ( Just dragCell, Just dropCell ) ->
-                            updateGridOnDrop dragPos dragCell dropPos dropCell grid
+            case ( Grid.get dragPos grid, Grid.get dropPos grid ) of
+                ( Just dragCell, Just dropCell ) ->
+                    updateGridOnDrop dragPos dragCell dropPos dropCell grid
 
-                        _ ->
-                            grid
-            }
+                _ ->
+                    grid
 
         _ ->
-            model
+            grid
 
 
 updateGridOnDrop : Grid.Pos -> Cell -> Grid.Pos -> Cell -> Grid -> Grid
@@ -260,9 +255,13 @@ destinationPositions =
         Set.empty
 
 
+toGrid (Model _ grid) =
+    grid
+
+
 isSolved : Model -> Bool
 isSolved =
-    .grid >> (\grid -> destinationPositions grid == litDestinationPositions grid)
+    toGrid >> (\grid -> destinationPositions grid == litDestinationPositions grid)
 
 
 getMirrorDirection : Int2 -> Grid -> Maybe Direction8
@@ -363,11 +362,8 @@ initCellT screen grid =
 
 
 view : Computer -> Model -> Shape
-view { time, screen } model =
+view { time, screen } (Model mouse2 grid) =
     let
-        { mouse2, grid } =
-            model
-
         ct =
             initCellT screen grid
 

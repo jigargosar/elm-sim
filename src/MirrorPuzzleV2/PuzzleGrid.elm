@@ -257,49 +257,48 @@ type alias LightPath =
 
 lightPaths : Grid -> List LightPath
 lightPaths grid =
-    Grid.foldl
-        (\pos cell ->
-            case cell of
-                SourceWithMirror dir ->
-                    accumLightPos grid dir pos [ pos ]
-                        |> (::)
-
-                _ ->
-                    identity
+    foldlSourceWithMirrors
+        (\pos dir pathAcc ->
+            lightPathStartingAt pos dir grid :: pathAcc
         )
         []
         grid
 
 
-accumLightPos : Grid -> Direction8 -> Int2 -> List Int2 -> List Int2
-accumLightPos grid dir pos acc =
+lightPathStartingAt : Int2 -> Direction8 -> Grid -> List Int2
+lightPathStartingAt pos0 dir0 grid =
     let
-        nextPos =
-            Dir.stepPos dir pos
+        accumLightPath : Direction8 -> Int2 -> List Int2 -> List Int2
+        accumLightPath dir pos acc =
+            let
+                nextPos =
+                    Dir.stepPos dir pos
 
-        accumInDir newDir =
-            accumLightPos grid newDir nextPos (nextPos :: acc)
-    in
-    case Grid.get nextPos grid of
-        Nothing ->
-            acc
-
-        Just cell ->
-            case cell of
-                Source ->
-                    accumInDir dir
-
-                SourceWithMirror _ ->
+                accumInDir newDir =
+                    accumLightPath newDir nextPos (nextPos :: acc)
+            in
+            case Grid.get nextPos grid of
+                Nothing ->
                     acc
 
-                Destination ->
-                    nextPos :: acc
+                Just cell ->
+                    case cell of
+                        Source ->
+                            accumInDir dir
 
-                Mirror direction ->
-                    accumInDir direction
+                        SourceWithMirror _ ->
+                            acc
 
-                Empty ->
-                    accumInDir dir
+                        Destination ->
+                            nextPos :: acc
+
+                        Mirror newDir ->
+                            accumInDir newDir
+
+                        Empty ->
+                            accumInDir dir
+    in
+    accumLightPath dir0 pos0 [ pos0 ]
 
 
 litDestinations : Grid -> Set Int2

@@ -318,39 +318,35 @@ lightPaths grid =
 updateGrid : CellTransform -> Mouse2 -> Grid -> Maybe Grid
 updateGrid ct mouse2 grid =
     Mouse2.handleEvents
-        [ Mouse2.onClick
-            (\pt ->
-                rotateMirrorAt (ct.fromView pt)
-            )
-        , Mouse2.onDrop
-            (\dragPt dropPt ->
-                Grid.mapCellAt2 cellsOnDnd
-                    (ct.fromView dragPt)
-                    (ct.fromView dropPt)
-                    |> ignoreNothing
-            )
+        [ Mouse2.onClick (\p -> rotateMirrorAt (ct.fromView p) grid)
+        , Mouse2.onDrop (\p1 p2 -> updateOnDnd ct p1 p2 grid)
         ]
         mouse2
-        |> Maybe.map (callWith grid)
 
 
-cellsOnDnd : Cell -> Cell -> Maybe ( Cell, Cell )
-cellsOnDnd dragCell dropCell =
-    case ( dragCell, dropCell ) of
-        ( SourceWithMirror dir, Empty ) ->
-            Just ( Source, Mirror dir )
+updateOnDnd : CellTransform -> Float2 -> Float2 -> Grid.Grid Cell -> Grid.Grid Cell
+updateOnDnd ct dragPt dropPt grid =
+    let
+        mapper dragCell dropCell =
+            case ( dragCell, dropCell ) of
+                ( SourceWithMirror dir, Empty ) ->
+                    Just ( Source, Mirror dir )
 
-        ( SourceWithMirror dir, Source ) ->
-            Just ( Source, SourceWithMirror dir )
+                ( SourceWithMirror dir, Source ) ->
+                    Just ( Source, SourceWithMirror dir )
 
-        ( Mirror dir, Empty ) ->
-            Just ( Empty, Mirror dir )
+                ( Mirror dir, Empty ) ->
+                    Just ( Empty, Mirror dir )
 
-        ( Mirror dir, Source ) ->
-            Just ( Empty, SourceWithMirror dir )
+                ( Mirror dir, Source ) ->
+                    Just ( Empty, SourceWithMirror dir )
 
-        _ ->
-            Nothing
+                _ ->
+                    Nothing
+    in
+    grid
+        |> Grid.mapCellAt2 mapper (ct.fromView dragPt) (ct.fromView dropPt)
+        |> Maybe.withDefault grid
 
 
 rotateMirrorAt : Int2 -> Grid -> Grid

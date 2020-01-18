@@ -15,7 +15,7 @@ import Playground exposing (..)
 import Playground.CellTransform as CT exposing (CellTransform)
 import Playground.Direction8 as Dir exposing (Direction8)
 import Playground.Extra exposing (..)
-import Playground.Grid as Grid exposing (Grid)
+import Playground.Grid as Grid
 import PointFree exposing (is, whenTrue)
 import Set exposing (Set)
 
@@ -29,13 +29,13 @@ type Cell
 
 
 type alias Model =
-    { grid : PuzzleGrid
+    { grid : Grid
     , mouse2 : Mouse2
     }
 
 
-type alias PuzzleGrid =
-    Grid Cell
+type alias Grid =
+    Grid.Grid Cell
 
 
 mirror : Int -> Cell
@@ -88,7 +88,7 @@ encoded =
     """
 
 
-fromGrid : PuzzleGrid -> Model
+fromGrid : Grid -> Model
 fromGrid grid =
     { grid = grid
     , mouse2 = Mouse2.initial
@@ -99,7 +99,7 @@ fromString =
     gridFromString >> fromGrid
 
 
-gridFromString : String -> PuzzleGrid
+gridFromString : String -> Grid
 gridFromString str =
     let
         lines : List String
@@ -118,7 +118,7 @@ gridFromString str =
                 width =
                     String.split "," first |> List.length
 
-                updateFromCellString : Int2 -> String -> PuzzleGrid -> PuzzleGrid
+                updateFromCellString : Int2 -> String -> Grid -> Grid
                 updateFromCellString pos cellStr =
                     let
                         ins =
@@ -149,12 +149,12 @@ gridFromString str =
                                 _ ->
                                     identity
 
-                updateFromRowString : Int -> String -> PuzzleGrid -> PuzzleGrid
+                updateFromRowString : Int -> String -> Grid -> Grid
                 updateFromRowString y rowString grid =
                     String.split "," rowString
                         |> List.Extra.indexedFoldl (\x cellStr -> updateFromCellString ( x, y ) cellStr) grid
 
-                updateFromRowStrings : PuzzleGrid -> PuzzleGrid
+                updateFromRowStrings : Grid -> Grid
                 updateFromRowStrings grid =
                     List.Extra.indexedFoldl updateFromRowString grid lines
             in
@@ -170,7 +170,7 @@ initial =
     fromGrid initialGrid
 
 
-initialGrid : PuzzleGrid
+initialGrid : Grid
 initialGrid =
     let
         insert =
@@ -250,7 +250,7 @@ updateHelp { screen } model =
             model
 
 
-dndGrid : Grid.Pos -> Cell -> Grid.Pos -> Cell -> Grid Cell -> Grid Cell
+dndGrid : Grid.Pos -> Cell -> Grid.Pos -> Cell -> Grid -> Grid
 dndGrid dragPos dragCell dropPos dropCell grid =
     let
         ( newDragCell, newDropCell ) =
@@ -273,7 +273,7 @@ dndGrid dragPos dragCell dropPos dropCell grid =
     grid |> Grid.insert dragPos newDragCell |> Grid.insert dropPos newDropCell
 
 
-destinationPositions : PuzzleGrid -> Set Int2
+destinationPositions : Grid -> Set Int2
 destinationPositions =
     Grid.foldl (\pos cell -> whenTrue (cell == Destination) (Set.insert pos))
         Set.empty
@@ -284,7 +284,7 @@ isSolved =
     .grid >> (\grid -> destinationPositions grid == litDestinationPositions grid)
 
 
-litDestinationPositions : PuzzleGrid -> Set Int2
+litDestinationPositions : Grid -> Set Int2
 litDestinationPositions grid =
     gridToLightPaths grid
         |> List.filterMap List.head
@@ -303,7 +303,7 @@ type alias LightPath =
     List Int2
 
 
-gridToLightPaths : PuzzleGrid -> List LightPath
+gridToLightPaths : Grid -> List LightPath
 gridToLightPaths grid =
     let
         accumLightPos : Direction8 -> Int2 -> List Int2 -> List Int2
@@ -354,7 +354,7 @@ gridToLightPaths grid =
 -- Puzzle Grid View
 
 
-initCellT : Screen -> PuzzleGrid -> CellTransform
+initCellT : Screen -> Grid -> CellTransform
 initCellT screen grid =
     let
         viewD =
@@ -445,7 +445,7 @@ viewPath ct =
 -- Puzzle Cell View
 
 
-gridCellShapes : Time -> CellTransform -> Set Int2 -> PuzzleGrid -> List Shape
+gridCellShapes : Time -> CellTransform -> Set Int2 -> Grid -> List Shape
 gridCellShapes time ct dimPos grid =
     let
         litDest =

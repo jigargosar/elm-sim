@@ -29,17 +29,10 @@ event (Mouse2 _ e) =
 update : Playground.Mouse -> Mouse2 -> Mouse2
 update mouse (Mouse2 state _) =
     let
-        ( a, b ) =
-            nextStateAndEvent ( mouse.x, mouse.y )
-                (if mouse.down then
-                    IsDown
-
-                 else
-                    IsUp
-                )
-                state
+        ( nextState, nextEvent ) =
+            nextStateAndEvent mouse state
     in
-    Mouse2 a b
+    Mouse2 nextState nextEvent
 
 
 type State
@@ -48,14 +41,12 @@ type State
     | Dragging Float2
 
 
-type MouseButton
-    = IsDown
-    | IsUp
-
-
-nextStateAndEvent : Float2 -> MouseButton -> State -> ( State, Event )
-nextStateAndEvent currentPosition button previousState =
+nextStateAndEvent : Mouse -> State -> ( State, Event )
+nextStateAndEvent mouse previousState =
     let
+        currentPosition =
+            ( mouse.x, mouse.y )
+
         tooFarFrom : Float2 -> Bool
         tooFarFrom =
             NT.equalWithin 3 currentPosition >> not
@@ -64,39 +55,38 @@ nextStateAndEvent currentPosition button previousState =
         tooLong elapsed =
             elapsed > 60
     in
-    case button of
-        IsDown ->
-            case previousState of
-                Up ->
-                    ( Down 0 currentPosition, NoEvent )
+    if mouse.down then
+        case previousState of
+            Up ->
+                ( Down 0 currentPosition, NoEvent )
 
-                Down elapsed startPosition ->
-                    let
-                        continue =
-                            Down (elapsed + 1) startPosition
-                    in
-                    if tooLong elapsed || tooFarFrom startPosition then
-                        ( Dragging startPosition, OnDragStart startPosition )
+            Down elapsed startPosition ->
+                let
+                    continue =
+                        Down (elapsed + 1) startPosition
+                in
+                if tooLong elapsed || tooFarFrom startPosition then
+                    ( Dragging startPosition, OnDragStart startPosition )
 
-                    else
-                        ( continue, NoEvent )
+                else
+                    ( continue, NoEvent )
 
-                Dragging startPosition ->
-                    ( Dragging startPosition, OnDrag startPosition currentPosition )
+            Dragging startPosition ->
+                ( Dragging startPosition, OnDrag startPosition currentPosition )
 
-        IsUp ->
-            ( Up
-            , case previousState of
-                Up ->
+    else
+        ( Up
+        , case previousState of
+            Up ->
+                NoEvent
+
+            Down elapsed startPosition ->
+                if tooLong elapsed || tooFarFrom startPosition then
                     NoEvent
 
-                Down elapsed startPosition ->
-                    if tooLong elapsed || tooFarFrom startPosition then
-                        NoEvent
+                else
+                    OnClick startPosition
 
-                    else
-                        OnClick startPosition
-
-                Dragging startPosition ->
-                    OnDrop startPosition currentPosition
-            )
+            Dragging startPosition ->
+                OnDrop startPosition currentPosition
+        )

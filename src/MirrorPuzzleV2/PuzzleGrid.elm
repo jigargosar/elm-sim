@@ -17,7 +17,7 @@ import Playground.CellTransform as CT exposing (CellTransform)
 import Playground.Direction8 as Dir exposing (Direction8)
 import Playground.Extra exposing (..)
 import Playground.Grid as Grid
-import PointFree exposing (callWith, ignoreNothing, whenTrue)
+import PointFree exposing (callWith, whenTrue)
 import Set exposing (Set)
 
 
@@ -42,11 +42,6 @@ fromString =
 fromGrid : Grid -> Model
 fromGrid grid =
     Model Mouse2.initial grid
-
-
-toGrid : Model -> Grid
-toGrid (Model _ grid) =
-    grid
 
 
 isSolved : Model -> Bool

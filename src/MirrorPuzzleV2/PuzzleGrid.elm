@@ -21,6 +21,87 @@ import PointFree exposing (callWith, ignoreNothing, whenTrue)
 import Set exposing (Set)
 
 
+
+-- Model
+
+
+type Model
+    = Model Mouse2 Grid
+
+
+initial : Model
+initial =
+    fromGrid initialGrid
+
+
+fromString : String -> Model
+fromString =
+    decodeGrid >> fromGrid
+
+
+fromGrid : Grid -> Model
+fromGrid grid =
+    Model Mouse2.initial grid
+
+
+toGrid : Model -> Grid
+toGrid (Model _ grid) =
+    grid
+
+
+isSolved : Model -> Bool
+isSolved =
+    toGrid >> (\grid -> destinationPositions grid == litDestinations grid)
+
+
+initCellT : Screen -> Grid -> CellTransform
+initCellT screen grid =
+    let
+        viewD =
+            NT.scale 0.8 ( screen.width, screen.height )
+    in
+    CT.fromViewD viewD (Grid.dimensions grid)
+
+
+
+-- Update
+
+
+update : Computer -> Model -> Model
+update computer (Model mouse2 grid) =
+    let
+        newMouse2 =
+            Mouse2.update computer.mouse mouse2
+
+        ct =
+            initCellT computer.screen grid
+    in
+    updateGrid ct newMouse2 grid
+        |> Maybe.withDefault grid
+        |> Model newMouse2
+
+
+
+-- View
+
+
+view : Computer -> Model -> Shape
+view { time, screen } (Model mouse2 grid) =
+    let
+        ct =
+            initCellT screen grid
+    in
+    viewGrid time mouse2 ct grid
+
+
+
+-- Grid Model
+
+
+type alias Grid =
+    Grid.Grid Cell
+
+
 type Cell
     = Source
     | Destination
@@ -29,12 +110,9 @@ type Cell
     | Empty
 
 
-type Model
-    = Model Mouse2 Grid
-
-
-type alias Grid =
-    Grid.Grid Cell
+initialGrid : Grid
+initialGrid =
+    decodeGrid encoded
 
 
 
@@ -75,16 +153,6 @@ encoded =
     __,SS,__,__,__
     DD,__,__,__,__
     """
-
-
-fromString : String -> Model
-fromString =
-    decodeGrid >> fromGrid
-
-
-fromGrid : Grid -> Model
-fromGrid grid =
-    Model Mouse2.initial grid
 
 
 decodeGrid : String -> Grid
@@ -153,66 +221,6 @@ decodeGrid str =
             Grid.filled 0 0 Empty
 
 
-initial : Model
-initial =
-    fromGrid initialGrid
-
-
-initialGrid : Grid
-initialGrid =
-    decodeGrid encoded
-
-
-update : Computer -> Model -> Model
-update computer (Model mouse2 grid) =
-    let
-        newMouse2 =
-            Mouse2.update computer.mouse mouse2
-
-        ct =
-            initCellT computer.screen grid
-    in
-    updateGrid ct newMouse2 grid
-        |> Maybe.withDefault grid
-        |> Model newMouse2
-
-
-rotateMirrorAt : Int2 -> Grid -> Grid
-rotateMirrorAt pos grid =
-    let
-        ins a =
-            Grid.insert pos a grid
-    in
-    case Grid.get pos grid of
-        Just (SourceWithMirror dir) ->
-            ins (SourceWithMirror (Dir.rotate 1 dir))
-
-        Just (Mirror dir) ->
-            ins (Mirror (Dir.rotate 1 dir))
-
-        _ ->
-            grid
-
-
-updateGrid : CellTransform -> Mouse2 -> Grid -> Maybe Grid
-updateGrid ct mouse2 grid =
-    Mouse2.handleEvents
-        [ Mouse2.onClick
-            (\pt ->
-                rotateMirrorAt (ct.fromView pt)
-            )
-        , Mouse2.onDrop
-            (\dragPt dropPt ->
-                Grid.map2Cells getNewCellsOnDnd
-                    (ct.fromView dragPt)
-                    (ct.fromView dropPt)
-                    |> ignoreNothing
-            )
-        ]
-        mouse2
-        |> Maybe.map (callWith grid)
-
-
 getNewCellsOnDnd : Cell -> Cell -> Maybe ( Cell, Cell )
 getNewCellsOnDnd dragCell dropCell =
     case ( dragCell, dropCell ) of
@@ -238,16 +246,6 @@ destinationPositions =
         Set.empty
 
 
-toGrid : Model -> Grid
-toGrid (Model _ grid) =
-    grid
-
-
-isSolved : Model -> Bool
-isSolved =
-    toGrid >> (\grid -> destinationPositions grid == litDestinationPositions grid)
-
-
 getMirrorDirection : Int2 -> Grid -> Maybe Direction8
 getMirrorDirection pos grid =
     case Grid.get pos grid of
@@ -266,9 +264,9 @@ getMirrorDirection pos grid =
             Nothing
 
 
-litDestinationPositions : Grid -> Set Int2
-litDestinationPositions grid =
-    gridToLightPaths grid
+litDestinations : Grid -> Set Int2
+litDestinations grid =
+    lightPaths grid
         |> List.filterMap List.head
         |> List.foldl
             (\pos ->
@@ -285,8 +283,8 @@ type alias LightPath =
     List Int2
 
 
-gridToLightPaths : Grid -> List LightPath
-gridToLightPaths grid =
+lightPaths : Grid -> List LightPath
+lightPaths grid =
     let
         accumLightPos : Direction8 -> Int2 -> List Int2 -> List Int2
         accumLightPos dir pos acc =
@@ -333,27 +331,55 @@ gridToLightPaths grid =
 
 
 
--- Puzzle Grid View
+-- Grid Update
 
 
-initCellT : Screen -> Grid -> CellTransform
-initCellT screen grid =
+updateGrid : CellTransform -> Mouse2 -> Grid -> Maybe Grid
+updateGrid ct mouse2 grid =
+    Mouse2.handleEvents
+        [ Mouse2.onClick
+            (\pt ->
+                rotateMirrorAt (ct.fromView pt)
+            )
+        , Mouse2.onDrop
+            (\dragPt dropPt ->
+                Grid.map2Cells getNewCellsOnDnd
+                    (ct.fromView dragPt)
+                    (ct.fromView dropPt)
+                    |> ignoreNothing
+            )
+        ]
+        mouse2
+        |> Maybe.map (callWith grid)
+
+
+rotateMirrorAt : Int2 -> Grid -> Grid
+rotateMirrorAt pos grid =
     let
-        viewD =
-            NT.scale 0.8 ( screen.width, screen.height )
+        ins a =
+            Grid.insert pos a grid
     in
-    CT.fromViewD viewD (Grid.dimensions grid)
+    case Grid.get pos grid of
+        Just (SourceWithMirror dir) ->
+            ins (SourceWithMirror (Dir.rotate 1 dir))
+
+        Just (Mirror dir) ->
+            ins (Mirror (Dir.rotate 1 dir))
+
+        _ ->
+            grid
 
 
-view : Computer -> Model -> Shape
-view { time, screen } (Model mouse2 grid) =
+
+-- Grid View
+
+
+viewGrid : Time -> Mouse2 -> CellTransform -> Grid -> Shape
+viewGrid time mouse2 ct grid =
     let
-        ct =
-            initCellT screen grid
-
         lightPathsShape =
             grid
-                |> gridToLightPaths
+                |> lightPaths
                 |> List.map (viewPath ct)
                 |> group
 
@@ -428,7 +454,7 @@ gridCellShapes : Time -> CellTransform -> Set Int2 -> Grid -> List Shape
 gridCellShapes time ct dimPos grid =
     let
         litDest =
-            litDestinationPositions grid
+            litDestinations grid
 
         toCellView ( pos, cell ) =
             cellShape time ct dimPos litDest pos cell

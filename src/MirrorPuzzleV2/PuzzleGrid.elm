@@ -381,6 +381,35 @@ initCellT screen grid =
     CT.fromViewD viewD (Grid.dimensions grid)
 
 
+view : Computer -> Model -> Shape
+view { time, screen } model =
+    let
+        { mouse2, grid } =
+            model
+
+        ct =
+            initCellT screen grid
+
+        lightPathsShape =
+            grid
+                |> gridToLightPaths
+                |> List.map (viewPath ct)
+                |> group
+
+        ( dimPos, draggedShape ) =
+            getDragPosAndIndicatorShape ct mouse2 grid
+    in
+    group
+        [ gridCellShapes time ct dimPos grid |> group
+        , lightPathsShape
+        , draggedShape
+        ]
+
+
+
+-- DND VIEW
+
+
 type alias DndView =
     { dragPos : Int2
     , dropViewPos : Float2
@@ -405,31 +434,6 @@ toDndView ct mouse2 grid =
 
         _ ->
             Nothing
-
-
-view : Computer -> Model -> Shape
-view { time, screen } model =
-    let
-        { mouse2, grid } =
-            model
-
-        ct =
-            initCellT screen grid
-
-        lightPathsShape =
-            grid
-                |> gridToLightPaths
-                |> List.map (viewPath ct)
-                |> group
-
-        ( dimPos, draggedShape ) =
-            getDragPosAndIndicatorShape ct mouse2 grid
-    in
-    group
-        [ gridCellShapes time ct dimPos grid |> group
-        , lightPathsShape
-        , draggedShape
-        ]
 
 
 getDragPosAndIndicatorShape : CellTransform -> Mouse2 -> Grid -> ( Set Int2, Shape )

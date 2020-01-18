@@ -364,7 +364,7 @@ initCellT screen grid =
 
 
 type alias DndView =
-    { dragPpos : Int2
+    { dragPos : Int2
     , dropViewPos : Float2
     , mirrorDir : Direction8
     }
@@ -398,7 +398,7 @@ toDndView ct mouse2 grid =
             in
             case getMirrorDirection pos grid of
                 Just dir ->
-                    Just { dragPpos = pos, dropViewPos = current, mirrorDir = dir }
+                    Just { dragPos = pos, dropViewPos = current, mirrorDir = dir }
 
                 Nothing ->
                     Nothing
@@ -424,8 +424,8 @@ view { time, screen } model =
 
         ( dimPos, draggedShape ) =
             case toDndView ct mouse2 grid of
-                Just { dragPpos, dropViewPos, mirrorDir } ->
-                    ( Set.singleton dragPpos
+                Just { dragPos, dropViewPos, mirrorDir } ->
+                    ( Set.singleton dragPos
                     , viewDraggedMirror ct.cellSize mirrorDir dropViewPos
                     )
 

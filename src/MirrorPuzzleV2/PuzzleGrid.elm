@@ -84,11 +84,7 @@ mapGrid func (Model mouse2 grid) =
 
 view : Computer -> Model -> Shape
 view { time, screen } (Model mouse2 grid) =
-    let
-        ct =
-            initCellT screen grid
-    in
-    viewGrid time mouse2 ct grid
+    viewGrid time mouse2 (initCellT screen grid) grid
 
 
 

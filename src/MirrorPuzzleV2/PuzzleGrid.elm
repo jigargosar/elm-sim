@@ -416,9 +416,6 @@ view { time, screen } model =
         ct =
             initCellT screen grid
 
-        dndView =
-            toDndView ct mouse2 grid
-
         lightPathsShape =
             grid
                 |> gridToLightPaths
@@ -426,7 +423,7 @@ view { time, screen } model =
                 |> group
 
         ( dimPos, draggedShape ) =
-            case dndView of
+            case toDndView ct mouse2 grid of
                 Just { dragPpos, dropViewPos, mirrorDir } ->
                     ( Set.singleton dragPpos
                     , mirrorShape ct.cellSize mirrorDir

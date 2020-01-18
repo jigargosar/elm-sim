@@ -8,11 +8,6 @@ type Mouse2
     = Mouse2 State Event
 
 
-type State
-    = Down Int Float2
-    | Up
-
-
 type Event
     = OnClick Float2
     | OnDragStart Float2
@@ -34,45 +29,70 @@ event (Mouse2 _ e) =
 update : Playground.Mouse -> Mouse2 -> Mouse2
 update mouse (Mouse2 state _) =
     let
-        current =
-            ( mouse.x, mouse.y )
+        ( a, b ) =
+            computeState2 ( mouse.x, mouse.y )
+                (if mouse.down then
+                    IsDown
 
-        ( nextState, nextEvent ) =
-            case state of
+                 else
+                    IsUp
+                )
+                state
+    in
+    Mouse2 a b
+
+
+type State
+    = Up
+    | DownAndNotDragging Int Float2
+    | DownAndDragging Float2
+
+
+type MouseButton
+    = IsDown
+    | IsUp
+
+
+computeState2 : Float2 -> MouseButton -> State -> ( State, Event )
+computeState2 currentPosition button previousState =
+    let
+        tooFarFrom : Float2 -> Bool
+        tooFarFrom =
+            NT.equalWithin 3 currentPosition >> not
+
+        tooLong : Int -> Bool
+        tooLong elapsed =
+            elapsed > 60
+    in
+    case button of
+        IsDown ->
+            case previousState of
                 Up ->
-                    if mouse.down then
-                        ( Down 0 current, NoEvent )
+                    ( DownAndNotDragging 0 currentPosition, NoEvent )
+
+                DownAndNotDragging elapsed startPosition ->
+                    if tooLong elapsed || tooFarFrom startPosition then
+                        ( DownAndDragging startPosition, OnDragStart startPosition )
 
                     else
-                        ( Up, NoEvent )
+                        ( DownAndNotDragging (elapsed + 1) startPosition, NoEvent )
 
-                Down elapsed startPosition ->
-                    let
-                        newModel =
-                            if mouse.down then
-                                Down (elapsed + 1) startPosition
+                DownAndDragging startPosition ->
+                    ( DownAndDragging startPosition, OnDrag startPosition currentPosition )
 
-                            else
-                                Up
+        IsUp ->
+            ( Up
+            , case previousState of
+                Up ->
+                    NoEvent
 
-                        newEvent =
-                            if elapsed < 60 && NT.equalWithin 3 startPosition current then
-                                if mouse.down then
-                                    NoEvent
+                DownAndNotDragging elapsed startPosition ->
+                    if tooLong elapsed || tooFarFrom startPosition then
+                        NoEvent
 
-                                else
-                                    OnClick startPosition
+                    else
+                        OnClick startPosition
 
-                            else if mouse.down then
-                                if elapsed == 0 then
-                                    OnDragStart startPosition
-
-                                else
-                                    OnDrag startPosition current
-
-                            else
-                                OnDrop startPosition current
-                    in
-                    ( newModel, newEvent )
-    in
-    Mouse2 nextState nextEvent
+                DownAndDragging startPosition ->
+                    OnDrop startPosition currentPosition
+            )

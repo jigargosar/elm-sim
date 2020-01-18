@@ -397,7 +397,7 @@ view { time, screen } model =
                 |> group
 
         ( dimPos, draggedShape ) =
-            getDragPosAndIndicatorShape ct mouse2 grid
+            getDragPosAndShape ct mouse2 grid
     in
     group
         [ gridCellShapes time ct dimPos grid |> group
@@ -436,8 +436,8 @@ toDndView ct mouse2 grid =
             Nothing
 
 
-getDragPosAndIndicatorShape : CellTransform -> Mouse2 -> Grid -> ( Set Int2, Shape )
-getDragPosAndIndicatorShape ct mouse2 grid =
+getDragPosAndShape : CellTransform -> Mouse2 -> Grid -> ( Set Int2, Shape )
+getDragPosAndShape ct mouse2 grid =
     case toDndView ct mouse2 grid of
         Just { dragPos, dropViewPos, mirrorDir } ->
             ( Set.singleton dragPos

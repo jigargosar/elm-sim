@@ -16,7 +16,7 @@ import Playground.CellTransform as CT exposing (CellTransform)
 import Playground.Direction8 as Dir exposing (Direction8)
 import Playground.Extra exposing (..)
 import Playground.Grid as Grid
-import PointFree exposing (is, whenTrue)
+import PointFree exposing (whenTrue)
 import Set exposing (Set)
 
 

@@ -1,6 +1,5 @@
 module MirrorPuzzleV2.Mouse2 exposing
     ( Mouse2
-    , handleEvents
     , initial
     , onClick
     , onDrag
@@ -8,14 +7,8 @@ module MirrorPuzzleV2.Mouse2 exposing
     , update
     )
 
-import Maybe.Extra
 import Number2 as NT exposing (Float2)
 import Playground exposing (Mouse)
-
-
-handleEvents : List (Mouse2 -> Maybe a) -> Mouse2 -> Maybe a
-handleEvents list0 mouse2 =
-    Maybe.Extra.oneOf list0 mouse2
 
 
 onClick : (Float2 -> a) -> Mouse2 -> Maybe a

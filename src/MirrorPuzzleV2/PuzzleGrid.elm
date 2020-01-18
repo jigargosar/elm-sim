@@ -65,7 +65,7 @@ initCellT screen grid =
 update : Computer -> Model -> Model
 update { mouse, screen } =
     mapMouse2 (Mouse2.update mouse)
-        >> mapGrid (updateGrid screen)
+        >> mapGrid (\mouse2 grid -> updateGrid (initCellT screen grid) mouse2 grid)
 
 
 mapMouse2 : (Mouse2 -> Mouse2) -> Model -> Model
@@ -312,12 +312,8 @@ lightPaths grid =
 -- Grid Update
 
 
-updateGrid : Screen -> Mouse2 -> Grid -> Grid
-updateGrid screen mouse2 grid =
-    let
-        ct =
-            initCellT screen grid
-    in
+updateGrid : CellTransform -> Mouse2 -> Grid -> Grid
+updateGrid ct mouse2 grid =
     Maybe.Extra.oneOf
         [ Mouse2.onClick (onGridTap ct)
         , Mouse2.onDrop (onGridDnd ct)

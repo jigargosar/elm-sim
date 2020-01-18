@@ -244,42 +244,11 @@ type alias LightPath =
 
 lightPaths : Grid -> List LightPath
 lightPaths grid =
-    let
-        accumLightPos : Direction8 -> Int2 -> List Int2 -> List Int2
-        accumLightPos dir pos acc =
-            let
-                nextPos =
-                    Dir.stepPos dir pos
-
-                accumInDir newDir =
-                    accumLightPos newDir nextPos (nextPos :: acc)
-            in
-            case Grid.get nextPos grid of
-                Nothing ->
-                    acc
-
-                Just cell ->
-                    case cell of
-                        Source ->
-                            accumInDir dir
-
-                        SourceWithMirror _ ->
-                            acc
-
-                        Destination ->
-                            nextPos :: acc
-
-                        Mirror direction ->
-                            accumInDir direction
-
-                        Empty ->
-                            accumInDir dir
-    in
     Grid.foldl
         (\pos cell ->
             case cell of
                 SourceWithMirror dir ->
-                    accumLightPos dir pos [ pos ]
+                    accumLightPos grid dir pos [ pos ]
                         |> (::)
 
                 _ ->
@@ -287,6 +256,37 @@ lightPaths grid =
         )
         []
         grid
+
+
+accumLightPos : Grid -> Direction8 -> Int2 -> List Int2 -> List Int2
+accumLightPos grid dir pos acc =
+    let
+        nextPos =
+            Dir.stepPos dir pos
+
+        accumInDir newDir =
+            accumLightPos grid newDir nextPos (nextPos :: acc)
+    in
+    case Grid.get nextPos grid of
+        Nothing ->
+            acc
+
+        Just cell ->
+            case cell of
+                Source ->
+                    accumInDir dir
+
+                SourceWithMirror _ ->
+                    acc
+
+                Destination ->
+                    nextPos :: acc
+
+                Mirror direction ->
+                    accumInDir direction
+
+                Empty ->
+                    accumInDir dir
 
 
 litDestinations : Grid -> Set Int2

@@ -80,7 +80,7 @@ encoded =
 
 fromString : String -> Model
 fromString =
-    gridFromString >> fromGrid
+    decodeGrid >> fromGrid
 
 
 fromGrid : Grid -> Model
@@ -90,8 +90,8 @@ fromGrid grid =
     }
 
 
-gridFromString : String -> Grid
-gridFromString str =
+decodeGrid : String -> Grid
+decodeGrid str =
     let
         lines : List String
         lines =
@@ -163,7 +163,7 @@ initial =
 
 initialGrid : Grid
 initialGrid =
-    gridFromString encoded
+    decodeGrid encoded
 
 
 update : Computer -> Model -> Model

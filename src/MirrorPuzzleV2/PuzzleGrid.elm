@@ -68,17 +68,19 @@ initCellT screen grid =
 
 
 update : Computer -> Model -> Model
-update computer (Model mouse2 grid) =
-    let
-        newMouse2 =
-            Mouse2.update computer.mouse mouse2
+update { mouse, screen } =
+    mapMouse2 (Mouse2.update mouse)
+        >> mapGrid (updateGrid screen)
 
-        ct =
-            initCellT computer.screen grid
-    in
-    updateGrid ct newMouse2 grid
-        |> Maybe.withDefault grid
-        |> Model newMouse2
+
+mapMouse2 : (Mouse2 -> Mouse2) -> Model -> Model
+mapMouse2 func (Model mouse2 grid) =
+    Model (func mouse2) grid
+
+
+mapGrid : (Mouse2 -> Grid -> Grid) -> Model -> Model
+mapGrid func (Model mouse2 grid) =
+    Model mouse2 (func mouse2 grid)
 
 
 
@@ -315,17 +317,22 @@ lightPaths grid =
 -- Grid Update
 
 
-updateGrid : CellTransform -> Mouse2 -> Grid -> Maybe Grid
-updateGrid ct mouse2 grid =
-    Mouse2.handleEvents
-        [ Mouse2.onClick (\p -> rotateMirrorAt (ct.fromView p) grid)
-        , Mouse2.onDrop (\p1 p2 -> updateOnDnd ct p1 p2 grid)
+updateGrid : Screen -> Mouse2 -> Grid -> Grid
+updateGrid screen mouse2 grid =
+    let
+        ct =
+            initCellT screen grid
+    in
+    Maybe.Extra.oneOf
+        [ Mouse2.onClick (onGridTap ct)
+        , Mouse2.onDrop (onGridDnd ct)
         ]
         mouse2
+        |> Maybe.Extra.unwrap grid (callWith grid)
 
 
-updateOnDnd : CellTransform -> Float2 -> Float2 -> Grid.Grid Cell -> Grid.Grid Cell
-updateOnDnd ct dragPt dropPt grid =
+onGridDnd : CellTransform -> Float2 -> Float2 -> Grid -> Grid
+onGridDnd ct dragPt dropPt grid =
     let
         mapper dragCell dropCell =
             case ( dragCell, dropCell ) of
@@ -347,6 +354,11 @@ updateOnDnd ct dragPt dropPt grid =
     grid
         |> Grid.mapCellAt2 mapper (ct.fromView dragPt) (ct.fromView dropPt)
         |> Maybe.withDefault grid
+
+
+onGridTap : CellTransform -> Float2 -> Grid -> Grid
+onGridTap ct pt =
+    rotateMirrorAt (ct.fromView pt)
 
 
 rotateMirrorAt : Int2 -> Grid -> Grid

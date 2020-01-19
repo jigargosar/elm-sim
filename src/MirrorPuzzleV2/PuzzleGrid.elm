@@ -85,6 +85,7 @@ type Cell
     | Destination
     | SourceWithMirror Direction8
     | Mirror Direction8
+    | Wall
     | Empty
 
 
@@ -252,6 +253,9 @@ lightPathStartingAt pos0 dir0 grid =
 
                         Empty ->
                             accumInDir dir
+
+                        Wall ->
+                            acc
     in
     accumLightPath dir0 pos0 [ pos0 ]
 
@@ -460,6 +464,9 @@ cellContentShapes time width litDest pos cell =
 
         Mirror dir ->
             [ mirrorShape width dir ]
+
+        Wall ->
+            [ rectangle darkBrown width width ]
 
         Empty ->
             []

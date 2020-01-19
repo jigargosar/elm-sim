@@ -285,39 +285,42 @@ updateGrid ct event grid =
             rotateMirrorAt (ct.fromView pt) grid
 
         Drop pt1 pt2 ->
-            let
-                ( gi1, gi2 ) =
-                    ( ct.fromView pt1, ct.fromView pt2 )
-            in
-            case ( Grid.get gi1 grid, Grid.get gi2 grid ) of
-                ( Just drag, Just drop ) ->
-                    (case ( drag, drop ) of
-                        ( SourceWithMirror dir, Empty ) ->
-                            ( Source, Mirror dir )
-
-                        ( SourceWithMirror dir, Source ) ->
-                            ( Source, SourceWithMirror dir )
-
-                        ( Mirror dir, Empty ) ->
-                            ( Empty, Mirror dir )
-
-                        ( Mirror dir, Source ) ->
-                            ( Empty, SourceWithMirror dir )
-
-                        _ ->
-                            ( drag, drop )
-                    )
-                        |> (\( c1, c2 ) ->
-                                Grid.insert gi1 c1 grid
-                                    |> Grid.insert gi2 c2
-                           )
-                        |> Just
-
-                _ ->
-                    Nothing
+            updateGridOnDnD (ct.fromView pt1) (ct.fromView pt2) grid
 
         _ ->
             Nothing
+
+
+updateGridOnDnD dragIdx dropIdx grid =
+    Maybe.map2
+        (\drag drop ->
+            cellsOnDnd drag drop
+                |> (\( c1, c2 ) ->
+                        Grid.insert dragIdx c1 grid
+                            |> Grid.insert dropIdx c2
+                   )
+        )
+        (Grid.get dragIdx grid)
+        (Grid.get dropIdx grid)
+
+
+cellsOnDnd : Cell -> Cell -> ( Cell, Cell )
+cellsOnDnd drag drop =
+    case ( drag, drop ) of
+        ( SourceWithMirror dir, Empty ) ->
+            ( Source, Mirror dir )
+
+        ( SourceWithMirror dir, Source ) ->
+            ( Source, SourceWithMirror dir )
+
+        ( Mirror dir, Empty ) ->
+            ( Empty, Mirror dir )
+
+        ( Mirror dir, Source ) ->
+            ( Empty, SourceWithMirror dir )
+
+        _ ->
+            ( drag, drop )
 
 
 rotateMirrorAt : Int2 -> Grid -> Maybe Grid

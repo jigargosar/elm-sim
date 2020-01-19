@@ -283,7 +283,11 @@ updateScene computer mouse2 scene =
     in
     case scene of
         Intro ->
-            Mouse2.onClick (always initialLevelSelect) mouse2
+            if mouse.click then
+                Just initialLevelSelect
+
+            else
+                Nothing
 
         LevelSelect levelCount ->
             Mouse2.onClickMay

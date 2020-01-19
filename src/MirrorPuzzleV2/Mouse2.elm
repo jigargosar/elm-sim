@@ -1,11 +1,8 @@
 module MirrorPuzzleV2.Mouse2 exposing
     ( Mouse2
     , initial
-    , onClick
     , onClickMay
-    , onDrag
     , onDragMay
-    , onDrop
     , onDropMay
     , update
     )

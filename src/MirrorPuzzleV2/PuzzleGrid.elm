@@ -287,12 +287,9 @@ updateGrid ct event grid =
         Drop pt1 pt2 ->
             let
                 ( gi1, gi2 ) =
-                    ( pt1, pt2 ) |> mapEach ct.fromView
-
-                cellAt gIdx =
-                    Grid.get gIdx grid
+                    ( ct.fromView pt1, ct.fromView pt2 )
             in
-            case ( cellAt gi1, cellAt gi2 ) of
+            case ( Grid.get gi1 grid, Grid.get gi2 grid ) of
                 ( Just drag, Just drop ) ->
                     (case ( drag, drop ) of
                         ( SourceWithMirror dir, Empty ) ->

@@ -306,6 +306,21 @@ updateGridOnDnD dragIdx dropIdx grid =
         (Grid.get dropIdx grid)
 
 
+gridCellMap2 : (b -> b -> ( b, b )) -> Int2 -> Int2 -> Grid.Grid b -> Maybe (Grid.Grid b)
+gridCellMap2 func gIdxA gIdxB grid =
+    Maybe.map2
+        (\drag drop ->
+            func drag drop
+                |> (\( cellA, cellB ) ->
+                        grid
+                            |> Grid.insert gIdxA cellA
+                            |> Grid.insert gIdxB cellB
+                   )
+        )
+        (Grid.get gIdxA grid)
+        (Grid.get gIdxB grid)
+
+
 cellChangeOnDnd : Cell -> Cell -> ( Cell, Cell )
 cellChangeOnDnd drag drop =
     case ( drag, drop ) of

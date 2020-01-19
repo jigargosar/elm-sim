@@ -105,7 +105,7 @@ type Cell
 
 initialGrid : Grid
 initialGrid =
-    decodeGrid encoded
+    decodeGrid encodedGrid
 
 
 
@@ -138,7 +138,7 @@ levels =
     ]
 
 
-encoded =
+encodedGrid =
     """
     __,__,__,__,S5
     __,__,M7,__,__
@@ -195,33 +195,8 @@ decodeGrid str =
                     String.split "," first |> List.length
 
                 updateFromCellString : Int2 -> String -> Grid -> Grid
-                updateFromCellString pos cellStr =
-                    let
-                        ins =
-                            Grid.insert pos
-
-                        dirFromChar : Char -> Direction8
-                        dirFromChar =
-                            String.fromChar
-                                >> String.toInt
-                                >> Maybe.withDefault 0
-                                >> Dir.fromInt
-                    in
-                    case String.trim cellStr |> String.toList of
-                        'S' :: [] ->
-                            ins Source
-
-                        'D' :: [] ->
-                            ins Destination
-
-                        'M' :: [ char ] ->
-                            ins (Mirror (dirFromChar char))
-
-                        'S' :: [ char ] ->
-                            ins (SourceWithMirror (dirFromChar char))
-
-                        _ ->
-                            identity
+                updateFromCellString pos encoded =
+                    Grid.insert pos (decodeCell encoded)
 
                 updateFromRowString : Int -> String -> Grid -> Grid
                 updateFromRowString y rowString grid =

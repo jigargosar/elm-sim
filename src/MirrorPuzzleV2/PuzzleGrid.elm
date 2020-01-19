@@ -148,14 +148,6 @@ encodedGrid =
     """
 
 
-tokenizeGridString : String -> List (List String)
-tokenizeGridString =
-    String.trim
-        >> String.lines
-        >> List.reverse
-        >> List.map (String.split ",")
-
-
 decodeGrid2 : String -> Grid
 decodeGrid2 str =
     let
@@ -176,6 +168,14 @@ decodeGrid2 str =
     indexedFoldlList2d insertEncodedCellAt
         (Grid.filled width height Empty)
         tokens
+
+
+tokenizeGridString : String -> List (List String)
+tokenizeGridString =
+    String.trim
+        >> String.lines
+        >> List.reverse
+        >> List.map (String.split ",")
 
 
 indexedFoldlList2d func =

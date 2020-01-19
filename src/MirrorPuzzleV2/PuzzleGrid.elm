@@ -370,7 +370,7 @@ type alias DndView =
 toDndView : CellTransform -> Mouse2 -> Grid -> Maybe DndView
 toDndView ct mouse2 grid =
     Mouse2.onDragMay
-        (\dragPt dropPt ->
+        (\( dragPt, dropPt ) ->
             let
                 pos =
                     ct.fromView dragPt

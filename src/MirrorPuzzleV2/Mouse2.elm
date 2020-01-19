@@ -39,17 +39,17 @@ onDrop func (Mouse2 _ e) =
             Nothing
 
 
-onDrag : (Float2 -> Float2 -> a) -> Mouse2 -> Maybe a
+onDrag : (( Float2, Float2 ) -> a) -> Mouse2 -> Maybe a
 onDrag func (Mouse2 _ e) =
     case e of
         OnDrag p1 p2 ->
-            func p1 p2 |> Just
+            func ( p1, p2 ) |> Just
 
         _ ->
             Nothing
 
 
-onDragMay : (Float2 -> Float2 -> Maybe a) -> Mouse2 -> Maybe a
+onDragMay : (( Float2, Float2 ) -> Maybe a) -> Mouse2 -> Maybe a
 onDragMay func m2 =
     onDrag func m2 |> Maybe.Extra.join
 

@@ -68,16 +68,6 @@ update { mouse, screen } mouse2 (Model _ grid) =
         |> Maybe.map (Model mouse2)
 
 
-mapMouse2 : (Mouse2 -> Mouse2) -> Model -> Model
-mapMouse2 func (Model mouse2 grid) =
-    Model (func mouse2) grid
-
-
-mapGrid : (Mouse2 -> Grid -> Grid) -> Model -> Model
-mapGrid func (Model mouse2 grid) =
-    Model mouse2 (func mouse2 grid)
-
-
 
 -- View
 

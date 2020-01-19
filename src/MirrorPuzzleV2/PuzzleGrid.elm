@@ -279,14 +279,13 @@ litDestinations grid =
 updateGrid : CellTransform -> Mouse2 -> Grid -> Maybe Grid
 updateGrid ct mouse2 grid =
     Maybe.Extra.oneOf
-        [ Mouse2.onClick (onGridTap ct)
-        , Mouse2.onDrop (onGridDnd ct)
+        [ Mouse2.onClickMay (onGridTap ct >> callWith grid)
+        , Mouse2.onDropMay (onGridDnd ct >> callWith grid)
         ]
         mouse2
-        |> Maybe.map (callWith grid)
 
 
-onGridDnd : CellTransform -> ( Float2, Float2 ) -> Grid -> Grid
+onGridDnd : CellTransform -> ( Float2, Float2 ) -> Grid -> Maybe Grid
 onGridDnd ct ( dragPt, dropPt ) grid =
     let
         mapper dragCell dropCell =
@@ -308,29 +307,32 @@ onGridDnd ct ( dragPt, dropPt ) grid =
     in
     grid
         |> Grid.mapCellAt2 mapper (ct.fromView dragPt) (ct.fromView dropPt)
-        |> Maybe.withDefault grid
 
 
-onGridTap : CellTransform -> Float2 -> Grid -> Grid
+onGridTap : CellTransform -> Float2 -> Grid -> Maybe Grid
 onGridTap ct pt =
     rotateMirrorAt (ct.fromView pt)
 
 
-rotateMirrorAt : Int2 -> Grid -> Grid
+rotateMirrorAt : Int2 -> Grid -> Maybe Grid
 rotateMirrorAt pos grid =
     let
         ins a =
             Grid.insert pos a grid
     in
-    case Grid.get pos grid of
-        Just (SourceWithMirror dir) ->
-            ins (SourceWithMirror (Dir.rotate 1 dir))
+    Grid.get pos grid
+        |> Maybe.map
+            (\cell ->
+                case cell of
+                    SourceWithMirror dir ->
+                        ins (SourceWithMirror (Dir.rotate 1 dir))
 
-        Just (Mirror dir) ->
-            ins (Mirror (Dir.rotate 1 dir))
+                    Mirror dir ->
+                        ins (Mirror (Dir.rotate 1 dir))
 
-        _ ->
-            grid
+                    _ ->
+                        grid
+            )
 
 
 

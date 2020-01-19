@@ -6,6 +6,7 @@ module MirrorPuzzleV2.Mouse2 exposing
     , onDrag
     , onDragMay
     , onDrop
+    , onDropMay
     , update
     )
 
@@ -37,6 +38,11 @@ onDrop func (Mouse2 _ e) =
 
         _ ->
             Nothing
+
+
+onDropMay : (( Float2, Float2 ) -> Maybe a) -> Mouse2 -> Maybe a
+onDropMay func m2 =
+    onDrop func m2 |> Maybe.Extra.join
 
 
 onDrag : (( Float2, Float2 ) -> a) -> Mouse2 -> Maybe a

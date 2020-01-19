@@ -109,6 +109,7 @@ initialGrid =
 
 
 
+-- Grid Decoder
 {-
    S       -> source
    D       -> destination
@@ -148,8 +149,8 @@ encodedGrid =
     """
 
 
-decodeGrid2 : String -> Grid
-decodeGrid2 str =
+decodeGrid : String -> Grid
+decodeGrid str =
     let
         tokens : List (List String)
         tokens =
@@ -212,43 +213,8 @@ decodeDirection =
         >> Dir.fromInt
 
 
-decodeGrid : String -> Grid
-decodeGrid str =
-    let
-        lines : List String
-        lines =
-            String.lines (String.trim str)
-                |> List.reverse
-    in
-    case lines of
-        first :: _ ->
-            let
-                height : Int
-                height =
-                    List.length lines
 
-                width : Int
-                width =
-                    String.split "," first |> List.length
-
-                updateFromCellString : Int2 -> String -> Grid -> Grid
-                updateFromCellString pos encoded =
-                    Grid.insert pos (decodeCell encoded)
-
-                updateFromRowString : Int -> String -> Grid -> Grid
-                updateFromRowString y rowString grid =
-                    String.split "," rowString
-                        |> List.Extra.indexedFoldl (\x cellStr -> updateFromCellString ( x, y ) cellStr) grid
-
-                updateFromRowStrings : Grid -> Grid
-                updateFromRowStrings grid =
-                    List.Extra.indexedFoldl updateFromRowString grid lines
-            in
-            Grid.filled width height Empty
-                |> updateFromRowStrings
-
-        _ ->
-            Grid.filled 0 0 Empty
+-- Grid Queries
 
 
 destinations : Grid -> Set Int2

@@ -18,15 +18,16 @@ type alias Mouse =
 
 type alias Computer2 =
     { mouse : Mouse
+    , mouse2 : Mouse2
     , keyboard : Keyboard
     , screen : Screen
     , time : Time
     }
 
 
-toComputer : Computer -> Mouse2 -> Computer2
-toComputer { mouse, keyboard, screen, time } mouse2 =
-    { mouse = toMouse mouse mouse2, keyboard = keyboard, screen = screen, time = time }
+init : Computer -> Mouse2 -> Computer2
+init { mouse, keyboard, screen, time } mouse2 =
+    { mouse = toMouse mouse mouse2, mouse2 = mouse2, keyboard = keyboard, screen = screen, time = time }
 
 
 toMouse : Playground.Mouse -> Mouse2 -> Mouse

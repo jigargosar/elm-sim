@@ -3,10 +3,10 @@ module MirrorPuzzleV2.Main exposing (main)
 import List.Extra
 import Maybe.Extra
 import MirrorPuzzleV2.Box as Box exposing (Box)
-import MirrorPuzzleV2.Computer2 as Computer exposing (Computer2)
+import MirrorPuzzleV2.Computer2 exposing (Computer2)
+import MirrorPuzzleV2.Game2 as Game2
 import MirrorPuzzleV2.Levels as Levels exposing (Levels)
 import MirrorPuzzleV2.Mouse2 as Mouse2 exposing (Mouse2)
-import MirrorPuzzleV2.MouseEvent exposing (MouseEvent)
 import MirrorPuzzleV2.PuzzleGrid as PuzzleGrid
 import Number2 exposing (Float2)
 import Playground exposing (..)
@@ -268,13 +268,13 @@ init =
     { scene = initialPuzzleScene, mouse2 = Mouse2.initial }
 
 
-updateMem : Playground.Computer -> Mem -> Mem
+updateMem : Computer2 -> Mem -> Mem
 updateMem computer mem =
     let
         mouse2 =
             Mouse2.update computer.mouse mem.mouse2
     in
-    { mem | scene = ignoreNothing (updateScene (Computer.toComputer computer mouse2) mouse2) mem.scene, mouse2 = mouse2 }
+    { mem | scene = ignoreNothing (updateScene computer mouse2) mem.scene, mouse2 = mouse2 }
 
 
 updateScene : Computer2 -> Mouse2 -> Scene -> Maybe Scene
@@ -329,11 +329,6 @@ updatePuzzleScene computer mouse2 model =
             )
 
 
-view : Computer -> Mem -> List Shape
-view computer mem =
-    viewMem (Computer.toComputer computer mem.mouse2) mem
-
-
 viewMem : Computer2 -> Mem -> List Shape
 viewMem computer mem =
     case mem.scene of
@@ -352,4 +347,4 @@ viewMem computer mem =
 
 
 main =
-    game view updateMem init
+    Game2.game2 viewMem updateMem init

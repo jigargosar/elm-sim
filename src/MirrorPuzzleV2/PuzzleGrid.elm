@@ -149,6 +149,9 @@ decodeCell cellString =
         'D' :: [] ->
             Destination
 
+        'X' :: [] ->
+            Wall
+
         'M' :: [ char ] ->
             Mirror (decodeDirection char)
 

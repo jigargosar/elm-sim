@@ -17,7 +17,7 @@ import Playground.CellTransform as CT exposing (CellTransform)
 import Playground.Direction8 as Dir exposing (Direction8)
 import Playground.Extra exposing (..)
 import Playground.Grid as Grid
-import PointFree exposing (callWith, flip, mapEach, whenTrue)
+import PointFree exposing (flip, whenTrue)
 import Set exposing (Set)
 
 
@@ -291,6 +291,7 @@ updateGrid ct event grid =
             Nothing
 
 
+updateGridOnDnD : Int2 -> Int2 -> Grid.Grid Cell -> Maybe (Grid.Grid Cell)
 updateGridOnDnD dragIdx dropIdx grid =
     Maybe.map2
         (\drag drop ->

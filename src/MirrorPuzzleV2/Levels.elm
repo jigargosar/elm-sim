@@ -2,6 +2,7 @@ module MirrorPuzzleV2.Levels exposing
     ( Levels
     , count
     , current
+    , fromIndex
     , goTo
     , index
     , initial
@@ -48,6 +49,11 @@ initial =
             levelCons
     in
     Levels (Pivot.fromCons first rest)
+
+
+fromIndex : Int -> Levels
+fromIndex i =
+    goTo i initial
 
 
 current : Levels -> Lvl

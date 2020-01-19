@@ -2,6 +2,7 @@ module MirrorPuzzleV2.Main exposing (main)
 
 import List.Extra
 import MirrorPuzzleV2.Box as Box exposing (Box)
+import MirrorPuzzleV2.Levels as Levels exposing (Levels)
 import MirrorPuzzleV2.PuzzleGrid as PuzzleGrid
 import Playground exposing (..)
 import Playground.Extra exposing (..)
@@ -13,22 +14,22 @@ import Playground.Extra exposing (..)
 
 type alias PuzzleSceneModel =
     { grid : PuzzleGrid.Model
-    , levelIdx : Int
+    , levels : Levels
     }
 
 
-initPuzzleScene : Int -> Scene
-initPuzzleScene levelIdx =
-    PuzzleScene { grid = PuzzleGrid.fromLevelIndex levelIdx, levelIdx = levelIdx }
+initPuzzleScene : Levels -> Scene
+initPuzzleScene levels =
+    PuzzleScene { grid = Levels.current levels, levels = levels }
 
 
-goToLevelBy : Int -> PuzzleSceneModel -> Scene
-goToLevelBy offset model =
-    initPuzzleScene (model.levelIdx + offset)
+initialPuzzleScene : Scene
+initialPuzzleScene =
+    initPuzzleScene Levels.initial
 
 
 viewPuzzleScene : Computer -> PuzzleSceneModel -> List Shape
-viewPuzzleScene computer { grid, levelIdx } =
+viewPuzzleScene computer { grid, levels } =
     let
         { mouse, time, screen } =
             computer
@@ -40,7 +41,7 @@ viewPuzzleScene computer { grid, levelIdx } =
     , words
         black
         ([ "Level "
-         , String.fromInt (levelIdx + 1)
+         , String.fromInt (Levels.index levels + 1)
          , caseBool isSolved " solved" ""
          ]
             |> String.concat
@@ -137,7 +138,7 @@ initPrevButtonBox screen =
 
 initialLevelSelect : Scene
 initialLevelSelect =
-    LevelSelect PuzzleGrid.levelCount
+    LevelSelect (Levels.initial |> Levels.count)
 
 
 type alias LevelButtons =
@@ -257,7 +258,7 @@ type alias Mem =
 
 init : Mem
 init =
-    { scene = initPuzzleScene 0 }
+    { scene = initialPuzzleScene }
 
 
 updateMem : Computer -> Mem -> Mem
@@ -281,52 +282,31 @@ updateMem computer mem =
             in
             case ( mouse.click, levelButtonIdxFromMouse mouse lbs ) of
                 ( True, Just i ) ->
-                    { mem | scene = initPuzzleScene i }
+                    { mem | scene = initPuzzleScene (Levels.fromIndex i) }
 
                 _ ->
                     mem
 
         PuzzleScene model ->
-            let
-                nextScene =
-                    case ( mouse.click, puzzleSceneBtnAt mouse screen ) of
-                        ( True, Just btn ) ->
-                            case btn of
-                                SelectLevel ->
-                                    initialLevelSelect
-
-                                NextLevel ->
-                                    goToLevelBy 1 model
-
-                                PrevLevel ->
-                                    goToLevelBy -1 model
-
-                        _ ->
-                            PuzzleScene { model | grid = PuzzleGrid.update computer model.grid }
-            in
-            { mem | scene = nextScene }
+            { mem | scene = updatePuzzleScene computer model }
 
 
 updatePuzzleScene : Computer -> PuzzleSceneModel -> Scene
 updatePuzzleScene ({ mouse, screen } as computer) model =
-    if mouse.click then
-        case puzzleSceneBtnAt mouse screen of
-            Just btn ->
-                case btn of
-                    SelectLevel ->
-                        initialLevelSelect
+    case ( mouse.click, puzzleSceneBtnAt mouse screen ) of
+        ( True, Just btn ) ->
+            case btn of
+                SelectLevel ->
+                    initialLevelSelect
 
-                    NextLevel ->
-                        goToLevelBy 1 model
+                NextLevel ->
+                    initPuzzleScene (Levels.next model.levels)
 
-                    PrevLevel ->
-                        goToLevelBy -1 model
+                PrevLevel ->
+                    initPuzzleScene (Levels.prev model.levels)
 
-            Nothing ->
-                PuzzleScene { model | grid = PuzzleGrid.update computer model.grid }
-
-    else
-        PuzzleScene model
+        _ ->
+            PuzzleScene { model | grid = PuzzleGrid.update computer model.grid }
 
 
 view : Computer -> Mem -> List Shape

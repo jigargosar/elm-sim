@@ -1,13 +1,16 @@
 module MirrorPuzzleV2.PuzzleGrid exposing
     ( Model
+    , fromLevelIndex
     , fromString
     , initial
     , isSolved
+    , levelCount
     , levels
     , update
     , view
     )
 
+import Cons exposing (Cons)
 import List.Extra
 import Maybe.Extra
 import MirrorPuzzleV2.Mouse2 as Mouse2 exposing (Mouse2)
@@ -124,19 +127,36 @@ initialGrid =
 -}
 
 
-levels : List String
+type alias Levels =
+    Cons String
+
+
+levels : Cons String
 levels =
-    [ """
-      __,__,__,__,__,__,__,__
-      __,S ,M0,__,__,__,D ,__
-      __,__,__,__,__,__,__,__
-      """
-    , """
-      __,__,__,__,__,__,__,__
-      __,S0,__,__,__,__,D ,__
-      __,__,__,__,__,__,__,__
-      """
-    ]
+    Cons.cons """
+         __,__,__,__,__,__,__,__
+         __,S ,M0,__,__,__,D ,__
+         __,__,__,__,__,__,__,__
+         """
+        [ """
+          __,__,__,__,__,__,__,__
+          __,S0,__,__,__,__,D ,__
+          __,__,__,__,__,__,__,__
+          """
+        ]
+
+
+levelCount : Int
+levelCount =
+    Cons.length levels
+
+
+fromLevelIndex : Int -> Model
+fromLevelIndex levelIndex =
+    Cons.drop (clamp 0 (levelCount - 1) levelIndex) levels
+        |> List.head
+        |> Maybe.withDefault (Cons.head levels)
+        |> fromString
 
 
 encodedGrid =

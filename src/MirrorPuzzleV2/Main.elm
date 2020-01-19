@@ -17,25 +17,14 @@ type alias PuzzleSceneModel =
     }
 
 
-initialPuzzleScene_ : Scene
-initialPuzzleScene_ =
-    PuzzleScene { grid = PuzzleGrid.initial, levelIdx = 0 }
-
-
 initPuzzleScene : Int -> Scene
 initPuzzleScene levelIdx =
-    case List.drop levelIdx PuzzleGrid.levels |> List.head of
-        Just levelStr ->
-            PuzzleScene { grid = PuzzleGrid.fromString levelStr, levelIdx = levelIdx }
-
-        Nothing ->
-            initialPuzzleScene_
+    PuzzleScene { grid = PuzzleGrid.fromLevelIndex levelIdx, levelIdx = levelIdx }
 
 
 goToLevelBy : Int -> PuzzleSceneModel -> Scene
 goToLevelBy offset model =
-    clamp 0 ((PuzzleGrid.levels |> List.length) - 1) (model.levelIdx + offset)
-        |> initPuzzleScene
+    initPuzzleScene (model.levelIdx + offset)
 
 
 viewPuzzleScene : Computer -> PuzzleSceneModel -> List Shape
@@ -148,7 +137,7 @@ initPrevButtonBox screen =
 
 initialLevelSelect : Scene
 initialLevelSelect =
-    LevelSelect (PuzzleGrid.levels |> List.length)
+    LevelSelect PuzzleGrid.levelCount
 
 
 type alias LevelButtons =

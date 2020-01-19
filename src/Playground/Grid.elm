@@ -82,9 +82,7 @@ mapCell2 func gIdxA gIdxB grid =
                 |> insert gIdxB cellB
     in
     Maybe.map2
-        (\drag drop ->
-            func drag drop |> insertCells
-        )
+        (\drag drop -> func drag drop |> insertCells)
         (get gIdxA grid)
         (get gIdxB grid)
 

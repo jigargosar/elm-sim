@@ -9,6 +9,7 @@ import MirrorPuzzleV2.PuzzleGrid as PuzzleGrid
 import Number2 exposing (Float2)
 import Playground exposing (..)
 import Playground.Extra exposing (..)
+import PointFree exposing (ignoreNothing)
 
 
 
@@ -270,10 +271,10 @@ updateMem computer mem =
         mouse2 =
             Mouse2.update computer.mouse mem.mouse2
     in
-    { mem | scene = updateScene computer mouse2 mem.scene, mouse2 = mouse2 }
+    { mem | scene = ignoreNothing (updateScene computer mouse2) mem.scene, mouse2 = mouse2 }
 
 
-updateScene : Computer -> Mouse2 -> Scene -> Scene
+updateScene : Computer -> Mouse2 -> Scene -> Maybe Scene
 updateScene computer mouse2 scene =
     let
         { mouse, screen } =
@@ -282,7 +283,6 @@ updateScene computer mouse2 scene =
     case scene of
         Intro ->
             Mouse2.onClick (always initialLevelSelect) mouse2
-                |> Maybe.withDefault scene
 
         LevelSelect levelCount ->
             let
@@ -296,28 +296,36 @@ updateScene computer mouse2 scene =
                 )
                 mouse2
                 |> Maybe.Extra.join
-                |> Maybe.withDefault scene
 
         PuzzleScene model ->
-            updatePuzzleScene computer model
+            updatePuzzleScene computer mouse2 model
 
 
-updatePuzzleScene : Computer -> PuzzleSceneModel -> Scene
-updatePuzzleScene ({ mouse, screen } as computer) model =
-    case ( mouse.click, puzzleSceneBtnAt mouse screen ) of
-        ( True, Just btn ) ->
-            case btn of
-                SelectLevel ->
-                    initialLevelSelect
+updatePuzzleScene : Computer -> Mouse2 -> PuzzleSceneModel -> Maybe Scene
+updatePuzzleScene ({ mouse, screen } as computer) mouse2 model =
+    Mouse2.onClick
+        (\p ->
+            puzzleSceneBtnAt mouse screen
+                |> Maybe.map
+                    (\btn ->
+                        case btn of
+                            SelectLevel ->
+                                initialLevelSelect
 
-                NextLevel ->
-                    initPuzzleScene (Levels.next model.levels)
+                            NextLevel ->
+                                initPuzzleScene (Levels.next model.levels)
 
-                PrevLevel ->
-                    initPuzzleScene (Levels.prev model.levels)
-
-        _ ->
-            PuzzleScene { model | grid = PuzzleGrid.update computer model.grid }
+                            PrevLevel ->
+                                initPuzzleScene (Levels.prev model.levels)
+                    )
+        )
+        mouse2
+        |> Maybe.Extra.join
+        |> Maybe.Extra.orElseLazy
+            (\_ ->
+                PuzzleScene { model | grid = PuzzleGrid.update computer model.grid }
+                    |> Just
+            )
 
 
 view : Computer -> Mem -> List Shape

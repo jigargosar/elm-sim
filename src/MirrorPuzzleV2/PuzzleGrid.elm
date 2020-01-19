@@ -490,7 +490,7 @@ mirrorShape width dir =
     group
         [ group [ oval green (width / 2) width |> moveLeft (width / 6) ]
             |> rotate (Dir.toDegrees dir)
-        , circle lightPurple 10
+        , circle lightPurple (width / 10)
         ]
         |> scale 0.9
 

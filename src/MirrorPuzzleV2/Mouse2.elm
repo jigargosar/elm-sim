@@ -4,9 +4,11 @@ module MirrorPuzzleV2.Mouse2 exposing
     , onClick
     , onDrag
     , onDrop
+    , toEvent
     , update
     )
 
+import MirrorPuzzleV2.MouseEvent as ME exposing (MouseEvent)
 import Number2 as NT exposing (Float2)
 import Playground exposing (Mouse)
 
@@ -39,6 +41,25 @@ onDrag func (Mouse2 _ e) =
 
         _ ->
             Nothing
+
+
+toEvent : Mouse2 -> MouseEvent
+toEvent (Mouse2 _ event) =
+    case event of
+        OnClick p ->
+            ME.Click p
+
+        OnDragStart p ->
+            ME.DragStart p
+
+        OnDrag p1 p2 ->
+            ME.Drag p1 p2
+
+        OnDrop p1 p2 ->
+            ME.Drop p1 p2
+
+        NoEvent ->
+            ME.None
 
 
 type Mouse2

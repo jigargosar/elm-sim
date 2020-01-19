@@ -62,10 +62,10 @@ initCellT screen grid =
 -- Update
 
 
-update : Computer -> Model -> Model
-update { mouse, screen } =
-    mapMouse2 (Mouse2.update mouse)
-        >> mapGrid (\mouse2 grid -> updateGrid (initCellT screen grid) mouse2 grid)
+update : Computer -> Mouse2 -> Model -> Maybe Model
+update { mouse, screen } mouse2 (Model _ grid) =
+    updateGrid (initCellT screen grid) mouse2 grid
+        |> Maybe.map (Model mouse2)
 
 
 mapMouse2 : (Mouse2 -> Mouse2) -> Model -> Model
@@ -340,14 +340,14 @@ litDestinations grid =
 -- Grid Update
 
 
-updateGrid : CellTransform -> Mouse2 -> Grid -> Grid
+updateGrid : CellTransform -> Mouse2 -> Grid -> Maybe Grid
 updateGrid ct mouse2 grid =
     Maybe.Extra.oneOf
         [ Mouse2.onClick (onGridTap ct)
         , Mouse2.onDrop (onGridDnd ct)
         ]
         mouse2
-        |> Maybe.Extra.unwrap grid (callWith grid)
+        |> Maybe.map (callWith grid)
 
 
 onGridDnd : CellTransform -> Float2 -> Float2 -> Grid -> Grid

@@ -323,8 +323,8 @@ updatePuzzleScene ({ mouse, screen } as computer) mouse2 model =
         |> Maybe.Extra.join
         |> Maybe.Extra.orElseLazy
             (\_ ->
-                PuzzleScene { model | grid = PuzzleGrid.update computer model.grid }
-                    |> Just
+                PuzzleGrid.update computer mouse2 model.grid
+                    |> Maybe.map (\grid -> PuzzleScene { model | grid = grid })
             )
 
 

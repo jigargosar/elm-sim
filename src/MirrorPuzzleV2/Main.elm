@@ -184,9 +184,10 @@ initLevelButtons screen count =
     }
 
 
-levelButtonIdxAt : Float2 -> LevelButtons -> Maybe Int
-levelButtonIdxAt mouse lbs =
-    lbs.list
+levelButtonIdxAt : Float2 -> Screen -> Int -> Maybe Int
+levelButtonIdxAt mouse screen levelCount =
+    initLevelButtons screen levelCount
+        |> .list
         |> List.Extra.findIndex (Box.contains mouse)
 
 
@@ -285,13 +286,9 @@ updateScene computer mouse2 scene =
             Mouse2.onClick (always initialLevelSelect) mouse2
 
         LevelSelect levelCount ->
-            let
-                lbs =
-                    initLevelButtons screen levelCount
-            in
             Mouse2.onClick
                 (\p ->
-                    levelButtonIdxAt p lbs
+                    levelButtonIdxAt p screen levelCount
                         |> Maybe.map (\i -> initPuzzleScene (Levels.fromIndex i))
                 )
                 mouse2

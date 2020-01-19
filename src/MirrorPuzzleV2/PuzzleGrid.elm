@@ -312,28 +312,24 @@ updateGridOnDnD dragIdx dropIdx =
                 _ ->
                     ( drag, drop )
     in
-    Grid.mapCell2 mapCellsOnDnd dragIdx dropIdx
+    Grid.mapCell2 dragIdx dropIdx mapCellsOnDnd
 
 
 rotateMirrorAt : Int2 -> Grid -> Maybe Grid
-rotateMirrorAt pos grid =
+rotateMirrorAt gIdx grid =
     let
-        ins a =
-            Grid.insert pos a grid
+        rotateMirror cell =
+            case cell of
+                SourceWithMirror dir ->
+                    SourceWithMirror (Dir.rotate 1 dir)
+
+                Mirror dir ->
+                    Mirror (Dir.rotate 1 dir)
+
+                _ ->
+                    cell
     in
-    Grid.get pos grid
-        |> Maybe.map
-            (\cell ->
-                case cell of
-                    SourceWithMirror dir ->
-                        ins (SourceWithMirror (Dir.rotate 1 dir))
-
-                    Mirror dir ->
-                        ins (Mirror (Dir.rotate 1 dir))
-
-                    _ ->
-                        grid
-            )
+    Grid.mapCell gIdx rotateMirror grid
 
 
 

@@ -32,8 +32,8 @@ initialPuzzleScene =
     initPuzzleScene Levels.initial
 
 
-viewPuzzleScene : Computer -> PuzzleSceneModel -> List Shape
-viewPuzzleScene computer { grid, levels } =
+viewPuzzleScene : Computer -> Mouse2 -> PuzzleSceneModel -> List Shape
+viewPuzzleScene computer mouse2 { grid, levels } =
     let
         { mouse, time, screen } =
             computer
@@ -41,7 +41,7 @@ viewPuzzleScene computer { grid, levels } =
         isSolved =
             PuzzleGrid.isSolved grid
     in
-    [ PuzzleGrid.view computer grid
+    [ PuzzleGrid.view computer mouse2 grid
     , words
         black
         ([ "Level "
@@ -342,7 +342,7 @@ view computer mem =
             viewLevelSelect computer.mouse lbs
 
         PuzzleScene puzzle ->
-            viewPuzzleScene computer puzzle
+            viewPuzzleScene computer mem.mouse2 puzzle
 
 
 main =

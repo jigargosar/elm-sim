@@ -1,7 +1,6 @@
 module MirrorPuzzleV2.PuzzleGrid exposing
     ( Model
     , fromString
-    , initial
     , isSolved
     , update
     , view
@@ -26,12 +25,7 @@ import Set exposing (Set)
 
 
 type Model
-    = Model Mouse2 Grid
-
-
-initial : Model
-initial =
-    fromGrid initialGrid
+    = Model Grid
 
 
 fromString : String -> Model
@@ -41,11 +35,11 @@ fromString =
 
 fromGrid : Grid -> Model
 fromGrid grid =
-    Model Mouse2.initial grid
+    Model grid
 
 
 isSolved : Model -> Bool
-isSolved (Model _ grid) =
+isSolved (Model grid) =
     destinations grid == litDestinations grid
 
 
@@ -63,17 +57,17 @@ initCellT screen grid =
 
 
 update : Computer -> Mouse2 -> Model -> Maybe Model
-update { mouse, screen } mouse2 (Model _ grid) =
+update { mouse, screen } mouse2 (Model grid) =
     updateGrid (initCellT screen grid) mouse2 grid
-        |> Maybe.map (Model mouse2)
+        |> Maybe.map Model
 
 
 
 -- View
 
 
-view : Computer -> Model -> Shape
-view { time, screen } (Model mouse2 grid) =
+view : Computer -> Mouse2 -> Model -> Shape
+view { time, screen } mouse2 (Model grid) =
     viewGrid time mouse2 (initCellT screen grid) grid
 
 
@@ -91,11 +85,6 @@ type Cell
     | SourceWithMirror Direction8
     | Mirror Direction8
     | Empty
-
-
-initialGrid : Grid
-initialGrid =
-    decodeGrid encodedGrid
 
 
 
@@ -116,44 +105,6 @@ initialGrid =
 
 type alias Levels =
     Cons String
-
-
-levels : Cons String
-levels =
-    Cons.cons """
-         __,__,__,__,__,__,__,__
-         __,S ,M0,__,__,__,D ,__
-         __,__,__,__,__,__,__,__
-         """
-        [ """
-          __,__,__,__,__,__,__,__
-          __,S0,__,__,__,__,D ,__
-          __,__,__,__,__,__,__,__
-          """
-        ]
-
-
-levelCount : Int
-levelCount =
-    Cons.length levels
-
-
-fromLevelIndex : Int -> Model
-fromLevelIndex levelIndex =
-    Cons.drop (clamp 0 (levelCount - 1) levelIndex) levels
-        |> List.head
-        |> Maybe.withDefault (Cons.head levels)
-        |> fromString
-
-
-encodedGrid =
-    """
-    __,__,__,__,S5
-    __,__,M7,__,__
-    __,S1,__,D ,__
-    __,S ,__,__,__
-    D ,__,__,__,__
-    """
 
 
 decodeGrid : String -> Grid

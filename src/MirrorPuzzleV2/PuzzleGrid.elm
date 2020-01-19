@@ -110,10 +110,10 @@ initialGrid =
 
 
 {-
-   SS       -> source
-   DD       -> destination
+   S       -> source
+   D       -> destination
    M<0-7>   -> mirror angle
-   N<0-7>   -> source with mirror
+   S<0-7>   -> source with mirror
    __       -> empty cell
 
 
@@ -127,12 +127,12 @@ levels : List String
 levels =
     [ """
       __,__,__,__,__,__,__,__
-      __,SS,M0,__,__,__,DD,__
+      __,S ,M0,__,__,__,D ,__
       __,__,__,__,__,__,__,__
       """
     , """
       __,__,__,__,__,__,__,__
-      __,N0,__,__,__,__,DD,__
+      __,S0,__,__,__,__,D ,__
       __,__,__,__,__,__,__,__
       """
     ]
@@ -140,11 +140,11 @@ levels =
 
 encoded =
     """
-    __,__,__,__,N5
+    __,__,__,__,S5
     __,__,M7,__,__
-    __,N1,__,DD,__
-    __,SS,__,__,__
-    DD,__,__,__,__
+    __,S1,__,D ,__
+    __,S ,__,__,__
+    D ,__,__,__,__
     """
 
 
@@ -184,7 +184,7 @@ decodeGrid str =
                         "SS" ->
                             ins Source
 
-                        "DD" ->
+                        "D " ->
                             ins Destination
 
                         chars ->

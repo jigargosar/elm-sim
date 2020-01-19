@@ -1,60 +1,44 @@
 module MirrorPuzzleV2.Mouse2 exposing
     ( Mouse2
     , initial
-    , onClickMay
-    , onDragMay
-    , onDropMay
+    , onClick
+    , onDrag
+    , onDrop
     , update
     )
 
-import Maybe.Extra
 import Number2 as NT exposing (Float2)
 import Playground exposing (Mouse)
 
 
-onClick : (Float2 -> a) -> Mouse2 -> Maybe a
+onClick : (Float2 -> Maybe a) -> Mouse2 -> Maybe a
 onClick func (Mouse2 _ e) =
     case e of
         OnClick p ->
-            func p |> Just
+            func p
 
         _ ->
             Nothing
 
 
-onClickMay : (Float2 -> Maybe a) -> Mouse2 -> Maybe a
-onClickMay func m2 =
-    onClick func m2 |> Maybe.Extra.join
-
-
-onDrop : (( Float2, Float2 ) -> a) -> Mouse2 -> Maybe a
+onDrop : (( Float2, Float2 ) -> Maybe a) -> Mouse2 -> Maybe a
 onDrop func (Mouse2 _ e) =
     case e of
         OnDrop p1 p2 ->
-            func ( p1, p2 ) |> Just
+            func ( p1, p2 )
 
         _ ->
             Nothing
 
 
-onDropMay : (( Float2, Float2 ) -> Maybe a) -> Mouse2 -> Maybe a
-onDropMay func m2 =
-    onDrop func m2 |> Maybe.Extra.join
-
-
-onDrag : (( Float2, Float2 ) -> a) -> Mouse2 -> Maybe a
+onDrag : (( Float2, Float2 ) -> Maybe a) -> Mouse2 -> Maybe a
 onDrag func (Mouse2 _ e) =
     case e of
         OnDrag p1 p2 ->
-            func ( p1, p2 ) |> Just
+            func ( p1, p2 )
 
         _ ->
             Nothing
-
-
-onDragMay : (( Float2, Float2 ) -> Maybe a) -> Mouse2 -> Maybe a
-onDragMay func m2 =
-    onDrag func m2 |> Maybe.Extra.join
 
 
 type Mouse2

@@ -290,7 +290,7 @@ updateScene computer mouse2 scene =
                 Nothing
 
         LevelSelect levelCount ->
-            Mouse2.onClickMay
+            Mouse2.onClick
                 (\p ->
                     levelButtonIdxAt p screen levelCount
                         |> Maybe.map (\i -> initPuzzleScene (Levels.fromIndex i))
@@ -303,7 +303,7 @@ updateScene computer mouse2 scene =
 
 updatePuzzleScene : Computer -> Mouse2 -> PuzzleSceneModel -> Maybe Scene
 updatePuzzleScene computer mouse2 model =
-    Mouse2.onClickMay
+    Mouse2.onClick
         (\p ->
             puzzleSceneBtnAt p computer.screen
                 |> Maybe.map

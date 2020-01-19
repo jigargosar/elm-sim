@@ -279,8 +279,8 @@ litDestinations grid =
 updateGrid : CellTransform -> Mouse2 -> Grid -> Maybe Grid
 updateGrid ct mouse2 grid =
     Maybe.Extra.oneOf
-        [ Mouse2.onClickMay (onGridTap ct >> callWith grid)
-        , Mouse2.onDropMay (onGridDnd ct >> callWith grid)
+        [ Mouse2.onClick (onGridTap ct >> callWith grid)
+        , Mouse2.onDrop (onGridDnd ct >> callWith grid)
         ]
         mouse2
 
@@ -371,7 +371,7 @@ type alias DndView =
 
 toDndView : CellTransform -> Mouse2 -> Grid -> Maybe DndView
 toDndView ct mouse2 grid =
-    Mouse2.onDragMay
+    Mouse2.onDrag
         (\( dragPt, dropPt ) ->
             let
                 pos =

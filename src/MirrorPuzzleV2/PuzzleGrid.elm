@@ -56,8 +56,8 @@ initCellT screen grid =
 -- Update
 
 
-update : Computer2 -> Mouse2 -> Model -> Maybe Model
-update { mouse, screen } mouse2 (Model grid) =
+update : Computer2 -> Model -> Maybe Model
+update { mouse, screen, mouse2 } (Model grid) =
     updateGrid (initCellT screen grid) mouse2 grid
         |> Maybe.map Model
 

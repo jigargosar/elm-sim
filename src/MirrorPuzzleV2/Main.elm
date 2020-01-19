@@ -260,25 +260,21 @@ type Scene
 
 
 type alias Mem =
-    { scene : Scene, mouse2 : Mouse2 }
+    { scene : Scene }
 
 
 init : Mem
 init =
-    { scene = initialPuzzleScene, mouse2 = Mouse2.initial }
+    { scene = initialPuzzleScene }
 
 
 updateMem : Computer2 -> Mem -> Mem
 updateMem computer mem =
-    let
-        mouse2 =
-            Mouse2.update computer.mouse mem.mouse2
-    in
-    { mem | scene = ignoreNothing (updateScene computer mouse2) mem.scene, mouse2 = mouse2 }
+    { mem | scene = ignoreNothing (updateScene computer) mem.scene }
 
 
-updateScene : Computer2 -> Mouse2 -> Scene -> Maybe Scene
-updateScene computer mouse2 scene =
+updateScene : Computer2 -> Scene -> Maybe Scene
+updateScene computer scene =
     let
         { mouse, screen } =
             computer
@@ -297,14 +293,14 @@ updateScene computer mouse2 scene =
                     levelButtonIdxAt p screen levelCount
                         |> Maybe.map (\i -> initPuzzleScene (Levels.fromIndex i))
                 )
-                mouse2
+                computer.mouse2
 
         PuzzleScene model ->
-            updatePuzzleScene computer mouse2 model
+            updatePuzzleScene computer model
 
 
-updatePuzzleScene : Computer2 -> Mouse2 -> PuzzleSceneModel -> Maybe Scene
-updatePuzzleScene computer mouse2 model =
+updatePuzzleScene : Computer2 -> PuzzleSceneModel -> Maybe Scene
+updatePuzzleScene computer model =
     Mouse2.onClick
         (\p ->
             puzzleSceneBtnAt p computer.screen
@@ -321,10 +317,10 @@ updatePuzzleScene computer mouse2 model =
                                 initPuzzleScene (Levels.prev model.levels)
                     )
         )
-        mouse2
+        computer.mouse2
         |> Maybe.Extra.orElseLazy
             (\_ ->
-                PuzzleGrid.update computer mouse2 model.grid
+                PuzzleGrid.update computer model.grid
                     |> Maybe.map (\grid -> PuzzleScene { model | grid = grid })
             )
 
@@ -343,7 +339,7 @@ viewMem computer mem =
             viewLevelSelect computer.mouse.pos lbs
 
         PuzzleScene puzzle ->
-            viewPuzzleScene computer mem.mouse2 puzzle
+            viewPuzzleScene computer computer.mouse2 puzzle
 
 
 main =

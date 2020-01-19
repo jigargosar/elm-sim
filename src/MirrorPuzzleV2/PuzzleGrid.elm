@@ -17,7 +17,7 @@ import Playground.CellTransform as CT exposing (CellTransform)
 import Playground.Direction8 as Dir exposing (Direction8)
 import Playground.Extra exposing (..)
 import Playground.Grid as Grid
-import PointFree exposing (callWith, whenTrue)
+import PointFree exposing (callWith, flip, whenTrue)
 import Set exposing (Set)
 
 
@@ -148,12 +148,41 @@ encodedGrid =
     """
 
 
-decodeDirection : Char -> Direction8
-decodeDirection =
-    String.fromChar
-        >> String.toInt
-        >> Maybe.withDefault 0
-        >> Dir.fromInt
+tokenizeGridString : String -> List (List String)
+tokenizeGridString =
+    String.trim
+        >> String.lines
+        >> List.reverse
+        >> List.map (String.split ",")
+
+
+decodeGrid2 : String -> Grid
+decodeGrid2 str =
+    let
+        tokens : List (List String)
+        tokens =
+            tokenizeGridString str
+
+        width : Int
+        width =
+            tokens |> List.head |> Maybe.Extra.unwrap 0 List.length
+
+        height =
+            tokens |> List.length
+
+        insertEncodedCellAt pos cs =
+            Grid.insert pos (decodeCell cs)
+    in
+    indexedFoldlList2d insertEncodedCellAt
+        (Grid.filled width height Empty)
+        tokens
+
+
+indexedFoldlList2d func =
+    List.Extra.indexedFoldl
+        (\y ->
+            List.Extra.indexedFoldl (\x -> func ( x, y )) |> flip
+        )
 
 
 decodeCell : String -> Cell
@@ -173,6 +202,14 @@ decodeCell cellString =
 
         _ ->
             Empty
+
+
+decodeDirection : Char -> Direction8
+decodeDirection =
+    String.fromChar
+        >> String.toInt
+        >> Maybe.withDefault 0
+        >> Dir.fromInt
 
 
 decodeGrid : String -> Grid

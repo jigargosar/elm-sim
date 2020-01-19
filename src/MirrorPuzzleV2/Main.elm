@@ -3,7 +3,7 @@ module MirrorPuzzleV2.Main exposing (main)
 import List.Extra
 import Maybe.Extra
 import MirrorPuzzleV2.Box as Box exposing (Box)
-import MirrorPuzzleV2.Computer as Computer exposing (Computer2)
+import MirrorPuzzleV2.Computer2 as Computer exposing (Computer2)
 import MirrorPuzzleV2.Levels as Levels exposing (Levels)
 import MirrorPuzzleV2.Mouse2 as Mouse2 exposing (Mouse2)
 import MirrorPuzzleV2.MouseEvent exposing (MouseEvent)

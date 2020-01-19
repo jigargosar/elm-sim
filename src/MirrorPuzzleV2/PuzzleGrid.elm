@@ -8,7 +8,7 @@ module MirrorPuzzleV2.PuzzleGrid exposing
 
 import List.Extra
 import Maybe.Extra
-import MirrorPuzzleV2.Computer exposing (Computer2)
+import MirrorPuzzleV2.Computer2 exposing (Computer2)
 import MirrorPuzzleV2.Mouse2 as Mouse2 exposing (Mouse2)
 import Number2 as NT exposing (Float2, Int2)
 import Playground exposing (..)

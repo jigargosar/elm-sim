@@ -173,30 +173,28 @@ decodeGrid str =
                         ins =
                             Grid.insert pos
 
-                        charToDir : Char -> Direction8
-                        charToDir =
+                        dirFromChar : Char -> Direction8
+                        dirFromChar =
                             String.fromChar
                                 >> String.toInt
                                 >> Maybe.withDefault 0
                                 >> Dir.fromInt
                     in
-                    case String.trim cellStr of
-                        "SS" ->
+                    case String.trim cellStr |> String.toList of
+                        'S' :: [] ->
                             ins Source
 
-                        "D " ->
+                        'D' :: [] ->
                             ins Destination
 
-                        chars ->
-                            case String.toList chars of
-                                'M' :: [ char ] ->
-                                    ins (Mirror (charToDir char))
+                        'M' :: [ char ] ->
+                            ins (Mirror (dirFromChar char))
 
-                                'N' :: [ char ] ->
-                                    ins (SourceWithMirror (charToDir char))
+                        'S' :: [ char ] ->
+                            ins (SourceWithMirror (dirFromChar char))
 
-                                _ ->
-                                    identity
+                        _ ->
+                            identity
 
                 updateFromRowString : Int -> String -> Grid -> Grid
                 updateFromRowString y rowString grid =

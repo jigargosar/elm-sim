@@ -79,7 +79,7 @@ initial =
     Mouse2 Up NoEvent
 
 
-update : Playground.Mouse -> Mouse2 -> Mouse2
+update : { a | x : Float, y : Float, down : Bool } -> Mouse2 -> Mouse2
 update mouse (Mouse2 state _) =
     let
         ( nextState, nextEvent ) =
@@ -94,7 +94,7 @@ type State
     | Dragging Float2
 
 
-nextStateAndEvent : Mouse -> State -> ( State, Event )
+nextStateAndEvent : { a | x : Float, y : Float, down : Bool } -> State -> ( State, Event )
 nextStateAndEvent mouse previousState =
     let
         currentPosition =

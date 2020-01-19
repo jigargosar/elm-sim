@@ -8,6 +8,7 @@ module MirrorPuzzleV2.PuzzleGrid exposing
 
 import List.Extra
 import Maybe.Extra
+import MirrorPuzzleV2.Computer exposing (Computer2)
 import MirrorPuzzleV2.Mouse2 as Mouse2 exposing (Mouse2)
 import Number2 as NT exposing (Float2, Int2)
 import Playground exposing (..)
@@ -55,7 +56,7 @@ initCellT screen grid =
 -- Update
 
 
-update : Computer -> Mouse2 -> Model -> Maybe Model
+update : Computer2 -> Mouse2 -> Model -> Maybe Model
 update { mouse, screen } mouse2 (Model grid) =
     updateGrid (initCellT screen grid) mouse2 grid
         |> Maybe.map Model
@@ -65,7 +66,7 @@ update { mouse, screen } mouse2 (Model grid) =
 -- View
 
 
-view : Computer -> Mouse2 -> Model -> Shape
+view : Computer2 -> Mouse2 -> Model -> Shape
 view { time, screen } mouse2 (Model grid) =
     viewGrid time mouse2 (initCellT screen grid) grid
 

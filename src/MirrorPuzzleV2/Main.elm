@@ -3,8 +3,10 @@ module MirrorPuzzleV2.Main exposing (main)
 import List.Extra
 import Maybe.Extra
 import MirrorPuzzleV2.Box as Box exposing (Box)
+import MirrorPuzzleV2.Computer as Computer exposing (Computer2)
 import MirrorPuzzleV2.Levels as Levels exposing (Levels)
 import MirrorPuzzleV2.Mouse2 as Mouse2 exposing (Mouse2)
+import MirrorPuzzleV2.MouseEvent exposing (MouseEvent)
 import MirrorPuzzleV2.PuzzleGrid as PuzzleGrid
 import Number2 exposing (Float2)
 import Playground exposing (..)
@@ -32,7 +34,7 @@ initialPuzzleScene =
     initPuzzleScene Levels.initial
 
 
-viewPuzzleScene : Computer -> Mouse2 -> PuzzleSceneModel -> List Shape
+viewPuzzleScene : Computer2 -> Mouse2 -> PuzzleSceneModel -> List Shape
 viewPuzzleScene computer mouse2 { grid, levels } =
     let
         { mouse, time, screen } =
@@ -52,7 +54,7 @@ viewPuzzleScene computer mouse2 { grid, levels } =
         )
         |> moveY screen.top
         |> moveDown 50
-    , viewPuzzleSceneButtons mouse screen
+    , viewPuzzleSceneButtons mouse.pos screen
     ]
 
 
@@ -96,7 +98,7 @@ puzzleBtnData screen puzzleButton =
             ( "Prev", initPrevButtonBox screen )
 
 
-viewPuzzleSceneButton : Mouse -> Screen -> PuzzleButton -> Shape
+viewPuzzleSceneButton : Float2 -> Screen -> PuzzleButton -> Shape
 viewPuzzleSceneButton mouse screen btn =
     let
         ( text, box ) =
@@ -105,7 +107,7 @@ viewPuzzleSceneButton mouse screen btn =
     renderButton mouse text box
 
 
-viewPuzzleSceneButtons : Mouse -> Screen -> Shape
+viewPuzzleSceneButtons : Float2 -> Screen -> Shape
 viewPuzzleSceneButtons mouse screen =
     puzzleSceneButtons
         |> List.map (viewPuzzleSceneButton mouse screen)
@@ -191,7 +193,7 @@ levelButtonIdxAt mouse screen levelCount =
         |> List.Extra.findIndex (Box.contains mouse)
 
 
-renderLevelButtons : Mouse -> LevelButtons -> Shape
+renderLevelButtons : Float2 -> LevelButtons -> Shape
 renderLevelButtons mouse lbs =
     lbs.list
         |> List.indexedMap
@@ -204,9 +206,9 @@ renderLevelButtons mouse lbs =
         |> group
 
 
-renderButton : Mouse -> String -> Box -> Shape
+renderButton : Float2 -> String -> Box -> Shape
 renderButton mouse text rect =
-    buttonShape (Box.containsXY mouse rect)
+    buttonShape (Box.contains mouse rect)
         (Box.dimensions rect)
         text
         |> move2 (Box.center rect)
@@ -233,7 +235,7 @@ buttonShape hover ( w, h ) text =
         |> group
 
 
-viewLevelSelect : Mouse -> LevelButtons -> List Shape
+viewLevelSelect : Float2 -> LevelButtons -> List Shape
 viewLevelSelect mouse lbs =
     [ words black "Select Level"
         |> scale 1.5
@@ -266,16 +268,16 @@ init =
     { scene = initialPuzzleScene, mouse2 = Mouse2.initial }
 
 
-updateMem : Computer -> Mem -> Mem
+updateMem : Playground.Computer -> Mem -> Mem
 updateMem computer mem =
     let
         mouse2 =
             Mouse2.update computer.mouse mem.mouse2
     in
-    { mem | scene = ignoreNothing (updateScene computer mouse2) mem.scene, mouse2 = mouse2 }
+    { mem | scene = ignoreNothing (updateScene (Computer.toComputer computer mouse2) mouse2) mem.scene, mouse2 = mouse2 }
 
 
-updateScene : Computer -> Mouse2 -> Scene -> Maybe Scene
+updateScene : Computer2 -> Mouse2 -> Scene -> Maybe Scene
 updateScene computer mouse2 scene =
     let
         { mouse, screen } =
@@ -301,7 +303,7 @@ updateScene computer mouse2 scene =
             updatePuzzleScene computer mouse2 model
 
 
-updatePuzzleScene : Computer -> Mouse2 -> PuzzleSceneModel -> Maybe Scene
+updatePuzzleScene : Computer2 -> Mouse2 -> PuzzleSceneModel -> Maybe Scene
 updatePuzzleScene computer mouse2 model =
     Mouse2.onClick
         (\p ->
@@ -329,6 +331,11 @@ updatePuzzleScene computer mouse2 model =
 
 view : Computer -> Mem -> List Shape
 view computer mem =
+    viewMem (Computer.toComputer computer mem.mouse2) mem
+
+
+viewMem : Computer2 -> Mem -> List Shape
+viewMem computer mem =
     case mem.scene of
         Intro ->
             [ words black "Tap To Start" ]
@@ -338,7 +345,7 @@ view computer mem =
                 lbs =
                     initLevelButtons computer.screen levelCount
             in
-            viewLevelSelect computer.mouse lbs
+            viewLevelSelect computer.mouse.pos lbs
 
         PuzzleScene puzzle ->
             viewPuzzleScene computer mem.mouse2 puzzle

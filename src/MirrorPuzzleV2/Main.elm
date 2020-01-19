@@ -6,6 +6,7 @@ import MirrorPuzzleV2.Box as Box exposing (Box)
 import MirrorPuzzleV2.Levels as Levels exposing (Levels)
 import MirrorPuzzleV2.Mouse2 as Mouse2 exposing (Mouse2)
 import MirrorPuzzleV2.PuzzleGrid as PuzzleGrid
+import Number2 exposing (Float2)
 import Playground exposing (..)
 import Playground.Extra exposing (..)
 
@@ -182,10 +183,10 @@ initLevelButtons screen count =
     }
 
 
-levelButtonIdxFromMouse : Mouse -> LevelButtons -> Maybe Int
-levelButtonIdxFromMouse mouse lbs =
+levelButtonIdxFromView : Float2 -> LevelButtons -> Maybe Int
+levelButtonIdxFromView mouse lbs =
     lbs.list
-        |> List.Extra.findIndex (Box.containsXY mouse)
+        |> List.Extra.findIndex (Box.contains mouse)
 
 
 renderLevelButtons : Mouse -> LevelButtons -> Shape
@@ -288,9 +289,14 @@ updateScene computer mouse2 scene =
                 lbs =
                     initLevelButtons screen levelCount
             in
-            Mouse2.onClick (\_ -> levelButtonIdxFromMouse mouse lbs) mouse2
+            Mouse2.onClick
+                (\p ->
+                    levelButtonIdxFromView p lbs
+                        |> Maybe.map (\i -> initPuzzleScene (Levels.fromIndex i))
+                )
+                mouse2
                 |> Maybe.Extra.join
-                |> Maybe.Extra.unwrap scene (\i -> initPuzzleScene (Levels.fromIndex i))
+                |> Maybe.withDefault scene
 
         PuzzleScene model ->
             updatePuzzleScene computer model

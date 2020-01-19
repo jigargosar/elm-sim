@@ -29,11 +29,11 @@ onClickMay func m2 =
     onClick func m2 |> Maybe.Extra.join
 
 
-onDrop : (Float2 -> Float2 -> a) -> Mouse2 -> Maybe a
+onDrop : (( Float2, Float2 ) -> a) -> Mouse2 -> Maybe a
 onDrop func (Mouse2 _ e) =
     case e of
         OnDrop p1 p2 ->
-            func p1 p2 |> Just
+            func ( p1, p2 ) |> Just
 
         _ ->
             Nothing

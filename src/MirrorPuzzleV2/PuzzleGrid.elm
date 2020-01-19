@@ -286,8 +286,8 @@ updateGrid ct mouse2 grid =
         |> Maybe.map (callWith grid)
 
 
-onGridDnd : CellTransform -> Float2 -> Float2 -> Grid -> Grid
-onGridDnd ct dragPt dropPt grid =
+onGridDnd : CellTransform -> ( Float2, Float2 ) -> Grid -> Grid
+onGridDnd ct ( dragPt, dropPt ) grid =
     let
         mapper dragCell dropCell =
             case ( dragCell, dropCell ) of

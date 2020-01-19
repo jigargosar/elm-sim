@@ -302,10 +302,10 @@ updateScene computer mouse2 scene =
 
 
 updatePuzzleScene : Computer -> Mouse2 -> PuzzleSceneModel -> Maybe Scene
-updatePuzzleScene ({ mouse, screen } as computer) mouse2 model =
+updatePuzzleScene computer mouse2 model =
     Mouse2.onClick
         (\p ->
-            puzzleSceneBtnAt p screen
+            puzzleSceneBtnAt p computer.screen
                 |> Maybe.map
                     (\btn ->
                         case btn of

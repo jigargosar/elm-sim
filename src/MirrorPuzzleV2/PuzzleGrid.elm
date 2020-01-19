@@ -10,13 +10,14 @@ import List.Extra
 import Maybe.Extra
 import MirrorPuzzleV2.Computer2 exposing (Computer2)
 import MirrorPuzzleV2.Mouse2 as Mouse2 exposing (Mouse2)
+import MirrorPuzzleV2.MouseEvent exposing (MouseEvent(..))
 import Number2 as NT exposing (Float2, Int2)
 import Playground exposing (..)
 import Playground.CellTransform as CT exposing (CellTransform)
 import Playground.Direction8 as Dir exposing (Direction8)
 import Playground.Extra exposing (..)
 import Playground.Grid as Grid
-import PointFree exposing (callWith, flip, whenTrue)
+import PointFree exposing (callWith, flip, mapEach, whenTrue)
 import Set exposing (Set)
 
 
@@ -57,8 +58,8 @@ initCellT screen grid =
 
 
 update : Computer2 -> Model -> Maybe Model
-update { mouse, screen, mouse2 } (Model grid) =
-    updateGrid (initCellT screen grid) mouse2 grid
+update { mouse, screen } (Model grid) =
+    updateGrid (initCellT screen grid) mouse.event grid
         |> Maybe.map Model
 
 
@@ -277,42 +278,49 @@ litDestinations grid =
 -- Grid Update
 
 
-updateGrid : CellTransform -> Mouse2 -> Grid -> Maybe Grid
-updateGrid ct mouse2 grid =
-    Maybe.Extra.oneOf
-        [ Mouse2.onClick (onGridTap ct >> callWith grid)
-        , Mouse2.onDrop (onGridDnd ct >> callWith grid)
-        ]
-        mouse2
+updateGrid : CellTransform -> MouseEvent -> Grid -> Maybe Grid
+updateGrid ct event grid =
+    case event of
+        Click pt ->
+            rotateMirrorAt (ct.fromView pt) grid
 
+        Drop pt1 pt2 ->
+            let
+                ( gi1, gi2 ) =
+                    ( pt1, pt2 ) |> mapEach ct.fromView
 
-onGridDnd : CellTransform -> ( Float2, Float2 ) -> Grid -> Maybe Grid
-onGridDnd ct ( dragPt, dropPt ) grid =
-    let
-        mapper dragCell dropCell =
-            case ( dragCell, dropCell ) of
-                ( SourceWithMirror dir, Empty ) ->
-                    Just ( Source, Mirror dir )
+                cellAt gIdx =
+                    Grid.get gIdx grid
+            in
+            case ( cellAt gi1, cellAt gi2 ) of
+                ( Just drag, Just drop ) ->
+                    (case ( drag, drop ) of
+                        ( SourceWithMirror dir, Empty ) ->
+                            ( Source, Mirror dir )
 
-                ( SourceWithMirror dir, Source ) ->
-                    Just ( Source, SourceWithMirror dir )
+                        ( SourceWithMirror dir, Source ) ->
+                            ( Source, SourceWithMirror dir )
 
-                ( Mirror dir, Empty ) ->
-                    Just ( Empty, Mirror dir )
+                        ( Mirror dir, Empty ) ->
+                            ( Empty, Mirror dir )
 
-                ( Mirror dir, Source ) ->
-                    Just ( Empty, SourceWithMirror dir )
+                        ( Mirror dir, Source ) ->
+                            ( Empty, SourceWithMirror dir )
+
+                        _ ->
+                            ( drag, drop )
+                    )
+                        |> (\( c1, c2 ) ->
+                                Grid.insert gi1 c1 grid
+                                    |> Grid.insert gi2 c2
+                           )
+                        |> Just
 
                 _ ->
                     Nothing
-    in
-    grid
-        |> Grid.mapCellAt2 mapper (ct.fromView dragPt) (ct.fromView dropPt)
 
-
-onGridTap : CellTransform -> Float2 -> Grid -> Maybe Grid
-onGridTap ct pt =
-    rotateMirrorAt (ct.fromView pt)
+        _ ->
+            Nothing
 
 
 rotateMirrorAt : Int2 -> Grid -> Maybe Grid

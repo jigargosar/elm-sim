@@ -148,6 +148,33 @@ encoded =
     """
 
 
+decodeDirection : Char -> Direction8
+decodeDirection =
+    String.fromChar
+        >> String.toInt
+        >> Maybe.withDefault 0
+        >> Dir.fromInt
+
+
+decodeCell : String -> Cell
+decodeCell cellString =
+    case String.trim cellString |> String.toList of
+        'S' :: [] ->
+            Source
+
+        'D' :: [] ->
+            Destination
+
+        'M' :: [ char ] ->
+            Mirror (decodeDirection char)
+
+        'S' :: [ char ] ->
+            SourceWithMirror (decodeDirection char)
+
+        _ ->
+            Empty
+
+
 decodeGrid : String -> Grid
 decodeGrid str =
     let

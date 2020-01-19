@@ -90,20 +90,17 @@ type Cell
 
 
 -- Grid Decoder
-{-
-   S       -> source
-   D       -> destination
-   M<0-7>   -> mirror angle
-   S<0-7>   -> source with mirror
-   __       -> empty cell
 
 
-   -- Later
-   O<0-7> -> double mirror
-   X -> wall
+{-|
+
+    S -> source
+    D -> destination
+    M<0-7> -> mirror angle
+    S<0-7> -> source with mirror
+    __ -> empty cell
+
 -}
-
-
 decodeGrid : String -> Grid
 decodeGrid str =
     let

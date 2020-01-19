@@ -2,11 +2,14 @@ module MirrorPuzzleV2.Mouse2 exposing
     ( Mouse2
     , initial
     , onClick
+    , onClickMay
     , onDrag
+    , onDragMay
     , onDrop
     , update
     )
 
+import Maybe.Extra
 import Number2 as NT exposing (Float2)
 import Playground exposing (Mouse)
 
@@ -19,6 +22,11 @@ onClick func (Mouse2 _ e) =
 
         _ ->
             Nothing
+
+
+onClickMay : (Float2 -> Maybe a) -> Mouse2 -> Maybe a
+onClickMay func m2 =
+    onClick func m2 |> Maybe.Extra.join
 
 
 onDrop : (Float2 -> Float2 -> a) -> Mouse2 -> Maybe a
@@ -39,6 +47,11 @@ onDrag func (Mouse2 _ e) =
 
         _ ->
             Nothing
+
+
+onDragMay : (Float2 -> Float2 -> Maybe a) -> Mouse2 -> Maybe a
+onDragMay func m2 =
+    onDrag func m2 |> Maybe.Extra.join
 
 
 type Mouse2

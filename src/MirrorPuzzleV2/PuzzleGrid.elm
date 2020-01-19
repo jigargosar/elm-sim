@@ -369,21 +369,19 @@ type alias DndView =
 
 toDndView : CellTransform -> Mouse2 -> Grid -> Maybe DndView
 toDndView ct mouse2 grid =
-    Mouse2.onDrag
+    Mouse2.onDragMay
         (\dragPt dropPt ->
             let
                 pos =
                     ct.fromView dragPt
             in
-            case mirrorDirectionAtCellPos pos grid of
-                Just dir ->
-                    Just { dragPos = pos, dropViewPos = dropPt, mirrorDir = dir }
-
-                Nothing ->
-                    Nothing
+            mirrorDirectionAtCellPos pos grid
+                |> Maybe.map
+                    (\dir ->
+                        { dragPos = pos, dropViewPos = dropPt, mirrorDir = dir }
+                    )
         )
         mouse2
-        |> Maybe.Extra.join
 
 
 getDragPosAndShape : CellTransform -> Mouse2 -> Grid -> ( Set Int2, Shape )

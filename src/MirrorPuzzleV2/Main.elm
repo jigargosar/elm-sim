@@ -265,16 +265,25 @@ init =
 updateMem : Computer -> Mem -> Mem
 updateMem computer mem =
     let
+        mouse2 =
+            Mouse2.update computer.mouse mem.mouse2
+    in
+    { mem | scene = updateScene computer mem.scene, mouse2 = mouse2 }
+
+
+updateScene : Computer -> Scene -> Scene
+updateScene computer scene =
+    let
         { mouse, screen } =
             computer
     in
-    case mem.scene of
+    case scene of
         Intro ->
             if mouse.click then
-                { mem | scene = initialLevelSelect }
+                initialLevelSelect
 
             else
-                mem
+                scene
 
         LevelSelect levelCount ->
             let
@@ -283,13 +292,13 @@ updateMem computer mem =
             in
             case ( mouse.click, levelButtonIdxFromMouse mouse lbs ) of
                 ( True, Just i ) ->
-                    { mem | scene = initPuzzleScene (Levels.fromIndex i) }
+                    initPuzzleScene (Levels.fromIndex i)
 
                 _ ->
-                    mem
+                    scene
 
         PuzzleScene model ->
-            { mem | scene = updatePuzzleScene computer model }
+            updatePuzzleScene computer model
 
 
 updatePuzzleScene : Computer -> PuzzleSceneModel -> Scene

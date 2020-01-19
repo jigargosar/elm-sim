@@ -1,6 +1,7 @@
 module MirrorPuzzleV2.Main exposing (main)
 
 import List.Extra
+import Maybe.Extra
 import MirrorPuzzleV2.Box as Box exposing (Box)
 import MirrorPuzzleV2.Levels as Levels exposing (Levels)
 import MirrorPuzzleV2.Mouse2 as Mouse2 exposing (Mouse2)
@@ -268,34 +269,28 @@ updateMem computer mem =
         mouse2 =
             Mouse2.update computer.mouse mem.mouse2
     in
-    { mem | scene = updateScene computer mem.scene, mouse2 = mouse2 }
+    { mem | scene = updateScene computer mouse2 mem.scene, mouse2 = mouse2 }
 
 
-updateScene : Computer -> Scene -> Scene
-updateScene computer scene =
+updateScene : Computer -> Mouse2 -> Scene -> Scene
+updateScene computer mouse2 scene =
     let
         { mouse, screen } =
             computer
     in
     case scene of
         Intro ->
-            if mouse.click then
-                initialLevelSelect
-
-            else
-                scene
+            Mouse2.onClick (always initialLevelSelect) mouse2
+                |> Maybe.withDefault scene
 
         LevelSelect levelCount ->
             let
                 lbs =
                     initLevelButtons screen levelCount
             in
-            case ( mouse.click, levelButtonIdxFromMouse mouse lbs ) of
-                ( True, Just i ) ->
-                    initPuzzleScene (Levels.fromIndex i)
-
-                _ ->
-                    scene
+            Mouse2.onClick (\_ -> levelButtonIdxFromMouse mouse lbs) mouse2
+                |> Maybe.Extra.join
+                |> Maybe.Extra.unwrap scene (\i -> initPuzzleScene (Levels.fromIndex i))
 
         PuzzleScene model ->
             updatePuzzleScene computer model

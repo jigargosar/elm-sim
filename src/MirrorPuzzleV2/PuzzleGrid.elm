@@ -279,16 +279,16 @@ litDestinations grid =
 
 
 updateGrid : CellTransform -> MouseEvent -> Grid -> Maybe Grid
-updateGrid ct event grid =
+updateGrid ct event =
     case event of
         Click pt ->
-            rotateMirrorAt (ct.fromView pt) grid
+            rotateMirrorAt (ct.fromView pt)
 
         Drop pt1 pt2 ->
-            updateGridOnDnD (ct.fromView pt1) (ct.fromView pt2) grid
+            updateGridOnDnD (ct.fromView pt1) (ct.fromView pt2)
 
         _ ->
-            Nothing
+            always Nothing
 
 
 updateGridOnDnD : Int2 -> Int2 -> Grid.Grid Cell -> Maybe (Grid.Grid Cell)

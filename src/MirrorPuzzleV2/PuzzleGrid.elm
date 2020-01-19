@@ -1,11 +1,8 @@
 module MirrorPuzzleV2.PuzzleGrid exposing
     ( Model
-    , fromLevelIndex
     , fromString
     , initial
     , isSolved
-    , levelCount
-    , levels
     , update
     , view
     )

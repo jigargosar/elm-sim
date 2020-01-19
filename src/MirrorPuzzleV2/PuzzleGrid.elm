@@ -295,7 +295,7 @@ updateGridOnDnD : Int2 -> Int2 -> Grid.Grid Cell -> Maybe (Grid.Grid Cell)
 updateGridOnDnD dragIdx dropIdx grid =
     Maybe.map2
         (\drag drop ->
-            cellsOnDnd drag drop
+            cellChangeOnDnd drag drop
                 |> (\( c1, c2 ) ->
                         Grid.insert dragIdx c1 grid
                             |> Grid.insert dropIdx c2
@@ -305,8 +305,8 @@ updateGridOnDnD dragIdx dropIdx grid =
         (Grid.get dropIdx grid)
 
 
-cellsOnDnd : Cell -> Cell -> ( Cell, Cell )
-cellsOnDnd drag drop =
+cellChangeOnDnd : Cell -> Cell -> ( Cell, Cell )
+cellChangeOnDnd drag drop =
     case ( drag, drop ) of
         ( SourceWithMirror dir, Empty ) ->
             ( Source, Mirror dir )

@@ -97,7 +97,7 @@ type Cell
     S -> source
     D -> destination
     M<0-7> -> mirror angle
-    S<0-7> -> source with mirror
+    S<0-7> -> source with mirror angle
     __ -> empty cell
 
 -}

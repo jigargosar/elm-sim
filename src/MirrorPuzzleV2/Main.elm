@@ -69,11 +69,11 @@ puzzleSceneButtons =
     [ SelectLevel, NextLevel, PrevLevel ]
 
 
-puzzleSceneBtnAt : Mouse -> Screen -> Maybe PuzzleButton
+puzzleSceneBtnAt : Float2 -> Screen -> Maybe PuzzleButton
 puzzleSceneBtnAt mouse screen =
     puzzleSceneButtons
         |> List.map (puzzleBtnData screen)
-        |> List.Extra.findIndex (Tuple.second >> Box.containsXY mouse)
+        |> List.Extra.findIndex (Tuple.second >> Box.contains mouse)
         |> Maybe.andThen (\idx -> List.Extra.getAt idx puzzleSceneButtons)
 
 
@@ -305,7 +305,7 @@ updatePuzzleScene : Computer -> Mouse2 -> PuzzleSceneModel -> Maybe Scene
 updatePuzzleScene ({ mouse, screen } as computer) mouse2 model =
     Mouse2.onClick
         (\p ->
-            puzzleSceneBtnAt mouse screen
+            puzzleSceneBtnAt p screen
                 |> Maybe.map
                     (\btn ->
                         case btn of

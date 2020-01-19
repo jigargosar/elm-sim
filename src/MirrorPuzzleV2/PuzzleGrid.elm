@@ -411,7 +411,7 @@ getDragPosAndShape ct mouse2 grid =
 viewPath : CellTransform -> List Int2 -> Shape
 viewPath ct =
     List.map ct.toView
-        >> (\path -> List.map2 (line red 5) path (List.drop 1 path))
+        >> (\path -> List.map2 (line red (ct.cellSize * 0.05)) path (List.drop 1 path))
         >> group
 
 

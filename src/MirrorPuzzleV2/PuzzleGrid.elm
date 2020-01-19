@@ -237,29 +237,33 @@ lightPathStartingAt pos0 dir0 grid =
                 accumInDir newDir =
                     accumLightPath newDir nextPos (nextPos :: acc)
             in
-            case Grid.get nextPos grid of
-                Nothing ->
-                    acc
+            if List.member nextPos acc then
+                acc
 
-                Just cell ->
-                    case cell of
-                        Source ->
-                            accumInDir dir
+            else
+                case Grid.get nextPos grid of
+                    Nothing ->
+                        acc
 
-                        SourceWithMirror _ ->
-                            acc
+                    Just cell ->
+                        case cell of
+                            Source ->
+                                accumInDir dir
 
-                        Destination ->
-                            nextPos :: acc
+                            SourceWithMirror _ ->
+                                acc
 
-                        Mirror newDir ->
-                            accumInDir newDir
+                            Destination ->
+                                nextPos :: acc
 
-                        Empty ->
-                            accumInDir dir
+                            Mirror newDir ->
+                                accumInDir newDir
 
-                        Wall ->
-                            acc
+                            Empty ->
+                                accumInDir dir
+
+                            Wall ->
+                                acc
     in
     accumLightPath dir0 pos0 [ pos0 ]
 

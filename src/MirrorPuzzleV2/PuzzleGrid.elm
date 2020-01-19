@@ -297,7 +297,8 @@ updateGridOnDnD dragIdx dropIdx grid =
         (\drag drop ->
             cellChangeOnDnd drag drop
                 |> (\( c1, c2 ) ->
-                        Grid.insert dragIdx c1 grid
+                        grid
+                            |> Grid.insert dragIdx c1
                             |> Grid.insert dropIdx c2
                    )
         )

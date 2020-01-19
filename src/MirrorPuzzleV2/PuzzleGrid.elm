@@ -6,7 +6,6 @@ module MirrorPuzzleV2.PuzzleGrid exposing
     , view
     )
 
-import Cons exposing (Cons)
 import List.Extra
 import Maybe.Extra
 import MirrorPuzzleV2.Mouse2 as Mouse2 exposing (Mouse2)
@@ -101,10 +100,6 @@ type Cell
    O<0-7> -> double mirror
    X -> wall
 -}
-
-
-type alias Levels =
-    Cons String
 
 
 decodeGrid : String -> Grid

@@ -292,52 +292,27 @@ updateGrid ct event grid =
 
 
 updateGridOnDnD : Int2 -> Int2 -> Grid.Grid Cell -> Maybe (Grid.Grid Cell)
-updateGridOnDnD dragIdx dropIdx grid =
-    Maybe.map2
-        (\drag drop ->
-            cellChangeOnDnd drag drop
-                |> (\( c1, c2 ) ->
-                        grid
-                            |> Grid.insert dragIdx c1
-                            |> Grid.insert dropIdx c2
-                   )
-        )
-        (Grid.get dragIdx grid)
-        (Grid.get dropIdx grid)
+updateGridOnDnD dragIdx dropIdx =
+    let
+        mapCellsOnDnd : Cell -> Cell -> ( Cell, Cell )
+        mapCellsOnDnd drag drop =
+            case ( drag, drop ) of
+                ( SourceWithMirror dir, Empty ) ->
+                    ( Source, Mirror dir )
 
+                ( SourceWithMirror dir, Source ) ->
+                    ( Source, SourceWithMirror dir )
 
-gridCellMap2 : (b -> b -> ( b, b )) -> Int2 -> Int2 -> Grid.Grid b -> Maybe (Grid.Grid b)
-gridCellMap2 func gIdxA gIdxB grid =
-    Maybe.map2
-        (\drag drop ->
-            func drag drop
-                |> (\( cellA, cellB ) ->
-                        grid
-                            |> Grid.insert gIdxA cellA
-                            |> Grid.insert gIdxB cellB
-                   )
-        )
-        (Grid.get gIdxA grid)
-        (Grid.get gIdxB grid)
+                ( Mirror dir, Empty ) ->
+                    ( Empty, Mirror dir )
 
+                ( Mirror dir, Source ) ->
+                    ( Empty, SourceWithMirror dir )
 
-cellChangeOnDnd : Cell -> Cell -> ( Cell, Cell )
-cellChangeOnDnd drag drop =
-    case ( drag, drop ) of
-        ( SourceWithMirror dir, Empty ) ->
-            ( Source, Mirror dir )
-
-        ( SourceWithMirror dir, Source ) ->
-            ( Source, SourceWithMirror dir )
-
-        ( Mirror dir, Empty ) ->
-            ( Empty, Mirror dir )
-
-        ( Mirror dir, Source ) ->
-            ( Empty, SourceWithMirror dir )
-
-        _ ->
-            ( drag, drop )
+                _ ->
+                    ( drag, drop )
+    in
+    Grid.mapCell2 mapCellsOnDnd dragIdx dropIdx
 
 
 rotateMirrorAt : Int2 -> Grid -> Maybe Grid

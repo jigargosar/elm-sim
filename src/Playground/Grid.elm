@@ -76,13 +76,13 @@ toList =
 mapCell2 : (b -> b -> ( b, b )) -> Int2 -> Int2 -> Grid b -> Maybe (Grid b)
 mapCell2 func gIdxA gIdxB grid =
     let
-        insertCells ( cellA, cellB ) =
+        insertCells ( newCellA, newCellB ) =
             grid
-                |> insert gIdxA cellA
-                |> insert gIdxB cellB
+                |> insert gIdxA newCellA
+                |> insert gIdxB newCellB
     in
     Maybe.map2
-        (\drag drop -> func drag drop |> insertCells)
+        (\cellA cellB -> func cellA cellB |> insertCells)
         (get gIdxA grid)
         (get gIdxB grid)
 

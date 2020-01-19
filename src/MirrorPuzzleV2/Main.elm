@@ -3,6 +3,7 @@ module MirrorPuzzleV2.Main exposing (main)
 import List.Extra
 import MirrorPuzzleV2.Box as Box exposing (Box)
 import MirrorPuzzleV2.Levels as Levels exposing (Levels)
+import MirrorPuzzleV2.Mouse2 as Mouse2 exposing (Mouse2)
 import MirrorPuzzleV2.PuzzleGrid as PuzzleGrid
 import Playground exposing (..)
 import Playground.Extra exposing (..)
@@ -253,12 +254,12 @@ type Scene
 
 
 type alias Mem =
-    { scene : Scene }
+    { scene : Scene, mouse2 : Mouse2 }
 
 
 init : Mem
 init =
-    { scene = initialPuzzleScene }
+    { scene = initialPuzzleScene, mouse2 = Mouse2.initial }
 
 
 updateMem : Computer -> Mem -> Mem

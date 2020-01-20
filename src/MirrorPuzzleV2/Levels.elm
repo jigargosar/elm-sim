@@ -6,7 +6,6 @@ module MirrorPuzzleV2.Levels exposing
     , goTo
     , index
     , initial
-    , isLast
     , next
     , prev
     )
@@ -145,27 +144,20 @@ index (Levels pivot) =
     Pivot.lengthL pivot
 
 
-prev : Levels -> Levels
+prev : Levels -> Maybe Levels
 prev (Levels pivot) =
-    ignoreNothing (Pivot.goBy -1) pivot
-        |> Levels
+    Maybe.map Levels (Pivot.goBy -1 pivot)
 
 
-next : Levels -> Levels
+next : Levels -> Maybe Levels
 next (Levels pivot) =
-    ignoreNothing (Pivot.goBy 1) pivot
-        |> Levels
+    Maybe.map Levels (Pivot.goBy 1 pivot)
 
 
 goTo : Int -> Levels -> Levels
 goTo idx (Levels pivot) =
     ignoreNothing (Pivot.goAbsolute idx) pivot
         |> Levels
-
-
-isLast : Levels -> Bool
-isLast (Levels p) =
-    Pivot.getR p |> List.isEmpty
 
 
 count : Levels -> Int

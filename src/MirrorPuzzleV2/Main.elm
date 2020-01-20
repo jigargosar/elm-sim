@@ -255,10 +255,14 @@ updateScene computer msg scene =
                     initialLevelSelect
 
                 NextLevel ->
-                    initPuzzleScene (Levels.next model.levels)
+                    Levels.next model.levels
+                        |> Maybe.map initPuzzleScene
+                        |> Maybe.withDefault scene
 
                 PrevLevel ->
-                    initPuzzleScene (Levels.prev model.levels)
+                    Levels.prev model.levels
+                        |> Maybe.map initPuzzleScene
+                        |> Maybe.withDefault scene
 
         ( UpdatePuzzleGrid, PuzzleScene model ) ->
             PuzzleScene { model | grid = PuzzleGrid.update computer model.grid }

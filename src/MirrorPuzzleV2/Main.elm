@@ -286,8 +286,7 @@ toMsg computer scene =
 
         ( PuzzleScene _, ev ) ->
             puzzleSceneButtons computer.screen
-                |> List.filterMap (Button.onClick ev)
-                |> List.head
+                |> Button.findClicked ev
                 |> Maybe.map PuzzleSceneBtnClicked
                 |> Maybe.withDefault UpdatePuzzleGrid
 

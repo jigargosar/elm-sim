@@ -1,8 +1,11 @@
-module MirrorPuzzleV2.Button exposing (Button, init, mapBox, onClick, view)
+module MirrorPuzzleV2.Button exposing (Button, findClicked, init, mapBox, view)
 
+import List.Extra
+import Maybe.Extra
 import MirrorPuzzleV2.Box as Box exposing (Box)
 import MirrorPuzzleV2.Computer2 as Computer2
 import MirrorPuzzleV2.MouseEvent as ME exposing (MouseEvent)
+import Number2 exposing (Float2)
 import Playground exposing (..)
 import Playground.Extra exposing (..)
 
@@ -64,14 +67,26 @@ buttonShape hover ( w, h ) text =
         |> group
 
 
-onClick : MouseEvent -> Button a -> Maybe a
-onClick ev (Button a _ box) =
+findClicked : MouseEvent -> List (Button a) -> Maybe a
+findClicked ev buttons =
     ME.onClick
         (\pt ->
-            if Box.contains pt box then
-                Just a
-
-            else
-                Nothing
+            findContaining pt buttons
         )
         ev
+
+
+findContaining : Float2 -> List (Button a) -> Maybe a
+findContaining pt =
+    List.Extra.find (contains pt)
+        >> Maybe.map data
+
+
+data : Button a -> a
+data (Button a _ _) =
+    a
+
+
+contains : Float2 -> Button a -> Bool
+contains pt (Button _ _ box) =
+    Box.contains pt box

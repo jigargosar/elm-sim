@@ -36,12 +36,12 @@ firstLevel =
 otherLevels =
     [ """
     __,__,__,__,__,__,__,__
-    __,S0,__,__,__,__,D ,__
+    __,S ,M0,__,__,__,D ,__
     __,__,__,__,__,__,__,__
       """
     , """
     __,__,__,__,__,__,__,__
-    __,S ,M0,__,__,__,D ,__
+    __,D ,__,__,M6,__,S ,__
     __,__,__,__,__,__,__,__
       """
     , """
@@ -72,6 +72,7 @@ initial =
             levelCons
     in
     Levels (Pivot.fromCons first rest)
+        |> goTo 3
 
 
 fromIndex : Int -> Levels

@@ -11,8 +11,8 @@ type Tile
     | Hole
 
 
-mapElement : (Element -> Element) -> Tile -> Maybe Tile
-mapElement func tile =
+mapElementInFilledContainer : (Element -> Element) -> Tile -> Maybe Tile
+mapElementInFilledContainer func tile =
     case tile of
         FilledContainer container element ->
             Just (FilledContainer container (func element))

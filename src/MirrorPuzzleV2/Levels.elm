@@ -50,6 +50,17 @@ otherLevels =
     X ,__,__,__,__,__,__,D ,__,X
     X ,__,__,__,__,__,__,__,__,X
       """
+    , """
+    X ,X ,X ,X ,X ,X ,X ,X ,X ,X
+    X ,__,__,__,__,__,__,__,__,X
+    X ,__,S ,__,M6,__,__,__,__,X
+    X ,__,__,__,__,__,__,__,__,X
+    X ,X ,X ,X ,X ,X ,X ,__,__,X
+    X ,X ,X ,X ,X ,X ,X ,__,__,X
+    X ,__,__,__,M2,__,__,__,__,X
+    X ,__,D ,__,__,__,__,__,__,X
+    X ,__,__,__,__,M0,__,__,__,X
+      """
     ]
 
 
@@ -68,7 +79,7 @@ initial =
             levelCons
     in
     Levels (Pivot.fromCons first rest)
-        |> goTo (3 - 1)
+        |> goTo (List.length otherLevels)
 
 
 fromIndex : Int -> Levels

@@ -69,7 +69,7 @@ update { mouse, screen } (Model grid) =
                     rotateMirrorAt (ct.fromView pt)
 
                 Drop pt1 pt2 ->
-                    updateOnDrop (ct.fromView pt1) (ct.fromView pt2)
+                    updateOnDnD (ct.fromView pt1) (ct.fromView pt2)
 
                 _ ->
                     always Nothing
@@ -296,8 +296,8 @@ litDestinations grid =
 -- Grid Update
 
 
-updateOnDrop : Int2 -> Int2 -> Grid.Grid Cell -> Maybe (Grid.Grid Cell)
-updateOnDrop dragIdx dropIdx =
+updateOnDnD : Int2 -> Int2 -> Grid.Grid Cell -> Maybe (Grid.Grid Cell)
+updateOnDnD dragIdx dropIdx =
     let
         mapCellsOnDnd : Cell -> Cell -> ( Cell, Cell )
         mapCellsOnDnd drag drop =

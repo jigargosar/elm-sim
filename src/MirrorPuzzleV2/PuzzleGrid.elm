@@ -261,21 +261,19 @@ lightPathStartingAt pos0 dir0 grid =
 
 litDestinations : Grid -> Set Int2
 litDestinations grid =
-    let
-        endPoints : List Int2
-        endPoints =
-            lightPaths grid |> List.filterMap List.head
-    in
-    endPoints
-        |> List.foldl
-            (\pos ->
-                if Grid.get pos grid == Just Destination then
-                    Set.insert pos
+    lightPaths grid
+        |> List.filterMap
+            (List.head
+                >> Maybe.andThen
+                    (\pos ->
+                        if Grid.get pos grid == Just Destination then
+                            Just pos
 
-                else
-                    identity
+                        else
+                            Nothing
+                    )
             )
-            Set.empty
+        |> Set.fromList
 
 
 

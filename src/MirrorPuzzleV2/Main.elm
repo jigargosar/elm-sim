@@ -5,7 +5,7 @@ import MirrorPuzzleV2.Box as Box exposing (Box)
 import MirrorPuzzleV2.Computer2 exposing (Computer2)
 import MirrorPuzzleV2.Game2 as Game2
 import MirrorPuzzleV2.Levels as Levels exposing (Levels)
-import MirrorPuzzleV2.MouseEvent as MouseEvent exposing (MouseEvent(..))
+import MirrorPuzzleV2.MouseEvent exposing (MouseEvent(..))
 import MirrorPuzzleV2.PuzzleGrid as PuzzleGrid
 import Number2 exposing (Float2)
 import Playground exposing (..)
@@ -274,6 +274,46 @@ init =
 updateMem : Computer2 -> Mem -> Mem
 updateMem computer mem =
     { mem | scene = updateScene computer mem.scene }
+
+
+type Msg
+    = SelectLevelClicked
+    | NextClicked
+    | PrevClicked
+    | IntroSceneClicked
+    | LevelButtonClicked Int
+    | NoOp
+
+
+toMsg : Computer2 -> Scene -> Msg
+toMsg computer scene =
+    case ( computer.mouse.event, scene ) of
+        ( Click _, Intro ) ->
+            IntroSceneClicked
+
+        ( Click pt, LevelSelect levelCount ) ->
+            levelButtonIdxAt pt computer.screen levelCount
+                |> Maybe.map LevelButtonClicked
+                |> Maybe.withDefault NoOp
+
+        ( Click pt, PuzzleScene _ ) ->
+            case puzzleSceneBtnAt pt computer.screen of
+                Just btn ->
+                    case btn of
+                        SelectLevel ->
+                            SelectLevelClicked
+
+                        NextLevel ->
+                            NextClicked
+
+                        PrevLevel ->
+                            PrevClicked
+
+                Nothing ->
+                    NoOp
+
+        _ ->
+            NoOp
 
 
 updateScene : Computer2 -> Scene -> Scene

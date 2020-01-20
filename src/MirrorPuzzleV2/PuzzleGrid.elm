@@ -198,28 +198,20 @@ mirrorDirectionAt pos grid =
             Nothing
 
 
-foldlSourceWithMirrors : (Int2 -> Direction8 -> a -> a) -> a -> Grid -> a
-foldlSourceWithMirrors func =
-    Grid.foldl
-        (\pos cell ->
-            case cell of
-                SourceWithMirror dir ->
-                    func pos dir
-
-                _ ->
-                    identity
-        )
-
-
 type alias LightPath =
     List Int2
 
 
 lightPaths : Grid -> List LightPath
 lightPaths grid =
-    foldlSourceWithMirrors
-        (\pos dir pathAcc ->
-            lightPathStartingAt pos dir grid :: pathAcc
+    Grid.foldl
+        (\pos cell ->
+            case cell of
+                SourceWithMirror dir ->
+                    (::) (lightPathStartingAt pos dir grid)
+
+                _ ->
+                    identity
         )
         []
         grid

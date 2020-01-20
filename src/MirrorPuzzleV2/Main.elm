@@ -53,7 +53,9 @@ viewPuzzleScene computer { grid, levels } =
         )
         |> moveY screen.top
         |> moveDown 50
-    , viewPuzzleSceneButtons mouse screen
+    , puzzleSceneButtons screen
+        |> List.map (Button.view mouse)
+        |> group
     ]
 
 
@@ -117,13 +119,6 @@ getPuzzleBtn screen puzzleButton =
 
 type alias Mouse =
     Computer2.Mouse
-
-
-viewPuzzleSceneButtons : Mouse -> Screen -> Shape
-viewPuzzleSceneButtons mouse screen =
-    puzzleSceneButtons screen
-        |> List.map (Button.view mouse)
-        |> group
 
 
 

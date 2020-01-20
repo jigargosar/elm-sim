@@ -13,8 +13,9 @@ svg {
 }
 
 svg text {
-  font-family: 'Open Sans', monospace;
+  font-family: 'Source Code Pro', Consolas, 'Fira Code', monospace;
   font-size: 22px;
+  letter-spacing: 0;
 }
 
 .fixed-full-screen {

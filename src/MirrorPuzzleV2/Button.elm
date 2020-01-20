@@ -16,7 +16,17 @@ type Button a
 
 init : a -> String -> Button a
 init a txt =
-    Button a txt (Box.atOrigin (String.length txt * 16 |> toFloat) 32)
+    let
+        fontSize =
+            22
+
+        lineHeight =
+            fontSize * 1.3
+
+        width =
+            toFloat (String.length txt + 2) * (fontSize * 0.55)
+    in
+    Button a txt (Box.atOrigin width lineHeight)
 
 
 mapBox : (Box -> Box) -> Button a -> Button a

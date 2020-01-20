@@ -66,35 +66,16 @@ caseBool bool true false =
         false
 
 
-puzzleSceneButtons =
+puzzleSceneButtons : Screen -> List (Button PuzzleButton)
+puzzleSceneButtons screen =
     [ SelectLevel, NextLevel, PrevLevel ]
-
-
-puzzleSceneBtnAt : Float2 -> Screen -> Maybe PuzzleButton
-puzzleSceneBtnAt mouse screen =
-    puzzleSceneButtons
-        |> List.map (puzzleBtnData screen)
-        |> List.Extra.findIndex (Tuple.second >> Box.contains mouse)
-        |> Maybe.andThen (\idx -> List.Extra.getAt idx puzzleSceneButtons)
+        |> List.map (getPuzzleBtn screen)
 
 
 type PuzzleButton
     = SelectLevel
     | NextLevel
     | PrevLevel
-
-
-puzzleBtnData : Screen -> PuzzleButton -> ( String, Box )
-puzzleBtnData screen puzzleButton =
-    case puzzleButton of
-        SelectLevel ->
-            ( "Select Level", initBackButtonBox screen )
-
-        NextLevel ->
-            ( "Next", initNextButtonBox screen )
-
-        PrevLevel ->
-            ( "Prev", initPrevButtonBox screen )
 
 
 getPuzzleBtn : Screen -> PuzzleButton -> Button PuzzleButton
@@ -138,40 +119,11 @@ type alias Mouse =
     Computer2.Mouse
 
 
-viewPuzzleSceneButton : Mouse -> Screen -> PuzzleButton -> Shape
-viewPuzzleSceneButton mouse screen btn =
-    Button.view mouse (getPuzzleBtn screen btn)
-
-
 viewPuzzleSceneButtons : Mouse -> Screen -> Shape
 viewPuzzleSceneButtons mouse screen =
-    puzzleSceneButtons
-        |> List.map (viewPuzzleSceneButton mouse screen)
+    puzzleSceneButtons screen
+        |> List.map (Button.view mouse)
         |> group
-
-
-initBackButtonBox : Screen -> Box
-initBackButtonBox screen =
-    Box.atTopLeft 150 40
-        |> Box.move ( screen.left, screen.top )
-        |> Box.moveRight 20
-        |> Box.moveDown 20
-
-
-initNextButtonBox : Screen -> Box
-initNextButtonBox screen =
-    Box.atTopRight 100 40
-        |> Box.move ( screen.right, screen.top )
-        |> Box.moveDown 20
-        |> Box.moveLeft 20
-
-
-initPrevButtonBox : Screen -> Box
-initPrevButtonBox screen =
-    Box.atTopRight 100 40
-        |> Box.move ( screen.right, screen.top )
-        |> Box.moveDown 20
-        |> Box.moveLeft (100 + 20 + 20)
 
 
 
@@ -333,14 +285,11 @@ toMsg computer scene =
                 |> Maybe.withDefault NoOp
 
         ( PuzzleScene _, ev ) ->
-            case ev of
-                Click pt ->
-                    puzzleSceneBtnAt pt computer.screen
-                        |> Maybe.map PuzzleSceneBtnClicked
-                        |> Maybe.withDefault UpdatePuzzleGrid
-
-                _ ->
-                    UpdatePuzzleGrid
+            puzzleSceneButtons computer.screen
+                |> List.filterMap (Button.onClick ev)
+                |> List.head
+                |> Maybe.map PuzzleSceneBtnClicked
+                |> Maybe.withDefault UpdatePuzzleGrid
 
         _ ->
             NoOp

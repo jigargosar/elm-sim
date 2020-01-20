@@ -1,7 +1,8 @@
-module MirrorPuzzleV2.Button exposing (Button, init, mapBox, view)
+module MirrorPuzzleV2.Button exposing (Button, init, mapBox, onClick, view)
 
 import MirrorPuzzleV2.Box as Box exposing (Box)
 import MirrorPuzzleV2.Computer2 as Computer2
+import MirrorPuzzleV2.MouseEvent as ME exposing (MouseEvent)
 import Playground exposing (..)
 import Playground.Extra exposing (..)
 
@@ -61,3 +62,16 @@ buttonShape hover ( w, h ) text =
     , words black text
     ]
         |> group
+
+
+onClick : MouseEvent -> Button a -> Maybe a
+onClick ev (Button a _ box) =
+    ME.onClick
+        (\pt ->
+            if Box.contains pt box then
+                Just a
+
+            else
+                Nothing
+        )
+        ev

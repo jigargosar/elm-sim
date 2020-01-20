@@ -435,10 +435,15 @@ cellShape time ct dimPos litDest pos cell =
     let
         bg : Shape
         bg =
-            group
-                [ rectangle black width width |> scale 0.95
-                , rectangle white width width |> scale 0.9
-                ]
+            case cell of
+                Empty ->
+                    noShape
+
+                _ ->
+                    group
+                        [ rectangle black width width |> scale 0.95
+                        , rectangle white width width |> scale 0.9
+                        ]
 
         width =
             ct.cellSize

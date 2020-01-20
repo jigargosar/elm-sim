@@ -180,8 +180,8 @@ destinations =
         Set.empty
 
 
-mirrorDirectionAtCellPos : Int2 -> Grid -> Maybe Direction8
-mirrorDirectionAtCellPos pos grid =
+mirrorDirectionAt : Int2 -> Grid -> Maybe Direction8
+mirrorDirectionAt pos grid =
     case Grid.get pos grid of
         Just cell ->
             case cell of
@@ -383,7 +383,7 @@ toDndView ct mouse2 grid =
                 pos =
                     ct.fromView dragPt
             in
-            mirrorDirectionAtCellPos pos grid
+            mirrorDirectionAt pos grid
                 |> Maybe.map
                     (\dir ->
                         { dragPos = pos, dropViewPos = dropPt, mirrorDir = dir }

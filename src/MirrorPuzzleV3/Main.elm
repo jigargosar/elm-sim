@@ -78,3 +78,8 @@ type alias Element =
 rotateElementBy : Int -> Element -> Element
 rotateElementBy steps element =
     { element | direction = rotateDirectionBy steps element.direction }
+
+
+rotateElement : Element -> Element
+rotateElement =
+    rotateElementBy 1

@@ -238,8 +238,29 @@ mirrorDirectionAt pos grid =
             Nothing
 
 
-type alias LightPath =
-    List Int2
+type LightPath
+    = Path (List Int2)
+    | Fork (List LightPath)
+
+
+lightPathContainsIndex : Int2 -> LightPath -> Bool
+lightPathContainsIndex index2 path =
+    case path of
+        Path indices ->
+            Set.fromList indices |> Set.member index2
+
+        Fork fork ->
+            List.any (lightPathContainsIndex index2) fork
+
+
+consLightPath : Int2 -> LightPath -> LightPath
+consLightPath index2 path =
+    case path of
+        Path list ->
+            Path (index2 :: list)
+
+        Fork list ->
+            Fork (List.map (consLightPath index2) list)
 
 
 lightPaths : Grid -> List LightPath
@@ -256,19 +277,19 @@ lightPaths grid =
     Grid.foldl reducer [] grid
 
 
-lightPathStartingAt : Int2 -> Direction8 -> Grid -> List Int2
+lightPathStartingAt : Int2 -> Direction8 -> Grid -> LightPath
 lightPathStartingAt pos0 dir0 grid =
     let
-        accumLightPath : Direction8 -> Int2 -> List Int2 -> List Int2
+        accumLightPath : Direction8 -> Int2 -> LightPath -> LightPath
         accumLightPath dir pos acc =
             let
                 nextPos =
                     Dir.stepPos dir pos
 
                 accumInDir newDir =
-                    accumLightPath newDir nextPos (nextPos :: acc)
+                    accumLightPath newDir nextPos (consLightPath nextPos acc)
             in
-            if List.member nextPos acc then
+            if lightPathContainsIndex nextPos acc then
                 acc
 
             else
@@ -285,7 +306,7 @@ lightPathStartingAt pos0 dir0 grid =
                                 acc
 
                             Destination ->
-                                nextPos :: acc
+                                consLightPath nextPos acc
 
                             Mirror newDir ->
                                 accumInDir newDir
@@ -302,7 +323,7 @@ lightPathStartingAt pos0 dir0 grid =
                             Prism newDir ->
                                 accumInDir newDir
     in
-    accumLightPath dir0 pos0 [ pos0 ]
+    accumLightPath dir0 pos0 (Path [ pos0 ])
 
 
 litDestinations : Grid -> Set Int2
@@ -315,12 +336,18 @@ litDestinations grid =
             else
                 Nothing
 
-        getPathEndIndex =
-            List.head
+        getPathEndIndices : LightPath -> List Int2
+        getPathEndIndices path =
+            case path of
+                Path list ->
+                    List.head list |> Maybe.Extra.unwrap [] List.singleton
+
+                Fork list ->
+                    List.concatMap getPathEndIndices list
     in
     lightPaths grid
         |> List.filterMap
-            (getPathEndIndex >> Maybe.andThen validateDestinationAt)
+            (getPathEndIndices >> List.map validateDestinationAt >> Maybe.Extra.orList)
         |> Set.fromList
 
 
@@ -414,11 +441,17 @@ getDragPosAndShape ct mouse2 grid =
 -- Puzzle Ligh Path View
 
 
-viewPath : CellTransform -> List Int2 -> Shape
-viewPath ct =
-    List.map ct.toView
-        >> (\path -> List.map2 (line red (ct.cellSize * 0.05)) path (List.drop 1 path))
-        >> group
+viewPath : CellTransform -> LightPath -> Shape
+viewPath ct path =
+    (case path of
+        Path indices ->
+            List.map ct.toView indices
+                |> (\points -> List.map2 (line red (ct.cellSize * 0.05)) points (List.drop 1 points))
+
+        Fork forks ->
+            []
+    )
+        |> group
 
 
 

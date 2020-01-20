@@ -9,7 +9,6 @@ module MirrorPuzzleV2.PuzzleGrid exposing
 import List.Extra
 import Maybe.Extra
 import MirrorPuzzleV2.Computer2 exposing (Computer2)
-import MirrorPuzzleV2.Mouse2 as Mouse2 exposing (Mouse2)
 import MirrorPuzzleV2.MouseEvent exposing (MouseEvent(..))
 import Number2 as NT exposing (Float2, Int2)
 import Playground exposing (..)
@@ -120,6 +119,7 @@ type Cell
     | Mirror Direction8
     | Wall
     | Floor
+    | Empty
 
 
 
@@ -176,26 +176,26 @@ indexedFoldlList2d func =
 decodeCell : String -> Cell
 decodeCell cellString =
     case String.trim cellString |> String.toList of
-        'S' :: [] ->
+        'S' :: [ char ] ->
+            SourceWithMirror (decodeDirection char)
+
+        'S' :: _ ->
             Source
-
-        'D' :: [] ->
-            Destination
-
-        '|' :: [] ->
-            Wall
 
         'M' :: [ char ] ->
             Mirror (decodeDirection char)
 
-        'S' :: [ char ] ->
-            SourceWithMirror (decodeDirection char)
+        'D' :: _ ->
+            Destination
 
-        '_' :: xx ->
+        '|' :: _ ->
+            Wall
+
+        '_' :: _ ->
             Floor
 
         _ ->
-            Floor
+            Empty
 
 
 decodeDirection : Char -> Direction8
@@ -290,6 +290,9 @@ lightPathStartingAt pos0 dir0 grid =
                                 acc
 
                             Floor ->
+                                accumInDir dir
+
+                            Empty ->
                                 accumInDir dir
     in
     accumLightPath dir0 pos0 [ pos0 ]
@@ -473,6 +476,9 @@ cellContentShapes time width litDest pos cell =
             [ rectangle darkBrown width width ]
 
         Floor ->
+            []
+
+        Empty ->
             []
 
 

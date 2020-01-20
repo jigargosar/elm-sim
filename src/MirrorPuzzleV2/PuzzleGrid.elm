@@ -261,18 +261,20 @@ lightPathStartingAt pos0 dir0 grid =
 
 litDestinations : Grid -> Set Int2
 litDestinations grid =
+    let
+        validateDestinationAt pos =
+            if Grid.get pos grid == Just Destination then
+                Just pos
+
+            else
+                Nothing
+
+        getPathEndIndex =
+            List.head
+    in
     lightPaths grid
         |> List.filterMap
-            (List.head
-                >> Maybe.andThen
-                    (\pos ->
-                        if Grid.get pos grid == Just Destination then
-                            Just pos
-
-                        else
-                            Nothing
-                    )
-            )
+            (getPathEndIndex >> Maybe.andThen validateDestinationAt)
         |> Set.fromList
 
 

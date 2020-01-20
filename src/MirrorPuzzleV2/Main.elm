@@ -1,6 +1,5 @@
 module MirrorPuzzleV2.Main exposing (main)
 
-import List.Extra
 import MirrorPuzzleV2.Box as Box exposing (Box)
 import MirrorPuzzleV2.Button as Button exposing (Button)
 import MirrorPuzzleV2.Computer2 as Computer2 exposing (Computer2)
@@ -132,7 +131,7 @@ initialLevelSelect =
 
 type alias LevelButtons =
     { top : Number
-    , list : List Box
+    , list : List (Button Int)
     }
 
 
@@ -163,38 +162,13 @@ initLevelButtons screen count =
         List.range 0 (count - 1)
             |> List.map
                 (\n ->
-                    Box.atOrigin width height
-                        |> Box.moveY (toY n)
+                    Button.initWithBox n
+                        ("Level " ++ String.fromInt n)
+                        (Box.atOrigin width height
+                            |> Box.moveY (toY n)
+                        )
                 )
     }
-
-
-levelButtonIdxAt : Float2 -> Screen -> Int -> Maybe Int
-levelButtonIdxAt mouse screen levelCount =
-    initLevelButtons screen levelCount
-        |> .list
-        |> List.Extra.findIndex (Box.contains mouse)
-
-
-renderLevelButtons : Float2 -> LevelButtons -> Shape
-renderLevelButtons mouse lbs =
-    lbs.list
-        |> List.indexedMap
-            (\levelIdx rect ->
-                renderButton
-                    mouse
-                    ("Level " ++ String.fromInt (levelIdx + 1))
-                    rect
-            )
-        |> group
-
-
-renderButton : Float2 -> String -> Box -> Shape
-renderButton mouse text rect =
-    buttonShape (Box.contains mouse rect)
-        (Box.dimensions rect)
-        text
-        |> move2 (Box.center rect)
 
 
 buttonShape : Bool -> ( Number, Number ) -> String -> Shape
@@ -218,13 +192,19 @@ buttonShape hover ( w, h ) text =
         |> group
 
 
-viewLevelSelect : Float2 -> LevelButtons -> List Shape
-viewLevelSelect mouse lbs =
+viewLevelSelect : Computer2 -> Int -> List Shape
+viewLevelSelect computer levelCount =
+    let
+        lbs =
+            initLevelButtons computer.screen levelCount
+    in
     [ words black "Select Level"
         |> scale 1.5
         |> moveUp lbs.top
         |> moveUp 60
-    , renderLevelButtons mouse lbs
+    , lbs.list
+        |> List.map (Button.view computer.mouse)
+        |> group
     ]
 
 
@@ -274,8 +254,10 @@ toMsg computer scene =
         ( Intro, Click _ ) ->
             IntroSceneClicked
 
-        ( LevelSelect levelCount, Click pt ) ->
-            levelButtonIdxAt pt computer.screen levelCount
+        ( LevelSelect levelCount, ev ) ->
+            initLevelButtons computer.screen levelCount
+                |> .list
+                |> Button.findClicked ev
                 |> Maybe.map LevelButtonClicked
                 |> Maybe.withDefault NoOp
 
@@ -323,11 +305,7 @@ viewMem computer mem =
             [ words black "Tap To Start" ]
 
         LevelSelect levelCount ->
-            let
-                lbs =
-                    initLevelButtons computer.screen levelCount
-            in
-            viewLevelSelect computer.mouse.pos lbs
+            viewLevelSelect computer levelCount
 
         PuzzleScene puzzle ->
             viewPuzzleScene computer puzzle

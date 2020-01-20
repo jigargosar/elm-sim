@@ -1,4 +1,4 @@
-module MirrorPuzzleV2.Button exposing (Button, findClicked, init, mapBox, view)
+module MirrorPuzzleV2.Button exposing (Button, findClicked, init, initWithBox, mapBox, view)
 
 import List.Extra
 import Maybe.Extra
@@ -16,6 +16,11 @@ type alias Mouse =
 
 type Button a
     = Button a String Box
+
+
+initWithBox : a -> String -> Box -> Button a
+initWithBox a txt =
+    Button a txt
 
 
 init : a -> String -> Button a

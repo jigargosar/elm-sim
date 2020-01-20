@@ -250,11 +250,11 @@ lightPathStartingAt pos0 dir0 grid =
                             Mirror newDir ->
                                 accumInDir newDir
 
-                            Empty ->
-                                accumInDir dir
-
                             Wall ->
                                 acc
+
+                            Empty ->
+                                accumInDir dir
     in
     accumLightPath dir0 pos0 [ pos0 ]
 

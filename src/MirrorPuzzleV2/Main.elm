@@ -216,8 +216,7 @@ updateMem computer mem =
 
 
 type Msg
-    = IntroSceneClicked
-    | LevelButtonClicked Int
+    = LevelButtonClicked Int
     | PuzzleSceneBtnClicked PuzzleButton
     | UpdatePuzzleGrid
     | NoOp
@@ -247,9 +246,6 @@ toMsg computer scene =
 updateScene : Computer2 -> Msg -> Scene -> Scene
 updateScene computer msg scene =
     case ( msg, scene ) of
-        ( IntroSceneClicked, _ ) ->
-            initialLevelSelect
-
         ( LevelButtonClicked idx, _ ) ->
             Levels.fromIndex idx |> initPuzzleScene
 

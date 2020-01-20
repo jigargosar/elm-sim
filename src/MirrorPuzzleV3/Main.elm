@@ -1,5 +1,7 @@
 module MirrorPuzzleV3.Main exposing (..)
 
+-- Tile
+
 
 type Tile
     = FilledContainer ElementContainer Element
@@ -7,32 +9,6 @@ type Tile
     | Goal
     | Wall
     | Hole
-
-
-type ElementContainer
-    = LightSource
-    | Floor
-
-
-type ElementType
-    = Mirror
-    | Prism
-
-
-type Direction
-    = Direction Int
-
-
-type alias Element =
-    { type_ : ElementType
-    , direction : Direction
-    , movable : Bool
-    }
-
-
-rotateElementBy : Int -> Element -> Element
-rotateElementBy steps element =
-    Debug.todo "impl"
 
 
 mapElement : (Element -> Element) -> Tile -> Maybe Tile
@@ -53,3 +29,52 @@ swapElementInTiles dragTile dropTile =
 
         _ ->
             Nothing
+
+
+getElementContainedInLightSource : Tile -> Maybe Element
+getElementContainedInLightSource tile =
+    case tile of
+        FilledContainer LightSource element ->
+            Just element
+
+        _ ->
+            Nothing
+
+
+type ElementContainer
+    = LightSource
+    | Floor
+
+
+type ElementType
+    = Mirror
+    | Prism
+
+
+
+-- Direction
+
+
+type Direction
+    = Direction Int
+
+
+rotateDirectionBy : Int -> Direction -> Direction
+rotateDirectionBy steps (Direction zeroToSevenInt) =
+    Direction (modBy 8 (zeroToSevenInt + steps))
+
+
+
+-- Element
+
+
+type alias Element =
+    { type_ : ElementType
+    , direction : Direction
+    , movable : Bool
+    }
+
+
+rotateElementBy : Int -> Element -> Element
+rotateElementBy steps element =
+    { element | direction = rotateDirectionBy steps element.direction }

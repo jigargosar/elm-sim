@@ -66,7 +66,7 @@ update { mouse, screen } (Model grid) =
         |> ignoreNothing
             (case mouse.event of
                 Click pt ->
-                    rotateMirrorAt (ct.fromView pt)
+                    rotateRefractorAt (ct.fromView pt)
 
                 Drop pt1 pt2 ->
                     updateOnDnD (ct.fromView pt1) (ct.fromView pt2)
@@ -380,8 +380,8 @@ updateOnDnD dragIdx dropIdx =
     Grid.update2 dragIdx dropIdx mapCellsOnDnd
 
 
-rotateMirrorAt : Int2 -> Grid -> Maybe Grid
-rotateMirrorAt gIdx grid =
+rotateRefractorAt : Int2 -> Grid -> Maybe Grid
+rotateRefractorAt gIdx grid =
     let
         rotateMirror cell =
             case cell of
@@ -390,6 +390,9 @@ rotateMirrorAt gIdx grid =
 
                 Mirror dir ->
                     Mirror (Dir.rotate 1 dir)
+
+                Prism dir ->
+                    Prism (Dir.rotate 1 dir)
 
                 _ ->
                     cell

@@ -81,9 +81,27 @@ update { mouse, screen } (Model grid) =
 -- View
 
 
-view : Computer2 -> Mouse2 -> Model -> Shape
-view { time, screen } mouse2 (Model grid) =
-    viewGrid time mouse2 (initCellT screen grid) grid
+view : Computer2 -> Model -> Shape
+view { time, screen, mouse } (Model grid) =
+    let
+        ct =
+            initCellT screen grid
+    in
+    let
+        lightPathsShape =
+            grid
+                |> lightPaths
+                |> List.map (viewPath ct)
+                |> group
+
+        ( dimPos, draggedShape ) =
+            getDragPosAndShape ct mouse.event grid
+    in
+    group
+        [ gridCellShapes time ct dimPos grid |> group
+        , lightPathsShape
+        , draggedShape
+        ]
 
 
 
@@ -338,29 +356,6 @@ rotateMirrorAt gIdx grid =
 
 
 
--- Grid View
-
-
-viewGrid : Time -> Mouse2 -> CellTransform -> Grid -> Shape
-viewGrid time mouse2 ct grid =
-    let
-        lightPathsShape =
-            grid
-                |> lightPaths
-                |> List.map (viewPath ct)
-                |> group
-
-        ( dimPos, draggedShape ) =
-            getDragPosAndShape ct mouse2 grid
-    in
-    group
-        [ gridCellShapes time ct dimPos grid |> group
-        , lightPathsShape
-        , draggedShape
-        ]
-
-
-
 -- DND VIEW
 
 
@@ -371,10 +366,10 @@ type alias DndView =
     }
 
 
-toDndView : CellTransform -> Mouse2 -> Grid -> Maybe DndView
-toDndView ct mouse2 grid =
-    Mouse2.onDrag
-        (\( dragPt, dropPt ) ->
+toDndView : CellTransform -> MouseEvent -> Grid -> Maybe DndView
+toDndView ct event grid =
+    case event of
+        Drag dragPt dropPt ->
             let
                 pos =
                     ct.fromView dragPt
@@ -384,11 +379,12 @@ toDndView ct mouse2 grid =
                     (\dir ->
                         { dragPos = pos, dropViewPos = dropPt, mirrorDir = dir }
                     )
-        )
-        mouse2
+
+        _ ->
+            Nothing
 
 
-getDragPosAndShape : CellTransform -> Mouse2 -> Grid -> ( Set Int2, Shape )
+getDragPosAndShape : CellTransform -> MouseEvent -> Grid -> ( Set Int2, Shape )
 getDragPosAndShape ct mouse2 grid =
     case toDndView ct mouse2 grid of
         Just { dragPos, dropViewPos, mirrorDir } ->

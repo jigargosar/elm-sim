@@ -6,7 +6,7 @@ import MirrorPuzzleV2.Box as Box exposing (Box)
 import MirrorPuzzleV2.Computer2 exposing (Computer2)
 import MirrorPuzzleV2.Game2 as Game2
 import MirrorPuzzleV2.Levels as Levels exposing (Levels)
-import MirrorPuzzleV2.MouseEvent exposing (MouseEvent(..))
+import MirrorPuzzleV2.MouseEvent as MouseEvent exposing (MouseEvent(..))
 import MirrorPuzzleV2.PuzzleGrid as PuzzleGrid
 import Number2 exposing (Float2)
 import Playground exposing (..)
@@ -288,17 +288,13 @@ updateScene computer scene =
                 scene
 
         LevelSelect levelCount ->
-            case mouse.event of
-                Click p ->
-                    case levelButtonIdxAt p screen levelCount of
-                        Just i ->
-                            initPuzzleScene (Levels.fromIndex i)
-
-                        Nothing ->
-                            scene
-
-                _ ->
-                    scene
+            MouseEvent.onClick mouse.event
+                (\p ->
+                    levelButtonIdxAt p screen levelCount
+                        |> Maybe.map
+                            (\i -> initPuzzleScene (Levels.fromIndex i))
+                )
+                |> Maybe.withDefault scene
 
         PuzzleScene model ->
             updatePuzzleScene computer model

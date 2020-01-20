@@ -132,7 +132,7 @@ type Cell
     D       -> destination
     M<0-7>  -> mirror angle
     S<0-7>  -> source with mirror angle
-    X       -> Wall
+    |       -> Wall
     __      -> empty cell
 
 -}
@@ -182,7 +182,7 @@ decodeCell cellString =
         'D' :: [] ->
             Destination
 
-        'X' :: [] ->
+        '|' :: [] ->
             Wall
 
         'M' :: [ char ] ->

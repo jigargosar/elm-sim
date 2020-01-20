@@ -59,8 +59,22 @@ initCellT screen grid =
 
 update : Computer2 -> Model -> Maybe Model
 update { mouse, screen } (Model grid) =
-    updateGrid (initCellT screen grid) mouse.event grid
-        |> Maybe.map Model
+    let
+        ct =
+            initCellT screen grid
+
+        updateGrid =
+            case mouse.event of
+                Click pt ->
+                    rotateMirrorAt (ct.fromView pt)
+
+                Drop pt1 pt2 ->
+                    updateGridOnDnD (ct.fromView pt1) (ct.fromView pt2)
+
+                _ ->
+                    always Nothing
+    in
+    updateGrid grid |> Maybe.map Model
 
 
 
@@ -280,19 +294,6 @@ litDestinations grid =
 
 
 -- Grid Update
-
-
-updateGrid : CellTransform -> MouseEvent -> Grid -> Maybe Grid
-updateGrid ct event =
-    case event of
-        Click pt ->
-            rotateMirrorAt (ct.fromView pt)
-
-        Drop pt1 pt2 ->
-            updateGridOnDnD (ct.fromView pt1) (ct.fromView pt2)
-
-        _ ->
-            always Nothing
 
 
 updateGridOnDnD : Int2 -> Int2 -> Grid.Grid Cell -> Maybe (Grid.Grid Cell)

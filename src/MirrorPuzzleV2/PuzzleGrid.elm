@@ -117,6 +117,7 @@ type Cell
     | Destination
     | SourceWithMirror Direction8
     | Mirror Direction8
+    | Prism
     | Wall
     | Floor
     | Empty
@@ -181,6 +182,9 @@ decodeCell cellString =
 
         'S' :: _ ->
             Source
+
+        'P' :: _ ->
+            Prism
 
         'M' :: [ char ] ->
             Mirror (decodeDirection char)
@@ -293,6 +297,9 @@ lightPathStartingAt pos0 dir0 grid =
                                 accumInDir dir
 
                             Empty ->
+                                accumInDir dir
+
+                            Prism ->
                                 accumInDir dir
     in
     accumLightPath dir0 pos0 [ pos0 ]
@@ -476,6 +483,9 @@ cellContentShapes time width litDest pos cell =
 
         Mirror dir ->
             [ mirrorShape width dir ]
+
+        Prism ->
+            [ triangle green (width / 2) ]
 
         Wall ->
             [ rectangle darkBrown width width ]

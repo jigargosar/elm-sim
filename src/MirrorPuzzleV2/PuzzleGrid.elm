@@ -204,17 +204,16 @@ type alias LightPath =
 
 lightPaths : Grid -> List LightPath
 lightPaths grid =
-    Grid.foldl
-        (\pos cell ->
+    let
+        reducer pos cell =
             case cell of
                 SourceWithMirror dir ->
                     (::) (lightPathStartingAt pos dir grid)
 
                 _ ->
                     identity
-        )
-        []
-        grid
+    in
+    Grid.foldl reducer [] grid
 
 
 lightPathStartingAt : Int2 -> Direction8 -> Grid -> List Int2

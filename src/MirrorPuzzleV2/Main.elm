@@ -6,7 +6,7 @@ import MirrorPuzzleV2.Box as Box exposing (Box)
 import MirrorPuzzleV2.Computer2 exposing (Computer2)
 import MirrorPuzzleV2.Game2 as Game2
 import MirrorPuzzleV2.Levels as Levels exposing (Levels)
-import MirrorPuzzleV2.Mouse2 as Mouse2 exposing (Mouse2)
+import MirrorPuzzleV2.MouseEvent exposing (MouseEvent(..))
 import MirrorPuzzleV2.PuzzleGrid as PuzzleGrid
 import Number2 exposing (Float2)
 import Playground exposing (..)
@@ -288,12 +288,13 @@ updateScene computer scene =
                 Nothing
 
         LevelSelect levelCount ->
-            Mouse2.onClick
-                (\p ->
+            case mouse.event of
+                Click p ->
                     levelButtonIdxAt p screen levelCount
                         |> Maybe.map (\i -> initPuzzleScene (Levels.fromIndex i))
-                )
-                computer.mouse2
+
+                _ ->
+                    Nothing
 
         PuzzleScene model ->
             updatePuzzleScene computer model
@@ -301,8 +302,8 @@ updateScene computer scene =
 
 updatePuzzleScene : Computer2 -> PuzzleSceneModel -> Maybe Scene
 updatePuzzleScene computer model =
-    Mouse2.onClick
-        (\p ->
+    case computer.mouse.event of
+        Click p ->
             puzzleSceneBtnAt p computer.screen
                 |> Maybe.map
                     (\btn ->
@@ -316,13 +317,14 @@ updatePuzzleScene computer model =
                             PrevLevel ->
                                 initPuzzleScene (Levels.prev model.levels)
                     )
-        )
-        computer.mouse2
-        |> Maybe.Extra.orElseLazy
-            (\_ ->
-                PuzzleGrid.update computer model.grid
-                    |> Maybe.map (\grid -> PuzzleScene { model | grid = grid })
-            )
+                |> Maybe.Extra.orElseLazy
+                    (\_ ->
+                        PuzzleGrid.update computer model.grid
+                            |> Maybe.map (\grid -> PuzzleScene { model | grid = grid })
+                    )
+
+        _ ->
+            Nothing
 
 
 viewMem : Computer2 -> Mem -> List Shape

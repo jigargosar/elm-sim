@@ -84,3 +84,14 @@ equalWithin tol a b =
             sub a b |> mapEach abs
     in
     dx < tol && dy < tol
+
+
+foldIndices2d : (Int2 -> b -> b) -> b -> Int2 -> b
+foldIndices2d func acc0 ( w, h ) =
+    List.range 0 (h - 1)
+        |> List.foldl
+            (\y acc1 ->
+                List.range 0 (w - 1)
+                    |> List.foldl (\x -> func ( x, y )) acc1
+            )
+            acc0

@@ -280,53 +280,34 @@ updateMem computer mem =
     { mem | scene = updateScene computer msg mem.scene }
 
 
-type PuzzleSceneMsg
-    = UpdatePuzzleGrid
-    | SelectLevelClicked
-    | NextClicked
-    | PrevClicked
-
-
 type Msg
     = IntroSceneClicked
     | LevelButtonClicked Int
-    | PuzzleSceneMsg PuzzleSceneMsg
+    | PuzzleSceneBtnClicked PuzzleButton
+    | UpdatePuzzleGrid
     | NoOp
 
 
 toMsg : Computer2 -> Scene -> Msg
 toMsg computer scene =
-    case ( computer.mouse.event, scene ) of
-        ( Click _, Intro ) ->
+    case ( scene, computer.mouse.event ) of
+        ( Intro, Click _ ) ->
             IntroSceneClicked
 
-        ( Click pt, LevelSelect levelCount ) ->
+        ( LevelSelect levelCount, Click pt ) ->
             levelButtonIdxAt pt computer.screen levelCount
                 |> Maybe.map LevelButtonClicked
                 |> Maybe.withDefault NoOp
 
-        ( me, PuzzleScene _ ) ->
-            (case me of
+        ( PuzzleScene _, ev ) ->
+            case ev of
                 Click pt ->
-                    case puzzleSceneBtnAt pt computer.screen of
-                        Just btn ->
-                            case btn of
-                                SelectLevel ->
-                                    SelectLevelClicked
-
-                                NextLevel ->
-                                    NextClicked
-
-                                PrevLevel ->
-                                    PrevClicked
-
-                        Nothing ->
-                            UpdatePuzzleGrid
+                    puzzleSceneBtnAt pt computer.screen
+                        |> Maybe.map PuzzleSceneBtnClicked
+                        |> Maybe.withDefault UpdatePuzzleGrid
 
                 _ ->
                     UpdatePuzzleGrid
-            )
-                |> PuzzleSceneMsg
 
         _ ->
             NoOp
@@ -341,17 +322,19 @@ updateScene computer msg scene =
         ( LevelButtonClicked idx, _ ) ->
             Levels.fromIndex idx |> initPuzzleScene
 
-        ( SelectLevelClicked, _ ) ->
-            initialLevelSelect
+        ( PuzzleSceneBtnClicked btn, PuzzleScene model ) ->
+            case btn of
+                SelectLevel ->
+                    initialLevelSelect
 
-        ( NextClicked, PuzzleScene model ) ->
-            initPuzzleScene (Levels.next model.levels)
+                NextLevel ->
+                    initPuzzleScene (Levels.next model.levels)
 
-        ( PrevClicked, PuzzleScene model ) ->
-            initPuzzleScene (Levels.prev model.levels)
+                PrevLevel ->
+                    initPuzzleScene (Levels.prev model.levels)
 
-        ( UpdatePuzzleGrid grid, PuzzleScene model ) ->
-            PuzzleScene { model | grid = PuzzleGrid.update computer grid }
+        ( UpdatePuzzleGrid, PuzzleScene model ) ->
+            PuzzleScene { model | grid = PuzzleGrid.update computer model.grid }
 
         _ ->
             scene

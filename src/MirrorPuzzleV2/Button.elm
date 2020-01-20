@@ -1,4 +1,4 @@
-module MirrorPuzzleV2.Button exposing (Button, init, view)
+module MirrorPuzzleV2.Button exposing (Button, init, mapBox, view)
 
 import MirrorPuzzleV2.Box as Box exposing (Box)
 import MirrorPuzzleV2.Computer2 as Computer2
@@ -17,6 +17,11 @@ type Button a
 init : a -> String -> Button a
 init a txt =
     Button a txt (Box.atOrigin ((String.length txt + 10) * 16 |> toFloat) 16)
+
+
+mapBox : (Box -> Box) -> Button a -> Button a
+mapBox func (Button a txt box) =
+    Button a txt (func box)
 
 
 view : Mouse -> Button a -> Shape

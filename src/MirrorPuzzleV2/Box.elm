@@ -11,6 +11,8 @@ module MirrorPuzzleV2.Box exposing
     , moveDown
     , moveLeft
     , moveRight
+    , moveToTopLeft
+    , moveToTopRight
     , moveX
     , moveY
     )
@@ -37,6 +39,20 @@ atTopLeft w h =
 atTopRight : Float -> Float -> Box
 atTopRight w h =
     atOrigin w h
+        |> moveLeft (w / 2)
+        |> moveDown (h / 2)
+
+
+moveToTopLeft : Box -> Box
+moveToTopLeft ((Box _ ( w, h )) as box) =
+    box
+        |> moveLeft (w / 2)
+        |> moveDown (h / 2)
+
+
+moveToTopRight : Box -> Box
+moveToTopRight ((Box _ ( w, h )) as box) =
+    box
         |> moveLeft (w / 2)
         |> moveDown (h / 2)
 

@@ -7,6 +7,7 @@ import MirrorPuzzleV2.MouseEvent as ME exposing (MouseEvent)
 import Number2 exposing (Float2)
 import Playground exposing (..)
 import Playground.Extra exposing (..)
+import PointFree exposing (whenTrue)
 
 
 type alias Mouse =
@@ -57,21 +58,25 @@ mapBox func (Button model) =
 
 view : Mouse -> Button a -> Shape
 view mouse (Button model) =
-    buttonShape (Box.contains mouse.pos model.box)
+    buttonShape model.disabled
+        (Box.contains mouse.pos model.box)
         (Box.dimensions model.box)
         model.label
         |> move2 (Box.center model.box)
 
 
-buttonShape : Bool -> ( Number, Number ) -> String -> Shape
-buttonShape hover ( w, h ) text =
+buttonShape : Bool -> Bool -> ( Number, Number ) -> String -> Shape
+buttonShape disabled hover ( w, h ) text =
     let
         thickness =
             3
     in
     [ rectangle black w h
     , rectangle
-        (if hover then
+        (if disabled then
+            lightGray
+
+         else if hover then
             lightPurple
 
          else
@@ -82,6 +87,7 @@ buttonShape hover ( w, h ) text =
     , words black text
     ]
         |> group
+        |> whenTrue disabled (fade 0.5)
 
 
 isEnabled : Button a -> Bool

@@ -17,7 +17,7 @@ import Playground.CellTransform as CT exposing (CellTransform)
 import Playground.Direction8 as Dir exposing (Direction8)
 import Playground.Extra exposing (..)
 import Playground.Grid as Grid
-import PointFree exposing (flip, whenTrue)
+import PointFree exposing (flip, ignoreNothing, whenTrue)
 import Set exposing (Set)
 
 
@@ -57,14 +57,15 @@ initCellT screen grid =
 -- Update
 
 
-update : Computer2 -> Model -> Maybe Model
+update : Computer2 -> Model -> Model
 update { mouse, screen } (Model grid) =
     let
         ct =
             initCellT screen grid
     in
     grid
-        |> (case mouse.event of
+        |> ignoreNothing
+            (case mouse.event of
                 Click pt ->
                     rotateMirrorAt (ct.fromView pt)
 
@@ -73,8 +74,8 @@ update { mouse, screen } (Model grid) =
 
                 _ ->
                     always Nothing
-           )
-        |> Maybe.map Model
+            )
+        |> Model
 
 
 

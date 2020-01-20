@@ -270,10 +270,10 @@ init =
 
 updateMem : Computer2 -> Mem -> Mem
 updateMem computer mem =
-    { mem | scene = ignoreNothing (updateScene computer) mem.scene }
+    { mem | scene = updateScene computer mem.scene }
 
 
-updateScene : Computer2 -> Scene -> Maybe Scene
+updateScene : Computer2 -> Scene -> Scene
 updateScene computer scene =
     let
         { mouse, screen } =
@@ -282,49 +282,49 @@ updateScene computer scene =
     case scene of
         Intro ->
             if mouse.click then
-                Just initialLevelSelect
+                initialLevelSelect
 
             else
-                Nothing
+                scene
 
         LevelSelect levelCount ->
             case mouse.event of
                 Click p ->
-                    levelButtonIdxAt p screen levelCount
-                        |> Maybe.map (\i -> initPuzzleScene (Levels.fromIndex i))
+                    case levelButtonIdxAt p screen levelCount of
+                        Just i ->
+                            initPuzzleScene (Levels.fromIndex i)
+
+                        Nothing ->
+                            scene
 
                 _ ->
-                    Nothing
+                    scene
 
         PuzzleScene model ->
             updatePuzzleScene computer model
 
 
-updatePuzzleScene : Computer2 -> PuzzleSceneModel -> Maybe Scene
+updatePuzzleScene : Computer2 -> PuzzleSceneModel -> Scene
 updatePuzzleScene computer model =
     case computer.mouse.event of
         Click p ->
-            puzzleSceneBtnAt p computer.screen
-                |> Maybe.map
-                    (\btn ->
-                        case btn of
-                            SelectLevel ->
-                                initialLevelSelect
+            case puzzleSceneBtnAt p computer.screen of
+                Just btn ->
+                    case btn of
+                        SelectLevel ->
+                            initialLevelSelect
 
-                            NextLevel ->
-                                initPuzzleScene (Levels.next model.levels)
+                        NextLevel ->
+                            initPuzzleScene (Levels.next model.levels)
 
-                            PrevLevel ->
-                                initPuzzleScene (Levels.prev model.levels)
-                    )
-                |> Maybe.Extra.orElseLazy
-                    (\_ ->
-                        PuzzleGrid.update computer model.grid
-                            |> Maybe.map (\grid -> PuzzleScene { model | grid = grid })
-                    )
+                        PrevLevel ->
+                            initPuzzleScene (Levels.prev model.levels)
+
+                Nothing ->
+                    PuzzleScene { model | grid = PuzzleGrid.update computer model.grid }
 
         _ ->
-            Nothing
+            PuzzleScene model
 
 
 viewMem : Computer2 -> Mem -> List Shape

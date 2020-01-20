@@ -189,8 +189,7 @@ viewLevelSelect computer levelCount =
 
 
 type Scene
-    = Intro
-    | LevelSelect Int
+    = LevelSelect Int
     | PuzzleScene PuzzleSceneModel
 
 
@@ -231,9 +230,6 @@ toMsg computer scene =
             computer.mouse.event
     in
     case scene of
-        Intro ->
-            NoOp
-
         LevelSelect levelCount ->
             initLevelButtons computer.screen levelCount
                 |> .list
@@ -278,9 +274,6 @@ updateScene computer msg scene =
 viewMem : Computer2 -> Mem -> List Shape
 viewMem computer mem =
     case mem.scene of
-        Intro ->
-            [ words black "Tap To Start" ]
-
         LevelSelect levelCount ->
             viewLevelSelect computer levelCount
 

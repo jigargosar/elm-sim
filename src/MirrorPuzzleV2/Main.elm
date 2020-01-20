@@ -250,25 +250,26 @@ type Msg
 
 toMsg : Computer2 -> Scene -> Msg
 toMsg computer scene =
-    case ( scene, computer.mouse.event ) of
-        ( Intro, Click _ ) ->
+    let
+        ev =
+            computer.mouse.event
+    in
+    case scene of
+        Intro ->
             IntroSceneClicked
 
-        ( LevelSelect levelCount, ev ) ->
+        LevelSelect levelCount ->
             initLevelButtons computer.screen levelCount
                 |> .list
                 |> Button.findClicked ev
                 |> Maybe.map LevelButtonClicked
                 |> Maybe.withDefault NoOp
 
-        ( PuzzleScene _, ev ) ->
+        PuzzleScene _ ->
             puzzleSceneButtons computer.screen
                 |> Button.findClicked ev
                 |> Maybe.map PuzzleSceneBtnClicked
                 |> Maybe.withDefault UpdatePuzzleGrid
-
-        _ ->
-            NoOp
 
 
 updateScene : Computer2 -> Msg -> Scene -> Scene

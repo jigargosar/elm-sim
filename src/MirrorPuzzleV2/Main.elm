@@ -1,7 +1,6 @@
 module MirrorPuzzleV2.Main exposing (main)
 
 import List.Extra
-import Maybe.Extra
 import MirrorPuzzleV2.Box as Box exposing (Box)
 import MirrorPuzzleV2.Computer2 exposing (Computer2)
 import MirrorPuzzleV2.Game2 as Game2
@@ -11,7 +10,6 @@ import MirrorPuzzleV2.PuzzleGrid as PuzzleGrid
 import Number2 exposing (Float2)
 import Playground exposing (..)
 import Playground.Extra exposing (..)
-import PointFree exposing (ignoreNothing)
 
 
 
@@ -27,6 +25,11 @@ type alias PuzzleSceneModel =
 initPuzzleScene : Levels -> Scene
 initPuzzleScene levels =
     PuzzleScene { grid = Levels.current levels, levels = levels }
+
+
+initPuzzleSceneFromLevelIndex : Int -> Scene
+initPuzzleSceneFromLevelIndex i =
+    initPuzzleScene (Levels.fromIndex i)
 
 
 initialPuzzleScene : Scene
@@ -292,7 +295,7 @@ updateScene computer scene =
                 (\p ->
                     levelButtonIdxAt p screen levelCount
                         |> Maybe.map
-                            (\i -> initPuzzleScene (Levels.fromIndex i))
+                            initPuzzleSceneFromLevelIndex
                 )
                 |> Maybe.withDefault scene
 

@@ -62,6 +62,11 @@ whenTrue bool t v =
         v
 
 
+whenNothing : Maybe a -> (c -> c) -> c -> c
+whenNothing maybe =
+    whenTrue (maybe == Nothing)
+
+
 inc : number -> number
 inc =
     (+) 1

@@ -1,7 +1,6 @@
-module MirrorPuzzleV2.Button exposing (Button, findClicked, init, initWithBox, mapBox, view)
+module MirrorPuzzleV2.Button exposing (Button, disable, findClicked, init, initWithBox, mapBox, view)
 
 import List.Extra
-import Maybe.Extra
 import MirrorPuzzleV2.Box as Box exposing (Box)
 import MirrorPuzzleV2.Computer2 as Computer2
 import MirrorPuzzleV2.MouseEvent as ME exposing (MouseEvent)
@@ -15,12 +14,20 @@ type alias Mouse =
 
 
 type Button a
-    = Button a String Box
+    = Button (Model a)
+
+
+type alias Model a =
+    { data : a
+    , label : String
+    , box : Box
+    , disabled : Bool
+    }
 
 
 initWithBox : a -> String -> Box -> Button a
-initWithBox a txt =
-    Button a txt
+initWithBox a txt box =
+    Model a txt box False |> Button
 
 
 init : a -> String -> Button a
@@ -35,20 +42,25 @@ init a txt =
         width =
             toFloat (String.length txt + 2) * (fontSize * 0.55)
     in
-    Button a txt (Box.atOrigin width lineHeight)
+    initWithBox a txt (Box.atOrigin width lineHeight)
+
+
+disable : Button a -> Button a
+disable (Button model) =
+    Button { model | disabled = True }
 
 
 mapBox : (Box -> Box) -> Button a -> Button a
-mapBox func (Button a txt box) =
-    Button a txt (func box)
+mapBox func (Button model) =
+    Button { model | box = func model.box }
 
 
 view : Mouse -> Button a -> Shape
-view mouse (Button _ txt box) =
-    buttonShape (Box.contains mouse.pos box)
-        (Box.dimensions box)
-        txt
-        |> move2 (Box.center box)
+view mouse (Button model) =
+    buttonShape (Box.contains mouse.pos model.box)
+        (Box.dimensions model.box)
+        model.label
+        |> move2 (Box.center model.box)
 
 
 buttonShape : Bool -> ( Number, Number ) -> String -> Shape
@@ -72,11 +84,16 @@ buttonShape hover ( w, h ) text =
         |> group
 
 
+isEnabled : Button a -> Bool
+isEnabled (Button model) =
+    not model.disabled
+
+
 findClicked : MouseEvent -> List (Button a) -> Maybe a
 findClicked ev buttons =
     ME.onClick
         (\pt ->
-            findContaining pt buttons
+            buttons |> List.filter isEnabled |> findContaining pt
         )
         ev
 
@@ -88,10 +105,10 @@ findContaining pt =
 
 
 data : Button a -> a
-data (Button a _ _) =
-    a
+data (Button model) =
+    model.data
 
 
 contains : Float2 -> Button a -> Bool
-contains pt (Button _ _ box) =
-    Box.contains pt box
+contains pt (Button model) =
+    Box.contains pt model.box

@@ -7,6 +7,7 @@ import MirrorPuzzleV2.Game2 as Game2
 import MirrorPuzzleV2.Levels as Levels exposing (Levels)
 import MirrorPuzzleV2.PuzzleGrid as PuzzleGrid
 import Playground exposing (..)
+import PointFree exposing (whenNothing, whenTrue)
 
 
 
@@ -49,7 +50,7 @@ viewPuzzleScene computer { grid, levels } =
         )
         |> moveY screen.top
         |> moveDown 50
-    , puzzleSceneButtons screen
+    , puzzleSceneButtons screen levels
         |> List.map (Button.view mouse)
         |> group
     ]
@@ -64,10 +65,10 @@ caseBool bool true false =
         false
 
 
-puzzleSceneButtons : Screen -> List (Button PuzzleButton)
-puzzleSceneButtons screen =
+puzzleSceneButtons : Screen -> Levels -> List (Button PuzzleButton)
+puzzleSceneButtons screen levels =
     [ SelectLevel, NextLevel, PrevLevel ]
-        |> List.map (getPuzzleBtn screen)
+        |> List.map (getPuzzleBtn screen levels)
 
 
 type PuzzleButton
@@ -76,8 +77,8 @@ type PuzzleButton
     | PrevLevel
 
 
-getPuzzleBtn : Screen -> PuzzleButton -> Button PuzzleButton
-getPuzzleBtn screen puzzleButton =
+getPuzzleBtn : Screen -> Levels -> PuzzleButton -> Button PuzzleButton
+getPuzzleBtn screen levels puzzleButton =
     case puzzleButton of
         SelectLevel ->
             Button.init SelectLevel "Select Level"
@@ -100,6 +101,7 @@ getPuzzleBtn screen puzzleButton =
                             |> Box.moveDown 20
                             |> Box.moveLeft 20
                     )
+                |> whenNothing (Levels.next levels) Button.disable
 
         PrevLevel ->
             Button.init PrevLevel "Prev"
@@ -111,6 +113,7 @@ getPuzzleBtn screen puzzleButton =
                             |> Box.moveDown 20
                             |> Box.moveLeft (100 + 20 + 20)
                     )
+                |> whenNothing (Levels.prev levels) Button.disable
 
 
 type alias Mouse =
@@ -236,8 +239,8 @@ toMsg computer scene =
                 |> Maybe.map LevelButtonClicked
                 |> Maybe.withDefault NoOp
 
-        PuzzleScene _ ->
-            puzzleSceneButtons computer.screen
+        PuzzleScene model ->
+            puzzleSceneButtons computer.screen model.levels
                 |> Button.findClicked ev
                 |> Maybe.map PuzzleSceneBtnClicked
                 |> Maybe.withDefault UpdatePuzzleGrid

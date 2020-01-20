@@ -9,3 +9,13 @@ type MouseEvent
     | Drag Float2 Float2
     | Drop Float2 Float2
     | None
+
+
+onClick : MouseEvent -> (Float2 -> Maybe a) -> Maybe a
+onClick ev func =
+    case ev of
+        Click pt ->
+            func pt
+
+        _ ->
+            Nothing

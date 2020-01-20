@@ -291,12 +291,17 @@ updateScene computer scene =
                 scene
 
         LevelSelect levelCount ->
-            MouseEvent.onClick mouse.event
-                (\p ->
-                    levelButtonIdxAt p screen levelCount
-                        |> Maybe.map
-                            initPuzzleSceneFromLevelIndex
-                )
+            let
+                getLevelIdx pt =
+                    levelButtonIdxAt pt screen levelCount
+            in
+            (case mouse.event of
+                Click pt ->
+                    getLevelIdx pt |> Maybe.map initPuzzleSceneFromLevelIndex
+
+                _ ->
+                    Nothing
+            )
                 |> Maybe.withDefault scene
 
         PuzzleScene model ->

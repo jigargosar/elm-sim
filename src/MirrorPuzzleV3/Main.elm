@@ -11,10 +11,10 @@ type TileGrid
     = TileGrid Int2 (Dict Int2 Tile)
 
 
-withDimesions : Int2 -> TileGrid
-withDimesions dimensions =
+filledWith : Tile -> Int2 -> TileGrid
+filledWith tile dimensions =
     let
         insertHole pos =
-            Dict.insert pos Hole
+            Dict.insert pos tile
     in
     TileGrid dimensions (NT.foldIndices2d insertHole Dict.empty dimensions)

@@ -16,7 +16,7 @@ type Button a
 
 init : a -> String -> Button a
 init a txt =
-    Button a txt (Box.atOrigin ((String.length txt + 10) * 16 |> toFloat) 16)
+    Button a txt (Box.atOrigin (String.length txt * 16 |> toFloat) 32)
 
 
 mapBox : (Box -> Box) -> Button a -> Button a

@@ -2,7 +2,8 @@ module MirrorPuzzleV2.Main exposing (main)
 
 import List.Extra
 import MirrorPuzzleV2.Box as Box exposing (Box)
-import MirrorPuzzleV2.Computer2 exposing (Computer2)
+import MirrorPuzzleV2.Button as Button exposing (Button)
+import MirrorPuzzleV2.Computer2 as Computer2 exposing (Computer2)
 import MirrorPuzzleV2.Game2 as Game2
 import MirrorPuzzleV2.Levels as Levels exposing (Levels)
 import MirrorPuzzleV2.MouseEvent exposing (MouseEvent(..))
@@ -25,11 +26,6 @@ type alias PuzzleSceneModel =
 initPuzzleScene : Levels -> Scene
 initPuzzleScene levels =
     PuzzleScene { grid = Levels.current levels, levels = levels }
-
-
-initPuzzleSceneFromLevelIndex : Int -> Scene
-initPuzzleSceneFromLevelIndex i =
-    initPuzzleScene (Levels.fromIndex i)
 
 
 initialPuzzleScene : Scene
@@ -57,7 +53,7 @@ viewPuzzleScene computer { grid, levels } =
         )
         |> moveY screen.top
         |> moveDown 50
-    , viewPuzzleSceneButtons mouse.pos screen
+    , viewPuzzleSceneButtons mouse screen
     ]
 
 
@@ -101,16 +97,53 @@ puzzleBtnData screen puzzleButton =
             ( "Prev", initPrevButtonBox screen )
 
 
-viewPuzzleSceneButton : Float2 -> Screen -> PuzzleButton -> Shape
+getPuzzleBtn : Screen -> PuzzleButton -> Button PuzzleButton
+getPuzzleBtn screen puzzleButton =
+    case puzzleButton of
+        SelectLevel ->
+            Button.init SelectLevel "Select Level"
+                |> Button.mapBox
+                    (\box ->
+                        box
+                            |> Box.moveToTopLeft
+                            |> Box.move ( screen.left, screen.top )
+                            |> Box.moveRight 20
+                            |> Box.moveDown 20
+                    )
+
+        NextLevel ->
+            Button.init NextLevel "Next"
+                |> Button.mapBox
+                    (\box ->
+                        box
+                            |> Box.moveToTopRight
+                            |> Box.move ( screen.right, screen.top )
+                            |> Box.moveDown 20
+                            |> Box.moveLeft 20
+                    )
+
+        PrevLevel ->
+            Button.init PrevLevel "Prev"
+                |> Button.mapBox
+                    (\box ->
+                        box
+                            |> Box.moveToTopRight
+                            |> Box.move ( screen.right, screen.top )
+                            |> Box.moveDown 20
+                            |> Box.moveLeft (100 + 20 + 20)
+                    )
+
+
+type alias Mouse =
+    Computer2.Mouse
+
+
+viewPuzzleSceneButton : Mouse -> Screen -> PuzzleButton -> Shape
 viewPuzzleSceneButton mouse screen btn =
-    let
-        ( text, box ) =
-            puzzleBtnData screen btn
-    in
-    renderButton mouse text box
+    Button.view mouse (getPuzzleBtn screen btn)
 
 
-viewPuzzleSceneButtons : Float2 -> Screen -> Shape
+viewPuzzleSceneButtons : Mouse -> Screen -> Shape
 viewPuzzleSceneButtons mouse screen =
     puzzleSceneButtons
         |> List.map (viewPuzzleSceneButton mouse screen)

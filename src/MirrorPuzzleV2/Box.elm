@@ -46,7 +46,7 @@ atTopRight w h =
 moveToTopLeft : Box -> Box
 moveToTopLeft ((Box _ ( w, h )) as box) =
     box
-        |> moveLeft (w / 2)
+        |> moveRight (w / 2)
         |> moveDown (h / 2)
 
 

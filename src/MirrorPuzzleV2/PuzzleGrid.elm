@@ -286,6 +286,7 @@ lightPathStartingAt pos0 dir0 grid =
                 nextPos =
                     Dir.stepPos dir pos
 
+                accumInDir : Direction8 -> LightPath
                 accumInDir newDir =
                     accumLightPath newDir nextPos (consLightPath nextPos acc)
             in
@@ -321,7 +322,7 @@ lightPathStartingAt pos0 dir0 grid =
                                 accumInDir dir
 
                             Prism newDir ->
-                                accumInDir newDir
+                                Fork [ accumInDir (Dir.opposite newDir), accumInDir newDir ]
     in
     accumLightPath dir0 pos0 (Path [ pos0 ])
 
@@ -346,8 +347,8 @@ litDestinations grid =
                     List.concatMap getPathEndIndices list
     in
     lightPaths grid
-        |> List.filterMap
-            (getPathEndIndices >> List.map validateDestinationAt >> Maybe.Extra.orList)
+        |> List.concatMap
+            (getPathEndIndices >> List.filterMap validateDestinationAt)
         |> Set.fromList
 
 
@@ -449,7 +450,7 @@ viewPath ct path =
                 |> (\points -> List.map2 (line red (ct.cellSize * 0.05)) points (List.drop 1 points))
 
         Fork forks ->
-            []
+            List.map (viewPath ct) forks
     )
         |> group
 
@@ -518,7 +519,7 @@ cellContentShapes time width litDest pos cell =
             [ mirrorShape width dir ]
 
         Prism dir ->
-            [ triangle green (width / 2) |> rotate (Dir.toDegrees dir - 90) ]
+            [ triangle green (width / 2) |> rotate (Dir.toDegrees dir) ]
 
         Wall ->
             [ rectangle darkBrown width width ]

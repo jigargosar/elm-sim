@@ -1,4 +1,4 @@
-module Playground.Direction8 exposing (Direction8, fromInt, rotate, stepPos, toDegrees)
+module Playground.Direction8 exposing (Direction8, fromInt, opposite, rotate, stepPos, toDegrees)
 
 
 type alias Pos =
@@ -22,6 +22,11 @@ rotate ct (Dir org) =
 toDegrees : Direction8 -> Float
 toDegrees (Dir ct) =
     45 * ct |> toFloat
+
+
+opposite : Direction8 -> Direction8
+opposite =
+    rotate 4
 
 
 stepPos : Direction8 -> Pos -> Pos

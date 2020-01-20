@@ -321,7 +321,7 @@ updateGridOnDnD dragIdx dropIdx =
                 _ ->
                     ( drag, drop )
     in
-    Grid.mapCell2 dragIdx dropIdx mapCellsOnDnd
+    Grid.update2 dragIdx dropIdx mapCellsOnDnd
 
 
 rotateMirrorAt : Int2 -> Grid -> Maybe Grid
@@ -338,7 +338,7 @@ rotateMirrorAt gIdx grid =
                 _ ->
                     cell
     in
-    Grid.mapCell gIdx rotateMirror grid
+    Grid.update gIdx rotateMirror grid
 
 
 

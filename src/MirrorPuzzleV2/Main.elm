@@ -5,11 +5,8 @@ import MirrorPuzzleV2.Button as Button exposing (Button)
 import MirrorPuzzleV2.Computer2 as Computer2 exposing (Computer2)
 import MirrorPuzzleV2.Game2 as Game2
 import MirrorPuzzleV2.Levels as Levels exposing (Levels)
-import MirrorPuzzleV2.MouseEvent exposing (MouseEvent(..))
 import MirrorPuzzleV2.PuzzleGrid as PuzzleGrid
-import Number2 exposing (Float2)
 import Playground exposing (..)
-import Playground.Extra exposing (..)
 
 
 
@@ -171,27 +168,6 @@ initLevelButtons screen count =
     }
 
 
-buttonShape : Bool -> ( Number, Number ) -> String -> Shape
-buttonShape hover ( w, h ) text =
-    let
-        thickness =
-            3
-    in
-    [ rectangle black w h
-    , rectangle
-        (if hover then
-            lightPurple
-
-         else
-            white
-        )
-        (w - thickness)
-        (h - thickness)
-    , words black text
-    ]
-        |> group
-
-
 viewLevelSelect : Computer2 -> Int -> List Shape
 viewLevelSelect computer levelCount =
     let
@@ -256,7 +232,7 @@ toMsg computer scene =
     in
     case scene of
         Intro ->
-            IntroSceneClicked
+            NoOp
 
         LevelSelect levelCount ->
             initLevelButtons computer.screen levelCount

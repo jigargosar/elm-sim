@@ -119,7 +119,7 @@ type Cell
     | SourceWithMirror Direction8
     | Mirror Direction8
     | Wall
-    | Empty
+    | Floor
 
 
 
@@ -133,7 +133,7 @@ type Cell
     M<0-7>  -> mirror angle
     S<0-7>  -> source with mirror angle
     |       -> Wall
-    __      -> empty cell
+    __      -> floor
 
 -}
 decodeGrid : String -> Grid
@@ -154,7 +154,7 @@ decodeGrid str =
             Grid.insert pos (decodeCell cs)
     in
     indexedFoldlList2d insertEncodedCellAt
-        (Grid.filled width height Empty)
+        (Grid.filled width height Floor)
         tokens
 
 
@@ -191,8 +191,11 @@ decodeCell cellString =
         'S' :: [ char ] ->
             SourceWithMirror (decodeDirection char)
 
+        '_' :: xx ->
+            Floor
+
         _ ->
-            Empty
+            Floor
 
 
 decodeDirection : Char -> Direction8
@@ -286,7 +289,7 @@ lightPathStartingAt pos0 dir0 grid =
                             Wall ->
                                 acc
 
-                            Empty ->
+                            Floor ->
                                 accumInDir dir
     in
     accumLightPath dir0 pos0 [ pos0 ]
@@ -321,17 +324,17 @@ updateOnDnD dragIdx dropIdx =
         mapCellsOnDnd : Cell -> Cell -> ( Cell, Cell )
         mapCellsOnDnd drag drop =
             case ( drag, drop ) of
-                ( SourceWithMirror dir, Empty ) ->
+                ( SourceWithMirror dir, Floor ) ->
                     ( Source, Mirror dir )
 
                 ( SourceWithMirror dir, Source ) ->
                     ( Source, SourceWithMirror dir )
 
-                ( Mirror dir, Empty ) ->
-                    ( Empty, Mirror dir )
+                ( Mirror dir, Floor ) ->
+                    ( Floor, Mirror dir )
 
                 ( Mirror dir, Source ) ->
-                    ( Empty, SourceWithMirror dir )
+                    ( Floor, SourceWithMirror dir )
 
                 _ ->
                     ( drag, drop )
@@ -469,7 +472,7 @@ cellContentShapes time width litDest pos cell =
         Wall ->
             [ rectangle darkBrown width width ]
 
-        Empty ->
+        Floor ->
             []
 
 

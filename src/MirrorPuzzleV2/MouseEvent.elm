@@ -11,8 +11,8 @@ type MouseEvent
     | None
 
 
-onClick : MouseEvent -> (Float2 -> Maybe a) -> Maybe a
-onClick ev func =
+onClick : (Float2 -> Maybe a) -> MouseEvent -> Maybe a
+onClick func ev =
     case ev of
         Click pt ->
             func pt

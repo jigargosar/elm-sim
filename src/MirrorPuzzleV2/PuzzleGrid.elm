@@ -62,9 +62,9 @@ update { mouse, screen } (Model grid) =
     let
         ct =
             initCellT screen grid
-
-        updateGrid =
-            case mouse.event of
+    in
+    grid
+        |> (case mouse.event of
                 Click pt ->
                     rotateMirrorAt (ct.fromView pt)
 
@@ -73,8 +73,8 @@ update { mouse, screen } (Model grid) =
 
                 _ ->
                     always Nothing
-    in
-    updateGrid grid |> Maybe.map Model
+           )
+        |> Maybe.map Model
 
 
 

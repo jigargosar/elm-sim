@@ -1,4 +1,4 @@
-module Int2 exposing (fold, member, toDict)
+module Length2 exposing (fold, member, toDict)
 
 import Dict exposing (Dict)
 import Length

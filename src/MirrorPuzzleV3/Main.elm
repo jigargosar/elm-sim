@@ -27,9 +27,15 @@ fromList2d list2d =
     TileGrid length2 dict2d
 
 
-rotateElementAt : Int2 -> TileGrid -> Maybe TileGrid
-rotateElementAt index2d (TileGrid length2 dict2d) =
-    Dict2d.maybeMapCellAt index2d
+rotateElement : Int2 -> TileGrid -> Maybe TileGrid
+rotateElement index2d (TileGrid length2 dict2d) =
+    Dict2d.maybeMapAt index2d
         Tile.rotateElementInTile
         dict2d
+        |> Maybe.map (TileGrid length2)
+
+
+swapElements : Int2 -> Int2 -> TileGrid -> Maybe TileGrid
+swapElements idxA idxB (TileGrid length2 dict2d) =
+    Dict2d.maybeMapAt2 idxA idxB Tile.swapElementInTiles dict2d
         |> Maybe.map (TileGrid length2)

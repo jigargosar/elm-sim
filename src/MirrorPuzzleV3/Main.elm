@@ -3,6 +3,7 @@ module MirrorPuzzleV3.Main exposing (..)
 -- TileGrid
 
 import Dict exposing (Dict)
+import Dict2d
 import Length2
 import List2d exposing (List2d)
 import MirrorPuzzleV3.Tile as Tile exposing (Tile(..))
@@ -15,7 +16,7 @@ type TileGrid
 
 filledWith : Tile -> Int2 -> TileGrid
 filledWith tile length2 =
-    TileGrid length2 (Length2.toDict (always tile) length2)
+    TileGrid length2 (Dict2d.filled tile length2)
 
 
 fromList2d : List2d Tile -> TileGrid
@@ -24,10 +25,7 @@ fromList2d list2d =
         lookupDict =
             List2d.toDict list2d
 
-        maybeTileAt index2d =
-            Dict.get index2d lookupDict
-
         length2 =
             ( List2d.maxWidth list2d, List2d.height list2d )
     in
-    TileGrid length2 (Length2.toDictWithDefault Tile.Hole maybeTileAt length2)
+    TileGrid length2 (Dict2d.resizeWithDefault Tile.Hole length2 lookupDict)

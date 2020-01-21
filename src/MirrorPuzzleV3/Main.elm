@@ -7,6 +7,7 @@ import Dict2d
 import List2d exposing (List2d)
 import MirrorPuzzleV3.Tile as Tile exposing (Tile(..))
 import Number2 exposing (Int2)
+import PointFree exposing (ignoreNothing)
 
 
 type TileGrid
@@ -25,3 +26,13 @@ fromList2d list2d =
             Dict2d.fromList2dWithDefault Tile.Hole list2d
     in
     TileGrid length2 dict2d
+
+
+rotateElementAt : Int2 -> TileGrid -> Maybe TileGrid
+rotateElementAt index2d (TileGrid length2 dict2d) =
+    Dict2d.mapAt index2d
+        (Tile.mapElementInFilledContainer Tile.rotateElement
+            |> ignoreNothing
+        )
+        dict2d
+        |> Maybe.map (TileGrid length2)

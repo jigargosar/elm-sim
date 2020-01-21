@@ -2,6 +2,7 @@ module Dict2d exposing (..)
 
 import Dict exposing (Dict)
 import Length2
+import List2d exposing (List2d)
 import Number2 exposing (Int2)
 
 
@@ -17,3 +18,15 @@ resizeWithDefault a len2 dict2d =
             Dict.get index2 dict2d |> Maybe.withDefault a
     in
     Length2.toDict func len2
+
+
+fromList2dWithDefault : a -> List2d a -> Dict Int2 a
+fromList2dWithDefault a list2d =
+    let
+        lookupDict =
+            List2d.toDict list2d
+
+        length2 =
+            ( List2d.maxWidth list2d, List2d.height list2d )
+    in
+    resizeWithDefault a length2 lookupDict

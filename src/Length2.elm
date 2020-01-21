@@ -1,4 +1,4 @@
-module Length2 exposing (fold, member, toDict)
+module Length2 exposing (fold, member, toDict, toDictWithDefault)
 
 import Dict exposing (Dict)
 import Length
@@ -19,6 +19,11 @@ fold func acc0 ( w, h ) =
 toDict : (Int2 -> b) -> Int2 -> Dict Int2 b
 toDict func =
     fold (\i2 -> Dict.insert i2 (func i2)) Dict.empty
+
+
+toDictWithDefault : b -> (Int2 -> Maybe b) -> Int2 -> Dict Int2 b
+toDictWithDefault b func =
+    fold (\i2 -> Dict.insert i2 (func i2 |> Maybe.withDefault b)) Dict.empty
 
 
 member : Int2 -> Int2 -> Bool

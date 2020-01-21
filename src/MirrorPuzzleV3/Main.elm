@@ -24,10 +24,10 @@ fromList2d list2d =
         lookupDict =
             List2d.toDict list2d
 
-        tileAtOrHole index2d =
-            Dict.get index2d lookupDict |> Maybe.withDefault Tile.Hole
+        maybeTileAt index2d =
+            Dict.get index2d lookupDict
 
         length2 =
             ( List2d.maxWidth list2d, List2d.height list2d )
     in
-    TileGrid length2 (Length2.toDict tileAtOrHole length2)
+    TileGrid length2 (Length2.toDictWithDefault Tile.Hole maybeTileAt length2)

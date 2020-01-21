@@ -41,4 +41,4 @@ swapElements idxA idxB =
 
 maybeMapDict2d : (Dict Int2 Tile -> Maybe (Dict Int2 Tile)) -> TileGrid -> Maybe TileGrid
 maybeMapDict2d func (TileGrid dim dict2d) =
-    func dict2d |> Maybe.map (TileGrid dim)
+    Maybe.map (TileGrid dim) (func dict2d)

@@ -2,6 +2,8 @@ module MirrorPuzzleV3.Tile exposing (Tile(..), rotateElement, swapElements)
 
 -- Tile
 
+import Number2 exposing (Int2)
+
 
 type Tile
     = FilledContainer ElementContainer Element
@@ -87,6 +89,29 @@ rotateDirectionBy steps (Direction zeroToSevenInt) =
 oppositeDirection : Direction -> Direction
 oppositeDirection =
     rotateDirectionBy 4
+
+
+
+-- Path
+
+
+type PathElement
+    = PathElement Int2 Direction
+
+
+type Path
+    = Path (List PathElement)
+    | Fork (List Path)
+
+
+pathCons : PathElement -> Path -> Path
+pathCons e path =
+    case path of
+        Path single ->
+            Path (e :: single)
+
+        Fork multiple ->
+            Fork (List.map (pathCons e) multiple)
 
 
 

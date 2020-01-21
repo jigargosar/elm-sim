@@ -97,6 +97,7 @@ oppositeDirection =
 
 type PathElement
     = PathElement Int2 Direction
+    | PathEnd Int2
 
 
 type Path

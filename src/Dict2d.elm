@@ -30,23 +30,3 @@ fromList2dWithDefault a list2d =
             ( List2d.maxWidth list2d, List2d.height list2d )
     in
     ( length2, resizeWithDefault a length2 lookupDict )
-
-
-mapAt : Int2 -> (a -> a) -> Dict Int2 a -> Maybe (Dict Int2 a)
-mapAt gIdx func grid =
-    Dict.get gIdx grid
-        |> Maybe.map (\cell -> Dict.insert gIdx (func cell) grid)
-
-
-mapAt2 : Int2 -> Int2 -> (b -> b -> ( b, b )) -> Dict Int2 b -> Maybe (Dict Int2 b)
-mapAt2 gIdxA gIdxB func grid =
-    let
-        insertCells ( newCellA, newCellB ) =
-            grid
-                |> Dict.insert gIdxA newCellA
-                |> Dict.insert gIdxB newCellB
-    in
-    Maybe.map2
-        (\cellA cellB -> func cellA cellB |> insertCells)
-        (Dict.get gIdxA grid)
-        (Dict.get gIdxB grid)

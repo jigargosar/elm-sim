@@ -28,11 +28,9 @@ fromList2d list2d =
     TileGrid length2 dict2d
 
 
-rotateElementAt : Int2 -> TileGrid -> Maybe TileGrid
+rotateElementAt : Int2 -> TileGrid -> TileGrid
 rotateElementAt index2d (TileGrid length2 dict2d) =
-    Dict2d.mapAt index2d
-        (Tile.mapElementInFilledContainer Tile.rotateElement
-            |> ignoreNothing
-        )
+    Dict.update index2d
+        (Maybe.andThen (Tile.mapElementInFilledContainer Tile.rotateElement))
         dict2d
-        |> Maybe.map (TileGrid length2)
+        |> TileGrid length2

@@ -30,14 +30,13 @@ fromList2d list2d =
 rotateElement : Int2 -> TileGrid -> Maybe TileGrid
 rotateElement index2d =
     maybeMapDict2d
-        (Dict2d.maybeMapAt index2d
-            Tile.rotateElementInTile
-        )
+        (Dict2d.maybeMapAt index2d Tile.rotateElementInTile)
 
 
 swapElements : Int2 -> Int2 -> TileGrid -> Maybe TileGrid
 swapElements idxA idxB =
-    maybeMapDict2d (Dict2d.maybeMapAt2 idxA idxB Tile.swapElementInTiles)
+    maybeMapDict2d
+        (Dict2d.maybeMapAt2 idxA idxB Tile.swapElementInTiles)
 
 
 maybeMapDict2d : (Dict Int2 Tile -> Maybe (Dict Int2 Tile)) -> TileGrid -> Maybe TileGrid

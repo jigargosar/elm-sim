@@ -22,7 +22,7 @@ fromList2d : List2d Tile -> TileGrid
 fromList2d list2d =
     let
         ( dim, dict2d ) =
-            Dict2d.fromList2dWithDefault Tile.Hole list2d
+            Dict2d.fromListsWithDefault Tile.Hole list2d
     in
     TileGrid dim dict2d
 

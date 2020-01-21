@@ -1,4 +1,4 @@
-module Dict2d exposing (filled, fromList2dWithDefault, maybeMapAt, maybeMapAt2)
+module Dict2d exposing (filled, fromListsWithDefault, maybeMapAt, maybeMapAt2)
 
 import Dict exposing (Dict)
 import Length2
@@ -20,8 +20,8 @@ resizeWithDefault a length2 dict =
     Length2.toDict func length2
 
 
-fromList2dWithDefault : a -> List2d a -> ( Int2, Dict Int2 a )
-fromList2dWithDefault a lists =
+fromListsWithDefault : a -> List2d a -> ( Int2, Dict Int2 a )
+fromListsWithDefault a lists =
     let
         lookupDict =
             List2d.toDict lists

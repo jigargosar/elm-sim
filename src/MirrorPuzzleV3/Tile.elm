@@ -36,8 +36,8 @@ swapElementInTiles dragTile dropTile =
             Nothing
 
 
-getElementContainedInLightSource : Tile -> Maybe Element
-getElementContainedInLightSource tile =
+getElementInLightSourceTile : Tile -> Maybe Element
+getElementInLightSourceTile tile =
     case tile of
         FilledContainer LightSource element ->
             Just element

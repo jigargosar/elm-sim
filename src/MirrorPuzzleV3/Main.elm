@@ -32,6 +32,6 @@ fromList2d list2d =
 rotateElementAt : Int2 -> TileGrid -> Maybe TileGrid
 rotateElementAt index2d (TileGrid length2 dict2d) =
     Dict2d.maybeMapCellAt index2d
-        (Tile.mapElementInFilledContainer Tile.rotateElement)
+        Tile.rotateElementInTile
         dict2d
         |> Maybe.map (TileGrid length2)

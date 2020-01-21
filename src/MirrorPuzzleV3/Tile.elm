@@ -1,4 +1,4 @@
-module MirrorPuzzleV3.Tile exposing (Tile(..), rotateElement, swapElements)
+module MirrorPuzzleV3.Tile exposing (Path, Tile(..), getElementInLightSource, rotateElement, singletonPath, swapElements)
 
 -- Tile
 
@@ -103,6 +103,11 @@ type PathElement
 type Path
     = Path (List PathElement)
     | Fork (List Path)
+
+
+singletonPath : Int2 -> Direction -> Path
+singletonPath int2 direction =
+    Debug.todo "impl"
 
 
 pathCons : PathElement -> Path -> Path

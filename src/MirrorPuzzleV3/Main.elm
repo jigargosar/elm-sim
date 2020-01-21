@@ -42,3 +42,18 @@ swapElements idxA idxB =
 maybeMapDict2d : (Dict Int2 Tile -> Maybe (Dict Int2 Tile)) -> TileGrid -> Maybe TileGrid
 maybeMapDict2d func (TileGrid dim dict2d) =
     Maybe.map (TileGrid dim) (func dict2d)
+
+
+computeLightPaths : TileGrid -> List Tile.Path
+computeLightPaths (TileGrid _ dict) =
+    Dict.foldl
+        (\index tile ->
+            case Tile.getElementInLightSource tile of
+                Just e ->
+                    (::) (Tile.singletonPath index e.direction)
+
+                Nothing ->
+                    identity
+        )
+        []
+        dict

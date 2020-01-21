@@ -4,7 +4,6 @@ module MirrorPuzzleV3.Main exposing (..)
 
 import Dict exposing (Dict)
 import Dict2d
-import Length2
 import List2d exposing (List2d)
 import MirrorPuzzleV3.Tile as Tile exposing (Tile(..))
 import Number2 exposing (Int2)

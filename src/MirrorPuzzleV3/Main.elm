@@ -7,6 +7,7 @@ import Dict2d
 import List2d exposing (List2d)
 import MirrorPuzzleV3.Tile as Tile exposing (Tile(..))
 import Number2 exposing (Int2)
+import PointFree exposing (flip)
 
 
 type TileGrid
@@ -46,14 +47,5 @@ maybeMapDict2d func (TileGrid dim dict2d) =
 
 computeLightPaths : TileGrid -> List Tile.Path
 computeLightPaths (TileGrid _ dict) =
-    Dict.foldl
-        (\index tile ->
-            case Tile.getElementInLightSource tile of
-                Just e ->
-                    (::) (Tile.singletonPath index e.direction)
-
-                Nothing ->
-                    identity
-        )
-        []
-        dict
+    Dict.keys dict
+        |> List.filterMap (Tile.computeLightPath (flip Dict.get dict))

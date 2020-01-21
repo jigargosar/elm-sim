@@ -1,4 +1,4 @@
-module MirrorPuzzleV3.Tile exposing (Path, Tile(..), getElementInLightSource, rotateElement, singletonPath, swapElements)
+module MirrorPuzzleV3.Tile exposing (Path, Tile(..), computeLightPath, getElementInLightSource, rotateElement, singletonPath, swapElements)
 
 -- Tile
 
@@ -107,6 +107,11 @@ type Path
 
 singletonPath : Int2 -> Direction -> Path
 singletonPath int2 direction =
+    Debug.todo "impl"
+
+
+computeLightPath : (Int2 -> Maybe Tile) -> Int2 -> Maybe Path
+computeLightPath =
     Debug.todo "impl"
 
 

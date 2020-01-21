@@ -30,3 +30,13 @@ fromList2dWithDefault a list2d =
             ( List2d.maxWidth list2d, List2d.height list2d )
     in
     ( length2, resizeWithDefault a length2 lookupDict )
+
+
+maybeMapCellAt : Int2 -> (a -> Maybe a) -> Dict Int2 a -> Maybe (Dict Int2 a)
+maybeMapCellAt index2d func dict =
+    let
+        replace a2 =
+            Dict.insert index2d a2 dict
+    in
+    Dict.get index2d dict
+        |> Maybe.andThen (func >> Maybe.map replace)

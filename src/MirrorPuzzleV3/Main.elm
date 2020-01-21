@@ -3,6 +3,7 @@ module MirrorPuzzleV3.Main exposing (..)
 -- TileGrid
 
 import Dict exposing (Dict)
+import Dict.Extra
 import Dict2d
 import List2d exposing (List2d)
 import MirrorPuzzleV3.Tile as Tile exposing (Tile(..))
@@ -28,9 +29,9 @@ fromList2d list2d =
     TileGrid length2 dict2d
 
 
-rotateElementAt : Int2 -> TileGrid -> TileGrid
+rotateElementAt : Int2 -> TileGrid -> Maybe TileGrid
 rotateElementAt index2d (TileGrid length2 dict2d) =
-    Dict.update index2d
-        (Maybe.andThen (Tile.mapElementInFilledContainer Tile.rotateElement))
+    Dict2d.maybeMapCellAt index2d
+        (Tile.mapElementInFilledContainer Tile.rotateElement)
         dict2d
-        |> TileGrid length2
+        |> Maybe.map (TileGrid length2)

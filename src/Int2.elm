@@ -1,6 +1,7 @@
-module Int2 exposing (fold, toDict)
+module Int2 exposing (fold, member, toDict)
 
 import Dict exposing (Dict)
+import Length
 import Number2 exposing (Int2)
 
 
@@ -18,3 +19,8 @@ fold func acc0 ( w, h ) =
 toDict : (Int2 -> b) -> Int2 -> Dict Int2 b
 toDict func =
     fold (\i2 -> Dict.insert i2 (func i2)) Dict.empty
+
+
+member : Int2 -> Int2 -> Bool
+member ( x, y ) ( w, h ) =
+    Length.member x w && Length.member y h

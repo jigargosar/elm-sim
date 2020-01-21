@@ -20,7 +20,7 @@ resizeWithDefault a len2 dict2d =
     Length2.toDict func len2
 
 
-fromList2dWithDefault : a -> List2d a -> Dict Int2 a
+fromList2dWithDefault : a -> List2d a -> ( Int2, Dict Int2 a )
 fromList2dWithDefault a list2d =
     let
         lookupDict =
@@ -29,4 +29,4 @@ fromList2dWithDefault a list2d =
         length2 =
             ( List2d.maxWidth list2d, List2d.height list2d )
     in
-    resizeWithDefault a length2 lookupDict
+    ( length2, resizeWithDefault a length2 lookupDict )

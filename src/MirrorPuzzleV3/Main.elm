@@ -21,10 +21,7 @@ filledWith tile length2 =
 fromList2d : List2d Tile -> TileGrid
 fromList2d list2d =
     let
-        length2 =
-            ( List2d.maxWidth list2d, List2d.height list2d )
-
-        dict2d =
+        ( length2, dict2d ) =
             Dict2d.fromList2dWithDefault Tile.Hole list2d
     in
     TileGrid length2 dict2d

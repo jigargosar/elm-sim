@@ -1,4 +1,4 @@
-module MirrorPuzzleV3.Main exposing (..)
+module MirrorPuzzleV3.Main exposing (filledWith, fromList2d)
 
 -- TileGrid
 
@@ -14,28 +14,33 @@ type TileGrid
 
 
 filledWith : Tile -> Int2 -> TileGrid
-filledWith tile length2 =
-    TileGrid length2 (Dict2d.filled tile length2)
+filledWith tile dim =
+    TileGrid dim (Dict2d.filled tile dim)
 
 
 fromList2d : List2d Tile -> TileGrid
 fromList2d list2d =
     let
-        ( length2, dict2d ) =
+        ( dim, dict2d ) =
             Dict2d.fromList2dWithDefault Tile.Hole list2d
     in
-    TileGrid length2 dict2d
+    TileGrid dim dict2d
 
 
 rotateElement : Int2 -> TileGrid -> Maybe TileGrid
-rotateElement index2d (TileGrid length2 dict2d) =
-    Dict2d.maybeMapAt index2d
-        Tile.rotateElementInTile
-        dict2d
-        |> Maybe.map (TileGrid length2)
+rotateElement index2d =
+    maybeMapDict2d
+        (Dict2d.maybeMapAt index2d
+            Tile.rotateElementInTile
+        )
 
 
 swapElements : Int2 -> Int2 -> TileGrid -> Maybe TileGrid
-swapElements idxA idxB (TileGrid length2 dict2d) =
-    Dict2d.maybeMapAt2 idxA idxB Tile.swapElementInTiles dict2d
-        |> Maybe.map (TileGrid length2)
+swapElements idxA idxB =
+    maybeMapDict2d (Dict2d.maybeMapAt2 idxA idxB Tile.swapElementInTiles)
+
+
+maybeMapDict2d : (Dict Int2 Tile -> Maybe (Dict Int2 Tile)) -> TileGrid -> Maybe TileGrid
+maybeMapDict2d func (TileGrid dim dict2d) =
+    func dict2d
+        |> Maybe.map (TileGrid dim)

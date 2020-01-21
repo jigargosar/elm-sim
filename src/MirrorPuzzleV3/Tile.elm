@@ -1,4 +1,4 @@
-module MirrorPuzzleV3.Tile exposing (Path, Tile(..), computeLightPath, getElementInLightSource, rotateElement, swapElements)
+module MirrorPuzzleV3.Tile exposing (Path, Tile(..), computeLightPathsOriginatingAt, getElementInLightSource, rotateElement, swapElements)
 
 -- Tile
 
@@ -97,7 +97,6 @@ oppositeDirection =
 
 type PathElement
     = PathElement Int2 Direction
-    | PathEnd Int2
 
 
 type Path
@@ -105,8 +104,8 @@ type Path
     | Fork (List Path)
 
 
-computeLightPath : (Int2 -> Maybe Tile) -> Int2 -> Maybe Path
-computeLightPath tileAt startPosition =
+computeLightPathsOriginatingAt : (Int2 -> Maybe Tile) -> Int2 -> List Path
+computeLightPathsOriginatingAt tileAt startPosition =
     let
         foo element =
             getRefractionDirectionsOfElement element
@@ -118,19 +117,16 @@ computeLightPath tileAt startPosition =
                         in
                         computeLightPathHelp tileAt pe (Path [ pe ])
                     )
-                |> Fork
     in
     tileAt startPosition
         |> Maybe.andThen getElementInLightSource
         |> Maybe.map foo
+        |> Maybe.withDefault []
 
 
 computeLightPathHelp : (Int2 -> Maybe Tile) -> PathElement -> Path -> Path
 computeLightPathHelp tileAt lastPE =
     case lastPE of
-        PathEnd _ ->
-            identity
-
         PathElement index direction ->
             let
                 nextIndex =

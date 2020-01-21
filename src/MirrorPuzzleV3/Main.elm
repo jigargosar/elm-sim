@@ -48,4 +48,4 @@ maybeMapDict2d func (TileGrid dim dict2d) =
 computeLightPaths : TileGrid -> List Tile.Path
 computeLightPaths (TileGrid _ dict) =
     Dict.keys dict
-        |> List.filterMap (Tile.computeLightPath (flip Dict.get dict))
+        |> List.concatMap (Tile.computeLightPathsOriginatingAt (flip Dict.get dict))

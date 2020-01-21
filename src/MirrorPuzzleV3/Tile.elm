@@ -114,6 +114,16 @@ pathCons e path =
             Fork (List.map (pathCons e) multiple)
 
 
+pathMember : PathElement -> Path -> Bool
+pathMember e path =
+    case path of
+        Path single ->
+            List.member e single
+
+        Fork multiple ->
+            List.any (pathMember e) multiple
+
+
 
 -- Element
 

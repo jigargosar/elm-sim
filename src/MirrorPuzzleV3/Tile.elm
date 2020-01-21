@@ -1,4 +1,4 @@
-module MirrorPuzzleV3.Tile exposing (Path, Tile(..), computeLightPath, getElementInLightSource, rotateElement, singletonPath, swapElements)
+module MirrorPuzzleV3.Tile exposing (Path, Tile(..), computeLightPath, getElementInLightSource, rotateElement, swapElements)
 
 -- Tile
 
@@ -105,13 +105,61 @@ type Path
     | Fork (List Path)
 
 
-singletonPath : Int2 -> Direction -> Path
-singletonPath int2 direction =
-    Debug.todo "impl"
-
-
 computeLightPath : (Int2 -> Maybe Tile) -> Int2 -> Maybe Path
-computeLightPath =
+computeLightPath tileAt startPosition =
+    let
+        foo element =
+            getRefractionDirectionsOfElement element
+                |> List.map
+                    (\dir ->
+                        let
+                            pe =
+                                PathElement startPosition dir
+                        in
+                        computeLightPathHelp tileAt pe (Path [ pe ])
+                    )
+                |> Fork
+    in
+    tileAt startPosition
+        |> Maybe.andThen getElementInLightSource
+        |> Maybe.map foo
+
+
+computeLightPathHelp : (Int2 -> Maybe Tile) -> PathElement -> Path -> Path
+computeLightPathHelp tileAt lastPE =
+    case lastPE of
+        PathEnd _ ->
+            identity
+
+        PathElement index direction ->
+            let
+                nextIndex =
+                    stepIndexInDirection direction index
+            in
+            case tileAt nextIndex of
+                Nothing ->
+                    identity
+
+                Just tile ->
+                    case tile of
+                        FilledContainer elementContainer element ->
+                            pathCons lastPE >> computeLightPathHelp tileAt lastPE
+
+                        EmptyContainer elementContainer ->
+                            pathCons lastPE >> computeLightPathHelp tileAt lastPE
+
+                        Goal ->
+                            pathCons lastPE >> computeLightPathHelp tileAt lastPE
+
+                        Wall ->
+                            pathCons lastPE >> computeLightPathHelp tileAt lastPE
+
+                        Hole ->
+                            pathCons lastPE >> computeLightPathHelp tileAt lastPE
+
+
+stepIndexInDirection : Direction -> Int2 -> Int2
+stepIndexInDirection =
     Debug.todo "impl"
 
 

@@ -97,6 +97,27 @@ nextSeedInDirection { position, visitedPositions } direction =
             |> Maybe.map nextSeedFromDirections
 
 
+getNextDirections : Direction8 -> Int2 -> Maybe (List Direction8)
+getNextDirections previousDirection position =
+    case Dict.get position grid of
+        Just el ->
+            case el of
+                Split newDirections ->
+                    Just newDirections
+
+                End ->
+                    Nothing
+
+                Start _ ->
+                    Just [ previousDirection ]
+
+                Continue ->
+                    Just [ previousDirection ]
+
+        Nothing ->
+            Nothing
+
+
 lightForest : List (Tree Int2)
 lightForest =
     let

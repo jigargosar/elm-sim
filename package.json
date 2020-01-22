@@ -28,6 +28,7 @@
   },
   "dependencies": {
     "elm-canvas": "^2.2.3",
-    "ramda": "^0.26.1"
+    "ramda": "^0.26.1",
+    "tachyons": "^4.11.1"
   }
 }

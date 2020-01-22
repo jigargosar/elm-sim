@@ -1,4 +1,5 @@
 const Module = require('./Main.elm')
+require('tachyons')
 require('./styles.css')
 
 // console.log(Module)

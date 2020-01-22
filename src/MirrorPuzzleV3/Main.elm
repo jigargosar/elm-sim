@@ -4,24 +4,27 @@ import Dict exposing (Dict)
 import Dict2d
 import Graph.Tree as Tree exposing (Tree)
 import Html
+import Html.Attributes
 import Number2 exposing (Int2)
 import Playground.Direction8 as D exposing (Direction8)
 
 
 main =
-    lightForest
-        |> List.map (Tree.levelOrder viewNode [] >> Html.div [])
-        |> Html.div []
+    viewForest 0 lightForest
 
 
-viewNode : Int2 -> List (Tree Int2) -> List (Html.Html msg) -> List (Html.Html msg)
-viewNode position forest acc =
-    let
-        forks : List Int2
-        forks =
-            List.filterMap Tree.root forest |> List.map Tuple.first
-    in
-    Html.div [] [ Html.text (Debug.toString position) ] :: acc
+viewForest : Int -> List (Tree a) -> Html.Html msg
+viewForest level forest =
+    Html.div []
+        (List.filterMap (Tree.root >> Maybe.map (viewTree level)) forest)
+
+
+viewTree : Int -> ( a, List (Tree b) ) -> Html.Html msg
+viewTree level ( label, forest ) =
+    Html.div [ Html.Attributes.class "ml3 pl3 bl b--red" ]
+        [ Html.div [ Html.Attributes.class "pv3  " ] [ Html.text (Debug.toString label) ]
+        , viewForest (level + 1) forest
+        ]
 
 
 type El

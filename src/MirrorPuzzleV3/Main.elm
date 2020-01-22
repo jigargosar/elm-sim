@@ -7,6 +7,7 @@ import Html
 import Html.Attributes
 import Number2 exposing (Int2)
 import Playground.Direction8 as D exposing (Direction8)
+import Set exposing (Set)
 
 
 main =
@@ -39,13 +40,14 @@ grid =
     Dict2d.fromListsWithDefault Continue
         [ [ Continue, Continue, Continue, Split [ D.left ] ]
         , [ Start [ D.right ], Continue, Continue, Split [ D.down, D.up ] ]
-        , [ Continue, Continue, Continue, Split [ D.left ] ]
+        , [ Split [ D.right ], Continue, Continue, Split [ D.left ] ]
         ]
         |> Tuple.second
 
 
 type alias Seed =
-    { position : Int2
+    { visitedPositions : Set Int2
+    , position : Int2
     , directions : List Direction8
     }
 
@@ -54,7 +56,7 @@ initSeeds : ( Int2, El ) -> List Seed
 initSeeds ( position, el ) =
     case el of
         Start dirs ->
-            [ Seed position dirs ]
+            [ Seed Set.empty position dirs ]
 
         _ ->
             []
@@ -77,17 +79,21 @@ nextSeeds seed =
                 Continue ->
                     Just [ previousDirection ]
 
-        nextSeedAt : Direction8 -> Maybe Seed
-        nextSeedAt direction =
+        nextSeedAt : Set Int2 -> Direction8 -> Maybe Seed
+        nextSeedAt visitedPositions direction =
             let
                 nextPosition =
                     D.stepPos direction seed.position
             in
             Dict.get nextPosition grid
                 |> Maybe.andThen (getNextLightDirections direction)
-                |> Maybe.map (Seed nextPosition)
+                |> Maybe.map (Seed visitedPositions nextPosition)
     in
-    seed.directions |> List.filterMap nextSeedAt
+    if Set.member seed.position seed.visitedPositions then
+        []
+
+    else
+        seed.directions |> List.filterMap (nextSeedAt (Set.insert seed.position seed.visitedPositions))
 
 
 lightForest : List (Tree Int2)
@@ -97,5 +103,4 @@ lightForest =
         next seed =
             ( seed.position, nextSeeds seed )
     in
-    Dict.toList grid
-        |> List.concatMap (initSeeds >> Tree.unfoldForest next)
+    Dict.toList grid |> List.concatMap (initSeeds >> Tree.unfoldForest next)

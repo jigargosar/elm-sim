@@ -17,7 +17,7 @@ import TypedSvg.Types exposing (Fill(..), Transform(..))
 
 
 main =
-    viewForest 0 lightForest
+    Html.div [] [ gridView, viewForest 0 lightForest ]
 
 
 viewForest : Int -> List (Tree a) -> Html.Html msg
@@ -35,7 +35,7 @@ viewTree level ( label, forest ) =
 
 
 cellSize =
-    100
+    30
 
 
 gridView =
@@ -43,7 +43,7 @@ gridView =
         ( w, h ) =
             gridDimensionsF |> NT.scale cellSize
     in
-    svg [ viewBox 0 0 w h ]
+    svg [ viewBox 0 0 w h, PX.width w, PX.height h ]
         [ g [] (Dict.toList grid |> List.map (Tuple.mapFirst NT.toFloat >> viewGridItem)) ]
 
 

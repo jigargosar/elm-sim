@@ -2,28 +2,14 @@ module MirrorPuzzleV3.Main exposing (main)
 
 import Dict exposing (Dict)
 import Dict2d
-import Graph.Tree as Tree exposing (Tree, unfoldTree)
+import Graph.Tree as Tree exposing (Tree)
 import Html
 import Number2 exposing (Int2)
 import Playground.Direction8 as D exposing (Direction8)
 
 
 main =
-    let
-        next : number -> ( number, List number )
-        next seed =
-            ( seed
-            , if seed == 1 then
-                [ 2, 3, 4 ]
-
-              else
-                []
-            )
-
-        tree2 =
-            unfoldTree next 1
-    in
-    tree2
+    lightForest
         |> Debug.toString
         |> Html.text
 
@@ -61,12 +47,42 @@ initSeeds ( position, el ) =
             []
 
 
+nextSeeds : Seed -> List Seed
+nextSeeds seed =
+    let
+        getNextLightDirections previousDirection el =
+            case el of
+                Split directions ->
+                    Just directions
+
+                End ->
+                    Nothing
+
+                Start _ ->
+                    Just [ previousDirection ]
+
+                Continue ->
+                    Just [ previousDirection ]
+
+        nextSeedAt : Direction8 -> Maybe Seed
+        nextSeedAt direction =
+            let
+                nextPosition =
+                    D.stepPos direction seed.position
+            in
+            Dict.get nextPosition grid
+                |> Maybe.andThen (getNextLightDirections direction)
+                |> Maybe.map (Seed nextPosition)
+    in
+    seed.directions |> List.filterMap nextSeedAt
+
+
 lightForest : List (Tree Int2)
 lightForest =
     let
         next : Seed -> ( Int2, List Seed )
         next seed =
-            ( seed.position, [] )
+            ( seed.position, nextSeeds seed )
     in
     Dict.toList grid
         |> List.concatMap (initSeeds >> Tree.unfoldForest next)

@@ -35,7 +35,7 @@ viewTree level ( label, forest ) =
 
 
 cellSize =
-    30
+    100
 
 
 gridView =

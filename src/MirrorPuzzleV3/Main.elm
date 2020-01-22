@@ -39,6 +39,7 @@ cellSize =
     100
 
 
+gridView : Html.Html msg
 gridView =
     let
         ( w, h ) =

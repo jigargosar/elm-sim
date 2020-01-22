@@ -62,8 +62,14 @@ gridView =
         ]
 
 
-viewLine : ( Float, Float ) -> ( ( Float, Float ), b ) -> Svg msg
-viewLine ( x1, y1 ) ( ( x2, y2 ), trees ) =
+viewLine p1 ( p2, trees ) =
+    let
+        ( x1, y1 ) =
+            p1 |> (NT.toFloat >> NT.scale cellSize)
+
+        ( x2, y2 ) =
+            p2 |> (NT.toFloat >> NT.scale cellSize)
+    in
     line
         [ PX.x1 x1
         , PX.y1 y1
@@ -73,13 +79,13 @@ viewLine ( x1, y1 ) ( ( x2, y2 ), trees ) =
         , transform [ Translate (cellSize / 2) (cellSize / 2) ]
         ]
         []
+        :: viewLightTree ( p2, trees )
 
 
 viewLightTree : ( Int2, List (Tree Int2) ) -> List (Svg msg)
 viewLightTree ( int2, trees ) =
     List.filterMap Tree.root trees
-        |> List.map (Tuple.mapFirst (NT.toFloat >> NT.scale cellSize))
-        |> List.map (viewLine (int2 |> NT.toFloat |> NT.scale cellSize))
+        |> List.concatMap (viewLine int2)
 
 
 viewLightForest : List (Tree Int2) -> List (Svg msg)

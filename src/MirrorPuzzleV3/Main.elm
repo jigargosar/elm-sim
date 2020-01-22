@@ -10,6 +10,8 @@ import Playground.Direction8 as D exposing (Direction8)
 
 main =
     lightForest
+        |> List.head
+        |> Maybe.map Tree.levelOrderList
         |> Debug.toString
         |> Html.text
 

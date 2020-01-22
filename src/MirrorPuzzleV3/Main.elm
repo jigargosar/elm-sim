@@ -11,9 +11,13 @@ import Playground.Direction8 as D exposing (Direction8)
 main =
     lightForest
         |> List.head
-        |> Maybe.map Tree.levelOrderList
+        |> Maybe.map (Tree.levelOrder viewNode [])
         |> Debug.toString
         |> Html.text
+
+
+viewNode position forest acc =
+    acc
 
 
 type El

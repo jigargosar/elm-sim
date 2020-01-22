@@ -1,8 +1,10 @@
 module MirrorPuzzleV3.Main exposing (main)
 
+import Dict exposing (Dict)
 import Dict2d
 import Graph.Tree exposing (unfoldTree)
 import Html
+import Number2 exposing (Int2)
 import Playground.Direction8 as D exposing (Direction8)
 
 
@@ -33,8 +35,10 @@ type El
     | End
 
 
+grid : ( Int2, Dict Int2 El )
 grid =
     Dict2d.fromListsWithDefault Continue
-        [ [ Start [ D.fromInt 0 ]
-          ]
+        [ [ Continue, Continue, Continue, Split [ D.left ] ]
+        , [ Start [ D.right ], Continue, Continue, Split [ D.down, D.up ] ]
+        , [ Continue, Continue, Continue, Split [ D.left ] ]
         ]

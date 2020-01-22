@@ -2,7 +2,7 @@ module MirrorPuzzleV3.Main exposing (main)
 
 import Dict exposing (Dict)
 import Dict2d
-import Graph.Tree exposing (unfoldTree)
+import Graph.Tree as Tree exposing (Tree, unfoldTree)
 import Html
 import Number2 exposing (Int2)
 import Playground.Direction8 as D exposing (Direction8)
@@ -35,10 +35,38 @@ type El
     | End
 
 
-grid : ( Int2, Dict Int2 El )
+grid : Dict Int2 El
 grid =
     Dict2d.fromListsWithDefault Continue
         [ [ Continue, Continue, Continue, Split [ D.left ] ]
         , [ Start [ D.right ], Continue, Continue, Split [ D.down, D.up ] ]
         , [ Continue, Continue, Continue, Split [ D.left ] ]
         ]
+        |> Tuple.second
+
+
+type alias Seed =
+    { position : Int2
+    , directions : List Direction8
+    }
+
+
+initSeeds : ( Int2, El ) -> List Seed
+initSeeds ( position, el ) =
+    case el of
+        Start dirs ->
+            [ Seed position dirs ]
+
+        _ ->
+            []
+
+
+lightForest : List (Tree Int2)
+lightForest =
+    let
+        next : Seed -> ( Int2, List Seed )
+        next seed =
+            ( seed.position, [] )
+    in
+    Dict.toList grid
+        |> List.concatMap (initSeeds >> Tree.unfoldForest next)

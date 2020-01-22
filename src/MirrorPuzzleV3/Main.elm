@@ -54,14 +54,15 @@ type alias Seed =
     }
 
 
-initSeeds : ( Int2, El ) -> List Seed
-initSeeds ( position, el ) =
-    case el of
-        Start dirs ->
-            [ Seed Set.empty position dirs nextDirections ]
-
-        _ ->
-            []
+initSeed :
+    { a
+        | position : Int2
+        , directions : List Direction8
+        , getNextDirections : Direction8 -> Int2 -> Maybe (List Direction8)
+    }
+    -> Seed
+initSeed config =
+    Seed Set.empty config.position config.directions config.getNextDirections
 
 
 nextSeedInDirection : Direction8 -> Seed -> Maybe Seed
@@ -86,9 +87,9 @@ nextSeedInDirection direction seed =
             |> Maybe.map nextSeedFromDirections
 
 
-nextDirections : Direction8 -> Int2 -> Maybe (List Direction8)
-nextDirections previousDirection position =
-    case Dict.get position grid of
+nextDirections : (Int2 -> Maybe El) -> Direction8 -> Int2 -> Maybe (List Direction8)
+nextDirections elAt previousDirection position =
+    case elAt position of
         Just el ->
             case el of
                 Split directions ->
@@ -110,10 +111,35 @@ nextDirections previousDirection position =
 lightForest : List (Tree Int2)
 lightForest =
     let
+        positionTreeConfig ( position, el ) =
+            case el of
+                Start dirs ->
+                    { position = position
+                    , directions = dirs
+                    , getNextDirections =
+                        nextDirections (flip Dict.get grid)
+                    }
+                        |> Just
+
+                _ ->
+                    Nothing
+    in
+    Dict.toList grid |> List.filterMap (positionTreeConfig >> Maybe.map unfoldPositionTree)
+
+
+unfoldPositionTree :
+    { a
+        | position : Int2
+        , directions : List Direction8
+        , getNextDirections : Direction8 -> Int2 -> Maybe (List Direction8)
+    }
+    -> Tree Int2
+unfoldPositionTree config =
+    let
         next : Seed -> ( Int2, List Seed )
         next seed =
             ( seed.position
             , List.filterMap (flip nextSeedInDirection seed) seed.directions
             )
     in
-    Dict.toList grid |> List.concatMap (initSeeds >> Tree.unfoldForest next)
+    Tree.unfoldTree next (initSeed config)

@@ -124,17 +124,17 @@ lightForest =
                 _ ->
                     Nothing
     in
-    Dict.toList grid |> List.filterMap (positionTreeConfig >> Maybe.map unfoldPositionTree)
+    Dict.toList grid |> List.filterMap (positionTreeConfig >> Maybe.map unfoldLightPathTree)
 
 
-unfoldPositionTree :
+unfoldLightPathTree :
     { a
         | position : Int2
         , directions : List Direction8
         , getNextDirections : Direction8 -> Int2 -> Maybe (List Direction8)
     }
     -> Tree Int2
-unfoldPositionTree config =
+unfoldLightPathTree config =
     let
         next : Seed -> ( Int2, List Seed )
         next seed =

@@ -4,14 +4,15 @@ import Color
 import Dict exposing (Dict)
 import Dict2d
 import Graph.Tree as Tree exposing (Tree)
-import Html
+import Html exposing (Html)
 import Html.Attributes
 import MirrorPuzzleV3.PositionTree as PositionTree
 import Number2 as NT exposing (Int2)
 import Playground.Direction8 as D exposing (Direction8)
 import PointFree exposing (flip, mapEach)
+import Svg exposing (Svg)
 import Svg.Attributes
-import TypedSvg exposing (g, rect, svg)
+import TypedSvg exposing (g, line, rect, svg)
 import TypedSvg.Attributes exposing (fill, stroke, transform, viewBox)
 import TypedSvg.Attributes.InPx as PX
 import TypedSvg.Types exposing (Fill(..), Transform(..))
@@ -53,8 +54,37 @@ gridView =
                 """
             , Svg.Attributes.transform "scale(0.9)"
             ]
-            (Dict.toList grid |> List.map (Tuple.mapFirst NT.toFloat >> viewGridItem))
+            ((Dict.toList grid
+                |> List.map (Tuple.mapFirst NT.toFloat >> viewGridItem)
+             )
+                ++ viewLightForest lightForest
+            )
         ]
+
+
+viewLine : ( Float, Float ) -> ( ( Float, Float ), b ) -> Svg msg
+viewLine ( x1, y1 ) ( ( x2, y2 ), trees ) =
+    line
+        [ PX.x1 x1
+        , PX.y1 y1
+        , PX.x2 x2
+        , PX.y2 y2
+        , stroke Color.black
+        , transform [ Translate (cellSize / 2) (-cellSize / 2) ]
+        ]
+        []
+
+
+viewLightTree : ( Int2, List (Tree Int2) ) -> List (Svg msg)
+viewLightTree ( int2, trees ) =
+    List.filterMap Tree.root trees
+        |> List.map (Tuple.mapFirst (NT.toFloat >> NT.scale cellSize))
+        |> List.map (viewLine (int2 |> NT.toFloat |> NT.scale cellSize))
+
+
+viewLightForest : List (Tree Int2) -> List (Svg msg)
+viewLightForest =
+    List.filterMap Tree.root >> List.concatMap viewLightTree
 
 
 viewGridItem ( position, el ) =

@@ -70,7 +70,7 @@ viewLine ( x1, y1 ) ( ( x2, y2 ), trees ) =
         , PX.x2 x2
         , PX.y2 y2
         , stroke Color.black
-        , transform [ Translate (cellSize / 2) (-cellSize / 2) ]
+        , transform [ Translate (cellSize / 2) (cellSize / 2) ]
         ]
         []
 

@@ -62,38 +62,39 @@ initSeeds ( position, el ) =
             []
 
 
-nextSeeds : Seed -> List Seed
-nextSeeds seed =
+elToLightDirections : Direction8 -> El -> Maybe (List Direction8)
+elToLightDirections previousDirection el =
+    case el of
+        Split newDirections ->
+            Just newDirections
+
+        End ->
+            Nothing
+
+        Start _ ->
+            Just [ previousDirection ]
+
+        Continue ->
+            Just [ previousDirection ]
+
+
+nextSeedInDirection : { a | position : Int2, visitedPositions : Set Int2 } -> Direction8 -> Maybe Seed
+nextSeedInDirection { position, visitedPositions } direction =
     let
-        getNextLightDirections previousDirection el =
-            case el of
-                Split directions ->
-                    Just directions
+        nextPosition =
+            D.stepPos direction position
 
-                End ->
-                    Nothing
-
-                Start _ ->
-                    Just [ previousDirection ]
-
-                Continue ->
-                    Just [ previousDirection ]
-
-        nextSeedAt : Set Int2 -> Direction8 -> Maybe Seed
-        nextSeedAt visitedPositions direction =
-            let
-                nextPosition =
-                    D.stepPos direction seed.position
-            in
-            Dict.get nextPosition grid
-                |> Maybe.andThen (getNextLightDirections direction)
-                |> Maybe.map (Seed visitedPositions nextPosition)
+        nextSeedFromDirections : List Direction8 -> Seed
+        nextSeedFromDirections =
+            Seed (Set.insert nextPosition visitedPositions) nextPosition
     in
-    if Set.member seed.position seed.visitedPositions then
-        []
+    if Set.member nextPosition visitedPositions then
+        Nothing
 
     else
-        seed.directions |> List.filterMap (nextSeedAt (Set.insert seed.position seed.visitedPositions))
+        Dict.get nextPosition grid
+            |> Maybe.andThen (elToLightDirections direction)
+            |> Maybe.map nextSeedFromDirections
 
 
 lightForest : List (Tree Int2)
@@ -101,6 +102,8 @@ lightForest =
     let
         next : Seed -> ( Int2, List Seed )
         next seed =
-            ( seed.position, nextSeeds seed )
+            ( seed.position
+            , List.filterMap (nextSeedInDirection seed) seed.directions
+            )
     in
     Dict.toList grid |> List.concatMap (initSeeds >> Tree.unfoldForest next)

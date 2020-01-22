@@ -44,7 +44,11 @@ gridView =
             gridDimensionsF |> NT.scale cellSize
     in
     svg [ viewBox 0 0 w h, PX.width w, PX.height h ]
-        [ g [] (Dict.toList grid |> List.map (Tuple.mapFirst NT.toFloat >> viewGridItem)) ]
+        [ g
+            [ transform [ Translate (w / 2) (h / 2), Scale 0.9 0.9, Translate (-w / 2) (-h / 2) ]
+            ]
+            (Dict.toList grid |> List.map (Tuple.mapFirst NT.toFloat >> viewGridItem))
+        ]
 
 
 viewGridItem ( position, el ) =

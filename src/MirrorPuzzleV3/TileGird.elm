@@ -1,4 +1,4 @@
-module MirrorPuzzleV3.Main exposing (filledWith, fromList2d, rotateElement, swapElements)
+module MirrorPuzzleV3.TileGird exposing (filledWith, fromList2d, rotateElement, swapElements)
 
 -- TileGrid
 

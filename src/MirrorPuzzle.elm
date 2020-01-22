@@ -1,6 +1,6 @@
 module MirrorPuzzle exposing (main)
 
-import MirrorPuzzleV2.Main as Main
+import MirrorPuzzleV3.Main as Main
 
 
 

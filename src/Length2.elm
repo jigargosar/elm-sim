@@ -1,7 +1,7 @@
 module Length2 exposing (fold, member, toDict, toDictWithDefault)
 
 import Dict exposing (Dict)
-import Length
+import Length1
 import Number2 exposing (Int2)
 
 
@@ -28,4 +28,4 @@ toDictWithDefault b func =
 
 member : Int2 -> Int2 -> Bool
 member ( x, y ) ( w, h ) =
-    Length.member x w && Length.member y h
+    Length1.member x w && Length1.member y h

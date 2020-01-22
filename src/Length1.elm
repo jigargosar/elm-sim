@@ -1,4 +1,4 @@
-module Length exposing (member)
+module Length1 exposing (member)
 
 
 member : Int -> Int -> Bool

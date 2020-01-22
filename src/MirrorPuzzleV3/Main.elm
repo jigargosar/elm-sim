@@ -10,6 +10,7 @@ import MirrorPuzzleV3.PositionTree as PositionTree
 import Number2 as NT exposing (Int2)
 import Playground.Direction8 as D exposing (Direction8)
 import PointFree exposing (flip, mapEach)
+import Svg.Attributes
 import TypedSvg exposing (g, rect, svg)
 import TypedSvg.Attributes exposing (fill, stroke, transform, viewBox)
 import TypedSvg.Attributes.InPx as PX
@@ -45,7 +46,11 @@ gridView =
     in
     svg [ viewBox 0 0 w h, PX.width w, PX.height h ]
         [ g
-            [ transform [ Translate (w / 2) (h / 2), Scale 0.9 0.9, Translate (-w / 2) (-h / 2) ]
+            [ Svg.Attributes.style
+                """
+                    transform-origin: center;
+                """
+            , Svg.Attributes.transform "scale(0.9)"
             ]
             (Dict.toList grid |> List.map (Tuple.mapFirst NT.toFloat >> viewGridItem))
         ]

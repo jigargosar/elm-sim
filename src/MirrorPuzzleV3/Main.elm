@@ -7,6 +7,7 @@ import Html
 import Html.Attributes
 import Number2 exposing (Int2)
 import Playground.Direction8 as D exposing (Direction8)
+import PointFree exposing (flip)
 import Set exposing (Set)
 
 
@@ -49,6 +50,7 @@ type alias Seed =
     { visitedPositions : Set Int2
     , position : Int2
     , directions : List Direction8
+    , nextDirections : Direction8 -> Int2 -> Maybe (List Direction8)
     }
 
 
@@ -56,23 +58,27 @@ initSeeds : ( Int2, El ) -> List Seed
 initSeeds ( position, el ) =
     case el of
         Start dirs ->
-            [ Seed Set.empty position dirs ]
+            [ Seed Set.empty position dirs lightDirectionsAtWithPreviousDirection ]
 
         _ ->
             []
 
 
-nextSeedInDirection : { a | position : Int2, visitedPositions : Set Int2 } -> Direction8 -> Maybe Seed
-nextSeedInDirection { position, visitedPositions } direction =
+nextSeedInDirection : Direction8 -> Seed -> Maybe Seed
+nextSeedInDirection direction seed =
     let
         nextPosition =
-            D.stepPos direction position
+            D.stepPos direction seed.position
 
         nextSeedFromDirections : List Direction8 -> Seed
-        nextSeedFromDirections =
-            Seed (Set.insert nextPosition visitedPositions) nextPosition
+        nextSeedFromDirections directions =
+            { seed
+                | visitedPositions = Set.insert nextPosition seed.visitedPositions
+                , position = nextPosition
+                , directions = directions
+            }
     in
-    if Set.member nextPosition visitedPositions then
+    if Set.member nextPosition seed.visitedPositions then
         Nothing
 
     else
@@ -107,7 +113,7 @@ lightForest =
         next : Seed -> ( Int2, List Seed )
         next seed =
             ( seed.position
-            , List.filterMap (nextSeedInDirection seed) seed.directions
+            , List.filterMap (flip nextSeedInDirection seed) seed.directions
             )
     in
     Dict.toList grid |> List.concatMap (initSeeds >> Tree.unfoldForest next)

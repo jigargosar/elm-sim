@@ -14,8 +14,13 @@ main =
         |> Html.div []
 
 
-viewNode : Int2 -> b -> List (Html.Html msg) -> List (Html.Html msg)
+viewNode : Int2 -> List (Tree Int2) -> List (Html.Html msg) -> List (Html.Html msg)
 viewNode position forest acc =
+    let
+        forks : List Int2
+        forks =
+            List.filterMap Tree.root forest |> List.map Tuple.first
+    in
     Html.div [] [ Html.text (Debug.toString position) ] :: acc
 
 

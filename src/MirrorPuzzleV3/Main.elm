@@ -1,14 +1,19 @@
 module MirrorPuzzleV3.Main exposing (main)
 
+import Color
 import Dict exposing (Dict)
 import Dict2d
 import Graph.Tree as Tree exposing (Tree)
 import Html
 import Html.Attributes
 import MirrorPuzzleV3.PositionTree as PositionTree
-import Number2 exposing (Int2)
+import Number2 as NT exposing (Int2)
 import Playground.Direction8 as D exposing (Direction8)
-import PointFree exposing (flip)
+import PointFree exposing (flip, mapEach)
+import TypedSvg exposing (g, rect, svg)
+import TypedSvg.Attributes exposing (fill, stroke, transform, viewBox)
+import TypedSvg.Attributes.InPx as PX
+import TypedSvg.Types exposing (Fill(..), Transform(..))
 
 
 main =
@@ -29,6 +34,34 @@ viewTree level ( label, forest ) =
         ]
 
 
+cellSize =
+    100
+
+
+gridView =
+    let
+        ( w, h ) =
+            gridDimensionsF |> NT.scale cellSize
+    in
+    svg [ viewBox 0 0 w h ]
+        [ g [] (Dict.toList grid |> List.map (Tuple.mapFirst NT.toFloat >> viewGridItem)) ]
+
+
+viewGridItem ( position, el ) =
+    let
+        ( x, y ) =
+            position |> NT.scale cellSize
+    in
+    rect
+        [ transform [ Translate x y ]
+        , PX.width cellSize
+        , PX.height cellSize
+        , stroke Color.black
+        , fill FillNone
+        ]
+        []
+
+
 type El
     = Start (List Direction8)
     | Continue
@@ -38,12 +71,23 @@ type El
 
 grid : Dict Int2 El
 grid =
+    gr |> Tuple.second
+
+
+gr =
     Dict2d.fromListsWithDefault Continue
         [ [ Continue, Continue, Continue, Split [ D.left ] ]
         , [ Start [ D.right ], Continue, Continue, Split [ D.down, D.up ] ]
         , [ Split [ D.right ], Continue, Continue, Split [ D.left ] ]
         ]
-        |> Tuple.second
+
+
+gridDimensions =
+    gr |> Tuple.first
+
+
+gridDimensionsF =
+    gridDimensions |> mapEach toFloat
 
 
 nextDirections : (Int2 -> Maybe El) -> Direction8 -> Int2 -> Maybe (List Direction8)

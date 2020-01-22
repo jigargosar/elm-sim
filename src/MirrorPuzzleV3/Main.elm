@@ -62,22 +62,6 @@ initSeeds ( position, el ) =
             []
 
 
-elToLightDirections : Direction8 -> El -> Maybe (List Direction8)
-elToLightDirections previousDirection el =
-    case el of
-        Split newDirections ->
-            Just newDirections
-
-        End ->
-            Nothing
-
-        Start _ ->
-            Just [ previousDirection ]
-
-        Continue ->
-            Just [ previousDirection ]
-
-
 nextSeedInDirection : { a | position : Int2, visitedPositions : Set Int2 } -> Direction8 -> Maybe Seed
 nextSeedInDirection { position, visitedPositions } direction =
     let
@@ -92,13 +76,12 @@ nextSeedInDirection { position, visitedPositions } direction =
         Nothing
 
     else
-        Dict.get nextPosition grid
-            |> Maybe.andThen (elToLightDirections direction)
+        lightDirectionsAtWithPreviousDirection direction nextPosition
             |> Maybe.map nextSeedFromDirections
 
 
-getNextDirections : Direction8 -> Int2 -> Maybe (List Direction8)
-getNextDirections previousDirection position =
+lightDirectionsAtWithPreviousDirection : Direction8 -> Int2 -> Maybe (List Direction8)
+lightDirectionsAtWithPreviousDirection previousDirection position =
     case Dict.get position grid of
         Just el ->
             case el of

@@ -5,10 +5,10 @@ import Dict2d
 import Graph.Tree as Tree exposing (Tree)
 import Html
 import Html.Attributes
+import MirrorPuzzleV3.PositionTree as PositionTree
 import Number2 exposing (Int2)
 import Playground.Direction8 as D exposing (Direction8)
 import PointFree exposing (flip)
-import Set exposing (Set)
 
 
 main =
@@ -46,47 +46,6 @@ grid =
         |> Tuple.second
 
 
-type alias Seed =
-    { visitedPositions : Set Int2
-    , position : Int2
-    , directions : List Direction8
-    , nextDirections : Direction8 -> Int2 -> Maybe (List Direction8)
-    }
-
-
-initSeed :
-    { a
-        | position : Int2
-        , directions : List Direction8
-        , getNextDirections : Direction8 -> Int2 -> Maybe (List Direction8)
-    }
-    -> Seed
-initSeed config =
-    Seed Set.empty config.position config.directions config.getNextDirections
-
-
-nextSeedInDirection : Direction8 -> Seed -> Maybe Seed
-nextSeedInDirection direction seed =
-    let
-        nextPosition =
-            D.stepPos direction seed.position
-
-        nextSeedFromDirections : List Direction8 -> Seed
-        nextSeedFromDirections directions =
-            { seed
-                | visitedPositions = Set.insert nextPosition seed.visitedPositions
-                , position = nextPosition
-                , directions = directions
-            }
-    in
-    if Set.member nextPosition seed.visitedPositions then
-        Nothing
-
-    else
-        seed.nextDirections direction nextPosition
-            |> Maybe.map nextSeedFromDirections
-
-
 nextDirections : (Int2 -> Maybe El) -> Direction8 -> Int2 -> Maybe (List Direction8)
 nextDirections elAt previousDirection position =
     case elAt position of
@@ -111,35 +70,18 @@ nextDirections elAt previousDirection position =
 lightForest : List (Tree Int2)
 lightForest =
     let
-        positionTreeConfig ( position, el ) =
+        toLightTree ( position, el ) =
             case el of
                 Start dirs ->
-                    { position = position
-                    , directions = dirs
-                    , getNextDirections =
-                        nextDirections (flip Dict.get grid)
-                    }
+                    PositionTree.unfold
+                        { position = position
+                        , directions = dirs
+                        , getNextDirections =
+                            nextDirections (flip Dict.get grid)
+                        }
                         |> Just
 
                 _ ->
                     Nothing
     in
-    Dict.toList grid |> List.filterMap (positionTreeConfig >> Maybe.map unfoldPositionTree)
-
-
-unfoldPositionTree :
-    { a
-        | position : Int2
-        , directions : List Direction8
-        , getNextDirections : Direction8 -> Int2 -> Maybe (List Direction8)
-    }
-    -> Tree Int2
-unfoldPositionTree config =
-    let
-        next : Seed -> ( Int2, List Seed )
-        next seed =
-            ( seed.position
-            , List.filterMap (flip nextSeedInDirection seed) seed.directions
-            )
-    in
-    Tree.unfoldTree next (initSeed config)
+    Dict.toList grid |> List.filterMap toLightTree

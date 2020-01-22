@@ -58,7 +58,7 @@ initSeeds : ( Int2, El ) -> List Seed
 initSeeds ( position, el ) =
     case el of
         Start dirs ->
-            [ Seed Set.empty position dirs lightDirectionsAtWithPreviousDirection ]
+            [ Seed Set.empty position dirs nextDirections ]
 
         _ ->
             []
@@ -82,17 +82,17 @@ nextSeedInDirection direction seed =
         Nothing
 
     else
-        lightDirectionsAtWithPreviousDirection direction nextPosition
+        seed.nextDirections direction nextPosition
             |> Maybe.map nextSeedFromDirections
 
 
-lightDirectionsAtWithPreviousDirection : Direction8 -> Int2 -> Maybe (List Direction8)
-lightDirectionsAtWithPreviousDirection previousDirection position =
+nextDirections : Direction8 -> Int2 -> Maybe (List Direction8)
+nextDirections previousDirection position =
     case Dict.get position grid of
         Just el ->
             case el of
-                Split newDirections ->
-                    Just newDirections
+                Split directions ->
+                    Just directions
 
                 End ->
                     Nothing

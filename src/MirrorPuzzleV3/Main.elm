@@ -12,7 +12,7 @@ import Number2 as NT exposing (Int2)
 import Playground.Direction8 as D exposing (Direction8)
 import PointFree exposing (flip, mapEach)
 import Set exposing (Set)
-import Svg exposing (Svg)
+import Svg exposing (Svg, g)
 import Svg.Attributes
 import TypedSvg exposing (circle, line, rect, svg)
 import TypedSvg.Attributes exposing (fill, stroke, transform, viewBox)
@@ -53,17 +53,33 @@ cellSize =
 
 gridView : Html.Html msg
 gridView =
-    Html.div [ class "pa2 inline-flex" ]
+    Html.div [ class "pa2 inline-flex flex-wrap" ]
         [ Html.div [ class "inline-flex flex-column" ]
-            [ Html.div [ class "tc pa2" ] [ Html.text "old" ]
+            [ Html.div [ class "tc pa2" ] [ Html.text "tree : view  recursion" ]
             , gridCanvasWith (viewLightForest lightForest)
             ]
         , Html.div [ class "inline-flex flex-column" ]
-            [ Html.div [ class "tc pa2" ] [ Html.text "new" ]
+            [ Html.div [ class "tc pa2" ] [ Html.text "tree to graph" ]
             , gridCanvasWith
                 (viewLightForestEdgesEndpoints (lightForestEdgesEndpoints lightForest))
             ]
+        , Html.div [ class "inline-flex flex-column" ]
+            [ Html.div [ class "tc pa2" ] [ Html.text "grid to graph" ]
+            , gridCanvasWith
+                (viewLightPathGraphs (lightPathGraphs grid))
+            ]
         ]
+
+
+viewLightPathGraphs : List (Graph Int2) -> List (Svg msg)
+viewLightPathGraphs =
+    List.concatMap viewLightPathGraph
+
+
+viewLightPathGraph : Graph Int2 -> List (Svg msg)
+viewLightPathGraph ( edges, eps ) =
+    List.map (uncurry viewLine) (Set.toList edges)
+        ++ List.map viewEndPoint (Set.toList eps)
 
 
 gridCanvasWith : List (Svg msg) -> Html msg
@@ -345,9 +361,6 @@ unfoldGraph nextPathNodeContextsFunc =
             case nodeContexts0 of
                 [] ->
                     acc0
-
-                ( endPoint, _ ) :: [] ->
-                    Tuple.mapSecond (Set.insert endPoint) acc0
 
                 nodeContext0 :: nodeContexts1 ->
                     let

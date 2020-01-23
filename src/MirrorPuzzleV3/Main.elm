@@ -252,5 +252,4 @@ lightForestEdgesEndpoints =
                     accumTreeEdges ( ( newDict, newEndPoints ), childForest ++ rest )
     in
     unpackForest
-        >> Tuple.pair ( Dict.empty, Set.empty )
-        >> accumTreeEdges
+        >> (\forest -> accumTreeEdges ( ( Dict.empty, Set.empty ), forest ))

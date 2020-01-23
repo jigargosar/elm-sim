@@ -204,3 +204,8 @@ apply2 func ( a, b ) =
 callWith : a -> (a -> b) -> b
 callWith a func =
     func a
+
+
+indexMemberOf : Int -> Int -> Bool
+indexMemberOf length index =
+    index >= 0 && index <= length

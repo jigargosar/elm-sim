@@ -86,8 +86,8 @@ equalWithin tol a b =
     dx < tol && dy < tol
 
 
-foldIndices2d : (Int2 -> b -> b) -> b -> Int2 -> b
-foldIndices2d func acc0 ( w, h ) =
+fold : (Int2 -> b -> b) -> b -> Int2 -> b
+fold func acc0 ( w, h ) =
     List.range 0 (h - 1)
         |> List.foldl
             (\y acc1 ->
@@ -95,3 +95,8 @@ foldIndices2d func acc0 ( w, h ) =
                     |> List.foldl (\x -> func ( x, y )) acc1
             )
             acc0
+
+
+indexMemberOf : Int2 -> Int2 -> Bool
+indexMemberOf ( w, h ) ( x, y ) =
+    PointFree.indexMemberOf w x && PointFree.indexMemberOf h y

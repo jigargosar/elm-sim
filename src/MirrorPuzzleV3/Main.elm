@@ -158,9 +158,20 @@ grid =
     gr |> Tuple.second
 
 
+
+{-
+   gr =
+       Dict2d.fromListsWithDefault Continue
+           [ [ Continue, Continue, Continue, Split [ D.left ] ]
+           , [ Start [ D.right ], Continue, Continue, Split [ D.down, D.up ] ]
+           , [ Split [ D.right ], Continue, Continue, Split [ D.left ] ]
+           ]
+-}
+
+
 gr =
     Dict2d.fromListsWithDefault Continue
-        [ [ Continue, Continue, Continue, Split [ D.left ] ]
+        [ [ Continue, Split [ D.right ], Continue, Split [ D.left ] ]
         , [ Start [ D.right ], Continue, Continue, Split [ D.down, D.up ] ]
         , [ Split [ D.right ], Continue, Continue, Split [ D.left ] ]
         ]
@@ -263,14 +274,33 @@ lightForestEdgesEndpoints =
         >> (\forest -> accumTreeEdges ( ( Dict.empty, Set.empty ), forest ))
 
 
-unfoldLightPaths :
-    { startPosition : Int2
-    , startDirections : List Direction8
-    , nextDirections : { previousDirection : Direction8, position : Int2 } -> Maybe (List Direction8)
-    }
-    ->
-        { parentLookup : Dict Int2 Int2
-        , leafNodes : Set Int2
-        }
-unfoldLightPaths =
+type alias PathNode =
+    ( Int2, Direction8 )
+
+
+nextPositionsFromPathNode : PathNode -> List Int2
+nextPositionsFromPathNode =
     Debug.todo "impl"
+
+
+type alias NextPathNodes =
+    PathNode -> List PathNode
+
+
+type alias PathAcc =
+    ( Set ( Int2, Int2 ), Set Int2 )
+
+
+pathGen : NextPathNodes -> PathNode -> PathAcc
+pathGen nextPathNodesFunc =
+    let
+        gen : PathAcc -> List PathNode -> PathAcc
+        gen acc pathNodes =
+            case pathNodes of
+                [] ->
+                    acc
+
+                first :: rest ->
+                    acc
+    in
+    List.singleton >> gen ( Set.empty, Set.empty )

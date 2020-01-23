@@ -8,6 +8,8 @@ module Playground.Direction8 exposing
     , rotate
     , stepPos
     , stepPosCCW
+    , stepPosCCWIn
+    , stepPosIn
     , toDegrees
     , toVec
     , toVecCCW
@@ -15,6 +17,7 @@ module Playground.Direction8 exposing
     )
 
 import Number2 as NT
+import PointFree exposing (flip)
 
 
 type alias Pos =
@@ -65,9 +68,14 @@ opposite =
     rotate 4
 
 
-stepPosCCW : Direction8 -> Pos -> Pos
-stepPosCCW direction8 pos =
+stepPosCCWIn : Direction8 -> Pos -> Pos
+stepPosCCWIn direction8 pos =
     NT.add pos (toVecCCW direction8)
+
+
+stepPosCCW : Pos -> Direction8 -> Pos
+stepPosCCW =
+    flip stepPosCCWIn
 
 
 toVecCCW : Direction8 -> ( number, number )
@@ -106,6 +114,11 @@ toVec (Dir ct) =
             ( 1, 0 )
 
 
-stepPos : Direction8 -> Pos -> Pos
-stepPos dir pos =
+stepPosIn : Direction8 -> Pos -> Pos
+stepPosIn dir pos =
     NT.add pos (toVecCCW dir)
+
+
+stepPos : Pos -> Direction8 -> Pos
+stepPos =
+    flip stepPosIn

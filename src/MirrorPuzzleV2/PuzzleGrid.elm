@@ -284,7 +284,7 @@ lightPathStartingAt pos0 dir0 grid =
         accumLightPath dir pos acc =
             let
                 nextPos =
-                    Dir.stepPos dir pos
+                    Dir.stepPosIn dir pos
 
                 accumInDir : Direction8 -> LightPath
                 accumInDir newDir =

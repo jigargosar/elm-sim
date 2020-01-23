@@ -309,11 +309,15 @@ type alias Graph comparable =
 foo : Grid -> NextPathNodes Int2 (List Direction8)
 foo grid0 ( prevPosition, previousDirections ) =
     let
+        nextPosIn : Direction8 -> Int2
+        nextPosIn =
+            D.stepPosCCW prevPosition
+
         nextPathNodeInDirection : Direction8 -> Maybe (PathNode Int2 (List Direction8))
         nextPathNodeInDirection direction =
             let
                 position =
-                    D.stepPosCCW direction prevPosition
+                    nextPosIn direction
             in
             (case Dict.get position grid0 of
                 Just el ->

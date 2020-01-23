@@ -48,7 +48,7 @@ nextSeedInDirection : Direction8 -> Seed -> Maybe Seed
 nextSeedInDirection direction seed =
     let
         nextPosition =
-            D.stepPos direction seed.position
+            D.stepPosIn direction seed.position
 
         nextSeedFromDirections : List Direction8 -> Seed
         nextSeedFromDirections directions =

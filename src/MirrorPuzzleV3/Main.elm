@@ -53,13 +53,13 @@ cellSize =
 
 gridView : Html.Html msg
 gridView =
-    Html.div [ class "inline-flex" ]
+    Html.div [ class "pa2 inline-flex" ]
         [ Html.div [ class "inline-flex flex-column" ]
-            [ Html.div [ class "tc pv1" ] [ Html.text "old" ]
+            [ Html.div [ class "tc pa2" ] [ Html.text "old" ]
             , gridCanvasWith (viewLightForest lightForest)
             ]
         , Html.div [ class "inline-flex flex-column" ]
-            [ Html.div [ class "tc pv1" ] [ Html.text "new" ]
+            [ Html.div [ class "tc pa2" ] [ Html.text "new" ]
             , gridCanvasWith
                 (viewLightForestEdgesEndpoints (lightForestEdgesEndpoints lightForest))
             ]
@@ -72,35 +72,26 @@ gridCanvasWith children =
         viewGridCells =
             Dict.toList grid |> List.map viewGridItem
     in
-    Html.div [ class "flex" ] [ canvas (viewGridCells ++ children) ]
+    Html.div [ class "pa2 flex" ] [ canvas (viewGridCells ++ children) ]
 
 
 canvas : List (Svg msg) -> Html msg
-canvas children =
+canvas =
     let
         ( w, h ) =
             gridDimensionsF |> NT.scale cellSize
     in
     svg [ viewBox 0 0 w h, PX.width w, PX.height h ]
-        [ g
-            [ Svg.Attributes.style
-                """
-                    transform-origin: center;
-                """
-            , Svg.Attributes.transform "scale(0.9)"
-            ]
-            children
-        ]
 
 
 viewLine : Int2 -> Int2 -> Svg msg
 viewLine p1 p2 =
     let
         ( x1, y1 ) =
-            p1 |> (NT.toFloat >> NT.scale cellSize)
+            p1 |> (NT.toFloat >> NT.scale cellSize >> NT.add ( cellSize / 2, cellSize / 2 ))
 
         ( x2, y2 ) =
-            p2 |> (NT.toFloat >> NT.scale cellSize)
+            p2 |> (NT.toFloat >> NT.scale cellSize >> NT.add ( cellSize / 2, cellSize / 2 ))
     in
     line
         [ PX.x1 x1
@@ -108,7 +99,6 @@ viewLine p1 p2 =
         , PX.x2 x2
         , PX.y2 y2
         , stroke Color.black
-        , transform [ Translate (cellSize / 2) (cellSize / 2) ]
         ]
         []
 

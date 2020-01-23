@@ -14,7 +14,7 @@ import PointFree exposing (flip, mapEach)
 import Set exposing (Set)
 import Svg exposing (Svg)
 import Svg.Attributes
-import TypedSvg exposing (g, line, rect, svg)
+import TypedSvg exposing (circle, g, line, rect, svg)
 import TypedSvg.Attributes exposing (fill, stroke, transform, viewBox)
 import TypedSvg.Attributes.InPx as PX
 import TypedSvg.Types exposing (Fill(..), Transform(..))
@@ -27,9 +27,10 @@ main =
         ]
 
 
-viewEdges : Dict Int2 Int2 -> List (Svg msg)
-viewEdges =
-    Dict.toList >> List.map (uncurry viewLine)
+viewLightForestEdgesEndpoints : EdgesEndPoints -> List (Svg msg)
+viewLightForestEdgesEndpoints ( dict, eps ) =
+    List.map (uncurry viewLine) (Dict.toList dict)
+        ++ List.map viewEndPoint (Set.toList eps)
 
 
 viewForest : Int -> List (Tree a) -> Html.Html msg
@@ -69,7 +70,7 @@ gridView =
             ]
             (viewGridCells
                 -- ++ viewLightForest lightForest
-                ++ viewEdges (lightForestEdges lightForest)
+                ++ viewLightForestEdgesEndpoints (lightForestEdgesEndpoints lightForest)
             )
         ]
 
@@ -89,6 +90,22 @@ viewLine p1 p2 =
         , PX.x2 x2
         , PX.y2 y2
         , stroke Color.black
+        , transform [ Translate (cellSize / 2) (cellSize / 2) ]
+        ]
+        []
+
+
+viewEndPoint : Int2 -> Svg msg
+viewEndPoint p1 =
+    let
+        ( x1, y1 ) =
+            p1 |> (NT.toFloat >> NT.scale cellSize)
+    in
+    circle
+        [ PX.cx x1
+        , PX.cy y1
+        , PX.r (cellSize / 10)
+        , Svg.Attributes.fillOpacity "0.5"
         , transform [ Translate (cellSize / 2) (cellSize / 2) ]
         ]
         []
@@ -196,17 +213,21 @@ unpackForest =
 
 
 type alias Acc =
-    ( ( Dict Int2 Int2, Set Int2 ), List ( Int2, Forest Int2 ) )
+    ( EdgesEndPoints, List ( Int2, Forest Int2 ) )
 
 
-lightForestEdges : Forest Int2 -> Dict Int2 Int2
-lightForestEdges =
+type alias EdgesEndPoints =
+    ( Dict Int2 Int2, Set Int2 )
+
+
+lightForestEdgesEndpoints : Forest Int2 -> EdgesEndPoints
+lightForestEdgesEndpoints =
     let
-        accumTreeEdges : Acc -> Dict Int2 Int2
+        accumTreeEdges : Acc -> EdgesEndPoints
         accumTreeEdges ( ( dict, endPoints ), list ) =
             case list of
                 [] ->
-                    dict
+                    ( dict, endPoints )
 
                 first :: rest ->
                     let

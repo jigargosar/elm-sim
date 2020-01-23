@@ -1,4 +1,4 @@
-module MirrorPuzzleV3.Graph exposing (..)
+module MirrorPuzzleV3.Graph exposing (GraphAcc, unfoldGraph)
 
 import Basics.Extra exposing (swap)
 import Set exposing (Set)

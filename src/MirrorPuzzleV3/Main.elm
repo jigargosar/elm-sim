@@ -413,7 +413,7 @@ unfoldGraph nextPathNodeContextsFunc =
                         ( acc2, nodeContexts4 ) =
                             nodeContexts2
                                 |> List.foldl
-                                    (\nodeContext1 (( ( edges, endPoints ), nodeContexts3 ) as acc1) ->
+                                    (\nodeContext1 ( ( edges, endPoints ), nodeContexts3 ) ->
                                         let
                                             child =
                                                 Tuple.first nodeContext1

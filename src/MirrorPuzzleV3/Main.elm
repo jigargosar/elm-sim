@@ -191,9 +191,9 @@ grid =
 
 gr =
     Dict2d.fromListsWithDefault Continue
-        [ [ Continue, Continue, Split [ D.up ], Split [ D.left ] ]
+        [ [ Continue, Continue, Split [ D.down ], Split [ D.left ] ]
         , [ Continue, Start [ D.right ], Continue, Split [ D.up, D.down ] ]
-        , [ Split [ D.down ], Continue, Continue, Split [ D.left ] ]
+        , [ Split [ D.up ], Continue, Continue, Split [ D.left ] ]
         ]
 
 
@@ -313,7 +313,7 @@ foo grid0 ( prevPosition, previousDirections ) =
         nextPathNodeInDirection direction =
             let
                 position =
-                    D.stepPos direction prevPosition
+                    D.stepPosCCW direction prevPosition
             in
             (case Dict.get position grid0 of
                 Just el ->

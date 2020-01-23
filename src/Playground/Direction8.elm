@@ -7,9 +7,12 @@ module Playground.Direction8 exposing
     , right
     , rotate
     , stepPos
+    , stepPosCCW
     , toDegrees
     , up
     )
+
+import Number2 as NT
 
 
 type alias Pos =
@@ -60,36 +63,47 @@ opposite =
     rotate 4
 
 
+stepPosCCW : Direction8 -> Pos -> Pos
+stepPosCCW direction8 pos =
+    stepPos direction8 (Tuple.mapSecond negate pos)
+        |> Tuple.mapSecond negate
+
+
+toVec : Direction8 -> ( number, number )
+toVec (Dir ct) =
+    case ct of
+        0 ->
+            ( 1, 0 )
+
+        1 ->
+            ( 1, 1 )
+
+        2 ->
+            ( 0, 1 )
+
+        3 ->
+            ( -1, 1 )
+
+        4 ->
+            ( -1, 0 )
+
+        5 ->
+            ( -1, -1 )
+
+        6 ->
+            ( 0, -1 )
+
+        7 ->
+            ( 1, -1 )
+
+        _ ->
+            ( 1, 0 )
+
+
 stepPos : Direction8 -> Pos -> Pos
-stepPos (Dir ct) ( x, y ) =
+stepPos dir ( x, y ) =
     let
         ( dx, dy ) =
-            case ct of
-                0 ->
-                    ( 1, 0 )
-
-                1 ->
-                    ( 1, 1 )
-
-                2 ->
-                    ( 0, 1 )
-
-                3 ->
-                    ( -1, 1 )
-
-                4 ->
-                    ( -1, 0 )
-
-                5 ->
-                    ( -1, -1 )
-
-                6 ->
-                    ( 0, -1 )
-
-                7 ->
-                    ( 1, -1 )
-
-                _ ->
-                    ( 1, 0 )
+            toVec dir
     in
     ( x + dx, y + dy )

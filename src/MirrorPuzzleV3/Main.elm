@@ -191,9 +191,9 @@ grid =
 
 gr =
     Dict2d.fromListsWithDefault Continue
-        [ [ Continue, Continue, Continue, Split [ D.left ] ]
-        , [ Start [ D.right ], Continue, Continue, Split [ D.up, D.down ] ]
-        , [ Continue, Split [ D.right ], Continue, Split [ D.left ] ]
+        [ [ Continue, Continue, Split [ D.up ], Split [ D.left ] ]
+        , [ Continue, Start [ D.right ], Continue, Split [ D.up, D.down ] ]
+        , [ Split [ D.down ], Continue, Continue, Split [ D.left ] ]
         ]
 
 

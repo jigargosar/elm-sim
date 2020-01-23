@@ -306,18 +306,18 @@ type alias Graph comparable =
     ( Set ( comparable, comparable ), Set comparable )
 
 
-foo : ElGrid -> NextPathNodes Int2 (List Direction8)
-foo grid0 ( prevPosition, previousDirections ) =
+nextLightPathNode : ElGrid -> NextPathNodes Int2 (List Direction8)
+nextLightPathNode grid0 ( prevPosition, previousDirections ) =
     let
-        nextPosIn : Direction8 -> Int2
-        nextPosIn =
+        nextPosInDirection : Direction8 -> Int2
+        nextPosInDirection =
             D.stepPosCCW prevPosition
 
         nextPathNodeInDirection : Direction8 -> Maybe (PathNode Int2 (List Direction8))
         nextPathNodeInDirection direction =
             let
                 position =
-                    nextPosIn direction
+                    nextPosInDirection direction
             in
             (case Dict.get position grid0 of
                 Just el ->
@@ -348,7 +348,7 @@ lightPathGraphs grid0 =
         toLightPathGraph ( position, el ) =
             case el of
                 Start dirs ->
-                    unfoldGraph (foo grid0) ( position, dirs )
+                    unfoldGraph (nextLightPathNode grid0) ( position, dirs )
                         |> Just
 
                 _ ->

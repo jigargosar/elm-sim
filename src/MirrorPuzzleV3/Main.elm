@@ -6,7 +6,7 @@ import Dict exposing (Dict)
 import Dict2d
 import Graph.Tree as Tree exposing (Forest, Tree)
 import Html exposing (Html)
-import Html.Attributes
+import Html.Attributes exposing (class)
 import MirrorPuzzleV3.PositionTree as PositionTree
 import Number2 as NT exposing (Int2)
 import Playground.Direction8 as D exposing (Direction8)
@@ -53,12 +53,33 @@ cellSize =
 
 gridView : Html.Html msg
 gridView =
+    Html.div [ class "inline-flex" ]
+        [ Html.div [ class "inline-flex flex-column" ]
+            [ Html.div [ class "tc pv1" ] [ Html.text "old" ]
+            , gridCanvasWith (viewLightForest lightForest)
+            ]
+        , Html.div [ class "inline-flex flex-column" ]
+            [ Html.div [ class "tc pv1" ] [ Html.text "new" ]
+            , gridCanvasWith
+                (viewLightForestEdgesEndpoints (lightForestEdgesEndpoints lightForest))
+            ]
+        ]
+
+
+gridCanvasWith : List (Svg msg) -> Html msg
+gridCanvasWith children =
+    let
+        viewGridCells =
+            Dict.toList grid |> List.map viewGridItem
+    in
+    Html.div [ class "flex" ] [ canvas (viewGridCells ++ children) ]
+
+
+canvas : List (Svg msg) -> Html msg
+canvas children =
     let
         ( w, h ) =
             gridDimensionsF |> NT.scale cellSize
-
-        viewGridCells =
-            Dict.toList grid |> List.map viewGridItem
     in
     svg [ viewBox 0 0 w h, PX.width w, PX.height h ]
         [ g
@@ -68,10 +89,7 @@ gridView =
                 """
             , Svg.Attributes.transform "scale(0.9)"
             ]
-            (viewGridCells
-                -- ++ viewLightForest lightForest
-                ++ viewLightForestEdgesEndpoints (lightForestEdgesEndpoints lightForest)
-            )
+            children
         ]
 
 
@@ -253,3 +271,16 @@ lightForestEdgesEndpoints =
     in
     unpackForest
         >> (\forest -> accumTreeEdges ( ( Dict.empty, Set.empty ), forest ))
+
+
+unfoldLightPaths :
+    { startPosition : Int2
+    , startDirections : List Direction8
+    , nextDirections : { previousDirection : Direction8, position : Int2 } -> Maybe (List Direction8)
+    }
+    ->
+        { parentLookup : Dict Int2 Int2
+        , leafNodes : Set Int2
+        }
+unfoldLightPaths =
+    Debug.todo "impl"

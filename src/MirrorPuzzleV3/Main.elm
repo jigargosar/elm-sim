@@ -1,5 +1,6 @@
 module MirrorPuzzleV3.Main exposing (main)
 
+import Basics.Extra exposing (uncurry)
 import Color
 import Dict exposing (Dict)
 import Dict2d
@@ -10,6 +11,7 @@ import MirrorPuzzleV3.PositionTree as PositionTree
 import Number2 as NT exposing (Int2)
 import Playground.Direction8 as D exposing (Direction8)
 import PointFree exposing (flip, mapEach)
+import Set exposing (Set)
 import Svg exposing (Svg)
 import Svg.Attributes
 import TypedSvg exposing (g, line, rect, svg)
@@ -21,9 +23,13 @@ import TypedSvg.Types exposing (Fill(..), Transform(..))
 main =
     Html.div []
         [ gridView
-        , lightForestEdges lightForest
         , viewForest 0 lightForest
         ]
+
+
+viewEdges : Dict Int2 Int2 -> List (Svg msg)
+viewEdges =
+    Dict.toList >> List.map (uncurry viewLine)
 
 
 viewForest : Int -> List (Tree a) -> Html.Html msg
@@ -49,6 +55,9 @@ gridView =
     let
         ( w, h ) =
             gridDimensionsF |> NT.scale cellSize
+
+        viewGridCells =
+            Dict.toList grid |> List.map viewGridItem
     in
     svg [ viewBox 0 0 w h, PX.width w, PX.height h ]
         [ g
@@ -58,10 +67,9 @@ gridView =
                 """
             , Svg.Attributes.transform "scale(0.9)"
             ]
-            ((Dict.toList grid
-                |> List.map (Tuple.mapFirst NT.toFloat >> viewGridItem)
-             )
-                ++ viewLightForest lightForest
+            (viewGridCells
+                -- ++ viewLightForest lightForest
+                ++ viewEdges (lightForestEdges lightForest)
             )
         ]
 
@@ -97,10 +105,11 @@ viewLightForest =
     List.filterMap Tree.root >> List.concatMap viewLightTree
 
 
+viewGridItem : ( Int2, b ) -> Svg msg
 viewGridItem ( position, el ) =
     let
         ( x, y ) =
-            position |> NT.scale cellSize
+            position |> NT.toFloat |> NT.scale cellSize
     in
     rect
         [ transform [ Translate x y ]
@@ -187,14 +196,14 @@ unpackForest =
 
 
 type alias Acc =
-    ( Dict Int2 Int2, List ( Int2, Forest Int2 ) )
+    ( ( Dict Int2 Int2, Set Int2 ), List ( Int2, Forest Int2 ) )
 
 
 lightForestEdges : Forest Int2 -> Dict Int2 Int2
 lightForestEdges =
     let
         accumTreeEdges : Acc -> Dict Int2 Int2
-        accumTreeEdges ( dict, list ) =
+        accumTreeEdges ( ( dict, endPoints ), list ) =
             case list of
                 [] ->
                     dict
@@ -211,9 +220,16 @@ lightForestEdges =
                                 )
                                 dict
                                 childForest
+
+                        newEndPoints =
+                            if List.isEmpty childForest then
+                                Set.insert parentIndex endPoints
+
+                            else
+                                endPoints
                     in
-                    accumTreeEdges ( newDict, childForest ++ rest )
+                    accumTreeEdges ( ( newDict, newEndPoints ), childForest ++ rest )
     in
     unpackForest
-        >> Tuple.pair Dict.empty
+        >> Tuple.pair ( Dict.empty, Set.empty )
         >> accumTreeEdges

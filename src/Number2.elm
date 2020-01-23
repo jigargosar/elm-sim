@@ -87,6 +87,10 @@ equalWithin tol a b =
     dx < tol && dy < tol
 
 
+
+-- Int2 Dimension functions
+
+
 fold : (Int2 -> b -> b) -> b -> Int2 -> b
 fold func acc0 ( w, h ) =
     List.range 0 (h - 1)

@@ -69,12 +69,22 @@ gridView =
             , gridCanvasWith
                 (viewLightPathGraphs (lightPathGraphs grid))
             ]
+        , Html.div [ class "inline-flex flex-column" ]
+            [ Html.div [ class "tc pa2" ] [ Html.text "graph.graphAcc" ]
+            , gridCanvasWith
+                (viewNewLPG (lightPathGraphAccList grid))
+            ]
         ]
 
 
 viewNewLPG : List (Graph.GraphAcc (PathNode Int2 (List Direction8)) Int2) -> List (Svg msg)
 viewNewLPG =
-    List.concatMap (Tuple.second >> viewLightPathGraph)
+    let
+        foo ( edges, eps ) =
+            List.map (uncurry viewLine) (Set.toList edges)
+                ++ List.map viewEndPoint (Set.toList eps)
+    in
+    List.concatMap (Tuple.second >> foo)
 
 
 viewLightPathGraphs : List (Graph Int2) -> List (Svg msg)

@@ -169,7 +169,7 @@ type El
     | End
 
 
-type alias Grid =
+type alias ElGrid =
     Dict Int2 El
 
 
@@ -306,7 +306,7 @@ type alias Graph comparable =
     ( Set ( comparable, comparable ), Set comparable )
 
 
-foo : Grid -> NextPathNodes Int2 (List Direction8)
+foo : ElGrid -> NextPathNodes Int2 (List Direction8)
 foo grid0 ( prevPosition, previousDirections ) =
     let
         nextPosIn : Direction8 -> Int2
@@ -342,7 +342,7 @@ foo grid0 ( prevPosition, previousDirections ) =
     List.filterMap nextPathNodeInDirection previousDirections
 
 
-lightPathGraphs : Grid -> List (Graph Int2)
+lightPathGraphs : ElGrid -> List (Graph Int2)
 lightPathGraphs grid0 =
     let
         toLightPathGraph ( position, el ) =

@@ -4,65 +4,87 @@ import Basics.Extra exposing (swap)
 import Set exposing (Set)
 
 
-type alias Graph comparable =
+type alias Graph node =
+    ( List (Edge node), List node )
+
+
+type alias Edge node =
+    ( node, node )
+
+
+type alias GraphAcc node comparable =
+    ( Graph node, Acc comparable )
+
+
+type alias Acc comparable =
     ( Set (Edge comparable), Set comparable )
 
 
-type alias Edge comparable =
-    ( comparable, comparable )
+insertEndPoint parentNode parent ( ( edgeList, endPointList ), ( edges, endPoints ) ) =
+    ( ( edgeList, parentNode :: endPointList ), ( edges, Set.insert parent endPoints ) )
 
 
-type alias PathNode comparable a =
-    ( comparable, a )
+insertEdge nodeEdge edge ( ( edgeList, endPointList ), ( edges, endPoints ) ) =
+    ( ( nodeEdge :: edgeList, endPointList ), ( Set.insert edge edges, endPoints ) )
 
 
-type alias NextPathNodes comparable a =
-    PathNode comparable a -> List (PathNode comparable a)
+isEdgeMember edge ( ( _, _ ), ( edges, _ ) ) =
+    Set.member edge edges || Set.member (swap edge) edges
 
 
-unfoldGraph : NextPathNodes comparable a -> PathNode comparable a -> Graph comparable
-unfoldGraph nextPathNodeContextsFunc =
+unfoldGraph : { nextNodes : node -> List node, toComparable : node -> comparable } -> node -> GraphAcc node comparable
+unfoldGraph cfg =
     let
-        gen : Graph comparable -> List (PathNode comparable a) -> Graph comparable
-        gen acc0 nodeContexts0 =
-            case nodeContexts0 of
+        accumGraphFor parentNode parent childNode ( gAcc, nodes ) =
+            let
+                child =
+                    cfg.toComparable childNode
+
+                edge =
+                    ( child, parent )
+
+                nodeEdge =
+                    ( childNode, parentNode )
+            in
+            if isEdgeMember edge gAcc then
+                -- on cyclic graph, we are currently adding an endpoint
+                -- alternatively, we could just ignore ep, on cycle.
+                ( insertEndPoint parentNode parent gAcc
+                , nodes
+                )
+
+            else
+                ( insertEdge nodeEdge edge gAcc
+                , childNode :: nodes
+                )
+
+        nextGraphAcc : GraphAcc node comparable -> List node -> GraphAcc node comparable
+        nextGraphAcc gAcc0 nodes0 =
+            case nodes0 of
                 [] ->
-                    acc0
+                    gAcc0
 
-                nodeContext0 :: nodeContexts1 ->
+                parentNode :: remaningParentNodes ->
                     let
+                        parent : comparable
                         parent =
-                            Tuple.first nodeContext0
+                            cfg.toComparable parentNode
 
-                        nodeContexts2 : List (PathNode comparable a)
-                        nodeContexts2 =
-                            nextPathNodeContextsFunc nodeContext0
-
-                        ( acc2, nodeContexts4 ) =
-                            nodeContexts2
-                                |> List.foldl
-                                    (\nodeContext1 (( ( edges, endPoints ), nodeContexts3 ) as acc1) ->
-                                        let
-                                            child =
-                                                Tuple.first nodeContext1
-
-                                            edge =
-                                                ( child, parent )
-                                        in
-                                        if Set.member edge edges || Set.member (swap edge) edges then
-                                            -- on cyclic graph, we are currently adding an endpoint
-                                            -- alternatively, we could just ignore ep, on cycle.
-                                            ( ( edges, Set.insert parent endPoints ), nodeContexts3 )
-
-                                        else
-                                            ( ( Set.insert edge edges, endPoints ), nodeContext1 :: nodeContexts3 )
-                                    )
-                                    ( acc0, nodeContexts1 )
+                        childNodes : List node
+                        childNodes =
+                            cfg.nextNodes parentNode
                     in
-                    if List.isEmpty nodeContexts2 then
-                        gen (Tuple.mapSecond (Set.insert parent) acc0) nodeContexts1
+                    if List.isEmpty childNodes then
+                        nextGraphAcc (insertEndPoint parentNode parent gAcc0) remaningParentNodes
 
                     else
-                        gen acc2 nodeContexts4
+                        let
+                            ( gAcc1, nodes1 ) =
+                                List.foldl
+                                    (accumGraphFor parentNode parent)
+                                    ( gAcc0, remaningParentNodes )
+                                    childNodes
+                        in
+                        nextGraphAcc gAcc1 nodes1
     in
-    List.singleton >> gen ( Set.empty, Set.empty )
+    List.singleton >> nextGraphAcc ( ( [], [] ), ( Set.empty, Set.empty ) )

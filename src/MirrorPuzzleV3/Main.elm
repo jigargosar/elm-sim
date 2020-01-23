@@ -191,9 +191,9 @@ grid =
 
 gr =
     Dict2d.fromListsWithDefault Continue
-        [ [ Continue, Split [ D.right ], Continue, Split [ D.left ] ]
-        , [ Start [ D.right ], Continue, Continue, Split [ D.down, D.up ] ]
-        , [ Split [ D.right ], Continue, Continue, Split [ D.left ] ]
+        [ [ Continue, Continue, Continue, Split [ D.left ] ]
+        , [ Start [ D.right ], Continue, Continue, Split [ D.up, D.down ] ]
+        , [ Continue, Split [ D.right ], Continue, Split [ D.left ] ]
         ]
 
 
@@ -367,10 +367,14 @@ unfoldGraph nextPathNodeContextsFunc =
                         parent =
                             Tuple.first nodeContext0
 
-                        ( acc2, nodeContexts3 ) =
+                        nodeContexts2 : List (PathNode comparable a)
+                        nodeContexts2 =
                             nextPathNodeContextsFunc nodeContext0
+
+                        ( acc2, nodeContexts4 ) =
+                            nodeContexts2
                                 |> List.foldl
-                                    (\nodeContext1 (( ( edges, endPoints ), nodeContexts2 ) as acc1) ->
+                                    (\nodeContext1 (( ( edges, endPoints ), nodeContexts3 ) as acc1) ->
                                         let
                                             child =
                                                 Tuple.first nodeContext1
@@ -379,13 +383,19 @@ unfoldGraph nextPathNodeContextsFunc =
                                                 ( child, parent )
                                         in
                                         if Set.member edge edges || Set.member (swap edge) edges then
-                                            acc1
+                                            -- on cyclic graph, we are currently adding an endpoint
+                                            -- alternatively, we could just ignore ep, on cycle.
+                                            ( ( edges, Set.insert parent endPoints ), nodeContexts3 )
 
                                         else
-                                            ( ( Set.insert edge edges, endPoints ), nodeContext1 :: nodeContexts2 )
+                                            ( ( Set.insert edge edges, endPoints ), nodeContext1 :: nodeContexts3 )
                                     )
                                     ( acc0, nodeContexts1 )
                     in
-                    gen acc2 nodeContexts3
+                    if List.isEmpty nodeContexts2 then
+                        gen (Tuple.mapSecond (Set.insert parent) acc0) nodeContexts1
+
+                    else
+                        gen acc2 nodeContexts4
     in
     List.singleton >> gen ( Set.empty, Set.empty )

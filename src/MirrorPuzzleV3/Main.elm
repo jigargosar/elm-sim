@@ -7,6 +7,7 @@ import Dict2d
 import Graph.Tree as Tree exposing (Forest, Tree)
 import Html exposing (Html)
 import Html.Attributes exposing (class)
+import MirrorPuzzleV3.Graph as Graph
 import MirrorPuzzleV3.PositionTree as PositionTree
 import Number2 as NT exposing (Int2)
 import Playground.Direction8 as D exposing (Direction8)
@@ -69,6 +70,11 @@ gridView =
                 (viewLightPathGraphs (lightPathGraphs grid))
             ]
         ]
+
+
+viewNewLPG : List (Graph.GraphAcc (PathNode Int2 (List Direction8)) Int2) -> List (Svg msg)
+viewNewLPG =
+    List.concatMap (Tuple.second >> viewLightPathGraph)
 
 
 viewLightPathGraphs : List (Graph Int2) -> List (Svg msg)
@@ -355,6 +361,25 @@ lightPathGraphs grid0 =
                     Nothing
     in
     Dict.toList grid0 |> List.filterMap toLightPathGraph
+
+
+lightPathGraphAccList : ElGrid -> List (Graph.GraphAcc (PathNode Int2 (List Direction8)) Int2)
+lightPathGraphAccList elGrid =
+    let
+        toLightPathGraph ( position, el ) =
+            case el of
+                Start dirs ->
+                    Graph.unfoldGraph
+                        { nextNodes = nextLightPathNode elGrid
+                        , toComparable = Tuple.first
+                        }
+                        ( position, dirs )
+                        |> Just
+
+                _ ->
+                    Nothing
+    in
+    Dict.toList elGrid |> List.filterMap toLightPathGraph
 
 
 unfoldGraph : NextPathNodes comparable a -> PathNode comparable a -> Graph comparable

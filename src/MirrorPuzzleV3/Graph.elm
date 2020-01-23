@@ -32,7 +32,12 @@ isEdgeMember edge ( ( _, _ ), ( edges, _ ) ) =
     Set.member edge edges || Set.member (swap edge) edges
 
 
-unfoldGraph : { nextNodes : node -> List node, toComparable : node -> comparable } -> node -> GraphAcc node comparable
+unfoldGraph :
+    { nextNodes : node -> List node
+    , toComparable : node -> comparable
+    }
+    -> node
+    -> GraphAcc node comparable
 unfoldGraph cfg =
     let
         accumGraphFor parentNode parent childNode ( gAcc, nodes ) =

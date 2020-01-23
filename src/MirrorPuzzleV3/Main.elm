@@ -14,7 +14,7 @@ import PointFree exposing (flip, mapEach)
 import Set exposing (Set)
 import Svg exposing (Svg)
 import Svg.Attributes
-import TypedSvg exposing (circle, g, line, rect, svg)
+import TypedSvg exposing (circle, line, rect, svg)
 import TypedSvg.Attributes exposing (fill, stroke, transform, viewBox)
 import TypedSvg.Attributes.InPx as PX
 import TypedSvg.Types exposing (Fill(..), Transform(..))
@@ -131,7 +131,7 @@ viewLightForest =
 
 
 viewGridItem : ( Int2, b ) -> Svg msg
-viewGridItem ( position, el ) =
+viewGridItem ( position, _ ) =
     let
         ( x, y ) =
             position |> NT.toFloat |> NT.scale cellSize
@@ -274,27 +274,22 @@ lightForestEdgesEndpoints =
         >> (\forest -> accumTreeEdges ( ( Dict.empty, Set.empty ), forest ))
 
 
-type alias PathNode =
-    ( Int2, Direction8 )
+type alias PathNode a =
+    ( Int2, a )
 
 
-nextPositionsFromPathNode : PathNode -> List Int2
-nextPositionsFromPathNode =
-    Debug.todo "impl"
-
-
-type alias NextPathNodes =
-    PathNode -> List PathNode
+type alias NextPathNodes a =
+    PathNode a -> List (PathNode a)
 
 
 type alias PathAcc =
     ( Set ( Int2, Int2 ), Set Int2 )
 
 
-pathGen : NextPathNodes -> PathNode -> PathAcc
+pathGen : NextPathNodes a -> PathNode a -> PathAcc
 pathGen nextPathNodesFunc =
     let
-        gen : PathAcc -> List PathNode -> PathAcc
+        gen : PathAcc -> List (PathNode a) -> PathAcc
         gen acc0 pathNodes0 =
             case pathNodes0 of
                 [] ->

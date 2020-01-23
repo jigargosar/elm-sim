@@ -3,7 +3,7 @@ module MirrorPuzzleV3.Main exposing (main)
 import Color
 import Dict exposing (Dict)
 import Dict2d
-import Graph.Tree as Tree exposing (Tree)
+import Graph.Tree as Tree exposing (Forest, Tree)
 import Html exposing (Html)
 import Html.Attributes
 import MirrorPuzzleV3.PositionTree as PositionTree
@@ -19,7 +19,11 @@ import TypedSvg.Types exposing (Fill(..), Transform(..))
 
 
 main =
-    Html.div [] [ gridView, viewForest 0 lightForest ]
+    Html.div []
+        [ gridView
+        , lightForestEdges lightForest
+        , viewForest 0 lightForest
+        ]
 
 
 viewForest : Int -> List (Tree a) -> Html.Html msg
@@ -62,6 +66,7 @@ gridView =
         ]
 
 
+viewLine : Int2 -> Int2 -> Svg msg
 viewLine p1 p2 =
     let
         ( x1, y1 ) =
@@ -174,3 +179,41 @@ lightForest =
                     Nothing
     in
     Dict.toList grid |> List.filterMap toLightTree
+
+
+unpackForest : List (Tree label) -> List ( label, Forest label )
+unpackForest =
+    List.filterMap Tree.root
+
+
+type alias Acc =
+    ( Dict Int2 Int2, List ( Int2, Forest Int2 ) )
+
+
+lightForestEdges : Forest Int2 -> Dict Int2 Int2
+lightForestEdges =
+    let
+        accumTreeEdges : Acc -> Dict Int2 Int2
+        accumTreeEdges ( dict, list ) =
+            case list of
+                [] ->
+                    dict
+
+                first :: rest ->
+                    let
+                        ( parentIndex, childForest ) =
+                            Tuple.mapSecond unpackForest first
+
+                        newDict =
+                            List.foldl
+                                (\( childIndex, _ ) ->
+                                    Dict.insert childIndex parentIndex
+                                )
+                                dict
+                                childForest
+                    in
+                    accumTreeEdges ( newDict, childForest ++ rest )
+    in
+    unpackForest
+        >> Tuple.pair Dict.empty
+        >> accumTreeEdges

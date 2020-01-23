@@ -153,6 +153,10 @@ type El
     | End
 
 
+type alias Grid =
+    Dict Int2 El
+
+
 grid : Dict Int2 El
 grid =
     gr |> Tuple.second
@@ -274,56 +278,101 @@ lightForestEdgesEndpoints =
         >> (\forest -> accumTreeEdges ( ( Dict.empty, Set.empty ), forest ))
 
 
-type alias PathNode a =
-    ( Int2, a )
+type alias PathNode comparable a =
+    ( comparable, a )
 
 
-type alias NextPathNodes a =
-    PathNode a -> List (PathNode a)
+type alias NextPathNodes comparable a =
+    PathNode comparable a -> List (PathNode comparable a)
 
 
-type alias PathAcc =
-    ( Set ( Int2, Int2 ), Set Int2 )
+type alias Graph comparable =
+    ( Set ( comparable, comparable ), Set comparable )
 
 
-pathGen : NextPathNodes a -> PathNode a -> PathAcc
-pathGen nextPathNodesFunc =
+foo : Grid -> NextPathNodes Int2 (List Direction8)
+foo grid0 ( prevPosition, previousDirections ) =
     let
-        gen : PathAcc -> List (PathNode a) -> PathAcc
-        gen acc0 pathNodes0 =
-            case pathNodes0 of
+        nextPathNodeInDirection : Direction8 -> Maybe (PathNode Int2 (List Direction8))
+        nextPathNodeInDirection direction =
+            let
+                position =
+                    D.stepPos direction prevPosition
+            in
+            (case Dict.get position grid0 of
+                Just el ->
+                    case el of
+                        Split directions ->
+                            Just directions
+
+                        End ->
+                            Nothing
+
+                        Start _ ->
+                            Just [ direction ]
+
+                        Continue ->
+                            Just [ direction ]
+
+                Nothing ->
+                    Nothing
+            )
+                |> Maybe.map (Tuple.pair position)
+    in
+    List.filterMap nextPathNodeInDirection previousDirections
+
+
+lightPathGraphs : Grid -> List (Graph Int2)
+lightPathGraphs grid0 =
+    let
+        toLightPathGraph ( position, el ) =
+            case el of
+                Start dirs ->
+                    unfoldGraph (foo grid0) ( position, dirs )
+                        |> Just
+
+                _ ->
+                    Nothing
+    in
+    Dict.toList grid0 |> List.filterMap toLightPathGraph
+
+
+unfoldGraph : NextPathNodes comparable a -> PathNode comparable a -> Graph comparable
+unfoldGraph nextPathNodeContextsFunc =
+    let
+        gen : Graph comparable -> List (PathNode comparable a) -> Graph comparable
+        gen acc0 nodeContexts0 =
+            case nodeContexts0 of
                 [] ->
                     acc0
 
                 ( endPoint, _ ) :: [] ->
                     Tuple.mapSecond (Set.insert endPoint) acc0
 
-                first :: rest ->
+                nodeContext0 :: nodeContexts1 ->
                     let
-                        parentPosition : Int2
-                        parentPosition =
-                            Tuple.first first
+                        parent =
+                            Tuple.first nodeContext0
 
-                        ( acc2, pathNodes1 ) =
-                            nextPathNodesFunc first
+                        ( acc2, nodeContexts3 ) =
+                            nextPathNodeContextsFunc nodeContext0
                                 |> List.foldl
-                                    (\nextNode (( ( edges, endPoints ), list ) as acc1) ->
+                                    (\nodeContext1 (( ( edges, endPoints ), nodeContexts2 ) as acc1) ->
                                         let
-                                            childPosition : Int2
-                                            childPosition =
-                                                Tuple.first nextNode
+                                            child =
+                                                Tuple.first nodeContext1
 
                                             edge =
-                                                ( childPosition, parentPosition )
+                                                ( child, parent )
                                         in
                                         if Set.member edge edges || Set.member (swap edge) edges then
                                             acc1
 
                                         else
-                                            ( ( Set.insert edge edges, endPoints ), nextNode :: list )
+                                            ( ( Set.insert edge edges, endPoints ), nodeContext1 :: nodeContexts2 )
                                     )
-                                    ( acc0, rest )
+                                    ( acc0, nodeContexts1 )
                     in
-                    gen acc2 pathNodes1
+                    gen acc2 nodeContexts3
     in
     List.singleton >> gen ( Set.empty, Set.empty )

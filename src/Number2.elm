@@ -1,5 +1,6 @@
 module Number2 exposing (..)
 
+import Dict exposing (Dict)
 import PointFree exposing (flip, mapEach, mapEach2, mulBy)
 
 
@@ -95,6 +96,11 @@ fold func acc0 ( w, h ) =
                     |> List.foldl (\x -> func ( x, y )) acc1
             )
             acc0
+
+
+toDict : (Int2 -> b) -> Int2 -> Dict Int2 b
+toDict func =
+    fold (\index -> Dict.insert index (func index)) Dict.empty
 
 
 indexMemberOf : Int2 -> Int2 -> Bool

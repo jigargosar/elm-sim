@@ -1,14 +1,13 @@
 module Dict2d exposing (filled, fromListsWithDefault, maybeMapAt, maybeMapAt2)
 
 import Dict exposing (Dict)
-import Length2
 import List2d exposing (List2d)
-import Number2 exposing (Int2)
+import Number2 as NT exposing (Int2)
 
 
 filled : a -> Int2 -> Dict Int2 a
 filled a =
-    Length2.toDict (always a)
+    NT.toDict (always a)
 
 
 resizeWithDefault : a -> Int2 -> Dict Int2 a -> Dict Int2 a
@@ -17,7 +16,7 @@ resizeWithDefault a length2 dict =
         func idx =
             Dict.get idx dict |> Maybe.withDefault a
     in
-    Length2.toDict func length2
+    NT.toDict func length2
 
 
 fromListsWithDefault : a -> List2d a -> ( Int2, Dict Int2 a )

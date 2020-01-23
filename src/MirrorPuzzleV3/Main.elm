@@ -1,6 +1,6 @@
 module MirrorPuzzleV3.Main exposing (main)
 
-import Basics.Extra exposing (uncurry)
+import Basics.Extra exposing (swap, uncurry)
 import Color
 import Dict exposing (Dict)
 import Dict2d
@@ -295,12 +295,44 @@ pathGen : NextPathNodes -> PathNode -> PathAcc
 pathGen nextPathNodesFunc =
     let
         gen : PathAcc -> List PathNode -> PathAcc
-        gen acc pathNodes =
+        gen acc0 pathNodes =
             case pathNodes of
                 [] ->
-                    acc
+                    acc0
+
+                ( endPoint, _ ) :: [] ->
+                    Tuple.mapSecond (Set.insert endPoint) acc0
 
                 first :: rest ->
-                    acc
+                    let
+                        parentPosition : Int2
+                        parentPosition =
+                            Tuple.first first
+
+                        nextCallArgs : ( PathAcc, List PathNode )
+                        nextCallArgs =
+                            nextPathNodesFunc first
+                                |> List.foldl
+                                    (\nextNode (( ( edges, endPoints ), list ) as acc1) ->
+                                        let
+                                            childPosition : Int2
+                                            childPosition =
+                                                Tuple.first nextNode
+
+                                            edge =
+                                                ( childPosition, parentPosition )
+                                        in
+                                        if Set.member edge edges || Set.member (swap edge) edges then
+                                            acc1
+
+                                        else
+                                            ( ( Set.insert edge edges, endPoints ), nextNode :: list )
+                                    )
+                                    ( acc0, rest )
+
+                        ( a1, a2 ) =
+                            nextCallArgs
+                    in
+                    gen a1 a2
     in
     List.singleton >> gen ( Set.empty, Set.empty )

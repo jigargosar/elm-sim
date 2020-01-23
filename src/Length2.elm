@@ -1,7 +1,6 @@
-module Length2 exposing (fold, member, toDict, toDictWithDefault)
+module Length2 exposing (fold, member, toDict)
 
 import Dict exposing (Dict)
-import Length1
 import Number2 exposing (Int2)
 
 
@@ -21,11 +20,11 @@ toDict func =
     fold (\i2 -> Dict.insert i2 (func i2)) Dict.empty
 
 
-toDictWithDefault : b -> (Int2 -> Maybe b) -> Int2 -> Dict Int2 b
-toDictWithDefault b func =
-    toDict (\i2 -> func i2 |> Maybe.withDefault b)
-
-
 member : Int2 -> Int2 -> Bool
 member ( x, y ) ( w, h ) =
-    Length1.member x w && Length1.member y h
+    isIndexMemberOf w x && isIndexMemberOf h y
+
+
+isIndexMemberOf : number -> number -> Bool
+isIndexMemberOf length index =
+    index >= 0 && index <= length

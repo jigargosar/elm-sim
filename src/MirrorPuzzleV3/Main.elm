@@ -295,8 +295,8 @@ pathGen : NextPathNodes -> PathNode -> PathAcc
 pathGen nextPathNodesFunc =
     let
         gen : PathAcc -> List PathNode -> PathAcc
-        gen acc0 pathNodes =
-            case pathNodes of
+        gen acc0 pathNodes0 =
+            case pathNodes0 of
                 [] ->
                     acc0
 
@@ -309,8 +309,7 @@ pathGen nextPathNodesFunc =
                         parentPosition =
                             Tuple.first first
 
-                        nextCallArgs : ( PathAcc, List PathNode )
-                        nextCallArgs =
+                        ( acc2, pathNodes1 ) =
                             nextPathNodesFunc first
                                 |> List.foldl
                                     (\nextNode (( ( edges, endPoints ), list ) as acc1) ->
@@ -329,10 +328,7 @@ pathGen nextPathNodesFunc =
                                             ( ( Set.insert edge edges, endPoints ), nextNode :: list )
                                     )
                                     ( acc0, rest )
-
-                        ( a1, a2 ) =
-                            nextCallArgs
                     in
-                    gen a1 a2
+                    gen acc2 pathNodes1
     in
     List.singleton >> gen ( Set.empty, Set.empty )

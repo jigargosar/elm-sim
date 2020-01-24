@@ -42,7 +42,7 @@ type UnfoldInstruction
 
 
 unfold : (Int2 -> UnfoldInstruction) -> Int2 -> List Direction8 -> Graph
-unfold newDirectionsAt startPosition startDirections =
+unfold unfoldInstructionAt startPosition startDirections =
     let
         nextSeeds : Seed -> List Seed
         nextSeeds ( position, directions ) =
@@ -52,7 +52,7 @@ unfold newDirectionsAt startPosition startDirections =
                         nextPosition =
                             D.stepPos position d
                     in
-                    case newDirectionsAt nextPosition of
+                    case unfoldInstructionAt nextPosition of
                         ContinuePrevious ->
                             Just ( nextPosition, [ d ] )
 

@@ -1,4 +1,4 @@
-module MirrorPuzzleV3.Graph exposing (Graph, getEdges, getLeafNodes, unfoldGraph)
+module MirrorPuzzleV3.Graph exposing (Graph, getEdges, getEndPoints, unfoldGraph)
 
 import Basics.Extra exposing (swap)
 import Number2 exposing (Int2)
@@ -20,8 +20,8 @@ getEdges (Graph ( edges, _ )) =
     edges
 
 
-getLeafNodes : Graph -> Set Int2
-getLeafNodes (Graph ( _, leafNodes )) =
+getEndPoints : Graph -> Set Int2
+getEndPoints (Graph ( _, leafNodes )) =
     leafNodes
 
 

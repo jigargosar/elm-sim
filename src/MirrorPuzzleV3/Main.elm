@@ -82,7 +82,7 @@ viewNewLightPathGraphs =
     let
         foo graph =
             List.map (uncurry viewLine) (Set.toList (Graph.getEdges graph))
-                ++ List.map viewEndPoint (Set.toList (Graph.getLeafNodes graph))
+                ++ List.map viewEndPoint (Set.toList (Graph.getEndPoints graph))
     in
     List.concatMap foo
 

@@ -53,15 +53,15 @@ unfoldGraphHelp context0 =
         Nothing ->
             Graph ( context0.edges, context0.endPoints )
 
-        Just ( currentSeed, context ) ->
-            case context.nextSeeds currentSeed of
+        Just ( parentSeed, context ) ->
+            case context.nextSeeds parentSeed of
                 [] ->
-                    unfoldGraphHelp (insertEndPoint currentSeed context)
+                    unfoldGraphHelp (insertEndPoint parentSeed context)
 
                 childSeeds ->
                     unfoldGraphHelp
                         (List.foldl
-                            (updateContextForParentChildSeed currentSeed)
+                            (updateContextForParentChildSeed parentSeed)
                             context
                             childSeeds
                         )

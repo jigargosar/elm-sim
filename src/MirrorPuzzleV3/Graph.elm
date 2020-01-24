@@ -1,7 +1,9 @@
 module MirrorPuzzleV3.Graph exposing
-    ( Graph
+    ( Edge
+    , Graph
     , UnfoldInstruction(..)
     , getEdges
+    , getEdgesAndEndPointsAsLists
     , getEndPoints
     , unfold
     )
@@ -29,6 +31,11 @@ getEdges (Graph ( edges, _ )) =
 getEndPoints : Graph -> Set Int2
 getEndPoints (Graph ( _, leafNodes )) =
     leafNodes
+
+
+getEdgesAndEndPointsAsLists : Graph -> ( List Edge, List Int2 )
+getEdgesAndEndPointsAsLists graph =
+    ( getEdges graph |> Set.toList, getEndPoints graph |> Set.toList )
 
 
 type alias Seed =

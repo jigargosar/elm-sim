@@ -6,9 +6,10 @@ import Dict exposing (Dict)
 import Dict2d
 import Html exposing (Html)
 import Html.Attributes exposing (class)
-import MirrorPuzzleV3.Graph as Graph
+import MirrorPuzzleV3.Graph as Graph exposing (Graph)
 import Number2 as NT exposing (Int2)
 import Playground.Direction8 as D exposing (Direction8)
+import PointFree exposing (mapEach)
 import Set exposing (Set)
 import Svg exposing (Svg)
 import Svg.Attributes
@@ -65,15 +66,27 @@ canvas gv children =
 
 viewLightPaths : ElGrid -> List (Svg msg)
 viewLightPaths elGrid =
-    let
-        edges =
-            Graph.getEdges >> Set.toList
+    List.concatMap (viewGraph elGrid) (toLightPathGraphs elGrid.dict)
 
-        viewGraph graph =
-            List.map (uncurry (viewLine elGrid)) (edges graph)
-                ++ List.map (viewEndPoint elGrid) (Set.toList (Graph.getEndPoints graph))
-    in
-    List.concatMap viewGraph (lightPathGraphs elGrid.dict)
+
+viewGraph : ElGrid -> Graph -> List (Svg msg)
+viewGraph elGrid graph =
+    viewGraphEdges elGrid graph ++ viewGraphEndPoints elGrid graph
+
+
+viewGraphEdges : ElGrid -> Graph -> List (Svg msg)
+viewGraphEdges elGrid graph =
+    List.map (viewEdge elGrid) (Graph.getEdges graph |> Set.toList)
+
+
+viewGraphEndPoints : ElGrid -> Graph -> List (Svg msg)
+viewGraphEndPoints elGrid graph =
+    List.map (viewEndPoint elGrid) (Graph.getEndPoints graph |> Set.toList)
+
+
+viewEdge : ElGrid -> ( Int2, Int2 ) -> Svg msg
+viewEdge grid ( p1, p2 ) =
+    viewLine grid p1 p2
 
 
 viewLine : ElGrid -> Int2 -> Int2 -> Svg msg
@@ -141,8 +154,8 @@ type alias ElDict =
     Dict Int2 El
 
 
-lightPathGraphs : ElDict -> List Graph.Graph
-lightPathGraphs elDict =
+toLightPathGraphs : ElDict -> List Graph.Graph
+toLightPathGraphs elDict =
     let
         unfoldInstructionAt : Int2 -> Graph.UnfoldInstruction
         unfoldInstructionAt position =

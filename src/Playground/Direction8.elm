@@ -12,12 +12,8 @@ module Playground.Direction8 exposing
     , up
     )
 
-import Number2 as NT
+import Number2 as NT exposing (Int2)
 import PointFree exposing (flip)
-
-
-type alias Pos =
-    ( Int, Int )
 
 
 type Direction8
@@ -64,11 +60,6 @@ opposite =
     rotate 4
 
 
-toVecCW : Direction8 -> ( number, number )
-toVecCW =
-    toVec >> Tuple.mapSecond negate
-
-
 toVec : Direction8 -> ( number, number )
 toVec (Dir ct) =
     case ct of
@@ -100,11 +91,11 @@ toVec (Dir ct) =
             ( 1, 0 )
 
 
-stepPosIn : Direction8 -> Pos -> Pos
+stepPosIn : Direction8 -> Int2 -> Int2
 stepPosIn dir pos =
     NT.add pos (toVec dir)
 
 
-stepPos : Pos -> Direction8 -> Pos
+stepPos : Int2 -> Direction8 -> Int2
 stepPos =
     flip stepPosIn

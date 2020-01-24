@@ -1,10 +1,14 @@
-module MirrorPuzzleV3.Graph exposing (GraphAcc, unfoldGraph)
+module MirrorPuzzleV3.Graph exposing (Graph, getEdges, getLeafNodes, unfoldGraph)
 
 import Basics.Extra exposing (swap)
 import Set exposing (Set)
 
 
-type alias Graph node =
+type Graph node comparable
+    = Graph (GraphAcc node comparable)
+
+
+type alias NodeGraph node =
     ( List (Edge node), List node )
 
 
@@ -12,8 +16,18 @@ type alias Edge node =
     ( node, node )
 
 
+getEdges : Graph node comparable -> Set (Edge comparable)
+getEdges (Graph ( _, ( edges, _ ) )) =
+    edges
+
+
+getLeafNodes : Graph node comparable -> Set comparable
+getLeafNodes (Graph ( _, ( _, leafNodes ) )) =
+    leafNodes
+
+
 type alias GraphAcc node comparable =
-    ( Graph node, Acc comparable )
+    ( NodeGraph node, Acc comparable )
 
 
 type alias Acc comparable =
@@ -37,7 +51,7 @@ unfoldGraph :
     , toComparable : node -> comparable
     }
     -> node
-    -> GraphAcc node comparable
+    -> Graph node comparable
 unfoldGraph cfg =
     let
         accumGraphFor parentNode parent childNode ( gAcc, nodes ) =
@@ -92,4 +106,4 @@ unfoldGraph cfg =
                         in
                         nextGraphAcc gAcc1 nodes1
     in
-    List.singleton >> nextGraphAcc ( ( [], [] ), ( Set.empty, Set.empty ) )
+    List.singleton >> nextGraphAcc ( ( [], [] ), ( Set.empty, Set.empty ) ) >> Graph

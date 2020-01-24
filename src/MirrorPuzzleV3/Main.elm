@@ -77,14 +77,14 @@ gridView =
         ]
 
 
-viewNewLPG : List (Graph.GraphAcc (PathNode Int2 (List Direction8)) Int2) -> List (Svg msg)
+viewNewLPG : List (Graph.Graph (PathNode Int2 (List Direction8)) Int2) -> List (Svg msg)
 viewNewLPG =
     let
-        foo ( edges, eps ) =
-            List.map (uncurry viewLine) (Set.toList edges)
-                ++ List.map viewEndPoint (Set.toList eps)
+        foo graph =
+            List.map (uncurry viewLine) (Set.toList (Graph.getEdges graph))
+                ++ List.map viewEndPoint (Set.toList (Graph.getLeafNodes graph))
     in
-    List.concatMap (Tuple.second >> foo)
+    List.concatMap foo
 
 
 viewLightPathGraphs : List (Graph Int2) -> List (Svg msg)
@@ -373,7 +373,7 @@ lightPathGraphs grid0 =
     Dict.toList grid0 |> List.filterMap toLightPathGraph
 
 
-lightPathGraphAccList : ElGrid -> List (Graph.GraphAcc (PathNode Int2 (List Direction8)) Int2)
+lightPathGraphAccList : ElGrid -> List (Graph.Graph (PathNode Int2 (List Direction8)) Int2)
 lightPathGraphAccList elGrid =
     let
         toLightPathGraph ( position, el ) =

@@ -20,15 +20,15 @@ import TypedSvg.Types exposing (Fill(..), Transform(..))
 
 main =
     let
-        gv =
+        elGrid =
             initialElGrid
     in
     Html.div [ class "pa2 inline-flex flex-wrap" ]
         [ Html.div [ class "inline-flex flex-column" ]
             [ Html.div [ class "tc pa2" ] [ Html.text "Grid" ]
-            , canvas gv
-                ((gv.dict |> Dict.toList |> List.map (viewGridCell gv))
-                    ++ viewNewLightPathGraphs gv (lightPathGraphs gv.dict)
+            , canvas elGrid
+                ((elGrid.dict |> Dict.toList |> List.map (viewGridCell elGrid))
+                    ++ viewNewLightPathGraphs elGrid (lightPathGraphs elGrid.dict)
                 )
             ]
         ]

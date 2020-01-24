@@ -31,9 +31,22 @@ main =
 
 type alias GridView =
     { grid : ElGrid
-    , cellSize : Float
     , dimensions : Int2
+    , cellSize : Float
     }
+
+
+initialGridView : GridView
+initialGridView =
+    let
+        ( dimensions, grid_ ) =
+            Dict2d.fromListsWithDefault Continue
+                [ [ Continue, Continue, Split [ D.down ], Split [ D.left ] ]
+                , [ Continue, Start [ D.right ], Continue, Split [ D.up, D.down ] ]
+                , [ Split [ D.up ], Continue, Continue, Split [ D.left ] ]
+                ]
+    in
+    GridView grid_ dimensions 100
 
 
 cellSize =

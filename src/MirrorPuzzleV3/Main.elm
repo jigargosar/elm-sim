@@ -79,14 +79,15 @@ viewTileGrid grid =
                 ( x, y ) =
                     position |> NT.toFloat |> NT.scale cellSize
             in
-            rect
-                [ transform [ Translate x y ]
-                , PX.width cellSize
+            [ rect
+                [ PX.width cellSize
                 , PX.height cellSize
                 , stroke Color.black
                 , fill FillNone
                 ]
                 []
+            ]
+                |> g [ transform [ Translate x y ] ]
     in
     let
         renderGridCells : Svg msg

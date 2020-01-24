@@ -71,11 +71,14 @@ canvas =
 viewLine : Int2 -> Int2 -> Svg msg
 viewLine p1 p2 =
     let
+        transformPoint =
+            NT.toFloat >> NT.scale cellSize >> NT.add ( cellSize / 2, cellSize / 2 )
+
         ( x1, y1 ) =
-            p1 |> (NT.toFloat >> NT.scale cellSize >> NT.add ( cellSize / 2, cellSize / 2 ))
+            transformPoint p1
 
         ( x2, y2 ) =
-            p2 |> (NT.toFloat >> NT.scale cellSize >> NT.add ( cellSize / 2, cellSize / 2 ))
+            transformPoint p2
     in
     line
         [ PX.x1 x1

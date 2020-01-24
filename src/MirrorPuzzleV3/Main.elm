@@ -49,6 +49,15 @@ initialGridView =
     GridView grid_ dimensions 100
 
 
+canvas2d : { a | dimensions : Int2, cellSize : Float } -> List (Svg msg) -> Html msg
+canvas2d gv =
+    let
+        ( w, h ) =
+            gv.dimensions |> NT.toFloat |> NT.scale gv.cellSize
+    in
+    svg [ viewBox 0 0 w h, PX.width w, PX.height h ]
+
+
 cellSize =
     100
 

@@ -42,16 +42,6 @@ unfoldGraph nextSeeds seed =
     unfoldGraphHelp (initContext nextSeeds seed)
 
 
-popPending : Context -> Maybe ( Seed, Context )
-popPending context =
-    case context.pendingSeeds of
-        [] ->
-            Nothing
-
-        first :: rest ->
-            Just ( first, { context | pendingSeeds = rest } )
-
-
 unfoldGraphHelp : Context -> Graph
 unfoldGraphHelp context0 =
     case popPending context0 of
@@ -97,6 +87,16 @@ type alias Context =
     , nextSeeds : Seed -> List Seed
     , pendingSeeds : List Seed
     }
+
+
+popPending : Context -> Maybe ( Seed, Context )
+popPending context =
+    case context.pendingSeeds of
+        [] ->
+            Nothing
+
+        first :: rest ->
+            Just ( first, { context | pendingSeeds = rest } )
 
 
 initContext : (Seed -> List Seed) -> Seed -> Context

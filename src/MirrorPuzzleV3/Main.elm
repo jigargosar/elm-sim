@@ -98,22 +98,22 @@ viewTileGrid grid =
                 ]
                 []
 
-        cc =
+        cellRadis =
             cellSize / 2
 
         mirrorForm direction =
             ellipse
-                [ PX.rx (cellSize / 4)
+                [ PX.rx (cellRadis / 2)
                 , PX.ry cellSize
-                , PX.cx (cc - cellSize / 4)
-                , PX.cy cc
+                , PX.cx (cellRadis - cellRadis / 2)
+                , PX.cy cellRadis
                 , Svg.Attributes.fill "lightblue"
                 , Svg.Attributes.stroke "none"
                 , transform
-                    [ Translate cc cc
+                    [ Translate cellRadis cellRadis
                     , Scale 0.45 0.45
-                    , Translate -cc -cc
-                    , Rotate (direction |> D.toDegrees) cc cc
+                    , Translate -cellRadis -cellRadis
+                    , Rotate (direction |> D.toDegrees) cellRadis cellRadis
                     ]
                 ]
                 []
@@ -154,8 +154,7 @@ viewTileGrid grid =
     in
     let
         renderGridCells =
-            TileGrid.toList grid
-                |> List.map renderCell
+            TileGrid.toList grid |> List.map renderCell
     in
     let
         renderGraphs =

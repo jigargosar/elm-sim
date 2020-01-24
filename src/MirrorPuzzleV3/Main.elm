@@ -4,16 +4,14 @@ import Basics.Extra exposing (swap, uncurry)
 import Color
 import Dict exposing (Dict)
 import Dict2d
-import Graph.Tree as Tree exposing (Forest, Tree)
 import Html exposing (Html)
 import Html.Attributes exposing (class)
 import MirrorPuzzleV3.Graph as Graph
-import MirrorPuzzleV3.PositionTree as PositionTree
 import Number2 as NT exposing (Int2)
 import Playground.Direction8 as D exposing (Direction8)
-import PointFree exposing (flip, mapEach)
+import PointFree exposing (mapEach)
 import Set exposing (Set)
-import Svg exposing (Svg, g)
+import Svg exposing (Svg)
 import Svg.Attributes
 import TypedSvg exposing (circle, line, rect, svg)
 import TypedSvg.Attributes exposing (fill, stroke, transform, viewBox)
@@ -24,27 +22,6 @@ import TypedSvg.Types exposing (Fill(..), Transform(..))
 main =
     Html.div []
         [ gridView
-        , viewForest 0 lightForest
-        ]
-
-
-viewLightForestEdgesEndpoints : EdgesEndPoints -> List (Svg msg)
-viewLightForestEdgesEndpoints ( dict, eps ) =
-    List.map (uncurry viewLine) (Dict.toList dict)
-        ++ List.map viewEndPoint (Set.toList eps)
-
-
-viewForest : Int -> List (Tree a) -> Html.Html msg
-viewForest level forest =
-    Html.div []
-        (List.filterMap (Tree.root >> Maybe.map (viewTree level)) forest)
-
-
-viewTree : Int -> ( a, List (Tree b) ) -> Html.Html msg
-viewTree level ( label, forest ) =
-    Html.div [ Html.Attributes.class "ml3 pl3 bl b--red" ]
-        [ Html.div [ Html.Attributes.class "pv3  " ] [ Html.text (Debug.toString label) ]
-        , viewForest (level + 1) forest
         ]
 
 
@@ -56,15 +33,6 @@ gridView : Html.Html msg
 gridView =
     Html.div [ class "pa2 inline-flex flex-wrap" ]
         [ Html.div [ class "inline-flex flex-column" ]
-            [ Html.div [ class "tc pa2" ] [ Html.text "tree : view  recursion" ]
-            , gridCanvasWith (viewLightForest lightForest)
-            ]
-        , Html.div [ class "inline-flex flex-column" ]
-            [ Html.div [ class "tc pa2" ] [ Html.text "tree to graph" ]
-            , gridCanvasWith
-                (viewLightForestEdgesEndpoints (lightForestEdgesEndpoints lightForest))
-            ]
-        , Html.div [ class "inline-flex flex-column" ]
             [ Html.div [ class "tc pa2" ] [ Html.text "grid to graph" ]
             , gridCanvasWith
                 (viewLightPathGraphs (lightPathGraphs grid))
@@ -156,17 +124,6 @@ viewEndPoint p1 =
         []
 
 
-viewLightTree : ( Int2, List (Tree Int2) ) -> List (Svg msg)
-viewLightTree ( start, trees ) =
-    List.filterMap Tree.root trees
-        |> List.concatMap (\( end, newTrees ) -> viewLine start end :: viewLightTree ( end, newTrees ))
-
-
-viewLightForest : List (Tree Int2) -> List (Svg msg)
-viewLightForest =
-    List.filterMap Tree.root >> List.concatMap viewLightTree
-
-
 viewGridItem : ( Int2, b ) -> Svg msg
 viewGridItem ( position, _ ) =
     let
@@ -224,95 +181,6 @@ gridDimensions =
 
 gridDimensionsF =
     gridDimensions |> mapEach toFloat
-
-
-nextDirections : (Int2 -> Maybe El) -> Direction8 -> Int2 -> Maybe (List Direction8)
-nextDirections elAt previousDirection position =
-    case elAt position of
-        Just el ->
-            case el of
-                Split directions ->
-                    Just directions
-
-                End ->
-                    Nothing
-
-                Start _ ->
-                    Just [ previousDirection ]
-
-                Continue ->
-                    Just [ previousDirection ]
-
-        Nothing ->
-            Nothing
-
-
-lightForest : List (Tree Int2)
-lightForest =
-    let
-        toLightTree ( position, el ) =
-            case el of
-                Start dirs ->
-                    PositionTree.unfold
-                        { position = position
-                        , directions = dirs
-                        , getNextDirections =
-                            nextDirections (flip Dict.get grid)
-                        }
-                        |> Just
-
-                _ ->
-                    Nothing
-    in
-    Dict.toList grid |> List.filterMap toLightTree
-
-
-unpackForest : List (Tree label) -> List ( label, Forest label )
-unpackForest =
-    List.filterMap Tree.root
-
-
-type alias Acc =
-    ( EdgesEndPoints, List ( Int2, Forest Int2 ) )
-
-
-type alias EdgesEndPoints =
-    ( Dict Int2 Int2, Set Int2 )
-
-
-lightForestEdgesEndpoints : Forest Int2 -> EdgesEndPoints
-lightForestEdgesEndpoints =
-    let
-        accumTreeEdges : Acc -> EdgesEndPoints
-        accumTreeEdges ( ( dict, endPoints ), list ) =
-            case list of
-                [] ->
-                    ( dict, endPoints )
-
-                first :: rest ->
-                    let
-                        ( parentIndex, childForest ) =
-                            Tuple.mapSecond unpackForest first
-
-                        newDict =
-                            List.foldl
-                                (\( childIndex, _ ) ->
-                                    Dict.insert childIndex parentIndex
-                                )
-                                dict
-                                childForest
-
-                        newEndPoints =
-                            if List.isEmpty childForest then
-                                Set.insert parentIndex endPoints
-
-                            else
-                                endPoints
-                    in
-                    accumTreeEdges ( ( newDict, newEndPoints ), childForest ++ rest )
-    in
-    unpackForest
-        >> (\forest -> accumTreeEdges ( ( Dict.empty, Set.empty ), forest ))
 
 
 type alias PathNode comparable a =

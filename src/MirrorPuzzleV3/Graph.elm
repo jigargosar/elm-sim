@@ -3,6 +3,7 @@ module MirrorPuzzleV3.Graph exposing (Graph, getEdges, getLeafNodes, unfoldGraph
 import Basics.Extra exposing (swap)
 import Number2 exposing (Int2)
 import Playground.Direction8 exposing (Direction8)
+import PointFree exposing (mapEach)
 import Set exposing (Set)
 
 
@@ -90,11 +91,8 @@ unfoldGraphHelp ( context, pendingSeeds ) =
 updateContextForParentChildSeed : Seed -> Seed -> ( Context, List Seed ) -> ( Context, List Seed )
 updateContextForParentChildSeed parentSeed childSeed ( context, pendingSeeds ) =
     let
-        child =
-            Tuple.first childSeed
-
         edge =
-            ( Tuple.first parentSeed, child )
+            ( parentSeed, childSeed ) |> mapEach Tuple.first
     in
     if isEdgeMember edge context then
         -- on cyclic graph, we are currently adding an endpoint

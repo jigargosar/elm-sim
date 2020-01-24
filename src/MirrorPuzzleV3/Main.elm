@@ -167,11 +167,6 @@ lightPathGraphs grid =
                 Start dirs ->
                     Just (Graph.unfold unfoldInstructionAt position dirs)
 
-                {- Graph.unfoldGraph
-                   (nextLightPathNode elGrid)
-                   ( position, dirs )
-                   |> Just
-                -}
                 _ ->
                     Nothing
     in

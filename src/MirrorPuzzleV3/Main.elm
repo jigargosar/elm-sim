@@ -55,7 +55,7 @@ initialTileGrid =
     TileGrid.fromList2d
         [ [ Tile.floor, Tile.floor, Tile.mirror D.down, Tile.mirror D.left ]
         , [ Tile.floor, Tile.lightSourceWithMirror D.right, Tile.floor, Tile.prism D.up ]
-        , [ Tile.floor, Tile.floor, Tile.floor, Tile.floor ]
+        , [ Tile.mirror D.up, Tile.floor, Tile.floor, Tile.mirror D.left ]
         ]
 
 

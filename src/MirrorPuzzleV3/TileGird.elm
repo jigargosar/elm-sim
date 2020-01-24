@@ -1,4 +1,4 @@
-module MirrorPuzzleV3.TileGird exposing (filledWith, fromList2d, rotateElement, swapElements)
+module MirrorPuzzleV3.TileGird exposing (computeLightPaths, filledWith, fromList2d, rotateElement, swapElements)
 
 -- TileGrid
 
@@ -8,7 +8,6 @@ import List2d exposing (List2d)
 import MirrorPuzzleV3.Graph as Graph
 import MirrorPuzzleV3.Tile as Tile exposing (Tile(..))
 import Number2 exposing (Int2)
-import PointFree exposing (flip)
 
 
 type TileGrid

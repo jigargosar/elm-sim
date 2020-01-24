@@ -30,24 +30,30 @@ getLeafNodes (Graph ( _, leafNodes )) =
 
 type alias Context =
     { edges : Set Edge
-    , endPoints : List Int2
-    , pendingSeeds : List Seed
+    , endPoints : Set Int2
+    , nextSeeds : Seed -> List Seed
     }
+
+
+initContext : (Seed -> List Seed) -> Context
+initContext nextSeeds =
+    Context Set.empty Set.empty nextSeeds
 
 
 type alias Acc =
     ( Set Edge, Set Int2 )
 
 
-insertEndPoint ( parent, _ ) ( edges, endPoints ) =
-    ( edges, Set.insert parent endPoints )
+insertEndPoint : Seed -> Context -> Context
+insertEndPoint ( parent, _ ) context =
+    { context | endPoints = Set.insert parent context.endPoints }
 
 
-insertEdge edge ( edges, endPoints ) =
-    ( Set.insert edge edges, endPoints )
+insertEdge edge context =
+    { context | edges = Set.insert edge context.edges }
 
 
-isEdgeMember edge ( edges, _ ) =
+isEdgeMember edge { edges } =
     Set.member edge edges || Set.member (swap edge) edges
 
 
@@ -60,38 +66,31 @@ unfoldGraph :
     -> Seed
     -> Graph
 unfoldGraph getChildSeeds seed =
-    let
-        initialAcc =
-            ( ( Set.empty, Set.empty ), List.singleton seed )
-    in
-    unfoldGraphHelp getChildSeeds initialAcc
+    unfoldGraphHelp ( initContext getChildSeeds, [ seed ] )
 
 
-unfoldGraphHelp :
-    (Seed -> List Seed)
-    -> ( Acc, List Seed )
-    -> Graph
-unfoldGraphHelp getNextSeeds ( graphAcc, pendingSeeds ) =
+unfoldGraphHelp : ( Context, List Seed ) -> Graph
+unfoldGraphHelp ( context, pendingSeeds ) =
     case pendingSeeds of
         [] ->
-            Graph graphAcc
+            Graph ( context.edges, context.endPoints )
 
         currentSeed :: otherSeeds ->
-            case getNextSeeds currentSeed of
+            case context.nextSeeds currentSeed of
                 [] ->
-                    unfoldGraphHelp getNextSeeds ( insertEndPoint currentSeed graphAcc, otherSeeds )
+                    unfoldGraphHelp ( insertEndPoint currentSeed context, otherSeeds )
 
                 childSeeds ->
-                    unfoldGraphHelp getNextSeeds
+                    unfoldGraphHelp
                         (List.foldl
                             (accumGraphWithChildSeedOf currentSeed)
-                            ( graphAcc, otherSeeds )
+                            ( context, otherSeeds )
                             childSeeds
                         )
 
 
-accumGraphWithChildSeedOf : Seed -> Seed -> ( Acc, List Seed ) -> ( Acc, List Seed )
-accumGraphWithChildSeedOf parentSeed childSeed ( graphAcc, pendingSeeds ) =
+accumGraphWithChildSeedOf : Seed -> Seed -> ( Context, List Seed ) -> ( Context, List Seed )
+accumGraphWithChildSeedOf parentSeed childSeed ( context, pendingSeeds ) =
     let
         child =
             Tuple.first childSeed
@@ -99,14 +98,14 @@ accumGraphWithChildSeedOf parentSeed childSeed ( graphAcc, pendingSeeds ) =
         edge =
             ( child, Tuple.first parentSeed )
     in
-    if isEdgeMember edge graphAcc then
+    if isEdgeMember edge context then
         -- on cyclic graph, we are currently adding an endpoint
         -- alternatively, we could just ignore ep, on cycle.
-        ( insertEndPoint parentSeed graphAcc
+        ( insertEndPoint parentSeed context
         , pendingSeeds
         )
 
     else
-        ( insertEdge edge graphAcc
+        ( insertEdge edge context
         , childSeed :: pendingSeeds
         )

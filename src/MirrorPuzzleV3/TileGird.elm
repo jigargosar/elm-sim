@@ -5,6 +5,7 @@ module MirrorPuzzleV3.TileGird exposing (filledWith, fromList2d, rotateElement, 
 import Dict exposing (Dict)
 import Dict2d
 import List2d exposing (List2d)
+import MirrorPuzzleV3.Graph as Graph
 import MirrorPuzzleV3.Tile as Tile exposing (Tile(..))
 import Number2 exposing (Int2)
 import PointFree exposing (flip)
@@ -45,7 +46,20 @@ maybeMapDict2d func (TileGrid dim dict2d) =
     Maybe.map (TileGrid dim) (func dict2d)
 
 
-computeLightPaths : TileGrid -> List Tile.Path
+computeLightPaths : TileGrid -> List Graph.Graph
 computeLightPaths (TileGrid _ dict) =
-    Dict.keys dict
-        |> List.concatMap (Tile.computeLightPathsOriginatingAt (flip Dict.get dict))
+    let
+        unfoldInstructionAt : Int2 -> Graph.UnfoldInstruction
+        unfoldInstructionAt position =
+            case Dict.get position dict of
+                Just tile ->
+                    Tile.getLightPathUnfoldInstruction tile
+
+                Nothing ->
+                    Graph.Stop
+
+        graphStartingAt ( position, el ) =
+            Tile.getRefractionDirectionOfLightSource el
+                |> Maybe.map (Graph.unfold unfoldInstructionAt position)
+    in
+    Dict.toList dict |> List.filterMap graphStartingAt

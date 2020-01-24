@@ -1,8 +1,9 @@
-module MirrorPuzzleV3.Tile exposing (Path, Tile(..), computeLightPathsOriginatingAt, getElementInLightSource, rotateElement, swapElements)
+module MirrorPuzzleV3.Tile exposing (Tile(..), getLightPathUnfoldInstruction, getRefractionDirectionOfLightSource, rotateElement, swapElements)
 
 -- Tile
 
-import Number2 exposing (Int2)
+import MirrorPuzzleV3.Graph as Graph
+import Playground.Direction8 as Direction8 exposing (Direction8)
 
 
 type Tile
@@ -48,19 +49,33 @@ getElementInLightSource tile =
             Nothing
 
 
-getRefractionDirections : Tile -> List Direction
-getRefractionDirections =
-    getElement >> Maybe.map getRefractionDirectionsOfElement >> Maybe.withDefault []
+getRefractionDirectionOfLightSource : Tile -> Maybe (List Direction)
+getRefractionDirectionOfLightSource =
+    getElementInLightSource >> Maybe.map getRefractionDirectionsOfElement
 
 
-getElement : Tile -> Maybe Element
-getElement tile =
+getLightPathUnfoldInstruction : Tile -> Graph.UnfoldInstruction
+getLightPathUnfoldInstruction tile =
     case tile of
-        FilledContainer _ element ->
-            Just element
+        FilledContainer elementContainer element ->
+            case elementContainer of
+                LightSource ->
+                    Graph.Stop
 
-        _ ->
-            Nothing
+                Floor ->
+                    Graph.Fork (getRefractionDirectionsOfElement element)
+
+        EmptyContainer _ ->
+            Graph.ContinuePrevious
+
+        Goal ->
+            Graph.Stop
+
+        Wall ->
+            Graph.Stop
+
+        Hole ->
+            Graph.ContinuePrevious
 
 
 type ElementContainer
@@ -77,111 +92,18 @@ type ElementType
 -- Direction
 
 
-type Direction
-    = Direction Int
+type alias Direction =
+    Direction8
 
 
 rotateDirectionBy : Int -> Direction -> Direction
-rotateDirectionBy steps (Direction zeroToSevenInt) =
-    Direction (modBy 8 (zeroToSevenInt + steps))
+rotateDirectionBy =
+    Direction8.rotate
 
 
 oppositeDirection : Direction -> Direction
 oppositeDirection =
-    rotateDirectionBy 4
-
-
-
--- Path
-
-
-type PathElement
-    = PathElement Int2 Direction
-
-
-type Path
-    = Path (List PathElement)
-    | Fork (List Path)
-
-
-computeLightPathsOriginatingAt : (Int2 -> Maybe Tile) -> Int2 -> List Path
-computeLightPathsOriginatingAt tileAt startPosition =
-    let
-        foo element =
-            getRefractionDirectionsOfElement element
-                |> List.map
-                    (\dir ->
-                        let
-                            pe =
-                                PathElement startPosition dir
-                        in
-                        computeLightPathHelp tileAt pe (Path [ pe ])
-                    )
-    in
-    tileAt startPosition
-        |> Maybe.andThen getElementInLightSource
-        |> Maybe.map foo
-        |> Maybe.withDefault []
-
-
-computeLightPathHelp : (Int2 -> Maybe Tile) -> PathElement -> Path -> Path
-computeLightPathHelp tileAt lastPE =
-    case lastPE of
-        PathElement index direction ->
-            let
-                nextIndex =
-                    stepIndexInDirection direction index
-            in
-            case tileAt nextIndex of
-                Nothing ->
-                    identity
-
-                Just tile ->
-                    case tile of
-                        FilledContainer elementContainer element ->
-                            pathCons lastPE >> computeLightPathHelp tileAt lastPE
-
-                        EmptyContainer elementContainer ->
-                            pathCons lastPE >> computeLightPathHelp tileAt lastPE
-
-                        Goal ->
-                            pathCons lastPE >> computeLightPathHelp tileAt lastPE
-
-                        Wall ->
-                            pathCons lastPE >> computeLightPathHelp tileAt lastPE
-
-                        Hole ->
-                            pathCons lastPE >> computeLightPathHelp tileAt lastPE
-
-
-stepIndexInDirection : Direction -> Int2 -> Int2
-stepIndexInDirection =
-    Debug.todo "impl"
-
-
-pathCons : PathElement -> Path -> Path
-pathCons e path =
-    case path of
-        Path single ->
-            Path (e :: single)
-
-        Fork multiple ->
-            Fork (List.map (pathCons e) multiple)
-
-
-pathCons2 : PathElement -> PathElement -> Path -> Path
-pathCons2 e1 e2 path =
-    Fork [ pathCons e1 path, pathCons e2 path ]
-
-
-pathMember : PathElement -> Path -> Bool
-pathMember e path =
-    case path of
-        Path single ->
-            List.member e single
-
-        Fork multiple ->
-            List.any (pathMember e) multiple
+    Direction8.opposite
 
 
 

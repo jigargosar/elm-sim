@@ -1,4 +1,4 @@
-module MirrorPuzzleV3.ElGrid exposing (ElGrid, initial, view)
+module MirrorPuzzleV3.ElGridDemo exposing (demoView)
 
 import Color
 import Dict exposing (Dict)
@@ -74,6 +74,11 @@ toLightPathGraphs elDict =
 
 
 -- View
+
+
+demoView : Html msg
+demoView =
+    view initial
 
 
 view : ElGrid -> Html msg

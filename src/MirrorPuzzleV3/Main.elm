@@ -3,7 +3,7 @@ module MirrorPuzzleV3.Main exposing (main)
 import Color
 import Html exposing (Html)
 import Html.Attributes exposing (class)
-import MirrorPuzzleV3.ElGrid as ElGrid
+import MirrorPuzzleV3.ElGridDemo as ElGridDemo
 import MirrorPuzzleV3.Graph as Graph exposing (Graph)
 import MirrorPuzzleV3.Tile as Tile
 import MirrorPuzzleV3.TileGird as TileGrid
@@ -24,9 +24,6 @@ import TypedSvg.Types exposing (Fill(..), Transform(..))
 
 main =
     let
-        elGrid =
-            ElGrid.initial
-
         tileGrid =
             initialTileGrid
     in
@@ -37,7 +34,7 @@ main =
             ]
         , Html.div [ class "inline-flex flex-column" ]
             [ Html.div [ class "tc pa2" ] [ Html.text "Grid" ]
-            , ElGrid.view elGrid
+            , ElGridDemo.demoView
             ]
         ]
 

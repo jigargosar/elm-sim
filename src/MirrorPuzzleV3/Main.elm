@@ -44,7 +44,7 @@ viewNewLightPathGraphs : List Graph.Graph -> List (Svg msg)
 viewNewLightPathGraphs =
     let
         foo graph =
-            List.map (uncurry viewGridCellLine) (Set.toList (Graph.getEdges graph))
+            List.map (uncurry viewLine) (Set.toList (Graph.getEdges graph))
                 ++ List.map viewEndPoint (Set.toList (Graph.getEndPoints graph))
     in
     List.concatMap foo
@@ -68,8 +68,8 @@ canvas =
     svg [ viewBox 0 0 w h, PX.width w, PX.height h ]
 
 
-viewGridCellLine : Int2 -> Int2 -> Svg msg
-viewGridCellLine p1 p2 =
+viewLine : Int2 -> Int2 -> Svg msg
+viewLine p1 p2 =
     let
         transformPoint =
             NT.toFloat >> NT.scale cellSize >> NT.add ( cellSize / 2, cellSize / 2 )

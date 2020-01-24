@@ -4,6 +4,8 @@ module MirrorPuzzleV3.Tile exposing
     , getLightPathUnfoldInstruction
     , getRefractionDirectionOfLightSource
     , lightSourceWithMirror
+    , mirror
+    , prism
     , rotateElement
     , swapElements
     )
@@ -24,6 +26,16 @@ floor =
 lightSourceWithMirror : Direction -> Tile
 lightSourceWithMirror direction =
     FilledContainer LightSource (mirrorFacing direction)
+
+
+prism : Direction -> Tile
+prism direction =
+    FilledContainer Floor (prismFasing direction)
+
+
+mirror : Direction -> Tile
+mirror direction =
+    FilledContainer Floor (mirrorFacing direction)
 
 
 
@@ -144,6 +156,11 @@ type alias Element =
 mirrorFacing : Direction -> Element
 mirrorFacing direction =
     Element Mirror direction True
+
+
+prismFasing : Direction -> Element
+prismFasing direction =
+    Element Prism direction True
 
 
 getRefractionDirectionsOfElement : Element -> List Direction

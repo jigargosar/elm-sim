@@ -35,7 +35,7 @@ gridView =
         [ Html.div [ class "inline-flex flex-column" ]
             [ Html.div [ class "tc pa2" ] [ Html.text "Graph.unfoldDirection8Graph movementAt" ]
             , gridCanvasWith
-                (viewNewLightPathGraphs (lightGraphsFromGridWithMovementFunc grid))
+                (viewNewLightPathGraphs (lightPathGraphs grid))
             ]
         ]
 
@@ -162,8 +162,8 @@ gridDimensionsF =
     gridDimensions |> mapEach toFloat
 
 
-lightGraphsFromGridWithMovementFunc : ElGrid -> List Graph.Graph
-lightGraphsFromGridWithMovementFunc elGrid =
+lightPathGraphs : ElGrid -> List Graph.Graph
+lightPathGraphs elGrid =
     let
         unfoldInstructionAt : Int2 -> Graph.UnfoldInstruction
         unfoldInstructionAt position =

@@ -11,7 +11,7 @@ import MirrorPuzzleV3.TileGird as TileGrid
 import Number2 as NT exposing (Int2)
 import Playground.Direction8 as D exposing (Direction8)
 import Set exposing (Set)
-import Svg exposing (Svg, g)
+import Svg exposing (Svg, ellipse, g)
 import Svg.Attributes
 import TypedSvg exposing (circle, line, rect, svg)
 import TypedSvg.Attributes exposing (fill, stroke, transform, viewBox)
@@ -98,16 +98,18 @@ viewTileGrid grid =
             cellSize / 2
 
         mirrorForm direction =
-            rect
-                [ PX.width cellSize
-                , PX.height cellSize
+            ellipse
+                [ PX.rx (cellSize / 4)
+                , PX.ry cellSize
+                , PX.cx (cc - cellSize / 4)
+                , PX.cy cc
                 , Svg.Attributes.fill "lightblue"
                 , Svg.Attributes.stroke "none"
                 , transform
                     [ Translate cc cc
-                    , Scale 0.2 0.2
+                    , Scale 0.45 0.45
                     , Translate -cc -cc
-                    , Rotate 45 cc cc
+                    , Rotate (direction |> D.toDegrees |> negate) cc cc
                     ]
                 ]
                 []

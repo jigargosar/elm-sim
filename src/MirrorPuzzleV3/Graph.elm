@@ -64,8 +64,8 @@ unfoldGraph :
     (Seed -> List Seed)
     -> Seed
     -> Graph
-unfoldGraph getChildSeeds seed =
-    unfoldGraphHelp ( initContext getChildSeeds, [ seed ] )
+unfoldGraph nextSeeds seed =
+    unfoldGraphHelp ( initContext nextSeeds, [ seed ] )
 
 
 unfoldGraphHelp : ( Context, List Seed ) -> Graph

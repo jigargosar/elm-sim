@@ -4,7 +4,6 @@ module MirrorPuzzleV3.Graph exposing
     , getEdges
     , getEndPoints
     , unfoldDirection8Graph
-    , unfoldGraph
     )
 
 import Basics.Extra exposing (swap)

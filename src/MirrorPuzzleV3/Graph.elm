@@ -32,11 +32,11 @@ type alias Acc =
     ( Set Edge, Set Int2 )
 
 
-insertEndPoint _ parent ( edges, endPoints ) =
+insertEndPoint parent ( edges, endPoints ) =
     ( edges, Set.insert parent endPoints )
 
 
-insertEdge _ edge ( edges, endPoints ) =
+insertEdge edge ( edges, endPoints ) =
     ( Set.insert edge edges, endPoints )
 
 
@@ -54,27 +54,24 @@ unfoldGraph :
     -> Graph
 unfoldGraph nextSeeds =
     let
-        accumGraphFor : Seed -> Int2 -> Seed -> ( Acc, List Seed ) -> ( Acc, List Seed )
-        accumGraphFor parentNode parent childNode ( gAcc, nodes ) =
+        accumGraphFor : Int2 -> Seed -> ( Acc, List Seed ) -> ( Acc, List Seed )
+        accumGraphFor parent childNode ( gAcc, nodes ) =
             let
                 child =
                     Tuple.first childNode
 
                 edge =
                     ( child, parent )
-
-                nodeEdge =
-                    ( childNode, parentNode )
             in
             if isEdgeMember edge gAcc then
                 -- on cyclic graph, we are currently adding an endpoint
                 -- alternatively, we could just ignore ep, on cycle.
-                ( insertEndPoint parentNode parent gAcc
+                ( insertEndPoint parent gAcc
                 , nodes
                 )
 
             else
-                ( insertEdge nodeEdge edge gAcc
+                ( insertEdge edge gAcc
                 , childNode :: nodes
                 )
 
@@ -95,13 +92,13 @@ unfoldGraph nextSeeds =
                             nextSeeds parentNode
                     in
                     if List.isEmpty childNodes then
-                        nextGraphAcc (insertEndPoint parentNode parent gAcc0) remaningParentNodes
+                        nextGraphAcc (insertEndPoint parent gAcc0) remaningParentNodes
 
                     else
                         let
                             ( gAcc1, nodes1 ) =
                                 List.foldl
-                                    (accumGraphFor parentNode parent)
+                                    (accumGraphFor parent)
                                     ( gAcc0, remaningParentNodes )
                                     childNodes
                         in

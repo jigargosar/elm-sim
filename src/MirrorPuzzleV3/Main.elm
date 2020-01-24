@@ -73,12 +73,7 @@ viewTileGrid grid =
             Html.div [ class "pa2 flex" ] [ svg [ viewBox 0 0 w h, PX.width w, PX.height h ] children ]
     in
     let
-        renderCell : ( Int2, b ) -> Svg msg
-        renderCell ( position, _ ) =
-            let
-                ( x, y ) =
-                    position |> NT.toFloat |> NT.scale cellSize
-            in
+        tileForm position tile =
             [ rect
                 [ PX.width cellSize
                 , PX.height cellSize
@@ -87,6 +82,14 @@ viewTileGrid grid =
                 ]
                 []
             ]
+
+        renderCell : ( Int2, b ) -> Svg msg
+        renderCell ( position, tile ) =
+            let
+                ( x, y ) =
+                    position |> NT.toFloat |> NT.scale cellSize
+            in
+            tileForm position tile
                 |> g [ transform [ Translate x y ] ]
     in
     let

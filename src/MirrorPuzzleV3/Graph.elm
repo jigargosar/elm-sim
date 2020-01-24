@@ -1,4 +1,9 @@
-module MirrorPuzzleV3.Graph exposing (Graph, getEdges, getEndPoints, unfoldGraph)
+module MirrorPuzzleV3.Graph exposing
+    ( Graph
+    , getEdges
+    , getEndPoints
+    , unfoldGraph
+    )
 
 import Basics.Extra exposing (swap)
 import Number2 exposing (Int2)

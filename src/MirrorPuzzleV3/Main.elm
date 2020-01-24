@@ -91,7 +91,13 @@ viewTileGrid grid =
                 |> List.map renderCell
                 |> g []
     in
-    renderGridContent [ renderGridCells ]
+    let
+        renderGraphs =
+            TileGrid.computeLightPaths grid
+                |> List.concatMap (viewGraph { cellSize = cellSize })
+                |> g []
+    in
+    renderGridContent [ renderGridCells, renderGraphs ]
 
 
 
@@ -171,27 +177,27 @@ viewLightPaths elGrid =
     List.concatMap (viewGraph elGrid) (toLightPathGraphs elGrid.dict)
 
 
-viewGraph : ElGrid -> Graph -> List (Svg msg)
+viewGraph : { a | cellSize : Float } -> Graph -> List (Svg msg)
 viewGraph elGrid graph =
     viewGraphEdges elGrid graph ++ viewGraphEndPoints elGrid graph
 
 
-viewGraphEdges : ElGrid -> Graph -> List (Svg msg)
+viewGraphEdges : { a | cellSize : Float } -> Graph -> List (Svg msg)
 viewGraphEdges elGrid graph =
     List.map (viewEdge elGrid) (Graph.getEdges graph |> Set.toList)
 
 
-viewGraphEndPoints : ElGrid -> Graph -> List (Svg msg)
+viewGraphEndPoints : { a | cellSize : Float } -> Graph -> List (Svg msg)
 viewGraphEndPoints elGrid graph =
     List.map (viewEndPoint elGrid) (Graph.getEndPoints graph |> Set.toList)
 
 
-viewEdge : ElGrid -> ( Int2, Int2 ) -> Svg msg
+viewEdge : { a | cellSize : Float } -> ( Int2, Int2 ) -> Svg msg
 viewEdge grid ( p1, p2 ) =
     viewLine grid p1 p2
 
 
-viewLine : ElGrid -> Int2 -> Int2 -> Svg msg
+viewLine : { a | cellSize : Float } -> Int2 -> Int2 -> Svg msg
 viewLine { cellSize } p1 p2 =
     let
         transformPoint =
@@ -213,7 +219,7 @@ viewLine { cellSize } p1 p2 =
         []
 
 
-viewEndPoint : ElGrid -> Int2 -> Svg msg
+viewEndPoint : { a | cellSize : Float } -> Int2 -> Svg msg
 viewEndPoint { cellSize } p1 =
     let
         ( x1, y1 ) =

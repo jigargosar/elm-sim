@@ -74,6 +74,11 @@ gridView =
             , gridCanvasWith
                 (viewNewLightPathGraphs (lightGraphsFromGrid grid))
             ]
+        , Html.div [ class "inline-flex flex-column" ]
+            [ Html.div [ class "tc pa2" ] [ Html.text "Graph.unfoldDirection8Graph movementAt" ]
+            , gridCanvasWith
+                (viewNewLightPathGraphs (lightGraphsFromGridWithMovementFunc grid))
+            ]
         ]
 
 
@@ -384,6 +389,45 @@ lightGraphsFromGrid elGrid =
                         ( position, dirs )
                         |> Just
 
+                _ ->
+                    Nothing
+    in
+    Dict.toList elGrid |> List.filterMap toLightPathGraph
+
+
+lightGraphsFromGridWithMovementFunc : ElGrid -> List Graph.Graph
+lightGraphsFromGridWithMovementFunc elGrid =
+    let
+        movementAt : Int2 -> Graph.Movement
+        movementAt position =
+            case Dict.get position elGrid of
+                Just el ->
+                    case el of
+                        Split directions ->
+                            Graph.Split directions
+
+                        End ->
+                            Graph.End
+
+                        Start _ ->
+                            Graph.Continue
+
+                        Continue ->
+                            Graph.Continue
+
+                Nothing ->
+                    Graph.End
+
+        toLightPathGraph ( position, el ) =
+            case el of
+                Start dirs ->
+                    Just (Graph.unfoldDirection8Graph movementAt position dirs)
+
+                {- Graph.unfoldGraph
+                   (nextLightPathNode elGrid)
+                   ( position, dirs )
+                   |> Just
+                -}
                 _ ->
                     Nothing
     in

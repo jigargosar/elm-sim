@@ -42,8 +42,8 @@ type Movement
     | Split (List Direction8)
 
 
-unfoldDirection8Graph : (Int2 -> Movement) -> Int2 -> Maybe Graph
-unfoldDirection8Graph movementAt startPosition =
+unfoldDirection8Graph : (Int2 -> Movement) -> Int2 -> List Direction8 -> Graph
+unfoldDirection8Graph movementAt startPosition startDirections =
     let
         nextSeeds : Seed -> List Seed
         nextSeeds ( position, directions ) =
@@ -65,15 +65,7 @@ unfoldDirection8Graph movementAt startPosition =
                 )
                 directions
     in
-    case movementAt startPosition of
-        Continue ->
-            Nothing
-
-        End ->
-            Nothing
-
-        Split nd ->
-            Just (unfoldGraph nextSeeds ( startPosition, nd ))
+    unfoldGraph nextSeeds ( startPosition, startDirections )
 
 
 unfoldGraph :

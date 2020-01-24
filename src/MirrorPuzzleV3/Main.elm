@@ -1,10 +1,9 @@
 module MirrorPuzzleV3.Main exposing (main)
 
 import Color
-import Dict exposing (Dict)
-import Dict2d
 import Html exposing (Html)
 import Html.Attributes exposing (class)
+import MirrorPuzzleV3.ElGrid as ElGrid
 import MirrorPuzzleV3.Graph as Graph exposing (Graph)
 import MirrorPuzzleV3.Tile as Tile
 import MirrorPuzzleV3.TileGird as TileGrid
@@ -26,7 +25,7 @@ import TypedSvg.Types exposing (Fill(..), Transform(..))
 main =
     let
         elGrid =
-            initialElGrid
+            ElGrid.initial
 
         tileGrid =
             initialTileGrid
@@ -38,10 +37,7 @@ main =
             ]
         , Html.div [ class "inline-flex flex-column" ]
             [ Html.div [ class "tc pa2" ] [ Html.text "Grid" ]
-            , canvas elGrid
-                ((elGrid.dict |> Dict.toList |> List.map (viewGridCell elGrid))
-                    ++ viewLightPaths elGrid
-                )
+            , ElGrid.view elGrid
             ]
         ]
 
@@ -122,7 +118,7 @@ viewTileGrid grid =
                 ]
                 []
 
-        tileForm position tile =
+        tileForm _ tile =
             case tile of
                 Tile.FilledContainer _ element ->
                     case element.type_ of
@@ -135,7 +131,7 @@ viewTileGrid grid =
                             [ floorForm
                             ]
 
-                Tile.EmptyContainer elementContainer ->
+                Tile.EmptyContainer _ ->
                     [ floorForm ]
 
                 Tile.Goal ->
@@ -180,79 +176,7 @@ viewTileGrid grid =
 
 
 -- Model
-
-
-type alias ElGrid =
-    { dict : ElDict
-    , dimensions : Int2
-    , cellSize : Float
-    }
-
-
-initialElGrid : ElGrid
-initialElGrid =
-    let
-        ( dimensions, grid_ ) =
-            Dict2d.fromListsWithDefault Continue
-                [ [ Continue, Continue, Split [ D.down ], Split [ D.left ] ]
-                , [ Continue, Start [ D.right ], Continue, Split [ D.up, D.down ] ]
-                , [ Split [ D.up ], Continue, Continue, Split [ D.left ] ]
-                ]
-    in
-    ElGrid grid_ dimensions 100
-
-
-toLightPathGraphs : ElDict -> List Graph.Graph
-toLightPathGraphs elDict =
-    let
-        unfoldInstructionAt : Int2 -> Graph.UnfoldInstruction
-        unfoldInstructionAt position =
-            case Dict.get position elDict of
-                Just el ->
-                    case el of
-                        Split directions ->
-                            Graph.Fork directions
-
-                        End ->
-                            Graph.Stop
-
-                        Start _ ->
-                            Graph.ContinuePrevious
-
-                        Continue ->
-                            Graph.ContinuePrevious
-
-                Nothing ->
-                    Graph.Stop
-
-        graphStartingAt : ( Int2, El ) -> Maybe Graph.Graph
-        graphStartingAt ( position, el ) =
-            case el of
-                Start dirs ->
-                    Just (Graph.unfold unfoldInstructionAt position dirs)
-
-                _ ->
-                    Nothing
-    in
-    Dict.toList elDict |> List.filterMap graphStartingAt
-
-
-
 -- View
-
-
-canvas : { a | dimensions : Int2, cellSize : Float } -> List (Svg msg) -> Html msg
-canvas gv children =
-    let
-        ( w, h ) =
-            gv.dimensions |> NT.toFloat |> NT.scale gv.cellSize
-    in
-    Html.div [ class "pa2 flex" ] [ svg [ viewBox 0 0 w h, PX.width w, PX.height h ] children ]
-
-
-viewLightPaths : ElGrid -> List (Svg msg)
-viewLightPaths elGrid =
-    List.concatMap (viewGraph elGrid) (toLightPathGraphs elGrid.dict)
 
 
 viewGraph : { a | cellSize : Float } -> Graph -> List (Svg msg)
@@ -311,30 +235,3 @@ viewEndPoint { cellSize } p1 =
         , transform [ Translate (cellSize / 2) (cellSize / 2) ]
         ]
         []
-
-
-viewGridCell : ElGrid -> ( Int2, b ) -> Svg msg
-viewGridCell { cellSize } ( position, _ ) =
-    let
-        ( x, y ) =
-            position |> NT.toFloat |> NT.scale cellSize
-    in
-    rect
-        [ transform [ Translate x y ]
-        , PX.width cellSize
-        , PX.height cellSize
-        , stroke Color.black
-        , fill FillNone
-        ]
-        []
-
-
-type El
-    = Start (List Direction8)
-    | Continue
-    | Split (List Direction8)
-    | End
-
-
-type alias ElDict =
-    Dict Int2 El

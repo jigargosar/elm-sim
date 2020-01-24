@@ -1,63 +1,64 @@
 module MirrorPuzzleV3.Graph exposing (Graph, getEdges, getLeafNodes, unfoldGraph)
 
 import Basics.Extra exposing (swap)
+import Number2 exposing (Int2)
+import Playground.Direction8 exposing (Direction8)
 import Set exposing (Set)
 
 
-type Graph node comparable
-    = Graph (GraphAcc node comparable)
+type Graph
+    = Graph Acc
 
 
 type alias NodeGraph node =
-    ( List (Edge node), List node )
+    ( List Edge, List node )
 
 
-type alias Edge node =
-    ( node, node )
+type alias Edge =
+    ( Int2, Int2 )
 
 
-getEdges : Graph node comparable -> Set (Edge comparable)
-getEdges (Graph ( _, ( edges, _ ) )) =
+getEdges : Graph -> Set Edge
+getEdges (Graph ( edges, _ )) =
     edges
 
 
-getLeafNodes : Graph node comparable -> Set comparable
-getLeafNodes (Graph ( _, ( _, leafNodes ) )) =
+getLeafNodes : Graph -> Set Int2
+getLeafNodes (Graph ( _, leafNodes )) =
     leafNodes
 
 
-type alias GraphAcc node comparable =
-    ( NodeGraph node, Acc comparable )
+type alias Acc =
+    ( Set Edge, Set Int2 )
 
 
-type alias Acc comparable =
-    ( Set (Edge comparable), Set comparable )
+insertEndPoint _ parent ( edges, endPoints ) =
+    ( edges, Set.insert parent endPoints )
 
 
-insertEndPoint parentNode parent ( ( edgeList, endPointList ), ( edges, endPoints ) ) =
-    ( ( edgeList, parentNode :: endPointList ), ( edges, Set.insert parent endPoints ) )
+insertEdge _ edge ( edges, endPoints ) =
+    ( Set.insert edge edges, endPoints )
 
 
-insertEdge nodeEdge edge ( ( edgeList, endPointList ), ( edges, endPoints ) ) =
-    ( ( nodeEdge :: edgeList, endPointList ), ( Set.insert edge edges, endPoints ) )
-
-
-isEdgeMember edge ( ( _, _ ), ( edges, _ ) ) =
+isEdgeMember edge ( edges, _ ) =
     Set.member edge edges || Set.member (swap edge) edges
 
 
+type alias Seed =
+    ( Int2, List Direction8 )
+
+
 unfoldGraph :
-    { nextNodes : node -> List node
-    , toComparable : node -> comparable
-    }
-    -> node
-    -> Graph node comparable
-unfoldGraph cfg =
+    (Seed -> List Seed)
+    -> Seed
+    -> Graph
+unfoldGraph nextSeeds =
     let
+        accumGraphFor : Seed -> Int2 -> Seed -> ( Acc, List Seed ) -> ( Acc, List Seed )
         accumGraphFor parentNode parent childNode ( gAcc, nodes ) =
             let
                 child =
-                    cfg.toComparable childNode
+                    Tuple.first childNode
 
                 edge =
                     ( child, parent )
@@ -77,7 +78,7 @@ unfoldGraph cfg =
                 , childNode :: nodes
                 )
 
-        nextGraphAcc : GraphAcc node comparable -> List node -> GraphAcc node comparable
+        nextGraphAcc : Acc -> List Seed -> Acc
         nextGraphAcc gAcc0 nodes0 =
             case nodes0 of
                 [] ->
@@ -85,13 +86,13 @@ unfoldGraph cfg =
 
                 parentNode :: remaningParentNodes ->
                     let
-                        parent : comparable
+                        parent : Int2
                         parent =
-                            cfg.toComparable parentNode
+                            Tuple.first parentNode
 
-                        childNodes : List node
+                        childNodes : List Seed
                         childNodes =
-                            cfg.nextNodes parentNode
+                            nextSeeds parentNode
                     in
                     if List.isEmpty childNodes then
                         nextGraphAcc (insertEndPoint parentNode parent gAcc0) remaningParentNodes
@@ -106,4 +107,4 @@ unfoldGraph cfg =
                         in
                         nextGraphAcc gAcc1 nodes1
     in
-    List.singleton >> nextGraphAcc ( ( [], [] ), ( Set.empty, Set.empty ) ) >> Graph
+    List.singleton >> nextGraphAcc ( Set.empty, Set.empty ) >> Graph

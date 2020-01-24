@@ -77,7 +77,7 @@ gridView =
         ]
 
 
-viewNewLightPathGraphs : List (Graph.Graph (PathNode Int2 (List Direction8)) Int2) -> List (Svg msg)
+viewNewLightPathGraphs : List Graph.Graph -> List (Svg msg)
 viewNewLightPathGraphs =
     let
         foo graph =
@@ -373,16 +373,14 @@ lightPathGraphs grid0 =
     Dict.toList grid0 |> List.filterMap toLightPathGraph
 
 
-newLightPathGraphsFromGrid : ElGrid -> List (Graph.Graph (PathNode Int2 (List Direction8)) Int2)
+newLightPathGraphsFromGrid : ElGrid -> List Graph.Graph
 newLightPathGraphsFromGrid elGrid =
     let
         toLightPathGraph ( position, el ) =
             case el of
                 Start dirs ->
                     Graph.unfoldGraph
-                        { nextNodes = nextLightPathNode elGrid
-                        , toComparable = Tuple.first
-                        }
+                        (nextLightPathNode elGrid)
                         ( position, dirs )
                         |> Just
 

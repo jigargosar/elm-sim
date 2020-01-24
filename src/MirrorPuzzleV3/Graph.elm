@@ -11,10 +11,6 @@ type Graph
     = Graph ( Set Edge, Set Int2 )
 
 
-type alias NodeGraph node =
-    ( List Edge, List node )
-
-
 type alias Edge =
     ( Int2, Int2 )
 
@@ -27,33 +23,6 @@ getEdges (Graph ( edges, _ )) =
 getLeafNodes : Graph -> Set Int2
 getLeafNodes (Graph ( _, leafNodes )) =
     leafNodes
-
-
-type alias Context =
-    { edges : Set Edge
-    , endPoints : Set Int2
-    , nextSeeds : Seed -> List Seed
-    }
-
-
-initContext : (Seed -> List Seed) -> Context
-initContext nextSeeds =
-    Context Set.empty Set.empty nextSeeds
-
-
-insertEndPoint : Seed -> Context -> Context
-insertEndPoint ( parent, _ ) context =
-    { context | endPoints = Set.insert parent context.endPoints }
-
-
-insertEdge : Edge -> Context -> Context
-insertEdge edge context =
-    { context | edges = Set.insert edge context.edges }
-
-
-isEdgeMember : Edge -> Context -> Bool
-isEdgeMember edge { edges } =
-    Set.member edge edges || Set.member (swap edge) edges
 
 
 type alias Seed =
@@ -105,3 +74,34 @@ updateContextForParentChildSeed parentSeed childSeed ( context, pendingSeeds ) =
         ( insertEdge edge context
         , childSeed :: pendingSeeds
         )
+
+
+
+-- Unfold Context
+
+
+type alias Context =
+    { edges : Set Edge
+    , endPoints : Set Int2
+    , nextSeeds : Seed -> List Seed
+    }
+
+
+initContext : (Seed -> List Seed) -> Context
+initContext nextSeeds =
+    Context Set.empty Set.empty nextSeeds
+
+
+insertEndPoint : Seed -> Context -> Context
+insertEndPoint ( parent, _ ) context =
+    { context | endPoints = Set.insert parent context.endPoints }
+
+
+insertEdge : Edge -> Context -> Context
+insertEdge edge context =
+    { context | edges = Set.insert edge context.edges }
+
+
+isEdgeMember : Edge -> Context -> Bool
+isEdgeMember edge { edges } =
+    Set.member edge edges || Set.member (swap edge) edges

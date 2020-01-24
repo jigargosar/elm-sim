@@ -33,15 +33,15 @@ main =
     in
     Html.div [ class "pa2 inline-flex flex-wrap" ]
         [ Html.div [ class "inline-flex flex-column" ]
+            [ Html.div [ class "tc pa2" ] [ Html.text "TileGrid" ]
+            , viewTileGrid tileGrid
+            ]
+        , Html.div [ class "inline-flex flex-column" ]
             [ Html.div [ class "tc pa2" ] [ Html.text "Grid" ]
             , canvas elGrid
                 ((elGrid.dict |> Dict.toList |> List.map (viewGridCell elGrid))
                     ++ viewLightPaths elGrid
                 )
-            ]
-        , Html.div [ class "inline-flex flex-column" ]
-            [ Html.div [ class "tc pa2" ] [ Html.text "TileGrid" ]
-            , viewTileGrid tileGrid
             ]
         ]
 
@@ -53,9 +53,12 @@ main =
 initialTileGrid : TileGrid.TileGrid
 initialTileGrid =
     TileGrid.fromList2d
-        [ [ Tile.floor, Tile.floor, Tile.mirror D.down, Tile.mirror D.left ]
-        , [ Tile.floor, Tile.lightSourceWithMirror D.right, Tile.floor, Tile.prism D.up ]
-        , [ Tile.mirror D.up, Tile.floor, Tile.floor, Tile.mirror D.left ]
+        [ [ Tile.Wall, Tile.Wall, Tile.Wall, Tile.Wall, Tile.Wall, Tile.Wall ]
+        , [ Tile.Wall, Tile.floor, Tile.floor, Tile.mirror D.down, Tile.mirror D.left, Tile.Wall ]
+        , [ Tile.Wall, Tile.floor, Tile.floor, Tile.mirror D.down, Tile.mirror D.left, Tile.Wall ]
+        , [ Tile.Wall, Tile.floor, Tile.lightSourceWithMirror D.right, Tile.floor, Tile.prism D.up, Tile.Wall ]
+        , [ Tile.Wall, Tile.mirror D.up, Tile.floor, Tile.floor, Tile.mirror D.left, Tile.Wall ]
+        , [ Tile.Wall, Tile.floor, Tile.floor, Tile.floor, Tile.floor, Tile.Wall ]
         ]
 
 

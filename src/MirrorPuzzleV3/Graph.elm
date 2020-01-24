@@ -55,53 +55,53 @@ unfoldGraph :
 unfoldGraph nextSeeds =
     let
         accumGraphFor : Int2 -> Seed -> ( Acc, List Seed ) -> ( Acc, List Seed )
-        accumGraphFor parent childNode ( gAcc, nodes ) =
+        accumGraphFor parent childSeeds ( graphAcc, seedsAcc ) =
             let
                 child =
-                    Tuple.first childNode
+                    Tuple.first childSeeds
 
                 edge =
                     ( child, parent )
             in
-            if isEdgeMember edge gAcc then
+            if isEdgeMember edge graphAcc then
                 -- on cyclic graph, we are currently adding an endpoint
                 -- alternatively, we could just ignore ep, on cycle.
-                ( insertEndPoint parent gAcc
-                , nodes
+                ( insertEndPoint parent graphAcc
+                , seedsAcc
                 )
 
             else
-                ( insertEdge edge gAcc
-                , childNode :: nodes
+                ( insertEdge edge graphAcc
+                , childSeeds :: seedsAcc
                 )
 
-        nextGraphAcc : Acc -> List Seed -> Acc
-        nextGraphAcc gAcc0 nodes0 =
-            case nodes0 of
+        unfoldGraphFromSeeds : Acc -> List Seed -> Acc
+        unfoldGraphFromSeeds graphAcc seedsAcc =
+            case seedsAcc of
                 [] ->
-                    gAcc0
+                    graphAcc
 
-                parentNode :: remaningParentNodes ->
+                currentSeed :: remaningSeeds ->
                     let
                         parent : Int2
                         parent =
-                            Tuple.first parentNode
+                            Tuple.first currentSeed
 
-                        childNodes : List Seed
-                        childNodes =
-                            nextSeeds parentNode
+                        childSeeds : List Seed
+                        childSeeds =
+                            nextSeeds currentSeed
                     in
-                    if List.isEmpty childNodes then
-                        nextGraphAcc (insertEndPoint parent gAcc0) remaningParentNodes
+                    if List.isEmpty childSeeds then
+                        unfoldGraphFromSeeds (insertEndPoint parent graphAcc) remaningSeeds
 
                     else
                         let
                             ( gAcc1, nodes1 ) =
                                 List.foldl
                                     (accumGraphFor parent)
-                                    ( gAcc0, remaningParentNodes )
-                                    childNodes
+                                    ( graphAcc, remaningSeeds )
+                                    childSeeds
                         in
-                        nextGraphAcc gAcc1 nodes1
+                        unfoldGraphFromSeeds gAcc1 nodes1
     in
-    List.singleton >> nextGraphAcc ( Set.empty, Set.empty ) >> Graph
+    List.singleton >> unfoldGraphFromSeeds ( Set.empty, Set.empty ) >> Graph

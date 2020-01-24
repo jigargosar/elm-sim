@@ -59,6 +59,10 @@ initialTileGrid =
         |> TileGrid.fromList2d
 
 
+
+-- View
+
+
 viewTileGrid grid =
     let
         cellSize =
@@ -174,7 +178,7 @@ viewTileGrid grid =
 
 
 
--- View
+-- View Graph
 
 
 viewGraph : Float -> Graph -> List (Svg msg)

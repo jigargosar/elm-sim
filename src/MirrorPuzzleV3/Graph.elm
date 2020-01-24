@@ -1,9 +1,9 @@
 module MirrorPuzzleV3.Graph exposing
     ( Graph
-    , Movement(..)
+    , UnfoldInstruction(..)
     , getEdges
     , getEndPoints
-    , unfoldDirection8Graph
+    , unfold
     )
 
 import Basics.Extra exposing (swap)
@@ -35,14 +35,14 @@ type alias Seed =
     ( Int2, List Direction8 )
 
 
-type Movement
-    = Continue
-    | End
-    | Split (List Direction8)
+type UnfoldInstruction
+    = ContinuePrevious
+    | Stop
+    | Fork (List Direction8)
 
 
-unfoldDirection8Graph : (Int2 -> Movement) -> Int2 -> List Direction8 -> Graph
-unfoldDirection8Graph movementAt startPosition startDirections =
+unfold : (Int2 -> UnfoldInstruction) -> Int2 -> List Direction8 -> Graph
+unfold newDirectionsAt startPosition startDirections =
     let
         nextSeeds : Seed -> List Seed
         nextSeeds ( position, directions ) =
@@ -52,31 +52,23 @@ unfoldDirection8Graph movementAt startPosition startDirections =
                         nextPosition =
                             D.stepPos position d
                     in
-                    case movementAt nextPosition of
-                        Continue ->
+                    case newDirectionsAt nextPosition of
+                        ContinuePrevious ->
                             Just ( nextPosition, [ d ] )
 
-                        End ->
+                        Stop ->
                             Nothing
 
-                        Split nd ->
+                        Fork nd ->
                             Just ( nextPosition, nd )
                 )
                 directions
     in
-    unfoldGraph nextSeeds ( startPosition, startDirections )
+    unfoldHelp (initContext nextSeeds ( startPosition, startDirections ))
 
 
-unfoldGraph :
-    (Seed -> List Seed)
-    -> Seed
-    -> Graph
-unfoldGraph nextSeeds seed =
-    unfoldGraphHelp (initContext nextSeeds seed)
-
-
-unfoldGraphHelp : Context -> Graph
-unfoldGraphHelp context0 =
+unfoldHelp : Context -> Graph
+unfoldHelp context0 =
     case popPending context0 of
         Nothing ->
             Graph ( context0.edges, context0.endPoints )
@@ -84,10 +76,10 @@ unfoldGraphHelp context0 =
         Just ( parentSeed, context ) ->
             case context.nextSeeds parentSeed of
                 [] ->
-                    unfoldGraphHelp (insertEndPoint parentSeed context)
+                    unfoldHelp (insertEndPoint parentSeed context)
 
                 childSeeds ->
-                    unfoldGraphHelp
+                    unfoldHelp
                         (List.foldl
                             (updateContextForParentChildSeed parentSeed)
                             context

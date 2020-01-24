@@ -165,30 +165,31 @@ gridDimensionsF =
 lightGraphsFromGridWithMovementFunc : ElGrid -> List Graph.Graph
 lightGraphsFromGridWithMovementFunc elGrid =
     let
-        movementAt : Int2 -> Graph.Movement
-        movementAt position =
+        unfoldInstructionAt : Int2 -> Graph.UnfoldInstruction
+        unfoldInstructionAt position =
             case Dict.get position elGrid of
                 Just el ->
                     case el of
                         Split directions ->
-                            Graph.Split directions
+                            Graph.Fork directions
 
                         End ->
-                            Graph.End
+                            Graph.Stop
 
                         Start _ ->
-                            Graph.Continue
+                            Graph.ContinuePrevious
 
                         Continue ->
-                            Graph.Continue
+                            Graph.ContinuePrevious
 
                 Nothing ->
-                    Graph.End
+                    Graph.Stop
 
-        toLightPathGraph ( position, el ) =
+        graphStartingAt : ( Int2, El ) -> Maybe Graph.Graph
+        graphStartingAt ( position, el ) =
             case el of
                 Start dirs ->
-                    Just (Graph.unfoldDirection8Graph movementAt position dirs)
+                    Just (Graph.unfold unfoldInstructionAt position dirs)
 
                 {- Graph.unfoldGraph
                    (nextLightPathNode elGrid)
@@ -198,4 +199,4 @@ lightGraphsFromGridWithMovementFunc elGrid =
                 _ ->
                     Nothing
     in
-    Dict.toList elGrid |> List.filterMap toLightPathGraph
+    Dict.toList elGrid |> List.filterMap graphStartingAt

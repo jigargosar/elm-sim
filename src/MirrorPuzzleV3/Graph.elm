@@ -60,31 +60,6 @@ unfoldGraph getChildSeeds seed =
     unfoldGraphHelp getChildSeeds initialAcc
 
 
-unfoldGraphHelp2 :
-    (Seed -> List Seed)
-    -> Seed
-    -> List Seed
-    -> Acc
-    -> Graph
-unfoldGraphHelp2 getChildSeeds currentSeed otherSeeds graphAcc =
-    case getChildSeeds currentSeed of
-        [] ->
-            case otherSeeds of
-                [] ->
-                    Graph graphAcc
-
-                first :: rest ->
-                    unfoldGraphHelp2 getChildSeeds first rest (insertEndPoint currentSeed graphAcc)
-
-        childSeeds ->
-            unfoldGraphHelp getChildSeeds
-                (List.foldl
-                    (accumGraphWithChildSeedOf currentSeed)
-                    ( graphAcc, otherSeeds )
-                    childSeeds
-                )
-
-
 unfoldGraphHelp :
     (Seed -> List Seed)
     -> ( Acc, List Seed )

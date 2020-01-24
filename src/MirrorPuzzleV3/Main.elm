@@ -29,6 +29,13 @@ main =
         ]
 
 
+type alias GridView =
+    { grid : ElGrid
+    , cellSize : Float
+    , dimensions : Int2
+    }
+
+
 cellSize =
     100
 

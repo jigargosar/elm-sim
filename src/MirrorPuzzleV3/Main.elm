@@ -20,17 +20,6 @@ import TypedSvg.Types exposing (Fill(..), Transform(..))
 
 
 main =
-    Html.div []
-        [ gridView
-        ]
-
-
-cellSize =
-    100
-
-
-gridView : Html.Html msg
-gridView =
     Html.div [ class "pa2 inline-flex flex-wrap" ]
         [ Html.div [ class "inline-flex flex-column" ]
             [ Html.div [ class "tc pa2" ] [ Html.text "Graph.unfoldDirection8Graph movementAt" ]
@@ -38,6 +27,10 @@ gridView =
                 (viewNewLightPathGraphs (lightPathGraphs grid))
             ]
         ]
+
+
+cellSize =
+    100
 
 
 viewNewLightPathGraphs : List Graph.Graph -> List (Svg msg)

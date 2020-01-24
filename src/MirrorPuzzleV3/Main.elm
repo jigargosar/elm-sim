@@ -139,11 +139,11 @@ type alias ElDict =
 
 
 lightPathGraphs : ElDict -> List Graph.Graph
-lightPathGraphs grid =
+lightPathGraphs elDict =
     let
         unfoldInstructionAt : Int2 -> Graph.UnfoldInstruction
         unfoldInstructionAt position =
-            case Dict.get position grid of
+            case Dict.get position elDict of
                 Just el ->
                     case el of
                         Split directions ->
@@ -170,4 +170,4 @@ lightPathGraphs grid =
                 _ ->
                     Nothing
     in
-    Dict.toList grid |> List.filterMap graphStartingAt
+    Dict.toList elDict |> List.filterMap graphStartingAt

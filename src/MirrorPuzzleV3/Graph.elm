@@ -94,7 +94,7 @@ updateContextForParentChildSeed parentSeed childSeed ( context, pendingSeeds ) =
             Tuple.first childSeed
 
         edge =
-            ( child, Tuple.first parentSeed )
+            ( Tuple.first parentSeed, child )
     in
     if isEdgeMember edge context then
         -- on cyclic graph, we are currently adding an endpoint

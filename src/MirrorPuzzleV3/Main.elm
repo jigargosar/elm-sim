@@ -27,7 +27,9 @@ main =
         [ Html.div [ class "inline-flex flex-column" ]
             [ Html.div [ class "tc pa2" ] [ Html.text "Grid" ]
             , canvas2d gv
-                (viewNewLightPathGraphs gv (lightPathGraphs gv.grid))
+                ((gv.grid |> Dict.toList |> List.map (viewGridCell gv))
+                    ++ viewNewLightPathGraphs gv (lightPathGraphs gv.grid)
+                )
             ]
         ]
 
@@ -109,24 +111,8 @@ viewEndPoint { cellSize } p1 =
         []
 
 
-viewCell : GridView -> ( Int2, b ) -> Svg msg
-viewCell gv ( position, _ ) =
-    let
-        ( x, y ) =
-            position |> NT.toFloat |> NT.scale gv.cellSize
-    in
-    rect
-        [ transform [ Translate x y ]
-        , PX.width gv.cellSize
-        , PX.height gv.cellSize
-        , stroke Color.black
-        , fill FillNone
-        ]
-        []
-
-
-viewGridItem : GridView -> ( Int2, b ) -> Svg msg
-viewGridItem { cellSize } ( position, _ ) =
+viewGridCell : GridView -> ( Int2, b ) -> Svg msg
+viewGridCell { cellSize } ( position, _ ) =
     let
         ( x, y ) =
             position |> NT.toFloat |> NT.scale cellSize

@@ -73,17 +73,34 @@ viewTileGrid grid =
             Html.div [ class "pa2 flex" ] [ svg [ viewBox 0 0 w h, PX.width w, PX.height h ] children ]
     in
     let
-        tileForm position tile =
-            [ rect
+        floorForm =
+            rect
                 [ PX.width cellSize
                 , PX.height cellSize
                 , stroke Color.black
                 , fill FillNone
                 ]
                 []
-            ]
 
-        renderCell : ( Int2, b ) -> Svg msg
+        tileForm position tile =
+            case tile of
+                Tile.FilledContainer _ _ ->
+                    [ floorForm
+                    ]
+
+                Tile.EmptyContainer elementContainer ->
+                    [ floorForm ]
+
+                Tile.Goal ->
+                    [ floorForm ]
+
+                Tile.Wall ->
+                    [ floorForm ]
+
+                Tile.Hole ->
+                    []
+
+        renderCell : ( Int2, Tile.Tile ) -> Svg msg
         renderCell ( position, tile ) =
             let
                 ( x, y ) =

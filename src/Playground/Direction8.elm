@@ -7,12 +7,8 @@ module Playground.Direction8 exposing
     , right
     , rotate
     , stepPos
-    , stepPosCCW
-    , stepPosCCWIn
     , stepPosIn
     , toDegrees
-    , toVec
-    , toVecCCW
     , up
     )
 
@@ -68,18 +64,8 @@ opposite =
     rotate 4
 
 
-stepPosCCWIn : Direction8 -> Pos -> Pos
-stepPosCCWIn direction8 pos =
-    NT.add pos (toVecCCW direction8)
-
-
-stepPosCCW : Pos -> Direction8 -> Pos
-stepPosCCW =
-    flip stepPosCCWIn
-
-
-toVecCCW : Direction8 -> ( number, number )
-toVecCCW =
+toVecCW : Direction8 -> ( number, number )
+toVecCW =
     toVec >> Tuple.mapSecond negate
 
 
@@ -116,7 +102,7 @@ toVec (Dir ct) =
 
 stepPosIn : Direction8 -> Pos -> Pos
 stepPosIn dir pos =
-    NT.add pos (toVecCCW dir)
+    NT.add pos (toVec dir)
 
 
 stepPos : Pos -> Direction8 -> Pos

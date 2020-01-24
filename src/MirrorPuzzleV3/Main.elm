@@ -1,8 +1,8 @@
 module MirrorPuzzleV3.Main exposing (main)
 
-import Collage exposing (circle, filled, rectangle, uniform)
-import Collage.Layout exposing (at, topLeft)
-import Collage.Render exposing (svg)
+import Collage exposing (..)
+import Collage.Layout exposing (..)
+import Collage.Render exposing (..)
 import Color
 import Html exposing (Html)
 import Html.Attributes exposing (class)
@@ -31,16 +31,33 @@ main =
         ]
 
 
+collageDemo : Html msg
 collageDemo =
     let
-        circ =
-            circle 50
-                |> filled (uniform Color.red)
-
         rect =
-            rectangle 200 100
-                |> filled (uniform Color.blue)
+            square 50
+                -- |> filled (uniform Color.blue)
+                |> outlined (solid thin (uniform Color.red))
+
+        cells =
+            List.repeat 5 rect
+                |> List.intersperse (square 10 |> filled transparent)
+
+        row =
+            cells |> horizontal
+
+        gridCells =
+            List.repeat 5 row
+                |> List.intersperse (square 10 |> filled transparent)
+                |> vertical
+                |> align base
+                |> shift ( 70, -100 )
+
+        gridBackground =
+            square 250
+                |> filled (uniform Color.red)
+                |> opacity 0.1
+                |> align base
     in
-    rect
-        |> at topLeft circ
+    impose gridCells gridBackground
         |> svg

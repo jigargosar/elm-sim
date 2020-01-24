@@ -52,31 +52,10 @@ unfoldGraph :
     (Seed -> List Seed)
     -> Seed
     -> Graph
-unfoldGraph nextSeeds =
+unfoldGraph getChildSeeds =
     let
-        accumGraphFor : Int2 -> Seed -> ( Acc, List Seed ) -> ( Acc, List Seed )
-        accumGraphFor parent childSeeds ( graphAcc, seedsAcc ) =
-            let
-                child =
-                    Tuple.first childSeeds
-
-                edge =
-                    ( child, parent )
-            in
-            if isEdgeMember edge graphAcc then
-                -- on cyclic graph, we are currently adding an endpoint
-                -- alternatively, we could just ignore ep, on cycle.
-                ( insertEndPoint parent graphAcc
-                , seedsAcc
-                )
-
-            else
-                ( insertEdge edge graphAcc
-                , childSeeds :: seedsAcc
-                )
-
-        unfoldGraphFromSeeds : Acc -> List Seed -> Acc
-        unfoldGraphFromSeeds graphAcc seedsAcc =
+        unfoldGraphFromSeeds : ( Acc, List Seed ) -> Acc
+        unfoldGraphFromSeeds ( graphAcc, seedsAcc ) =
             case seedsAcc of
                 [] ->
                     graphAcc
@@ -89,19 +68,39 @@ unfoldGraph nextSeeds =
 
                         childSeeds : List Seed
                         childSeeds =
-                            nextSeeds currentSeed
+                            getChildSeeds currentSeed
                     in
                     if List.isEmpty childSeeds then
-                        unfoldGraphFromSeeds (insertEndPoint parent graphAcc) remaningSeeds
+                        unfoldGraphFromSeeds ( insertEndPoint parent graphAcc, remaningSeeds )
 
                     else
-                        let
-                            ( gAcc1, nodes1 ) =
-                                List.foldl
-                                    (accumGraphFor parent)
-                                    ( graphAcc, remaningSeeds )
-                                    childSeeds
-                        in
-                        unfoldGraphFromSeeds gAcc1 nodes1
+                        unfoldGraphFromSeeds
+                            (List.foldl
+                                (accumGraphFor parent)
+                                ( graphAcc, remaningSeeds )
+                                childSeeds
+                            )
     in
-    List.singleton >> unfoldGraphFromSeeds ( Set.empty, Set.empty ) >> Graph
+    List.singleton >> Tuple.pair ( Set.empty, Set.empty ) >> unfoldGraphFromSeeds >> Graph
+
+
+accumGraphFor : Int2 -> Seed -> ( Acc, List Seed ) -> ( Acc, List Seed )
+accumGraphFor parent childSeeds ( graphAcc, seedsAcc ) =
+    let
+        child =
+            Tuple.first childSeeds
+
+        edge =
+            ( child, parent )
+    in
+    if isEdgeMember edge graphAcc then
+        -- on cyclic graph, we are currently adding an endpoint
+        -- alternatively, we could just ignore ep, on cycle.
+        ( insertEndPoint parent graphAcc
+        , seedsAcc
+        )
+
+    else
+        ( insertEdge edge graphAcc
+        , childSeeds :: seedsAcc
+        )

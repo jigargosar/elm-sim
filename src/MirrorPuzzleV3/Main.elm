@@ -160,7 +160,7 @@ viewTileGrid grid =
     let
         renderGraphs =
             TileGrid.computeLightPaths grid
-                |> List.concatMap (viewGraph { cellSize = cellSize })
+                |> List.concatMap (viewGraph cellSize)
     in
     renderGridContent
         [ g
@@ -175,35 +175,34 @@ viewTileGrid grid =
 
 
 
--- Model
 -- View
 
 
-viewGraph : { a | cellSize : Float } -> Graph -> List (Svg msg)
-viewGraph elGrid graph =
-    viewGraphEdges elGrid graph ++ viewGraphEndPoints elGrid graph
+viewGraph : Float -> Graph -> List (Svg msg)
+viewGraph width graph =
+    viewGraphEdges width graph ++ viewGraphEndPoints width graph
 
 
-viewGraphEdges : { a | cellSize : Float } -> Graph -> List (Svg msg)
+viewGraphEdges : Float -> Graph -> List (Svg msg)
 viewGraphEdges elGrid graph =
     List.map (viewEdge elGrid) (Graph.getEdges graph |> Set.toList)
 
 
-viewGraphEndPoints : { a | cellSize : Float } -> Graph -> List (Svg msg)
+viewGraphEndPoints : Float -> Graph -> List (Svg msg)
 viewGraphEndPoints elGrid graph =
     List.map (viewEndPoint elGrid) (Graph.getEndPoints graph |> Set.toList)
 
 
-viewEdge : { a | cellSize : Float } -> ( Int2, Int2 ) -> Svg msg
+viewEdge : Float -> ( Int2, Int2 ) -> Svg msg
 viewEdge grid ( p1, p2 ) =
     viewLine grid p1 p2
 
 
-viewLine : { a | cellSize : Float } -> Int2 -> Int2 -> Svg msg
-viewLine { cellSize } p1 p2 =
+viewLine : Float -> Int2 -> Int2 -> Svg msg
+viewLine width p1 p2 =
     let
         transformPoint =
-            NT.toFloat >> NT.scale cellSize >> NT.add ( cellSize / 2, cellSize / 2 )
+            NT.toFloat >> NT.scale width >> NT.add ( width / 2, width / 2 )
 
         ( x1, y1 ) =
             transformPoint p1
@@ -221,17 +220,17 @@ viewLine { cellSize } p1 p2 =
         []
 
 
-viewEndPoint : { a | cellSize : Float } -> Int2 -> Svg msg
-viewEndPoint { cellSize } p1 =
+viewEndPoint : Float -> Int2 -> Svg msg
+viewEndPoint width p1 =
     let
         ( x1, y1 ) =
-            p1 |> (NT.toFloat >> NT.scale cellSize)
+            p1 |> (NT.toFloat >> NT.scale width)
     in
     circle
         [ PX.cx x1
         , PX.cy y1
-        , PX.r (cellSize / 10)
+        , PX.r (width / 10)
         , Svg.Attributes.fillOpacity "0.5"
-        , transform [ Translate (cellSize / 2) (cellSize / 2) ]
+        , transform [ Translate (width / 2) (width / 2) ]
         ]
         []

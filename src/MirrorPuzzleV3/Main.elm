@@ -53,8 +53,8 @@ main =
 initialTileGrid : TileGrid.TileGrid
 initialTileGrid =
     TileGrid.fromList2d
-        [ [ Tile.Wall, Tile.Wall, Tile.Wall, Tile.Wall, Tile.Wall, Tile.Wall ]
-        , [ Tile.Wall, Tile.floor, Tile.floor, Tile.mirror D.down, Tile.mirror D.left, Tile.Wall ]
+        [ [ Tile.Hole, Tile.Wall, Tile.Wall, Tile.Wall, Tile.Wall, Tile.Hole ]
+        , [ Tile.Wall, Tile.floor, Tile.floor, Tile.floor, Tile.floor, Tile.Wall ]
         , [ Tile.Wall, Tile.floor, Tile.floor, Tile.mirror D.down, Tile.mirror D.left, Tile.Wall ]
         , [ Tile.Wall, Tile.floor, Tile.lightSourceWithMirror D.right, Tile.floor, Tile.prism D.up, Tile.Wall ]
         , [ Tile.Wall, Tile.mirror D.up, Tile.floor, Tile.floor, Tile.mirror D.left, Tile.Wall ]
@@ -80,16 +80,50 @@ viewTileGrid grid =
             rect
                 [ PX.width cellSize
                 , PX.height cellSize
-                , stroke Color.black
+                , Svg.Attributes.stroke "gray"
                 , fill FillNone
+                ]
+                []
+
+        wallForm =
+            rect
+                [ PX.width cellSize
+                , PX.height cellSize
+                , Svg.Attributes.fill "silver"
+                , Svg.Attributes.stroke "silver"
+                ]
+                []
+
+        cc =
+            cellSize / 2
+
+        mirrorForm direction =
+            rect
+                [ PX.width cellSize
+                , PX.height cellSize
+                , Svg.Attributes.fill "lightblue"
+                , Svg.Attributes.stroke "none"
+                , transform
+                    [ Translate cc cc
+                    , Scale 0.2 0.2
+                    , Translate -cc -cc
+                    , Rotate 45 cc cc
+                    ]
                 ]
                 []
 
         tileForm position tile =
             case tile of
-                Tile.FilledContainer _ _ ->
-                    [ floorForm
-                    ]
+                Tile.FilledContainer _ element ->
+                    case element.type_ of
+                        Tile.Mirror ->
+                            [ floorForm
+                            , mirrorForm element.direction
+                            ]
+
+                        _ ->
+                            [ floorForm
+                            ]
 
                 Tile.EmptyContainer elementContainer ->
                     [ floorForm ]
@@ -98,7 +132,7 @@ viewTileGrid grid =
                     [ floorForm ]
 
                 Tile.Wall ->
-                    [ floorForm ]
+                    [ wallForm ]
 
                 Tile.Hole ->
                     []

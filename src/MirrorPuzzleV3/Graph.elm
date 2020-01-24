@@ -32,7 +32,7 @@ type alias Acc =
     ( Set Edge, Set Int2 )
 
 
-insertEndPoint parent ( edges, endPoints ) =
+insertEndPoint ( parent, _ ) ( edges, endPoints ) =
     ( edges, Set.insert parent endPoints )
 
 
@@ -60,47 +60,67 @@ unfoldGraph getChildSeeds seed =
     unfoldGraphHelp getChildSeeds initialAcc
 
 
+unfoldGraphHelp2 :
+    (Seed -> List Seed)
+    -> Seed
+    -> List Seed
+    -> Acc
+    -> Graph
+unfoldGraphHelp2 getChildSeeds currentSeed otherSeeds graphAcc =
+    case getChildSeeds currentSeed of
+        [] ->
+            case otherSeeds of
+                [] ->
+                    Graph graphAcc
+
+                first :: rest ->
+                    unfoldGraphHelp2 getChildSeeds first rest (insertEndPoint currentSeed graphAcc)
+
+        childSeeds ->
+            unfoldGraphHelp getChildSeeds
+                (List.foldl
+                    (accumGraphWithChildSeedOf currentSeed)
+                    ( graphAcc, otherSeeds )
+                    childSeeds
+                )
+
+
 unfoldGraphHelp :
     (Seed -> List Seed)
     -> ( Acc, List Seed )
     -> Graph
-unfoldGraphHelp getChildSeeds ( graphAcc, pendingSeeds ) =
+unfoldGraphHelp getNextSeeds ( graphAcc, pendingSeeds ) =
     case pendingSeeds of
         [] ->
             Graph graphAcc
 
         currentSeed :: otherSeeds ->
-            let
-                parent : Int2
-                parent =
-                    Tuple.first currentSeed
-            in
-            case getChildSeeds currentSeed of
+            case getNextSeeds currentSeed of
                 [] ->
-                    unfoldGraphHelp getChildSeeds ( insertEndPoint parent graphAcc, otherSeeds )
+                    unfoldGraphHelp getNextSeeds ( insertEndPoint currentSeed graphAcc, otherSeeds )
 
                 childSeeds ->
-                    unfoldGraphHelp getChildSeeds
+                    unfoldGraphHelp getNextSeeds
                         (List.foldl
-                            (accumGraphWithChildSeedOf parent)
+                            (accumGraphWithChildSeedOf currentSeed)
                             ( graphAcc, otherSeeds )
                             childSeeds
                         )
 
 
-accumGraphWithChildSeedOf : Int2 -> Seed -> ( Acc, List Seed ) -> ( Acc, List Seed )
-accumGraphWithChildSeedOf parent childSeed ( graphAcc, pendingSeeds ) =
+accumGraphWithChildSeedOf : Seed -> Seed -> ( Acc, List Seed ) -> ( Acc, List Seed )
+accumGraphWithChildSeedOf parentSeed childSeed ( graphAcc, pendingSeeds ) =
     let
         child =
             Tuple.first childSeed
 
         edge =
-            ( child, parent )
+            ( child, Tuple.first parentSeed )
     in
     if isEdgeMember edge graphAcc then
         -- on cyclic graph, we are currently adding an endpoint
         -- alternatively, we could just ignore ep, on cycle.
-        ( insertEndPoint parent graphAcc
+        ( insertEndPoint parentSeed graphAcc
         , pendingSeeds
         )
 

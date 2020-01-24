@@ -52,36 +52,43 @@ unfoldGraph :
     (Seed -> List Seed)
     -> Seed
     -> Graph
-unfoldGraph getChildSeeds =
+unfoldGraph getChildSeeds seed =
     let
-        unfoldGraphFromSeeds : ( Acc, List Seed ) -> Acc
-        unfoldGraphFromSeeds ( graphAcc, seedsAcc ) =
-            case seedsAcc of
-                [] ->
-                    graphAcc
-
-                currentSeed :: remaningSeeds ->
-                    let
-                        parent : Int2
-                        parent =
-                            Tuple.first currentSeed
-
-                        childSeeds : List Seed
-                        childSeeds =
-                            getChildSeeds currentSeed
-                    in
-                    if List.isEmpty childSeeds then
-                        unfoldGraphFromSeeds ( insertEndPoint parent graphAcc, remaningSeeds )
-
-                    else
-                        unfoldGraphFromSeeds
-                            (List.foldl
-                                (accumGraphFor parent)
-                                ( graphAcc, remaningSeeds )
-                                childSeeds
-                            )
+        initialAcc =
+            ( ( Set.empty, Set.empty ), List.singleton seed )
     in
-    List.singleton >> Tuple.pair ( Set.empty, Set.empty ) >> unfoldGraphFromSeeds >> Graph
+    Graph (unfoldGraphHelp getChildSeeds initialAcc)
+
+
+unfoldGraphHelp :
+    (( Int2, List Direction8 ) -> List Seed)
+    -> ( ( Set Edge, Set Int2 ), List ( Int2, List Direction8 ) )
+    -> ( Set Edge, Set Int2 )
+unfoldGraphHelp getChildSeeds ( graphAcc, seedsAcc ) =
+    case seedsAcc of
+        [] ->
+            graphAcc
+
+        currentSeed :: remaningSeeds ->
+            let
+                parent : Int2
+                parent =
+                    Tuple.first currentSeed
+
+                childSeeds : List Seed
+                childSeeds =
+                    getChildSeeds currentSeed
+            in
+            if List.isEmpty childSeeds then
+                unfoldGraphHelp getChildSeeds ( insertEndPoint parent graphAcc, remaningSeeds )
+
+            else
+                unfoldGraphHelp getChildSeeds
+                    (List.foldl
+                        (accumGraphFor parent)
+                        ( graphAcc, remaningSeeds )
+                        childSeeds
+                    )
 
 
 accumGraphFor : Int2 -> Seed -> ( Acc, List Seed ) -> ( Acc, List Seed )

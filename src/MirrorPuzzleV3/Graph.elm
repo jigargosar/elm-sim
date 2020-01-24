@@ -81,14 +81,14 @@ unfoldGraphHelp ( context, pendingSeeds ) =
                 childSeeds ->
                     unfoldGraphHelp
                         (List.foldl
-                            (accumGraphWithChildSeedOf currentSeed)
+                            (updateContextForParentChildSeed currentSeed)
                             ( context, otherSeeds )
                             childSeeds
                         )
 
 
-accumGraphWithChildSeedOf : Seed -> Seed -> ( Context, List Seed ) -> ( Context, List Seed )
-accumGraphWithChildSeedOf parentSeed childSeed ( context, pendingSeeds ) =
+updateContextForParentChildSeed : Seed -> Seed -> ( Context, List Seed ) -> ( Context, List Seed )
+updateContextForParentChildSeed parentSeed childSeed ( context, pendingSeeds ) =
     let
         child =
             Tuple.first childSeed

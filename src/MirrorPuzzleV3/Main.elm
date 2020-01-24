@@ -28,7 +28,7 @@ main =
             [ Html.div [ class "tc pa2" ] [ Html.text "Grid" ]
             , canvas elGrid
                 ((elGrid.dict |> Dict.toList |> List.map (viewGridCell elGrid))
-                    ++ viewNewLightPathGraphs elGrid (lightPathGraphs elGrid.dict)
+                    ++ viewLightPaths elGrid
                 )
             ]
         ]
@@ -63,14 +63,17 @@ canvas gv children =
     Html.div [ class "pa2 flex" ] [ svg [ viewBox 0 0 w h, PX.width w, PX.height h ] children ]
 
 
-viewNewLightPathGraphs : ElGrid -> List Graph.Graph -> List (Svg msg)
-viewNewLightPathGraphs gv =
+viewLightPaths : ElGrid -> List (Svg msg)
+viewLightPaths elGrid =
     let
-        foo graph =
-            List.map (uncurry (viewLine gv)) (Set.toList (Graph.getEdges graph))
-                ++ List.map (viewEndPoint gv) (Set.toList (Graph.getEndPoints graph))
+        edges =
+            Graph.getEdges >> Set.toList
+
+        viewGraph graph =
+            List.map (uncurry (viewLine elGrid)) (edges graph)
+                ++ List.map (viewEndPoint elGrid) (Set.toList (Graph.getEndPoints graph))
     in
-    List.concatMap foo
+    List.concatMap viewGraph (lightPathGraphs elGrid.dict)
 
 
 viewLine : ElGrid -> Int2 -> Int2 -> Svg msg

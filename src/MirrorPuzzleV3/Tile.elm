@@ -1,9 +1,33 @@
-module MirrorPuzzleV3.Tile exposing (Tile(..), getLightPathUnfoldInstruction, getRefractionDirectionOfLightSource, rotateElement, swapElements)
-
--- Tile
+module MirrorPuzzleV3.Tile exposing
+    ( Tile(..)
+    , floor
+    , getLightPathUnfoldInstruction
+    , getRefractionDirectionOfLightSource
+    , lightSourceWithMirror
+    , rotateElement
+    , swapElements
+    )
 
 import MirrorPuzzleV3.Graph as Graph
 import Playground.Direction8 as Direction8 exposing (Direction8)
+
+
+
+-- Tile Constructors
+
+
+floor : Tile
+floor =
+    EmptyContainer Floor
+
+
+lightSourceWithMirror : Direction -> Tile
+lightSourceWithMirror direction =
+    FilledContainer LightSource (mirrorFacing direction)
+
+
+
+-- Tile
 
 
 type Tile
@@ -115,6 +139,11 @@ type alias Element =
     , direction : Direction
     , movable : Bool
     }
+
+
+mirrorFacing : Direction -> Element
+mirrorFacing direction =
+    Element Mirror direction True
 
 
 getRefractionDirectionsOfElement : Element -> List Direction

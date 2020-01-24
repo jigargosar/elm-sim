@@ -6,10 +6,12 @@ import Dict2d
 import Html exposing (Html)
 import Html.Attributes exposing (class)
 import MirrorPuzzleV3.Graph as Graph exposing (Graph)
+import MirrorPuzzleV3.Tile as Tile
+import MirrorPuzzleV3.TileGird as TileGrid
 import Number2 as NT exposing (Int2)
 import Playground.Direction8 as D exposing (Direction8)
 import Set exposing (Set)
-import Svg exposing (Svg)
+import Svg exposing (Svg, g)
 import Svg.Attributes
 import TypedSvg exposing (circle, line, rect, svg)
 import TypedSvg.Attributes exposing (fill, stroke, transform, viewBox)
@@ -25,6 +27,9 @@ main =
     let
         elGrid =
             initialElGrid
+
+        tileGrid =
+            initialTileGrid
     in
     Html.div [ class "pa2 inline-flex flex-wrap" ]
         [ Html.div [ class "inline-flex flex-column" ]
@@ -34,7 +39,59 @@ main =
                     ++ viewLightPaths elGrid
                 )
             ]
+        , Html.div [ class "inline-flex flex-column" ]
+            [ Html.div [ class "tc pa2" ] [ Html.text "TileGrid" ]
+            , viewTileGrid tileGrid
+            ]
         ]
+
+
+
+-- TileGrid
+
+
+initialTileGrid : TileGrid.TileGrid
+initialTileGrid =
+    TileGrid.fromList2d [ [ Tile.lightSourceWithMirror D.right, Tile.floor, Tile.floor, Tile.floor ] ]
+
+
+viewTileGrid grid =
+    let
+        cellSize =
+            100
+    in
+    let
+        renderGridContent children =
+            let
+                ( w, h ) =
+                    TileGrid.dimensions grid |> NT.toFloat |> NT.scale cellSize
+            in
+            Html.div [ class "pa2 flex" ] [ svg [ viewBox 0 0 w h, PX.width w, PX.height h ] children ]
+    in
+    let
+        renderCell : ( Int2, b ) -> Svg msg
+        renderCell ( position, _ ) =
+            let
+                ( x, y ) =
+                    position |> NT.toFloat |> NT.scale cellSize
+            in
+            rect
+                [ transform [ Translate x y ]
+                , PX.width cellSize
+                , PX.height cellSize
+                , stroke Color.black
+                , fill FillNone
+                ]
+                []
+    in
+    let
+        renderGridCells : Svg msg
+        renderGridCells =
+            TileGrid.toList grid
+                |> List.map renderCell
+                |> g []
+    in
+    renderGridContent [ renderGridCells ]
 
 
 

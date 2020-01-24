@@ -1,4 +1,13 @@
-module MirrorPuzzleV3.TileGird exposing (computeLightPaths, filledWith, fromList2d, rotateElement, swapElements)
+module MirrorPuzzleV3.TileGird exposing
+    ( TileGrid
+    , computeLightPaths
+    , dimensions
+    , filledWith
+    , fromList2d
+    , rotateElement
+    , swapElements
+    , toList
+    )
 
 -- TileGrid
 
@@ -12,6 +21,11 @@ import Number2 exposing (Int2)
 
 type TileGrid
     = TileGrid Int2 (Dict Int2 Tile)
+
+
+dimensions : TileGrid -> Int2
+dimensions (TileGrid length2 _) =
+    length2
 
 
 filledWith : Tile -> Int2 -> TileGrid
@@ -62,3 +76,8 @@ computeLightPaths (TileGrid _ dict) =
                 |> Maybe.map (Graph.unfold unfoldInstructionAt position)
     in
     Dict.toList dict |> List.filterMap graphStartingAt
+
+
+toList : TileGrid -> List ( Int2, Tile )
+toList (TileGrid _ dict) =
+    Dict.toList dict

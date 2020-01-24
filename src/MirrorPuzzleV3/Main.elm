@@ -73,7 +73,14 @@ viewTileGrid grid =
                 ( w, h ) =
                     TileGrid.dimensions grid |> NT.toFloat |> NT.scale cellSize
             in
-            Html.div [ class "pa2 flex" ] [ svg [ viewBox 0 0 w h, PX.width w, PX.height h ] children ]
+            svg
+                [ Svg.Attributes.class "cartesian"
+                , viewBox (-w / 2) (-h / 2) w h
+                , PX.width w
+                , PX.height h
+                , Svg.Attributes.preserveAspectRatio "xMidYMid meet"
+                ]
+                [ g [] children ]
     in
     let
         floorForm =
@@ -149,19 +156,25 @@ viewTileGrid grid =
                 |> g [ transform [ Translate x y ] ]
     in
     let
-        renderGridCells : Svg msg
         renderGridCells =
             TileGrid.toList grid
                 |> List.map renderCell
-                |> g []
     in
     let
         renderGraphs =
             TileGrid.computeLightPaths grid
                 |> List.concatMap (viewGraph { cellSize = cellSize })
-                |> g []
     in
-    renderGridContent [ renderGridCells, renderGraphs ]
+    renderGridContent
+        [ g
+            [ let
+                ( w, h ) =
+                    TileGrid.dimensions grid |> NT.toFloat |> NT.scale cellSize
+              in
+              transform [ Translate (-w / 2) (-h / 2) ]
+            ]
+            (renderGridCells ++ renderGraphs)
+        ]
 
 
 

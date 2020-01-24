@@ -65,3 +65,19 @@ svg text {
 .yellow {
   color: rgb(255, 255, 0);
 }
+
+/*- svg cartesian -*/
+
+svg.cartesian {
+  display:flex;
+}
+
+/* Flip the vertical axis in <g> to emulate cartesian. */
+svg.cartesian > g {
+  transform: scaleY(-1);
+}
+
+/* Re-flip all <text> element descendants to their original side up. */
+svg.cartesian > g text {
+  transform: scaleY(-1);
+}

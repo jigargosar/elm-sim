@@ -72,7 +72,7 @@ gridView =
         , Html.div [ class "inline-flex flex-column" ]
             [ Html.div [ class "tc pa2" ] [ Html.text "graph.graphAcc" ]
             , gridCanvasWith
-                (viewNewLightPathGraphs (newLightPathGraphsFromGrid grid))
+                (viewNewLightPathGraphs (lightGraphsFromGrid grid))
             ]
         ]
 
@@ -373,8 +373,8 @@ lightPathGraphs grid0 =
     Dict.toList grid0 |> List.filterMap toLightPathGraph
 
 
-newLightPathGraphsFromGrid : ElGrid -> List Graph.Graph
-newLightPathGraphsFromGrid elGrid =
+lightGraphsFromGrid : ElGrid -> List Graph.Graph
+lightGraphsFromGrid elGrid =
     let
         toLightPathGraph ( position, el ) =
             case el of

@@ -26,7 +26,7 @@ main =
     Html.div [ class "pa2 inline-flex flex-wrap" ]
         [ Html.div [ class "inline-flex flex-column" ]
             [ Html.div [ class "tc pa2" ] [ Html.text "Grid" ]
-            , canvasNode gv
+            , canvas gv
                 ((gv.dict |> Dict.toList |> List.map (viewGridCell gv))
                     ++ viewNewLightPathGraphs gv (lightPathGraphs gv.dict)
                 )
@@ -54,8 +54,8 @@ initialElGrid =
     ElGrid grid_ dimensions 100
 
 
-canvasNode : { a | dimensions : Int2, cellSize : Float } -> List (Svg msg) -> Html msg
-canvasNode gv children =
+canvas : { a | dimensions : Int2, cellSize : Float } -> List (Svg msg) -> Html msg
+canvas gv children =
     let
         ( w, h ) =
             gv.dimensions |> NT.toFloat |> NT.scale gv.cellSize

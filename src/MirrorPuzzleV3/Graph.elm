@@ -28,6 +28,13 @@ getLeafNodes (Graph ( _, leafNodes )) =
     leafNodes
 
 
+type alias Context =
+    { edges : Set Edge
+    , endPoints : List Int2
+    , pendingSeeds : List Seed
+    }
+
+
 type alias Acc =
     ( Set Edge, Set Int2 )
 

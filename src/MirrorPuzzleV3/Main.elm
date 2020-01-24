@@ -117,7 +117,7 @@ viewTileGrid grid =
                     [ Translate cc cc
                     , Scale 0.45 0.45
                     , Translate -cc -cc
-                    , Rotate (direction |> D.toDegrees |> negate) cc cc
+                    , Rotate (direction |> D.toDegrees) cc cc
                     ]
                 ]
                 []

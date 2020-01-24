@@ -57,17 +57,17 @@ unfoldGraph getChildSeeds seed =
         initialAcc =
             ( ( Set.empty, Set.empty ), List.singleton seed )
     in
-    Graph (unfoldGraphHelp getChildSeeds initialAcc)
+    unfoldGraphHelp getChildSeeds initialAcc
 
 
 unfoldGraphHelp :
     (Seed -> List Seed)
     -> ( Acc, List Seed )
-    -> Acc
+    -> Graph
 unfoldGraphHelp getChildSeeds ( graphAcc, pendingSeeds ) =
     case pendingSeeds of
         [] ->
-            graphAcc
+            Graph graphAcc
 
         currentSeed :: otherSeeds ->
             let

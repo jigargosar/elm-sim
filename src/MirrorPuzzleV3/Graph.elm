@@ -7,7 +7,7 @@ import Set exposing (Set)
 
 
 type Graph
-    = Graph Acc
+    = Graph ( Set Edge, Set Int2 )
 
 
 type alias NodeGraph node =
@@ -38,10 +38,6 @@ type alias Context =
 initContext : (Seed -> List Seed) -> Context
 initContext nextSeeds =
     Context Set.empty Set.empty nextSeeds
-
-
-type alias Acc =
-    ( Set Edge, Set Int2 )
 
 
 insertEndPoint : Seed -> Context -> Context

@@ -21,28 +21,28 @@ import TypedSvg.Types exposing (Fill(..), Transform(..))
 main =
     let
         gv =
-            initialGridView
+            initialElGrid
     in
     Html.div [ class "pa2 inline-flex flex-wrap" ]
         [ Html.div [ class "inline-flex flex-column" ]
             [ Html.div [ class "tc pa2" ] [ Html.text "Grid" ]
             , canvas2d gv
-                ((gv.grid |> Dict.toList |> List.map (viewGridCell gv))
-                    ++ viewNewLightPathGraphs gv (lightPathGraphs gv.grid)
+                ((gv.dict |> Dict.toList |> List.map (viewGridCell gv))
+                    ++ viewNewLightPathGraphs gv (lightPathGraphs gv.dict)
                 )
             ]
         ]
 
 
-type alias GridView =
-    { grid : ElGrid
+type alias ElGrid =
+    { dict : ElDict
     , dimensions : Int2
     , cellSize : Float
     }
 
 
-initialGridView : GridView
-initialGridView =
+initialElGrid : ElGrid
+initialElGrid =
     let
         ( dimensions, grid_ ) =
             Dict2d.fromListsWithDefault Continue
@@ -51,7 +51,7 @@ initialGridView =
                 , [ Split [ D.up ], Continue, Continue, Split [ D.left ] ]
                 ]
     in
-    GridView grid_ dimensions 100
+    ElGrid grid_ dimensions 100
 
 
 canvas2d : { a | dimensions : Int2, cellSize : Float } -> List (Svg msg) -> Html msg
@@ -63,7 +63,7 @@ canvas2d gv children =
     Html.div [ class "pa2 flex" ] [ svg [ viewBox 0 0 w h, PX.width w, PX.height h ] children ]
 
 
-viewNewLightPathGraphs : GridView -> List Graph.Graph -> List (Svg msg)
+viewNewLightPathGraphs : ElGrid -> List Graph.Graph -> List (Svg msg)
 viewNewLightPathGraphs gv =
     let
         foo graph =
@@ -73,7 +73,7 @@ viewNewLightPathGraphs gv =
     List.concatMap foo
 
 
-viewLine : GridView -> Int2 -> Int2 -> Svg msg
+viewLine : ElGrid -> Int2 -> Int2 -> Svg msg
 viewLine { cellSize } p1 p2 =
     let
         transformPoint =
@@ -95,7 +95,7 @@ viewLine { cellSize } p1 p2 =
         []
 
 
-viewEndPoint : GridView -> Int2 -> Svg msg
+viewEndPoint : ElGrid -> Int2 -> Svg msg
 viewEndPoint { cellSize } p1 =
     let
         ( x1, y1 ) =
@@ -111,7 +111,7 @@ viewEndPoint { cellSize } p1 =
         []
 
 
-viewGridCell : GridView -> ( Int2, b ) -> Svg msg
+viewGridCell : ElGrid -> ( Int2, b ) -> Svg msg
 viewGridCell { cellSize } ( position, _ ) =
     let
         ( x, y ) =
@@ -134,11 +134,11 @@ type El
     | End
 
 
-type alias ElGrid =
+type alias ElDict =
     Dict Int2 El
 
 
-lightPathGraphs : ElGrid -> List Graph.Graph
+lightPathGraphs : ElDict -> List Graph.Graph
 lightPathGraphs grid =
     let
         unfoldInstructionAt : Int2 -> Graph.UnfoldInstruction

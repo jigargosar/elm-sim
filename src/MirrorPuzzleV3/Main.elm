@@ -9,7 +9,6 @@ import Html.Attributes exposing (class)
 import MirrorPuzzleV3.Graph as Graph
 import Number2 as NT exposing (Int2)
 import Playground.Direction8 as D exposing (Direction8)
-import PointFree exposing (mapEach)
 import Set exposing (Set)
 import Svg exposing (Svg)
 import Svg.Attributes
@@ -20,11 +19,15 @@ import TypedSvg.Types exposing (Fill(..), Transform(..))
 
 
 main =
+    let
+        gv =
+            initialGridView
+    in
     Html.div [ class "pa2 inline-flex flex-wrap" ]
         [ Html.div [ class "inline-flex flex-column" ]
-            [ Html.div [ class "tc pa2" ] [ Html.text "Graph.unfoldDirection8Graph movementAt" ]
-            , gridCanvasWith
-                (viewNewLightPathGraphs (lightPathGraphs grid))
+            [ Html.div [ class "tc pa2" ] [ Html.text "Grid" ]
+            , canvas2d gv
+                (viewNewLightPathGraphs gv (lightPathGraphs gv.grid))
             ]
         ]
 
@@ -50,48 +53,26 @@ initialGridView =
 
 
 canvas2d : { a | dimensions : Int2, cellSize : Float } -> List (Svg msg) -> Html msg
-canvas2d gv =
+canvas2d gv children =
     let
         ( w, h ) =
             gv.dimensions |> NT.toFloat |> NT.scale gv.cellSize
     in
-    svg [ viewBox 0 0 w h, PX.width w, PX.height h ]
+    Html.div [ class "pa2 flex" ] [ svg [ viewBox 0 0 w h, PX.width w, PX.height h ] children ]
 
 
-cellSize =
-    100
-
-
-viewNewLightPathGraphs : List Graph.Graph -> List (Svg msg)
-viewNewLightPathGraphs =
+viewNewLightPathGraphs : GridView -> List Graph.Graph -> List (Svg msg)
+viewNewLightPathGraphs gv =
     let
         foo graph =
-            List.map (uncurry viewLine) (Set.toList (Graph.getEdges graph))
-                ++ List.map viewEndPoint (Set.toList (Graph.getEndPoints graph))
+            List.map (uncurry (viewLine gv)) (Set.toList (Graph.getEdges graph))
+                ++ List.map (viewEndPoint gv) (Set.toList (Graph.getEndPoints graph))
     in
     List.concatMap foo
 
 
-gridCanvasWith : List (Svg msg) -> Html msg
-gridCanvasWith children =
-    let
-        viewGridCells =
-            Dict.toList grid |> List.map viewGridItem
-    in
-    Html.div [ class "pa2 flex" ] [ canvas (viewGridCells ++ children) ]
-
-
-canvas : List (Svg msg) -> Html msg
-canvas =
-    let
-        ( w, h ) =
-            gridDimensionsF |> NT.scale cellSize
-    in
-    svg [ viewBox 0 0 w h, PX.width w, PX.height h ]
-
-
-viewLine : Int2 -> Int2 -> Svg msg
-viewLine p1 p2 =
+viewLine : GridView -> Int2 -> Int2 -> Svg msg
+viewLine { cellSize } p1 p2 =
     let
         transformPoint =
             NT.toFloat >> NT.scale cellSize >> NT.add ( cellSize / 2, cellSize / 2 )
@@ -112,8 +93,8 @@ viewLine p1 p2 =
         []
 
 
-viewEndPoint : Int2 -> Svg msg
-viewEndPoint p1 =
+viewEndPoint : GridView -> Int2 -> Svg msg
+viewEndPoint { cellSize } p1 =
     let
         ( x1, y1 ) =
             p1 |> (NT.toFloat >> NT.scale cellSize)
@@ -128,8 +109,24 @@ viewEndPoint p1 =
         []
 
 
-viewGridItem : ( Int2, b ) -> Svg msg
-viewGridItem ( position, _ ) =
+viewCell : GridView -> ( Int2, b ) -> Svg msg
+viewCell gv ( position, _ ) =
+    let
+        ( x, y ) =
+            position |> NT.toFloat |> NT.scale gv.cellSize
+    in
+    rect
+        [ transform [ Translate x y ]
+        , PX.width gv.cellSize
+        , PX.height gv.cellSize
+        , stroke Color.black
+        , fill FillNone
+        ]
+        []
+
+
+viewGridItem : GridView -> ( Int2, b ) -> Svg msg
+viewGridItem { cellSize } ( position, _ ) =
     let
         ( x, y ) =
             position |> NT.toFloat |> NT.scale cellSize
@@ -155,44 +152,12 @@ type alias ElGrid =
     Dict Int2 El
 
 
-grid : Dict Int2 El
-grid =
-    gr |> Tuple.second
-
-
-
-{-
-   gr =
-       Dict2d.fromListsWithDefault Continue
-           [ [ Continue, Continue, Continue, Split [ D.left ] ]
-           , [ Start [ D.right ], Continue, Continue, Split [ D.down, D.up ] ]
-           , [ Split [ D.right ], Continue, Continue, Split [ D.left ] ]
-           ]
--}
-
-
-gr =
-    Dict2d.fromListsWithDefault Continue
-        [ [ Continue, Continue, Split [ D.down ], Split [ D.left ] ]
-        , [ Continue, Start [ D.right ], Continue, Split [ D.up, D.down ] ]
-        , [ Split [ D.up ], Continue, Continue, Split [ D.left ] ]
-        ]
-
-
-gridDimensions =
-    gr |> Tuple.first
-
-
-gridDimensionsF =
-    gridDimensions |> mapEach toFloat
-
-
 lightPathGraphs : ElGrid -> List Graph.Graph
-lightPathGraphs elGrid =
+lightPathGraphs grid =
     let
         unfoldInstructionAt : Int2 -> Graph.UnfoldInstruction
         unfoldInstructionAt position =
-            case Dict.get position elGrid of
+            case Dict.get position grid of
                 Just el ->
                     case el of
                         Split directions ->
@@ -224,4 +189,4 @@ lightPathGraphs elGrid =
                 _ ->
                     Nothing
     in
-    Dict.toList elGrid |> List.filterMap graphStartingAt
+    Dict.toList grid |> List.filterMap graphStartingAt

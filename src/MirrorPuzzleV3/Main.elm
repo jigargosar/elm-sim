@@ -1,6 +1,5 @@
 module MirrorPuzzleV3.Main exposing (main)
 
-import Basics.Extra exposing (uncurry)
 import Color
 import Dict exposing (Dict)
 import Dict2d
@@ -9,7 +8,6 @@ import Html.Attributes exposing (class)
 import MirrorPuzzleV3.Graph as Graph exposing (Graph)
 import Number2 as NT exposing (Int2)
 import Playground.Direction8 as D exposing (Direction8)
-import PointFree exposing (mapEach)
 import Set exposing (Set)
 import Svg exposing (Svg)
 import Svg.Attributes
@@ -17,6 +15,10 @@ import TypedSvg exposing (circle, line, rect, svg)
 import TypedSvg.Attributes exposing (fill, stroke, transform, viewBox)
 import TypedSvg.Attributes.InPx as PX
 import TypedSvg.Types exposing (Fill(..), Transform(..))
+
+
+
+-- Main
 
 
 main =
@@ -33,6 +35,10 @@ main =
                 )
             ]
         ]
+
+
+
+-- Model
 
 
 type alias ElGrid =
@@ -53,6 +59,45 @@ initialElGrid =
                 ]
     in
     ElGrid grid_ dimensions 100
+
+
+toLightPathGraphs : ElDict -> List Graph.Graph
+toLightPathGraphs elDict =
+    let
+        unfoldInstructionAt : Int2 -> Graph.UnfoldInstruction
+        unfoldInstructionAt position =
+            case Dict.get position elDict of
+                Just el ->
+                    case el of
+                        Split directions ->
+                            Graph.Fork directions
+
+                        End ->
+                            Graph.Stop
+
+                        Start _ ->
+                            Graph.ContinuePrevious
+
+                        Continue ->
+                            Graph.ContinuePrevious
+
+                Nothing ->
+                    Graph.Stop
+
+        graphStartingAt : ( Int2, El ) -> Maybe Graph.Graph
+        graphStartingAt ( position, el ) =
+            case el of
+                Start dirs ->
+                    Just (Graph.unfold unfoldInstructionAt position dirs)
+
+                _ ->
+                    Nothing
+    in
+    Dict.toList elDict |> List.filterMap graphStartingAt
+
+
+
+-- View
 
 
 canvas : { a | dimensions : Int2, cellSize : Float } -> List (Svg msg) -> Html msg
@@ -152,38 +197,3 @@ type El
 
 type alias ElDict =
     Dict Int2 El
-
-
-toLightPathGraphs : ElDict -> List Graph.Graph
-toLightPathGraphs elDict =
-    let
-        unfoldInstructionAt : Int2 -> Graph.UnfoldInstruction
-        unfoldInstructionAt position =
-            case Dict.get position elDict of
-                Just el ->
-                    case el of
-                        Split directions ->
-                            Graph.Fork directions
-
-                        End ->
-                            Graph.Stop
-
-                        Start _ ->
-                            Graph.ContinuePrevious
-
-                        Continue ->
-                            Graph.ContinuePrevious
-
-                Nothing ->
-                    Graph.Stop
-
-        graphStartingAt : ( Int2, El ) -> Maybe Graph.Graph
-        graphStartingAt ( position, el ) =
-            case el of
-                Start dirs ->
-                    Just (Graph.unfold unfoldInstructionAt position dirs)
-
-                _ ->
-                    Nothing
-    in
-    Dict.toList elDict |> List.filterMap graphStartingAt

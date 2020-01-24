@@ -1,13 +1,15 @@
 module MirrorPuzzleV3.Graph exposing
     ( Graph
+    , Movement(..)
     , getEdges
     , getEndPoints
+    , unfoldDirection8Graph
     , unfoldGraph
     )
 
 import Basics.Extra exposing (swap)
 import Number2 exposing (Int2)
-import Playground.Direction8 exposing (Direction8)
+import Playground.Direction8 as D exposing (Direction8)
 import PointFree exposing (mapEach)
 import Set exposing (Set)
 
@@ -32,6 +34,46 @@ getEndPoints (Graph ( _, leafNodes )) =
 
 type alias Seed =
     ( Int2, List Direction8 )
+
+
+type Movement
+    = Continue
+    | End
+    | Split (List Direction8)
+
+
+unfoldDirection8Graph : (Int2 -> Movement) -> Int2 -> Maybe Graph
+unfoldDirection8Graph movementAt startPosition =
+    let
+        nextSeeds : Seed -> List Seed
+        nextSeeds ( position, directions ) =
+            List.filterMap
+                (\d ->
+                    let
+                        nextPosition =
+                            D.stepPos position d
+                    in
+                    case movementAt nextPosition of
+                        Continue ->
+                            Just ( nextPosition, [ d ] )
+
+                        End ->
+                            Nothing
+
+                        Split nd ->
+                            Just ( nextPosition, nd )
+                )
+                directions
+    in
+    case movementAt startPosition of
+        Continue ->
+            Nothing
+
+        End ->
+            Nothing
+
+        Split nd ->
+            Just (unfoldGraph nextSeeds ( startPosition, nd ))
 
 
 unfoldGraph :

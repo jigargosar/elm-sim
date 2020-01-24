@@ -34,31 +34,41 @@ unfoldGraph :
     -> Seed
     -> Graph
 unfoldGraph nextSeeds seed =
-    unfoldGraphHelp ( initContext nextSeeds, [ seed ] )
+    unfoldGraphHelp (initContext nextSeeds seed)
 
 
-unfoldGraphHelp : ( Context, List Seed ) -> Graph
-unfoldGraphHelp ( context, pendingSeeds ) =
-    case pendingSeeds of
+popPending : Context -> Maybe ( Seed, Context )
+popPending context =
+    case context.pendingSeeds of
         [] ->
-            Graph ( context.edges, context.endPoints )
+            Nothing
 
-        currentSeed :: otherSeeds ->
+        first :: rest ->
+            Just ( first, { context | pendingSeeds = rest } )
+
+
+unfoldGraphHelp : Context -> Graph
+unfoldGraphHelp context0 =
+    case popPending context0 of
+        Nothing ->
+            Graph ( context0.edges, context0.endPoints )
+
+        Just ( currentSeed, context ) ->
             case context.nextSeeds currentSeed of
                 [] ->
-                    unfoldGraphHelp ( insertEndPoint currentSeed context, otherSeeds )
+                    unfoldGraphHelp (insertEndPoint currentSeed context)
 
                 childSeeds ->
                     unfoldGraphHelp
                         (List.foldl
                             (updateContextForParentChildSeed currentSeed)
-                            ( context, otherSeeds )
+                            context
                             childSeeds
                         )
 
 
-updateContextForParentChildSeed : Seed -> Seed -> ( Context, List Seed ) -> ( Context, List Seed )
-updateContextForParentChildSeed parentSeed childSeed ( context, pendingSeeds ) =
+updateContextForParentChildSeed : Seed -> Seed -> Context -> Context
+updateContextForParentChildSeed parentSeed childSeed context =
     let
         edge =
             ( parentSeed, childSeed ) |> mapEach Tuple.first
@@ -66,14 +76,10 @@ updateContextForParentChildSeed parentSeed childSeed ( context, pendingSeeds ) =
     if isEdgeMember edge context then
         -- on cyclic graph, we are currently adding an endpoint
         -- alternatively, we could just ignore ep, on cycle.
-        ( insertEndPoint parentSeed context
-        , pendingSeeds
-        )
+        insertEndPoint parentSeed context
 
     else
-        ( insertEdge edge context
-        , childSeed :: pendingSeeds
-        )
+        insertEdge edge childSeed context
 
 
 
@@ -84,12 +90,13 @@ type alias Context =
     { edges : Set Edge
     , endPoints : Set Int2
     , nextSeeds : Seed -> List Seed
+    , pendingSeeds : List Seed
     }
 
 
-initContext : (Seed -> List Seed) -> Context
-initContext nextSeeds =
-    Context Set.empty Set.empty nextSeeds
+initContext : (Seed -> List Seed) -> Seed -> Context
+initContext nextSeeds seed =
+    Context Set.empty Set.empty nextSeeds [ seed ]
 
 
 insertEndPoint : Seed -> Context -> Context
@@ -97,9 +104,9 @@ insertEndPoint ( parent, _ ) context =
     { context | endPoints = Set.insert parent context.endPoints }
 
 
-insertEdge : Edge -> Context -> Context
-insertEdge edge context =
-    { context | edges = Set.insert edge context.edges }
+insertEdge : Edge -> Seed -> Context -> Context
+insertEdge edge seed context =
+    { context | edges = Set.insert edge context.edges, pendingSeeds = seed :: context.pendingSeeds }
 
 
 isEdgeMember : Edge -> Context -> Bool

@@ -45,10 +45,12 @@ insertEndPoint ( parent, _ ) context =
     { context | endPoints = Set.insert parent context.endPoints }
 
 
+insertEdge : Edge -> Context -> Context
 insertEdge edge context =
     { context | edges = Set.insert edge context.edges }
 
 
+isEdgeMember : Edge -> Context -> Bool
 isEdgeMember edge { edges } =
     Set.member edge edges || Set.member (swap edge) edges
 

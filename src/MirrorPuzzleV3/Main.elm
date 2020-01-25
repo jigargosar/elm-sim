@@ -79,8 +79,10 @@ collageDemo =
         mirrorShape d =
             ellipse (cellW / 8) (cellW / 2)
                 |> filled (uniform Color.lightBlue)
-                |> scale 0.9
                 |> shiftX (-cellW / 8)
+                |> List.singleton
+                |> stack
+                |> scale 0.9
                 |> List.singleton
                 |> stack
                 |> rotate (D.toRadians d)

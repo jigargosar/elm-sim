@@ -8,11 +8,14 @@ import Color
 import Html exposing (Html)
 import Html.Attributes exposing (class)
 import MirrorPuzzleV3.ElGrid as ElGrid
+import MirrorPuzzleV3.Graph as Graph
 import MirrorPuzzleV3.Tile as Tile
 import MirrorPuzzleV3.TileGird as TileGrid
 import MirrorPuzzleV3.TileGridDemo as TileGridDemo
 import Number2 as NT
 import Playground.Direction8 as D
+import PointFree exposing (mapEach)
+import Set
 
 
 
@@ -54,14 +57,17 @@ collageDemo =
         cellW =
             50
 
+        shiftCellAt position =
+            shift (toViewPosition position)
+
+        toViewPosition position =
+            position |> NT.toFloat |> NT.scale cellW
+
         viewCellLayer =
             initialTileGrid
                 |> TileGrid.toList
                 |> List.map viewGridCell
                 |> group
-
-        shiftCellAt position =
-            shift (position |> NT.toFloat |> NT.scale cellW)
 
         viewGridCell ( position, _ ) =
             [ square cellW
@@ -72,11 +78,38 @@ collageDemo =
                 |> Text.fromString
                 --|> Text.size Text.normal
                 |> rendered
-                |> opacity 0.5
+                |> opacity 0.3
             ]
                 |> stack
                 |> shiftCellAt position
+
+        viewLightPathLayer =
+            initialTileGrid
+                |> TileGrid.computeLightPaths
+                |> List.concatMap viewLightPath
+                |> group
+
+        viewLightPath : Graph.Graph -> List (Collage msg)
+        viewLightPath graph =
+            viewEdges graph
+
+        viewEdges : Graph.Graph -> List (Collage msg)
+        viewEdges graph =
+            Graph.getEdges graph
+                |> Set.toList
+                |> List.map viewEdge
+
+        viewEdge : ( NT.Int2, NT.Int2 ) -> Collage msg
+        viewEdge points =
+            let
+                ( p1, p2 ) =
+                    mapEach toViewPosition points
+            in
+            segment p1 p2
+                |> traced (solid thin (uniform Color.black))
+                |> opacity 0.5
     in
-    viewCellLayer
+    [ viewLightPathLayer, viewCellLayer ]
+        |> group
         |> debug
         |> svg

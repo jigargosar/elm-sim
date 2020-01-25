@@ -20,6 +20,10 @@ svg text {
 }
 */
 
+.lh-0{
+  line-height: 0;
+}
+
 .fixed-full-screen {
   position: fixed;
   top: 0;

@@ -23,7 +23,7 @@ main =
     Html.div [ class "pa2 inline-flex flex-wrap" ]
         [ Html.div [ class "inline-flex flex-column" ]
             [ Html.div [ class "tc pa2" ] [ Html.text "collageDemo" ]
-            , Html.div [ class "pa4" ] [ collageDemo ]
+            , Html.div [ class "pa4 lh-0" ] [ collageDemo ]
             ]
         , Html.div [ class "inline-flex flex-column" ]
             [ Html.div [ class "tc pa2" ] [ Html.text "TileGrid" ]
@@ -51,6 +51,9 @@ collageDemo =
                 |> List.reverse
                 |> TileGrid.fromList2d
 
+        cellW =
+            50
+
         viewCellLayer =
             initialTileGrid
                 |> TileGrid.toList
@@ -58,10 +61,10 @@ collageDemo =
                 |> group
 
         shiftCellAt position =
-            shift (position |> NT.toFloat |> NT.scale 50)
+            shift (position |> NT.toFloat |> NT.scale cellW)
 
         viewGridCell ( position, _ ) =
-            [ square 50
+            [ square cellW
                 |> outlined (solid thin (uniform Color.gray))
 
             --|> debug
@@ -69,8 +72,11 @@ collageDemo =
                 |> Text.fromString
                 --|> Text.size Text.normal
                 |> rendered
+                |> opacity 0.5
             ]
                 |> stack
                 |> shiftCellAt position
     in
-    viewCellLayer |> svg
+    viewCellLayer
+        |> debug
+        |> svg

@@ -82,9 +82,6 @@ viewTileGrid { cellW, grid } =
                 |> List.map viewTile
                 |> stack
 
-        viewCellDebugLayer =
-            tileViewList |> List.map viewDebugTile |> stack
-
         viewLightPathLayer =
             grid
                 |> TileGrid.computeLightPaths
@@ -92,7 +89,7 @@ viewTileGrid { cellW, grid } =
                 |> stack
     in
     [ viewLightPathLayer
-    , viewCellDebugLayer
+    , tileViewList |> List.map viewDebugTile |> stack
     , viewCellLayer
     ]
         |> stack
@@ -118,6 +115,7 @@ type alias TileView =
     }
 
 
+viewDebugTile : { a | position : Int2, viewPosition : Float2 } -> Collage Msg
 viewDebugTile { position, viewPosition } =
     NT.int2ToString position
         |> Text.fromString
@@ -129,16 +127,7 @@ viewDebugTile { position, viewPosition } =
 
 viewTile : TileView -> Collage Msg
 viewTile { cellW, position, viewPosition, tile, showIndex } =
-    [ Debug.toString position
-        |> Text.fromString
-        --|> Text.size Text.normal
-        |> rendered
-        |> opacity 0.3
-
-    --|> debug
-    , tileShape cellW tile
-    ]
-        |> stack
+    tileShape cellW tile
         |> shift viewPosition
 
 

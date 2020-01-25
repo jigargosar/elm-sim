@@ -20,21 +20,21 @@ svg text {
 }
 */
 
-.lh-0{
+.lh-0 {
   line-height: 0;
 }
 
-.pe-none{
+.pe-none {
   pointer-events: none;
 }
-.pe-all{
+.pe-all {
   pointer-events: all;
 }
-svg #pe-none{
+svg #pe-none {
   pointer-events: none;
 }
 
-svg #pe-all{
+svg #pe-all {
   pointer-events: all;
 }
 
@@ -89,7 +89,7 @@ svg #pe-all{
 /*- svg cartesian -*/
 
 svg.cartesian {
-  display:flex;
+  display: flex;
 }
 
 /* Flip the vertical axis in <g> to emulate cartesian. */

@@ -8,6 +8,7 @@ import Collage.Render exposing (..)
 import Collage.Text as Text
 import Color
 import Html exposing (Html)
+import Html.Attributes exposing (class)
 import MirrorPuzzleV3.Graph as Graph
 import MirrorPuzzleV3.Tile as Tile exposing (Tile)
 import MirrorPuzzleV3.TileGird as TileGrid exposing (TileGrid)
@@ -96,17 +97,9 @@ viewTileGrid { cellW, grid } =
     ]
         |> stack
         --|> debug
-        |> svg [ Svg.class "pe-none" ]
-
-
-svg : List (Svg.Attribute msg) -> Collage msg -> Html msg
-svg attrs collage =
-    Collage.Render.svgExplicit
-        (PX.width (width collage)
-            :: PX.height (height collage)
-            :: attrs
-        )
-        (align topLeft collage)
+        |> svg
+        |> List.singleton
+        |> Html.div [ class "pe-none" ]
 
 
 toViewPosition : Float -> Int2 -> ( Float, Float )

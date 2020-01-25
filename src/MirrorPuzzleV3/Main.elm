@@ -96,10 +96,9 @@ viewTileGrid { cellW, grid } =
         |> name "pe-all"
     ]
         |> stack
+        |> name "pe-none"
         --|> debug
         |> svg
-        |> List.singleton
-        |> Html.div [ class "pe-none" ]
 
 
 toViewPosition : Float -> Int2 -> ( Float, Float )

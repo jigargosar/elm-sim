@@ -69,9 +69,21 @@ collageDemo =
                 |> List.map viewGridCell
                 |> group
 
-        viewGridCell ( position, _ ) =
+        tileShape tile =
+            case tile of
+                Tile.Wall ->
+                    square cellW
+                        |> outlined (solid thin (uniform Color.gray))
+
+                _ ->
+                    square cellW
+                        |> outlined (solid thin (uniform Color.gray))
+
+        viewGridCell ( position, tile ) =
             [ square cellW
                 |> outlined (solid thin (uniform Color.gray))
+                |> opacity 0
+            , tileShape tile
 
             --|> debug
             , Debug.toString position

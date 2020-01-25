@@ -67,30 +67,35 @@ collageDemo =
             initialTileGrid
                 |> TileGrid.toList
                 |> List.map viewGridCell
-                |> group
+                |> stack
+
+        silver =
+            uniform <| Color.rgb255 192 192 192
+
+        floorShape =
+            square cellW
+                |> outlined (solid thin silver)
 
         tileShape tile =
             case tile of
                 Tile.Wall ->
-                    square cellW
-                        |> outlined (solid thin (uniform Color.gray))
+                    [ square cellW |> filled silver
+                    , floorShape
+                    ]
+                        |> stack
 
                 _ ->
-                    square cellW
-                        |> outlined (solid thin (uniform Color.gray))
+                    floorShape
 
         viewGridCell ( position, tile ) =
-            [ square cellW
-                |> outlined (solid thin (uniform Color.gray))
-                |> opacity 0
-            , tileShape tile
-
-            --|> debug
-            , Debug.toString position
+            [ Debug.toString position
                 |> Text.fromString
                 --|> Text.size Text.normal
                 |> rendered
                 |> opacity 0.3
+
+            --|> debug
+            , tileShape tile
             ]
                 |> stack
                 |> shiftCellAt position
@@ -99,7 +104,7 @@ collageDemo =
             initialTileGrid
                 |> TileGrid.computeLightPaths
                 |> List.concatMap viewLightPath
-                |> group
+                |> stack
 
         viewLightPath : Graph.Graph -> List (Collage msg)
         viewLightPath graph =
@@ -122,6 +127,6 @@ collageDemo =
                 |> opacity 0.5
     in
     [ viewLightPathLayer, viewCellLayer ]
-        |> group
-        |> debug
+        |> stack
+        --|> debug
         |> svg

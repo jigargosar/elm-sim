@@ -1,4 +1,4 @@
-module MirrorPuzzleV3.ElGrid exposing (viewDemo)
+module MirrorPuzzleV3.SimpleGridDemo exposing (viewDemo)
 
 import Color
 import Dict exposing (Dict)

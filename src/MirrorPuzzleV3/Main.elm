@@ -2,7 +2,7 @@ module MirrorPuzzleV3.Main exposing (main)
 
 import Html exposing (Html)
 import Html.Attributes exposing (class)
-import MirrorPuzzleV3.ElGrid as ElGrid
+import MirrorPuzzleV3.SimpleGridDemo as SimpleGridDemo
 import MirrorPuzzleV3.TileGridCollageDemo as TileGridCollageDemo
 import MirrorPuzzleV3.TileGridSvgDemo as TileGridDemo
 
@@ -23,6 +23,6 @@ main =
             ]
         , Html.div [ class "inline-flex flex-column" ]
             [ Html.div [ class "tc pa2" ] [ Html.text "Grid" ]
-            , ElGrid.viewDemo
+            , SimpleGridDemo.viewDemo
             ]
         ]

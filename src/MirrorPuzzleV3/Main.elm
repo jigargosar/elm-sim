@@ -164,7 +164,7 @@ viewTile { cellW, position, viewPosition, tile, showIndex } =
     in
     tileShapeHelp
         |> shift viewPosition
-        |> Collage.Events.onClick NoOp
+        |> Collage.Events.onClick (CellClick position)
 
 
 viewLightPath : Float -> Graph.Graph -> Collage msg
@@ -213,12 +213,20 @@ viewLightPath cellW graph =
 
 type Msg
     = NoOp
+    | CellClick Int2
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update message model =
     case message of
         NoOp ->
+            ( model, Cmd.none )
+
+        CellClick position ->
+            let
+                _ =
+                    Debug.log "position" position
+            in
             ( model, Cmd.none )
 
 

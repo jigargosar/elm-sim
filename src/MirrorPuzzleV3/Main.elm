@@ -34,24 +34,20 @@ main =
 collageDemo : Html msg
 collageDemo =
     let
-        rect =
+        cell =
             square 50
                 -- |> filled (uniform Color.blue)
                 |> outlined (solid thin (uniform Color.red))
 
-        cells =
-            List.repeat 5 rect
-                |> List.intersperse (square 10 |> filled transparent)
-
-        row =
-            cells |> horizontal
+        repeatSpaced n =
+            List.repeat n >> List.intersperse (spacer 10 10)
 
         gridCells =
-            List.repeat 5 row
-                |> List.intersperse (square 10 |> filled transparent)
+            repeatSpaced 5 cell
+                |> horizontal
+                |> repeatSpaced 10
                 |> vertical
                 |> align base
-                |> shift ( 70, -100 )
 
         gridBackground =
             square 250
@@ -59,5 +55,10 @@ collageDemo =
                 |> opacity 0.1
                 |> align base
     in
-    impose gridCells gridBackground
+    impose
+        (gridCells
+            |> align bottomLeft
+            |> shift ( 20, 20 )
+        )
+        (gridBackground |> align bottomLeft)
         |> svg

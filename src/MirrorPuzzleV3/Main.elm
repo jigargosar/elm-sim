@@ -8,7 +8,7 @@ import Collage.Text as Text
 import Color
 import Html exposing (Html)
 import MirrorPuzzleV3.Graph as Graph
-import MirrorPuzzleV3.Tile as Tile
+import MirrorPuzzleV3.Tile as Tile exposing (Tile)
 import MirrorPuzzleV3.TileGird as TileGrid exposing (TileGrid)
 import Number2 as NT exposing (Float2, Int2)
 import Playground.Direction8 as D
@@ -69,7 +69,7 @@ view model =
     viewTileGrid model
 
 
-viewTileGrid : { a | cellW : Float, grid : TileGrid } -> Html msg
+viewTileGrid : { a | cellW : Float, grid : TileGrid } -> Html Msg
 viewTileGrid { cellW, grid } =
     let
         toViewPosition position =
@@ -78,11 +78,8 @@ viewTileGrid { cellW, grid } =
         viewCellLayer =
             grid
                 |> TileGrid.toList
-                |> List.map
-                    (\( position, tile ) ->
-                        tileShape cellW ( position, tile )
-                            |> shift (toViewPosition position)
-                    )
+                |> List.map (toTileView cellW toViewPosition)
+                |> List.map viewTile
                 |> stack
 
         viewLightPathLayer =
@@ -97,8 +94,37 @@ viewTileGrid { cellW, grid } =
         |> svg
 
 
-tileShape : Float -> ( Int2, Tile.Tile ) -> Collage msg
-tileShape cellW ( position, tile ) =
+toTileView : Float -> (Int2 -> Float2) -> ( Int2, Tile ) -> TileView
+toTileView cellW toViewPosition ( position, tile ) =
+    TileView position (position |> toViewPosition) tile True cellW
+
+
+type alias TileView =
+    { position : Int2
+    , viewPosition : Float2
+    , tile : Tile
+    , showIndex : Bool
+    , cellW : Float
+    }
+
+
+viewTile : TileView -> Collage Msg
+viewTile { cellW, position, viewPosition, tile, showIndex } =
+    [ Debug.toString position
+        |> Text.fromString
+        --|> Text.size Text.normal
+        |> rendered
+        |> opacity 0.3
+
+    --|> debug
+    , tileShape cellW tile
+    ]
+        |> stack
+        |> shift viewPosition
+
+
+tileShape : Float -> Tile.Tile -> Collage msg
+tileShape cellW tile =
     let
         silver =
             uniform <| Color.rgb255 192 192 192
@@ -140,14 +166,7 @@ tileShape cellW ( position, tile ) =
                 _ ->
                     floorShape
     in
-    [ Debug.toString position
-        |> Text.fromString
-        --|> Text.size Text.normal
-        |> rendered
-        |> opacity 0.3
-
-    --|> debug
-    , tileShapeHelp
+    [ tileShapeHelp
     ]
         |> stack
 

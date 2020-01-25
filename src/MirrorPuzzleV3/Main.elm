@@ -74,7 +74,7 @@ collageDemo =
 
         floorShape =
             square cellW
-                |> outlined (solid thin silver)
+                |> outlined (solid 0.5 silver)
 
         tileShape tile =
             case tile of

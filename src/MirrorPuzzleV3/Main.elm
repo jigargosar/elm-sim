@@ -16,7 +16,8 @@ import Playground.Direction8 as D
 import PointFree exposing (mapEach)
 import Set
 import String exposing (fromFloat)
-import Svg.Attributes as Svg
+import Svg
+import TypedSvg.Attributes.InPx as PX
 
 
 
@@ -95,29 +96,17 @@ viewTileGrid { cellW, grid } =
         |> stack
         |> name "pe-none"
         --|> debug
-        |> svg
+        |> svg []
 
 
-svg : Collage msg -> Html msg
-svg collage =
-    svgAbsolute ( Collage.Layout.width collage, Collage.Layout.height collage ) <|
-        Collage.Layout.align Collage.Layout.topLeft collage
-
-
-svgAbsolute : Float2 -> Collage msg -> Html msg
-svgAbsolute ( width, height ) =
-    let
-        w =
-            fromFloat width
-
-        h =
-            fromFloat height
-    in
+svg : List (Svg.Attribute msg) -> Collage msg -> Html msg
+svg attrs collage =
     Collage.Render.svgExplicit
-        [ Svg.width w
-        , Svg.height h
-        , Svg.version "1.1"
-        ]
+        (PX.width (width collage)
+            :: PX.height (height collage)
+            :: attrs
+        )
+        (align topLeft collage)
 
 
 toViewPosition : Float -> Int2 -> ( Float, Float )

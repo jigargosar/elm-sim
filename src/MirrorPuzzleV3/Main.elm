@@ -119,12 +119,6 @@ viewDebugTile { position, viewPosition } =
 
 viewTile : TileView -> Collage Msg
 viewTile { cellW, position, viewPosition, tile, showIndex } =
-    tileShape cellW tile
-        |> shift viewPosition
-
-
-tileShape : Float -> Tile.Tile -> Collage msg
-tileShape cellW tile =
     let
         silver =
             uniform <| Color.rgb255 192 192 192
@@ -166,9 +160,8 @@ tileShape cellW tile =
                 _ ->
                     floorShape
     in
-    [ tileShapeHelp
-    ]
-        |> stack
+    tileShapeHelp
+        |> shift viewPosition
 
 
 viewLightPath : Float -> Graph.Graph -> Collage msg

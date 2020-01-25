@@ -55,7 +55,7 @@ collageDemo =
                 |> TileGrid.fromList2d
 
         cellW =
-            50
+            100
 
         shiftCellAt position =
             shift (toViewPosition position)

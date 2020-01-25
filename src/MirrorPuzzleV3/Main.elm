@@ -127,13 +127,29 @@ collageDemo =
 
         viewLightPath : Graph.Graph -> List (Collage msg)
         viewLightPath graph =
-            viewEdges graph
+            [ viewEndPoints graph
+            , viewEdges graph
+            ]
+                |> List.concat
 
         viewEdges : Graph.Graph -> List (Collage msg)
         viewEdges graph =
             Graph.getEdges graph
                 |> Set.toList
                 |> List.map viewEdge
+
+        viewEndPoints : Graph.Graph -> List (Collage msg)
+        viewEndPoints graph =
+            Graph.getEndPoints graph
+                |> Set.toList
+                |> List.map viewEndPoint
+
+        viewEndPoint ep =
+            endPointShape |> shift (toViewPosition ep)
+
+        endPointShape : Collage msg
+        endPointShape =
+            circle (cellW / 8) |> filled (uniform Color.black) |> opacity 0.5
 
         viewEdge : ( NT.Int2, NT.Int2 ) -> Collage msg
         viewEdge points =

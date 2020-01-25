@@ -24,6 +24,12 @@ svg text {
   line-height: 0;
 }
 
+.pe-none{
+  pointer-events: none;
+}
+.pe-all{
+  pointer-events: all;
+}
 svg #pe-none{
   pointer-events: none;
 }

@@ -17,6 +17,7 @@ import PointFree exposing (mapEach)
 import Set
 import String exposing (fromFloat)
 import Svg
+import Svg.Attributes as Svg
 import TypedSvg.Attributes.InPx as PX
 
 
@@ -94,9 +95,8 @@ viewTileGrid { cellW, grid } =
         |> name "pe-all"
     ]
         |> stack
-        |> name "pe-none"
         --|> debug
-        |> svg []
+        |> svg [ Svg.class "pe-none" ]
 
 
 svg : List (Svg.Attribute msg) -> Collage msg -> Html msg

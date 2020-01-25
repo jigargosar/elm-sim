@@ -1,6 +1,7 @@
 module MirrorPuzzleV3.Tile exposing
     ( ElementType(..)
     , Tile(..)
+    , decode
     , floor
     , getLightPathUnfoldInstruction
     , getRefractionDirectionOfLightSource

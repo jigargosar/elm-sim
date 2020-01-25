@@ -1,4 +1,4 @@
-module Dict2d exposing (filled, fromCSVWithDefault, fromListsWithDefault, maybeMapAt, maybeMapAt2)
+module Dict2d exposing (decodeCSV, filled, fromListsWithDefault, maybeMapAt, maybeMapAt2)
 
 import Dict exposing (Dict)
 import List2d exposing (List2d)
@@ -31,18 +31,18 @@ fromListsWithDefault a lists =
     ( length2, resizeWithDefault a length2 lookupDict )
 
 
-fromCSVWithDefault : String -> String -> ( Int2, Dict Int2 String )
-fromCSVWithDefault a encoded =
+decodeCSV : (String -> a) -> String -> ( Int2, Dict Int2 a )
+decodeCSV decoder encoded =
     let
-        tokens : List (List String)
+        tokens : List (List a)
         tokens =
             encoded
                 |> String.trim
                 >> String.lines
                 >> List.reverse
-                >> List.map (String.split ",")
+                >> List.map (String.split "," >> List.map decoder)
     in
-    fromListsWithDefault a tokens
+    fromListsWithDefault (decoder "") tokens
 
 
 maybeMapAt : Int2 -> (a -> Maybe a) -> Dict Int2 a -> Maybe (Dict Int2 a)

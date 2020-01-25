@@ -1,6 +1,7 @@
 module MirrorPuzzleV3.TileGird exposing
     ( TileGrid
     , computeLightPaths
+    , decode
     , dimensions
     , filledWith
     , fromList2d
@@ -38,6 +39,15 @@ fromList2d list2d =
     let
         ( dim, dict2d ) =
             Dict2d.fromListsWithDefault Tile.Hole list2d
+    in
+    TileGrid dim dict2d
+
+
+decode : String -> TileGrid
+decode encoded =
+    let
+        ( dim, dict2d ) =
+            Dict2d.decodeCSV Tile.decode encoded
     in
     TileGrid dim dict2d
 

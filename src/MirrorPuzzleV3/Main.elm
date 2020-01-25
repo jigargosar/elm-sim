@@ -66,47 +66,48 @@ collageDemo =
                 |> List.map viewGridCell
                 |> stack
 
-        silver =
-            uniform <| Color.rgb255 192 192 192
+        viewGridCell ( position, tile ) =
+            let
+                silver =
+                    uniform <| Color.rgb255 192 192 192
 
-        floorShape =
-            square cellW
-                |> outlined (solid 0.5 silver)
+                floorShape =
+                    square cellW
+                        |> outlined (solid 0.5 silver)
 
-        mirrorShape d =
-            ellipse (cellW / 8) (cellW / 2)
-                |> filled (uniform Color.lightBlue)
-                |> shiftX (-cellW / 8)
-                |> List.singleton
-                |> stack
-                |> scale 0.9
-                |> List.singleton
-                |> stack
-                |> rotate (D.toRadians d)
+                mirrorShape d =
+                    ellipse (cellW / 8) (cellW / 2)
+                        |> filled (uniform Color.lightBlue)
+                        |> shiftX (-cellW / 8)
+                        |> List.singleton
+                        |> stack
+                        |> scale 0.9
+                        |> List.singleton
+                        |> stack
+                        |> rotate (D.toRadians d)
 
-        tileShape tile =
-            case tile of
-                Tile.FilledContainer _ element ->
-                    case element.type_ of
-                        Tile.Mirror ->
-                            [ mirrorShape element.direction
+                tileShape =
+                    case tile of
+                        Tile.FilledContainer _ element ->
+                            case element.type_ of
+                                Tile.Mirror ->
+                                    [ mirrorShape element.direction
+                                    , floorShape
+                                    ]
+                                        |> stack
+
+                                _ ->
+                                    floorShape
+
+                        Tile.Wall ->
+                            [ square cellW |> filled silver
                             , floorShape
                             ]
                                 |> stack
 
                         _ ->
                             floorShape
-
-                Tile.Wall ->
-                    [ square cellW |> filled silver
-                    , floorShape
-                    ]
-                        |> stack
-
-                _ ->
-                    floorShape
-
-        viewGridCell ( position, tile ) =
+            in
             [ Debug.toString position
                 |> Text.fromString
                 --|> Text.size Text.normal
@@ -114,7 +115,7 @@ collageDemo =
                 |> opacity 0.3
 
             --|> debug
-            , tileShape tile
+            , tileShape
             ]
                 |> stack
                 |> shift (toViewPosition position)

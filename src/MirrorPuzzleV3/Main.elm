@@ -127,40 +127,39 @@ collageDemo =
 
         viewLightPath : Graph.Graph -> List (Collage msg)
         viewLightPath graph =
-            [ viewEndPoints graph
-            , viewEdges graph
+            let
+                viewEdges =
+                    Graph.getEdges graph
+                        |> Set.toList
+                        |> List.map viewEdge
+
+                viewEndPoints =
+                    Graph.getEndPoints graph
+                        |> Set.toList
+                        |> List.map viewEndPoint
+
+                viewEndPoint : NT.Int2 -> Collage msg
+                viewEndPoint ep =
+                    endPointShape |> shift (toViewPosition ep)
+
+                endPointShape : Collage msg
+                endPointShape =
+                    circle (cellW / 8) |> filled (uniform Color.black) |> opacity 0.5
+
+                viewEdge : ( NT.Int2, NT.Int2 ) -> Collage msg
+                viewEdge points =
+                    let
+                        ( p1, p2 ) =
+                            mapEach toViewPosition points
+                    in
+                    segment p1 p2
+                        |> traced (solid thin (uniform Color.black))
+                        |> opacity 0.5
+            in
+            [ viewEndPoints
+            , viewEdges
             ]
                 |> List.concat
-
-        viewEdges : Graph.Graph -> List (Collage msg)
-        viewEdges graph =
-            Graph.getEdges graph
-                |> Set.toList
-                |> List.map viewEdge
-
-        viewEndPoints : Graph.Graph -> List (Collage msg)
-        viewEndPoints graph =
-            Graph.getEndPoints graph
-                |> Set.toList
-                |> List.map viewEndPoint
-
-        viewEndPoint : NT.Int2 -> Collage msg
-        viewEndPoint ep =
-            endPointShape |> shift (toViewPosition ep)
-
-        endPointShape : Collage msg
-        endPointShape =
-            circle (cellW / 8) |> filled (uniform Color.black) |> opacity 0.5
-
-        viewEdge : ( NT.Int2, NT.Int2 ) -> Collage msg
-        viewEdge points =
-            let
-                ( p1, p2 ) =
-                    mapEach toViewPosition points
-            in
-            segment p1 p2
-                |> traced (solid thin (uniform Color.black))
-                |> opacity 0.5
     in
     [ viewLightPathLayer, viewCellLayer ]
         |> stack

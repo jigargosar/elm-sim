@@ -7,7 +7,6 @@ import Collage.Render exposing (..)
 import Collage.Text as Text
 import Color
 import Html exposing (Html)
-import MirrorPuzzleV3.Demos as Demos
 import MirrorPuzzleV3.Graph as Graph
 import MirrorPuzzleV3.Tile as Tile
 import MirrorPuzzleV3.TileGird as TileGrid exposing (TileGrid)
@@ -79,7 +78,11 @@ viewTileGrid { cellW, grid } =
         viewCellLayer =
             grid
                 |> TileGrid.toList
-                |> List.map (viewGridCell cellW toViewPosition)
+                |> List.map
+                    (\( position, tile ) ->
+                        tileShape cellW ( position, tile )
+                            |> shift (toViewPosition position)
+                    )
                 |> stack
 
         viewLightPathLayer =
@@ -94,8 +97,8 @@ viewTileGrid { cellW, grid } =
         |> svg
 
 
-viewGridCell : Float -> (Int2 -> Float2) -> ( Int2, Tile.Tile ) -> Collage msg
-viewGridCell cellW toViewPosition ( position, tile ) =
+tileShape : Float -> ( Int2, Tile.Tile ) -> Collage msg
+tileShape cellW ( position, tile ) =
     let
         silver =
             uniform <| Color.rgb255 192 192 192
@@ -115,7 +118,7 @@ viewGridCell cellW toViewPosition ( position, tile ) =
                 |> stack
                 |> rotate (D.toRadians d)
 
-        tileShape =
+        tileShapeHelp =
             case tile of
                 Tile.FilledContainer _ element ->
                     case element.type_ of
@@ -144,10 +147,9 @@ viewGridCell cellW toViewPosition ( position, tile ) =
         |> opacity 0.3
 
     --|> debug
-    , tileShape
+    , tileShapeHelp
     ]
         |> stack
-        |> shift (toViewPosition position)
 
 
 viewLightPath : Float -> (Int2 -> Float2) -> Graph.Graph -> List (Collage msg)

@@ -1,9 +1,7 @@
-module MirrorPuzzleV3.TileGridDemo exposing (viewDemo)
+module MirrorPuzzleV3.TileGridSvgDemo exposing (viewDemo)
 
 import Color
 import Html exposing (Html)
-import Html.Attributes exposing (class)
-import MirrorPuzzleV3.ElGrid as ElGrid
 import MirrorPuzzleV3.Graph as Graph exposing (Graph)
 import MirrorPuzzleV3.Tile as Tile
 import MirrorPuzzleV3.TileGird as TileGrid

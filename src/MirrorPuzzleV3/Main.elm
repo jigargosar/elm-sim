@@ -57,6 +57,9 @@ collageDemo =
                 |> List.map viewGridCell
                 |> group
 
+        shiftCellAt position =
+            shift (position |> NT.toFloat |> NT.scale 50)
+
         viewGridCell ( position, _ ) =
             [ square 50
                 |> outlined (solid thin (uniform Color.gray))
@@ -68,6 +71,6 @@ collageDemo =
                 |> rendered
             ]
                 |> stack
-                |> shift (position |> NT.toFloat |> NT.scale 50)
+                |> shiftCellAt position
     in
     viewCellLayer |> svg

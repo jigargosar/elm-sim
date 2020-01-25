@@ -9,6 +9,7 @@ module Playground.Direction8 exposing
     , stepPos
     , stepPosIn
     , toDegrees
+    , toRadians
     , up
     )
 
@@ -53,6 +54,11 @@ rotate ct (Dir org) =
 toDegrees : Direction8 -> Float
 toDegrees (Dir ct) =
     45 * ct |> toFloat
+
+
+toRadians : Direction8 -> Float
+toRadians (Dir ct) =
+    turns (1 / 8) * toFloat ct
 
 
 opposite : Direction8 -> Direction8

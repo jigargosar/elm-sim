@@ -76,8 +76,28 @@ collageDemo =
             square cellW
                 |> outlined (solid 0.5 silver)
 
+        mirrorShape d =
+            ellipse (cellW / 8) (cellW / 2)
+                |> filled (uniform Color.lightBlue)
+                |> scale 0.9
+                |> shiftX (-cellW / 8)
+                |> List.singleton
+                |> stack
+                |> rotate (D.toRadians d)
+
         tileShape tile =
             case tile of
+                Tile.FilledContainer _ element ->
+                    case element.type_ of
+                        Tile.Mirror ->
+                            [ mirrorShape element.direction
+                            , floorShape
+                            ]
+                                |> stack
+
+                        _ ->
+                            floorShape
+
                 Tile.Wall ->
                     [ square cellW |> filled silver
                     , floorShape

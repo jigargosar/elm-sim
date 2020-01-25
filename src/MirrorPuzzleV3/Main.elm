@@ -162,7 +162,8 @@ viewTile { cellW, position, viewPosition, tile, showIndex } =
                 _ ->
                     floorShape
     in
-    tileShapeHelp
+    [ square cellW |> filled (uniform Color.black) |> opacity 0, tileShapeHelp ]
+        |> stack
         |> shift viewPosition
         |> Collage.Events.onClick (CellClick position)
 

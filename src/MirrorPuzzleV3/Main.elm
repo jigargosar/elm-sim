@@ -78,12 +78,20 @@ viewTileGrid { cellW, grid } =
                 |> TileGrid.toList
                 |> List.map (toTileView cellW)
     in
-    [ grid
-        |> TileGrid.computeLightPaths
-        |> List.map (viewLightPath cellW)
+    [ [ grid
+            |> TileGrid.computeLightPaths
+            |> List.map (viewLightPath cellW)
+            |> stack
+      , tileViewList
+            |> List.map viewDebugTile
+            |> stack
+      ]
         |> stack
-    , tileViewList |> List.map viewDebugTile |> stack
-    , tileViewList |> List.map viewTile |> stack
+        |> name "pe-none"
+    , tileViewList
+        |> List.map viewTile
+        |> stack
+        |> name "pe-all"
     ]
         |> stack
         --|> debug
@@ -162,8 +170,7 @@ viewTile { cellW, position, viewPosition, tile, showIndex } =
                 _ ->
                     floorShape
     in
-    [ square cellW |> filled (uniform Color.black) |> opacity 0, tileShapeHelp ]
-        |> stack
+    tileShapeHelp
         |> shift viewPosition
         |> Collage.Events.onClick (CellClick position)
 

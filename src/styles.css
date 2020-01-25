@@ -24,6 +24,14 @@ svg text {
   line-height: 0;
 }
 
+svg #pe-none{
+  pointer-events: none;
+}
+
+svg #pe-all{
+  pointer-events: all;
+}
+
 .fixed-full-screen {
   position: fixed;
   top: 0;

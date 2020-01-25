@@ -12,7 +12,7 @@ module MirrorPuzzleV3.Tile exposing
     )
 
 import MirrorPuzzleV3.Graph as Graph
-import Playground.Direction8 as Direction8 exposing (Direction8)
+import Playground.Direction8 as D exposing (Direction8)
 
 
 
@@ -24,17 +24,17 @@ floor =
     EmptyContainer Floor
 
 
-lightSourceWithMirror : Direction -> Tile
+lightSourceWithMirror : Direction8 -> Tile
 lightSourceWithMirror direction =
     FilledContainer LightSource (mirrorFacing direction)
 
 
-prism : Direction -> Tile
+prism : Direction8 -> Tile
 prism direction =
     FilledContainer Floor (prismFasing direction)
 
 
-mirror : Direction -> Tile
+mirror : Direction8 -> Tile
 mirror direction =
     FilledContainer Floor (mirrorFacing direction)
 
@@ -49,6 +49,45 @@ type Tile
     | Goal
     | Wall
     | Hole
+
+
+decode : String -> Tile
+decode encoded =
+    let
+        decodeDirection : Char -> Direction8
+        decodeDirection =
+            String.fromChar
+                >> String.toInt
+                >> Maybe.withDefault 0
+                >> D.fromInt
+    in
+    case String.trim encoded |> String.toList of
+        'S' :: [ char ] ->
+            mirrorFacing (decodeDirection char)
+                |> FilledContainer LightSource
+
+        'S' :: _ ->
+            EmptyContainer LightSource
+
+        'P' :: [ char ] ->
+            prismFasing (decodeDirection char)
+                |> FilledContainer Floor
+
+        'M' :: [ char ] ->
+            mirrorFacing (decodeDirection char)
+                |> FilledContainer Floor
+
+        'D' :: _ ->
+            Goal
+
+        '|' :: _ ->
+            Wall
+
+        '_' :: _ ->
+            EmptyContainer Floor
+
+        _ ->
+            Hole
 
 
 mapElement : (Element -> Element) -> Tile -> Maybe Tile
@@ -86,7 +125,7 @@ getElementInLightSource tile =
             Nothing
 
 
-getRefractionDirectionOfLightSource : Tile -> Maybe (List Direction)
+getRefractionDirectionOfLightSource : Tile -> Maybe (List Direction8)
 getRefractionDirectionOfLightSource =
     getElementInLightSource >> Maybe.map getRefractionDirectionsOfElement
 
@@ -129,18 +168,14 @@ type ElementType
 -- Direction
 
 
-type alias Direction =
-    Direction8
-
-
-rotateDirectionBy : Int -> Direction -> Direction
+rotateDirectionBy : Int -> Direction8 -> Direction8
 rotateDirectionBy =
-    Direction8.rotate
+    D.rotate
 
 
-oppositeDirection : Direction -> Direction
+oppositeDirection : Direction8 -> Direction8
 oppositeDirection =
-    Direction8.opposite
+    D.opposite
 
 
 
@@ -149,22 +184,22 @@ oppositeDirection =
 
 type alias Element =
     { type_ : ElementType
-    , direction : Direction
+    , direction : Direction8
     , movable : Bool
     }
 
 
-mirrorFacing : Direction -> Element
+mirrorFacing : Direction8 -> Element
 mirrorFacing direction =
     Element Mirror direction True
 
 
-prismFasing : Direction -> Element
+prismFasing : Direction8 -> Element
 prismFasing direction =
     Element Prism direction True
 
 
-getRefractionDirectionsOfElement : Element -> List Direction
+getRefractionDirectionsOfElement : Element -> List Direction8
 getRefractionDirectionsOfElement element =
     case element.type_ of
         Mirror ->

@@ -76,21 +76,13 @@ viewTileGrid { cellW, grid } =
             grid
                 |> TileGrid.toList
                 |> List.map (toTileView cellW)
-
-        viewCellLayer =
-            tileViewList
-                |> List.map viewTile
-                |> stack
-
-        viewLightPathLayer =
-            grid
-                |> TileGrid.computeLightPaths
-                |> List.concatMap (viewLightPath cellW)
-                |> stack
     in
-    [ viewLightPathLayer
+    [ grid
+        |> TileGrid.computeLightPaths
+        |> List.map (viewLightPath cellW)
+        |> stack
     , tileViewList |> List.map viewDebugTile |> stack
-    , viewCellLayer
+    , tileViewList |> List.map viewTile |> stack
     ]
         |> stack
         --|> debug
@@ -179,19 +171,9 @@ tileShape cellW tile =
         |> stack
 
 
-viewLightPath : Float -> Graph.Graph -> List (Collage msg)
+viewLightPath : Float -> Graph.Graph -> Collage msg
 viewLightPath cellW graph =
     let
-        viewEdges =
-            Graph.getEdges graph
-                |> Set.toList
-                |> List.map viewEdge
-
-        viewEndPoints =
-            Graph.getEndPoints graph
-                |> Set.toList
-                |> List.map viewEndPoint
-
         viewEndPoint : NT.Int2 -> Collage msg
         viewEndPoint ep =
             endPointShape |> shift (toViewPosition cellW ep)
@@ -210,10 +192,23 @@ viewLightPath cellW graph =
                 |> traced (solid thin (uniform Color.black))
                 |> opacity 0.5
     in
+    let
+        viewEdges =
+            Graph.getEdges graph
+                |> Set.toList
+                |> List.map viewEdge
+                |> stack
+
+        viewEndPoints =
+            Graph.getEndPoints graph
+                |> Set.toList
+                |> List.map viewEndPoint
+                |> stack
+    in
     [ viewEndPoints
     , viewEdges
     ]
-        |> List.concat
+        |> stack
 
 
 

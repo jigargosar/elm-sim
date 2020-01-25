@@ -89,6 +89,7 @@ viewTileGrid { cellW, grid } =
         |> svg
 
 
+toViewPosition : Float -> Int2 -> ( Float, Float )
 toViewPosition cellW position =
     position |> NT.toFloat |> NT.scale cellW
 

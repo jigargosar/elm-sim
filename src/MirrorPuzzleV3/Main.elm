@@ -3,11 +3,16 @@ module MirrorPuzzleV3.Main exposing (main)
 import Collage exposing (..)
 import Collage.Layout exposing (..)
 import Collage.Render exposing (..)
+import Collage.Text as Text
 import Color
 import Html exposing (Html)
 import Html.Attributes exposing (class)
 import MirrorPuzzleV3.ElGrid as ElGrid
+import MirrorPuzzleV3.Tile as Tile
+import MirrorPuzzleV3.TileGird as TileGrid
 import MirrorPuzzleV3.TileGridDemo as TileGridDemo
+import Number2 as NT
+import Playground.Direction8 as D
 
 
 
@@ -34,31 +39,35 @@ main =
 collageDemo : Html msg
 collageDemo =
     let
-        cell =
-            square 50
-                -- |> filled (uniform Color.blue)
-                |> outlined (solid thin (uniform Color.red))
+        initialTileGrid : TileGrid.TileGrid
+        initialTileGrid =
+            [ [ Tile.Hole, Tile.Wall, Tile.Wall, Tile.Wall, Tile.Wall, Tile.Hole ]
+            , [ Tile.Wall, Tile.floor, Tile.floor, Tile.floor, Tile.floor, Tile.Wall ]
+            , [ Tile.Wall, Tile.floor, Tile.floor, Tile.mirror D.down, Tile.mirror (D.rotate 1 D.left), Tile.Wall ]
+            , [ Tile.Wall, Tile.floor, Tile.lightSourceWithMirror D.right, Tile.floor, Tile.prism D.up, Tile.Wall ]
+            , [ Tile.Wall, Tile.mirror D.up, Tile.floor, Tile.floor, Tile.mirror D.left, Tile.Wall ]
+            , [ Tile.Wall, Tile.floor, Tile.floor, Tile.floor, Tile.floor, Tile.Wall ]
+            ]
+                |> List.reverse
+                |> TileGrid.fromList2d
 
-        repeatSpaced n =
-            List.repeat n >> List.intersperse (spacer 10 10)
+        viewCellLayer =
+            initialTileGrid
+                |> TileGrid.toList
+                |> List.map viewGridCell
+                |> group
 
-        gridCells =
-            repeatSpaced 5 cell
-                |> horizontal
-                |> repeatSpaced 10
-                |> vertical
-                |> align base
+        viewGridCell ( position, _ ) =
+            [ square 50
+                |> outlined (solid thin (uniform Color.gray))
 
-        gridBackground =
-            square 250
-                |> filled (uniform Color.red)
-                |> opacity 0.1
-                |> align base
+            --|> debug
+            , Debug.toString position
+                |> Text.fromString
+                --|> Text.size Text.normal
+                |> rendered
+            ]
+                |> stack
+                |> shift (position |> NT.toFloat |> NT.scale 50)
     in
-    impose
-        (gridCells
-            |> align bottomLeft
-            |> shift ( 20, 20 )
-        )
-        (gridBackground |> align bottomLeft)
-        |> svg
+    viewCellLayer |> svg

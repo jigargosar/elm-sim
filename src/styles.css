@@ -12,11 +12,13 @@ svg {
   user-select: none;
 }
 
+/*
 svg text {
   font-family: 'Source Code Pro', Consolas, 'Fira Code', monospace;
   font-size: 22px;
   letter-spacing: 0;
 }
+*/
 
 .fixed-full-screen {
   position: fixed;

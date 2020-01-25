@@ -2,6 +2,7 @@ module MirrorPuzzleV3.Main exposing (main)
 
 import Browser
 import Collage exposing (..)
+import Collage.Events
 import Collage.Layout exposing (..)
 import Collage.Render exposing (..)
 import Collage.Text as Text
@@ -163,6 +164,7 @@ viewTile { cellW, position, viewPosition, tile, showIndex } =
     in
     tileShapeHelp
         |> shift viewPosition
+        |> Collage.Events.onClick NoOp
 
 
 viewLightPath : Float -> Graph.Graph -> Collage msg

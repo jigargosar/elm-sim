@@ -19,7 +19,7 @@ main =
 
 
 
--- Model
+-- Init
 
 
 type alias Model =
@@ -36,16 +36,20 @@ init _ =
 
 
 
+-- View
+
+
+view : Model -> Html Msg
+view _ =
+    Demos.main
+
+
+
 -- Update
 
 
 type Msg
     = NoOp
-
-
-subscriptions : Model -> Sub Msg
-subscriptions _ =
-    Sub.batch []
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -55,6 +59,10 @@ update message model =
             ( model, Cmd.none )
 
 
-view : Model -> Html Msg
-view _ =
-    Demos.main
+
+-- Subscriptions
+
+
+subscriptions : Model -> Sub Msg
+subscriptions _ =
+    Sub.batch []

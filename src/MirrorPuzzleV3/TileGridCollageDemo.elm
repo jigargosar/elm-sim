@@ -8,7 +8,7 @@ import Color
 import Html exposing (Html)
 import MirrorPuzzleV3.Graph as Graph
 import MirrorPuzzleV3.Tile as Tile
-import MirrorPuzzleV3.TileGird as TileGrid
+import MirrorPuzzleV3.TileGird as TileGrid exposing (TileGrid)
 import Number2 as NT exposing (Float2, Int2)
 import Playground.Direction8 as D
 import PointFree exposing (mapEach)
@@ -22,7 +22,7 @@ import Set
 viewDemo : Html msg
 viewDemo =
     let
-        initialTileGrid : TileGrid.TileGrid
+        initialTileGrid : TileGrid
         initialTileGrid =
             """
               ,| ,| ,| ,| ,

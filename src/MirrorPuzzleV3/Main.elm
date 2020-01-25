@@ -57,9 +57,6 @@ collageDemo =
         cellW =
             100
 
-        shiftCellAt position =
-            shift (toViewPosition position)
-
         toViewPosition position =
             position |> NT.toFloat |> NT.scale cellW
 
@@ -120,7 +117,7 @@ collageDemo =
             , tileShape tile
             ]
                 |> stack
-                |> shiftCellAt position
+                |> shift (toViewPosition position)
 
         viewLightPathLayer =
             initialTileGrid

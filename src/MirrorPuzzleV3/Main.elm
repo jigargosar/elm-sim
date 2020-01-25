@@ -9,6 +9,7 @@ import MirrorPuzzleV3.Demos as Demos
 -- Main
 
 
+main : Program Flags Model Msg
 main =
     Browser.element
         { init = init

@@ -72,12 +72,18 @@ view model =
 viewTileGrid : { a | cellW : Float, grid : TileGrid } -> Html Msg
 viewTileGrid { cellW, grid } =
     let
-        viewCellLayer =
+        tileViewList =
             grid
                 |> TileGrid.toList
                 |> List.map (toTileView cellW)
+
+        viewCellLayer =
+            tileViewList
                 |> List.map viewTile
                 |> stack
+
+        viewCellDebugLayer =
+            tileViewList |> List.map viewDebugTile |> stack
 
         viewLightPathLayer =
             grid
@@ -85,7 +91,10 @@ viewTileGrid { cellW, grid } =
                 |> List.concatMap (viewLightPath cellW)
                 |> stack
     in
-    [ viewLightPathLayer, viewCellLayer ]
+    [ viewLightPathLayer
+    , viewCellDebugLayer
+    , viewCellLayer
+    ]
         |> stack
         --|> debug
         |> svg
@@ -107,6 +116,15 @@ type alias TileView =
     , showIndex : Bool
     , cellW : Float
     }
+
+
+viewDebugTile { position, viewPosition } =
+    NT.toStringInt2 position
+        |> Text.fromString
+        --|> Text.size Text.normal
+        |> rendered
+        |> opacity 0.3
+        |> shift viewPosition
 
 
 viewTile : TileView -> Collage Msg

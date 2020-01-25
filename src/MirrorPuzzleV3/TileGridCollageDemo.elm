@@ -24,15 +24,15 @@ viewDemo =
     let
         initialTileGrid : TileGrid.TileGrid
         initialTileGrid =
-            [ [ Tile.Hole, Tile.Wall, Tile.Wall, Tile.Wall, Tile.Wall, Tile.Hole ]
-            , [ Tile.Wall, Tile.floor, Tile.floor, Tile.floor, Tile.floor, Tile.Wall ]
-            , [ Tile.Wall, Tile.floor, Tile.floor, Tile.mirror D.down, Tile.mirror (D.rotate 1 D.left), Tile.Wall ]
-            , [ Tile.Wall, Tile.floor, Tile.lightSourceWithMirror D.right, Tile.floor, Tile.prism D.up, Tile.Wall ]
-            , [ Tile.Wall, Tile.mirror D.up, Tile.floor, Tile.floor, Tile.mirror D.left, Tile.Wall ]
-            , [ Tile.Wall, Tile.floor, Tile.floor, Tile.floor, Tile.floor, Tile.Wall ]
-            ]
-                |> List.reverse
-                |> TileGrid.fromList2d
+            """
+              ,| ,| ,| ,| ,
+            | ,__,__,__,__,|
+            | ,__,__,M6,M4,|
+            | ,__,S0,__,P2,|
+            | ,M2,__,__,M4,|
+            | ,__,__,__,__,|
+            """
+                |> TileGrid.decode
 
         cellW =
             100

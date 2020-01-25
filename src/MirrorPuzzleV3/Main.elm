@@ -144,6 +144,7 @@ collageDemo =
                 |> Set.toList
                 |> List.map viewEndPoint
 
+        viewEndPoint : NT.Int2 -> Collage msg
         viewEndPoint ep =
             endPointShape |> shift (toViewPosition ep)
 

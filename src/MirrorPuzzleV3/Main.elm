@@ -12,7 +12,7 @@ import MirrorPuzzleV3.Graph as Graph
 import MirrorPuzzleV3.Tile as Tile
 import MirrorPuzzleV3.TileGird as TileGrid
 import MirrorPuzzleV3.TileGridDemo as TileGridDemo
-import Number2 as NT
+import Number2 as NT exposing (Float2, Int2)
 import Playground.Direction8 as D
 import PointFree exposing (mapEach)
 import Set
@@ -122,46 +122,47 @@ collageDemo =
         viewLightPathLayer =
             initialTileGrid
                 |> TileGrid.computeLightPaths
-                |> List.concatMap viewLightPath
+                |> List.concatMap (viewLightPath cellW toViewPosition)
                 |> stack
-
-        viewLightPath : Graph.Graph -> List (Collage msg)
-        viewLightPath graph =
-            let
-                viewEdges =
-                    Graph.getEdges graph
-                        |> Set.toList
-                        |> List.map viewEdge
-
-                viewEndPoints =
-                    Graph.getEndPoints graph
-                        |> Set.toList
-                        |> List.map viewEndPoint
-
-                viewEndPoint : NT.Int2 -> Collage msg
-                viewEndPoint ep =
-                    endPointShape |> shift (toViewPosition ep)
-
-                endPointShape : Collage msg
-                endPointShape =
-                    circle (cellW / 8) |> filled (uniform Color.black) |> opacity 0.5
-
-                viewEdge : ( NT.Int2, NT.Int2 ) -> Collage msg
-                viewEdge points =
-                    let
-                        ( p1, p2 ) =
-                            mapEach toViewPosition points
-                    in
-                    segment p1 p2
-                        |> traced (solid thin (uniform Color.black))
-                        |> opacity 0.5
-            in
-            [ viewEndPoints
-            , viewEdges
-            ]
-                |> List.concat
     in
     [ viewLightPathLayer, viewCellLayer ]
         |> stack
         --|> debug
         |> svg
+
+
+viewLightPath : Float -> (Int2 -> Float2) -> Graph.Graph -> List (Collage msg)
+viewLightPath cellW toViewPosition graph =
+    let
+        viewEdges =
+            Graph.getEdges graph
+                |> Set.toList
+                |> List.map viewEdge
+
+        viewEndPoints =
+            Graph.getEndPoints graph
+                |> Set.toList
+                |> List.map viewEndPoint
+
+        viewEndPoint : NT.Int2 -> Collage msg
+        viewEndPoint ep =
+            endPointShape |> shift (toViewPosition ep)
+
+        endPointShape : Collage msg
+        endPointShape =
+            circle (cellW / 8) |> filled (uniform Color.black) |> opacity 0.5
+
+        viewEdge : ( NT.Int2, NT.Int2 ) -> Collage msg
+        viewEdge points =
+            let
+                ( p1, p2 ) =
+                    mapEach toViewPosition points
+            in
+            segment p1 p2
+                |> traced (solid thin (uniform Color.black))
+                |> opacity 0.5
+    in
+    [ viewEndPoints
+    , viewEdges
+    ]
+        |> List.concat

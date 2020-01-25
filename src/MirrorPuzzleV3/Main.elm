@@ -36,7 +36,7 @@ main =
 
 
 type alias Model =
-    ()
+    { cellW : Float, grid : TileGrid }
 
 
 type alias Flags =
@@ -45,24 +45,12 @@ type alias Flags =
 
 init : Flags -> ( Model, Cmd Msg )
 init _ =
-    ( (), Cmd.none )
+    ( { cellW = 100, grid = initialTileGrid }, Cmd.none )
 
 
-
--- View
-
-
-view : Model -> Html Msg
-view _ =
-    viewDemo
-
-
-viewDemo : Html msg
-viewDemo =
-    let
-        initialTileGrid : TileGrid
-        initialTileGrid =
-            """
+initialTileGrid : TileGrid
+initialTileGrid =
+    """
               ,||,||,||,||,
             ||,__,__,__,__,||
             ||,__,__,M6,M4,||
@@ -70,22 +58,32 @@ viewDemo =
             ||,M2,__,__,M4,||
             ||,__,__,__,__,||
             """
-                |> TileGrid.decode
+        |> TileGrid.decode
 
-        cellW =
-            100
 
+
+-- View
+
+
+view : Model -> Html Msg
+view model =
+    viewTileGrid model
+
+
+viewTileGrid : { a | cellW : Float, grid : TileGrid } -> Html msg
+viewTileGrid { cellW, grid } =
+    let
         toViewPosition position =
             position |> NT.toFloat |> NT.scale cellW
 
         viewCellLayer =
-            initialTileGrid
+            grid
                 |> TileGrid.toList
                 |> List.map (viewGridCell cellW toViewPosition)
                 |> stack
 
         viewLightPathLayer =
-            initialTileGrid
+            grid
                 |> TileGrid.computeLightPaths
                 |> List.concatMap (viewLightPath cellW toViewPosition)
                 |> stack

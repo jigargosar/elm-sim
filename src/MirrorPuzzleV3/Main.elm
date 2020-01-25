@@ -78,22 +78,20 @@ viewTileGrid { cellW, grid } =
                 |> TileGrid.toList
                 |> List.map (toTileView cellW)
     in
-    [ [ grid
-            |> TileGrid.computeLightPaths
-            |> List.map (viewLightPath cellW)
-            |> stack
-      , tileViewList
-            |> List.map viewDebugTile
-            |> stack
-      ]
+    [ grid
+        |> TileGrid.computeLightPaths
+        |> List.map (viewLightPath cellW)
         |> stack
-        |> name "pe-none"
+    , tileViewList
+        |> List.map viewDebugTile
+        |> stack
     , tileViewList
         |> List.map viewTile
         |> stack
         |> name "pe-all"
     ]
         |> stack
+        |> name "pe-none"
         --|> debug
         |> svg
 

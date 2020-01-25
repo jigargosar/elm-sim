@@ -119,7 +119,7 @@ type alias TileView =
 
 
 viewDebugTile { position, viewPosition } =
-    NT.toStringInt2 position
+    NT.int2ToString position
         |> Text.fromString
         --|> Text.size Text.normal
         |> rendered

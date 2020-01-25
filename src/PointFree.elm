@@ -209,3 +209,8 @@ callWith a func =
 indexMemberOf : Int -> Int -> Bool
 indexMemberOf length index =
     index >= 0 && index <= length
+
+
+t2ToList : ( b, b ) -> List b
+t2ToList ( a, b ) =
+    [ a, b ]

@@ -1,7 +1,7 @@
 module Number2 exposing (..)
 
 import Dict exposing (Dict)
-import PointFree exposing (flip, mapEach, mapEach2, mulBy)
+import PointFree exposing (flip, mapEach, mapEach2, mulBy, t2ToList)
 
 
 type alias Int2 =
@@ -85,6 +85,11 @@ equalWithin tol a b =
             sub a b |> mapEach abs
     in
     dx < tol && dy < tol
+
+
+int2ToString : Int2 -> String
+int2ToString =
+    mapEach String.fromInt >> t2ToList >> String.join ","
 
 
 

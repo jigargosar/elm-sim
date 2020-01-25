@@ -72,20 +72,17 @@ view model =
 viewTileGrid : { a | cellW : Float, grid : TileGrid } -> Html Msg
 viewTileGrid { cellW, grid } =
     let
-        toViewPosition position =
-            position |> NT.toFloat |> NT.scale cellW
-
         viewCellLayer =
             grid
                 |> TileGrid.toList
-                |> List.map (toTileView cellW toViewPosition)
+                |> List.map (toTileView cellW)
                 |> List.map viewTile
                 |> stack
 
         viewLightPathLayer =
             grid
                 |> TileGrid.computeLightPaths
-                |> List.concatMap (viewLightPath cellW toViewPosition)
+                |> List.concatMap (viewLightPath cellW)
                 |> stack
     in
     [ viewLightPathLayer, viewCellLayer ]
@@ -94,9 +91,13 @@ viewTileGrid { cellW, grid } =
         |> svg
 
 
-toTileView : Float -> (Int2 -> Float2) -> ( Int2, Tile ) -> TileView
-toTileView cellW toViewPosition ( position, tile ) =
-    TileView position (position |> toViewPosition) tile True cellW
+toViewPosition cellW position =
+    position |> NT.toFloat |> NT.scale cellW
+
+
+toTileView : Float -> ( Int2, Tile ) -> TileView
+toTileView cellW ( position, tile ) =
+    TileView position (toViewPosition cellW position) tile True cellW
 
 
 type alias TileView =
@@ -171,8 +172,8 @@ tileShape cellW tile =
         |> stack
 
 
-viewLightPath : Float -> (Int2 -> Float2) -> Graph.Graph -> List (Collage msg)
-viewLightPath cellW toViewPosition graph =
+viewLightPath : Float -> Graph.Graph -> List (Collage msg)
+viewLightPath cellW graph =
     let
         viewEdges =
             Graph.getEdges graph
@@ -186,7 +187,7 @@ viewLightPath cellW toViewPosition graph =
 
         viewEndPoint : NT.Int2 -> Collage msg
         viewEndPoint ep =
-            endPointShape |> shift (toViewPosition ep)
+            endPointShape |> shift (toViewPosition cellW ep)
 
         endPointShape : Collage msg
         endPointShape =
@@ -196,7 +197,7 @@ viewLightPath cellW toViewPosition graph =
         viewEdge points =
             let
                 ( p1, p2 ) =
-                    mapEach toViewPosition points
+                    mapEach (toViewPosition cellW) points
             in
             segment p1 p2
                 |> traced (solid thin (uniform Color.black))

@@ -141,29 +141,32 @@ viewTile { cellW, position, viewPosition, tile, showIndex } =
                 |> shiftX (-cellW / 8)
                 |> List.singleton
                 |> stack
-                |> scale 0.9
+                |> scale 0.8
                 |> List.singleton
                 |> stack
                 |> rotate (D.toRadians d)
 
+        prismShape d =
+            triangle cellW
+                |> filled (uniform Color.lightBlue)
+                |> rotate (D.toRadians d)
+                |> scale 0.8
+
         lightSourceShape =
-            square (cellW * 0.9) |> filled (uniform Color.green)
+            square cellW |> filled (uniform Color.green) |> scale 0.9
+
+        goalShape =
+            circle (cellW / 2) |> filled (uniform Color.green) |> scale 0.9
 
         tileShapeHelp =
             case tile of
                 Tile.FilledContainer elementContainer element ->
                     [ case element.type_ of
                         Tile.Mirror ->
-                            [ mirrorShape element.direction
-                            ]
-                                |> stack
+                            mirrorShape element.direction
 
                         Tile.Prism ->
-                            [ triangle cellW
-                                |> filled (uniform Color.lightBlue)
-                                |> rotate (D.toRadians element.direction)
-                            ]
-                                |> stack
+                            prismShape element.direction
                     , case elementContainer of
                         Tile.LightSource ->
                             lightSourceShape
@@ -192,7 +195,7 @@ viewTile { cellW, position, viewPosition, tile, showIndex } =
                         |> stack
 
                 Tile.Goal ->
-                    [ circle (cellW / 2) |> filled (uniform Color.green)
+                    [ goalShape
                     , floorShape
                     ]
                         |> stack

@@ -111,15 +111,15 @@ create typeOfNodeAt startPoint branchingDirections =
                     ( insertEndPoint p1 acc, pending )
 
         toGraph : { edges : Set Edge, eps : Set Int2 } -> List ( Int2, Direction8 ) -> Graph
-        toGraph acc vectors =
-            case vectors of
+        toGraph acc0 vectors0 =
+            case vectors0 of
                 [] ->
-                    Graph ( acc.edges, acc.eps )
+                    Graph ( acc0.edges, acc0.eps )
 
                 ( p1, d ) :: pending ->
                     let
                         ( acc1, vectors1 ) =
-                            updateAccAndVectors p1 d acc pending
+                            updateAccAndVectors p1 d acc0 pending
                     in
                     toGraph acc1 vectors1
 

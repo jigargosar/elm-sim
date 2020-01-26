@@ -209,9 +209,9 @@ viewTile { cellW, position, viewPosition, tile, showIndex } =
     in
     tileShapeHelp
         |> shift viewPosition
-        |> Collage.Events.onClick (CellClick position)
-        |> Collage.Events.onMouseDown (CellMouseDown position |> always)
         |> Collage.Events.onMouseUp (CellMouseUp position |> always)
+        --|> Collage.Events.onClick (CellClick position)
+        |> Collage.Events.onMouseDown (CellMouseDown position |> always)
 
 
 elementShape cellW element =
@@ -384,10 +384,10 @@ subscriptions model =
                 Sub.none
 
             Dragging _ ->
-                [ JD.map MouseMove clientXYDecoder
-                    |> Browser.Events.onMouseMove
-                , JD.succeed MouseUp
-                    |> Browser.Events.onMouseUp
+                [--JD.map MouseMove clientXYDecoder
+                 --    |> Browser.Events.onMouseMove
+                 --, JD.succeed MouseUp
+                 --    |> Browser.Events.onMouseUp
                 ]
                     |> Sub.batch
         ]

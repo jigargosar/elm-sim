@@ -154,8 +154,24 @@ viewTile { cellW, position, viewPosition, tile, showIndex } =
                 |> rotate (D.toRadians d)
                 |> scale 0.8
 
+        elementShape element =
+            case element.type_ of
+                Tile.Mirror ->
+                    mirrorShape element.direction
+
+                Tile.Prism ->
+                    prismShape element.direction
+
         lightSourceShape =
             square cellW |> filled (uniform Color.green) |> scale 0.9
+
+        elementContainerShape elementContainer =
+            case elementContainer of
+                Tile.LightSource ->
+                    lightSourceShape
+
+                Tile.Platform ->
+                    empty
 
         goalShape =
             circle (cellW / 2) |> filled (uniform Color.green) |> scale 0.9
@@ -163,18 +179,8 @@ viewTile { cellW, position, viewPosition, tile, showIndex } =
         tileShapeHelp =
             case tile of
                 Tile.FilledContainer elementContainer element ->
-                    [ case element.type_ of
-                        Tile.Mirror ->
-                            mirrorShape element.direction
-
-                        Tile.Prism ->
-                            prismShape element.direction
-                    , case elementContainer of
-                        Tile.LightSource ->
-                            lightSourceShape
-
-                        Tile.Platform ->
-                            empty
+                    [ elementShape element
+                    , elementContainerShape elementContainer
                     , floorShape
                     ]
                         |> stack
@@ -186,12 +192,7 @@ viewTile { cellW, position, viewPosition, tile, showIndex } =
                         |> stack
 
                 Tile.EmptyContainer elementContainer ->
-                    [ case elementContainer of
-                        Tile.LightSource ->
-                            lightSourceShape
-
-                        Tile.Platform ->
-                            empty
+                    [ elementContainerShape elementContainer
                     , floorShape
                     ]
                         |> stack

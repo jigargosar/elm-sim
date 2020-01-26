@@ -58,6 +58,10 @@ isEdgeMember ( p1, p2 ) acc =
     Set.member ( p1, p2 ) acc.edges || Set.member ( p2, p1 ) acc.edges
 
 
+insertEndPoint ep acc =
+    { acc | eps = Set.insert ep acc.eps }
+
+
 create : (Int2 -> Maybe NodeType) -> Int2 -> List Direction8 -> Graph
 create typeOfNodeAt startPoint branchingDirections =
     let
@@ -78,14 +82,14 @@ create typeOfNodeAt startPoint branchingDirections =
                     case typeOfNodeAt p2 of
                         Just ContinuePreviousDirectionNode ->
                             if isEdgeMember edge acc then
-                                toGraph { acc | eps = Set.insert p1 acc.eps } pending
+                                toGraph (insertEndPoint p1 acc) pending
 
                             else
                                 toGraph (insertEdge edge acc) (( p2, d ) :: pending)
 
                         Just (BranchNode dl) ->
                             if isEdgeMember edge acc then
-                                toGraph { acc | eps = Set.insert p1 acc.eps } pending
+                                toGraph (insertEndPoint p1 acc) pending
 
                             else
                                 toGraph (insertEdge edge acc)
@@ -93,18 +97,15 @@ create typeOfNodeAt startPoint branchingDirections =
 
                         Just LeafNode ->
                             if isEdgeMember edge acc then
-                                toGraph { acc | eps = Set.insert p2 acc.eps } pending
+                                toGraph (insertEndPoint p2 acc) pending
 
                             else
                                 toGraph
-                                    { acc
-                                        | edges = Set.insert ( p1, p2 ) acc.edges
-                                        , eps = Set.insert p2 acc.eps
-                                    }
+                                    (acc |> insertEndPoint p2 |> insertEdge edge)
                                     pending
 
                         Nothing ->
-                            toGraph { acc | eps = Set.insert p1 acc.eps } pending
+                            toGraph (insertEndPoint p1 acc) pending
 
         -- recurse acc
     in

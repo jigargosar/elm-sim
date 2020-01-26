@@ -91,10 +91,10 @@ view model =
                     , style "height" "20px"
                     , style "top" top
                     , style "left" left
-                    , class "bg-blue"
                     , class "fixed"
+                    , class "lh-0"
                     ]
-                    []
+                    [ elementShape 100 r.element |> svg ]
         ]
 
 

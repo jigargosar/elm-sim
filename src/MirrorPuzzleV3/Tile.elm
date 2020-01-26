@@ -6,6 +6,7 @@ module MirrorPuzzleV3.Tile exposing
     , decode
     , floor
     , getLightPathNodeType
+    , getMovableElement
     , getRefractionDirectionOfLightSource
     , isMovable
     , lightSourceWithMirror
@@ -127,6 +128,20 @@ isMovable tile =
 
         _ ->
             False
+
+
+getMovableElement : Tile -> Maybe Element
+getMovableElement tile =
+    case tile of
+        FilledContainer _ element ->
+            if element.movable then
+                Just element
+
+            else
+                Nothing
+
+        _ ->
+            Nothing
 
 
 getElementInLightSource : Tile -> Maybe Element

@@ -277,7 +277,7 @@ type Drag
 
 
 type alias DraggingR =
-    { start : Int2, current : Float2 }
+    { start : Int2, element : Tile.Element, current : Float2 }
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -302,9 +302,9 @@ update message model =
             )
 
         CellMouseDown position ->
-            case ( model.drag, TileGrid.isMovable position model.grid ) of
-                ( NotDragging, True ) ->
-                    ( { model | drag = DraggingR position ( 0, 0 ) |> Dragging }, Cmd.none )
+            case ( model.drag, TileGrid.getMovableElement position model.grid ) of
+                ( NotDragging, Just element ) ->
+                    ( { model | drag = DraggingR position element ( 0, 0 ) |> Dragging }, Cmd.none )
 
                 _ ->
                     ( model, Cmd.none )

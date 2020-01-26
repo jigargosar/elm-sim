@@ -50,6 +50,14 @@ type NodeType
     | LeafNode
 
 
+insertEdge edge acc =
+    { acc | edges = Set.insert edge acc.edges }
+
+
+isEdgeMember ( p1, p2 ) acc =
+    Set.member ( p1, p2 ) acc.edges || Set.member ( p2, p1 ) acc.edges
+
+
 create : (Int2 -> Maybe NodeType) -> Int2 -> List Direction8 -> Graph
 create typeOfNodeAt startPoint branchingDirections =
     let
@@ -64,50 +72,39 @@ create typeOfNodeAt startPoint branchingDirections =
                         p2 =
                             D.translatePoint p1 d
 
-                        isEdgeMember =
-                            Set.member ( p1, p2 ) acc.edges || Set.member ( p2, p1 ) acc.edges
-
-                        recurse acc_ =
-                            toGraph acc_ pending
-
-                        recurse1 acc_ newVec =
-                            toGraph acc_ (newVec :: pending)
-
-                        recurseList acc_ newList =
-                            toGraph acc_ (newList ++ pending)
-
-                        insertEdge acc_ =
-                            { acc_ | edges = Set.insert ( p1, p2 ) acc_.edges }
+                        edge =
+                            ( p1, p2 )
                     in
                     case typeOfNodeAt p2 of
                         Just ContinuePreviousDirectionNode ->
-                            if isEdgeMember then
-                                recurse { acc | eps = Set.insert p1 acc.eps }
+                            if isEdgeMember edge acc then
+                                toGraph { acc | eps = Set.insert p1 acc.eps } pending
 
                             else
-                                recurse1 (insertEdge acc) ( p2, d )
+                                toGraph (insertEdge edge acc) (( p2, d ) :: pending)
 
                         Just (BranchNode dl) ->
-                            if isEdgeMember then
-                                recurse { acc | eps = Set.insert p1 acc.eps }
+                            if isEdgeMember edge acc then
+                                toGraph { acc | eps = Set.insert p1 acc.eps } pending
 
                             else
-                                recurseList (insertEdge acc)
-                                    (List.map (Tuple.pair p2) dl)
+                                toGraph (insertEdge edge acc)
+                                    (List.map (Tuple.pair p2) dl ++ pending)
 
                         Just LeafNode ->
-                            if isEdgeMember then
-                                recurse { acc | eps = Set.insert p2 acc.eps }
+                            if isEdgeMember edge acc then
+                                toGraph { acc | eps = Set.insert p2 acc.eps } pending
 
                             else
-                                recurse
+                                toGraph
                                     { acc
                                         | edges = Set.insert ( p1, p2 ) acc.edges
                                         , eps = Set.insert p2 acc.eps
                                     }
+                                    pending
 
                         Nothing ->
-                            recurse { acc | eps = Set.insert p1 acc.eps }
+                            toGraph { acc | eps = Set.insert p1 acc.eps } pending
 
         -- recurse acc
     in

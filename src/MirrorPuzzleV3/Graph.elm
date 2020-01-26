@@ -65,13 +65,13 @@ insertEndPoint ep acc =
 create : (Int2 -> Maybe NodeType) -> Int2 -> List Direction8 -> Graph
 create typeOfNodeAt startPoint branchingDirections =
     let
-        toGraphHelp :
+        updateAccAndVectors :
             Int2
             -> Direction8
             -> { edges : Set Edge, eps : Set Int2 }
             -> List ( Int2, Direction8 )
             -> ( { edges : Set Edge, eps : Set Int2 }, List ( Int2, Direction8 ) )
-        toGraphHelp p1 d acc pending =
+        updateAccAndVectors p1 d acc pending =
             let
                 p2 =
                     D.translatePoint p1 d
@@ -118,41 +118,10 @@ create typeOfNodeAt startPoint branchingDirections =
 
                 ( p1, d ) :: pending ->
                     let
-                        p2 =
-                            D.translatePoint p1 d
-
-                        edge =
-                            ( p1, p2 )
+                        ( acc1, vectors1 ) =
+                            updateAccAndVectors p1 d acc pending
                     in
-                    case typeOfNodeAt p2 of
-                        Just type_ ->
-                            case type_ of
-                                ContinuePreviousDirectionNode ->
-                                    if isEdgeMember edge acc then
-                                        toGraph (insertEndPoint p1 acc) pending
-
-                                    else
-                                        toGraph (insertEdge edge acc) (( p2, d ) :: pending)
-
-                                BranchNode dl ->
-                                    if isEdgeMember edge acc then
-                                        toGraph (insertEndPoint p1 acc) pending
-
-                                    else
-                                        toGraph (insertEdge edge acc)
-                                            (List.map (Tuple.pair p2) dl ++ pending)
-
-                                LeafNode ->
-                                    if isEdgeMember edge acc then
-                                        toGraph (insertEndPoint p2 acc) pending
-
-                                    else
-                                        toGraph
-                                            (acc |> insertEndPoint p2 |> insertEdge edge)
-                                            pending
-
-                        Nothing ->
-                            toGraph (insertEndPoint p1 acc) pending
+                    toGraph acc1 vectors1
 
         -- recurse acc
     in

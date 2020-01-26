@@ -350,12 +350,6 @@ update message model =
 -- Subscriptions
 
 
-pageXYDecoder =
-    JD.map2 Tuple.pair
-        (JD.field "pageX" JD.float)
-        (JD.field "pageY" JD.float)
-
-
 clientXYDecoder =
     JD.map2 Tuple.pair
         (JD.field "clientX" JD.float)

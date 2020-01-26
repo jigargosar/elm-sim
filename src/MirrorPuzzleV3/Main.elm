@@ -8,16 +8,17 @@ import Collage.Layout exposing (..)
 import Collage.Render exposing (..)
 import Collage.Text as Text
 import Color
-import Html exposing (Html, div)
-import Html.Attributes exposing (class)
+import Html exposing (Html, div, text)
+import Html.Attributes exposing (class, style)
 import Json.Decode as JD
 import MirrorPuzzleV3.Graph as Graph
 import MirrorPuzzleV3.Tile as Tile exposing (Tile)
 import MirrorPuzzleV3.TileGird as TileGrid exposing (TileGrid)
 import Number2 as NT exposing (Float2, Int2)
 import Playground.Direction8 as D
-import PointFree exposing (ignoreNothing, mapEach)
+import PointFree exposing (flip, ignoreNothing, mapEach)
 import Set
+import String exposing (fromFloat)
 
 
 
@@ -76,7 +77,25 @@ initialTileGrid =
 view : Model -> Html Msg
 view model =
     div [ class "flex justify-center pv4" ]
-        [ viewTileGrid model ]
+        [ viewTileGrid model
+        , case model.drag of
+            NotDragging ->
+                text ""
+
+            Dragging r ->
+                let
+                    ( left, top ) =
+                        r.current |> mapEach (fromFloat >> flip (++) "px")
+                in
+                div
+                    [ style "width" "20px"
+                    , style "height" "20px"
+                    , style "top" top
+                    , style "left" left
+                    , class "absolute bg-blue"
+                    ]
+                    []
+        ]
 
 
 viewTileGrid : { a | cellW : Float, grid : TileGrid } -> Html Msg

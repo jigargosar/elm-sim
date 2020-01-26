@@ -384,10 +384,11 @@ subscriptions model =
                 Sub.none
 
             Dragging _ ->
-                [--JD.map MouseMove clientXYDecoder
-                 --    |> Browser.Events.onMouseMove
-                 --, JD.succeed MouseUp
-                 --    |> Browser.Events.onMouseUp
+                [ JD.map MouseMove clientXYDecoder
+                    |> Browser.Events.onMouseMove
+
+                --, JD.succeed MouseUp
+                --    |> Browser.Events.onMouseUp
                 ]
                     |> Sub.batch
         ]

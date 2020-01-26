@@ -65,6 +65,51 @@ insertEndPoint ep acc =
 create : (Int2 -> Maybe NodeType) -> Int2 -> List Direction8 -> Graph
 create typeOfNodeAt startPoint branchingDirections =
     let
+        toGraphHelp :
+            Int2
+            -> Direction8
+            -> { edges : Set Edge, eps : Set Int2 }
+            -> List ( Int2, Direction8 )
+            -> ( { edges : Set Edge, eps : Set Int2 }, List ( Int2, Direction8 ) )
+        toGraphHelp p1 d acc pending =
+            let
+                p2 =
+                    D.translatePoint p1 d
+
+                edge =
+                    ( p1, p2 )
+            in
+            case typeOfNodeAt p2 of
+                Just type_ ->
+                    case type_ of
+                        ContinuePreviousDirectionNode ->
+                            if isEdgeMember edge acc then
+                                ( insertEndPoint p1 acc, pending )
+
+                            else
+                                ( insertEdge edge acc, ( p2, d ) :: pending )
+
+                        BranchNode dl ->
+                            if isEdgeMember edge acc then
+                                ( insertEndPoint p1 acc, pending )
+
+                            else
+                                ( insertEdge edge acc
+                                , List.map (Tuple.pair p2) dl ++ pending
+                                )
+
+                        LeafNode ->
+                            if isEdgeMember edge acc then
+                                ( insertEndPoint p2 acc, pending )
+
+                            else
+                                ( acc |> insertEndPoint p2 |> insertEdge edge
+                                , pending
+                                )
+
+                Nothing ->
+                    ( insertEndPoint p1 acc, pending )
+
         toGraph : { edges : Set Edge, eps : Set Int2 } -> List ( Int2, Direction8 ) -> Graph
         toGraph acc vectors =
             case vectors of

@@ -211,6 +211,7 @@ viewTile { cellW, position, viewPosition, tile, showIndex } =
         |> shift viewPosition
         |> Collage.Events.onClick (CellClick position)
         |> Collage.Events.onMouseDown (CellMouseDown position |> always)
+        |> Collage.Events.onMouseUp (CellMouseUp position |> always)
 
 
 elementShape cellW element =
@@ -288,6 +289,7 @@ type Msg
     = NoOp
     | CellClick Int2
     | CellMouseDown Int2
+    | CellMouseUp Int2
     | MouseMove Float2
     | MouseUp
 
@@ -326,6 +328,23 @@ update message model =
             case ( model.drag, TileGrid.getMovableElement position model.grid ) of
                 ( NotDragging, Just element ) ->
                     ( { model | drag = DraggingR position element ( 0, 0 ) |> Dragging }, Cmd.none )
+
+                _ ->
+                    ( model, Cmd.none )
+
+        CellMouseUp position ->
+            case model.drag of
+                Dragging r ->
+                    ( { model
+                        | drag = NotDragging
+                        , grid =
+                            (TileGrid.swapElements r.start position
+                                |> ignoreNothing
+                            )
+                                model.grid
+                      }
+                    , Cmd.none
+                    )
 
                 _ ->
                     ( model, Cmd.none )

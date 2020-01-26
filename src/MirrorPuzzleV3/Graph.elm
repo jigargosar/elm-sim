@@ -45,7 +45,7 @@ type alias Seed =
 
 
 type NodeType
-    = ContinuePreviousDirectionNode -- Or we can Skip node
+    = ContinuePreviousDirectionNode
     | BranchNode (List Direction8)
     | LeafNode
 

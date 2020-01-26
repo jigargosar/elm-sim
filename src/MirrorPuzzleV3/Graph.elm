@@ -75,8 +75,8 @@ create typeOfNodeAt startPoint branchingDirections =
                     case typeOfNodeAt p2 of
                         Just ContinuePreviousDirectionNode ->
                             if Set.member ( p1, p2 ) acc.edges || Set.member ( p2, p1 ) acc.edges then
-                                toGraph { acc | eps = Set.insert p2 acc.eps }
-                                    (( p2, d ) :: pending)
+                                toGraph { acc | eps = Set.insert p1 acc.eps }
+                                    pending
 
                             else
                                 toGraph { acc | edges = Set.insert ( p1, p2 ) acc.edges }
@@ -84,8 +84,7 @@ create typeOfNodeAt startPoint branchingDirections =
 
                         Just (BranchNode dl) ->
                             if Set.member ( p1, p2 ) acc.edges || Set.member ( p2, p1 ) acc.edges then
-                                toGraph { acc | eps = Set.insert p2 acc.eps }
-                                    pending
+                                toGraph { acc | eps = Set.insert p1 acc.eps } pending
 
                             else
                                 toGraph { acc | edges = Set.insert ( p1, p2 ) acc.edges }

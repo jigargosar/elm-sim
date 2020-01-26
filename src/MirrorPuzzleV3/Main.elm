@@ -17,7 +17,6 @@ import MirrorPuzzleV3.TileGird as TileGrid exposing (TileGrid)
 import Number2 as NT exposing (Float2, Int2)
 import Playground.Direction8 as D
 import PointFree exposing (flip, ignoreNothing, mapEach)
-import Set
 import String exposing (fromFloat)
 
 
@@ -164,31 +163,6 @@ viewTile { cellW, position, viewPosition, tile, showIndex } =
             square cellW
                 |> outlined (solid 0.5 silver)
 
-        mirrorShape d =
-            ellipse (cellW / 8) (cellW / 2)
-                |> filled (uniform Color.lightBlue)
-                |> shiftX (-cellW / 8)
-                |> List.singleton
-                |> stack
-                |> scale 0.8
-                |> List.singleton
-                |> stack
-                |> rotate (D.toRadians d)
-
-        prismShape d =
-            triangle cellW
-                |> filled (uniform Color.lightBlue)
-                |> rotate (D.toRadians d)
-                |> scale 0.8
-
-        elementShape element =
-            case element.type_ of
-                Tile.Mirror ->
-                    mirrorShape element.direction
-
-                Tile.Prism ->
-                    prismShape element.direction
-
         lightSourceShape =
             square cellW |> filled (uniform Color.green) |> scale 0.9
 
@@ -206,7 +180,7 @@ viewTile { cellW, position, viewPosition, tile, showIndex } =
         tileShapeHelp =
             case tile of
                 Tile.FilledContainer elementContainer element ->
-                    [ elementShape element
+                    [ elementShape cellW element
                     , elementContainerShape elementContainer
                     , floorShape
                     ]
@@ -237,6 +211,33 @@ viewTile { cellW, position, viewPosition, tile, showIndex } =
         |> shift viewPosition
         |> Collage.Events.onClick (CellClick position)
         |> Collage.Events.onMouseDown (CellMouseDown position |> always)
+
+
+elementShape cellW element =
+    let
+        mirrorShape d =
+            ellipse (cellW / 8) (cellW / 2)
+                |> filled (uniform Color.lightBlue)
+                |> shiftX (-cellW / 8)
+                |> List.singleton
+                |> stack
+                |> scale 0.8
+                |> List.singleton
+                |> stack
+                |> rotate (D.toRadians d)
+
+        prismShape d =
+            triangle cellW
+                |> filled (uniform Color.lightBlue)
+                |> rotate (D.toRadians d)
+                |> scale 0.8
+    in
+    case element.type_ of
+        Tile.Mirror ->
+            mirrorShape element.direction
+
+        Tile.Prism ->
+            prismShape element.direction
 
 
 viewLightPath : Float -> Graph.Graph -> Collage msg

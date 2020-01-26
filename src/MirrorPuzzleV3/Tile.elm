@@ -1,5 +1,6 @@
 module MirrorPuzzleV3.Tile exposing
-    ( ElementContainer(..)
+    ( Element
+    , ElementContainer(..)
     , ElementType(..)
     , Tile(..)
     , decode

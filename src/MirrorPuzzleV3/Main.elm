@@ -260,6 +260,11 @@ type Msg
     | CellClick Int2
 
 
+type Dnd
+    = NotDragging
+    | Dragging Int2 Tile.Element
+
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update message model =
     case message of

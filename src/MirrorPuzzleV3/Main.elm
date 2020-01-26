@@ -136,7 +136,7 @@ toGridSvg cellW dim =
             dim |> NT.toFloat |> NT.scale cellW
     in
     List.singleton
-        >> Svg.svg [ Svg.Attributes.width (fromFloat w), Svg.Attributes.height (fromFloat h) ]
+        >> Svg.svg [ Svg.Attributes.width (fromFloat w), Svg.Attributes.height (fromFloat h), fill "transparent" ]
         >> List.singleton
         >> div []
 

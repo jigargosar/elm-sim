@@ -63,19 +63,20 @@ create typeOfNodeAt startPoint branchingDirections =
                     let
                         p2 =
                             D.translatePoint p1 d
+
+                        isEdgeMember =
+                            Set.member ( p1, p2 ) acc.edges || Set.member ( p2, p1 ) acc.edges
                     in
                     case typeOfNodeAt p2 of
                         Just ContinuePreviousDirectionNode ->
-                            if Set.member ( p1, p2 ) acc.edges || Set.member ( p2, p1 ) acc.edges then
-                                toGraph { acc | eps = Set.insert p1 acc.eps }
-                                    pending
+                            if isEdgeMember then
+                                toGraph { acc | eps = Set.insert p1 acc.eps } pending
 
                             else
-                                toGraph { acc | edges = Set.insert ( p1, p2 ) acc.edges }
-                                    (( p2, d ) :: pending)
+                                toGraph { acc | edges = Set.insert ( p1, p2 ) acc.edges } (( p2, d ) :: pending)
 
                         Just (BranchNode dl) ->
-                            if Set.member ( p1, p2 ) acc.edges || Set.member ( p2, p1 ) acc.edges then
+                            if isEdgeMember then
                                 toGraph { acc | eps = Set.insert p1 acc.eps } pending
 
                             else
@@ -83,7 +84,7 @@ create typeOfNodeAt startPoint branchingDirections =
                                     (List.map (Tuple.pair p2) dl ++ pending)
 
                         Just LeafNode ->
-                            if Set.member ( p1, p2 ) acc.edges || Set.member ( p2, p1 ) acc.edges then
+                            if isEdgeMember then
                                 toGraph { acc | eps = Set.insert p2 acc.eps } pending
 
                             else

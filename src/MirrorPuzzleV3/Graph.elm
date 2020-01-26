@@ -20,11 +20,6 @@ type alias Edge =
     ( Int2, Int2 )
 
 
-getEdges : Graph -> Set Edge
-getEdges (Graph ( edges, _ )) =
-    edges
-
-
 edgeList : Graph -> List Edge
 edgeList =
     getEdges >> Set.toList
@@ -35,13 +30,14 @@ endPointList =
     getEndPoints >> Set.toList
 
 
+getEdges : Graph -> Set Edge
+getEdges (Graph ( edges, _ )) =
+    edges
+
+
 getEndPoints : Graph -> Set Int2
-getEndPoints (Graph ( _, leafNodes )) =
-    leafNodes
-
-
-type alias Seed =
-    ( Int2, List Direction8 )
+getEndPoints (Graph ( _, eps )) =
+    eps
 
 
 type NodeType

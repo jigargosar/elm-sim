@@ -266,7 +266,7 @@ viewTile { cellW, position, viewPosition, tile, showIndex } =
             "sliver"
 
         floorShape =
-            square cellW [ outlineColor silver, thickness 0.5 ]
+            square cellW [ outlineColor "black", thickness 2 ]
 
         lightSourceShape =
             square cellW [ fill "green", transform [ scale 0.9 ] ]
@@ -280,7 +280,8 @@ viewTile { cellW, position, viewPosition, tile, showIndex } =
                     empty
 
         goalShape =
-            circle (cellW / 2) [ fill "green", transform [ scale 0.9 ] ]
+            [ circle (cellW / 2) [ fill "green", transform [ scale 0.9 ] ] ]
+                |> stack []
 
         tileShapeHelp : List (Svg.Attribute msg) -> Svg msg
         tileShapeHelp attrs =

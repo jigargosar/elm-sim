@@ -1,5 +1,6 @@
 module MirrorPuzzleV3.Tile exposing
-    ( ElementType(..)
+    ( ElementContainer(..)
+    , ElementType(..)
     , Tile(..)
     , decode
     , floor

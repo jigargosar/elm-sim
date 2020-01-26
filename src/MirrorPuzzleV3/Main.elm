@@ -56,7 +56,7 @@ initialTileGrid =
             ||,__,__,M6,M4,||
             ||,__,S0,__,P2,||
             ||,M2,__,__,M4,||
-            ||,__,__,__,__,||
+            ||,__,__,__,D ,||
             """
         |> TileGrid.decode
 
@@ -146,18 +146,33 @@ viewTile { cellW, position, viewPosition, tile, showIndex } =
                 |> stack
                 |> rotate (D.toRadians d)
 
+        lightSourceShape =
+            square (cellW * 0.9) |> filled (uniform Color.green)
+
         tileShapeHelp =
             case tile of
-                Tile.FilledContainer _ element ->
-                    case element.type_ of
+                Tile.FilledContainer elementContainer element ->
+                    [ case element.type_ of
                         Tile.Mirror ->
                             [ mirrorShape element.direction
-                            , floorShape
                             ]
                                 |> stack
 
-                        _ ->
-                            floorShape
+                        Tile.Prism ->
+                            [ triangle cellW
+                                |> filled (uniform Color.lightBlue)
+                                |> rotate (D.toRadians element.direction)
+                            ]
+                                |> stack
+                    , case elementContainer of
+                        Tile.LightSource ->
+                            lightSourceShape
+
+                        Tile.Floor ->
+                            empty
+                    , floorShape
+                    ]
+                        |> stack
 
                 Tile.Wall ->
                     [ square cellW |> filled silver
@@ -165,8 +180,25 @@ viewTile { cellW, position, viewPosition, tile, showIndex } =
                     ]
                         |> stack
 
-                _ ->
-                    floorShape
+                Tile.EmptyContainer elementContainer ->
+                    [ case elementContainer of
+                        Tile.LightSource ->
+                            lightSourceShape
+
+                        Tile.Floor ->
+                            empty
+                    , floorShape
+                    ]
+                        |> stack
+
+                Tile.Goal ->
+                    [ circle (cellW / 2) |> filled (uniform Color.green)
+                    , floorShape
+                    ]
+                        |> stack
+
+                Tile.Hole ->
+                    empty
     in
     tileShapeHelp
         |> shift viewPosition

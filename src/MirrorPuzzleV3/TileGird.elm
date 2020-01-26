@@ -5,6 +5,7 @@ module MirrorPuzzleV3.TileGird exposing
     , dimensions
     , filledWith
     , fromList2d
+    , isMovable
     , rotateElement
     , swapElements
     , toList
@@ -62,6 +63,16 @@ swapElements : Int2 -> Int2 -> TileGrid -> Maybe TileGrid
 swapElements idxA idxB =
     maybeMapDict2d
         (Dict2d.maybeMapAt2 idxA idxB Tile.swapElements)
+
+
+isMovable : Int2 -> TileGrid -> Bool
+isMovable idx (TileGrid _ dict) =
+    case Dict.get idx dict of
+        Nothing ->
+            False
+
+        Just tile ->
+            Tile.isMovable tile
 
 
 maybeMapDict2d : (Dict Int2 Tile -> Maybe (Dict Int2 Tile)) -> TileGrid -> Maybe TileGrid

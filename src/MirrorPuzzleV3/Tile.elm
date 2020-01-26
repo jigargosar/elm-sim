@@ -7,6 +7,7 @@ module MirrorPuzzleV3.Tile exposing
     , floor
     , getLightPathNodeType
     , getRefractionDirectionOfLightSource
+    , isMovable
     , lightSourceWithMirror
     , mirror
     , prism
@@ -116,6 +117,16 @@ swapElements dragTile dropTile =
 
         _ ->
             Nothing
+
+
+isMovable : Tile -> Bool
+isMovable tile =
+    case tile of
+        FilledContainer _ element ->
+            element.movable
+
+        _ ->
+            False
 
 
 getElementInLightSource : Tile -> Maybe Element

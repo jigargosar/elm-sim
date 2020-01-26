@@ -216,6 +216,7 @@ viewTile { cellW, position, viewPosition, tile, showIndex } =
     tileShapeHelp
         |> shift viewPosition
         |> Collage.Events.onClick (CellClick position)
+        |> Collage.Events.onMouseDown (CellMouseDown position |> always)
 
 
 viewLightPath : Float -> Graph.Graph -> Collage msg
@@ -265,6 +266,7 @@ viewLightPath cellW graph =
 type Msg
     = NoOp
     | CellClick Int2
+    | CellMouseDown Int2
     | MouseMove Float2
     | MouseUp
 
@@ -275,7 +277,7 @@ type Drag
 
 
 type alias DraggingR =
-    { start : Float2, current : Float2 }
+    { start : Int2, current : Float2 }
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -298,6 +300,14 @@ update message model =
               }
             , Cmd.none
             )
+
+        CellMouseDown position ->
+            case ( model.drag, TileGrid.isMovable position model.grid ) of
+                ( NotDragging, True ) ->
+                    ( { model | drag = DraggingR position ( 0, 0 ) |> Dragging }, Cmd.none )
+
+                _ ->
+                    ( model, Cmd.none )
 
         MouseMove pageXY ->
             case model.drag of

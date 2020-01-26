@@ -62,15 +62,28 @@ insertEndPoint ep acc =
     { acc | eps = Set.insert ep acc.eps }
 
 
+type alias Context =
+    { edges : Set Edge
+    , eps : Set Int2
+    , typeOfNodeAt : Int2 -> Maybe NodeType
+    , pending : List ( Int2, Direction8 )
+    }
+
+
+initContext : (Int2 -> Maybe NodeType) -> Int2 -> List Direction8 -> Context
+initContext typeOfNodeAt startPoint branchingDirections =
+    Context Set.empty Set.empty typeOfNodeAt (List.map (Tuple.pair startPoint) branchingDirections)
+
+
 create : (Int2 -> Maybe NodeType) -> Int2 -> List Direction8 -> Graph
 create typeOfNodeAt startPoint branchingDirections =
     let
         updateAccAndVectors :
             Int2
             -> Direction8
-            -> { edges : Set Edge, eps : Set Int2 }
+            -> Context
             -> List ( Int2, Direction8 )
-            -> ( { edges : Set Edge, eps : Set Int2 }, List ( Int2, Direction8 ) )
+            -> ( Context, List ( Int2, Direction8 ) )
         updateAccAndVectors p1 d acc pending =
             let
                 p2 =
@@ -110,7 +123,7 @@ create typeOfNodeAt startPoint branchingDirections =
                 Nothing ->
                     ( insertEndPoint p1 acc, pending )
 
-        toGraph : { edges : Set Edge, eps : Set Int2 } -> List ( Int2, Direction8 ) -> Graph
+        toGraph : Context -> List ( Int2, Direction8 ) -> Graph
         toGraph acc0 vectors0 =
             case vectors0 of
                 [] ->
@@ -125,4 +138,4 @@ create typeOfNodeAt startPoint branchingDirections =
 
         -- recurse acc
     in
-    toGraph { edges = Set.empty, eps = Set.empty } (List.map (Tuple.pair startPoint) branchingDirections)
+    toGraph (initContext typeOfNodeAt startPoint branchingDirections) (List.map (Tuple.pair startPoint) branchingDirections)

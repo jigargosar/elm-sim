@@ -66,31 +66,44 @@ create typeOfNodeAt startPoint branchingDirections =
 
                         isEdgeMember =
                             Set.member ( p1, p2 ) acc.edges || Set.member ( p2, p1 ) acc.edges
+
+                        recurse acc_ =
+                            toGraph acc_ pending
+
+                        recurse1 acc_ newVec =
+                            toGraph acc_ (newVec :: pending)
+
+                        recurseList acc_ newList =
+                            toGraph acc_ (newList ++ pending)
                     in
                     case typeOfNodeAt p2 of
                         Just ContinuePreviousDirectionNode ->
                             if isEdgeMember then
-                                toGraph { acc | eps = Set.insert p1 acc.eps } pending
+                                recurse { acc | eps = Set.insert p1 acc.eps }
 
                             else
-                                toGraph { acc | edges = Set.insert ( p1, p2 ) acc.edges } (( p2, d ) :: pending)
+                                recurse1 { acc | edges = Set.insert ( p1, p2 ) acc.edges } ( p2, d )
 
                         Just (BranchNode dl) ->
                             if isEdgeMember then
-                                toGraph { acc | eps = Set.insert p1 acc.eps } pending
+                                recurse { acc | eps = Set.insert p1 acc.eps }
 
                             else
-                                toGraph { acc | edges = Set.insert ( p1, p2 ) acc.edges }
-                                    (List.map (Tuple.pair p2) dl ++ pending)
+                                recurseList { acc | edges = Set.insert ( p1, p2 ) acc.edges }
+                                    (List.map (Tuple.pair p2) dl)
 
                         Just LeafNode ->
                             if isEdgeMember then
-                                toGraph { acc | eps = Set.insert p2 acc.eps } pending
+                                recurse { acc | eps = Set.insert p2 acc.eps }
 
                             else
-                                toGraph { acc | edges = Set.insert ( p1, p2 ) acc.edges, eps = Set.insert p2 acc.eps } pending
+                                recurse
+                                    { acc
+                                        | edges = Set.insert ( p1, p2 ) acc.edges
+                                        , eps = Set.insert p2 acc.eps
+                                    }
 
                         Nothing ->
-                            toGraph { acc | eps = Set.insert p1 acc.eps } pending
+                            recurse { acc | eps = Set.insert p1 acc.eps }
     in
     toGraph { edges = Set.empty, eps = Set.empty } (List.map (Tuple.pair startPoint) branchingDirections)

@@ -78,28 +78,27 @@ unfold unfoldInstructionAt startPosition startDirections =
                             Just ( nextPosition, [] )
                 )
                 directions
+
+        unfoldHelp : Context -> Graph
+        unfoldHelp context0 =
+            case popPending context0 of
+                Nothing ->
+                    Graph ( context0.edges, context0.endPoints )
+
+                Just ( parentSeed, context ) ->
+                    case context.nextSeeds parentSeed of
+                        [] ->
+                            unfoldHelp (insertEndPoint parentSeed context)
+
+                        childSeeds ->
+                            unfoldHelp
+                                (List.foldl
+                                    (updateContextForParentChildSeed parentSeed)
+                                    context
+                                    childSeeds
+                                )
     in
     unfoldHelp (initContext nextSeeds ( startPosition, startDirections ))
-
-
-unfoldHelp : Context -> Graph
-unfoldHelp context0 =
-    case popPending context0 of
-        Nothing ->
-            Graph ( context0.edges, context0.endPoints )
-
-        Just ( parentSeed, context ) ->
-            case context.nextSeeds parentSeed of
-                [] ->
-                    unfoldHelp (insertEndPoint parentSeed context)
-
-                childSeeds ->
-                    unfoldHelp
-                        (List.foldl
-                            (updateContextForParentChildSeed parentSeed)
-                            context
-                            childSeeds
-                        )
 
 
 updateContextForParentChildSeed : Seed -> Seed -> Context -> Context

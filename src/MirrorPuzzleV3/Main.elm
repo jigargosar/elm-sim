@@ -92,7 +92,8 @@ view model =
                     , style "height" "20px"
                     , style "top" top
                     , style "left" left
-                    , class "absolute bg-blue"
+                    , class "bg-blue"
+                    , class "fixed"
                     ]
                     []
         ]
@@ -355,6 +356,12 @@ pageXYDecoder =
         (JD.field "pageY" JD.float)
 
 
+clientXYDecoder =
+    JD.map2 Tuple.pair
+        (JD.field "clientX" JD.float)
+        (JD.field "clientY" JD.float)
+
+
 subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
@@ -363,7 +370,7 @@ subscriptions model =
                 Sub.none
 
             Dragging _ ->
-                [ JD.map MouseMove pageXYDecoder
+                [ JD.map MouseMove clientXYDecoder
                     |> Browser.Events.onMouseMove
                 , JD.succeed MouseUp
                     |> Browser.Events.onMouseUp

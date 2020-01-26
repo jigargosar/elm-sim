@@ -46,6 +46,62 @@ type alias Seed =
     ( Int2, List Direction8 )
 
 
+type NodeType
+    = ContinuePreviousDirectionNode -- Or we can Skip node
+    | BranchNode (List Direction8)
+    | LeafNode
+
+
+create : (Int2 -> Maybe NodeType) -> Int2 -> List Direction8 -> Graph
+create typeOfNodeAt startPoint branchingDirections =
+    let
+        insertNewEdge : Int2 -> Int2 -> { edges : Set Edge, eps : Set Int2 } -> Maybe { edges : Set Edge, eps : Set Int2 }
+        insertNewEdge p1 p2 =
+            Debug.todo "impl"
+
+        toGraph : { edges : Set Edge, eps : Set Int2 } -> List ( Int2, Direction8 ) -> Graph
+        toGraph acc vectors =
+            case vectors of
+                [] ->
+                    Graph ( acc.edges, acc.eps )
+
+                ( p1, d ) :: pending ->
+                    let
+                        p2 =
+                            D.translatePoint p1 d
+                    in
+                    case typeOfNodeAt p2 of
+                        Just ContinuePreviousDirectionNode ->
+                            if Set.member ( p1, p2 ) acc.edges || Set.member ( p2, p1 ) acc.edges then
+                                toGraph { acc | eps = Set.insert p2 acc.eps }
+                                    (( p2, d ) :: pending)
+
+                            else
+                                toGraph { acc | edges = Set.insert ( p1, p2 ) acc.edges }
+                                    (( p2, d ) :: pending)
+
+                        Just (BranchNode dl) ->
+                            if Set.member ( p1, p2 ) acc.edges || Set.member ( p2, p1 ) acc.edges then
+                                toGraph { acc | eps = Set.insert p2 acc.eps }
+                                    (List.map (Tuple.pair p2) dl ++ pending)
+
+                            else
+                                toGraph { acc | edges = Set.insert ( p1, p2 ) acc.edges }
+                                    (List.map (Tuple.pair p2) dl ++ pending)
+
+                        Just LeafNode ->
+                            if Set.member ( p1, p2 ) acc.edges || Set.member ( p2, p1 ) acc.edges then
+                                toGraph { acc | eps = Set.insert p2 acc.eps } pending
+
+                            else
+                                toGraph { acc | edges = Set.insert ( p1, p2 ) acc.edges } pending
+
+                        Nothing ->
+                            toGraph { acc | eps = Set.insert p1 acc.eps } pending
+    in
+    toGraph { edges = Set.empty, eps = Set.empty } (List.map (Tuple.pair startPoint) branchingDirections)
+
+
 type UnfoldInstruction
     = ContinuePrevious
     | Stop
@@ -62,7 +118,7 @@ unfold unfoldInstructionAt startPosition startDirections =
                 (\d ->
                     let
                         nextPosition =
-                            D.stepPos position d
+                            D.translatePoint position d
                     in
                     case unfoldInstructionAt nextPosition of
                         ContinuePrevious ->

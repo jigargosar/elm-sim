@@ -6,10 +6,10 @@ module Playground.Direction8 exposing
     , opposite
     , right
     , rotate
-    , stepPos
     , stepPosIn
     , toDegrees
     , toRadians
+    , translatePoint
     , up
     )
 
@@ -102,6 +102,6 @@ stepPosIn dir pos =
     NT.add pos (toVec dir)
 
 
-stepPos : Int2 -> Direction8 -> Int2
-stepPos =
+translatePoint : Int2 -> Direction8 -> Int2
+translatePoint =
     flip stepPosIn

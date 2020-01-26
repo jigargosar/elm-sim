@@ -233,14 +233,14 @@ viewLightPath cellW graph =
     in
     let
         viewEdges =
-            Graph.getEdges graph
-                |> Set.toList
+            graph
+                |> Graph.edgeList
                 |> List.map viewEdge
                 |> stack
 
         viewEndPoints =
-            Graph.getEndPoints graph
-                |> Set.toList
+            graph
+                |> Graph.endPointList
                 |> List.map viewEndPoint
                 |> stack
     in

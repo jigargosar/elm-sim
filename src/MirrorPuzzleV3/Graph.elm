@@ -2,8 +2,8 @@ module MirrorPuzzleV3.Graph exposing
     ( Edge
     , Graph
     , UnfoldInstruction(..)
-    , getEdges
-    , getEndPoints
+    , edgeList
+    , endPointList
     , unfold
     )
 
@@ -25,6 +25,16 @@ type alias Edge =
 getEdges : Graph -> Set Edge
 getEdges (Graph ( edges, _ )) =
     edges
+
+
+edgeList : Graph -> List Edge
+edgeList =
+    getEdges >> Set.toList
+
+
+endPointList : Graph -> List Int2
+endPointList =
+    getEndPoints >> Set.toList
 
 
 getEndPoints : Graph -> Set Int2

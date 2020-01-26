@@ -72,18 +72,13 @@ maybeMapDict2d func (TileGrid dim dict2d) =
 computeLightPaths : TileGrid -> List Graph.Graph
 computeLightPaths (TileGrid _ dict) =
     let
-        unfoldInstructionAt : Int2 -> Graph.UnfoldInstruction
-        unfoldInstructionAt position =
-            case Dict.get position dict of
-                Just tile ->
-                    Tile.getLightPathUnfoldInstruction tile
-
-                Nothing ->
-                    Graph.Stop
+        nodeTypeAt : Int2 -> Maybe Graph.NodeType
+        nodeTypeAt position =
+            Dict.get position dict |> Maybe.andThen Tile.getLightPathNodeType
 
         graphStartingAt ( position, el ) =
             Tile.getRefractionDirectionOfLightSource el
-                |> Maybe.map (Graph.unfold unfoldInstructionAt position)
+                |> Maybe.map (Graph.create nodeTypeAt position)
     in
     Dict.toList dict |> List.filterMap graphStartingAt
 

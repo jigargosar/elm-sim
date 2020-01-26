@@ -1,7 +1,9 @@
 module MirrorPuzzleV3.Graph exposing
     ( Edge
     , Graph
+    , NodeType(..)
     , UnfoldInstruction(..)
+    , create
     , edgeList
     , endPointList
     , unfold
@@ -83,7 +85,7 @@ create typeOfNodeAt startPoint branchingDirections =
                         Just (BranchNode dl) ->
                             if Set.member ( p1, p2 ) acc.edges || Set.member ( p2, p1 ) acc.edges then
                                 toGraph { acc | eps = Set.insert p2 acc.eps }
-                                    (List.map (Tuple.pair p2) dl ++ pending)
+                                    pending
 
                             else
                                 toGraph { acc | edges = Set.insert ( p1, p2 ) acc.edges }
@@ -94,7 +96,7 @@ create typeOfNodeAt startPoint branchingDirections =
                                 toGraph { acc | eps = Set.insert p2 acc.eps } pending
 
                             else
-                                toGraph { acc | edges = Set.insert ( p1, p2 ) acc.edges } pending
+                                toGraph { acc | edges = Set.insert ( p1, p2 ) acc.edges, eps = Set.insert p2 acc.eps } pending
 
                         Nothing ->
                             toGraph { acc | eps = Set.insert p1 acc.eps } pending

@@ -4,6 +4,7 @@ module MirrorPuzzleV3.Tile exposing
     , Tile(..)
     , decode
     , floor
+    , getLightPathNodeType
     , getLightPathUnfoldInstruction
     , getRefractionDirectionOfLightSource
     , lightSourceWithMirror
@@ -130,6 +131,30 @@ getElementInLightSource tile =
 getRefractionDirectionOfLightSource : Tile -> Maybe (List Direction8)
 getRefractionDirectionOfLightSource =
     getElementInLightSource >> Maybe.map getRefractionDirectionsOfElement
+
+
+getLightPathNodeType : Tile -> Maybe Graph.NodeType
+getLightPathNodeType tile =
+    case tile of
+        FilledContainer elementContainer element ->
+            case elementContainer of
+                LightSource ->
+                    Nothing
+
+                Floor ->
+                    Just (Graph.BranchNode (getRefractionDirectionsOfElement element))
+
+        EmptyContainer _ ->
+            Just Graph.ContinuePreviousDirectionNode
+
+        Goal ->
+            Just Graph.LeafNode
+
+        Wall ->
+            Nothing
+
+        Hole ->
+            Just Graph.ContinuePreviousDirectionNode
 
 
 getLightPathUnfoldInstruction : Tile -> Graph.UnfoldInstruction

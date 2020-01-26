@@ -56,7 +56,7 @@ build typeOfNodeAt startPoint branchingDirections =
 
 
 
--- Context
+-- BuilderContext
 
 
 type alias Context =

@@ -3,7 +3,6 @@ module MirrorPuzzleV3.Graph exposing
     , Graph
     , UnfoldInstruction(..)
     , getEdges
-    , getEdgesAndEndPointsAsLists
     , getEndPoints
     , unfold
     )
@@ -33,11 +32,6 @@ getEndPoints (Graph ( _, leafNodes )) =
     leafNodes
 
 
-getEdgesAndEndPointsAsLists : Graph -> ( List Edge, List Int2 )
-getEdgesAndEndPointsAsLists graph =
-    ( getEdges graph |> Set.toList, getEndPoints graph |> Set.toList )
-
-
 type alias Seed =
     ( Int2, List Direction8 )
 
@@ -45,6 +39,7 @@ type alias Seed =
 type UnfoldInstruction
     = ContinuePrevious
     | Stop
+    | EndPoint
     | Fork (List Direction8)
 
 
@@ -68,6 +63,9 @@ unfold unfoldInstructionAt startPosition startDirections =
 
                         Fork nd ->
                             Just ( nextPosition, nd )
+
+                        EndPoint ->
+                            Just ( nextPosition, [] )
                 )
                 directions
     in

@@ -5,7 +5,6 @@ module MirrorPuzzleV3.Tile exposing
     , decode
     , floor
     , getLightPathNodeType
-    , getLightPathUnfoldInstruction
     , getRefractionDirectionOfLightSource
     , lightSourceWithMirror
     , mirror
@@ -155,30 +154,6 @@ getLightPathNodeType tile =
 
         Hole ->
             Just Graph.ContinuePreviousDirectionNode
-
-
-getLightPathUnfoldInstruction : Tile -> Graph.UnfoldInstruction
-getLightPathUnfoldInstruction tile =
-    case tile of
-        FilledContainer elementContainer element ->
-            case elementContainer of
-                LightSource ->
-                    Graph.Stop
-
-                Floor ->
-                    Graph.Fork (getRefractionDirectionsOfElement element)
-
-        EmptyContainer _ ->
-            Graph.ContinuePrevious
-
-        Goal ->
-            Graph.Stop
-
-        Wall ->
-            Graph.Stop
-
-        Hole ->
-            Graph.ContinuePrevious
 
 
 type ElementContainer

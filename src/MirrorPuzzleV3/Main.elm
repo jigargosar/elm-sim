@@ -7,7 +7,8 @@ import Collage.Layout exposing (..)
 import Collage.Render exposing (..)
 import Collage.Text as Text
 import Color
-import Html exposing (Html)
+import Html exposing (Html, div)
+import Html.Attributes exposing (class)
 import MirrorPuzzleV3.Graph as Graph
 import MirrorPuzzleV3.Tile as Tile exposing (Tile)
 import MirrorPuzzleV3.TileGird as TileGrid exposing (TileGrid)
@@ -67,7 +68,8 @@ initialTileGrid =
 
 view : Model -> Html Msg
 view model =
-    viewTileGrid model
+    div [ class "flex justify-center pv3" ]
+        [ viewTileGrid model ]
 
 
 viewTileGrid : { a | cellW : Float, grid : TileGrid } -> Html Msg

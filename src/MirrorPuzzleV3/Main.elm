@@ -14,7 +14,7 @@ import MirrorPuzzleV3.Tile as Tile exposing (Tile)
 import MirrorPuzzleV3.TileGird as TileGrid exposing (TileGrid)
 import Number2 as NT exposing (Float2, Int2)
 import Playground.Direction8 as D
-import PointFree exposing (mapEach)
+import PointFree exposing (ignoreNothing, mapEach)
 import Set
 
 
@@ -270,7 +270,15 @@ update message model =
                 _ =
                     Debug.log "position" position
             in
-            ( model, Cmd.none )
+            ( { model
+                | grid =
+                    (TileGrid.rotateElement position
+                        |> ignoreNothing
+                    )
+                        model.grid
+              }
+            , Cmd.none
+            )
 
 
 

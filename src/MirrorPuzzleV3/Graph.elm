@@ -80,29 +80,31 @@ create typeOfNodeAt startPoint branchingDirections =
                             ( p1, p2 )
                     in
                     case typeOfNodeAt p2 of
-                        Just ContinuePreviousDirectionNode ->
-                            if isEdgeMember edge acc then
-                                toGraph (insertEndPoint p1 acc) pending
+                        Just type_ ->
+                            case type_ of
+                                ContinuePreviousDirectionNode ->
+                                    if isEdgeMember edge acc then
+                                        toGraph (insertEndPoint p1 acc) pending
 
-                            else
-                                toGraph (insertEdge edge acc) (( p2, d ) :: pending)
+                                    else
+                                        toGraph (insertEdge edge acc) (( p2, d ) :: pending)
 
-                        Just (BranchNode dl) ->
-                            if isEdgeMember edge acc then
-                                toGraph (insertEndPoint p1 acc) pending
+                                BranchNode dl ->
+                                    if isEdgeMember edge acc then
+                                        toGraph (insertEndPoint p1 acc) pending
 
-                            else
-                                toGraph (insertEdge edge acc)
-                                    (List.map (Tuple.pair p2) dl ++ pending)
+                                    else
+                                        toGraph (insertEdge edge acc)
+                                            (List.map (Tuple.pair p2) dl ++ pending)
 
-                        Just LeafNode ->
-                            if isEdgeMember edge acc then
-                                toGraph (insertEndPoint p2 acc) pending
+                                LeafNode ->
+                                    if isEdgeMember edge acc then
+                                        toGraph (insertEndPoint p2 acc) pending
 
-                            else
-                                toGraph
-                                    (acc |> insertEndPoint p2 |> insertEdge edge)
-                                    pending
+                                    else
+                                        toGraph
+                                            (acc |> insertEndPoint p2 |> insertEdge edge)
+                                            pending
 
                         Nothing ->
                             toGraph (insertEndPoint p1 acc) pending

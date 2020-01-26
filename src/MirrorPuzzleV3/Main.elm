@@ -68,7 +68,7 @@ initialTileGrid =
 
 view : Model -> Html Msg
 view model =
-    div [ class "flex justify-center pv3" ]
+    div [ class "flex justify-center pv4" ]
         [ viewTileGrid model ]
 
 

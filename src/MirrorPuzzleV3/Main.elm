@@ -1,6 +1,7 @@
 module MirrorPuzzleV3.Main exposing (main)
 
 import Browser
+import Browser.Events
 import Collage exposing (..)
 import Collage.Events
 import Collage.Layout exposing (..)
@@ -9,6 +10,7 @@ import Collage.Text as Text
 import Color
 import Html exposing (Html, div)
 import Html.Attributes exposing (class)
+import Json.Decode as JD
 import MirrorPuzzleV3.Graph as Graph
 import MirrorPuzzleV3.Tile as Tile exposing (Tile)
 import MirrorPuzzleV3.TileGird as TileGrid exposing (TileGrid)
@@ -37,7 +39,7 @@ main =
 
 
 type alias Model =
-    { cellW : Float, grid : TileGrid }
+    { cellW : Float, grid : TileGrid, drag : Drag }
 
 
 type alias Flags =
@@ -46,7 +48,12 @@ type alias Flags =
 
 init : Flags -> ( Model, Cmd Msg )
 init _ =
-    ( { cellW = 100, grid = initialTileGrid }, Cmd.none )
+    ( { cellW = 100
+      , grid = initialTileGrid
+      , drag = NotDragging
+      }
+    , Cmd.none
+    )
 
 
 initialTileGrid : TileGrid
@@ -258,11 +265,17 @@ viewLightPath cellW graph =
 type Msg
     = NoOp
     | CellClick Int2
+    | MouseMove Float2
+    | MouseUp
 
 
-type Dnd
+type Drag
     = NotDragging
-    | Dragging Int2 Tile.Element
+    | Dragging DraggingR
+
+
+type alias DraggingR =
+    { start : Float2, current : Float2 }
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -286,11 +299,45 @@ update message model =
             , Cmd.none
             )
 
+        MouseMove pageXY ->
+            case model.drag of
+                NotDragging ->
+                    ( model, Cmd.none )
+
+                Dragging draggingR ->
+                    ( { model | drag = Dragging { draggingR | current = pageXY } }, Cmd.none )
+
+        MouseUp ->
+            case model.drag of
+                NotDragging ->
+                    ( model, Cmd.none )
+
+                Dragging _ ->
+                    ( { model | drag = NotDragging }, Cmd.none )
+
 
 
 -- Subscriptions
 
 
+pageXYDecoder =
+    JD.map2 Tuple.pair
+        (JD.field "pageX" JD.float)
+        (JD.field "pageY" JD.float)
+
+
 subscriptions : Model -> Sub Msg
-subscriptions _ =
-    Sub.batch []
+subscriptions model =
+    Sub.batch
+        [ case model.drag of
+            NotDragging ->
+                Sub.none
+
+            Dragging _ ->
+                [ JD.map MouseMove pageXYDecoder
+                    |> Browser.Events.onMouseMove
+                , JD.succeed MouseUp
+                    |> Browser.Events.onMouseUp
+                ]
+                    |> Sub.batch
+        ]

@@ -8,7 +8,6 @@ import Collage.Render exposing (..)
 import Collage.Text as Text
 import Color
 import Html exposing (Html)
-import Html.Attributes exposing (class)
 import MirrorPuzzleV3.Graph as Graph
 import MirrorPuzzleV3.Tile as Tile exposing (Tile)
 import MirrorPuzzleV3.TileGird as TileGrid exposing (TileGrid)
@@ -16,10 +15,6 @@ import Number2 as NT exposing (Float2, Int2)
 import Playground.Direction8 as D
 import PointFree exposing (mapEach)
 import Set
-import String exposing (fromFloat)
-import Svg
-import Svg.Attributes as Svg
-import TypedSvg.Attributes.InPx as PX
 
 
 

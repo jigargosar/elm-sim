@@ -23,7 +23,7 @@ import Playground.Direction8 as D exposing (Direction8)
 
 floor : Tile
 floor =
-    EmptyContainer Floor
+    EmptyContainer Platform
 
 
 lightSourceWithMirror : Direction8 -> Tile
@@ -33,12 +33,12 @@ lightSourceWithMirror direction =
 
 prism : Direction8 -> Tile
 prism direction =
-    FilledContainer Floor (prismFasing direction)
+    FilledContainer Platform (prismFasing direction)
 
 
 mirror : Direction8 -> Tile
 mirror direction =
-    FilledContainer Floor (mirrorFacing direction)
+    FilledContainer Platform (mirrorFacing direction)
 
 
 
@@ -73,11 +73,11 @@ decode encoded =
 
         'P' :: [ char ] ->
             prismFasing (decodeDirection char)
-                |> FilledContainer Floor
+                |> FilledContainer Platform
 
         'M' :: [ char ] ->
             mirrorFacing (decodeDirection char)
-                |> FilledContainer Floor
+                |> FilledContainer Platform
 
         'D' :: _ ->
             Goal
@@ -86,7 +86,7 @@ decode encoded =
             Wall
 
         '_' :: _ ->
-            EmptyContainer Floor
+            EmptyContainer Platform
 
         _ ->
             Hole
@@ -140,7 +140,7 @@ getLightPathNodeType tile =
                 LightSource ->
                     Nothing
 
-                Floor ->
+                Platform ->
                     Just (Graph.BranchNode (getRefractionDirectionsOfElement element))
 
         EmptyContainer _ ->
@@ -158,7 +158,7 @@ getLightPathNodeType tile =
 
 type ElementContainer
     = LightSource
-    | Floor
+    | Platform
 
 
 type ElementType

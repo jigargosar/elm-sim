@@ -173,7 +173,7 @@ viewTile { cellW, position, viewPosition, tile, showIndex } =
                         Tile.LightSource ->
                             lightSourceShape
 
-                        Tile.Floor ->
+                        Tile.Platform ->
                             empty
                     , floorShape
                     ]
@@ -190,7 +190,7 @@ viewTile { cellW, position, viewPosition, tile, showIndex } =
                         Tile.LightSource ->
                             lightSourceShape
 
-                        Tile.Floor ->
+                        Tile.Platform ->
                             empty
                     , floorShape
                     ]

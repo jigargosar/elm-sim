@@ -1,7 +1,13 @@
-module MirrorPuzzleV3.Main exposing (main)
+module MirrorPuzzleV3.MainCollage exposing (main)
 
 import Browser
 import Browser.Events
+import Collage exposing (..)
+import Collage.Events
+import Collage.Layout exposing (..)
+import Collage.Render exposing (..)
+import Collage.Text as Text
+import Color
 import Html exposing (Html, div, text)
 import Html.Attributes exposing (class, style)
 import Json.Decode as JD
@@ -12,9 +18,6 @@ import Number2 as NT exposing (Float2, Int2)
 import Playground.Direction8 as D
 import PointFree exposing (flip, ignoreNothing, mapEach)
 import String exposing (fromFloat)
-import Svg exposing (Svg)
-import Svg.Attributes
-import Svg.Events
 
 
 
@@ -91,20 +94,8 @@ view model =
                     , class "fixed"
                     , class "lh-0"
                     ]
-                    [ elementShape 100 r.element ]
+                    [ elementShape 100 r.element |> svg ]
         ]
-
-
-group =
-    Svg.g
-
-
-stack =
-    group
-
-
-stackWithName name =
-    stack [ Svg.Attributes.class name ]
 
 
 viewTileGrid : { a | cellW : Float, grid : TileGrid } -> Html Msg
@@ -118,27 +109,19 @@ viewTileGrid { cellW, grid } =
     [ grid
         |> TileGrid.computeLightPaths
         |> List.map (viewLightPath cellW)
-        |> group []
+        |> stack
     , tileViewList
         |> List.map viewDebugTile
-        |> stack []
+        |> stack
     , tileViewList
         |> List.map viewTile
-        |> stackWithName "pe-all"
+        |> stack
+        |> name "pe-all"
     ]
-        |> stackWithName "pe-none"
-        |> toGridSvg cellW (TileGrid.dimensions grid)
-
-
-toGridSvg cellW dim =
-    let
-        ( w, h ) =
-            dim |> NT.toFloat |> NT.scale cellW
-    in
-    List.singleton
-        >> Svg.svg [ Svg.Attributes.width (fromFloat w), Svg.Attributes.height (fromFloat h) ]
-        >> List.singleton
-        >> div []
+        |> stack
+        |> name "pe-none"
+        --|> debug
+        |> svg
 
 
 toViewPosition : Float -> Int2 -> ( Float, Float )
@@ -160,112 +143,28 @@ type alias TileView =
     }
 
 
-rendered attrs =
-    List.singleton >> stack attrs
-
-
-opacity =
-    fromFloat >> Svg.Attributes.opacity
-
-
-type Transform
-    = Shift Float2
-    | Scale Float
-    | Rotate Float
-
-
-shift =
-    Shift
-
-
-scale =
-    Scale
-
-
-rotate =
-    Rotate
-
-
-transformToString t =
-    case t of
-        Shift ( x, y ) ->
-            "translate(" ++ fromFloat x ++ "," ++ fromFloat y ++ ")"
-
-        Scale s ->
-            "scale(" ++ fromFloat s ++ ")"
-
-        Rotate deg ->
-            "rotate(" ++ fromFloat deg ++ ")"
-
-
-transform =
-    List.map transformToString >> String.join " " >> Svg.Attributes.transform
-
-
-viewDebugTile : { a | position : Int2, viewPosition : Float2 } -> Svg Msg
+viewDebugTile : { a | position : Int2, viewPosition : Float2 } -> Collage Msg
 viewDebugTile { position, viewPosition } =
     NT.int2ToString position
-        |> Svg.text
-        |> rendered [ opacity 0.3, transform [ shift viewPosition ] ]
+        |> Text.fromString
+        --|> Text.size Text.normal
+        |> rendered
+        |> opacity 0.3
+        |> shift viewPosition
 
 
-square : Float -> List (Svg.Attribute msg) -> Svg msg
-square w attrs =
-    Svg.rect
-        (Svg.Attributes.width (fromFloat w) :: Svg.Attributes.height (fromFloat w) :: attrs)
-        []
-
-
-segment ( x1, y1 ) ( x2, y2 ) attrs =
-    Svg.line
-        (Svg.Attributes.x1 (fromFloat x1)
-            :: Svg.Attributes.x2 (fromFloat x2)
-            :: Svg.Attributes.y1 (fromFloat y1)
-            :: Svg.Attributes.y2 (fromFloat y2)
-            :: attrs
-        )
-        []
-
-
-triangle =
-    square
-
-
-circle r attrs =
-    Svg.circle (Svg.Attributes.r (fromFloat r) :: attrs) []
-
-
-ellipse w h attrs =
-    Svg.ellipse (Svg.Attributes.rx (fromFloat w) :: Svg.Attributes.ry (fromFloat h) :: attrs) []
-
-
-fill =
-    Svg.Attributes.fill
-
-
-outlineColor =
-    Svg.Attributes.stroke
-
-
-thickness =
-    fromFloat >> Svg.Attributes.strokeWidth
-
-
-empty =
-    Svg.text ""
-
-
-viewTile : TileView -> Svg Msg
+viewTile : TileView -> Collage Msg
 viewTile { cellW, position, viewPosition, tile, showIndex } =
     let
         silver =
-            "sliver"
+            uniform <| Color.rgb255 192 192 192
 
         floorShape =
-            square cellW [ outlineColor silver, thickness 0.5 ]
+            square cellW
+                |> outlined (solid 0.5 silver)
 
         lightSourceShape =
-            square cellW [ fill "green", transform [ scale 0.9 ] ]
+            square cellW |> filled (uniform Color.green) |> scale 0.9
 
         elementContainerShape elementContainer =
             case elementContainer of
@@ -276,54 +175,63 @@ viewTile { cellW, position, viewPosition, tile, showIndex } =
                     empty
 
         goalShape =
-            circle (cellW / 2) [ fill "green", transform [ scale 0.9 ] ]
+            circle (cellW / 2) |> filled (uniform Color.green) |> scale 0.9
 
-        tileShapeHelp : List (Svg.Attribute msg) -> Svg msg
-        tileShapeHelp attrs =
+        tileShapeHelp =
             case tile of
                 Tile.FilledContainer elementContainer element ->
                     [ elementShape cellW element
                     , elementContainerShape elementContainer
                     , floorShape
                     ]
-                        |> stack attrs
+                        |> stack
 
                 Tile.Wall ->
-                    [ square cellW [ fill silver ]
+                    [ square cellW |> filled silver
                     , floorShape
                     ]
-                        |> stack attrs
+                        |> stack
 
                 Tile.EmptyContainer elementContainer ->
                     [ elementContainerShape elementContainer
                     , floorShape
                     ]
-                        |> stack attrs
+                        |> stack
 
                 Tile.Goal ->
                     [ goalShape
                     , floorShape
                     ]
-                        |> stack attrs
+                        |> stack
 
                 Tile.Hole ->
                     empty
     in
     tileShapeHelp
-        [ transform [ shift viewPosition ]
-        , Svg.Events.onMouseUp (CellMouseUp position)
-        , Svg.Events.onClick (CellClick position)
-        , Svg.Events.onMouseDown (CellMouseDown position)
-        ]
+        |> shift viewPosition
+        |> Collage.Events.onMouseUp (CellMouseUp position |> always)
+        --|> Collage.Events.onClick (CellClick position)
+        |> Collage.Events.onMouseDown (CellMouseDown position |> always)
 
 
 elementShape cellW element =
     let
         mirrorShape d =
-            ellipse (cellW / 8) (cellW / 2) [ fill "lightblue", transform [ shift ( -cellW / 2, 0 ), scale 0.8, rotate (D.toDegrees d) ] ]
+            ellipse (cellW / 8) (cellW / 2)
+                |> filled (uniform Color.lightBlue)
+                |> shiftX (-cellW / 8)
+                |> List.singleton
+                |> stack
+                |> scale 0.8
+                |> List.singleton
+                |> stack
+                |> rotate (D.toRadians d)
 
         prismShape d =
-            triangle cellW [ fill "lightblue", transform [ rotate (D.toDegrees d), scale 0.8 ] ]
+            triangle cellW
+                |> filled (uniform Color.lightBlue)
+                |> rotate (D.toRadians d)
+                |> scale 0.8
     in
     case element.type_ of
         Tile.Mirror ->
@@ -333,41 +241,44 @@ elementShape cellW element =
             prismShape element.direction
 
 
-viewLightPath : Float -> Graph.Graph -> Svg msg
+viewLightPath : Float -> Graph.Graph -> Collage msg
 viewLightPath cellW graph =
     let
-        viewEndPoint : NT.Int2 -> Svg msg
+        viewEndPoint : NT.Int2 -> Collage msg
         viewEndPoint ep =
-            endPointShape [ transform [ shift (toViewPosition cellW ep) ] ]
+            endPointShape |> shift (toViewPosition cellW ep)
 
-        endPointShape attrs =
-            circle (cellW / 8) (fill "black" :: opacity 0.5 :: attrs)
+        endPointShape : Collage msg
+        endPointShape =
+            circle (cellW / 8) |> filled (uniform Color.black) |> opacity 0.5
 
-        viewEdge : ( NT.Int2, NT.Int2 ) -> Svg msg
+        viewEdge : ( NT.Int2, NT.Int2 ) -> Collage msg
         viewEdge points =
             let
                 ( p1, p2 ) =
                     mapEach (toViewPosition cellW) points
             in
-            segment p1 p2 [ outlineColor "black", thickness 1, opacity 0.5 ]
+            segment p1 p2
+                |> traced (solid thin (uniform Color.black))
+                |> opacity 0.5
     in
     let
         viewEdges =
             graph
                 |> Graph.edgeList
                 |> List.map viewEdge
-                |> stack []
+                |> stack
 
         viewEndPoints =
             graph
                 |> Graph.endPointList
                 |> List.map viewEndPoint
-                |> stack []
+                |> stack
     in
     [ viewEndPoints
     , viewEdges
     ]
-        |> stack []
+        |> stack
 
 
 

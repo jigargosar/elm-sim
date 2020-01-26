@@ -2,7 +2,7 @@ module MirrorPuzzleV3.Graph exposing
     ( Edge
     , Graph
     , NodeType(..)
-    , create
+    , build
     , edgeList
     , endPointList
     )
@@ -50,16 +50,13 @@ type NodeType
     | LeafNode
 
 
-insertEdge edge acc =
-    { acc | edges = Set.insert edge acc.edges }
+build : (Int2 -> Maybe NodeType) -> Int2 -> List Direction8 -> Graph
+build typeOfNodeAt startPoint branchingDirections =
+    contextUnfolder (initContext typeOfNodeAt startPoint branchingDirections)
 
 
-isEdgeMember ( p1, p2 ) acc =
-    Set.member ( p1, p2 ) acc.edges || Set.member ( p2, p1 ) acc.edges
 
-
-insertEndPoint ep acc =
-    { acc | eps = Set.insert ep acc.eps }
+-- Context
 
 
 type alias Context =
@@ -73,6 +70,54 @@ type alias Context =
 initContext : (Int2 -> Maybe NodeType) -> Int2 -> List Direction8 -> Context
 initContext typeOfNodeAt startPoint branchingDirections =
     Context Set.empty Set.empty typeOfNodeAt (List.map (Tuple.pair startPoint) branchingDirections)
+
+
+contextUnfolder : Context -> Graph
+contextUnfolder context0 =
+    case popPending context0 of
+        Nothing ->
+            Graph ( context0.edges, context0.eps )
+
+        Just ( ( p1, d ), context ) ->
+            contextUnfolder (contextReducer p1 d context)
+
+
+contextReducer : Int2 -> Direction8 -> Context -> Context
+contextReducer p1 d acc =
+    let
+        p2 =
+            D.translatePoint p1 d
+
+        edge =
+            ( p1, p2 )
+    in
+    case acc.typeOfNodeAt p2 of
+        Just type_ ->
+            case type_ of
+                ContinuePreviousDirectionNode ->
+                    if isEdgeMember edge acc then
+                        insertEndPoint p1 acc
+
+                    else
+                        insertEdge edge acc |> pushPending ( p2, d )
+
+                BranchNode dl ->
+                    if isEdgeMember edge acc then
+                        insertEndPoint p1 acc
+
+                    else
+                        insertEdge edge acc
+                            |> pushPendingList (List.map (Tuple.pair p2) dl)
+
+                LeafNode ->
+                    if isEdgeMember edge acc then
+                        insertEndPoint p2 acc
+
+                    else
+                        acc |> insertEndPoint p2 |> insertEdge edge
+
+        Nothing ->
+            insertEndPoint p1 acc
 
 
 popPending : Context -> Maybe ( ( Int2, Direction8 ), Context )
@@ -95,59 +140,13 @@ pushPendingList vecList context =
     { context | pending = vecList ++ context.pending }
 
 
-create : (Int2 -> Maybe NodeType) -> Int2 -> List Direction8 -> Graph
-create typeOfNodeAt startPoint branchingDirections =
-    let
-        reducer :
-            Int2
-            -> Direction8
-            -> Context
-            -> Context
-        reducer p1 d acc =
-            let
-                p2 =
-                    D.translatePoint p1 d
+insertEdge edge acc =
+    { acc | edges = Set.insert edge acc.edges }
 
-                edge =
-                    ( p1, p2 )
-            in
-            case typeOfNodeAt p2 of
-                Just type_ ->
-                    case type_ of
-                        ContinuePreviousDirectionNode ->
-                            if isEdgeMember edge acc then
-                                insertEndPoint p1 acc
 
-                            else
-                                insertEdge edge acc |> pushPending ( p2, d )
+isEdgeMember ( p1, p2 ) acc =
+    Set.member ( p1, p2 ) acc.edges || Set.member ( p2, p1 ) acc.edges
 
-                        BranchNode dl ->
-                            if isEdgeMember edge acc then
-                                insertEndPoint p1 acc
 
-                            else
-                                insertEdge edge acc
-                                    |> pushPendingList (List.map (Tuple.pair p2) dl)
-
-                        LeafNode ->
-                            if isEdgeMember edge acc then
-                                insertEndPoint p2 acc
-
-                            else
-                                acc |> insertEndPoint p2 |> insertEdge edge
-
-                Nothing ->
-                    insertEndPoint p1 acc
-
-        unfolder : Context -> Graph
-        unfolder context0 =
-            case popPending context0 of
-                Nothing ->
-                    Graph ( context0.edges, context0.eps )
-
-                Just ( ( p1, d ), context ) ->
-                    unfolder (reducer p1 d context)
-
-        -- recurse acc
-    in
-    unfolder (initContext typeOfNodeAt startPoint branchingDirections)
+insertEndPoint ep acc =
+    { acc | eps = Set.insert ep acc.eps }

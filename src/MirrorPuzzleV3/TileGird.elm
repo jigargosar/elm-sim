@@ -78,7 +78,7 @@ computeLightPaths (TileGrid _ dict) =
 
         graphStartingAt ( position, el ) =
             Tile.getRefractionDirectionOfLightSource el
-                |> Maybe.map (Graph.create nodeTypeAt position)
+                |> Maybe.map (Graph.build nodeTypeAt position)
     in
     Dict.toList dict |> List.filterMap graphStartingAt
 

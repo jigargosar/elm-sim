@@ -75,6 +75,9 @@ create typeOfNodeAt startPoint branchingDirections =
 
                         recurseList acc_ newList =
                             toGraph acc_ (newList ++ pending)
+
+                        insertEdge acc_ =
+                            { acc_ | edges = Set.insert ( p1, p2 ) acc_.edges }
                     in
                     case typeOfNodeAt p2 of
                         Just ContinuePreviousDirectionNode ->
@@ -82,14 +85,14 @@ create typeOfNodeAt startPoint branchingDirections =
                                 recurse { acc | eps = Set.insert p1 acc.eps }
 
                             else
-                                recurse1 { acc | edges = Set.insert ( p1, p2 ) acc.edges } ( p2, d )
+                                recurse1 (insertEdge acc) ( p2, d )
 
                         Just (BranchNode dl) ->
                             if isEdgeMember then
                                 recurse { acc | eps = Set.insert p1 acc.eps }
 
                             else
-                                recurseList { acc | edges = Set.insert ( p1, p2 ) acc.edges }
+                                recurseList (insertEdge acc)
                                     (List.map (Tuple.pair p2) dl)
 
                         Just LeafNode ->
@@ -105,5 +108,7 @@ create typeOfNodeAt startPoint branchingDirections =
 
                         Nothing ->
                             recurse { acc | eps = Set.insert p1 acc.eps }
+
+        -- recurse acc
     in
     toGraph { edges = Set.empty, eps = Set.empty } (List.map (Tuple.pair startPoint) branchingDirections)

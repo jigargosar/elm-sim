@@ -15,7 +15,7 @@ import String exposing (fromFloat)
 import Svg exposing (Svg)
 import Svg.Attributes as SA
 import Svg.Events
-import TypedSvg.Attributes as T
+import TypedSvg.Attributes as TA
 
 
 
@@ -130,9 +130,11 @@ view model =
                 --, H.style "position" "absolute"
                 --, H.style "top" "0"
                 --, H.style "left" "0"
+                , fill "transparent"
                 ]
                 [ words "FOO BAR" [] --[ transform [ shift ( w / 2, h / 2 ) ] ]
                 , circle 100 [ fill "black", opacity 0.3 ]
+                , viewTileGrid model
                 ]
             ]
         ]
@@ -160,8 +162,12 @@ scale =
     Scale
 
 
-centerSquare _ =
-    Shift ( 0, 0 )
+centerSquare w =
+    centerRect ( w, w )
+
+
+centerRect ( w, h ) =
+    Shift ( -w / 2, h / 2 )
 
 
 rotate =
@@ -195,15 +201,34 @@ segment ( x1, y1 ) ( x2, y2 ) attrs =
     Svg.line
         (SA.x1 (fromFloat x1)
             :: SA.x2 (fromFloat x2)
-            :: SA.y1 (fromFloat y1)
-            :: SA.y2 (fromFloat y2)
+            :: SA.y1 (fromFloat -y1)
+            :: SA.y2 (fromFloat -y2)
             :: attrs
         )
         []
 
 
-triangle =
-    square
+triangle r attrs =
+    Svg.polygon (SA.points (toNgonPoints 0 3 r "") :: attrs) []
+
+
+toNgonPoints : Int -> Int -> Float -> String -> String
+toNgonPoints i n radius string =
+    if i == n then
+        string
+
+    else
+        let
+            a =
+                turns (toFloat i / toFloat n - 0.25)
+
+            x =
+                radius * cos a
+
+            y =
+                radius * sin a
+        in
+        toNgonPoints (i + 1) n radius (string ++ String.fromFloat x ++ "," ++ String.fromFloat y ++ " ")
 
 
 circle r attrs =
@@ -255,12 +280,25 @@ viewTileGrid { cellW, grid } =
             grid
                 |> TileGrid.toList
                 |> List.map (toTileView cellW)
+
+        gridLeftBottom =
+            let
+                gd =
+                    TileGrid.dimensions grid |> (NT.toFloat >> NT.scale cellW)
+
+                cd =
+                    ( cellW, cellW )
+            in
+            NT.sub cd gd |> NT.scale 0.5
     in
     [ tileViewList
         |> List.map viewDebugTile
         |> group []
+    , tileViewList
+        |> List.map viewTile
+        |> group []
     ]
-        |> group [ name "pe-none" ]
+        |> group [ name "pe-none", transform [ shift gridLeftBottom ] ]
 
 
 toViewPosition : Float -> Int2 -> ( Float, Float )
@@ -298,7 +336,7 @@ viewTile { cellW, position, viewPosition, tile, showIndex } =
             square cellW [ outlineColor "black", thickness 2, transform [ centerSquare cellW ] ]
 
         lightSourceShape =
-            square cellW [ fill "green", transform [ centerSquare cellW, scale 0.9 ] ]
+            square cellW [ fill "green", transform [ scale 0.9, centerSquare cellW ] ]
 
         elementContainerShape elementContainer =
             case elementContainer of
@@ -317,8 +355,8 @@ viewTile { cellW, position, viewPosition, tile, showIndex } =
             case tile of
                 Tile.FilledContainer elementContainer element ->
                     [ elementShape cellW element
-                    , elementContainerShape elementContainer
                     , floorShape
+                    , elementContainerShape elementContainer
                     ]
                         |> group attrs
 
@@ -354,10 +392,16 @@ viewTile { cellW, position, viewPosition, tile, showIndex } =
 elementShape cellW element =
     let
         mirrorShape d =
-            ellipse (cellW / 8) (cellW / 2) [ fill "lightblue", transform [ shift ( -cellW / 2, 0 ), scale 0.8, rotate (D.toDegrees d) ] ]
+            let
+                ( w, h ) =
+                    ( cellW / 8, cellW / 2 )
+            in
+            ellipse w
+                h
+                [ fill "lightblue", transform [ scale 0.8, rotate (D.toDegrees d), shift ( -w / 2, 0 ) ] ]
 
         prismShape d =
-            triangle cellW [ fill "lightblue", transform [ centerSquare cellW, rotate (D.toDegrees d), scale 0.8 ] ]
+            triangle (cellW / 2) [ fill "lightblue", transform [ rotate (D.toDegrees d), scale 0.8 ] ]
     in
     case element.type_ of
         Tile.Mirror ->

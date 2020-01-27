@@ -303,10 +303,10 @@ viewTileGrid { cellW, grid } =
         |> group [ opacity 0.8 ]
     , TileGrid.computeLightPaths grid
         |> List.map (viewLightPath cellW)
-        |> group [ opacity 0.4 ]
+        |> group [ opacity 0.6, SA.class "pe-none" ]
     , tileViewList
         |> List.map viewDebugTile
-        |> group [ opacity 0.4 ]
+        |> group [ opacity 0.4, SA.class "pe-none" ]
     ]
         |> group [ transform [ shift gridLeftBottom ] ]
 
@@ -415,7 +415,7 @@ elementShape cellW element =
                     [ transform [ scale 0.8, rotate (D.toDegrees d) ] ]
 
         prismShape d =
-            triangle (cellW / 2) [ fill "lightblue", transform [ rotate (D.toDegrees d), scale 0.8 ] ]
+            triangle (cellW / 2) [ fill "dodgerblue", transform [ rotate (D.toDegrees d), scale 0.8 ] ]
     in
     case element.type_ of
         Tile.Mirror ->
@@ -433,7 +433,7 @@ viewLightPath cellW graph =
             endPointShape [ transform [ shift (toViewPosition cellW ep) ] ]
 
         endPointShape attrs =
-            circle (cellW / 8) (fill "black" :: attrs)
+            circle (cellW / 8) (fill "red" :: attrs)
 
         viewEdge : ( NT.Int2, NT.Int2 ) -> Svg msg
         viewEdge points =

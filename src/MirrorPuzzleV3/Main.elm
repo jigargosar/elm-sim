@@ -38,7 +38,7 @@ main =
 
 
 type alias Model =
-    { cellW : Float, grid : TileGrid, drag : Drag, sceneExtrema : Extrema }
+    { cellW : Float, grid : TileGrid, drag : Drag, screen : Extrema }
 
 
 type alias Flags =
@@ -50,7 +50,7 @@ init _ =
     ( { cellW = 100
       , grid = initialTileGrid
       , drag = NotDragging
-      , sceneExtrema = toExtrema ( 600, 600 )
+      , screen = toExtrema ( 600, 600 )
       }
     , Browser.Dom.getViewport |> Task.perform GotViewport
     )
@@ -112,7 +112,7 @@ view model =
                 toExtrema gridViewDimensions
 
             ex =
-                model.sceneExtrema
+                model.screen
 
             w =
                 String.fromFloat ex.width
@@ -578,7 +578,7 @@ update message model =
                 ( NotDragging, Just element ) ->
                     ( { model
                         | drag =
-                            DraggingR position element (transformPageXY pageXY model.sceneExtrema)
+                            DraggingR position element (transformPageXY pageXY model.screen)
                                 |> Dragging
                       }
                     , Cmd.none
@@ -605,7 +605,7 @@ update message model =
                     ( model, Cmd.none )
 
         MouseMove pageXY ->
-            ( setDragCurrent (transformPageXY pageXY model.sceneExtrema) model
+            ( setDragCurrent (transformPageXY pageXY model.screen) model
             , Cmd.none
             )
 
@@ -618,10 +618,10 @@ update message model =
                     ( { model | drag = NotDragging }, Cmd.none )
 
         GotViewport { scene } ->
-            ( { model | sceneExtrema = toExtrema ( scene.width, scene.height ) }, Cmd.none )
+            ( { model | screen = toExtrema ( scene.width, scene.height ) }, Cmd.none )
 
         Resize w h ->
-            ( { model | sceneExtrema = toExtrema (( w, h ) |> NT.toFloat) }, Cmd.none )
+            ( { model | screen = toExtrema (( w, h ) |> NT.toFloat) }, Cmd.none )
 
 
 setDragCurrent current model =

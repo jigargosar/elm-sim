@@ -131,7 +131,7 @@ view model =
                 --, H.style "top" "0"
                 --, H.style "left" "0"
                 ]
-                [ words "FOO BAR" [ S.textAnchor "middle", S.dominantBaseline "central" ] --[ transform [ shift ( w / 2, h / 2 ) ] ]
+                [ words "FOO BAR" [] --[ transform [ shift ( w / 2, h / 2 ) ] ]
                 , circle 100 [ fill "black", opacity 0.3 ]
                 ]
             ]
@@ -139,8 +139,13 @@ view model =
 
 
 words : String -> List (Svg.Attribute msg) -> Svg msg
-words w al =
-    Svg.text_ al [ Svg.text w ]
+words txt al =
+    Svg.text_
+        (S.textAnchor "middle"
+            :: S.dominantBaseline "central"
+            :: al
+        )
+        [ Svg.text txt ]
 
 
 group =

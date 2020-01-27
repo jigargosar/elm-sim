@@ -3,7 +3,7 @@ module MirrorPuzzleV3.Main exposing (main)
 import Browser
 import Browser.Events
 import Html exposing (Html, div)
-import Html.Attributes exposing (class)
+import Html.Attributes exposing (class, style)
 import Json.Decode as JD
 import MirrorPuzzleV3.Graph as Graph
 import MirrorPuzzleV3.Tile as Tile exposing (Tile)
@@ -132,7 +132,48 @@ view model =
                 ]
                 [ viewTileGrid model
                 ]
+            , case model.drag of
+                NotDragging ->
+                    empty
+
+                Dragging draggingR ->
+                    [ [ [ elementShape cellW draggingR.element ]
+                            |> group []
+                      ]
+                        |> svgCanvas (toExtrema ( cellW, cellW ))
+                    ]
+                        |> div
+                            [ style "position" "fixed"
+                            , style "top" ((fromFloat <| Tuple.second draggingR.current) ++ "px")
+                            , style "left" ((fromFloat <| Tuple.first draggingR.current) ++ "px")
+                            , class "pe-none"
+                            ]
             ]
+        ]
+
+
+svgCanvas ex =
+    let
+        w =
+            String.fromFloat ex.width
+
+        h =
+            String.fromFloat ex.height
+
+        x =
+            String.fromFloat ex.left
+
+        y =
+            String.fromFloat ex.bottom
+    in
+    Svg.svg
+        [ SA.viewBox ([ x, y, w, h ] |> String.join " ")
+        , SA.width w
+        , SA.height h
+
+        --, H.style "position" "absolute"
+        --, H.style "top" "0"
+        --, H.style "left" "0"
         ]
 
 
@@ -601,9 +642,8 @@ subscriptions model =
             Dragging _ ->
                 [ JD.map MouseMove clientXYDecoder
                     |> Browser.Events.onMouseMove
-
-                --, JD.succeed MouseUp
-                --    |> Browser.Events.onMouseUp
+                , JD.succeed MouseUp
+                    |> Browser.Events.onMouseUp
                 ]
                     |> Sub.batch
         ]

@@ -355,9 +355,12 @@ viewTile { cellW, position, viewPosition, tile, showIndex } =
                 Tile.Platform ->
                     empty
 
+        green =
+            "hsl(116, 86%, 37%)"
+
         goalShape : Svg msg
         goalShape =
-            [ circle (cellW / 2) [ fill "lime", transform [ scale 0.9 ] ] ]
+            [ circle (cellW / 2) [ fill green, transform [ scale 0.9 ] ] ]
                 |> group []
 
         tileShapeHelp : List (Svg.Attribute msg) -> Svg msg

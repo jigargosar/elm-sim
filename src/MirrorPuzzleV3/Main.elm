@@ -173,10 +173,12 @@ transformToString t =
             "rotate(" ++ fromFloat -deg ++ ")"
 
 
+transform : List Transform -> Svg.Attribute msg
 transform =
     List.map transformToString >> String.join " " >> SA.transform
 
 
+rectangle : ( Float, Float ) -> List (Svg.Attribute msg) -> Svg msg
 rectangle ( width, height ) attrs =
     let
         top =

@@ -635,10 +635,10 @@ update message model =
 -- Subscriptions
 
 
-clientXYDecoder =
+pageXYDecoder =
     JD.map2 Tuple.pair
-        (JD.field "clientX" JD.float)
-        (JD.field "clientY" JD.float)
+        (JD.field "pageX" JD.float)
+        (JD.field "pageY" JD.float)
 
 
 subscriptions : Model -> Sub Msg
@@ -650,7 +650,7 @@ subscriptions model =
                 Sub.none
 
             Dragging _ ->
-                [ JD.map MouseMove clientXYDecoder
+                [ JD.map MouseMove pageXYDecoder
                     |> Browser.Events.onMouseMove
                 , JD.succeed MouseUp
                     |> Browser.Events.onMouseUp

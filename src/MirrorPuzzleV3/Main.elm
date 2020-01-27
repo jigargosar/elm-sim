@@ -192,6 +192,15 @@ square w attrs =
         []
 
 
+polygon points attrs =
+    Svg.polygon (SA.points (List.foldl addPoint "" points) :: attrs)
+
+
+addPoint : ( Float, Float ) -> String -> String
+addPoint ( x, y ) str =
+    str ++ String.fromFloat x ++ "," ++ String.fromFloat -y ++ " "
+
+
 squareC w attrs =
     group attrs [ square w [ transform [ centerSquare w ] ] ]
 

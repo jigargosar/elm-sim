@@ -310,13 +310,29 @@ group =
     Svg.g
 
 
-viewTileGrid : { a | cellW : Float, grid : TileGrid } -> Svg Msg
-viewTileGrid { cellW, grid } =
+viewTileGrid { cellW, grid, drag } =
     let
+        dragPosition : Maybe Int2
+        dragPosition =
+            case drag of
+                Dragging r ->
+                    Just r.start
+
+                NotDragging ->
+                    Nothing
+
+        toTileView : ( Int2, Tile ) -> TileView
+        toTileView ( position, tile ) =
+            TileView position
+                (toViewPosition cellW position)
+                tile
+                cellW
+                (Just position == dragPosition)
+
         tileViewList =
             grid
                 |> TileGrid.toList
-                |> List.map (toTileView cellW)
+                |> List.map toTileView
 
         gridLeftBottom =
             let
@@ -346,16 +362,12 @@ toViewPosition cellW position =
     position |> NT.toFloat |> NT.scale cellW
 
 
-toTileView : Float -> ( Int2, Tile ) -> TileView
-toTileView cellW ( position, tile ) =
-    TileView position (toViewPosition cellW position) tile cellW
-
-
 type alias TileView =
     { position : Int2
     , viewPosition : Float2
     , tile : Tile
     , cellW : Float
+    , dimElement : Bool
     }
 
 

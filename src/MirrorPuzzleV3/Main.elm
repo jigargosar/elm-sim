@@ -596,24 +596,6 @@ update message model =
             ( { model | sceneExtrema = toExtrema (( w, h ) |> NT.toFloat) }, Cmd.none )
 
 
-mapDrag : (Drag -> Drag) -> Model -> Model
-mapDrag func model =
-    { model | drag = func model.drag }
-
-
-mapDraggingR : (DraggingR -> DraggingR) -> Model -> Model
-mapDraggingR func =
-    mapDrag
-        (\drag ->
-            case drag of
-                NotDragging ->
-                    drag
-
-                Dragging draggingR ->
-                    Dragging (func draggingR)
-        )
-
-
 setDragCurrent current model =
     case model.drag of
         Dragging r ->

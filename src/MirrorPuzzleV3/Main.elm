@@ -157,14 +157,6 @@ scale =
     Scale
 
 
-centerSquare w =
-    centerRect ( w, w )
-
-
-centerRect ( w, h ) =
-    Shift ( -w / 2, h / 2 )
-
-
 rotate =
     Rotate
 
@@ -185,15 +177,26 @@ transform =
     List.map transformToString >> String.join " " >> SA.transform
 
 
-square : Float -> List (Svg.Attribute msg) -> Svg msg
-square w attrs =
-    Svg.rect
-        (SA.width (fromFloat w) :: SA.height (fromFloat w) :: attrs)
-        []
+rectangle ( width, height ) attrs =
+    let
+        top =
+            height / 2
+
+        left =
+            -width / 2
+
+        right =
+            width / 2
+
+        bottom =
+            -height / 2
+    in
+    polygon [ ( left, top ), ( right, top ), ( right, bottom ), ( left, bottom ) ] attrs
 
 
+polygon : List ( Float, Float ) -> List (Svg.Attribute msg) -> Svg msg
 polygon points attrs =
-    Svg.polygon (SA.points (List.foldl addPoint "" points) :: attrs)
+    Svg.polygon (SA.points (List.foldl addPoint "" points) :: attrs) []
 
 
 addPoint : ( Float, Float ) -> String -> String
@@ -201,8 +204,9 @@ addPoint ( x, y ) str =
     str ++ String.fromFloat x ++ "," ++ String.fromFloat -y ++ " "
 
 
-squareC w attrs =
-    group attrs [ square w [ transform [ centerSquare w ] ] ]
+square : Float -> List (Svg.Attribute msg) -> Svg msg
+square w attrs =
+    rectangle ( w, w ) attrs
 
 
 segment ( x1, y1 ) ( x2, y2 ) attrs =
@@ -277,10 +281,6 @@ group =
     Svg.g
 
 
-name =
-    SA.id
-
-
 viewTileGrid : { a | cellW : Float, grid : TileGrid } -> Svg Msg
 viewTileGrid { cellW, grid } =
     let
@@ -309,7 +309,7 @@ viewTileGrid { cellW, grid } =
         |> List.map viewDebugTile
         |> group [ opacity 0.4 ]
     ]
-        |> group [ name "pe-none", transform [ shift gridLeftBottom ] ]
+        |> group [ transform [ shift gridLeftBottom ] ]
 
 
 toViewPosition : Float -> Int2 -> ( Float, Float )
@@ -339,14 +339,11 @@ viewDebugTile { position, viewPosition } =
 viewTile : TileView -> Svg Msg
 viewTile { cellW, position, viewPosition, tile, showIndex } =
     let
-        silver =
-            "sliver"
-
         floorShape =
-            squareC (cellW * 0.99) [ fill "black", opacity 0.1 ]
+            square (cellW * 0.99) [ fill "black", opacity 0.1 ]
 
         lightSourceShape =
-            squareC cellW [ fill "green", transform [ scale 0.9 ] ]
+            square cellW [ fill "green", transform [ scale 0.9 ] ]
 
         elementContainerShape elementContainer =
             case elementContainer of
@@ -356,6 +353,7 @@ viewTile { cellW, position, viewPosition, tile, showIndex } =
                 Tile.Platform ->
                     empty
 
+        goalShape : Svg msg
         goalShape =
             [ circle (cellW / 2) [ fill "green", transform [ scale 0.9 ] ] ]
                 |> group []
@@ -372,7 +370,7 @@ viewTile { cellW, position, viewPosition, tile, showIndex } =
 
                 Tile.Wall ->
                     [ floorShape
-                    , squareC cellW [ fill "gray" ]
+                    , square cellW [ fill "gray" ]
                     ]
                         |> group attrs
 
@@ -399,6 +397,7 @@ viewTile { cellW, position, viewPosition, tile, showIndex } =
         ]
 
 
+elementShape : Float -> { a | type_ : Tile.ElementType, direction : D.Direction8 } -> Svg msg
 elementShape cellW element =
     let
         mirrorShape d =

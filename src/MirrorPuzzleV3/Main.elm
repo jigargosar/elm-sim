@@ -129,11 +129,8 @@ view model =
                 --, H.style "position" "absolute"
                 --, H.style "top" "0"
                 --, H.style "left" "0"
-                , fill "transparent"
                 ]
-                [ words "FOO BAR" [] --[ transform [ shift ( w / 2, h / 2 ) ] ]
-                , circle 100 [ fill "black", opacity 0.3 ]
-                , viewTileGrid model
+                [ viewTileGrid model
                 ]
             ]
         ]
@@ -342,10 +339,13 @@ viewTile : TileView -> Svg Msg
 viewTile { cellW, position, viewPosition, tile, showIndex } =
     let
         floorShape =
-            square (cellW * 0.99) [ fill "black", opacity 0.1 ]
+            [ square cellW [ fill "gray" ]
+            , square cellW [ fill "white", transform [ scale 0.99 ] ]
+            ]
+                |> group []
 
         lightSourceShape =
-            square cellW [ fill "green", transform [ scale 0.9 ] ]
+            square cellW [ fill "orange", transform [ scale 0.9 ] ]
 
         elementContainerShape elementContainer =
             case elementContainer of
@@ -357,7 +357,7 @@ viewTile { cellW, position, viewPosition, tile, showIndex } =
 
         goalShape : Svg msg
         goalShape =
-            [ circle (cellW / 2) [ fill "green", transform [ scale 0.9 ] ] ]
+            [ circle (cellW / 2) [ fill "lime", transform [ scale 0.9 ] ] ]
                 |> group []
 
         tileShapeHelp : List (Svg.Attribute msg) -> Svg msg
@@ -372,7 +372,7 @@ viewTile { cellW, position, viewPosition, tile, showIndex } =
 
                 Tile.Wall ->
                     [ floorShape
-                    , square cellW [ fill "gray" ]
+                    , square cellW [ fill "chocolate" ]
                     ]
                         |> group attrs
 
@@ -407,9 +407,12 @@ elementShape cellW element =
                 ( w, h ) =
                     ( cellW / 8, cellW / 2 )
             in
-            ellipse w
+            [ ellipse w
                 h
-                [ fill "lightblue", transform [ scale 0.8, rotate (D.toDegrees d), shift ( -w / 2, 0 ) ] ]
+                [ fill "dodgerblue", transform [ shift ( -w, 0 ) ] ]
+            ]
+                |> group
+                    [ transform [ scale 0.8, rotate (D.toDegrees d) ] ]
 
         prismShape d =
             triangle (cellW / 2) [ fill "lightblue", transform [ rotate (D.toDegrees d), scale 0.8 ] ]
@@ -438,7 +441,7 @@ viewLightPath cellW graph =
                 ( p1, p2 ) =
                     mapEach (toViewPosition cellW) points
             in
-            segment p1 p2 [ outlineColor "black", thickness 1 ]
+            segment p1 p2 [ outlineColor "red", thickness 3 ]
     in
     let
         viewEdges =

@@ -143,7 +143,9 @@ opacity =
 type Transform
     = Shift Float2
     | Scale Float
+    | Scale2 Float Float
     | Rotate Float
+    | Rotate3 Float Float Float
 
 
 shift =
@@ -154,8 +156,20 @@ scale =
     Scale
 
 
+scaleY =
+    Scale2 1
+
+
+scaleX sx =
+    Scale2 sx 1
+
+
 rotate =
     Rotate
+
+
+rotate3 =
+    Rotate3
 
 
 transformToString t =
@@ -168,6 +182,12 @@ transformToString t =
 
         Rotate deg ->
             "rotate(" ++ fromFloat -deg ++ ")"
+
+        Scale2 sx sy ->
+            "scale(" ++ fromFloat sx ++ "," ++ fromFloat sy ++ ")"
+
+        Rotate3 deg x y ->
+            "rotate(" ++ fromFloat -deg ++ "," ++ fromFloat x ++ "," ++ fromFloat -y ++ ")"
 
 
 transform : List Transform -> Svg.Attribute msg
@@ -417,7 +437,9 @@ elementShape cellW element =
                     [ transform [ scale 0.8, rotate (D.toDegrees d) ] ]
 
         prismShape d =
-            triangle (cellW / 2) [ fill "dodgerblue", transform [ rotate (D.toDegrees d), scale 0.8 ] ]
+            [ triangle (cellW / 2) [ fill "dodgerblue", transform [ scaleX 0.8, scale 0.8 ] ]
+            ]
+                |> group [ transform [ rotate (D.toDegrees d) ] ]
     in
     case element.type_ of
         Tile.Mirror ->

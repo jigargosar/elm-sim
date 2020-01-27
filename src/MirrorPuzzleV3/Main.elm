@@ -1,6 +1,7 @@
 module MirrorPuzzleV3.Main exposing (main)
 
 import Browser
+import Browser.Dom
 import Browser.Events
 import Html exposing (Html, div)
 import Html.Attributes exposing (class, style)
@@ -15,6 +16,7 @@ import String exposing (fromFloat)
 import Svg exposing (Svg)
 import Svg.Attributes as SA
 import Svg.Events
+import Task
 
 
 
@@ -36,7 +38,7 @@ main =
 
 
 type alias Model =
-    { cellW : Float, grid : TileGrid, drag : Drag }
+    { cellW : Float, grid : TileGrid, drag : Drag, viewExtrema : Extrema }
 
 
 type alias Flags =
@@ -48,8 +50,9 @@ init _ =
     ( { cellW = 100
       , grid = initialTileGrid
       , drag = NotDragging
+      , viewExtrema = toExtrema ( 600, 600 )
       }
-    , Cmd.none
+    , Browser.Dom.getViewport |> Task.perform GotViewport
     )
 
 
@@ -548,6 +551,8 @@ type Msg
     | CellMouseUp Int2
     | MouseMove Float2
     | MouseUp
+    | GotViewport Browser.Dom.Viewport
+    | Resize Int Int
 
 
 type Drag
@@ -621,6 +626,12 @@ update message model =
                 Dragging _ ->
                     ( { model | drag = NotDragging }, Cmd.none )
 
+        GotViewport { scene } ->
+            ( { model | viewExtrema = toExtrema ( scene.width, scene.height ) }, Cmd.none )
+
+        Resize w h ->
+            ( { model | viewExtrema = toExtrema (( w, h ) |> NT.toFloat) }, Cmd.none )
+
 
 
 -- Subscriptions
@@ -635,7 +646,8 @@ clientXYDecoder =
 subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
-        [ case model.drag of
+        [ Browser.Events.onResize Resize
+        , case model.drag of
             NotDragging ->
                 Sub.none
 

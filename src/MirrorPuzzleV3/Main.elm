@@ -577,9 +577,7 @@ update message model =
                     ( model, Cmd.none )
 
         MouseMove pageXY ->
-            ( mapDraggingR
-                (\r -> { r | current = transformPageXY pageXY model.sceneExtrema })
-                model
+            ( setDragCurrent (transformPageXY pageXY model.sceneExtrema) model
             , Cmd.none
             )
 
@@ -614,6 +612,15 @@ mapDraggingR func =
                 Dragging draggingR ->
                     Dragging (func draggingR)
         )
+
+
+setDragCurrent current model =
+    case model.drag of
+        Dragging r ->
+            { model | drag = Dragging { r | current = current } }
+
+        NotDragging ->
+            model
 
 
 transformPageXY ( pageX, pageY ) ex =

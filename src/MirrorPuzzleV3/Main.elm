@@ -38,7 +38,7 @@ main =
 
 
 type alias Model =
-    { cellW : Float, grid : TileGrid, drag : Drag, viewExtrema : Extrema }
+    { cellW : Float, grid : TileGrid, drag : Drag, viewportExtrema : Extrema }
 
 
 type alias Flags =
@@ -50,7 +50,7 @@ init _ =
     ( { cellW = 100
       , grid = initialTileGrid
       , drag = NotDragging
-      , viewExtrema = toExtrema ( 600, 600 )
+      , viewportExtrema = toExtrema ( 600, 600 )
       }
     , Browser.Dom.getViewport |> Task.perform GotViewport
     )
@@ -627,10 +627,10 @@ update message model =
                     ( { model | drag = NotDragging }, Cmd.none )
 
         GotViewport { scene } ->
-            ( { model | viewExtrema = toExtrema ( scene.width, scene.height ) }, Cmd.none )
+            ( { model | viewportExtrema = toExtrema ( scene.width, scene.height ) }, Cmd.none )
 
         Resize w h ->
-            ( { model | viewExtrema = toExtrema (( w, h ) |> NT.toFloat) }, Cmd.none )
+            ( { model | viewportExtrema = toExtrema (( w, h ) |> NT.toFloat) }, Cmd.none )
 
 
 

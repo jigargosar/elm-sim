@@ -2,7 +2,7 @@ module MirrorPuzzleV3.Main exposing (main)
 
 import Browser
 import Browser.Events
-import Html exposing (Html, div, text)
+import Html exposing (Html, div)
 import Html.Attributes exposing (class)
 import Json.Decode as JD
 import MirrorPuzzleV3.Graph as Graph
@@ -15,7 +15,6 @@ import String exposing (fromFloat)
 import Svg exposing (Svg)
 import Svg.Attributes as SA
 import Svg.Events
-import TypedSvg.Attributes as TA
 
 
 
@@ -193,6 +192,10 @@ square w attrs =
         []
 
 
+squareC w attrs =
+    group attrs [ square w [ transform [ centerSquare w ] ] ]
+
+
 segment ( x1, y1 ) ( x2, y2 ) attrs =
     Svg.line
         (SA.x1 (fromFloat x1)
@@ -331,12 +334,10 @@ viewTile { cellW, position, viewPosition, tile, showIndex } =
             "sliver"
 
         floorShape =
-            [ square (cellW * 0.99) [ fill "black", opacity 0.1, transform [ centerSquare (cellW * 0.99) ] ]
-            ]
-                |> group []
+            squareC (cellW * 0.99) [ fill "black", opacity 0.1 ]
 
         lightSourceShape =
-            square cellW [ fill "green", transform [ scale 0.9, centerSquare cellW ] ]
+            squareC cellW [ fill "green", transform [ scale 0.9 ] ]
 
         elementContainerShape elementContainer =
             case elementContainer of
@@ -354,27 +355,27 @@ viewTile { cellW, position, viewPosition, tile, showIndex } =
         tileShapeHelp attrs =
             case tile of
                 Tile.FilledContainer elementContainer element ->
-                    [ elementShape cellW element
-                    , floorShape
+                    [ floorShape
                     , elementContainerShape elementContainer
+                    , elementShape cellW element
                     ]
                         |> group attrs
 
                 Tile.Wall ->
-                    [ square cellW [ fill silver, transform [ centerSquare cellW ] ]
-                    , floorShape
+                    [ floorShape
+                    , squareC cellW [ fill "gray" ]
                     ]
                         |> group attrs
 
                 Tile.EmptyContainer elementContainer ->
-                    [ elementContainerShape elementContainer
-                    , floorShape
+                    [ floorShape
+                    , elementContainerShape elementContainer
                     ]
                         |> group attrs
 
                 Tile.Goal ->
-                    [ goalShape
-                    , floorShape
+                    [ floorShape
+                    , goalShape
                     ]
                         |> group attrs
 

@@ -15,6 +15,7 @@ import String exposing (fromFloat)
 import Svg exposing (Svg)
 import Svg.Attributes
 import Svg.Events
+import TypedSvg.Attributes
 
 
 
@@ -73,25 +74,14 @@ initialTileGrid =
 view : Model -> Html Msg
 view model =
     div [ class "flex justify-center pv4" ]
-        [ viewTileGrid model
-        , case model.drag of
-            NotDragging ->
-                text ""
+        [ let
+            { cellW, grid } =
+                model
 
-            Dragging r ->
-                let
-                    ( left, top ) =
-                        r.current |> mapEach (fromFloat >> flip (++) "px")
-                in
-                div
-                    [ style "width" "20px"
-                    , style "height" "20px"
-                    , style "top" top
-                    , style "left" left
-                    , class "fixed"
-                    , class "lh-0"
-                    ]
-                    [ elementShape 100 r.element ]
+            ( w, h ) =
+                TileGrid.dimensions grid |> (NT.toFloat >> NT.scale cellW)
+          in
+          Svg.svg [ TypedSvg.Attributes.viewBox 0 0 w h ] []
         ]
 
 
@@ -115,16 +105,9 @@ viewTileGrid { cellW, grid } =
                 |> TileGrid.toList
                 |> List.map (toTileView cellW)
     in
-    [ grid
-        |> TileGrid.computeLightPaths
-        |> List.map (viewLightPath cellW)
-        |> group []
-    , tileViewList
+    [ tileViewList
         |> List.map viewDebugTile
         |> stack []
-    , tileViewList
-        |> List.map viewTile
-        |> stackWithName "pe-all"
     ]
         |> stackWithName "pe-none"
         |> toGridSvg cellW (TileGrid.dimensions grid)
@@ -139,10 +122,11 @@ toGridSvg cellW dim =
         >> Svg.svg
             [ Svg.Attributes.width (fromFloat w)
             , Svg.Attributes.height (fromFloat h)
+            , TypedSvg.Attributes.viewBox 0 0 w h
             , fill "transparent"
             ]
         >> List.singleton
-        >> div []
+        >> div [ class "flex" ]
 
 
 toViewPosition : Float -> Int2 -> ( Float, Float )
@@ -164,8 +148,8 @@ type alias TileView =
     }
 
 
-rendered attrs =
-    List.singleton >> stack attrs
+rendered attrs text =
+    Svg.text_ (Svg.Attributes.textAnchor "middle" :: attrs) [ Svg.text text ]
 
 
 opacity =
@@ -213,8 +197,7 @@ transform =
 viewDebugTile : { a | position : Int2, viewPosition : Float2 } -> Svg Msg
 viewDebugTile { position, viewPosition } =
     NT.int2ToString position
-        |> Svg.text
-        |> rendered [ opacity 0.3, transform [ shift viewPosition ] ]
+        |> rendered [ opacity 0.8, fill "black", transform [ shift viewPosition ] ]
 
 
 square : Float -> List (Svg.Attribute msg) -> Svg msg

@@ -554,7 +554,13 @@ update message model =
         CellMouseDown position pageXY ->
             case ( model.drag, TileGrid.getMovableElement position model.grid ) of
                 ( NotDragging, Just element ) ->
-                    ( { model | drag = DraggingR position element pageXY |> Dragging }, Cmd.none )
+                    ( { model
+                        | drag =
+                            DraggingR position element (transformPageXY pageXY model.sceneExtrema)
+                                |> Dragging
+                      }
+                    , Cmd.none
+                    )
 
                 _ ->
                     ( model, Cmd.none )

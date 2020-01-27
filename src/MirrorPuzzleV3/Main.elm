@@ -318,14 +318,13 @@ toViewPosition cellW position =
 
 toTileView : Float -> ( Int2, Tile ) -> TileView
 toTileView cellW ( position, tile ) =
-    TileView position (toViewPosition cellW position) tile True cellW
+    TileView position (toViewPosition cellW position) tile cellW
 
 
 type alias TileView =
     { position : Int2
     , viewPosition : Float2
     , tile : Tile
-    , showIndex : Bool
     , cellW : Float
     }
 
@@ -336,7 +335,7 @@ viewDebugTile { position, viewPosition } =
 
 
 viewTile : TileView -> Svg Msg
-viewTile { cellW, position, viewPosition, tile, showIndex } =
+viewTile { cellW, position, viewPosition, tile } =
     let
         floorShape =
             [ square cellW [ fill "gray" ]

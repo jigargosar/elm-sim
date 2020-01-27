@@ -141,7 +141,7 @@ view model =
 
                 Dragging draggingR ->
                     [ elementShape cellW draggingR.element ]
-                        |> group [ transform [ shift draggingR.current ] ]
+                        |> group [ SA.class "pe-none", transform [ shift draggingR.current ] ]
             ]
         ]
 

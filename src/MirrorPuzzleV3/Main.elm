@@ -140,10 +140,6 @@ view model =
         ]
 
 
-rendered attrs text =
-    Svg.text_ (SA.textAnchor "middle" :: attrs) [ Svg.text text ]
-
-
 opacity =
     fromFloat >> SA.opacity
 
@@ -297,6 +293,9 @@ viewTileGrid { cellW, grid } =
     , tileViewList
         |> List.map viewTile
         |> group []
+    , TileGrid.computeLightPaths grid
+        |> List.map (viewLightPath cellW)
+        |> group []
     ]
         |> group [ name "pe-none", transform [ shift gridLeftBottom ] ]
 
@@ -322,8 +321,7 @@ type alias TileView =
 
 viewDebugTile : { a | position : Int2, viewPosition : Float2 } -> Svg Msg
 viewDebugTile { position, viewPosition } =
-    NT.int2ToString position
-        |> rendered [ opacity 0.8, fill "black", transform [ shift viewPosition ] ]
+    words (NT.int2ToString position) [ opacity 0.8, fill "black", transform [ shift viewPosition ] ]
 
 
 viewTile : TileView -> Svg Msg
@@ -333,7 +331,10 @@ viewTile { cellW, position, viewPosition, tile, showIndex } =
             "sliver"
 
         floorShape =
-            square cellW [ outlineColor "black", thickness 2, transform [ centerSquare cellW ] ]
+            [ square cellW [ fill "black", opacity 0.1, transform [ centerSquare cellW ] ]
+            , square (cellW * 0.9) [ fill "black", opacity 0.1, transform [ centerSquare (cellW * 0.9) ] ]
+            ]
+                |> group []
 
         lightSourceShape =
             square cellW [ fill "green", transform [ scale 0.9, centerSquare cellW ] ]

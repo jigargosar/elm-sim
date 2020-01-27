@@ -138,6 +138,98 @@ view model =
         ]
 
 
+rendered attrs text =
+    Svg.text_ (SA.textAnchor "middle" :: attrs) [ Svg.text text ]
+
+
+opacity =
+    fromFloat >> SA.opacity
+
+
+type Transform
+    = Shift Float2
+    | Scale Float
+    | Rotate Float
+
+
+shift =
+    Shift
+
+
+scale =
+    Scale
+
+
+centerSquare _ =
+    Shift ( 0, 0 )
+
+
+rotate =
+    Rotate
+
+
+transformToString t =
+    case t of
+        Shift ( x, y ) ->
+            "translate(" ++ fromFloat x ++ "," ++ fromFloat -y ++ ")"
+
+        Scale s ->
+            "scale(" ++ fromFloat s ++ ")"
+
+        Rotate deg ->
+            "rotate(" ++ fromFloat -deg ++ ")"
+
+
+transform =
+    List.map transformToString >> String.join " " >> SA.transform
+
+
+square : Float -> List (Svg.Attribute msg) -> Svg msg
+square w attrs =
+    Svg.rect
+        (SA.width (fromFloat w) :: SA.height (fromFloat w) :: attrs)
+        []
+
+
+segment ( x1, y1 ) ( x2, y2 ) attrs =
+    Svg.line
+        (SA.x1 (fromFloat x1)
+            :: SA.x2 (fromFloat x2)
+            :: SA.y1 (fromFloat y1)
+            :: SA.y2 (fromFloat y2)
+            :: attrs
+        )
+        []
+
+
+triangle =
+    square
+
+
+circle r attrs =
+    Svg.circle (SA.r (fromFloat r) :: attrs) []
+
+
+ellipse w h attrs =
+    Svg.ellipse (SA.rx (fromFloat w) :: SA.ry (fromFloat h) :: attrs) []
+
+
+fill =
+    SA.fill
+
+
+outlineColor =
+    SA.stroke
+
+
+thickness =
+    fromFloat >> SA.strokeWidth
+
+
+empty =
+    Svg.text ""
+
+
 words : String -> List (Svg.Attribute msg) -> Svg msg
 words txt al =
     Svg.text_
@@ -190,102 +282,10 @@ type alias TileView =
     }
 
 
-rendered attrs text =
-    Svg.text_ (SA.textAnchor "middle" :: attrs) [ Svg.text text ]
-
-
-opacity =
-    fromFloat >> SA.opacity
-
-
-type Transform
-    = Shift Float2
-    | Scale Float
-    | Rotate Float
-
-
-shift =
-    Shift
-
-
-scale =
-    Scale
-
-
-centerSquare width =
-    Shift ( width / 2, width / 2 )
-
-
-rotate =
-    Rotate
-
-
-transformToString t =
-    case t of
-        Shift ( x, y ) ->
-            "translate(" ++ fromFloat x ++ "," ++ fromFloat y ++ ")"
-
-        Scale s ->
-            "scale(" ++ fromFloat s ++ ")"
-
-        Rotate deg ->
-            "rotate(" ++ fromFloat deg ++ ")"
-
-
-transform =
-    List.map transformToString >> String.join " " >> SA.transform
-
-
 viewDebugTile : { a | position : Int2, viewPosition : Float2 } -> Svg Msg
 viewDebugTile { position, viewPosition } =
     NT.int2ToString position
         |> rendered [ opacity 0.8, fill "black", transform [ shift viewPosition ] ]
-
-
-square : Float -> List (Svg.Attribute msg) -> Svg msg
-square w attrs =
-    Svg.rect
-        (SA.width (fromFloat w) :: SA.height (fromFloat w) :: attrs)
-        []
-
-
-segment ( x1, y1 ) ( x2, y2 ) attrs =
-    Svg.line
-        (SA.x1 (fromFloat x1)
-            :: SA.x2 (fromFloat x2)
-            :: SA.y1 (fromFloat y1)
-            :: SA.y2 (fromFloat y2)
-            :: attrs
-        )
-        []
-
-
-triangle =
-    square
-
-
-circle r attrs =
-    Svg.circle (SA.r (fromFloat r) :: attrs) []
-
-
-ellipse w h attrs =
-    Svg.ellipse (SA.rx (fromFloat w) :: SA.ry (fromFloat h) :: attrs) []
-
-
-fill =
-    SA.fill
-
-
-outlineColor =
-    SA.stroke
-
-
-thickness =
-    fromFloat >> SA.strokeWidth
-
-
-empty =
-    Svg.text ""
 
 
 viewTile : TileView -> Svg Msg

@@ -186,6 +186,10 @@ scale =
     Scale
 
 
+centerSquare width =
+    Shift ( width / 2, width / 2 )
+
+
 rotate =
     Rotate
 
@@ -266,10 +270,10 @@ viewTile { cellW, position, viewPosition, tile, showIndex } =
             "sliver"
 
         floorShape =
-            square cellW [ outlineColor "black", thickness 2 ]
+            square cellW [ outlineColor "black", thickness 2, transform [ centerSquare cellW ] ]
 
         lightSourceShape =
-            square cellW [ fill "green", transform [ scale 0.9 ] ]
+            square cellW [ fill "green", transform [ centerSquare cellW, scale 0.9 ] ]
 
         elementContainerShape elementContainer =
             case elementContainer of
@@ -294,7 +298,7 @@ viewTile { cellW, position, viewPosition, tile, showIndex } =
                         |> stack attrs
 
                 Tile.Wall ->
-                    [ square cellW [ fill silver ]
+                    [ square cellW [ fill silver, transform [ centerSquare cellW ] ]
                     , floorShape
                     ]
                         |> stack attrs
@@ -328,7 +332,7 @@ elementShape cellW element =
             ellipse (cellW / 8) (cellW / 2) [ fill "lightblue", transform [ shift ( -cellW / 2, 0 ), scale 0.8, rotate (D.toDegrees d) ] ]
 
         prismShape d =
-            triangle cellW [ fill "lightblue", transform [ rotate (D.toDegrees d), scale 0.8 ] ]
+            triangle cellW [ fill "lightblue", transform [ centerSquare cellW, rotate (D.toDegrees d), scale 0.8 ] ]
     in
     case element.type_ of
         Tile.Mirror ->

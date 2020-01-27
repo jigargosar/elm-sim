@@ -310,6 +310,26 @@ group =
     Svg.g
 
 
+renderGridCells : (Float -> Int2 -> b -> Svg msg) -> Float -> Int2 -> List ( Int2, a ) -> Svg c
+renderGridCells func cellW gridWH =
+    let
+        renderCell ( index, content ) =
+            [ func cellW index content ]
+                |> group [ transform [ shift (toViewPosition cellW index) ] ]
+
+        gridLeftBottom =
+            let
+                gd =
+                    gridWH |> (NT.toFloat >> NT.scale cellW)
+
+                cd =
+                    ( cellW, cellW )
+            in
+            NT.sub cd gd |> NT.scale 0.5
+    in
+    List.map renderCell >> group [ transform [ shift gridLeftBottom ] ]
+
+
 viewTileGrid : { a | cellW : Float, grid : TileGrid, drag : Drag } -> Svg Msg
 viewTileGrid { cellW, grid, drag } =
     let

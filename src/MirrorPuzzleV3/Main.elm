@@ -288,14 +288,14 @@ viewTileGrid { cellW, grid } =
             NT.sub cd gd |> NT.scale 0.5
     in
     [ tileViewList
-        |> List.map viewDebugTile
-        |> group []
-    , tileViewList
         |> List.map viewTile
-        |> group []
+        |> group [ opacity 0.8 ]
     , TileGrid.computeLightPaths grid
         |> List.map (viewLightPath cellW)
-        |> group []
+        |> group [ opacity 0.4 ]
+    , tileViewList
+        |> List.map viewDebugTile
+        |> group [ opacity 0.4 ]
     ]
         |> group [ name "pe-none", transform [ shift gridLeftBottom ] ]
 
@@ -321,7 +321,7 @@ type alias TileView =
 
 viewDebugTile : { a | position : Int2, viewPosition : Float2 } -> Svg Msg
 viewDebugTile { position, viewPosition } =
-    words (NT.int2ToString position) [ opacity 0.8, fill "black", transform [ shift viewPosition ] ]
+    words (NT.int2ToString position) [ fill "black", transform [ shift viewPosition ] ]
 
 
 viewTile : TileView -> Svg Msg
@@ -331,8 +331,7 @@ viewTile { cellW, position, viewPosition, tile, showIndex } =
             "sliver"
 
         floorShape =
-            [ square cellW [ fill "black", opacity 0.1, transform [ centerSquare cellW ] ]
-            , square (cellW * 0.9) [ fill "black", opacity 0.1, transform [ centerSquare (cellW * 0.9) ] ]
+            [ square (cellW * 0.99) [ fill "black", opacity 0.1, transform [ centerSquare (cellW * 0.99) ] ]
             ]
                 |> group []
 
@@ -420,7 +419,7 @@ viewLightPath cellW graph =
             endPointShape [ transform [ shift (toViewPosition cellW ep) ] ]
 
         endPointShape attrs =
-            circle (cellW / 8) (fill "black" :: opacity 0.5 :: attrs)
+            circle (cellW / 8) (fill "black" :: attrs)
 
         viewEdge : ( NT.Int2, NT.Int2 ) -> Svg msg
         viewEdge points =
@@ -428,7 +427,7 @@ viewLightPath cellW graph =
                 ( p1, p2 ) =
                     mapEach (toViewPosition cellW) points
             in
-            segment p1 p2 [ outlineColor "black", thickness 1, opacity 0.5 ]
+            segment p1 p2 [ outlineColor "black", thickness 1 ]
     in
     let
         viewEdges =

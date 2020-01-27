@@ -146,31 +146,6 @@ view model =
         ]
 
 
-svgCanvas ex =
-    let
-        w =
-            String.fromFloat ex.width
-
-        h =
-            String.fromFloat ex.height
-
-        x =
-            String.fromFloat ex.left
-
-        y =
-            String.fromFloat ex.bottom
-    in
-    Svg.svg
-        [ SA.viewBox ([ x, y, w, h ] |> String.join " ")
-        , SA.width w
-        , SA.height h
-
-        --, H.style "position" "absolute"
-        --, H.style "top" "0"
-        --, H.style "left" "0"
-        ]
-
-
 opacity =
     fromFloat >> SA.opacity
 
@@ -452,7 +427,7 @@ viewTile { cellW, position, viewPosition, tile } =
         [ transform [ shift viewPosition ]
         , Svg.Events.onMouseUp (CellMouseUp position)
         , Svg.Events.onClick (CellClick position)
-        , Svg.Events.onMouseDown (CellMouseDown position)
+        , Svg.Events.on "mousedown" (JD.map (CellMouseDown position) pageXYDecoder)
         ]
 
 
@@ -538,7 +513,7 @@ viewLightPath cellW graph =
 type Msg
     = NoOp
     | CellClick Int2
-    | CellMouseDown Int2
+    | CellMouseDown Int2 Float2
     | CellMouseUp Int2
     | MouseMove Float2
     | MouseUp
@@ -576,10 +551,10 @@ update message model =
             , Cmd.none
             )
 
-        CellMouseDown position ->
+        CellMouseDown position pageXY ->
             case ( model.drag, TileGrid.getMovableElement position model.grid ) of
                 ( NotDragging, Just element ) ->
-                    ( { model | drag = DraggingR position element ( 0, 0 ) |> Dragging }, Cmd.none )
+                    ( { model | drag = DraggingR position element pageXY |> Dragging }, Cmd.none )
 
                 _ ->
                     ( model, Cmd.none )
@@ -601,20 +576,12 @@ update message model =
                 _ ->
                     ( model, Cmd.none )
 
-        MouseMove ( pageX, pageY ) ->
-            case model.drag of
-                NotDragging ->
-                    ( model, Cmd.none )
-
-                Dragging draggingR ->
-                    let
-                        x =
-                            model.sceneExtrema.left + pageX
-
-                        y =
-                            model.sceneExtrema.top - pageY
-                    in
-                    ( { model | drag = Dragging { draggingR | current = ( x, y ) } }, Cmd.none )
+        MouseMove pageXY ->
+            ( mapDraggingR
+                (\r -> { r | current = transformPageXY pageXY model.sceneExtrema })
+                model
+            , Cmd.none
+            )
 
         MouseUp ->
             case model.drag of
@@ -629,6 +596,28 @@ update message model =
 
         Resize w h ->
             ( { model | sceneExtrema = toExtrema (( w, h ) |> NT.toFloat) }, Cmd.none )
+
+
+mapDrag : (Drag -> Drag) -> Model -> Model
+mapDrag func model =
+    { model | drag = func model.drag }
+
+
+mapDraggingR : (DraggingR -> DraggingR) -> Model -> Model
+mapDraggingR func =
+    mapDrag
+        (\drag ->
+            case drag of
+                NotDragging ->
+                    drag
+
+                Dragging draggingR ->
+                    Dragging (func draggingR)
+        )
+
+
+transformPageXY ( pageX, pageY ) ex =
+    ( ex.left + pageX, ex.top - pageY )
 
 
 

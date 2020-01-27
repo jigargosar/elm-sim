@@ -437,9 +437,19 @@ elementShape cellW element =
                     [ transform [ scale 0.8, rotate (D.toDegrees d) ] ]
 
         prismShape d =
-            [ triangle (cellW / 2) [ fill "dodgerblue", transform [ scaleX 0.8, scale 0.8 ] ]
+            let
+                ( w, h ) =
+                    ( cellW / 8, cellW / 2 )
+
+                mirrorElipse dx =
+                    ellipse w
+                        h
+                        [ fill "dodgerblue", transform [ shift ( dx, 0 ) ] ]
+            in
+            [ mirrorElipse -w
+            , mirrorElipse w
             ]
-                |> group [ transform [ rotate (D.toDegrees d) ] ]
+                |> group [ transform [ scale 0.8, rotate (D.toDegrees d) ] ]
     in
     case element.type_ of
         Tile.Mirror ->

@@ -337,7 +337,7 @@ viewDebugTile { position, viewPosition } =
 viewTile : TileView -> Svg Msg
 viewTile { cellW, position, viewPosition, tile } =
     let
-        floorShape =
+        bgBorderShape =
             [ square cellW [ fill "gray" ]
             , square cellW [ fill "white", transform [ scale 0.99 ] ]
             ]
@@ -366,26 +366,26 @@ viewTile { cellW, position, viewPosition, tile } =
         tileShapeHelp attrs =
             case tile of
                 Tile.FilledContainer elementContainer element ->
-                    [ floorShape
+                    [ bgBorderShape
                     , elementContainerShape elementContainer
                     , elementShape cellW element
                     ]
                         |> group attrs
 
                 Tile.Wall ->
-                    [ floorShape
+                    [ bgBorderShape
                     , square cellW [ fill "chocolate" ]
                     ]
                         |> group attrs
 
                 Tile.EmptyContainer elementContainer ->
-                    [ floorShape
+                    [ bgBorderShape
                     , elementContainerShape elementContainer
                     ]
                         |> group attrs
 
                 Tile.Goal ->
-                    [ floorShape
+                    [ bgBorderShape
                     , goalShape
                     ]
                         |> group attrs

@@ -152,12 +152,8 @@ group =
     Svg.g
 
 
-stack =
-    group
-
-
 stackWithName name =
-    stack [ SA.class name ]
+    group [ SA.class name ]
 
 
 viewTileGrid : { a | cellW : Float, grid : TileGrid } -> Html Msg
@@ -170,7 +166,7 @@ viewTileGrid { cellW, grid } =
     in
     [ tileViewList
         |> List.map viewDebugTile
-        |> stack []
+        |> group []
     ]
         |> stackWithName "pe-none"
         |> toGridSvg cellW (TileGrid.dimensions grid)
@@ -331,7 +327,7 @@ viewTile { cellW, position, viewPosition, tile, showIndex } =
 
         goalShape =
             [ circle (cellW / 2) [ fill "green", transform [ scale 0.9 ] ] ]
-                |> stack []
+                |> group []
 
         tileShapeHelp : List (Svg.Attribute msg) -> Svg msg
         tileShapeHelp attrs =
@@ -341,25 +337,25 @@ viewTile { cellW, position, viewPosition, tile, showIndex } =
                     , elementContainerShape elementContainer
                     , floorShape
                     ]
-                        |> stack attrs
+                        |> group attrs
 
                 Tile.Wall ->
                     [ square cellW [ fill silver, transform [ centerSquare cellW ] ]
                     , floorShape
                     ]
-                        |> stack attrs
+                        |> group attrs
 
                 Tile.EmptyContainer elementContainer ->
                     [ elementContainerShape elementContainer
                     , floorShape
                     ]
-                        |> stack attrs
+                        |> group attrs
 
                 Tile.Goal ->
                     [ goalShape
                     , floorShape
                     ]
-                        |> stack attrs
+                        |> group attrs
 
                 Tile.Hole ->
                     empty
@@ -411,18 +407,18 @@ viewLightPath cellW graph =
             graph
                 |> Graph.edgeList
                 |> List.map viewEdge
-                |> stack []
+                |> group []
 
         viewEndPoints =
             graph
                 |> Graph.endPointList
                 |> List.map viewEndPoint
-                |> stack []
+                |> group []
     in
     [ viewEndPoints
     , viewEdges
     ]
-        |> stack []
+        |> group []
 
 
 

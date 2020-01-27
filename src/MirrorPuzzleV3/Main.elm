@@ -13,7 +13,7 @@ import Playground.Direction8 as D
 import PointFree exposing (ignoreNothing, mapEach)
 import String exposing (fromFloat)
 import Svg exposing (Svg)
-import Svg.Attributes as S
+import Svg.Attributes as SA
 import Svg.Events
 import TypedSvg.Attributes as T
 
@@ -123,9 +123,9 @@ view model =
           in
           div []
             [ Svg.svg
-                [ S.viewBox ([ x, y, w, h ] |> String.join " ")
-                , S.width w
-                , S.height h
+                [ SA.viewBox ([ x, y, w, h ] |> String.join " ")
+                , SA.width w
+                , SA.height h
 
                 --, H.style "position" "absolute"
                 --, H.style "top" "0"
@@ -141,8 +141,8 @@ view model =
 words : String -> List (Svg.Attribute msg) -> Svg msg
 words txt al =
     Svg.text_
-        (S.textAnchor "middle"
-            :: S.dominantBaseline "central"
+        (SA.textAnchor "middle"
+            :: SA.dominantBaseline "central"
             :: al
         )
         [ Svg.text txt ]
@@ -157,7 +157,7 @@ stack =
 
 
 stackWithName name =
-    stack [ S.class name ]
+    stack [ SA.class name ]
 
 
 viewTileGrid : { a | cellW : Float, grid : TileGrid } -> Html Msg
@@ -183,8 +183,8 @@ toGridSvg cellW dim =
     in
     List.singleton
         >> Svg.svg
-            [ S.width (fromFloat w)
-            , S.height (fromFloat h)
+            [ SA.width (fromFloat w)
+            , SA.height (fromFloat h)
             , T.viewBox 0 0 w h
             , fill "transparent"
             ]
@@ -212,11 +212,11 @@ type alias TileView =
 
 
 rendered attrs text =
-    Svg.text_ (S.textAnchor "middle" :: attrs) [ Svg.text text ]
+    Svg.text_ (SA.textAnchor "middle" :: attrs) [ Svg.text text ]
 
 
 opacity =
-    fromFloat >> S.opacity
+    fromFloat >> SA.opacity
 
 
 type Transform
@@ -254,7 +254,7 @@ transformToString t =
 
 
 transform =
-    List.map transformToString >> String.join " " >> S.transform
+    List.map transformToString >> String.join " " >> SA.transform
 
 
 viewDebugTile : { a | position : Int2, viewPosition : Float2 } -> Svg Msg
@@ -266,16 +266,16 @@ viewDebugTile { position, viewPosition } =
 square : Float -> List (Svg.Attribute msg) -> Svg msg
 square w attrs =
     Svg.rect
-        (S.width (fromFloat w) :: S.height (fromFloat w) :: attrs)
+        (SA.width (fromFloat w) :: SA.height (fromFloat w) :: attrs)
         []
 
 
 segment ( x1, y1 ) ( x2, y2 ) attrs =
     Svg.line
-        (S.x1 (fromFloat x1)
-            :: S.x2 (fromFloat x2)
-            :: S.y1 (fromFloat y1)
-            :: S.y2 (fromFloat y2)
+        (SA.x1 (fromFloat x1)
+            :: SA.x2 (fromFloat x2)
+            :: SA.y1 (fromFloat y1)
+            :: SA.y2 (fromFloat y2)
             :: attrs
         )
         []
@@ -286,23 +286,23 @@ triangle =
 
 
 circle r attrs =
-    Svg.circle (S.r (fromFloat r) :: attrs) []
+    Svg.circle (SA.r (fromFloat r) :: attrs) []
 
 
 ellipse w h attrs =
-    Svg.ellipse (S.rx (fromFloat w) :: S.ry (fromFloat h) :: attrs) []
+    Svg.ellipse (SA.rx (fromFloat w) :: SA.ry (fromFloat h) :: attrs) []
 
 
 fill =
-    S.fill
+    SA.fill
 
 
 outlineColor =
-    S.stroke
+    SA.stroke
 
 
 thickness =
-    fromFloat >> S.strokeWidth
+    fromFloat >> SA.strokeWidth
 
 
 empty =

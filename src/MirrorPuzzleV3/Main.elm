@@ -108,8 +108,11 @@ view model =
             gridViewDimensions =
                 TileGrid.dimensions grid |> (NT.toFloat >> NT.scale cellW)
 
-            ex =
+            _ =
                 toExtrema gridViewDimensions
+
+            ex =
+                model.sceneExtrema
 
             w =
                 String.fromFloat ex.width
@@ -123,34 +126,22 @@ view model =
             y =
                 String.fromFloat ex.bottom
           in
-          div [ class "lh-0" ]
-            [ Svg.svg
-                [ SA.viewBox ([ x, y, w, h ] |> String.join " ")
-                , SA.width w
-                , SA.height h
-
-                --, H.style "position" "absolute"
-                --, H.style "top" "0"
-                --, H.style "left" "0"
-                ]
-                [ viewTileGrid model
-                ]
+          Svg.svg
+            [ SA.viewBox ([ x, y, w, h ] |> String.join " ")
+            , SA.width w
+            , SA.height h
+            , style "position" "fixed"
+            , style "top" "0"
+            , style "left" "0"
+            ]
+            [ viewTileGrid model
             , case model.drag of
                 NotDragging ->
                     empty
 
                 Dragging draggingR ->
-                    [ [ [ elementShape cellW draggingR.element ]
-                            |> group []
-                      ]
-                        |> svgCanvas (toExtrema ( cellW, cellW ))
-                    ]
-                        |> div
-                            [ style "position" "fixed"
-                            , style "top" ((fromFloat <| Tuple.second draggingR.current) ++ "px")
-                            , style "left" ((fromFloat <| Tuple.first draggingR.current) ++ "px")
-                            , class "pe-none"
-                            ]
+                    [ elementShape cellW draggingR.element ]
+                        |> group [ transform [ shift draggingR.current ] ]
             ]
         ]
 
@@ -610,13 +601,20 @@ update message model =
                 _ ->
                     ( model, Cmd.none )
 
-        MouseMove pageXY ->
+        MouseMove ( pageX, pageY ) ->
             case model.drag of
                 NotDragging ->
                     ( model, Cmd.none )
 
                 Dragging draggingR ->
-                    ( { model | drag = Dragging { draggingR | current = pageXY } }, Cmd.none )
+                    let
+                        x =
+                            model.sceneExtrema.left + pageX
+
+                        y =
+                            model.sceneExtrema.top - pageY
+                    in
+                    ( { model | drag = Dragging { draggingR | current = ( x, y ) } }, Cmd.none )
 
         MouseUp ->
             case model.drag of

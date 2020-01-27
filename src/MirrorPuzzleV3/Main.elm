@@ -121,7 +121,7 @@ view model =
             y =
                 String.fromFloat ex.bottom
           in
-          div []
+          div [ class "lh-0" ]
             [ Svg.svg
                 [ SA.viewBox ([ x, y, w, h ] |> String.join " ")
                 , SA.width w
@@ -152,11 +152,11 @@ group =
     Svg.g
 
 
-stackWithName name =
-    group [ SA.class name ]
+name =
+    SA.id
 
 
-viewTileGrid : { a | cellW : Float, grid : TileGrid } -> Html Msg
+viewTileGrid : { a | cellW : Float, grid : TileGrid } -> Svg Msg
 viewTileGrid { cellW, grid } =
     let
         tileViewList =
@@ -168,24 +168,7 @@ viewTileGrid { cellW, grid } =
         |> List.map viewDebugTile
         |> group []
     ]
-        |> stackWithName "pe-none"
-        |> toGridSvg cellW (TileGrid.dimensions grid)
-
-
-toGridSvg cellW dim =
-    let
-        ( w, h ) =
-            dim |> NT.toFloat |> NT.scale cellW
-    in
-    List.singleton
-        >> Svg.svg
-            [ SA.width (fromFloat w)
-            , SA.height (fromFloat h)
-            , T.viewBox 0 0 w h
-            , fill "transparent"
-            ]
-        >> List.singleton
-        >> div [ class "flex" ]
+        |> group [ name "pe-none" ]
 
 
 toViewPosition : Float -> Int2 -> ( Float, Float )

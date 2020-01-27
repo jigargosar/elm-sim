@@ -140,7 +140,7 @@ view model =
                     empty
 
                 Dragging draggingR ->
-                    [ elementShape cellW draggingR.element ]
+                    [ elementShape cellW False draggingR.element ]
                         |> group [ SA.class "pe-none", transform [ shift draggingR.current ] ]
             ]
         ]
@@ -310,6 +310,7 @@ group =
     Svg.g
 
 
+viewTileGrid : { a | cellW : Float, grid : TileGrid, drag : Drag } -> Svg Msg
 viewTileGrid { cellW, grid, drag } =
     let
         dragPosition : Maybe Int2
@@ -377,7 +378,7 @@ viewDebugTile { position, viewPosition } =
 
 
 viewTile : TileView -> Svg Msg
-viewTile { cellW, position, viewPosition, tile } =
+viewTile { cellW, position, viewPosition, tile, dimElement } =
     let
         bgBorderShape =
             [ square cellW [ fill "gray" ]
@@ -410,7 +411,7 @@ viewTile { cellW, position, viewPosition, tile } =
                 Tile.FilledContainer elementContainer element ->
                     [ bgBorderShape
                     , elementContainerShape elementContainer
-                    , elementShape cellW element
+                    , elementShape cellW dimElement element
                     ]
                         |> group attrs
 
@@ -443,9 +444,18 @@ viewTile { cellW, position, viewPosition, tile } =
         ]
 
 
-elementShape : Float -> { a | type_ : Tile.ElementType, direction : D.Direction8 } -> Svg msg
-elementShape cellW element =
+elementShape cellW shouldDim element =
     let
+        opacityVal =
+            if shouldDim then
+                0.5
+
+            else
+                1
+
+        transformVal d =
+            [ scale 0.8, rotate (D.toDegrees d) ]
+
         mirrorShape d =
             let
                 ( w, h ) =
@@ -456,7 +466,7 @@ elementShape cellW element =
                 [ fill "dodgerblue", transform [ shift ( -w, 0 ) ] ]
             ]
                 |> group
-                    [ transform [ scale 0.8, rotate (D.toDegrees d) ] ]
+                    [ transform (transformVal d), opacity opacityVal ]
 
         prismShape d =
             let
@@ -471,7 +481,7 @@ elementShape cellW element =
             [ mirrorElipse -w
             , mirrorElipse w
             ]
-                |> group [ transform [ scale 0.8, rotate (D.toDegrees d) ] ]
+                |> group [ transform (transformVal d), opacity opacityVal ]
     in
     case element.type_ of
         Tile.Mirror ->

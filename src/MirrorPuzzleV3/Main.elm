@@ -3,19 +3,19 @@ module MirrorPuzzleV3.Main exposing (main)
 import Browser
 import Browser.Events
 import Html exposing (Html, div, text)
-import Html.Attributes exposing (class, style)
+import Html.Attributes exposing (class)
 import Json.Decode as JD
 import MirrorPuzzleV3.Graph as Graph
 import MirrorPuzzleV3.Tile as Tile exposing (Tile)
 import MirrorPuzzleV3.TileGird as TileGrid exposing (TileGrid)
 import Number2 as NT exposing (Float2, Int2)
 import Playground.Direction8 as D
-import PointFree exposing (flip, ignoreNothing, mapEach)
+import PointFree exposing (ignoreNothing, mapEach)
 import String exposing (fromFloat)
 import Svg exposing (Svg)
-import Svg.Attributes
+import Svg.Attributes as S
 import Svg.Events
-import TypedSvg.Attributes
+import TypedSvg.Attributes as T
 
 
 
@@ -71,6 +71,31 @@ initialTileGrid =
 -- View
 
 
+type alias Number =
+    Float
+
+
+type alias Extrema =
+    { width : Number
+    , height : Number
+    , top : Number
+    , left : Number
+    , right : Number
+    , bottom : Number
+    }
+
+
+toExtrema : ( Float, Float ) -> Extrema
+toExtrema ( width, height ) =
+    { width = width
+    , height = height
+    , top = height / 2
+    , left = -width / 2
+    , right = width / 2
+    , bottom = -height / 2
+    }
+
+
 view : Model -> Html Msg
 view model =
     div [ class "flex justify-center pv4" ]
@@ -78,11 +103,44 @@ view model =
             { cellW, grid } =
                 model
 
-            ( w, h ) =
+            gridViewDimensions =
                 TileGrid.dimensions grid |> (NT.toFloat >> NT.scale cellW)
+
+            ex =
+                toExtrema gridViewDimensions
+
+            w =
+                String.fromFloat ex.width
+
+            h =
+                String.fromFloat ex.height
+
+            x =
+                String.fromFloat ex.left
+
+            y =
+                String.fromFloat ex.bottom
           in
-          Svg.svg [ TypedSvg.Attributes.viewBox 0 0 w h ] []
+          div []
+            [ Svg.svg
+                [ S.viewBox ([ x, y, w, h ] |> String.join " ")
+                , S.width w
+                , S.height h
+
+                --, H.style "position" "absolute"
+                --, H.style "top" "0"
+                --, H.style "left" "0"
+                ]
+                [ words "FOO BAR" [ S.textAnchor "middle", S.dominantBaseline "central" ] --[ transform [ shift ( w / 2, h / 2 ) ] ]
+                , circle 100 [ fill "black", opacity 0.3 ]
+                ]
+            ]
         ]
+
+
+words : String -> List (Svg.Attribute msg) -> Svg msg
+words w al =
+    Svg.text_ al [ Svg.text w ]
 
 
 group =
@@ -94,7 +152,7 @@ stack =
 
 
 stackWithName name =
-    stack [ Svg.Attributes.class name ]
+    stack [ S.class name ]
 
 
 viewTileGrid : { a | cellW : Float, grid : TileGrid } -> Html Msg
@@ -120,9 +178,9 @@ toGridSvg cellW dim =
     in
     List.singleton
         >> Svg.svg
-            [ Svg.Attributes.width (fromFloat w)
-            , Svg.Attributes.height (fromFloat h)
-            , TypedSvg.Attributes.viewBox 0 0 w h
+            [ S.width (fromFloat w)
+            , S.height (fromFloat h)
+            , T.viewBox 0 0 w h
             , fill "transparent"
             ]
         >> List.singleton
@@ -149,11 +207,11 @@ type alias TileView =
 
 
 rendered attrs text =
-    Svg.text_ (Svg.Attributes.textAnchor "middle" :: attrs) [ Svg.text text ]
+    Svg.text_ (S.textAnchor "middle" :: attrs) [ Svg.text text ]
 
 
 opacity =
-    fromFloat >> Svg.Attributes.opacity
+    fromFloat >> S.opacity
 
 
 type Transform
@@ -191,7 +249,7 @@ transformToString t =
 
 
 transform =
-    List.map transformToString >> String.join " " >> Svg.Attributes.transform
+    List.map transformToString >> String.join " " >> S.transform
 
 
 viewDebugTile : { a | position : Int2, viewPosition : Float2 } -> Svg Msg
@@ -203,16 +261,16 @@ viewDebugTile { position, viewPosition } =
 square : Float -> List (Svg.Attribute msg) -> Svg msg
 square w attrs =
     Svg.rect
-        (Svg.Attributes.width (fromFloat w) :: Svg.Attributes.height (fromFloat w) :: attrs)
+        (S.width (fromFloat w) :: S.height (fromFloat w) :: attrs)
         []
 
 
 segment ( x1, y1 ) ( x2, y2 ) attrs =
     Svg.line
-        (Svg.Attributes.x1 (fromFloat x1)
-            :: Svg.Attributes.x2 (fromFloat x2)
-            :: Svg.Attributes.y1 (fromFloat y1)
-            :: Svg.Attributes.y2 (fromFloat y2)
+        (S.x1 (fromFloat x1)
+            :: S.x2 (fromFloat x2)
+            :: S.y1 (fromFloat y1)
+            :: S.y2 (fromFloat y2)
             :: attrs
         )
         []
@@ -223,23 +281,23 @@ triangle =
 
 
 circle r attrs =
-    Svg.circle (Svg.Attributes.r (fromFloat r) :: attrs) []
+    Svg.circle (S.r (fromFloat r) :: attrs) []
 
 
 ellipse w h attrs =
-    Svg.ellipse (Svg.Attributes.rx (fromFloat w) :: Svg.Attributes.ry (fromFloat h) :: attrs) []
+    Svg.ellipse (S.rx (fromFloat w) :: S.ry (fromFloat h) :: attrs) []
 
 
 fill =
-    Svg.Attributes.fill
+    S.fill
 
 
 outlineColor =
-    Svg.Attributes.stroke
+    S.stroke
 
 
 thickness =
-    fromFloat >> Svg.Attributes.strokeWidth
+    fromFloat >> S.strokeWidth
 
 
 empty =

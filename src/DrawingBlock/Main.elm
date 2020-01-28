@@ -11,6 +11,7 @@ import Number2 as N2 exposing (Float2, Int2)
 import Svg.Attributes as SA
 import Svg.Events as SE
 import Task
+import Time
 
 
 
@@ -19,7 +20,7 @@ import Task
 
 type Mouse
     = Up
-    | Down Float2 Float2
+    | Down Time.Posix Float2 Float2
 
 
 type MouseOverElement
@@ -58,6 +59,7 @@ type Msg
     = NoOp
     | BrowserResized Float2
     | OnMouseDown Float2
+    | OnMouseDownWithNow Float2 Time.Posix
     | OnMouseUp Float2
     | OnMouseMove Float2
     | MouseOverZoom
@@ -74,15 +76,18 @@ update message model =
             ( setBrowserWH wh model, Cmd.none )
 
         OnMouseDown xy ->
-            ( { model | mouse = Down xy xy }, Cmd.none )
+            ( model, Time.now |> Task.perform (OnMouseDownWithNow xy) )
+
+        OnMouseDownWithNow xy now ->
+            ( { model | mouse = Down now xy xy }, Cmd.none )
 
         OnMouseUp _ ->
             ( { model | mouse = Up }, Cmd.none )
 
         OnMouseMove xy ->
             case model.mouse of
-                Down startXY _ ->
-                    ( { model | mouse = Down startXY xy }, Cmd.none )
+                Down t s _ ->
+                    ( { model | mouse = Down t s xy }, Cmd.none )
 
                 Up ->
                     ( model, Cmd.none )
@@ -106,7 +111,7 @@ subscriptions model =
             Up ->
                 BE.onMouseDown (JD.map OnMouseDown IO.pageXYDecoder)
 
-            Down _ _ ->
+            Down _ _ _ ->
                 [ BE.onMouseUp (JD.map OnMouseUp IO.pageXYDecoder)
                 , BE.onMouseMove (JD.map OnMouseMove IO.pageXYDecoder)
                 ]

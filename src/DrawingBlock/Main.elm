@@ -6,9 +6,6 @@ import Browser
 import Html exposing (Html)
 import IO
 import Number2 as N2 exposing (Float2, Int2)
-import String2 as ST
-import Svg as S
-import Svg.Attributes as SA
 import Task
 
 

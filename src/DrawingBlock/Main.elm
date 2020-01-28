@@ -179,13 +179,19 @@ update message model =
             let
                 _ =
                     Debug.log "key" key
-            in
-            case key of
-                "1" ->
-                    ( model, Cmd.none )
 
-                _ ->
-                    ( model, Cmd.none )
+                zoom =
+                    case key of
+                        "1" ->
+                            model.zoom |> mapEach (\s -> clamp 0.8 50 (s + 0.01))
+
+                        "2" ->
+                            model.zoom |> mapEach (\s -> clamp 0.8 50 (s - 0.01))
+
+                        _ ->
+                            model.zoom
+            in
+            ( { model | zoom = zoom }, Cmd.none )
 
 
 eventDecoder =

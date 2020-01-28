@@ -174,6 +174,69 @@ update message ((Model ({ mouse, scene } as env) state) as model) =
             ( model, Cmd.none )
 
 
+updateStateOnEnvMsg : EnvMsg -> State -> State
+updateStateOnEnvMsg envMsg state =
+    case envMsg of
+        BrowserResized wh ->
+            state
+
+        OnMouseDown _ ->
+            { state | mouseDown = Just ( state.zoom, state.mouseOver ) }
+
+        OnMouseUp _ ->
+            { state | mouseDown = Nothing }
+
+        OnMouseMove _ ->
+            state
+
+        OnKeyDown key ->
+            let
+                _ =
+                    Debug.log "key" key
+
+                zoom =
+                    case key of
+                        "1" ->
+                            state.zoom |> mapEach (\s -> clamp 0.05 50 (s + s * 0.1))
+
+                        "2" ->
+                            state.zoom |> mapEach (\s -> clamp 0.05 50 (s - s * 0.1))
+
+                        _ ->
+                            state.zoom
+            in
+            { state | zoom = zoom }
+
+
+updateEnv : EnvMsg -> Env -> Env
+updateEnv message env =
+    case message of
+        BrowserResized wh ->
+            { env | scene = wh }
+
+        OnMouseDown e ->
+            { env | mouse = Down e e }
+
+        OnMouseUp _ ->
+            case env.mouse of
+                Up ->
+                    env
+
+                Down _ _ ->
+                    { env | mouse = Up }
+
+        OnMouseMove current ->
+            case env.mouse of
+                Down start _ ->
+                    { env | mouse = Down start current }
+
+                Up ->
+                    env
+
+        OnKeyDown key ->
+            env
+
+
 eventDecoder =
     JD.map2 Tuple.pair IO.timeStampDecoder IO.pageXYDecoder
 

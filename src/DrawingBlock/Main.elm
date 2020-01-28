@@ -127,10 +127,40 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update message ((Model ({ mouse, scene } as env) state) as model) =
     case message of
         EnvMsg msg ->
-            ( Model (updateEnv msg env) (updateStateOnEnvMsg msg state), Cmd.none )
+            ( onEnvMessage msg env state, Cmd.none )
 
         StateMsg _ ->
             ( model, Cmd.none )
+
+
+onEnvMessage : EnvMsg -> Env -> State -> Model
+onEnvMessage message env state =
+    -- ( Model (updateEnv message env) (updateStateOnEnvMsg message state), Cmd.none )
+    case message of
+        BrowserResized wh ->
+            Model { env | scene = wh } state
+
+        OnMouseDown e ->
+            Model { env | mouse = Down e e } (onMouseDown state)
+
+        OnMouseUp _ ->
+            case env.mouse of
+                Up ->
+                    Model env state
+
+                Down _ _ ->
+                    Model { env | mouse = Up } (onMouseUp state)
+
+        OnMouseMove current ->
+            case env.mouse of
+                Down start _ ->
+                    Model { env | mouse = Down start current } state
+
+                Up ->
+                    Model env state
+
+        OnKeyDown key ->
+            Model env (onKeyDown key state)
 
 
 onMouseDown : State -> State
@@ -161,69 +191,6 @@ onKeyDown key state =
                     state.zoom
     in
     { state | zoom = zoom }
-
-
-updateStateOnEnvMsg : EnvMsg -> State -> State
-updateStateOnEnvMsg envMsg state =
-    case envMsg of
-        BrowserResized wh ->
-            state
-
-        OnMouseDown _ ->
-            { state | mouseDown = Just ( state.zoom, state.mouseOver ) }
-
-        OnMouseUp _ ->
-            { state | mouseDown = Nothing }
-
-        OnMouseMove _ ->
-            state
-
-        OnKeyDown key ->
-            let
-                _ =
-                    Debug.log "key" key
-
-                zoom =
-                    case key of
-                        "1" ->
-                            state.zoom |> mapEach (\s -> clamp 0.05 50 (s + s * 0.1))
-
-                        "2" ->
-                            state.zoom |> mapEach (\s -> clamp 0.05 50 (s - s * 0.1))
-
-                        _ ->
-                            state.zoom
-            in
-            { state | zoom = zoom }
-
-
-updateEnv : EnvMsg -> Env -> Env
-updateEnv message env =
-    case message of
-        BrowserResized wh ->
-            { env | scene = wh }
-
-        OnMouseDown e ->
-            { env | mouse = Down e e }
-
-        OnMouseUp _ ->
-            case env.mouse of
-                Up ->
-                    env
-
-                Down _ _ ->
-                    { env | mouse = Up }
-
-        OnMouseMove current ->
-            case env.mouse of
-                Down start _ ->
-                    { env | mouse = Down start current }
-
-                Up ->
-                    env
-
-        OnKeyDown _ ->
-            env
 
 
 eventDecoder =

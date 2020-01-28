@@ -127,48 +127,7 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update message ((Model ({ mouse, scene } as env) state) as model) =
     case message of
         EnvMsg msg ->
-            case msg of
-                BrowserResized wh ->
-                    ( Model (Env mouse wh) state, Cmd.none )
-
-                OnMouseDown e ->
-                    ( Model (Env (Down e e) scene) { state | mouseDown = Just ( state.zoom, state.mouseOver ) }
-                    , Cmd.none
-                    )
-
-                OnMouseUp _ ->
-                    case mouse of
-                        Up ->
-                            ( model, Cmd.none )
-
-                        Down _ _ ->
-                            ( Model (Env Up scene) state, Cmd.none )
-
-                OnMouseMove current ->
-                    case mouse of
-                        Down start _ ->
-                            ( Model (Env (Down start current) scene) state, Cmd.none )
-
-                        Up ->
-                            ( model, Cmd.none )
-
-                OnKeyDown key ->
-                    let
-                        _ =
-                            Debug.log "key" key
-
-                        zoom =
-                            case key of
-                                "1" ->
-                                    state.zoom |> mapEach (\s -> clamp 0.05 50 (s + s * 0.1))
-
-                                "2" ->
-                                    state.zoom |> mapEach (\s -> clamp 0.05 50 (s - s * 0.1))
-
-                                _ ->
-                                    state.zoom
-                    in
-                    ( Model env { state | zoom = zoom }, Cmd.none )
+            ( Model (updateEnv msg env) (updateStateOnEnvMsg msg state), Cmd.none )
 
         StateMsg _ ->
             ( model, Cmd.none )

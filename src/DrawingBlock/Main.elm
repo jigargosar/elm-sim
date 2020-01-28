@@ -112,14 +112,18 @@ update message model =
                         tooFar =
                             abs dx > 10 || abs dy > 10
 
+                        isDnd =
+                            tooLong || tooFar
+
+                        isClick =
+                            not isDnd
+
                         zoom =
-                            if tooLong || tooFar then
-                                -- handle dnd
-                                model.zoom
+                            if isClick && model.mouseOver == Just ZoomElement then
+                                N2.scale 1.1 model.zoom
 
                             else
-                                -- handle click
-                                N2.scale 1.1 model.zoom
+                                model.zoom
                     in
                     ( { model | mouse = Up, zoom = zoom }, Cmd.none )
 

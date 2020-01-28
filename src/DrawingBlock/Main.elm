@@ -71,7 +71,7 @@ subscriptions _ =
 view : Model -> Html Msg
 view model =
     IO.canvas model.browserWH
-        [ [ IO.text "HW" []
+        [ [ IO.text ("Zoom = " ++ Debug.toString model.zoom) []
           ]
             |> IO.group
                 [ IO.transform [ IO.scale2 model.zoom ]

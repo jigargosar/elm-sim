@@ -192,7 +192,7 @@ updateEnv message env =
                 Up ->
                     env
 
-        OnKeyDown key ->
+        OnKeyDown _ ->
             env
 
 

@@ -133,6 +133,36 @@ update message ((Model ({ mouse, scene } as env) state) as model) =
             ( model, Cmd.none )
 
 
+onMouseDown : State -> State
+onMouseDown state =
+    { state | mouseDown = Just ( state.zoom, state.mouseOver ) }
+
+
+onMouseUp : State -> State
+onMouseUp state =
+    { state | mouseDown = Nothing }
+
+
+onKeyDown : String -> State -> State
+onKeyDown key state =
+    let
+        _ =
+            Debug.log "key" key
+
+        zoom =
+            case key of
+                "1" ->
+                    state.zoom |> mapEach (\s -> clamp 0.05 50 (s + s * 0.1))
+
+                "2" ->
+                    state.zoom |> mapEach (\s -> clamp 0.05 50 (s - s * 0.1))
+
+                _ ->
+                    state.zoom
+    in
+    { state | zoom = zoom }
+
+
 updateStateOnEnvMsg : EnvMsg -> State -> State
 updateStateOnEnvMsg envMsg state =
     case envMsg of

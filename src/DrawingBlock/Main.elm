@@ -38,8 +38,8 @@ type Element
     = ZoomElement
 
 
-type Env
-    = Env Mouse Float2
+type alias Env =
+    { mouse : Mouse, scene : Float2 }
 
 
 type Model
@@ -116,7 +116,7 @@ eventDiff ( st, sxy ) ( t, xy ) =
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
-update message ((Model ((Env mouse browserWH) as env) state) as model) =
+update message ((Model ({ mouse, scene } as env) state) as model) =
     case message of
         NoOp ->
             ( model, Cmd.none )
@@ -125,7 +125,7 @@ update message ((Model ((Env mouse browserWH) as env) state) as model) =
             ( Model (Env mouse wh) state, Cmd.none )
 
         OnMouseDown e ->
-            ( Model (Env (Down e e) browserWH) { state | mouseDown = Just ( state.zoom, state.mouseOver ) }
+            ( Model (Env (Down e e) scene) { state | mouseDown = Just ( state.zoom, state.mouseOver ) }
             , Cmd.none
             )
 
@@ -135,12 +135,12 @@ update message ((Model ((Env mouse browserWH) as env) state) as model) =
                     ( model, Cmd.none )
 
                 Down _ _ ->
-                    ( Model (Env Up browserWH) state, Cmd.none )
+                    ( Model (Env Up scene) state, Cmd.none )
 
         OnMouseMove current ->
             case mouse of
                 Down start _ ->
-                    ( Model (Env (Down start current) browserWH) state, Cmd.none )
+                    ( Model (Env (Down start current) scene) state, Cmd.none )
 
                 Up ->
                     ( model, Cmd.none )
@@ -179,10 +179,10 @@ keyDecoder =
 
 
 subscriptions : Model -> Sub Msg
-subscriptions (Model (Env mouse _) _) =
+subscriptions (Model env _) =
     Sub.batch
         [ IO.onBrowserWH BrowserResized
-        , case mouse of
+        , case env.mouse of
             Up ->
                 BE.onMouseDown (JD.map OnMouseDown eventDecoder)
 
@@ -201,8 +201,8 @@ subscriptions (Model (Env mouse _) _) =
 
 
 view : Model -> Html Msg
-view (Model (Env _ browserWH) state) =
-    canvas browserWH
+view (Model env state) =
+    canvas env.scene
         state.zoom
         [ let
             isMouseOverZoom =

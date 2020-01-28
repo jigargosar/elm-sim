@@ -1,8 +1,9 @@
-module IO exposing (canvas, getBrowserWH, group, onBrowserWH, scale2, text, transform)
+module IO exposing (canvas, getBrowserWH, group, onBrowserWH, pageXYDecoder, scale2, text, transform)
 
 import Browser.Dom as BD
 import Browser.Events as BE
 import Html as H
+import Json.Decode as JD
 import Number2 as NT exposing (Float2)
 import PointFree exposing (mapEach)
 import String exposing (fromFloat)
@@ -77,3 +78,10 @@ textAttributes list =
     SA.textAnchor "middle"
         :: SA.dominantBaseline "central"
         :: list
+
+
+pageXYDecoder : JD.Decoder ( Float, Float )
+pageXYDecoder =
+    JD.map2 Tuple.pair
+        (JD.field "pageX" JD.float)
+        (JD.field "pageY" JD.float)

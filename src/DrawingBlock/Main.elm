@@ -3,9 +3,13 @@ module DrawingBlock.Main exposing (main)
 -- Browser.Element Scaffold
 
 import Browser
+import Browser.Events as BE
 import Html exposing (Html)
 import IO
+import Json.Decode as JD
 import Number2 as N2 exposing (Float2, Int2)
+import Svg.Attributes as SA
+import Svg.Events as SE
 import Task
 
 
@@ -13,8 +17,17 @@ import Task
 -- Model
 
 
+type Mouse
+    = Up
+    | Down Float2 Float2
+
+
+type MouseOverElement
+    = ZoomElement
+
+
 type alias Model =
-    { browserWH : Float2, zoom : Float2 }
+    { browserWH : Float2, zoom : Float2, mouse : Mouse, mouseOver : Maybe MouseOverElement }
 
 
 setBrowserWH wh m =
@@ -29,6 +42,8 @@ init : Flags -> ( Model, Cmd Msg )
 init _ =
     ( { browserWH = ( 600, 600 )
       , zoom = ( 1, 1 ) |> N2.scale 2.5
+      , mouse = Up
+      , mouseOver = Nothing
       }
     , IO.getBrowserWH |> Task.perform BrowserResized
       --, Cmd.none
@@ -42,6 +57,10 @@ init _ =
 type Msg
     = NoOp
     | BrowserResized Float2
+    | OnMouseDown Float2
+    | OnMouseUp Float2
+    | OnMouseMove Float2
+    | ZoomMouseOver
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -53,11 +72,37 @@ update message model =
         BrowserResized wh ->
             ( setBrowserWH wh model, Cmd.none )
 
+        OnMouseDown xy ->
+            ( { model | mouse = Down xy xy }, Cmd.none )
+
+        OnMouseUp _ ->
+            ( { model | mouse = Up }, Cmd.none )
+
+        OnMouseMove xy ->
+            case model.mouse of
+                Down startXY _ ->
+                    ( { model | mouse = Down startXY xy }, Cmd.none )
+
+                Up ->
+                    ( model, Cmd.none )
+
+        ZoomMouseOver ->
+            ( { model | mouseOver = Just ZoomElement }, Cmd.none )
+
 
 subscriptions : Model -> Sub Msg
-subscriptions _ =
+subscriptions model =
     Sub.batch
         [ IO.onBrowserWH BrowserResized
+        , case model.mouse of
+            Up ->
+                BE.onMouseDown (JD.map OnMouseDown IO.pageXYDecoder)
+
+            Down _ _ ->
+                [ BE.onMouseUp (JD.map OnMouseUp IO.pageXYDecoder)
+                , BE.onMouseMove (JD.map OnMouseMove IO.pageXYDecoder)
+                ]
+                    |> Sub.batch
         ]
 
 
@@ -68,7 +113,10 @@ subscriptions _ =
 view : Model -> Html Msg
 view model =
     IO.canvas model.browserWH
-        [ [ IO.text ("Zoom = " ++ Debug.toString model.zoom) []
+        [ [ IO.text ("Zoom = " ++ Debug.toString model.zoom)
+                [ SA.id "zoom-element"
+                , SE.onMouseOver ZoomMouseOver
+                ]
           ]
             |> IO.group
                 [ IO.transform [ IO.scale2 model.zoom ]

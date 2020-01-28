@@ -17,7 +17,7 @@ type alias Model =
     { browserWH : Float2 }
 
 
-setBrowserWH wh m =
+cacheBrowserWH wh m =
     { m | browserWH = wh }
 
 
@@ -48,7 +48,7 @@ update message model =
             ( model, Cmd.none )
 
         BrowserResized wh ->
-            ( setBrowserWH wh model, Cmd.none )
+            ( cacheBrowserWH wh model, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg

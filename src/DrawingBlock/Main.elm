@@ -10,6 +10,7 @@ import IO
 import Json.Decode as JD
 import Number2 as N2 exposing (Float2, Int2)
 import PointFree exposing (mapEach)
+import Svg as S
 import Svg.Attributes as SA
 import Svg.Events as SE
 import Task
@@ -164,23 +165,30 @@ subscriptions model =
 view : Model -> Html Msg
 view model =
     IO.canvas model.browserWH
-        [ [ IO.text ("Zoom = " ++ Debug.toString model.zoom)
-                [ SA.id "zoom-element"
-                , SE.onMouseOver MouseOverZoom
-                , SE.onMouseOut MouseOutZoom
-                , SA.fill
-                    (if model.mouseOver == Just ZoomElement then
-                        "green"
-
-                     else
-                        ""
-                    )
-                ]
+        [ [ viewZoomText (model.mouseOver == Just ZoomElement) model.zoom
           ]
             |> IO.group
                 [ IO.transform [ IO.scale2 model.zoom ]
                 ]
         ]
+
+
+viewZoomText isMouseOver zoom =
+    [ IO.tspan "Zoom = " []
+    , IO.tspan (Debug.toString zoom)
+        [ SA.id "zoom-element"
+        , SE.onMouseOver MouseOverZoom
+        , SE.onMouseOut MouseOutZoom
+        , SA.fill
+            (if isMouseOver then
+                "green"
+
+             else
+                ""
+            )
+        ]
+    ]
+        |> IO.textGroup []
 
 
 empty : Html msg

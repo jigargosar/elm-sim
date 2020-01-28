@@ -78,10 +78,10 @@ scale2 sxy =
 view : Model -> Html Msg
 view model =
     IO.canvas model.browserWH
-        [ S.g
-            [ scale2 model.zoom |> SA.transform
-            ]
-            [ S.text_ [] [ S.text "HW" ] ]
+        [ [ S.text_ [] [ S.text "HW" ] ]
+            |> S.g
+                [ scale2 model.zoom |> SA.transform
+                ]
         ]
 
 

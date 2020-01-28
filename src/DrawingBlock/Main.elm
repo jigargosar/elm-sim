@@ -43,7 +43,7 @@ type alias Model =
     , zoom : Float2
     , mouse : Mouse
     , mouseOver : Maybe Element
-    , lastMouseDownOn : Maybe Element
+    , stateOnLastMouseDown : Maybe ( Float2, Maybe Element )
     }
 
 
@@ -61,7 +61,7 @@ init _ =
       , zoom = ( 1, 1 ) |> N2.scale 2.5
       , mouse = Up
       , mouseOver = Nothing
-      , lastMouseDownOn = Nothing
+      , stateOnLastMouseDown = Nothing
       }
     , IO.getBrowserWH |> Task.perform BrowserResized
       --, Cmd.none
@@ -123,7 +123,7 @@ update message model =
             ( setBrowserWH wh model, Cmd.none )
 
         OnMouseDown e ->
-            ( { model | mouse = Down e e, lastMouseDownOn = model.mouseOver }, Cmd.none )
+            ( { model | mouse = Down e e, stateOnLastMouseDown = Just ( model.zoom, model.mouseOver ) }, Cmd.none )
 
         OnMouseUp current ->
             case model.mouse of

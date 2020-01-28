@@ -164,13 +164,14 @@ subscriptions model =
 
 view : Model -> Html Msg
 view model =
-    IO.canvas model.browserWH
-        [ [ viewZoomText (model.mouseOver == Just ZoomElement) model.zoom
-          ]
-            |> IO.group
-                [ IO.transform [ IO.scale2 model.zoom ]
-                ]
+    canvas model
+        [ viewZoomText (model.mouseOver == Just ZoomElement) model.zoom
         ]
+
+
+canvas model children =
+    IO.canvas model.browserWH
+        [ IO.group [ IO.transform [ IO.scale2 model.zoom ] ] children ]
 
 
 viewZoomText isMouseOver zoom =

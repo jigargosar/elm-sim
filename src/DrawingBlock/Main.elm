@@ -60,7 +60,8 @@ type Msg
     | OnMouseDown Float2
     | OnMouseUp Float2
     | OnMouseMove Float2
-    | ZoomMouseOver
+    | MouseOverZoom
+    | MouseOutZoom
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -86,8 +87,15 @@ update message model =
                 Up ->
                     ( model, Cmd.none )
 
-        ZoomMouseOver ->
+        MouseOverZoom ->
             ( { model | mouseOver = Just ZoomElement }, Cmd.none )
+
+        MouseOutZoom ->
+            if model.mouseOver == Just ZoomElement then
+                ( { model | mouseOver = Nothing }, Cmd.none )
+
+            else
+                ( model, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg
@@ -115,7 +123,7 @@ view model =
     IO.canvas model.browserWH
         [ [ IO.text ("Zoom = " ++ Debug.toString model.zoom)
                 [ SA.id "zoom-element"
-                , SE.onMouseOver ZoomMouseOver
+                , SE.onMouseOver MouseOverZoom
                 ]
           ]
             |> IO.group

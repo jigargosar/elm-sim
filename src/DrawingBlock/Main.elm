@@ -6,6 +6,7 @@ import Browser
 import Browser.Dom as BD
 import Browser.Events as BE
 import Html exposing (Html)
+import IO
 import Number2 as NT exposing (Float2, Int2)
 import Task
 
@@ -29,7 +30,7 @@ type alias Flags =
 init : Flags -> ( Model, Cmd Msg )
 init _ =
     ( { browserWH = ( 600, 600 ) }
-    , BD.getViewport |> Task.map (.scene >> whFromRecord) |> Task.perform BrowserResized
+    , IO.getBrowserWH |> Task.perform BrowserResized
     )
 
 
@@ -60,7 +61,7 @@ update message model =
 subscriptions : Model -> Sub Msg
 subscriptions _ =
     Sub.batch
-        [ BE.onResize (\w h -> BrowserResized (NT.toFloat ( w, h )))
+        [ IO.onBrowserWH BrowserResized
         ]
 
 

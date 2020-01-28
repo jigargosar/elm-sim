@@ -71,14 +71,10 @@ subscriptions _ =
 view : Model -> Html Msg
 view model =
     IO.canvas model.browserWH
-        [ [ S.text_
-                [ SA.textAnchor "middle"
-                , SA.dominantBaseline "central"
-                ]
-                [ S.text "HW" ]
+        [ [ IO.text "HW" []
           ]
-            |> S.g
-                [ IO.scale2 model.zoom |> SA.transform
+            |> IO.group
+                [ IO.transform [ IO.scale2 model.zoom ]
                 ]
         ]
 

@@ -1,4 +1,4 @@
-module IO exposing (canvas, getBrowserWH, onBrowserWH, scale2)
+module IO exposing (canvas, getBrowserWH, group, onBrowserWH, scale2, text, transform)
 
 import Browser.Dom as BD
 import Browser.Events as BE
@@ -61,6 +61,16 @@ scale2 sxy =
 text : String -> List (S.Attribute msg) -> S.Svg msg
 text words attributes =
     S.text_ (textAttributes attributes) [ S.text words ]
+
+
+group : List (S.Attribute msg) -> List (S.Svg msg) -> S.Svg msg
+group =
+    S.g
+
+
+transform : List String -> S.Attribute msg
+transform =
+    String.join " " >> SA.transform
 
 
 textAttributes list =

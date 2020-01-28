@@ -82,7 +82,8 @@ type Msg
 
 
 type alias EventDiff =
-    { dxy : Float2
+    { dx : Float
+    , dy : Float
     , isDragging : Bool
     }
 
@@ -108,7 +109,7 @@ eventDiff ( st, sxy ) ( t, xy ) =
         isDragging =
             tooLong || tooFar
     in
-    EventDiff ( dx, dy ) isDragging
+    EventDiff dx dy isDragging
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -123,34 +124,15 @@ update message model =
         OnMouseDown e ->
             ( { model | mouse = Down e e }, Cmd.none )
 
-        OnMouseUp ( t, xy ) ->
+        OnMouseUp current ->
             case model.mouse of
                 Up ->
                     ( model, Cmd.none )
 
-                Down ( st, sxy ) _ ->
+                Down start _ ->
                     let
-                        elapsed =
-                            ( t, st ) |> uncurry (-)
-
-                        tooLong =
-                            abs elapsed > (3 * 1000)
-
-                        dx =
-                            ( xy, sxy ) |> mapEach Tuple.first |> uncurry (-)
-
-                        dy =
-                            ( xy, sxy ) |> mapEach Tuple.second |> uncurry (-)
-
-                        tooFar =
-                            abs dx > 10 || abs dy > 10
-
-                        isDnd =
-                            tooLong || tooFar
-
-                        isClick =
-                            not isDnd
-                                |> Debug.log "isClick"
+                        { dx, dy, isDragging } =
+                            eventDiff start current
 
                         zoom =
                             --if isDnd && sElement == Just ZoomElement then

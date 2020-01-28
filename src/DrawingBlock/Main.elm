@@ -120,8 +120,9 @@ update message model =
                             not isDnd
 
                         zoom =
-                            if isClick && model.mouseOver == Just ZoomElement then
-                                N2.scale 1.1 model.zoom
+                            if isDnd && model.mouseOver == Just ZoomElement then
+                                -- N2.scale 1.1 model.zoom
+                                model.zoom |> mapEach (\s -> s + (dy / 10))
 
                             else
                                 model.zoom

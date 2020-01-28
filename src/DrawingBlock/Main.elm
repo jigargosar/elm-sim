@@ -24,7 +24,7 @@ import Time
 
 type Mouse
     = Up
-    | Down ( Maybe MouseOverElement, Time.Posix, Float2 ) Float2
+    | Down ( Time.Posix, Float2 ) Float2
 
 
 type MouseOverElement
@@ -88,7 +88,7 @@ update message model =
             ( model, Time.now |> Task.perform (OnMouseDownWithNow xy) )
 
         OnMouseDownWithNow xy now ->
-            ( { model | mouse = Down ( model.mouseOver, now, xy ) xy }, Cmd.none )
+            ( { model | mouse = Down ( now, xy ) xy }, Cmd.none )
 
         OnMouseUp xy ->
             ( model, Time.now |> Task.perform (OnMouseUpWithNow xy) )
@@ -98,7 +98,7 @@ update message model =
                 Up ->
                     ( model, Cmd.none )
 
-                Down ( sElement, st, sxy ) _ ->
+                Down ( st, sxy ) _ ->
                     let
                         elapsed =
                             ( t, st )
@@ -124,12 +124,12 @@ update message model =
                             not isDnd
 
                         zoom =
-                            if isDnd && sElement == Just ZoomElement then
-                                -- N2.scale 1.1 model.zoom
-                                model.zoom |> mapEach (\s -> clamp 0.5 3 (s + (dy / 10)))
-
-                            else
-                                model.zoom
+                            --if isDnd && sElement == Just ZoomElement then
+                            -- N2.scale 1.1 model.zoom
+                            --model.zoom |> mapEach (\s -> clamp 0.5 3 (s + (dy / 10)))
+                            --
+                            --else
+                            model.zoom
                     in
                     ( { model | mouse = Up, zoom = zoom }, Cmd.none )
 

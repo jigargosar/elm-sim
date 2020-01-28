@@ -1,4 +1,4 @@
-module IO exposing (canvas, getBrowserWH, group, onBrowserWH, pageXYDecoder, scale2, text, textGroup, timestampDecoder, transform, tspan)
+module IO exposing (canvas, getBrowserWH, group, onBrowserWH, pageXYDecoder, scale2, text, textGroup, timeStampDecoder, transform, tspan)
 
 import Browser.Dom as BD
 import Browser.Events as BE
@@ -97,6 +97,6 @@ pageXYDecoder =
         (JD.field "pageY" JD.float)
 
 
-timestampDecoder : JD.Decoder Float
-timestampDecoder =
-    JD.field "timestamp" JD.float
+timeStampDecoder : JD.Decoder Float
+timeStampDecoder =
+    JD.field "timeStamp" JD.float

@@ -121,6 +121,7 @@ update message model =
 
                         isClick =
                             not isDnd
+                                |> Debug.log "isClick"
 
                         zoom =
                             --if isDnd && sElement == Just ZoomElement then
@@ -152,7 +153,7 @@ update message model =
 
 
 eventDecoder =
-    JD.map2 Tuple.pair IO.timestampDecoder IO.pageXYDecoder
+    JD.map2 Tuple.pair IO.timeStampDecoder IO.pageXYDecoder
 
 
 subscriptions : Model -> Sub Msg

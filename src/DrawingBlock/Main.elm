@@ -145,10 +145,21 @@ update message model =
                     in
                     ( { model | mouse = Up, zoom = zoom }, Cmd.none )
 
-        OnMouseMove e ->
+        OnMouseMove current ->
             case model.mouse of
-                Down se _ ->
-                    ( { model | mouse = Down se e }, Cmd.none )
+                Down start _ ->
+                    let
+                        { dx, dy, isDragging } =
+                            eventDiff start current
+
+                        zoom =
+                            if isDragging then
+                                model.zoom |> mapEach (\s -> clamp 0.8 50 (s + dy / 1000))
+
+                            else
+                                model.zoom
+                    in
+                    ( { model | mouse = Down start current, zoom = zoom }, Cmd.none )
 
                 Up ->
                     ( model, Cmd.none )

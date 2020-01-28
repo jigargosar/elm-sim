@@ -80,6 +80,7 @@ type Msg
     | OnMouseMove EventData
     | MouseOverZoom
     | MouseOutZoom
+    | OnKeyDown String
 
 
 type alias EventDiff =
@@ -174,9 +175,25 @@ update message model =
             else
                 ( model, Cmd.none )
 
+        OnKeyDown key ->
+            let
+                _ =
+                    Debug.log "key" key
+            in
+            case key of
+                "1" ->
+                    ( model, Cmd.none )
+
+                _ ->
+                    ( model, Cmd.none )
+
 
 eventDecoder =
     JD.map2 Tuple.pair IO.timeStampDecoder IO.pageXYDecoder
+
+
+keyDecoder =
+    JD.field "key" JD.string
 
 
 subscriptions : Model -> Sub Msg
@@ -192,6 +209,8 @@ subscriptions model =
                 , BE.onMouseMove (JD.map OnMouseMove eventDecoder)
                 ]
                     |> Sub.batch
+        , JD.map OnKeyDown keyDecoder
+            |> BE.onKeyDown
         ]
 
 

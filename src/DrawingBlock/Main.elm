@@ -3,7 +3,11 @@ module DrawingBlock.Main exposing (main)
 -- Browser.Element Scaffold
 
 import Browser
+import Browser.Dom as BD
+import Browser.Events as BE
 import Html exposing (Html)
+import Number2 as NT exposing (Int2)
+import Task
 
 
 
@@ -11,7 +15,11 @@ import Html exposing (Html)
 
 
 type alias Model =
-    {}
+    { browserWH : Int2 }
+
+
+setBrowserWH wh m =
+    { m | browserWH = wh }
 
 
 type alias Flags =
@@ -20,9 +28,14 @@ type alias Flags =
 
 init : Flags -> ( Model, Cmd Msg )
 init _ =
-    ( {}
-    , Cmd.none
+    ( { browserWH = ( 600, 600 ) }
+    , BD.getViewport |> Task.map (.scene >> whFromRecord >> NT.round) |> Task.perform BrowserResized
     )
+
+
+whFromRecord : { a | width : b, height : c } -> ( b, c )
+whFromRecord r =
+    ( r.width, r.height )
 
 
 
@@ -31,6 +44,7 @@ init _ =
 
 type Msg
     = NoOp
+    | BrowserResized Int2
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -39,10 +53,15 @@ update message model =
         NoOp ->
             ( model, Cmd.none )
 
+        BrowserResized wh ->
+            ( setBrowserWH wh model, Cmd.none )
+
 
 subscriptions : Model -> Sub Msg
 subscriptions _ =
-    Sub.batch []
+    Sub.batch
+        [ BE.onResize (\w h -> BrowserResized ( w, h ))
+        ]
 
 
 

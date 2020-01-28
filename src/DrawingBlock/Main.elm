@@ -5,7 +5,7 @@ module DrawingBlock.Main exposing (main)
 import Basics.Extra exposing (uncurry)
 import Browser
 import Browser.Events as BE
-import Html exposing (Html)
+import Html as H exposing (Html)
 import IO
 import Json.Decode as JD
 import Number2 as N2 exposing (Float2, Int2)
@@ -64,8 +64,9 @@ init _ =
         , mouseOver = Nothing
         , mouseDown = Nothing
         }
-    , IO.getBrowserWH |> Task.perform BrowserResized
-      --, Cmd.none
+    , IO.getBrowserWH
+        |> Task.perform BrowserResized
+        |> Cmd.map EnvMsg
     )
 
 
@@ -73,15 +74,22 @@ init _ =
 -- Update
 
 
-type Msg
-    = NoOp
-    | BrowserResized Float2
+type StateMsg
+    = MouseOverZoom
+    | MouseOutZoom
+
+
+type EnvMsg
+    = BrowserResized Float2
     | OnMouseDown EventData
     | OnMouseUp EventData
     | OnMouseMove EventData
-    | MouseOverZoom
-    | MouseOutZoom
     | OnKeyDown String
+
+
+type Msg
+    = EnvMsg EnvMsg
+    | StateMsg StateMsg
 
 
 type alias EventDiff =
@@ -118,56 +126,52 @@ eventDiff ( st, sxy ) ( t, xy ) =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update message ((Model ({ mouse, scene } as env) state) as model) =
     case message of
-        NoOp ->
+        EnvMsg msg ->
+            case msg of
+                BrowserResized wh ->
+                    ( Model (Env mouse wh) state, Cmd.none )
+
+                OnMouseDown e ->
+                    ( Model (Env (Down e e) scene) { state | mouseDown = Just ( state.zoom, state.mouseOver ) }
+                    , Cmd.none
+                    )
+
+                OnMouseUp _ ->
+                    case mouse of
+                        Up ->
+                            ( model, Cmd.none )
+
+                        Down _ _ ->
+                            ( Model (Env Up scene) state, Cmd.none )
+
+                OnMouseMove current ->
+                    case mouse of
+                        Down start _ ->
+                            ( Model (Env (Down start current) scene) state, Cmd.none )
+
+                        Up ->
+                            ( model, Cmd.none )
+
+                OnKeyDown key ->
+                    let
+                        _ =
+                            Debug.log "key" key
+
+                        zoom =
+                            case key of
+                                "1" ->
+                                    state.zoom |> mapEach (\s -> clamp 0.05 50 (s + s * 0.1))
+
+                                "2" ->
+                                    state.zoom |> mapEach (\s -> clamp 0.05 50 (s - s * 0.1))
+
+                                _ ->
+                                    state.zoom
+                    in
+                    ( Model env { state | zoom = zoom }, Cmd.none )
+
+        StateMsg _ ->
             ( model, Cmd.none )
-
-        BrowserResized wh ->
-            ( Model (Env mouse wh) state, Cmd.none )
-
-        OnMouseDown e ->
-            ( Model (Env (Down e e) scene) { state | mouseDown = Just ( state.zoom, state.mouseOver ) }
-            , Cmd.none
-            )
-
-        OnMouseUp _ ->
-            case mouse of
-                Up ->
-                    ( model, Cmd.none )
-
-                Down _ _ ->
-                    ( Model (Env Up scene) state, Cmd.none )
-
-        OnMouseMove current ->
-            case mouse of
-                Down start _ ->
-                    ( Model (Env (Down start current) scene) state, Cmd.none )
-
-                Up ->
-                    ( model, Cmd.none )
-
-        MouseOverZoom ->
-            ( model, Cmd.none )
-
-        MouseOutZoom ->
-            ( model, Cmd.none )
-
-        OnKeyDown key ->
-            let
-                _ =
-                    Debug.log "key" key
-
-                zoom =
-                    case key of
-                        "1" ->
-                            state.zoom |> mapEach (\s -> clamp 0.05 50 (s + s * 0.1))
-
-                        "2" ->
-                            state.zoom |> mapEach (\s -> clamp 0.05 50 (s - s * 0.1))
-
-                        _ ->
-                            state.zoom
-            in
-            ( Model env { state | zoom = zoom }, Cmd.none )
 
 
 eventDecoder =
@@ -194,6 +198,7 @@ subscriptions (Model env _) =
         , JD.map OnKeyDown keyDecoder
             |> BE.onKeyDown
         ]
+        |> Sub.map EnvMsg
 
 
 
@@ -202,17 +207,20 @@ subscriptions (Model env _) =
 
 view : Model -> Html Msg
 view (Model env state) =
-    canvas env.scene
-        state.zoom
-        [ let
-            isMouseOverZoom =
-                state.mouseOver == Just ZoomElement
-          in
-          viewZoomData isMouseOverZoom state.zoom
-        ]
+    canvas env.scene state.zoom (viewState state)
+        |> H.map StateMsg
 
 
-viewZoomData : Bool -> Float2 -> S.Svg Msg
+viewState state =
+    [ let
+        isMouseOverZoom =
+            state.mouseOver == Just ZoomElement
+      in
+      viewZoomData isMouseOverZoom state.zoom
+    ]
+
+
+viewZoomData : Bool -> Float2 -> S.Svg StateMsg
 viewZoomData isMouseOver zoom =
     let
         twoDecimalZoom =
@@ -235,6 +243,7 @@ viewZoomData isMouseOver zoom =
         |> IO.textGroup []
 
 
+canvas : Float2 -> ( Float, Float ) -> List (S.Svg msg) -> Html msg
 canvas browserWH zoom children =
     IO.canvas browserWH
         [ IO.group [ IO.transform [ IO.scale2 zoom ] ] children ]
@@ -242,7 +251,7 @@ canvas browserWH zoom children =
 
 empty : Html msg
 empty =
-    Html.text ""
+    H.text ""
 
 
 

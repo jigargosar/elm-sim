@@ -1,6 +1,6 @@
 module Main exposing (main)
 
-import MirrorPuzzle as Main
+import DrawingBlock.Main as Main
 
 
 main =

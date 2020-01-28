@@ -3,7 +3,6 @@ module IO exposing (canvas, getBrowserWH, onBrowserWH)
 import Browser.Dom as BD
 import Browser.Events as BE
 import Html as H
-import Html.Attributes as HA
 import Number2 as NT exposing (Float2)
 import PointFree exposing (mapEach)
 import String exposing (fromFloat)

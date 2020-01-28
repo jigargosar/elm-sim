@@ -6,7 +6,11 @@ import Browser
 import Html exposing (Html)
 import IO
 import Number2 exposing (Float2, Int2)
+import PointFree exposing (mapEach)
+import String exposing (fromFloat)
+import String2 as ST
 import Svg as S
+import Svg.Attributes as SA
 import Task
 
 
@@ -66,9 +70,22 @@ subscriptions _ =
 -- View
 
 
+scale2 sxy =
+    let
+        ( x, y ) =
+            ST.fromFloat sxy
+    in
+    "scale(" ++ x ++ "," ++ y ++ ")"
+
+
 view : Model -> Html Msg
 view model =
-    IO.canvas model.browserWH [ S.text_ [] [ S.text "HW" ] ]
+    IO.canvas model.browserWH
+        [ S.g
+            [ scale2 model.scaleXY |> SA.transform
+            ]
+            [ S.text_ [] [ S.text "HW" ] ]
+        ]
 
 
 empty : Html msg

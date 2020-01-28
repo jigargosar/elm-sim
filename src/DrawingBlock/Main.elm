@@ -87,6 +87,7 @@ type alias EventDiff =
     }
 
 
+eventDiff : EventData -> EventData -> EventDiff
 eventDiff ( st, sxy ) ( t, xy ) =
     let
         elapsed =

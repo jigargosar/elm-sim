@@ -3,11 +3,9 @@ module DrawingBlock.Main exposing (main)
 -- Browser.Element Scaffold
 
 import Browser
-import Browser.Dom as BD
-import Browser.Events as BE
 import Html exposing (Html)
 import IO
-import Number2 as NT exposing (Float2, Int2)
+import Number2 exposing (Float2, Int2)
 import Task
 
 
@@ -32,11 +30,6 @@ init _ =
     ( { browserWH = ( 600, 600 ) }
     , IO.getBrowserWH |> Task.perform BrowserResized
     )
-
-
-whFromRecord : { a | width : b, height : c } -> ( b, c )
-whFromRecord r =
-    ( r.width, r.height )
 
 
 

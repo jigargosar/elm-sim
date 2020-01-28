@@ -101,8 +101,7 @@ update message model =
                 Down ( st, sxy ) _ ->
                     let
                         elapsed =
-                            ( t, st )
-                                |> uncurry (-)
+                            ( t, st ) |> uncurry (-)
 
                         tooLong =
                             abs elapsed > (3 * 1000)

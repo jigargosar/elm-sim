@@ -38,17 +38,19 @@ type Element
     = ZoomElement
 
 
-type alias Model =
-    { browserWH : Float2
-    , zoom : Float2
-    , mouse : Mouse
+type Env
+    = Env Mouse Float2
+
+
+type Model
+    = Model Env State
+
+
+type alias State =
+    { zoom : Float2
     , mouseOver : Maybe Element
     , mouseDown : Maybe ( Float2, Maybe Element )
     }
-
-
-setBrowserWH wh m =
-    { m | browserWH = wh }
 
 
 type alias Flags =
@@ -57,12 +59,11 @@ type alias Flags =
 
 init : Flags -> ( Model, Cmd Msg )
 init _ =
-    ( { browserWH = ( 600, 600 )
-      , zoom = ( 1, 1 ) |> N2.scale 2.5
-      , mouse = Up
-      , mouseOver = Nothing
-      , mouseDown = Nothing
-      }
+    ( Model (Env Up ( 600, 600 ))
+        { zoom = ( 1, 1 ) |> N2.scale 2.5
+        , mouseOver = Nothing
+        , mouseDown = Nothing
+        }
     , IO.getBrowserWH |> Task.perform BrowserResized
       --, Cmd.none
     )
@@ -115,65 +116,40 @@ eventDiff ( st, sxy ) ( t, xy ) =
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
-update message model =
+update message ((Model ((Env mouse browserWH) as env) state) as model) =
     case message of
         NoOp ->
             ( model, Cmd.none )
 
         BrowserResized wh ->
-            ( setBrowserWH wh model, Cmd.none )
+            ( Model (Env mouse wh) state, Cmd.none )
 
         OnMouseDown e ->
-            ( { model | mouse = Down e e, mouseDown = Just ( model.zoom, model.mouseOver ) }, Cmd.none )
+            ( Model (Env (Down e e) browserWH) { state | mouseDown = Just ( state.zoom, state.mouseOver ) }
+            , Cmd.none
+            )
 
-        OnMouseUp current ->
-            case model.mouse of
+        OnMouseUp _ ->
+            case mouse of
                 Up ->
                     ( model, Cmd.none )
 
-                Down start _ ->
-                    let
-                        { dx, dy, isDragging } =
-                            eventDiff start current
-
-                        zoom =
-                            --if isDnd && sElement == Just ZoomElement then
-                            -- N2.scale 1.1 model.zoom
-                            --model.zoom |> mapEach (\s -> clamp 0.5 3 (s + (dy / 10)))
-                            --
-                            --else
-                            model.zoom
-                    in
-                    ( { model | mouse = Up, zoom = zoom }, Cmd.none )
+                Down _ _ ->
+                    ( Model (Env Up browserWH) state, Cmd.none )
 
         OnMouseMove current ->
-            case model.mouse of
+            case mouse of
                 Down start _ ->
-                    let
-                        { dx, dy, isDragging } =
-                            eventDiff start current
-
-                        zoom =
-                            if isDragging then
-                                model.zoom |> mapEach (\s -> clamp 0.8 50 (s + dy / 1000))
-
-                            else
-                                model.zoom
-                    in
-                    ( { model | mouse = Down start current, zoom = zoom }, Cmd.none )
+                    ( Model (Env (Down start current) browserWH) state, Cmd.none )
 
                 Up ->
                     ( model, Cmd.none )
 
         MouseOverZoom ->
-            ( { model | mouseOver = Just ZoomElement }, Cmd.none )
+            ( model, Cmd.none )
 
         MouseOutZoom ->
-            if model.mouseOver == Just ZoomElement then
-                ( { model | mouseOver = Nothing }, Cmd.none )
-
-            else
-                ( model, Cmd.none )
+            ( model, Cmd.none )
 
         OnKeyDown key ->
             let
@@ -183,15 +159,15 @@ update message model =
                 zoom =
                     case key of
                         "1" ->
-                            model.zoom |> mapEach (\s -> clamp 0.05 50 (s + s * 0.1))
+                            state.zoom |> mapEach (\s -> clamp 0.05 50 (s + s * 0.1))
 
                         "2" ->
-                            model.zoom |> mapEach (\s -> clamp 0.05 50 (s - s * 0.1))
+                            state.zoom |> mapEach (\s -> clamp 0.05 50 (s - s * 0.1))
 
                         _ ->
-                            model.zoom
+                            state.zoom
             in
-            ( { model | zoom = zoom }, Cmd.none )
+            ( Model env { state | zoom = zoom }, Cmd.none )
 
 
 eventDecoder =
@@ -203,10 +179,10 @@ keyDecoder =
 
 
 subscriptions : Model -> Sub Msg
-subscriptions model =
+subscriptions (Model (Env mouse _) _) =
     Sub.batch
         [ IO.onBrowserWH BrowserResized
-        , case model.mouse of
+        , case mouse of
             Up ->
                 BE.onMouseDown (JD.map OnMouseDown eventDecoder)
 
@@ -225,13 +201,14 @@ subscriptions model =
 
 
 view : Model -> Html Msg
-view model =
-    canvas model
+view (Model (Env _ browserWH) state) =
+    canvas browserWH
+        state.zoom
         [ let
             isMouseOverZoom =
-                model.mouseOver == Just ZoomElement
+                state.mouseOver == Just ZoomElement
           in
-          viewZoomData isMouseOverZoom model.zoom
+          viewZoomData isMouseOverZoom state.zoom
         ]
 
 
@@ -258,9 +235,9 @@ viewZoomData isMouseOver zoom =
         |> IO.textGroup []
 
 
-canvas model children =
-    IO.canvas model.browserWH
-        [ IO.group [ IO.transform [ IO.scale2 model.zoom ] ] children ]
+canvas browserWH zoom children =
+    IO.canvas browserWH
+        [ IO.group [ IO.transform [ IO.scale2 zoom ] ] children ]
 
 
 empty : Html msg

@@ -5,7 +5,7 @@ module DrawingBlock.Main exposing (main)
 import Browser
 import Html exposing (Html)
 import IO
-import Number2 exposing (Float2, Int2)
+import Number2 as N2 exposing (Float2, Int2)
 import String2 as ST
 import Svg as S
 import Svg.Attributes as SA
@@ -16,7 +16,7 @@ import Svg.Attributes as SA
 
 
 type alias Model =
-    { browserWH : Float2, scaleXY : Float2 }
+    { browserWH : Float2, zoom : Float2 }
 
 
 setBrowserWH wh m =
@@ -30,7 +30,7 @@ type alias Flags =
 init : Flags -> ( Model, Cmd Msg )
 init _ =
     ( { browserWH = ( 600, 600 )
-      , scaleXY = ( 1, 1 )
+      , zoom = ( 1, 1 ) |> N2.scale 2.5
       }
       --, IO.getBrowserWH |> Task.perform BrowserResized
     , Cmd.none
@@ -79,7 +79,7 @@ view : Model -> Html Msg
 view model =
     IO.canvas model.browserWH
         [ S.g
-            [ scale2 model.scaleXY |> SA.transform
+            [ scale2 model.zoom |> SA.transform
             ]
             [ S.text_ [] [ S.text "HW" ] ]
         ]

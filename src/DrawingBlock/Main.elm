@@ -26,13 +26,13 @@ type alias Timestamp =
     Float
 
 
-type alias Event =
+type alias EventData =
     ( Timestamp, Float2 )
 
 
 type Mouse
     = Up
-    | Down Event Event
+    | Down EventData EventData
 
 
 type MouseOverElement
@@ -74,9 +74,9 @@ init _ =
 type Msg
     = NoOp
     | BrowserResized Float2
-    | OnMouseDown Event
-    | OnMouseUp Event
-    | OnMouseMove Event
+    | OnMouseDown EventData
+    | OnMouseUp EventData
+    | OnMouseMove EventData
     | MouseOverZoom
     | MouseOutZoom
 

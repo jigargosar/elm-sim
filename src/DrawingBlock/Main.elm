@@ -124,6 +124,14 @@ view model =
         [ [ IO.text ("Zoom = " ++ Debug.toString model.zoom)
                 [ SA.id "zoom-element"
                 , SE.onMouseOver MouseOverZoom
+                , SE.onMouseOut MouseOutZoom
+                , SA.fill
+                    (if model.mouseOver == Just ZoomElement then
+                        "green"
+
+                     else
+                        ""
+                    )
                 ]
           ]
             |> IO.group

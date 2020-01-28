@@ -24,7 +24,7 @@ import Time
 
 type Mouse
     = Up
-    | Down Time.Posix Float2 Float2
+    | Down ( Maybe MouseOverElement, Time.Posix, Float2 ) Float2
 
 
 type MouseOverElement
@@ -32,7 +32,11 @@ type MouseOverElement
 
 
 type alias Model =
-    { browserWH : Float2, zoom : Float2, mouse : Mouse, mouseOver : Maybe MouseOverElement }
+    { browserWH : Float2
+    , zoom : Float2
+    , mouse : Mouse
+    , mouseOver : Maybe MouseOverElement
+    }
 
 
 setBrowserWH wh m =
@@ -84,7 +88,7 @@ update message model =
             ( model, Time.now |> Task.perform (OnMouseDownWithNow xy) )
 
         OnMouseDownWithNow xy now ->
-            ( { model | mouse = Down now xy xy }, Cmd.none )
+            ( { model | mouse = Down ( model.mouseOver, now, xy ) xy }, Cmd.none )
 
         OnMouseUp xy ->
             ( model, Time.now |> Task.perform (OnMouseUpWithNow xy) )
@@ -94,7 +98,7 @@ update message model =
                 Up ->
                     ( model, Cmd.none )
 
-                Down st sxy _ ->
+                Down ( sElement, st, sxy ) _ ->
                     let
                         elapsed =
                             ( t, st )
@@ -120,9 +124,9 @@ update message model =
                             not isDnd
 
                         zoom =
-                            if isDnd && model.mouseOver == Just ZoomElement then
+                            if isDnd && sElement == Just ZoomElement then
                                 -- N2.scale 1.1 model.zoom
-                                model.zoom |> mapEach (\s -> s + (dy / 10))
+                                model.zoom |> mapEach (\s -> clamp 0.5 3 (s + (dy / 10)))
 
                             else
                                 model.zoom
@@ -131,8 +135,8 @@ update message model =
 
         OnMouseMove xy ->
             case model.mouse of
-                Down t s _ ->
-                    ( { model | mouse = Down t s xy }, Cmd.none )
+                Down s _ ->
+                    ( { model | mouse = Down s xy }, Cmd.none )
 
                 Up ->
                     ( model, Cmd.none )
@@ -156,7 +160,7 @@ subscriptions model =
             Up ->
                 BE.onMouseDown (JD.map OnMouseDown IO.pageXYDecoder)
 
-            Down _ _ _ ->
+            Down _ _ ->
                 [ BE.onMouseUp (JD.map OnMouseUp IO.pageXYDecoder)
                 , BE.onMouseMove (JD.map OnMouseMove IO.pageXYDecoder)
                 ]

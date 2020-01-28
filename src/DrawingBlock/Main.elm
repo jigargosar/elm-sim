@@ -81,6 +81,35 @@ type Msg
     | MouseOutZoom
 
 
+type alias EventDiff =
+    { dxy : Float2
+    , isDragging : Bool
+    }
+
+
+eventDiff ( st, sxy ) ( t, xy ) =
+    let
+        elapsed =
+            ( t, st ) |> uncurry (-)
+
+        tooLong =
+            abs elapsed > (3 * 1000)
+
+        dx =
+            ( xy, sxy ) |> mapEach Tuple.first |> uncurry (-)
+
+        dy =
+            ( xy, sxy ) |> mapEach Tuple.second |> uncurry (-)
+
+        tooFar =
+            abs dx > 10 || abs dy > 10
+
+        isDragging =
+            tooLong || tooFar
+    in
+    EventDiff ( dx, dy ) isDragging
+
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update message model =
     case message of

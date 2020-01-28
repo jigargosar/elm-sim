@@ -183,10 +183,10 @@ update message model =
                 zoom =
                     case key of
                         "1" ->
-                            model.zoom |> mapEach (\s -> clamp 0.8 50 (s + 0.01))
+                            model.zoom |> mapEach (\s -> clamp 0.05 50 (s + s * 0.1))
 
                         "2" ->
-                            model.zoom |> mapEach (\s -> clamp 0.8 50 (s - 0.01))
+                            model.zoom |> mapEach (\s -> clamp 0.05 50 (s - s * 0.1))
 
                         _ ->
                             model.zoom

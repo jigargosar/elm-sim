@@ -68,14 +68,6 @@ subscriptions _ =
 -- View
 
 
-scale2 sxy =
-    let
-        ( x, y ) =
-            ST.fromFloat sxy
-    in
-    "scale(" ++ x ++ "," ++ y ++ ")"
-
-
 view : Model -> Html Msg
 view model =
     IO.canvas model.browserWH
@@ -86,7 +78,7 @@ view model =
                 [ S.text "HW" ]
           ]
             |> S.g
-                [ scale2 model.zoom |> SA.transform
+                [ IO.scale2 model.zoom |> SA.transform
                 ]
         ]
 

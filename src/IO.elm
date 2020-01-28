@@ -1,4 +1,4 @@
-module IO exposing (canvas, getBrowserWH, onBrowserWH)
+module IO exposing (canvas, getBrowserWH, onBrowserWH, scale2)
 
 import Browser.Dom as BD
 import Browser.Events as BE
@@ -6,6 +6,7 @@ import Html as H
 import Number2 as NT exposing (Float2)
 import PointFree exposing (mapEach)
 import String exposing (fromFloat)
+import String2 as ST
 import Svg as S
 import Svg.Attributes as SA
 import Task
@@ -46,3 +47,23 @@ canvas wh =
                 height:100%;
             """
         ]
+
+
+scale2 : ( Float, Float ) -> String
+scale2 sxy =
+    let
+        ( x, y ) =
+            ST.fromFloat sxy
+    in
+    "scale(" ++ x ++ "," ++ y ++ ")"
+
+
+text : String -> List (S.Attribute msg) -> S.Svg msg
+text words attributes =
+    S.text_ (textAttributes attributes) [ S.text words ]
+
+
+textAttributes list =
+    SA.textAnchor "middle"
+        :: SA.dominantBaseline "central"
+        :: list

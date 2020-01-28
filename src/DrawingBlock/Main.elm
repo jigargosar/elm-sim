@@ -15,7 +15,7 @@ import Task
 
 
 type alias Model =
-    { browserWH : Float2 }
+    { browserWH : Float2, scaleXY : Float2 }
 
 
 setBrowserWH wh m =
@@ -28,7 +28,9 @@ type alias Flags =
 
 init : Flags -> ( Model, Cmd Msg )
 init _ =
-    ( { browserWH = ( 600, 600 ) }
+    ( { browserWH = ( 600, 600 )
+      , scaleXY = ( 1, 1 )
+      }
       --, IO.getBrowserWH |> Task.perform BrowserResized
     , Cmd.none
     )

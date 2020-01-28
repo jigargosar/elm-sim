@@ -22,9 +22,17 @@ import Time
 -- Model
 
 
+type alias Timestamp =
+    Float
+
+
+type alias Event =
+    ( Timestamp, Float2 )
+
+
 type Mouse
     = Up
-    | Down ( Time.Posix, Float2 ) Float2
+    | Down Event Event
 
 
 type MouseOverElement
@@ -66,11 +74,9 @@ init _ =
 type Msg
     = NoOp
     | BrowserResized Float2
-    | OnMouseDown Float2
-    | OnMouseDownWithNow Float2 Time.Posix
-    | OnMouseUp Float2
-    | OnMouseUpWithNow Float2 Time.Posix
-    | OnMouseMove Float2
+    | OnMouseDown Event
+    | OnMouseUp Event
+    | OnMouseMove Event
     | MouseOverZoom
     | MouseOutZoom
 
@@ -84,16 +90,10 @@ update message model =
         BrowserResized wh ->
             ( setBrowserWH wh model, Cmd.none )
 
-        OnMouseDown xy ->
-            ( model, Time.now |> Task.perform (OnMouseDownWithNow xy) )
+        OnMouseDown e ->
+            ( { model | mouse = Down e e }, Cmd.none )
 
-        OnMouseDownWithNow xy now ->
-            ( { model | mouse = Down ( now, xy ) xy }, Cmd.none )
-
-        OnMouseUp xy ->
-            ( model, Time.now |> Task.perform (OnMouseUpWithNow xy) )
-
-        OnMouseUpWithNow xy t ->
+        OnMouseUp ( t, xy ) ->
             case model.mouse of
                 Up ->
                     ( model, Cmd.none )
@@ -102,7 +102,6 @@ update message model =
                     let
                         elapsed =
                             ( t, st )
-                                |> mapEach Time.posixToMillis
                                 |> uncurry (-)
 
                         tooLong =
@@ -133,10 +132,10 @@ update message model =
                     in
                     ( { model | mouse = Up, zoom = zoom }, Cmd.none )
 
-        OnMouseMove xy ->
+        OnMouseMove e ->
             case model.mouse of
-                Down s _ ->
-                    ( { model | mouse = Down s xy }, Cmd.none )
+                Down se _ ->
+                    ( { model | mouse = Down se e }, Cmd.none )
 
                 Up ->
                     ( model, Cmd.none )
@@ -152,17 +151,21 @@ update message model =
                 ( model, Cmd.none )
 
 
+eventDecoder =
+    JD.map2 Tuple.pair IO.timestampDecoder IO.pageXYDecoder
+
+
 subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
         [ IO.onBrowserWH BrowserResized
         , case model.mouse of
             Up ->
-                BE.onMouseDown (JD.map OnMouseDown IO.pageXYDecoder)
+                BE.onMouseDown (JD.map OnMouseDown eventDecoder)
 
             Down _ _ ->
-                [ BE.onMouseUp (JD.map OnMouseUp IO.pageXYDecoder)
-                , BE.onMouseMove (JD.map OnMouseMove IO.pageXYDecoder)
+                [ BE.onMouseUp (JD.map OnMouseUp eventDecoder)
+                , BE.onMouseMove (JD.map OnMouseMove eventDecoder)
                 ]
                     |> Sub.batch
         ]

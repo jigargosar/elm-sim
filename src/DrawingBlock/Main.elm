@@ -9,7 +9,8 @@ import Html exposing (Html)
 import IO
 import Json.Decode as JD
 import Number2 as N2 exposing (Float2, Int2)
-import PointFree exposing (mapEach)
+import PointFree exposing (ignoreNothing, mapEach)
+import Round
 import Svg as S
 import Svg.Attributes as SA
 import Svg.Events as SE
@@ -179,8 +180,12 @@ view model =
 
 viewZoomData : Bool -> Float2 -> S.Svg Msg
 viewZoomData isMouseOver zoom =
+    let
+        twoDecimalZoom =
+            zoom |> mapEach (Round.round 2 >> String.toFloat |> ignoreNothing)
+    in
     [ IO.tspan "Zoom = " []
-    , IO.tspan (Debug.toString zoom)
+    , IO.tspan (Debug.toString twoDecimalZoom)
         [ SA.id "zoom-element"
         , SE.onMouseOver MouseOverZoom
         , SE.onMouseOut MouseOutZoom

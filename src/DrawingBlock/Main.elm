@@ -6,6 +6,7 @@ import Browser
 import Html exposing (Html)
 import IO
 import Number2 exposing (Float2, Int2)
+import Svg as S
 import Task
 
 
@@ -63,8 +64,8 @@ subscriptions _ =
 
 
 view : Model -> Html Msg
-view _ =
-    empty
+view model =
+    IO.canvas model.browserWH [ S.text_ [] [ S.text "HW" ] ]
 
 
 empty : Html msg

@@ -2,12 +2,14 @@ module DrawingBlock.Main exposing (main)
 
 -- Browser.Element Scaffold
 
+import Basics.Extra exposing (uncurry)
 import Browser
 import Browser.Events as BE
 import Html exposing (Html)
 import IO
 import Json.Decode as JD
 import Number2 as N2 exposing (Float2, Int2)
+import PointFree exposing (mapEach)
 import Svg.Attributes as SA
 import Svg.Events as SE
 import Task
@@ -61,6 +63,7 @@ type Msg
     | OnMouseDown Float2
     | OnMouseDownWithNow Float2 Time.Posix
     | OnMouseUp Float2
+    | OnMouseUpWithNow Float2 Time.Posix
     | OnMouseMove Float2
     | MouseOverZoom
     | MouseOutZoom
@@ -81,8 +84,43 @@ update message model =
         OnMouseDownWithNow xy now ->
             ( { model | mouse = Down now xy xy }, Cmd.none )
 
-        OnMouseUp _ ->
-            ( { model | mouse = Up }, Cmd.none )
+        OnMouseUp xy ->
+            ( model, Time.now |> Task.perform (OnMouseUpWithNow xy) )
+
+        OnMouseUpWithNow xy t ->
+            case model.mouse of
+                Up ->
+                    ( model, Cmd.none )
+
+                Down st sxy _ ->
+                    let
+                        elapsed =
+                            ( t, st )
+                                |> mapEach Time.posixToMillis
+                                |> uncurry (-)
+
+                        tooLong =
+                            abs elapsed > (3 * 1000)
+
+                        dx =
+                            ( xy, sxy ) |> mapEach Tuple.first |> uncurry (-)
+
+                        dy =
+                            ( xy, sxy ) |> mapEach Tuple.second |> uncurry (-)
+
+                        tooFar =
+                            abs dx > 10 || abs dy > 10
+
+                        zoom =
+                            if tooLong || tooFar then
+                                -- handle dnd
+                                model.zoom
+
+                            else
+                                -- handle click
+                                N2.scale 1.1 model.zoom
+                    in
+                    ( { model | mouse = Up, zoom = zoom }, Cmd.none )
 
         OnMouseMove xy ->
             case model.mouse of

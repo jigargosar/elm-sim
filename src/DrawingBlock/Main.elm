@@ -29,7 +29,8 @@ type alias Flags =
 init : Flags -> ( Model, Cmd Msg )
 init _ =
     ( { browserWH = ( 600, 600 ) }
-    , IO.getBrowserWH |> Task.perform BrowserResized
+      --, IO.getBrowserWH |> Task.perform BrowserResized
+    , Cmd.none
     )
 
 

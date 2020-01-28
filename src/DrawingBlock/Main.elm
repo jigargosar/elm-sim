@@ -165,16 +165,16 @@ subscriptions model =
 view : Model -> Html Msg
 view model =
     canvas model
-        [ viewZoomText (model.mouseOver == Just ZoomElement) model.zoom
+        [ let
+            isMouseOverZoom =
+                model.mouseOver == Just ZoomElement
+          in
+          viewZoomData isMouseOverZoom model.zoom
         ]
 
 
-canvas model children =
-    IO.canvas model.browserWH
-        [ IO.group [ IO.transform [ IO.scale2 model.zoom ] ] children ]
-
-
-viewZoomText isMouseOver zoom =
+viewZoomData : Bool -> Float2 -> S.Svg Msg
+viewZoomData isMouseOver zoom =
     [ IO.tspan "Zoom = " []
     , IO.tspan (Debug.toString zoom)
         [ SA.id "zoom-element"
@@ -190,6 +190,11 @@ viewZoomText isMouseOver zoom =
         ]
     ]
         |> IO.textGroup []
+
+
+canvas model children =
+    IO.canvas model.browserWH
+        [ IO.group [ IO.transform [ IO.scale2 model.zoom ] ] children ]
 
 
 empty : Html msg

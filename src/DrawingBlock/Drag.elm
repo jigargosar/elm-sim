@@ -100,19 +100,20 @@ subscriptions state =
     let
         decoder x =
             JD.map x eventDecoder
+
+        subs =
+            case state of
+                Up ->
+                    []
+
+                Down _ ->
+                    [ BE.onMouseUp (decoder OnClick)
+                    , BE.onMouseMove (decoder OnDrag)
+                    ]
+
+                Drag _ ->
+                    [ BE.onMouseUp (decoder OnDrop)
+                    , BE.onMouseMove (decoder OnDrag)
+                    ]
     in
-    case state of
-        Up ->
-            Sub.none
-
-        Down _ ->
-            [ BE.onMouseUp (decoder OnClick)
-            , BE.onMouseMove (decoder OnDrag)
-            ]
-                |> Sub.batch
-
-        Drag _ ->
-            [ BE.onMouseUp (decoder OnDrop)
-            , BE.onMouseMove (decoder OnDrag)
-            ]
-                |> Sub.batch
+    Sub.batch subs

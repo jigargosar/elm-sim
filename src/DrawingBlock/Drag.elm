@@ -34,9 +34,8 @@ type Drag
 
 
 type Msg
-    = OnDrag Event
-    | OnClick Event
-    | OnDrop Event
+    = OnMove Event
+    | OnUp Event
 
 
 intial : Drag
@@ -81,18 +80,35 @@ type OutMsg
 update : Msg -> Drag -> ( Drag, OutMsg )
 update message model =
     case message of
-        OnDrag event ->
-            let
-                newModel =
-                    Drag event
-            in
-            ( newModel, Move (delta model newModel) )
+        OnMove event ->
+            case model of
+                Up ->
+                    ( Up, End )
 
-        OnClick _ ->
-            ( Up, Click )
+                Down _ ->
+                    let
+                        newModel =
+                            Drag event
+                    in
+                    ( newModel, Move (delta model newModel) )
 
-        OnDrop _ ->
-            ( Up, End )
+                Drag _ ->
+                    let
+                        newModel =
+                            Drag event
+                    in
+                    ( newModel, Move (delta model newModel) )
+
+        OnUp _ ->
+            case model of
+                Up ->
+                    ( Up, End )
+
+                Down _ ->
+                    ( Up, Click )
+
+                Drag _ ->
+                    ( Up, End )
 
 
 subscriptions : Drag -> Sub Msg
@@ -106,14 +122,9 @@ subscriptions state =
                 Up ->
                     []
 
-                Down _ ->
-                    [ BE.onMouseUp (decoder OnClick)
-                    , BE.onMouseMove (decoder OnDrag)
-                    ]
-
-                Drag _ ->
-                    [ BE.onMouseUp (decoder OnDrop)
-                    , BE.onMouseMove (decoder OnDrag)
+                _ ->
+                    [ BE.onMouseUp (decoder OnUp)
+                    , BE.onMouseMove (decoder OnMove)
                     ]
     in
     Sub.batch subs

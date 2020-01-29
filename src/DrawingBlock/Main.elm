@@ -33,7 +33,7 @@ type alias EventData =
 type alias Model =
     { zoom : Float2
     , scene : Float2
-    , drag : DragModel
+    , drag : Drag.Model
     , edit : Edit
     }
 
@@ -41,10 +41,6 @@ type alias Model =
 type Edit
     = Zoom Float2
     | NoEdit
-
-
-type alias DragModel =
-    Drag.Model Edit
 
 
 type alias DragMsg =

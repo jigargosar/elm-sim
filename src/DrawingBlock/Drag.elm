@@ -28,20 +28,20 @@ eventDecoder =
     JD.map Event IO.pageXYDecoder
 
 
-type Model a
-    = Down a Event
-    | Drag a Event
+type Model
+    = Down Event
+    | Drag Event
     | Up
 
 
 type Msg a
     = OnDown a Event
-    | OnDrag a Event
-    | OnClick a Event
-    | OnDrop a Event
+    | OnDrag Event
+    | OnClick Event
+    | OnDrop Event
 
 
-init : Model a
+init : Model
 init =
     Up
 
@@ -54,20 +54,20 @@ onDown a =
         )
 
 
-delta : Model a -> Model b -> ( Float, Float )
+delta : Model -> Model -> ( Float, Float )
 delta oldModel newModel =
     Maybe.map2 Tuple.pair (getEvent newModel) (getEvent oldModel)
         |> Maybe.map (mapEach .pageXY >> uncurry N2.sub)
         |> Maybe.withDefault ( 0, 0 )
 
 
-getEvent : Model a -> Maybe Event
+getEvent : Model -> Maybe Event
 getEvent model =
     case model of
-        Down _ e ->
+        Down e ->
             Just e
 
-        Drag _ e ->
+        Drag e ->
             Just e
 
         Up ->
@@ -81,27 +81,27 @@ type OutMsg a
     | End
 
 
-update : Msg a -> Model a -> ( Model a, OutMsg a )
+update : Msg a -> Model -> ( Model, OutMsg a )
 update message model =
     case message of
         OnDown a event ->
-            ( Down a event, Start a )
+            ( Down event, Start a )
 
-        OnDrag a event ->
+        OnDrag event ->
             let
                 newModel =
-                    Drag a event
+                    Drag event
             in
             ( newModel, Move (delta model newModel) )
 
-        OnClick _ _ ->
+        OnClick _ ->
             ( Up, Click )
 
-        OnDrop _ _ ->
+        OnDrop _ ->
             ( Up, End )
 
 
-subscriptions : Model a -> Sub (Msg a)
+subscriptions : Model -> Sub (Msg a)
 subscriptions state =
     let
         decoder x =
@@ -111,14 +111,14 @@ subscriptions state =
         Up ->
             Sub.none
 
-        Down a _ ->
-            [ BE.onMouseUp (decoder (OnClick a))
-            , BE.onMouseMove (decoder (OnDrag a))
+        Down _ ->
+            [ BE.onMouseUp (decoder OnClick)
+            , BE.onMouseMove (decoder OnDrag)
             ]
                 |> Sub.batch
 
-        Drag a _ ->
-            [ BE.onMouseUp (decoder (OnDrop a))
-            , BE.onMouseMove (decoder (OnDrag a))
+        Drag _ ->
+            [ BE.onMouseUp (decoder OnDrop)
+            , BE.onMouseMove (decoder OnDrag)
             ]
                 |> Sub.batch

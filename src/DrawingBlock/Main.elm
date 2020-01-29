@@ -205,12 +205,21 @@ view model =
 
 
 viewState model =
-    [ viewZoomData model.zoom
+    let
+        isDraggingZoom =
+            case Drag.getA model.drag of
+                Just ( ZoomElement, _ ) ->
+                    True
+
+                _ ->
+                    False
+    in
+    [ viewZoomData isDraggingZoom model.zoom
     ]
 
 
-viewZoomData : Float2 -> S.Svg Msg
-viewZoomData zoom =
+viewZoomData : Bool -> Float2 -> S.Svg Msg
+viewZoomData forceHover zoom =
     let
         twoDecimalZoom =
             zoom |> mapEach (Round.round 2) |> S2.join " , "
@@ -220,6 +229,15 @@ viewZoomData zoom =
         [ SA.id "zoom-element"
         , SE.on "mousedown" (JD.map (OnMouseDown ZoomElement) IO.pageXYDecoder)
         , SA.class "pointer"
+        , if forceHover then
+            SA.style """
+                        fill: green;
+                        cursor: ns-resize;
+                     """
+
+          else
+            SA.style """
+                     """
         ]
     , S.style []
         [ S.text

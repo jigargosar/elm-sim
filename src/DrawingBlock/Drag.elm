@@ -1,4 +1,4 @@
-module DrawingBlock.Drag exposing (Model, Msg(..), data, init, initDown, subscriptions, update)
+module DrawingBlock.Drag exposing (Model, Msg(..), data, getA, init, initDown, subscriptions, update)
 
 import Browser.Events as BE
 import Json.Decode as JD exposing (Decoder)
@@ -37,6 +37,19 @@ data model =
 
         Drag a b ->
             Just b
+
+
+getA : Model a b -> Maybe a
+getA model =
+    case model of
+        Up ->
+            Nothing
+
+        Down a b ->
+            Just a
+
+        Drag a b ->
+            Just a
 
 
 update : Msg a b -> Model a b -> Model a b

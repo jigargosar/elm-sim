@@ -33,7 +33,7 @@ type alias Model =
     { zoom : Float2
     , scene : Float2
     , drag : Drag
-    , edit : EditMode
+    , editMode : EditMode
     }
 
 
@@ -55,7 +55,7 @@ init _ =
     ( { zoom = ( 1, 1 ) |> N2.scale 2.5
       , scene = ( 600, 600 )
       , drag = Drag.intial
-      , edit = NotEditing
+      , editMode = NotEditing
       }
     , IO.getBrowserWH
         |> Task.perform BrowserResized
@@ -86,7 +86,7 @@ update message model =
             ( onKeyDown key model, Cmd.none )
 
         OnMouseDown editMode drag ->
-            ( { model | edit = editMode, drag = drag }, Cmd.none )
+            ( { model | editMode = editMode, drag = drag }, Cmd.none )
 
 
 onDragMessage : DragMsg -> Model -> Model
@@ -101,7 +101,7 @@ onDragMessage message model =
 
 handleDragEvents : Drag.OutMsg -> Model -> Model
 handleDragEvents out model =
-    case ( out, model.edit ) of
+    case ( out, model.editMode ) of
         ( Drag.Move, Zooming _ ) ->
             let
                 ( _, dy ) =
@@ -162,7 +162,7 @@ viewState : Model -> List (S.Svg Msg)
 viewState model =
     let
         isDraggingZoom =
-            case model.edit of
+            case model.editMode of
                 Zooming _ ->
                     True
 

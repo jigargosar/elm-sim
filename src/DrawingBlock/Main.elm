@@ -38,8 +38,16 @@ type Element
 type alias Model =
     { zoom : Float2
     , scene : Float2
-    , drag : Drag.Model Element Float2
+    , drag : DragModel
     }
+
+
+type alias DragModel =
+    Drag.Model ( Element, Float2 ) Float2
+
+
+type alias DragMsg =
+    Drag.Msg ( Element, Float2 ) Float2
 
 
 type alias Flags =
@@ -62,7 +70,7 @@ init _ =
 
 
 type Msg
-    = DragMsg (Drag.Msg Element Float2)
+    = OnDragMsg DragMsg
     | BrowserResized Float2
     | OnKeyDown String
     | OnMouseDown Element Float2
@@ -102,7 +110,7 @@ eventDiff ( st, sxy ) ( t, xy ) =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update message model =
     case message of
-        DragMsg dragMsg ->
+        OnDragMsg dragMsg ->
             ( onDragMessage dragMsg model, Cmd.none )
 
         BrowserResized wh ->
@@ -112,24 +120,27 @@ update message model =
             ( onKeyDown key model, Cmd.none )
 
         OnMouseDown element pageXY ->
-            ( { model | drag = Drag.initDown element pageXY }, Cmd.none )
+            ( { model | drag = Drag.initDown ( element, pageXY ) pageXY }, Cmd.none )
 
 
-updateDrag : Drag.Msg Element Float2 -> Model -> Model
+updateDrag : DragMsg -> Model -> Model
 updateDrag message state =
     { state | drag = Drag.update message state.drag }
 
 
-onDragMessage : Drag.Msg Element Float2 -> Model -> Model
+onDragMessage : DragMsg -> Model -> Model
 onDragMessage message =
     updateDrag message
         >> handleDragEvents message
 
 
-handleDragEvents : Drag.Msg Element Float2 -> Model -> Model
+handleDragEvents : DragMsg -> Model -> Model
 handleDragEvents message state =
     case message of
-        Drag.OnClick ZoomElement _ ->
+        Drag.OnClick ( ZoomElement, _ ) _ ->
+            { state | zoom = N2.scale 1.1 state.zoom }
+
+        Drag.OnDrag ( ZoomElement, _ ) current ->
             { state | zoom = N2.scale 1.1 state.zoom }
 
         _ ->
@@ -168,7 +179,7 @@ subscriptions : Model -> Sub Msg
 subscriptions model =
     [ IO.onBrowserWH BrowserResized
     , JD.map OnKeyDown keyDecoder |> BE.onKeyDown
-    , Drag.subscriptions IO.pageXYDecoder model.drag |> Sub.map DragMsg
+    , Drag.subscriptions IO.pageXYDecoder model.drag |> Sub.map OnDragMsg
     ]
         |> Sub.batch
 

@@ -85,8 +85,8 @@ update message model =
         OnKeyDown key ->
             ( onKeyDown key model, Cmd.none )
 
-        OnMouseDown edit drag ->
-            ( { model | edit = edit, drag = drag }, Cmd.none )
+        OnMouseDown editMode drag ->
+            ( { model | edit = editMode, drag = drag }, Cmd.none )
 
 
 onDragMessage : DragMsg -> Model -> Model

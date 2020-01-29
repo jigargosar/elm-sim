@@ -26,6 +26,35 @@ type Msg
     | OnDrop
 
 
+update : Msg -> State -> ( State, Cmd Msg )
+update message model =
+    case message of
+        OnMouseDown ->
+            case model of
+                Down ->
+                    ( Down, Process.sleep 1000 |> Task.perform (\_ -> OnDragStart) )
+
+                _ ->
+                    ( model, Cmd.none )
+
+        OnDragStart ->
+            case model of
+                Down ->
+                    ( Drag, Cmd.none )
+
+                _ ->
+                    ( model, Cmd.none )
+
+        OnDrag ->
+            ( model, Cmd.none )
+
+        OnClick ->
+            ( Up, Cmd.none )
+
+        OnDrop ->
+            ( Up, Cmd.none )
+
+
 tooFar =
     False
 

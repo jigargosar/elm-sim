@@ -33,12 +33,12 @@ type alias Model =
     { zoom : Float2
     , scene : Float2
     , drag : Drag
-    , edit : Edit
+    , edit : EditMode
     }
 
 
-type Edit
-    = Zoom Float2
+type EditMode
+    = Zooming Float2
     | NoEdit
 
 
@@ -70,7 +70,7 @@ type Msg
     = OnDragMsg DragMsg
     | BrowserResized Float2
     | OnKeyDown String
-    | OnMouseDown Edit Drag
+    | OnMouseDown EditMode Drag
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -101,8 +101,8 @@ onDragMessage message model =
 
 handleDragEvents : Drag.OutMsg -> Model -> Model
 handleDragEvents out model =
-    case out of
-        Drag.Move ->
+    case ( out, model.edit ) of
+        ( Drag.Move, Zooming _ ) ->
             let
                 ( _, dy ) =
                     Drag.delta model.drag
@@ -163,7 +163,7 @@ viewState model =
     let
         isDraggingZoom =
             case model.edit of
-                Zoom _ ->
+                Zooming _ ->
                     True
 
                 _ ->
@@ -182,7 +182,7 @@ viewZoomData forceHover zoom =
     [ IO.tspan "Zoom = " []
     , IO.tspan (Debug.toString twoDecimalZoom)
         [ SA.id "zoom-element"
-        , Drag.onDown (OnMouseDown (Zoom zoom))
+        , Drag.onDown (OnMouseDown (Zooming zoom))
         , SA.class "pointer"
         , if forceHover then
             SA.style """

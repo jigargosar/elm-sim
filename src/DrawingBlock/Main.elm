@@ -32,7 +32,7 @@ type alias EventData =
 type alias Model =
     { zoom : Float2
     , scene : Float2
-    , drag : Drag.Model
+    , drag : Drag.Drag
     , edit : Edit
     }
 
@@ -70,7 +70,7 @@ type Msg
     = OnDragMsg DragMsg
     | BrowserResized Float2
     | OnKeyDown String
-    | OnDragStart Edit Drag.Model
+    | OnDragStart Edit Drag.Drag
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )

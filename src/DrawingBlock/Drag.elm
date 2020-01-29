@@ -1,9 +1,8 @@
 module DrawingBlock.Drag exposing
-    ( Event
-    , Model
+    ( Drag
+    , Event
     , Msg
     , OutMsg(..)
-    , delta
     , intial
     , onDown
     , subscriptions
@@ -28,7 +27,7 @@ eventDecoder =
     JD.map Event IO.pageXYDecoder
 
 
-type Model
+type Drag
     = Down Event
     | Drag Event
     | Up
@@ -40,12 +39,12 @@ type Msg
     | OnDrop Event
 
 
-intial : Model
+intial : Drag
 intial =
     Up
 
 
-onDown : (Model -> msg) -> VirtualDom.Attribute msg
+onDown : (Drag -> msg) -> VirtualDom.Attribute msg
 onDown msg =
     VirtualDom.on "mousedown"
         (VirtualDom.Normal
@@ -53,14 +52,14 @@ onDown msg =
         )
 
 
-delta : Model -> Model -> ( Float, Float )
+delta : Drag -> Drag -> ( Float, Float )
 delta oldModel newModel =
     Maybe.map2 Tuple.pair (getEvent newModel) (getEvent oldModel)
         |> Maybe.map (mapEach .pageXY >> uncurry N2.sub)
         |> Maybe.withDefault ( 0, 0 )
 
 
-getEvent : Model -> Maybe Event
+getEvent : Drag -> Maybe Event
 getEvent model =
     case model of
         Down e ->
@@ -79,7 +78,7 @@ type OutMsg
     | End
 
 
-update : Msg -> Model -> ( Model, OutMsg )
+update : Msg -> Drag -> ( Drag, OutMsg )
 update message model =
     case message of
         OnDrag event ->
@@ -96,7 +95,7 @@ update message model =
             ( Up, End )
 
 
-subscriptions : Model -> Sub Msg
+subscriptions : Drag -> Sub Msg
 subscriptions state =
     let
         decoder x =

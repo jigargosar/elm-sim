@@ -28,8 +28,8 @@ eventDecoder =
     JD.map Event IO.pageXYDecoder
 
 
-type Drag
-    = Drag (Maybe State)
+type alias Drag =
+    Maybe State
 
 
 type alias State =
@@ -52,11 +52,11 @@ type Msg
 
 intial : Drag
 intial =
-    Drag Nothing
+    Nothing
 
 
 fromEvent e =
-    Drag (Just (State e e e MouseDown))
+    Just (State e e e MouseDown)
 
 
 onDown : (Drag -> msg) -> VirtualDom.Attribute msg
@@ -73,7 +73,7 @@ deltaState { current, prev } =
 
 
 delta : Drag -> ( Float, Float )
-delta (Drag maybeState) =
+delta maybeState =
     Maybe.map deltaState maybeState |> Maybe.withDefault ( 0, 0 )
 
 
@@ -84,7 +84,7 @@ type OutMsg
 
 
 update : Msg -> Drag -> ( Drag, OutMsg )
-update message ((Drag maybeState) as model) =
+update message (maybeState as model) =
     case message of
         OnMove event ->
             case maybeState of
@@ -94,7 +94,6 @@ update message ((Drag maybeState) as model) =
                 Just state ->
                     ( { state | prev = state.current, current = event, type_ = MouseDrag }
                         |> Just
-                        |> Drag
                     , Move
                     )
 
@@ -104,7 +103,7 @@ update message ((Drag maybeState) as model) =
                     ( model, End )
 
                 Just { type_ } ->
-                    ( Drag Nothing
+                    ( Nothing
                     , case type_ of
                         MouseDown ->
                             Click
@@ -115,7 +114,7 @@ update message ((Drag maybeState) as model) =
 
 
 subscriptions : Drag -> Sub Msg
-subscriptions (Drag maybeState) =
+subscriptions maybeState =
     let
         decoder x =
             JD.map x eventDecoder

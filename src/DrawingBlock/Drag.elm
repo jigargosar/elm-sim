@@ -1,52 +1,52 @@
-module DrawingBlock.Drag exposing (Msg, State, subscriptions)
+module DrawingBlock.Drag exposing (Model, Msg, subscriptions)
 
 import Browser.Events as BE
 import Json.Decode as JD
 
 
-type State
-    = Down
-    | Drag
+type Model a
+    = Down a
+    | Drag a
     | Up
 
 
-type Msg
-    = OnMouseDown
-    | OnDrag
-    | OnClick
-    | OnDrop
+type Msg a
+    = OnDown a
+    | OnDrag a
+    | OnClick a
+    | OnDrop a
 
 
-update : Msg -> State -> State
+update : Msg a -> Model a -> Model a
 update message model =
     case message of
-        OnMouseDown ->
-            Down
+        OnDown a ->
+            Down a
 
-        OnDrag ->
-            Drag
+        OnDrag a ->
+            Drag a
 
-        OnClick ->
+        OnClick _ ->
             Up
 
-        OnDrop ->
+        OnDrop _ ->
             Up
 
 
-subscriptions : State -> Sub Msg
+subscriptions : Model a -> Sub (Msg a)
 subscriptions state =
     case state of
         Up ->
-            BE.onMouseDown (JD.succeed OnMouseDown)
+            Sub.none
 
-        Down ->
-            [ BE.onMouseUp (JD.succeed OnClick)
-            , BE.onMouseMove (JD.succeed OnDrag)
+        Down a ->
+            [ BE.onMouseUp (JD.succeed (OnClick a))
+            , BE.onMouseMove (JD.succeed (OnDrag a))
             ]
                 |> Sub.batch
 
-        Drag ->
-            [ BE.onMouseUp (JD.succeed OnDrop)
-            , BE.onMouseMove (JD.succeed OnDrag)
+        Drag a ->
+            [ BE.onMouseUp (JD.succeed (OnDrop a))
+            , BE.onMouseMove (JD.succeed (OnDrag a))
             ]
                 |> Sub.batch

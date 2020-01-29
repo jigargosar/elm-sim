@@ -77,7 +77,13 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update message model =
     case message of
         OnDragMsg dragMsg ->
-            ( onDragMessage dragMsg model, Cmd.none )
+            let
+                ( drag, out ) =
+                    Drag.update dragMsg model.drag
+            in
+            ( { model | drag = drag } |> handleDragEvents out
+            , Cmd.none
+            )
 
         BrowserResized wh ->
             ( { model | scene = wh }, Cmd.none )
@@ -87,16 +93,6 @@ update message model =
 
         OnMouseDown editMode drag ->
             ( { model | editMode = editMode, drag = drag }, Cmd.none )
-
-
-onDragMessage : DragMsg -> Model -> Model
-onDragMessage message model =
-    let
-        ( drag, out ) =
-            Drag.update message model.drag
-    in
-    { model | drag = drag }
-        |> handleDragEvents out
 
 
 handleDragEvents : Drag.OutMsg -> Model -> Model

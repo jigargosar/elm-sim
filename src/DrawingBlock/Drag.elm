@@ -4,7 +4,7 @@ module DrawingBlock.Drag exposing
     , Msg
     , OutMsg(..)
     , delta
-    , init
+    , intial
     , onDown
     , subscriptions
     , update
@@ -34,23 +34,22 @@ type Model
     | Up
 
 
-type Msg a
-    = OnDown a Event
-    | OnDrag Event
+type Msg
+    = OnDrag Event
     | OnClick Event
     | OnDrop Event
 
 
-init : Model
-init =
+intial : Model
+intial =
     Up
 
 
-onDown : a -> VirtualDom.Attribute (Msg a)
-onDown a =
+onDown : (Model -> msg) -> VirtualDom.Attribute msg
+onDown msg =
     VirtualDom.on "mousedown"
         (VirtualDom.Normal
-            (JD.map (OnDown a) eventDecoder)
+            (JD.map (Down >> msg) eventDecoder)
         )
 
 
@@ -74,19 +73,15 @@ getEvent model =
             Nothing
 
 
-type OutMsg a
-    = Start a
-    | Move Float2
+type OutMsg
+    = Move Float2
     | Click
     | End
 
 
-update : Msg a -> Model -> ( Model, OutMsg a )
+update : Msg -> Model -> ( Model, OutMsg )
 update message model =
     case message of
-        OnDown a event ->
-            ( Down event, Start a )
-
         OnDrag event ->
             let
                 newModel =
@@ -101,7 +96,7 @@ update message model =
             ( Up, End )
 
 
-subscriptions : Model -> Sub (Msg a)
+subscriptions : Model -> Sub Msg
 subscriptions state =
     let
         decoder x =

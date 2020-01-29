@@ -6,7 +6,6 @@ import Browser
 import Browser.Events as BE
 import DrawingBlock.Drag as Drag
 import Html as H exposing (Html)
-import Html.Attributes as HA
 import IO
 import Json.Decode as JD
 import Number2 as N2 exposing (Float2, Int2)
@@ -44,7 +43,7 @@ type Edit
 
 
 type alias DragMsg =
-    Drag.Msg Edit
+    Drag.Msg
 
 
 type alias Flags =
@@ -55,7 +54,7 @@ init : Flags -> ( Model, Cmd Msg )
 init _ =
     ( { zoom = ( 1, 1 ) |> N2.scale 2.5
       , scene = ( 600, 600 )
-      , drag = Drag.init
+      , drag = Drag.intial
       , edit = NoEdit
       }
     , IO.getBrowserWH
@@ -71,6 +70,7 @@ type Msg
     = OnDragMsg DragMsg
     | BrowserResized Float2
     | OnKeyDown String
+    | OnDragStart Edit Drag.Model
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -85,6 +85,9 @@ update message model =
         OnKeyDown key ->
             ( onKeyDown key model, Cmd.none )
 
+        OnDragStart edit drag ->
+            ( { model | edit = edit, drag = drag }, Cmd.none )
+
 
 onDragMessage : DragMsg -> Model -> Model
 onDragMessage message model =
@@ -96,12 +99,9 @@ onDragMessage message model =
         |> handleDragEvents out
 
 
-handleDragEvents : Drag.OutMsg Edit -> Model -> Model
+handleDragEvents : Drag.OutMsg -> Model -> Model
 handleDragEvents out model =
     case out of
-        Drag.Start _ ->
-            model
-
         Drag.Move ( _, dy ) ->
             let
                 zoomStep =
@@ -179,7 +179,7 @@ viewZoomData forceHover zoom =
     [ IO.tspan "Zoom = " []
     , IO.tspan (Debug.toString twoDecimalZoom)
         [ SA.id "zoom-element"
-        , Drag.onDown (Zoom zoom) |> HA.map OnDragMsg
+        , Drag.onDown (OnDragStart (Zoom zoom))
         , SA.class "pointer"
         , if forceHover then
             SA.style """

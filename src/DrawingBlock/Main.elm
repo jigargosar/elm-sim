@@ -12,6 +12,7 @@ import Json.Decode as JD
 import Number2 as N2 exposing (Float2, Int2)
 import PointFree exposing (ignoreNothing, mapEach)
 import Round
+import String2 as S2
 import Svg as S
 import Svg.Attributes as SA
 import Svg.Events as SE
@@ -190,12 +191,12 @@ viewZoomData : Float2 -> S.Svg Msg
 viewZoomData zoom =
     let
         twoDecimalZoom =
-            zoom |> mapEach (Round.round 2 >> String.toFloat |> ignoreNothing)
+            zoom |> mapEach (Round.round 2) |> S2.join " , "
     in
     [ IO.tspan "Zoom = " []
     , IO.tspan (Debug.toString twoDecimalZoom)
         [ SA.id "zoom-element"
-        , SE.on "down" (JD.map (OnMouseDown ZoomElement) IO.pageXYDecoder)
+        , SE.on "mousedown" (JD.map (OnMouseDown ZoomElement) IO.pageXYDecoder)
         , SA.class "pointer"
         ]
     , S.style []

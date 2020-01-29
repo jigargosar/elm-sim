@@ -1,4 +1,4 @@
-module DrawingBlock.Drag exposing (Model, Msg, init, initDown, subscriptions, update)
+module DrawingBlock.Drag exposing (Model, Msg(..), init, initDown, subscriptions, update)
 
 import Browser.Events as BE
 import Json.Decode as JD exposing (Decoder)

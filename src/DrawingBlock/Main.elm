@@ -120,13 +120,34 @@ update message ((Model ({ scene } as env) state) as model) =
             ( model, Cmd.none )
 
         DragMsg dragMsg ->
-            ( Model env { state | drag = Drag.update dragMsg state.drag }, Cmd.none )
+            ( Model env (onDragMessage dragMsg state), Cmd.none )
 
         BrowserResized wh ->
             ( Model { env | scene = wh } state, Cmd.none )
 
         OnKeyDown key ->
             ( Model env (onKeyDown key state), Cmd.none )
+
+
+updateDrag : Drag.Msg Element Float2 -> State -> State
+updateDrag message state =
+    { state | drag = Drag.update message state.drag }
+
+
+onDragMessage : Drag.Msg Element Float2 -> State -> State
+onDragMessage message =
+    updateDrag message
+        >> handleDragEvents message
+
+
+handleDragEvents : Drag.Msg Element Float2 -> State -> State
+handleDragEvents message state =
+    case message of
+        Drag.OnClick ZoomElement _ ->
+            { state | zoom = N2.scale 1.1 state.zoom }
+
+        _ ->
+            state
 
 
 onMouseDown : State -> State

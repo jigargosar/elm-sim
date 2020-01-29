@@ -1,5 +1,5 @@
 module DrawingBlock.Drag exposing
-    ( Drag
+    ( DragModel
     , Event
     , Msg
     , OutMsg(..)
@@ -28,7 +28,7 @@ eventDecoder =
     JD.map Event IO.pageXYDecoder
 
 
-type alias Drag =
+type alias DragModel =
     Maybe State
 
 
@@ -50,7 +50,7 @@ type Msg
     | OnUp Event
 
 
-intial : Drag
+intial : DragModel
 intial =
     Nothing
 
@@ -59,7 +59,7 @@ fromEvent e =
     Just (State e e e MouseDown)
 
 
-onDown : (Drag -> msg) -> VirtualDom.Attribute msg
+onDown : (DragModel -> msg) -> VirtualDom.Attribute msg
 onDown msg =
     VirtualDom.on "mousedown"
         (VirtualDom.Normal
@@ -67,14 +67,14 @@ onDown msg =
         )
 
 
-deltaState : State -> ( Float, Float )
-deltaState { current, prev } =
-    ( current, prev ) |> (mapEach .pageXY >> uncurry N2.sub)
-
-
-delta : Drag -> ( Float, Float )
+delta : DragModel -> ( Float, Float )
 delta maybeState =
-    Maybe.map deltaState maybeState |> Maybe.withDefault ( 0, 0 )
+    Maybe.map deltaHelp maybeState |> Maybe.withDefault ( 0, 0 )
+
+
+deltaHelp : State -> ( Float, Float )
+deltaHelp { current, prev } =
+    ( current, prev ) |> (mapEach .pageXY >> uncurry N2.sub)
 
 
 type OutMsg
@@ -83,7 +83,7 @@ type OutMsg
     | End
 
 
-update : Msg -> Drag -> ( Drag, OutMsg )
+update : Msg -> DragModel -> ( DragModel, OutMsg )
 update message (maybeState as model) =
     case message of
         OnMove event ->
@@ -113,7 +113,7 @@ update message (maybeState as model) =
                     )
 
 
-subscriptions : Drag -> Sub Msg
+subscriptions : DragModel -> Sub Msg
 subscriptions maybeState =
     let
         decoder x =

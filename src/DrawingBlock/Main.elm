@@ -77,6 +77,7 @@ type Msg
     | DragMsg (Drag.Msg Element Float2)
     | BrowserResized Float2
     | OnKeyDown String
+    | OnMouseDown Element Float2
 
 
 type alias EventDiff =
@@ -127,6 +128,9 @@ update message ((Model ({ scene } as env) state) as model) =
 
         OnKeyDown key ->
             ( Model env (onKeyDown key state), Cmd.none )
+
+        OnMouseDown element pageXY ->
+            ( Model env { state | drag = Drag.initDown element pageXY }, Cmd.none )
 
 
 updateDrag : Drag.Msg Element Float2 -> State -> State
@@ -226,6 +230,7 @@ viewZoomData isMouseOver zoom =
         [ SA.id "zoom-element"
         , SE.onMouseOver MouseOverZoom
         , SE.onMouseOut MouseOutZoom
+        , SE.on "down" (JD.map (OnMouseDown ZoomElement) IO.pageXYDecoder)
         , SA.fill
             (if isMouseOver then
                 "green"

@@ -30,10 +30,6 @@ type alias EventData =
     ( Timestamp, Float2 )
 
 
-type Element
-    = ZoomElement
-
-
 type alias Model =
     { zoom : Float2
     , scene : Float2
@@ -42,11 +38,15 @@ type alias Model =
 
 
 type alias DragModel =
-    Drag.Model Element
+    Drag.Model Mode
+
+
+type Mode
+    = Zoom Float2
 
 
 type alias DragMsg =
-    Drag.Msg Element
+    Drag.Msg Mode
 
 
 type alias Flags =
@@ -72,7 +72,6 @@ type Msg
     = OnDragMsg DragMsg
     | BrowserResized Float2
     | OnKeyDown String
-    | OnMouseDown Element Drag.Event
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -86,9 +85,6 @@ update message model =
 
         OnKeyDown key ->
             ( onKeyDown key model, Cmd.none )
-
-        OnMouseDown element pageXY ->
-            ( { model | drag = Drag.initDown element pageXY }, Cmd.none )
 
 
 updateDrag : DragMsg -> Model -> Model
@@ -105,10 +101,7 @@ onDragMessage message model =
 handleDragEvents : DragMsg -> Model -> Model
 handleDragEvents message model =
     case message of
-        Drag.OnClick ZoomElement _ ->
-            { model | zoom = N2.scale 1.1 model.zoom }
-
-        Drag.OnDrag ZoomElement _ ->
+        Drag.OnDrag (Zoom _) _ ->
             let
                 dy =
                     10
@@ -169,7 +162,7 @@ viewState model =
     let
         isDraggingZoom =
             case Drag.getA model.drag of
-                Just ZoomElement ->
+                Just (Zoom _) ->
                     True
 
                 _ ->
@@ -188,7 +181,7 @@ viewZoomData forceHover zoom =
     [ IO.tspan "Zoom = " []
     , IO.tspan (Debug.toString twoDecimalZoom)
         [ SA.id "zoom-element"
-        , Drag.onDown ZoomElement |> HA.map OnDragMsg
+        , Drag.onDown (Zoom zoom) |> HA.map OnDragMsg
         , SA.class "pointer"
         , if forceHover then
             SA.style """

@@ -3,6 +3,7 @@ module DrawingBlock.Drag exposing
     , Event
     , Msg
     , OutMsg(..)
+    , delta
     , intial
     , onDown
     , subscriptions
@@ -66,13 +67,18 @@ onDown msg =
         )
 
 
-delta : State -> ( Float, Float )
-delta { current, prev } =
+deltaState : State -> ( Float, Float )
+deltaState { current, prev } =
     ( current, prev ) |> (mapEach .pageXY >> uncurry N2.sub)
 
 
+delta : Drag -> ( Float, Float )
+delta (Drag maybeState) =
+    Maybe.map deltaState maybeState |> Maybe.withDefault ( 0, 0 )
+
+
 type OutMsg
-    = Move Float2
+    = Move
     | Click
     | End
 
@@ -86,11 +92,11 @@ update message ((Drag maybeState) as model) =
                     ( model, End )
 
                 Just state ->
-                    let
-                        newState =
-                            { state | prev = state.current, current = event, type_ = MouseDrag }
-                    in
-                    ( newState |> Just |> Drag, Move (delta newState) )
+                    ( { state | prev = state.current, current = event, type_ = MouseDrag }
+                        |> Just
+                        |> Drag
+                    , Move
+                    )
 
         OnUp _ ->
             case maybeState of

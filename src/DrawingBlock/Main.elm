@@ -102,8 +102,11 @@ onDragMessage message model =
 handleDragEvents : Drag.OutMsg -> Model -> Model
 handleDragEvents out model =
     case out of
-        Drag.Move ( _, dy ) ->
+        Drag.Move ->
             let
+                ( _, dy ) =
+                    Drag.delta model.drag
+
                 zoomStep =
                     ( dy, dy ) |> N2.scale 0.01 |> N2.mul model.zoom
             in

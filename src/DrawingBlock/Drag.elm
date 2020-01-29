@@ -2,6 +2,7 @@ module DrawingBlock.Drag exposing
     ( Event
     , Model
     , Msg(..)
+    , delta
     , eventDecoder
     , getA
     , init
@@ -11,10 +12,12 @@ module DrawingBlock.Drag exposing
     , update
     )
 
+import Basics.Extra exposing (uncurry)
 import Browser.Events as BE
 import IO
 import Json.Decode as JD exposing (Decoder)
-import Number2 exposing (Float2)
+import Number2 as N2 exposing (Float2)
+import PointFree exposing (mapEach)
 import VirtualDom
 
 
@@ -56,6 +59,26 @@ onDown a =
         (VirtualDom.Normal
             (JD.map (OnDown a) eventDecoder)
         )
+
+
+delta : Model a -> Model b -> ( Float, Float )
+delta oldModel newModel =
+    Maybe.map2 Tuple.pair (getEvent newModel) (getEvent oldModel)
+        |> Maybe.map (mapEach .pageXY >> uncurry N2.sub)
+        |> Maybe.withDefault ( 0, 0 )
+
+
+getEvent : Model a -> Maybe Event
+getEvent model =
+    case model of
+        Down _ e ->
+            Just e
+
+        Drag _ e ->
+            Just e
+
+        Up ->
+            Nothing
 
 
 getA : Model a -> Maybe a

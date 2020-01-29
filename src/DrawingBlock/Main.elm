@@ -95,16 +95,16 @@ updateDrag message state =
 onDragMessage : DragMsg -> Model -> Model
 onDragMessage message model =
     updateDrag message model
-        |> handleDragEvents message
+        |> handleDragEvents model.drag message
 
 
-handleDragEvents : DragMsg -> Model -> Model
-handleDragEvents message model =
+handleDragEvents : DragModel -> DragMsg -> Model -> Model
+handleDragEvents prevDrag message model =
     case message of
         Drag.OnDrag (Zoom _) _ ->
             let
-                dy =
-                    10
+                ( _, dy ) =
+                    Drag.delta prevDrag model.drag
 
                 zoomStep =
                     ( dy, dy ) |> N2.scale 0.01 |> N2.mul model.zoom

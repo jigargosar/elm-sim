@@ -1,52 +1,62 @@
-module DrawingBlock.Drag exposing (Model, Msg, subscriptions)
+module DrawingBlock.Drag exposing (Model, Msg, subscriptions, update)
 
 import Browser.Events as BE
-import Json.Decode as JD
+import Json.Decode as JD exposing (Decoder)
 
 
-type Model a
-    = Down a
-    | Drag a
+type Model a b
+    = Down a b
+    | Drag a b
     | Up
 
 
-type Msg a
-    = OnDown a
-    | OnDrag a
-    | OnClick a
-    | OnDrop a
+type Msg a b
+    = OnDrag a b
+    | OnClick a b
+    | OnDrop a b
 
 
-update : Msg a -> Model a -> Model a
+init : Model a b
+init =
+    Up
+
+
+initDown : a -> b -> Model a b
+initDown =
+    Down
+
+
+update : Msg a b -> Model a b -> Model a b
 update message model =
     case message of
-        OnDown a ->
-            Down a
+        OnDrag a b ->
+            Drag a b
 
-        OnDrag a ->
-            Drag a
-
-        OnClick _ ->
+        OnClick _ _ ->
             Up
 
-        OnDrop _ ->
+        OnDrop _ _ ->
             Up
 
 
-subscriptions : Model a -> Sub (Msg a)
-subscriptions state =
+subscriptions : Decoder b -> Model a b -> Sub (Msg a b)
+subscriptions bDecoder state =
+    let
+        decoder x =
+            JD.map x bDecoder
+    in
     case state of
         Up ->
             Sub.none
 
-        Down a ->
-            [ BE.onMouseUp (JD.succeed (OnClick a))
-            , BE.onMouseMove (JD.succeed (OnDrag a))
+        Down a _ ->
+            [ BE.onMouseUp (decoder (OnClick a))
+            , BE.onMouseMove (decoder (OnDrag a))
             ]
                 |> Sub.batch
 
-        Drag a ->
-            [ BE.onMouseUp (JD.succeed (OnDrop a))
-            , BE.onMouseMove (JD.succeed (OnDrag a))
+        Drag a _ ->
+            [ BE.onMouseUp (decoder (OnDrop a))
+            , BE.onMouseMove (decoder (OnDrag a))
             ]
                 |> Sub.batch

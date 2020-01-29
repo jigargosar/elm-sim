@@ -1,59 +1,67 @@
-module DrawingBlock.Drag exposing (Model, Msg(..), data, getA, init, initDown, subscriptions, update)
+module DrawingBlock.Drag exposing
+    ( Event
+    , Model
+    , Msg(..)
+    , eventDecoder
+    , getA
+    , init
+    , initDown
+    , subscriptions
+    , update
+    )
 
 import Browser.Events as BE
+import IO
 import Json.Decode as JD exposing (Decoder)
+import Number2 exposing (Float2)
 
 
-type Model a b
-    = Down a b
-    | Drag a b
+type alias Event =
+    { pageXY : Float2 }
+
+
+eventDecoder : Decoder Event
+eventDecoder =
+    JD.map Event IO.pageXYDecoder
+
+
+type Model a
+    = Down a Event
+    | Drag a Event
     | Up
 
 
-type Msg a b
-    = OnDrag a b
-    | OnClick a b
-    | OnDrop a b
+type Msg a
+    = OnDrag a Event
+    | OnClick a Event
+    | OnDrop a Event
 
 
-init : Model a b
+init : Model a
 init =
     Up
 
 
-initDown : a -> b -> Model a b
+initDown : a -> Event -> Model a
 initDown =
     Down
 
 
-data : Model a b -> Maybe b
-data model =
-    case model of
-        Up ->
-            Nothing
-
-        Down a b ->
-            Just b
-
-        Drag a b ->
-            Just b
-
-
-getA : Model a b -> Maybe a
+getA : Model a -> Maybe a
 getA model =
     case model of
         Up ->
             Nothing
 
-        Down a b ->
+        Down a _ ->
             Just a
 
-        Drag a b ->
+        Drag a _ ->
             Just a
 
 
-update : Msg a b -> Model a b -> Model a b
-update message model =
+update : Msg a -> Model a -> Model a
+update message _ =
     case message of
         OnDrag a b ->
             Drag a b
@@ -65,11 +73,11 @@ update message model =
             Up
 
 
-subscriptions : Decoder b -> Model a b -> Sub (Msg a b)
-subscriptions bDecoder state =
+subscriptions : Model a -> Sub (Msg a)
+subscriptions state =
     let
         decoder x =
-            JD.map x bDecoder
+            JD.map x eventDecoder
     in
     case state of
         Up ->

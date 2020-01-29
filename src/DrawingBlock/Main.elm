@@ -2,7 +2,6 @@ module DrawingBlock.Main exposing (main)
 
 -- Browser.Element Scaffold
 
-import Basics.Extra exposing (uncurry)
 import Browser
 import Browser.Events as BE
 import DrawingBlock.Drag as Drag
@@ -10,7 +9,7 @@ import Html as H exposing (Html)
 import IO
 import Json.Decode as JD
 import Number2 as N2 exposing (Float2, Int2)
-import PointFree exposing (ignoreNothing, mapEach)
+import PointFree exposing (mapEach)
 import Round
 import String2 as S2
 import Svg as S
@@ -43,11 +42,11 @@ type alias Model =
 
 
 type alias DragModel =
-    Drag.Model ( Element, Float2 ) Float2
+    Drag.Model Element
 
 
 type alias DragMsg =
-    Drag.Msg ( Element, Float2 ) Float2
+    Drag.Msg Element
 
 
 type alias Flags =
@@ -73,38 +72,7 @@ type Msg
     = OnDragMsg DragMsg
     | BrowserResized Float2
     | OnKeyDown String
-    | OnMouseDown Element Float2
-
-
-type alias EventDiff =
-    { dx : Float
-    , dy : Float
-    , isDragging : Bool
-    }
-
-
-eventDiff : EventData -> EventData -> EventDiff
-eventDiff ( st, sxy ) ( t, xy ) =
-    let
-        elapsed =
-            ( t, st ) |> uncurry (-)
-
-        tooLong =
-            abs elapsed > (3 * 1000)
-
-        dx =
-            ( xy, sxy ) |> mapEach Tuple.first |> uncurry (-)
-
-        dy =
-            ( xy, sxy ) |> mapEach Tuple.second |> uncurry (-)
-
-        tooFar =
-            abs dx > 10 || abs dy > 10
-
-        isDragging =
-            tooLong || tooFar
-    in
-    EventDiff dx dy isDragging
+    | OnMouseDown Element Drag.Event
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -120,7 +88,7 @@ update message model =
             ( onKeyDown key model, Cmd.none )
 
         OnMouseDown element pageXY ->
-            ( { model | drag = Drag.initDown ( element, pageXY ) pageXY }, Cmd.none )
+            ( { model | drag = Drag.initDown element pageXY }, Cmd.none )
 
 
 updateDrag : DragMsg -> Model -> Model
@@ -130,24 +98,20 @@ updateDrag message state =
 
 onDragMessage : DragMsg -> Model -> Model
 onDragMessage message model =
-    let
-        prevDragData =
-            Drag.data model.drag
-    in
     updateDrag message model
-        |> handleDragEvents prevDragData message
+        |> handleDragEvents message
 
 
-handleDragEvents : Maybe Float2 -> DragMsg -> Model -> Model
-handleDragEvents mabePrev message model =
+handleDragEvents : DragMsg -> Model -> Model
+handleDragEvents message model =
     case message of
-        Drag.OnClick ( ZoomElement, _ ) _ ->
+        Drag.OnClick ZoomElement _ ->
             { model | zoom = N2.scale 1.1 model.zoom }
 
-        Drag.OnDrag ( ZoomElement, _ ) current ->
+        Drag.OnDrag ZoomElement _ ->
             let
-                ( dx, dy ) =
-                    N2.sub current (Maybe.withDefault current mabePrev)
+                dy =
+                    10
 
                 zoomStep =
                     ( dy, dy ) |> N2.scale 0.01 |> N2.mul model.zoom
@@ -178,10 +142,6 @@ onKeyDown key state =
     { state | zoom = zoom }
 
 
-eventDecoder =
-    JD.map2 Tuple.pair IO.timeStampDecoder IO.pageXYDecoder
-
-
 keyDecoder =
     JD.field "key" JD.string
 
@@ -190,7 +150,7 @@ subscriptions : Model -> Sub Msg
 subscriptions model =
     [ IO.onBrowserWH BrowserResized
     , JD.map OnKeyDown keyDecoder |> BE.onKeyDown
-    , Drag.subscriptions IO.pageXYDecoder model.drag |> Sub.map OnDragMsg
+    , Drag.subscriptions model.drag |> Sub.map OnDragMsg
     ]
         |> Sub.batch
 
@@ -204,11 +164,12 @@ view model =
     canvas model.scene model.zoom (viewState model)
 
 
+viewState : Model -> List (S.Svg Msg)
 viewState model =
     let
         isDraggingZoom =
             case Drag.getA model.drag of
-                Just ( ZoomElement, _ ) ->
+                Just ZoomElement ->
                     True
 
                 _ ->
@@ -227,7 +188,7 @@ viewZoomData forceHover zoom =
     [ IO.tspan "Zoom = " []
     , IO.tspan (Debug.toString twoDecimalZoom)
         [ SA.id "zoom-element"
-        , SE.on "mousedown" (JD.map (OnMouseDown ZoomElement) IO.pageXYDecoder)
+        , SE.on "mousedown" (JD.map (OnMouseDown ZoomElement) Drag.eventDecoder)
         , SA.class "pointer"
         , if forceHover then
             SA.style """

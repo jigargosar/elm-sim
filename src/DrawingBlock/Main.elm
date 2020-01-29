@@ -6,6 +6,7 @@ import Browser
 import Browser.Events as BE
 import DrawingBlock.Drag as Drag
 import Html as H exposing (Html)
+import Html.Attributes as HA
 import IO
 import Json.Decode as JD
 import Number2 as N2 exposing (Float2, Int2)
@@ -14,7 +15,6 @@ import Round
 import String2 as S2
 import Svg as S
 import Svg.Attributes as SA
-import Svg.Events as SE
 import Task
 
 
@@ -188,7 +188,7 @@ viewZoomData forceHover zoom =
     [ IO.tspan "Zoom = " []
     , IO.tspan (Debug.toString twoDecimalZoom)
         [ SA.id "zoom-element"
-        , SE.on "mousedown" (JD.map (OnMouseDown ZoomElement) Drag.eventDecoder)
+        , Drag.onDown ZoomElement |> HA.map OnDragMsg
         , SA.class "pointer"
         , if forceHover then
             SA.style """

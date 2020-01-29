@@ -6,6 +6,7 @@ module DrawingBlock.Drag exposing
     , getA
     , init
     , initDown
+    , onDown
     , subscriptions
     , update
     )
@@ -14,6 +15,7 @@ import Browser.Events as BE
 import IO
 import Json.Decode as JD exposing (Decoder)
 import Number2 exposing (Float2)
+import VirtualDom
 
 
 type alias Event =
@@ -32,7 +34,8 @@ type Model a
 
 
 type Msg a
-    = OnDrag a Event
+    = OnDown a Event
+    | OnDrag a Event
     | OnClick a Event
     | OnDrop a Event
 
@@ -43,8 +46,16 @@ init =
 
 
 initDown : a -> Event -> Model a
-initDown =
-    Down
+initDown a event =
+    update (OnDown a event) init
+
+
+onDown : a -> VirtualDom.Attribute (Msg a)
+onDown a =
+    VirtualDom.on "mousedown"
+        (VirtualDom.Normal
+            (JD.map (OnDown a) eventDecoder)
+        )
 
 
 getA : Model a -> Maybe a
@@ -63,8 +74,11 @@ getA model =
 update : Msg a -> Model a -> Model a
 update message _ =
     case message of
-        OnDrag a b ->
-            Drag a b
+        OnDown a event ->
+            Down a event
+
+        OnDrag a event ->
+            Drag a event
 
         OnClick _ _ ->
             Up

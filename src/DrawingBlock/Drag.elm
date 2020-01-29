@@ -1,12 +1,10 @@
 module DrawingBlock.Drag exposing
     ( Event
     , Model
-    , Msg(..)
+    , Msg
+    , OutMsg(..)
     , delta
-    , eventDecoder
-    , getA
     , init
-    , initDown
     , onDown
     , subscriptions
     , update
@@ -48,11 +46,6 @@ init =
     Up
 
 
-initDown : a -> Event -> Model a
-initDown a event =
-    update (OnDown a event) init
-
-
 onDown : a -> VirtualDom.Attribute (Msg a)
 onDown a =
     VirtualDom.on "mousedown"
@@ -81,33 +74,31 @@ getEvent model =
             Nothing
 
 
-getA : Model a -> Maybe a
-getA model =
-    case model of
-        Up ->
-            Nothing
-
-        Down a _ ->
-            Just a
-
-        Drag a _ ->
-            Just a
+type OutMsg a
+    = Start a
+    | Move Float2
+    | Click
+    | End
 
 
-update : Msg a -> Model a -> Model a
-update message _ =
+update : Msg a -> Model a -> ( Model a, OutMsg a )
+update message model =
     case message of
         OnDown a event ->
-            Down a event
+            ( Down a event, Start a )
 
         OnDrag a event ->
-            Drag a event
+            let
+                newModel =
+                    Drag a event
+            in
+            ( newModel, Move (delta model newModel) )
 
         OnClick _ _ ->
-            Up
+            ( Up, Click )
 
         OnDrop _ _ ->
-            Up
+            ( Up, End )
 
 
 subscriptions : Model a -> Sub (Msg a)

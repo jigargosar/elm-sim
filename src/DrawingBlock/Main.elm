@@ -34,19 +34,21 @@ type alias Model =
     { zoom : Float2
     , scene : Float2
     , drag : DragModel
+    , edit : Edit
     }
 
 
-type alias DragModel =
-    Drag.Model Mode
-
-
-type Mode
+type Edit
     = Zoom Float2
+    | NoEdit
+
+
+type alias DragModel =
+    Drag.Model Edit
 
 
 type alias DragMsg =
-    Drag.Msg Mode
+    Drag.Msg Edit
 
 
 type alias Flags =
@@ -58,6 +60,7 @@ init _ =
     ( { zoom = ( 1, 1 ) |> N2.scale 2.5
       , scene = ( 600, 600 )
       , drag = Drag.init
+      , edit = NoEdit
       }
     , IO.getBrowserWH
         |> Task.perform BrowserResized
@@ -87,25 +90,24 @@ update message model =
             ( onKeyDown key model, Cmd.none )
 
 
-updateDrag : DragMsg -> Model -> Model
-updateDrag message state =
-    { state | drag = Drag.update message state.drag }
-
-
 onDragMessage : DragMsg -> Model -> Model
 onDragMessage message model =
-    updateDrag message model
-        |> handleDragEvents model.drag message
+    let
+        ( drag, out ) =
+            Drag.update message model.drag
+    in
+    { model | drag = drag }
+        |> handleDragEvents out
 
 
-handleDragEvents : DragModel -> DragMsg -> Model -> Model
-handleDragEvents prevDrag message model =
-    case message of
-        Drag.OnDrag (Zoom _) _ ->
+handleDragEvents : Drag.OutMsg Edit -> Model -> Model
+handleDragEvents out model =
+    case out of
+        Drag.Start _ ->
+            model
+
+        Drag.Move ( _, dy ) ->
             let
-                ( _, dy ) =
-                    Drag.delta prevDrag model.drag
-
                 zoomStep =
                     ( dy, dy ) |> N2.scale 0.01 |> N2.mul model.zoom
             in
@@ -161,8 +163,8 @@ viewState : Model -> List (S.Svg Msg)
 viewState model =
     let
         isDraggingZoom =
-            case Drag.getA model.drag of
-                Just (Zoom _) ->
+            case model.edit of
+                Zoom _ ->
                     True
 
                 _ ->

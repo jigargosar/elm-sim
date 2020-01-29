@@ -39,7 +39,7 @@ type alias Model =
 
 type EditMode
     = Zooming Float2
-    | NoEdit
+    | NotEditing
 
 
 type alias DragMsg =
@@ -55,7 +55,7 @@ init _ =
     ( { zoom = ( 1, 1 ) |> N2.scale 2.5
       , scene = ( 600, 600 )
       , drag = Drag.intial
-      , edit = NoEdit
+      , edit = NotEditing
       }
     , IO.getBrowserWH
         |> Task.perform BrowserResized

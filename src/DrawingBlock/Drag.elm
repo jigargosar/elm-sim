@@ -1,5 +1,6 @@
 module DrawingBlock.Drag exposing (State, onDown)
 
+import Browser.Events as BE
 import IO
 import Json.Decode as JD
 import Number2 exposing (Float2)
@@ -29,6 +30,7 @@ type Msg
     | OnMouseMove EventData
 
 
+eventDataDecoder : JD.Decoder EventData
 eventDataDecoder =
     JD.map2 EventData IO.pageXYDecoder IO.timeStampDecoder
 
@@ -40,3 +42,15 @@ onDown toMsg =
             (JD.map OnMouseDown eventDataDecoder)
         )
         |> VirtualDom.mapAttribute toMsg
+
+
+subscriptions state =
+    case state of
+        Up ->
+            BE.onMouseDown (JD.map OnMouseDown eventDataDecoder)
+
+        Down _ _ ->
+            [ BE.onMouseUp (JD.map OnMouseUp eventDataDecoder)
+            , BE.onMouseMove (JD.map OnMouseMove eventDataDecoder)
+            ]
+                |> Sub.batch

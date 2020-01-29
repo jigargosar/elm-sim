@@ -28,9 +28,20 @@ eventDecoder =
 
 
 type Drag
-    = Down Event
-    | Drag Event
-    | Up
+    = Drag (Maybe State)
+
+
+type alias State =
+    { start : Event
+    , prev : Event
+    , current : Event
+    , type_ : EventType
+    }
+
+
+type EventType
+    = MouseDown
+    | MouseDrag
 
 
 type Msg
@@ -40,35 +51,24 @@ type Msg
 
 intial : Drag
 intial =
-    Up
+    Drag Nothing
+
+
+fromEvent e =
+    Drag (Just (State e e e MouseDown))
 
 
 onDown : (Drag -> msg) -> VirtualDom.Attribute msg
 onDown msg =
     VirtualDom.on "mousedown"
         (VirtualDom.Normal
-            (JD.map (Down >> msg) eventDecoder)
+            (JD.map (fromEvent >> msg) eventDecoder)
         )
 
 
-delta : Drag -> Drag -> ( Float, Float )
-delta oldModel newModel =
-    Maybe.map2 Tuple.pair (getEvent newModel) (getEvent oldModel)
-        |> Maybe.map (mapEach .pageXY >> uncurry N2.sub)
-        |> Maybe.withDefault ( 0, 0 )
-
-
-getEvent : Drag -> Maybe Event
-getEvent model =
-    case model of
-        Down e ->
-            Just e
-
-        Drag e ->
-            Just e
-
-        Up ->
-            Nothing
+delta : State -> ( Float, Float )
+delta { current, prev } =
+    ( current, prev ) |> (mapEach .pageXY >> uncurry N2.sub)
 
 
 type OutMsg
@@ -78,48 +78,45 @@ type OutMsg
 
 
 update : Msg -> Drag -> ( Drag, OutMsg )
-update message model =
+update message ((Drag maybeState) as model) =
     case message of
         OnMove event ->
-            case model of
-                Up ->
-                    ( Up, End )
+            case maybeState of
+                Nothing ->
+                    ( model, End )
 
-                Down _ ->
+                Just state ->
                     let
-                        newModel =
-                            Drag event
+                        newState =
+                            { state | prev = state.current, current = event, type_ = MouseDrag }
                     in
-                    ( newModel, Move (delta model newModel) )
-
-                Drag _ ->
-                    let
-                        newModel =
-                            Drag event
-                    in
-                    ( newModel, Move (delta model newModel) )
+                    ( newState |> Just |> Drag, Move (delta newState) )
 
         OnUp _ ->
-            case model of
-                Up ->
-                    ( Up, End )
+            case maybeState of
+                Nothing ->
+                    ( model, End )
 
-                Down _ ->
-                    ( Up, Click )
+                Just { type_ } ->
+                    ( Drag Nothing
+                    , case type_ of
+                        MouseDown ->
+                            Click
 
-                Drag _ ->
-                    ( Up, End )
+                        MouseDrag ->
+                            End
+                    )
 
 
 subscriptions : Drag -> Sub Msg
-subscriptions state =
+subscriptions (Drag maybeState) =
     let
         decoder x =
             JD.map x eventDecoder
 
         subs =
-            case state of
-                Up ->
+            case maybeState of
+                Nothing ->
                     []
 
                 _ ->

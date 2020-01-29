@@ -5,6 +5,7 @@ module DrawingBlock.Main exposing (main)
 import Basics.Extra exposing (uncurry)
 import Browser
 import Browser.Events as BE
+import DrawingBlock.Drag as Drag
 import Html as H exposing (Html)
 import IO
 import Json.Decode as JD
@@ -29,17 +30,12 @@ type alias EventData =
     ( Timestamp, Float2 )
 
 
-type Mouse
-    = Up
-    | Down EventData EventData
-
-
 type Element
     = ZoomElement
 
 
 type alias Env =
-    { mouse : Mouse, scene : Float2 }
+    { scene : Float2 }
 
 
 type Model
@@ -50,6 +46,7 @@ type alias State =
     { zoom : Float2
     , mouseOver : Maybe Element
     , mouseDown : Maybe ( Float2, Maybe Element )
+    , drag : Drag.Model Element Float2
     }
 
 
@@ -59,10 +56,11 @@ type alias Flags =
 
 init : Flags -> ( Model, Cmd Msg )
 init _ =
-    ( Model (Env Up ( 600, 600 ))
+    ( Model (Env ( 600, 600 ))
         { zoom = ( 1, 1 ) |> N2.scale 2.5
         , mouseOver = Nothing
         , mouseDown = Nothing
+        , drag = Drag.init
         }
     , IO.getBrowserWH
         |> Task.perform BrowserResized
@@ -77,13 +75,11 @@ init _ =
 type StateMsg
     = MouseOverZoom
     | MouseOutZoom
+    | DragMsg (Drag.Msg Element Float2)
 
 
 type EnvMsg
     = BrowserResized Float2
-    | OnMouseDown EventData
-    | OnMouseUp EventData
-    | OnMouseMove EventData
     | OnKeyDown String
 
 
@@ -124,13 +120,21 @@ eventDiff ( st, sxy ) ( t, xy ) =
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
-update message ((Model ({ mouse, scene } as env) state) as model) =
+update message ((Model ({ scene } as env) state) as model) =
     case message of
         EnvMsg msg ->
             ( onEnvMessage msg env state, Cmd.none )
 
-        StateMsg _ ->
-            ( model, Cmd.none )
+        StateMsg msg ->
+            case msg of
+                MouseOverZoom ->
+                    ( model, Cmd.none )
+
+                MouseOutZoom ->
+                    ( model, Cmd.none )
+
+                DragMsg dragMsg ->
+                    ( Model env { state | drag = Drag.update dragMsg state.drag }, Cmd.none )
 
 
 onEnvMessage : EnvMsg -> Env -> State -> Model
@@ -139,25 +143,6 @@ onEnvMessage message env state =
     case message of
         BrowserResized wh ->
             Model { env | scene = wh } state
-
-        OnMouseDown e ->
-            Model { env | mouse = Down e e } (onMouseDown state)
-
-        OnMouseUp _ ->
-            case env.mouse of
-                Up ->
-                    Model env state
-
-                Down _ _ ->
-                    Model { env | mouse = Up } (onMouseUp state)
-
-        OnMouseMove current ->
-            case env.mouse of
-                Down start _ ->
-                    Model { env | mouse = Down start current } state
-
-                Up ->
-                    Model env state
 
         OnKeyDown key ->
             Model env (onKeyDown key state)
@@ -202,22 +187,22 @@ keyDecoder =
 
 
 subscriptions : Model -> Sub Msg
-subscriptions (Model env _) =
-    Sub.batch
-        [ IO.onBrowserWH BrowserResized
-        , case env.mouse of
-            Up ->
-                BE.onMouseDown (JD.map OnMouseDown eventDecoder)
+subscriptions (Model env state) =
+    let
+        envSub =
+            [ IO.onBrowserWH BrowserResized
+            , JD.map OnKeyDown keyDecoder |> BE.onKeyDown
+            ]
+                |> Sub.batch
 
-            Down _ _ ->
-                [ BE.onMouseUp (JD.map OnMouseUp eventDecoder)
-                , BE.onMouseMove (JD.map OnMouseMove eventDecoder)
-                ]
-                    |> Sub.batch
-        , JD.map OnKeyDown keyDecoder
-            |> BE.onKeyDown
+        stateSub =
+            [ Drag.subscriptions IO.pageXYDecoder state.drag |> Sub.map DragMsg ]
+                |> Sub.batch
+    in
+    Sub.batch
+        [ envSub |> Sub.map EnvMsg
+        , stateSub |> Sub.map StateMsg
         ]
-        |> Sub.map EnvMsg
 
 
 

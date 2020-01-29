@@ -129,22 +129,33 @@ updateDrag message state =
 
 
 onDragMessage : DragMsg -> Model -> Model
-onDragMessage message =
-    updateDrag message
-        >> handleDragEvents message
+onDragMessage message model =
+    let
+        prevDragData =
+            Drag.data model.drag
+    in
+    updateDrag message model
+        |> handleDragEvents prevDragData message
 
 
-handleDragEvents : DragMsg -> Model -> Model
-handleDragEvents message state =
+handleDragEvents : Maybe Float2 -> DragMsg -> Model -> Model
+handleDragEvents mabePrev message model =
     case message of
         Drag.OnClick ( ZoomElement, _ ) _ ->
-            { state | zoom = N2.scale 1.1 state.zoom }
+            { model | zoom = N2.scale 1.1 model.zoom }
 
         Drag.OnDrag ( ZoomElement, _ ) current ->
-            { state | zoom = N2.scale 1.1 state.zoom }
+            let
+                ( dx, dy ) =
+                    N2.sub current (Maybe.withDefault current mabePrev)
+
+                zoomStep =
+                    ( dy, dy ) |> N2.scale 0.01 |> N2.mul model.zoom
+            in
+            { model | zoom = N2.add model.zoom zoomStep }
 
         _ ->
-            state
+            model
 
 
 onKeyDown : String -> Model -> Model

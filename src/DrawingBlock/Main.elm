@@ -70,7 +70,7 @@ type Msg
     = OnDragMsg DragMsg
     | BrowserResized Float2
     | OnKeyDown String
-    | OnDragStart Edit Drag
+    | OnMouseDown Edit Drag
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -85,7 +85,7 @@ update message model =
         OnKeyDown key ->
             ( onKeyDown key model, Cmd.none )
 
-        OnDragStart edit drag ->
+        OnMouseDown edit drag ->
             ( { model | edit = edit, drag = drag }, Cmd.none )
 
 
@@ -179,7 +179,7 @@ viewZoomData forceHover zoom =
     [ IO.tspan "Zoom = " []
     , IO.tspan (Debug.toString twoDecimalZoom)
         [ SA.id "zoom-element"
-        , Drag.onDown (OnDragStart (Zoom zoom))
+        , Drag.onDown (OnMouseDown (Zoom zoom))
         , SA.class "pointer"
         , if forceHover then
             SA.style """

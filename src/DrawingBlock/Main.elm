@@ -38,7 +38,6 @@ type alias Model =
     { zoom : Float2
     , scene : Float2
     , mouseOver : Maybe Element
-    , mouseDown : Maybe ( Float2, Maybe Element )
     , drag : Drag.Model Element Float2
     }
 
@@ -52,7 +51,6 @@ init _ =
     ( { zoom = ( 1, 1 ) |> N2.scale 2.5
       , scene = ( 600, 600 )
       , mouseOver = Nothing
-      , mouseDown = Nothing
       , drag = Drag.init
       }
     , IO.getBrowserWH
@@ -145,16 +143,6 @@ handleDragEvents message state =
 
         _ ->
             state
-
-
-onMouseDown : Model -> Model
-onMouseDown state =
-    { state | mouseDown = Just ( state.zoom, state.mouseOver ) }
-
-
-onMouseUp : Model -> Model
-onMouseUp state =
-    { state | mouseDown = Nothing }
 
 
 onKeyDown : String -> Model -> Model

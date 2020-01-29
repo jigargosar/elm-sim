@@ -64,7 +64,6 @@ init _ =
         }
     , IO.getBrowserWH
         |> Task.perform BrowserResized
-        |> Cmd.map EnvMsg
     )
 
 
@@ -72,20 +71,12 @@ init _ =
 -- Update
 
 
-type StateMsg
+type Msg
     = MouseOverZoom
     | MouseOutZoom
     | DragMsg (Drag.Msg Element Float2)
-
-
-type EnvMsg
-    = BrowserResized Float2
+    | BrowserResized Float2
     | OnKeyDown String
-
-
-type Msg
-    = EnvMsg EnvMsg
-    | StateMsg StateMsg
 
 
 type alias EventDiff =
@@ -122,30 +113,20 @@ eventDiff ( st, sxy ) ( t, xy ) =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update message ((Model ({ scene } as env) state) as model) =
     case message of
-        EnvMsg msg ->
-            ( onEnvMessage msg env state, Cmd.none )
+        MouseOverZoom ->
+            ( model, Cmd.none )
 
-        StateMsg msg ->
-            case msg of
-                MouseOverZoom ->
-                    ( model, Cmd.none )
+        MouseOutZoom ->
+            ( model, Cmd.none )
 
-                MouseOutZoom ->
-                    ( model, Cmd.none )
+        DragMsg dragMsg ->
+            ( Model env { state | drag = Drag.update dragMsg state.drag }, Cmd.none )
 
-                DragMsg dragMsg ->
-                    ( Model env { state | drag = Drag.update dragMsg state.drag }, Cmd.none )
-
-
-onEnvMessage : EnvMsg -> Env -> State -> Model
-onEnvMessage message env state =
-    -- ( Model (updateEnv message env) (updateStateOnEnvMsg message state), Cmd.none )
-    case message of
         BrowserResized wh ->
-            Model { env | scene = wh } state
+            ( Model { env | scene = wh } state, Cmd.none )
 
         OnKeyDown key ->
-            Model env (onKeyDown key state)
+            ( Model env (onKeyDown key state), Cmd.none )
 
 
 onMouseDown : State -> State
@@ -188,21 +169,11 @@ keyDecoder =
 
 subscriptions : Model -> Sub Msg
 subscriptions (Model env state) =
-    let
-        envSub =
-            [ IO.onBrowserWH BrowserResized
-            , JD.map OnKeyDown keyDecoder |> BE.onKeyDown
-            ]
-                |> Sub.batch
-
-        stateSub =
-            [ Drag.subscriptions IO.pageXYDecoder state.drag |> Sub.map DragMsg ]
-                |> Sub.batch
-    in
-    Sub.batch
-        [ envSub |> Sub.map EnvMsg
-        , stateSub |> Sub.map StateMsg
-        ]
+    [ IO.onBrowserWH BrowserResized
+    , JD.map OnKeyDown keyDecoder |> BE.onKeyDown
+    , Drag.subscriptions IO.pageXYDecoder state.drag |> Sub.map DragMsg
+    ]
+        |> Sub.batch
 
 
 
@@ -212,7 +183,6 @@ subscriptions (Model env state) =
 view : Model -> Html Msg
 view (Model env state) =
     canvas env.scene state.zoom (viewState state)
-        |> H.map StateMsg
 
 
 viewState state =
@@ -224,7 +194,7 @@ viewState state =
     ]
 
 
-viewZoomData : Bool -> Float2 -> S.Svg StateMsg
+viewZoomData : Bool -> Float2 -> S.Svg Msg
 viewZoomData isMouseOver zoom =
     let
         twoDecimalZoom =

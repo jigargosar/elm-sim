@@ -34,16 +34,9 @@ type Element
     = ZoomElement
 
 
-type alias Env =
-    { scene : Float2 }
-
-
-type Model
-    = Model Env State
-
-
-type alias State =
+type alias Model =
     { zoom : Float2
+    , scene : Float2
     , mouseOver : Maybe Element
     , mouseDown : Maybe ( Float2, Maybe Element )
     , drag : Drag.Model Element Float2
@@ -56,12 +49,12 @@ type alias Flags =
 
 init : Flags -> ( Model, Cmd Msg )
 init _ =
-    ( Model (Env ( 600, 600 ))
-        { zoom = ( 1, 1 ) |> N2.scale 2.5
-        , mouseOver = Nothing
-        , mouseDown = Nothing
-        , drag = Drag.init
-        }
+    ( { zoom = ( 1, 1 ) |> N2.scale 2.5
+      , scene = ( 600, 600 )
+      , mouseOver = Nothing
+      , mouseDown = Nothing
+      , drag = Drag.init
+      }
     , IO.getBrowserWH
         |> Task.perform BrowserResized
     )
@@ -112,7 +105,7 @@ eventDiff ( st, sxy ) ( t, xy ) =
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
-update message ((Model ({ scene } as env) state) as model) =
+update message model =
     case message of
         MouseOverZoom ->
             ( model, Cmd.none )
@@ -121,30 +114,30 @@ update message ((Model ({ scene } as env) state) as model) =
             ( model, Cmd.none )
 
         DragMsg dragMsg ->
-            ( Model env (onDragMessage dragMsg state), Cmd.none )
+            ( onDragMessage dragMsg model, Cmd.none )
 
         BrowserResized wh ->
-            ( Model { env | scene = wh } state, Cmd.none )
+            ( { model | scene = wh }, Cmd.none )
 
         OnKeyDown key ->
-            ( Model env (onKeyDown key state), Cmd.none )
+            ( onKeyDown key model, Cmd.none )
 
         OnMouseDown element pageXY ->
-            ( Model env { state | drag = Drag.initDown element pageXY }, Cmd.none )
+            ( { model | drag = Drag.initDown element pageXY }, Cmd.none )
 
 
-updateDrag : Drag.Msg Element Float2 -> State -> State
+updateDrag : Drag.Msg Element Float2 -> Model -> Model
 updateDrag message state =
     { state | drag = Drag.update message state.drag }
 
 
-onDragMessage : Drag.Msg Element Float2 -> State -> State
+onDragMessage : Drag.Msg Element Float2 -> Model -> Model
 onDragMessage message =
     updateDrag message
         >> handleDragEvents message
 
 
-handleDragEvents : Drag.Msg Element Float2 -> State -> State
+handleDragEvents : Drag.Msg Element Float2 -> Model -> Model
 handleDragEvents message state =
     case message of
         Drag.OnClick ZoomElement _ ->
@@ -154,17 +147,17 @@ handleDragEvents message state =
             state
 
 
-onMouseDown : State -> State
+onMouseDown : Model -> Model
 onMouseDown state =
     { state | mouseDown = Just ( state.zoom, state.mouseOver ) }
 
 
-onMouseUp : State -> State
+onMouseUp : Model -> Model
 onMouseUp state =
     { state | mouseDown = Nothing }
 
 
-onKeyDown : String -> State -> State
+onKeyDown : String -> Model -> Model
 onKeyDown key state =
     let
         _ =
@@ -193,10 +186,10 @@ keyDecoder =
 
 
 subscriptions : Model -> Sub Msg
-subscriptions (Model env state) =
+subscriptions model =
     [ IO.onBrowserWH BrowserResized
     , JD.map OnKeyDown keyDecoder |> BE.onKeyDown
-    , Drag.subscriptions IO.pageXYDecoder state.drag |> Sub.map DragMsg
+    , Drag.subscriptions IO.pageXYDecoder model.drag |> Sub.map DragMsg
     ]
         |> Sub.batch
 
@@ -206,8 +199,8 @@ subscriptions (Model env state) =
 
 
 view : Model -> Html Msg
-view (Model env state) =
-    canvas env.scene state.zoom (viewState state)
+view model =
+    canvas model.scene model.zoom (viewState model)
 
 
 viewState state =

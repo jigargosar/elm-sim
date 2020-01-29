@@ -37,7 +37,6 @@ type Element
 type alias Model =
     { zoom : Float2
     , scene : Float2
-    , mouseOver : Maybe Element
     , drag : Drag.Model Element Float2
     }
 
@@ -50,7 +49,6 @@ init : Flags -> ( Model, Cmd Msg )
 init _ =
     ( { zoom = ( 1, 1 ) |> N2.scale 2.5
       , scene = ( 600, 600 )
-      , mouseOver = Nothing
       , drag = Drag.init
       }
     , IO.getBrowserWH
@@ -63,9 +61,7 @@ init _ =
 
 
 type Msg
-    = MouseOverZoom
-    | MouseOutZoom
-    | DragMsg (Drag.Msg Element Float2)
+    = DragMsg (Drag.Msg Element Float2)
     | BrowserResized Float2
     | OnKeyDown String
     | OnMouseDown Element Float2
@@ -105,12 +101,6 @@ eventDiff ( st, sxy ) ( t, xy ) =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update message model =
     case message of
-        MouseOverZoom ->
-            ( model, Cmd.none )
-
-        MouseOutZoom ->
-            ( model, Cmd.none )
-
         DragMsg dragMsg ->
             ( onDragMessage dragMsg model, Cmd.none )
 
@@ -191,17 +181,13 @@ view model =
     canvas model.scene model.zoom (viewState model)
 
 
-viewState state =
-    [ let
-        isMouseOverZoom =
-            state.mouseOver == Just ZoomElement
-      in
-      viewZoomData isMouseOverZoom state.zoom
+viewState model =
+    [ viewZoomData model.zoom
     ]
 
 
-viewZoomData : Bool -> Float2 -> S.Svg Msg
-viewZoomData isMouseOver zoom =
+viewZoomData : Float2 -> S.Svg Msg
+viewZoomData zoom =
     let
         twoDecimalZoom =
             zoom |> mapEach (Round.round 2 >> String.toFloat |> ignoreNothing)
@@ -209,16 +195,17 @@ viewZoomData isMouseOver zoom =
     [ IO.tspan "Zoom = " []
     , IO.tspan (Debug.toString twoDecimalZoom)
         [ SA.id "zoom-element"
-        , SE.onMouseOver MouseOverZoom
-        , SE.onMouseOut MouseOutZoom
         , SE.on "down" (JD.map (OnMouseDown ZoomElement) IO.pageXYDecoder)
-        , SA.fill
-            (if isMouseOver then
-                "green"
-
-             else
-                ""
-            )
+        , SA.class "pointer"
+        ]
+    , S.style []
+        [ S.text
+            """
+                #zoom-element:hover{
+                    fill: green;
+                    cursor: ns-resize;
+                }
+            """
         ]
     ]
         |> IO.textGroup []

@@ -53,6 +53,11 @@ stopAll msg =
     CustomHandler msg True True
 
 
+stopAllHandler : Decoder a -> VirtualDom.Handler a
+stopAllHandler decoder =
+    VirtualDom.Custom (JD.map stopAll decoder)
+
+
 mouseTrigger : (State -> msg) -> VirtualDom.Attribute msg
 mouseTrigger msg =
     let
@@ -64,12 +69,7 @@ mouseTrigger msg =
                         Just (InternalState MouseDown e.pageXY)
                     )
     in
-    VirtualDom.on "mousedown"
-        (VirtualDom.Custom
-            (mouseDownStateDecoder
-                |> JD.map (msg >> stopAll)
-            )
-        )
+    IO.stopAllOn "mousedown" (JD.map msg mouseDownStateDecoder)
 
 
 type End

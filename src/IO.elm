@@ -1,9 +1,9 @@
-module IO exposing (canvas, getBrowserWH, group, movementXYDecoder, onBrowserWH, pageXYDecoder, scale2, text, textGroup, timeStampDecoder, transform, tspan)
+module IO exposing (canvas, getBrowserWH, group, movementXYDecoder, onBrowserWH, pageXYDecoder, scale2, stopAllOn, text, textGroup, timeStampDecoder, transform, tspan)
 
 import Browser.Dom as BD
 import Browser.Events as BE
 import Html as H
-import Json.Decode as JD
+import Json.Decode as JD exposing (Decoder)
 import Number2 as NT exposing (Float2)
 import PointFree exposing (mapEach)
 import String exposing (fromFloat)
@@ -11,6 +11,7 @@ import String2 as ST
 import Svg as S
 import Svg.Attributes as SA
 import Task
+import VirtualDom
 
 
 whFromRecord : { a | width : b, height : c } -> ( b, c )
@@ -107,3 +108,22 @@ movementXYDecoder =
 timeStampDecoder : JD.Decoder Float
 timeStampDecoder =
     JD.field "timeStamp" JD.float
+
+
+type alias CustomHandler msg =
+    { message : msg, preventDefault : Bool, stopPropagation : Bool }
+
+
+stopAll : a -> CustomHandler a
+stopAll msg =
+    CustomHandler msg True True
+
+
+stopAllHandler : Decoder a -> VirtualDom.Handler a
+stopAllHandler decoder =
+    VirtualDom.Custom (JD.map stopAll decoder)
+
+
+stopAllOn : String -> Decoder a -> VirtualDom.Attribute a
+stopAllOn eventName decoder =
+    VirtualDom.on eventName (stopAllHandler decoder)

@@ -147,7 +147,7 @@ keyDecoder =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    [ IO.onBrowserWH BrowserResized
+    [ IO.onBrowserResize BrowserResized
     , JD.map OnKeyDown keyDecoder |> BE.onKeyDown
     , Draggable.subscriptions UpdateDrag model.drag
     , onDatGUIChange OnDatGUIChange

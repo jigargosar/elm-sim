@@ -1,4 +1,4 @@
-module IO exposing (MouseEvent, buttonDecoder, canvas, getBrowserWH, group, mouseEventDecoder, movementXYDecoder, onBrowserWH, pageXYDecoder, scale, scale2, stopAllOn, styleNode, text, textGroup, timeStampDecoder, transform, tspan)
+module IO exposing (MouseEvent, buttonDecoder, canvas, getBrowserWH, group, mouseEventDecoder, movementXYDecoder, onBrowserResize, pageXYDecoder, scale, scale2, stopAllOn, styleNode, text, textGroup, timeStampDecoder, transform, tspan)
 
 import Browser.Dom as BD
 import Browser.Events as BE
@@ -24,8 +24,8 @@ getBrowserWH =
     BD.getViewport |> Task.map (.scene >> whFromRecord)
 
 
-onBrowserWH : (NT.Float2 -> a) -> Sub a
-onBrowserWH func =
+onBrowserResize : (NT.Float2 -> a) -> Sub a
+onBrowserResize func =
     BE.onResize (\w h -> func (NT.toFloat ( w, h )))
 
 

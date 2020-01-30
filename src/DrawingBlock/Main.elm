@@ -39,13 +39,13 @@ type alias Model =
     { zoom : Float
     , scene : Float2
     , drag : Draggable.State
-    , editMode : EditMode
+    , dragging : Maybe Dragging
     }
 
 
-type EditMode
-    = Zooming Float
-    | NotEditing
+type Dragging
+    = Zooming
+    | Panning
 
 
 type alias Flags =
@@ -57,7 +57,7 @@ init _ =
     ( { zoom = 2.5
       , scene = ( 600, 600 )
       , drag = Draggable.intial
-      , editMode = NotEditing
+      , dragging = Nothing
       }
     , IO.getBrowserSize |> Task.perform GotBrowserSize
     )
@@ -69,7 +69,7 @@ init _ =
 
 type Msg
     = UpdateDrag Draggable.State Draggable.Event
-    | StartDrag EditMode Draggable.State
+    | StartDrag Dragging Draggable.State
     | GotBrowserSize Float2
     | OnKeyDown String
     | OnDatGUIChange DatGUIModel
@@ -99,8 +99,8 @@ update message model =
             , Cmd.none
             )
 
-        StartDrag editMode drag ->
-            ( { model | editMode = editMode, drag = drag }, Cmd.none )
+        StartDrag dragging dragState ->
+            ( { model | dragging = Just dragging, drag = dragState }, Cmd.none )
 
         OnDatGUIChange datGUIModel ->
             let
@@ -112,8 +112,8 @@ update message model =
 
 handleDragEvents : Draggable.Event -> Model -> Model
 handleDragEvents event model =
-    case ( event, model.editMode ) of
-        ( Draggable.OnDrag { movementXY }, Zooming _ ) ->
+    case ( event, model.dragging ) of
+        ( Draggable.OnDrag { movementXY }, Just Zooming ) ->
             let
                 ( _, dy ) =
                     movementXY
@@ -124,7 +124,7 @@ handleDragEvents event model =
             { model | zoom = model.zoom + zoomStep }
 
         ( Draggable.OnUp _ _, _ ) ->
-            { model | editMode = NotEditing }
+            { model | dragging = Nothing }
 
         _ ->
             model
@@ -180,12 +180,7 @@ viewState : Model -> List (S.Svg Msg)
 viewState model =
     let
         isDraggingZoom =
-            case model.editMode of
-                Zooming _ ->
-                    True
-
-                _ ->
-                    False
+            model.dragging == Just Zooming
     in
     [ viewZoomData isDraggingZoom model.zoom
     ]
@@ -211,7 +206,7 @@ viewZoomData forceHover zoom =
         )
     ]
         |> IO.textGroup
-            [ Draggable.onMouseDown (StartDrag (Zooming zoom))
+            [ Draggable.onMouseDown (StartDrag Zooming)
             , SA.class "ns-resize"
             , if forceHover then
                 SA.class "fill-green"

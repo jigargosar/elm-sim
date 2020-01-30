@@ -58,25 +58,6 @@ mouseEventDecoderWhenBtn btn =
             )
 
 
-primaryMEDecoder : Decoder IO.MouseEvent
-primaryMEDecoder =
-    let
-        whenPrimaryMouseButton : a -> Decoder a
-        whenPrimaryMouseButton msg =
-            JD.field "button" JD.int
-                |> JD.andThen
-                    (\button ->
-                        if button == 0 then
-                            JD.succeed msg
-
-                        else
-                            JD.fail "not primary button"
-                    )
-    in
-    IO.mouseEventDecoder
-        |> JD.andThen whenPrimaryMouseButton
-
-
 subscriptions : (State -> Event -> msg) -> State -> Sub msg
 subscriptions updateDrag state =
     case state of

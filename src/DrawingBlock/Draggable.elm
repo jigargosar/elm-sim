@@ -12,13 +12,10 @@ import Json.Decode as JD exposing (Decoder)
 import VirtualDom
 
 
-type alias State =
-    Maybe MouseState
-
-
-type MouseState
-    = MouseDown
-    | MouseDrag
+type State
+    = Waiting
+    | DownNotMoved
+    | DownAndMoved
 
 
 type Event
@@ -28,7 +25,7 @@ type Event
 
 intial : State
 intial =
-    Nothing
+    Waiting
 
 
 mouseTrigger : (State -> msg) -> VirtualDom.Attribute msg
@@ -39,7 +36,7 @@ mouseTrigger msg =
             primaryMEDecoder
                 |> JD.map
                     (\_ ->
-                        Just MouseDown
+                        DownNotMoved
                     )
     in
     IO.stopAllOn "mousedown" (JD.map msg mouseDownStateDecoder)
@@ -70,47 +67,43 @@ primaryMEDecoder =
 
 
 subscriptions : (State -> Event -> msg) -> State -> Sub msg
-subscriptions updateDrag maybeState =
-    case maybeState of
-        Nothing ->
+subscriptions updateDrag state =
+    case state of
+        Waiting ->
             Sub.none
 
-        Just type_ ->
-            Sub.batch
-                [ BE.onMouseMove
-                    (primaryMEDecoder
-                        |> JD.map
-                            (\current ->
-                                let
-                                    newState =
-                                        Just MouseDrag
+        DownNotMoved ->
+            [ BE.onMouseMove
+                (primaryMEDecoder
+                    |> JD.map
+                        (\event ->
+                            updateDrag DownAndMoved (OnDrag event)
+                        )
+                )
+            , BE.onMouseUp
+                (primaryMEDecoder
+                    |> JD.map
+                        (\event ->
+                            updateDrag Waiting (OnEnd event Click)
+                        )
+                )
+            ]
+                |> Sub.batch
 
-                                    msg =
-                                        OnDrag current
-                                in
-                                updateDrag newState msg
-                            )
-                    )
-                , BE.onMouseUp
-                    (primaryMEDecoder
-                        |> JD.map
-                            (\current ->
-                                let
-                                    newState =
-                                        Nothing
-
-                                    msg =
-                                        OnEnd
-                                            current
-                                            (case type_ of
-                                                MouseDown ->
-                                                    Click
-
-                                                MouseDrag ->
-                                                    Drop
-                                            )
-                                in
-                                updateDrag newState msg
-                            )
-                    )
-                ]
+        DownAndMoved ->
+            [ BE.onMouseMove
+                (primaryMEDecoder
+                    |> JD.map
+                        (\current ->
+                            updateDrag DownAndMoved (OnDrag current)
+                        )
+                )
+            , BE.onMouseUp
+                (primaryMEDecoder
+                    |> JD.map
+                        (\event ->
+                            updateDrag Waiting (OnEnd event Drop)
+                        )
+                )
+            ]
+                |> Sub.batch

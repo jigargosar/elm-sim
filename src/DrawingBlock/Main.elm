@@ -72,9 +72,9 @@ init _ =
 
 type Msg
     = UpdateDrag Draggable.State Draggable.Event
+    | StartDrag EditMode Draggable.State
     | BrowserResized Float2
     | OnKeyDown String
-    | OnMouseDown EditMode Draggable.State
     | OnDatGUIChange DatGUIModel
 
 
@@ -92,7 +92,7 @@ update message model =
         OnKeyDown key ->
             ( onKeyDown key model, Cmd.none )
 
-        OnMouseDown editMode drag ->
+        StartDrag editMode drag ->
             ( { model | editMode = editMode, drag = drag }, Cmd.none )
 
         OnDatGUIChange datGUIModel ->
@@ -104,8 +104,8 @@ update message model =
 
 
 handleDragEvents : Draggable.Event -> Model -> Model
-handleDragEvents out model =
-    case ( out, model.editMode ) of
+handleDragEvents event model =
+    case ( event, model.editMode ) of
         ( Draggable.OnDrag points, Zooming _ ) ->
             let
                 ( _, dy ) =
@@ -187,7 +187,7 @@ viewZoomData forceHover zoom =
     [ IO.tspan "Zoom = " []
     , IO.tspan (Debug.toString twoDecimalZoom)
         [ SA.id "zoom-element"
-        , Draggable.onDown (OnMouseDown (Zooming zoom))
+        , Draggable.startOnPrimaryMouseDown (StartDrag (Zooming zoom))
         , SA.class "pointer"
         , if forceHover then
             SA.style """

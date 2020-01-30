@@ -5,7 +5,7 @@ module DrawingBlock.Draggable exposing
     , State
     , delta
     , intial
-    , onDown
+    , startOnPrimaryMouseDown
     , subscriptions
     )
 
@@ -63,8 +63,8 @@ fromEvent msg =
         IO.pageXYDecoder
 
 
-onDown : (State -> msg) -> VirtualDom.Attribute msg
-onDown msg =
+startOnPrimaryMouseDown : (State -> msg) -> VirtualDom.Attribute msg
+startOnPrimaryMouseDown msg =
     VirtualDom.on "mousedown"
         (VirtualDom.Custom (fromEvent msg))
 

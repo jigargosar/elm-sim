@@ -8,7 +8,7 @@ import DrawingBlock.Draggable as Draggable
 import Html as H exposing (Html)
 import IO
 import Json.Decode as JD
-import Number2 exposing (Float2, Int2)
+import Number2 as NT exposing (Float2, Int2)
 import Round
 import Svg as S
 import Svg.Attributes as SA
@@ -127,13 +127,10 @@ handleDragEvents event model =
 
         ( Draggable.OnDrag { movementXY }, Just Panning ) ->
             let
-                ( _, dy ) =
-                    movementXY
-
-                zoomStep =
-                    dy * 0.01 * model.zoom
+                panStep =
+                    movementXY |> NT.scale model.zoom
             in
-            { model | zoom = model.zoom + zoomStep }
+            { model | pan = NT.add model.pan panStep }
 
         ( Draggable.OnUp _ _, _ ) ->
             { model | dragging = Nothing }

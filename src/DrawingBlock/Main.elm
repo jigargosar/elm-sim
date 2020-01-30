@@ -61,8 +61,7 @@ init _ =
       , drag = Draggable.intial
       , editMode = NotEditing
       }
-    , IO.getBrowserWH
-        |> Task.perform BrowserResized
+    , IO.getBrowserSize |> Task.perform BrowserResized
     )
 
 

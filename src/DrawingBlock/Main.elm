@@ -37,6 +37,7 @@ type alias EventData =
 
 type alias Model =
     { zoom : Float
+    , pan : Float2
     , scene : Float2
     , drag : Draggable.State
     , dragging : Maybe Dragging
@@ -55,6 +56,7 @@ type alias Flags =
 init : Flags -> ( Model, Cmd Msg )
 init _ =
     ( { zoom = 2.5
+      , pan = ( 0, 0 )
       , scene = ( 600, 600 )
       , drag = Draggable.intial
       , dragging = Nothing

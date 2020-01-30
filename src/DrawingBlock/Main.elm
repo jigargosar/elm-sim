@@ -4,7 +4,7 @@ port module DrawingBlock.Main exposing (main)
 
 import Browser
 import Browser.Events as BE
-import DrawingBlock.Drag as Drag exposing (DragModel)
+import DrawingBlock.Draggable as Drag exposing (Draggable)
 import Html as H exposing (Html)
 import IO
 import Json.Decode as JD
@@ -40,7 +40,7 @@ type alias EventData =
 type alias Model =
     { zoom : Float2
     , scene : Float2
-    , drag : DragModel
+    , drag : Draggable
     , editMode : EditMode
     }
 
@@ -78,7 +78,7 @@ type Msg
     = OnDragMsg DragMsg
     | BrowserResized Float2
     | OnKeyDown String
-    | OnMouseDown EditMode DragModel
+    | OnMouseDown EditMode Draggable
     | OnDatGUIChange DatGUIModel
 
 

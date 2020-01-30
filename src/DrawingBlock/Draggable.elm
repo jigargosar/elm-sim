@@ -1,8 +1,8 @@
-module DrawingBlock.Drag exposing
-    ( DragModel
-    , Event
+module DrawingBlock.Draggable exposing
+    ( Draggable
     , Msg
     , OutMsg(..)
+    , PageXY
     , delta
     , intial
     , onDown
@@ -14,28 +14,23 @@ import Basics.Extra exposing (uncurry)
 import Browser.Events as BE
 import IO
 import Json.Decode as JD exposing (Decoder)
+import Maybe.Extra
 import Number2 as N2 exposing (Float2)
-import PointFree exposing (mapEach)
 import VirtualDom
 
 
-type alias Event =
-    { pageXY : Float2 }
+type alias PageXY =
+    Float2
 
 
-eventDecoder : Decoder Event
-eventDecoder =
-    JD.map Event IO.pageXYDecoder
+type alias Draggable =
+    Maybe InternalState
 
 
-type alias DragModel =
-    Maybe State
-
-
-type alias State =
-    { start : Event
-    , prev : Event
-    , current : Event
+type alias InternalState =
+    { start : PageXY
+    , prev : PageXY
+    , current : PageXY
     , type_ : EventType
     }
 
@@ -46,38 +41,40 @@ type EventType
 
 
 type Msg
-    = OnMove Event
-    | OnUp Event
+    = OnMove PageXY
+    | OnUp PageXY
 
 
-intial : DragModel
+intial : Draggable
 intial =
     Nothing
 
 
-fromEvent msg e =
-    { message = msg (Just (State e e e MouseDown))
-    , preventDefault = True
-    , stopPropagation = True
-    }
+fromEvent msg =
+    JD.map
+        (\e ->
+            { message = msg (Just (InternalState e e e MouseDown))
+            , preventDefault = True
+            , stopPropagation = True
+            }
+        )
+        IO.pageXYDecoder
 
 
-onDown : (DragModel -> msg) -> VirtualDom.Attribute msg
+onDown : (Draggable -> msg) -> VirtualDom.Attribute msg
 onDown msg =
     VirtualDom.on "mousedown"
-        (VirtualDom.Custom
-            (JD.map (fromEvent msg) eventDecoder)
-        )
+        (VirtualDom.Custom (fromEvent msg))
 
 
-delta : DragModel -> ( Float, Float )
+delta : Draggable -> ( Float, Float )
 delta maybeState =
     Maybe.map deltaHelp maybeState |> Maybe.withDefault ( 0, 0 )
 
 
-deltaHelp : State -> ( Float, Float )
+deltaHelp : InternalState -> ( Float, Float )
 deltaHelp { current, prev } =
-    ( current, prev ) |> (mapEach .pageXY >> uncurry N2.sub)
+    ( current, prev ) |> uncurry N2.sub
 
 
 type OutMsg
@@ -86,7 +83,7 @@ type OutMsg
     | End
 
 
-update : Msg -> DragModel -> ( DragModel, OutMsg )
+update : Msg -> Draggable -> ( Draggable, OutMsg )
 update message (maybeState as model) =
     case message of
         OnMove event ->
@@ -116,20 +113,19 @@ update message (maybeState as model) =
                     )
 
 
-subscriptions : DragModel -> Sub Msg
+subscriptions : Draggable -> Sub Msg
 subscriptions maybeState =
     let
         decoder x =
-            JD.map x eventDecoder
+            JD.map x IO.pageXYDecoder
 
         subs =
-            case maybeState of
-                Nothing ->
-                    []
-
-                _ ->
+            Maybe.Extra.unwrap []
+                (\_ ->
                     [ BE.onMouseUp (decoder OnUp)
                     , BE.onMouseMove (decoder OnMove)
                     ]
+                )
+                maybeState
     in
     Sub.batch subs

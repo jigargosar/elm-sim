@@ -61,7 +61,7 @@ init _ =
       , drag = Draggable.intial
       , editMode = NotEditing
       }
-    , IO.getBrowserSize |> Task.perform BrowserResized
+    , IO.getBrowserSize |> Task.perform OnBrowserSize
     )
 
 
@@ -72,7 +72,7 @@ init _ =
 type Msg
     = UpdateDrag Draggable.State Draggable.Event
     | StartDrag EditMode Draggable.State
-    | BrowserResized Float2
+    | OnBrowserSize Float2
     | OnKeyDown String
     | OnDatGUIChange DatGUIModel
 
@@ -85,7 +85,7 @@ update message model =
             , Cmd.none
             )
 
-        BrowserResized wh ->
+        OnBrowserSize wh ->
             ( { model | scene = wh }, Cmd.none )
 
         OnKeyDown key ->
@@ -146,7 +146,7 @@ keyDecoder =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    [ IO.onBrowserResize BrowserResized
+    [ IO.onBrowserResize OnBrowserSize
     , JD.map OnKeyDown keyDecoder |> BE.onKeyDown
     , Draggable.subscriptions UpdateDrag model.drag
     , onDatGUIChange OnDatGUIChange

@@ -53,17 +53,17 @@ stopAll msg =
     CustomHandler msg True True
 
 
-mouseDownStateDecoder : Decoder State
-mouseDownStateDecoder =
-    primaryMEDecoder
-        |> JD.map
-            (\e ->
-                Just (InternalState MouseDown e.pageXY)
-            )
-
-
 mouseTrigger : (State -> msg) -> VirtualDom.Attribute msg
 mouseTrigger msg =
+    let
+        mouseDownStateDecoder : Decoder State
+        mouseDownStateDecoder =
+            primaryMEDecoder
+                |> JD.map
+                    (\e ->
+                        Just (InternalState MouseDown e.pageXY)
+                    )
+    in
     VirtualDom.on "mousedown"
         (VirtualDom.Custom
             (mouseDownStateDecoder

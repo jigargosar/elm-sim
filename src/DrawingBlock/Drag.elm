@@ -55,15 +55,18 @@ intial =
     Nothing
 
 
-fromEvent e =
-    Just (State e e e MouseDown)
+fromEvent msg e =
+    { message = msg (Just (State e e e MouseDown))
+    , preventDefault = True
+    , stopPropagation = True
+    }
 
 
 onDown : (DragModel -> msg) -> VirtualDom.Attribute msg
 onDown msg =
     VirtualDom.on "mousedown"
-        (VirtualDom.Normal
-            (JD.map (fromEvent >> msg) eventDecoder)
+        (VirtualDom.Custom
+            (JD.map (fromEvent msg) eventDecoder)
         )
 
 

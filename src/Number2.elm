@@ -72,6 +72,11 @@ negate =
     mapEach Basics.negate
 
 
+negateSecond : ( number, number ) -> ( number, number )
+negateSecond =
+    Tuple.mapSecond Basics.negate
+
+
 fromXY : { a | x : number, y : number } -> ( number, number )
 fromXY { x, y } =
     ( x, y )

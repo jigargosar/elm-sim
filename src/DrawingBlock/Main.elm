@@ -128,7 +128,7 @@ handleDragEvents event model =
         ( Draggable.OnDrag { movementXY }, Just Panning ) ->
             let
                 panStep =
-                    movementXY |> NT.scale model.zoom
+                    movementXY |> NT.negateSecond |> NT.scale (1 / model.zoom)
             in
             { model | pan = NT.add model.pan panStep }
 
@@ -172,7 +172,7 @@ view model =
         , IO.canvas model.scene
             [ Draggable.onMouseDown (StartDrag Panning)
             ]
-            [ IO.group [ IO.transform [ IO.scale model.zoom ] ]
+            [ IO.group [ IO.transform [ IO.scale model.zoom, IO.shift model.pan ] ]
                 (svgContent model)
             ]
         ]

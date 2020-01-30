@@ -10,7 +10,6 @@ import Browser.Events as BE
 import IO
 import Json.Decode as JD exposing (Decoder)
 import Maybe.Extra
-import Number2 exposing (Float2)
 import VirtualDom
 
 
@@ -19,7 +18,7 @@ type alias State =
 
 
 type InternalState
-    = InternalState Float2 MouseState
+    = InternalState MouseState
 
 
 type MouseState
@@ -44,8 +43,8 @@ mouseTrigger msg =
         mouseDownStateDecoder =
             primaryMEDecoder
                 |> JD.map
-                    (\e ->
-                        Just (InternalState e.pageXY MouseDown)
+                    (\_ ->
+                        Just (InternalState MouseDown)
                     )
     in
     IO.stopAllOn "mousedown" (JD.map msg mouseDownStateDecoder)
@@ -80,14 +79,14 @@ subscriptions updateDrag maybeState =
     let
         subs =
             Maybe.Extra.unwrap []
-                (\(InternalState start type_) ->
+                (\(InternalState type_) ->
                     [ BE.onMouseMove
                         (primaryMEDecoder
                             |> JD.map
                                 (\current ->
                                     let
                                         newState =
-                                            Just (InternalState start MouseDrag)
+                                            Just (InternalState MouseDrag)
 
                                         msg =
                                             OnDrag current

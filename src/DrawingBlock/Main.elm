@@ -106,10 +106,10 @@ update message model =
 handleDragEvents : Draggable.Event -> Model -> Model
 handleDragEvents event model =
     case ( event, model.editMode ) of
-        ( Draggable.OnDrag points, Zooming _ ) ->
+        ( Draggable.OnDrag { movementXY }, Zooming _ ) ->
             let
                 ( _, dy ) =
-                    Draggable.delta points
+                    movementXY
 
                 zoomStep =
                     ( dy, dy ) |> N2.scale 0.01 |> N2.mul model.zoom

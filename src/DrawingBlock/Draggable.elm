@@ -1,20 +1,18 @@
 module DrawingBlock.Draggable exposing
     ( Event(..)
+    , MouseEvent
     , PageXY
-    , Points
     , State
-    , delta
     , intial
     , primartMouseTrigger
     , subscriptions
     )
 
-import Basics.Extra exposing (uncurry)
 import Browser.Events as BE
 import IO
 import Json.Decode as JD exposing (Decoder)
 import Maybe.Extra
-import Number2 as N2 exposing (Float2)
+import Number2 exposing (Float2)
 import VirtualDom
 
 
@@ -27,19 +25,12 @@ type alias State =
 
 
 type InternalState
-    = InternalState MouseState Points
+    = InternalState MouseState PageXY
 
 
 type MouseState
     = MouseDown
     | MouseDrag
-
-
-type alias Points =
-    { start : PageXY
-    , prev : PageXY
-    , current : PageXY
-    }
 
 
 type alias MouseEvent =
@@ -48,14 +39,9 @@ type alias MouseEvent =
     }
 
 
-mouseEventDecoder : Decoder MouseEvent
-mouseEventDecoder =
-    JD.map2 MouseEvent IO.pageXYDecoder IO.movementXYDecoder
-
-
 type Event
-    = OnEnd Points End
-    | OnDrag Points
+    = OnEnd MouseEvent End
+    | OnDrag MouseEvent
 
 
 intial : State
@@ -72,26 +58,12 @@ stopAll msg =
     CustomHandler msg True True
 
 
-whenPrimaryMouseButton : a -> Decoder a
-whenPrimaryMouseButton msg =
-    JD.field "button" JD.int
-        |> JD.andThen
-            (\button ->
-                if button == 0 then
-                    JD.succeed msg
-
-                else
-                    JD.fail "not primary button"
-            )
-
-
 mouseDownStateDecoder : Decoder State
 mouseDownStateDecoder =
-    IO.pageXYDecoder
-        |> JD.andThen whenPrimaryMouseButton
+    primaryMEDecoder
         |> JD.map
             (\e ->
-                Just (InternalState MouseDown (Points e e e))
+                Just (InternalState MouseDown e.pageXY)
             )
 
 
@@ -105,14 +77,32 @@ primartMouseTrigger msg =
         )
 
 
-delta : Points -> ( Float, Float )
-delta { prev, current } =
-    ( current, prev ) |> uncurry N2.sub
-
-
 type End
     = Click
     | Drop
+
+
+primaryMEDecoder : Decoder MouseEvent
+primaryMEDecoder =
+    let
+        mouseEventDecoder : Decoder MouseEvent
+        mouseEventDecoder =
+            JD.map2 MouseEvent IO.pageXYDecoder IO.movementXYDecoder
+
+        whenPrimaryMouseButton : a -> Decoder a
+        whenPrimaryMouseButton msg =
+            JD.field "button" JD.int
+                |> JD.andThen
+                    (\button ->
+                        if button == 0 then
+                            JD.succeed msg
+
+                        else
+                            JD.fail "not primary button"
+                    )
+    in
+    mouseEventDecoder
+        |> JD.andThen whenPrimaryMouseButton
 
 
 subscriptions : (State -> Event -> msg) -> State -> Sub msg
@@ -120,30 +110,23 @@ subscriptions updateDrag maybeState =
     let
         subs =
             Maybe.Extra.unwrap []
-                (\(InternalState type_ points) ->
-                    let
-                        newPoints current =
-                            { start = points.start
-                            , prev = points.current
-                            , current = current
-                            }
-                    in
+                (\(InternalState type_ start) ->
                     [ BE.onMouseMove
-                        (IO.pageXYDecoder
+                        (primaryMEDecoder
                             |> JD.map
                                 (\current ->
                                     let
                                         newState =
-                                            Just (InternalState MouseDrag (newPoints current))
+                                            Just (InternalState MouseDrag start)
 
                                         msg =
-                                            OnDrag (newPoints current)
+                                            OnDrag current
                                     in
                                     updateDrag newState msg
                                 )
                         )
                     , BE.onMouseUp
-                        (IO.pageXYDecoder
+                        (primaryMEDecoder
                             |> JD.map
                                 (\current ->
                                     let
@@ -152,7 +135,7 @@ subscriptions updateDrag maybeState =
 
                                         msg =
                                             OnEnd
-                                                (newPoints current)
+                                                current
                                                 (case type_ of
                                                     MouseDown ->
                                                         Click

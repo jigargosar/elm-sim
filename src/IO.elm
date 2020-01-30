@@ -29,8 +29,8 @@ onBrowserResize func =
     BE.onResize (\w h -> func (NT.toFloat ( w, h )))
 
 
-canvas : Float2 -> List (S.Svg msg) -> H.Html msg
-canvas wh =
+canvas : ( Float, Float ) -> List (S.Attribute msg) -> List (S.Svg msg) -> H.Html msg
+canvas wh attributes =
     let
         ( w, h ) =
             mapEach fromFloat wh
@@ -39,16 +39,17 @@ canvas wh =
             NT.scale -0.5 wh |> mapEach fromFloat
     in
     S.svg
-        [ SA.viewBox (x ++ " " ++ y ++ " " ++ w ++ " " ++ h)
-        , SA.style
-            """
+        (SA.viewBox (x ++ " " ++ y ++ " " ++ w ++ " " ++ h)
+            :: SA.style
+                """
                 position:fixed;
                 top:0;
                 left0;
                 width:100%;
                 height:100%;
             """
-        ]
+            :: attributes
+        )
 
 
 scale2 : ( Float, Float ) -> String

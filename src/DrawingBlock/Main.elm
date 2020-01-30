@@ -78,6 +78,9 @@ type Msg
 update : Msg -> Model -> ( Model, Cmd Msg )
 update message model =
     case message of
+        StartDrag dragging dragState ->
+            ( { model | dragging = Just dragging, drag = dragState }, Cmd.none )
+
         UpdateDrag drag dragMsg ->
             ( { model | drag = drag } |> handleDragEvents dragMsg
             , Cmd.none
@@ -99,9 +102,6 @@ update message model =
             , Cmd.none
             )
 
-        StartDrag dragging dragState ->
-            ( { model | dragging = Just dragging, drag = dragState }, Cmd.none )
-
         OnDatGUIChange datGUIModel ->
             let
                 _ =
@@ -114,6 +114,16 @@ handleDragEvents : Draggable.Event -> Model -> Model
 handleDragEvents event model =
     case ( event, model.dragging ) of
         ( Draggable.OnDrag { movementXY }, Just Zooming ) ->
+            let
+                ( _, dy ) =
+                    movementXY
+
+                zoomStep =
+                    dy * 0.01 * model.zoom
+            in
+            { model | zoom = model.zoom + zoomStep }
+
+        ( Draggable.OnDrag { movementXY }, Just Panning ) ->
             let
                 ( _, dy ) =
                     movementXY
@@ -161,6 +171,8 @@ view model =
     H.div []
         [ IO.styleNode globalStyles
         , IO.canvas model.scene
+            [ Draggable.onMouseDown (StartDrag Panning)
+            ]
             [ IO.group [ IO.transform [ IO.scale model.zoom ] ]
                 (svgContent model)
             ]

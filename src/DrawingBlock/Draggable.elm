@@ -19,7 +19,7 @@ type alias State =
 
 
 type InternalState
-    = InternalState MouseState Float2
+    = InternalState Float2 MouseState
 
 
 type MouseState
@@ -45,7 +45,7 @@ mouseTrigger msg =
             primaryMEDecoder
                 |> JD.map
                     (\e ->
-                        Just (InternalState MouseDown e.pageXY)
+                        Just (InternalState e.pageXY MouseDown)
                     )
     in
     IO.stopAllOn "mousedown" (JD.map msg mouseDownStateDecoder)
@@ -80,14 +80,14 @@ subscriptions updateDrag maybeState =
     let
         subs =
             Maybe.Extra.unwrap []
-                (\(InternalState type_ start) ->
+                (\(InternalState start type_) ->
                     [ BE.onMouseMove
                         (primaryMEDecoder
                             |> JD.map
                                 (\current ->
                                     let
                                         newState =
-                                            Just (InternalState MouseDrag start)
+                                            Just (InternalState start MouseDrag)
 
                                         msg =
                                             OnDrag current

@@ -115,13 +115,14 @@ update message model =
 handleDragEvents : Draggable.Event -> Model -> Model
 handleDragEvents event model =
     case ( event, model.dragging ) of
-        ( Draggable.OnDrag { movementXY, pageXY }, Just Zooming ) ->
+        ( Draggable.OnDrag startXY { movementXY }, Just Zooming ) ->
             let
                 ( _, dy ) =
                     movementXY |> NT.negateSecond
 
                 canvasXY =
-                    IO.pageXYToCanvas model.scene pageXY
+                    IO.pageXYToCanvas model.scene startXY
+                        |> Debug.log "dragstart"
 
                 zoomStep =
                     dy * 0.01 * model.zoom
@@ -129,9 +130,9 @@ handleDragEvents event model =
                 newZoom =
                     model.zoom + zoomStep
             in
-            setZoomUpdatePan newZoom model
+            setZoomUpdatePan2 canvasXY newZoom model
 
-        ( Draggable.OnDrag { movementXY }, Just Panning ) ->
+        ( Draggable.OnDrag _ { movementXY }, Just Panning ) ->
             let
                 panStep =
                     movementXY |> NT.negateSecond |> NT.scale (1 / model.zoom)
@@ -146,6 +147,13 @@ handleDragEvents event model =
 
 
 setZoomUpdatePan zoom model =
+    { model
+        | zoom = zoom
+        , pan = model.pan |> NT.scale model.zoom |> NT.scale (1 / zoom)
+    }
+
+
+setZoomUpdatePan2 startXY zoom model =
     { model
         | zoom = zoom
         , pan = model.pan |> NT.scale model.zoom |> NT.scale (1 / zoom)

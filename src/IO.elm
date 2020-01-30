@@ -1,4 +1,4 @@
-module IO exposing (MouseEvent, buttonDecoder, canvas, getBrowserSize, group, mouseEventDecoder, movementXYDecoder, onBrowserResize, pageXYDecoder, scale, scale2, shift, stopAllOn, styleNode, text, textGroup, timeStampDecoder, transform, tspan)
+module IO exposing (MouseEvent, buttonDecoder, canvas, getBrowserSize, group, mouseEventDecoder, movementXYDecoder, onBrowserResize, pageXYDecoder, pageXYToCanvas, scale, scale2, shift, stopAllOn, styleNode, text, textGroup, timeStampDecoder, transform, tspan)
 
 import Browser.Dom as BD
 import Browser.Events as BE
@@ -29,6 +29,16 @@ onBrowserResize func =
     BE.onResize (\w h -> func (NT.toFloat ( w, h )))
 
 
+leftBottom : ( Float, Float ) -> ( Float, Float )
+leftBottom wh =
+    NT.scale -0.5 wh
+
+
+pageXYToCanvas : ( Float, Float ) -> ( Float, Float ) -> ( Float, Float )
+pageXYToCanvas wh pageXY =
+    NT.add (NT.negateSecond (leftBottom wh)) (NT.negateSecond pageXY)
+
+
 canvas : ( Float, Float ) -> List (S.Attribute msg) -> List (S.Svg msg) -> H.Html msg
 canvas wh attributes =
     let
@@ -36,7 +46,7 @@ canvas wh attributes =
             mapEach fromFloat wh
 
         ( x, y ) =
-            NT.scale -0.5 wh |> mapEach fromFloat
+            leftBottom wh |> mapEach fromFloat
     in
     S.svg
         (SA.viewBox (x ++ " " ++ y ++ " " ++ w ++ " " ++ h)

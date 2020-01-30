@@ -115,15 +115,21 @@ update message model =
 handleDragEvents : Draggable.Event -> Model -> Model
 handleDragEvents event model =
     case ( event, model.dragging ) of
-        ( Draggable.OnDrag { movementXY }, Just Zooming ) ->
+        ( Draggable.OnDrag { movementXY, pageXY }, Just Zooming ) ->
             let
                 ( _, dy ) =
-                    movementXY
+                    movementXY |> NT.negateSecond
+
+                canvasXY =
+                    IO.pageXYToCanvas model.scene pageXY
 
                 zoomStep =
                     dy * 0.01 * model.zoom
+
+                newZoom =
+                    model.zoom + zoomStep
             in
-            { model | zoom = model.zoom + zoomStep }
+            setZoomUpdatePan newZoom model
 
         ( Draggable.OnDrag { movementXY }, Just Panning ) ->
             let
@@ -139,12 +145,19 @@ handleDragEvents event model =
             model
 
 
+setZoomUpdatePan zoom model =
+    { model
+        | zoom = zoom
+        , pan = model.pan |> NT.scale model.zoom |> NT.scale (1 / zoom)
+    }
+
+
 zoomIn model =
-    { model | zoom = model.zoom |> (\s -> clamp 0.05 50 (s + s * 0.1)) }
+    setZoomUpdatePan (model.zoom |> (\s -> clamp 0.05 50 (s + s * 0.1))) model
 
 
 zoomOut model =
-    { model | zoom = model.zoom |> (\s -> clamp 0.05 50 (s + s * 0.1)) }
+    setZoomUpdatePan (model.zoom |> (\s -> clamp 0.05 50 (s + s * 0.1))) model
 
 
 keyDecoder =
@@ -173,7 +186,7 @@ view model =
             [ Draggable.onMouseDown (StartDrag Panning)
             ]
             [ IO.group [ IO.transform [ IO.scale model.zoom, IO.shift model.pan ] ]
-                (svgContent model)
+                (drawing model)
             ]
         ]
 
@@ -190,8 +203,8 @@ globalStyles =
     """
 
 
-svgContent : Model -> List (S.Svg Msg)
-svgContent model =
+drawing : Model -> List (S.Svg Msg)
+drawing model =
     let
         isDraggingZoom =
             model.dragging == Just Zooming

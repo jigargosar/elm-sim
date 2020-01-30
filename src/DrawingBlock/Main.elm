@@ -130,7 +130,7 @@ handleDragEvents event model =
                 newZoom =
                     model.zoom + zoomStep
             in
-            setZoomUpdatePan2 canvasXY newZoom model
+            setZoomUpdatePan newZoom model
 
         ( Draggable.OnDrag _ { movementXY }, Just Panning ) ->
             let
@@ -147,13 +147,6 @@ handleDragEvents event model =
 
 
 setZoomUpdatePan zoom model =
-    { model
-        | zoom = zoom
-        , pan = model.pan |> NT.scale model.zoom |> NT.scale (1 / zoom)
-    }
-
-
-setZoomUpdatePan2 startXY zoom model =
     { model
         | zoom = zoom
         , pan = model.pan |> NT.scale model.zoom |> NT.scale (1 / zoom)

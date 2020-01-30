@@ -79,8 +79,12 @@ deltaHelp { current, prev } =
 
 type OutMsg
     = Move
-    | Click
-    | End
+    | Up Up
+
+
+type Up
+    = Click
+    | Drop
 
 
 update : Msg -> Draggable -> ( Draggable, OutMsg )
@@ -89,7 +93,7 @@ update message (maybeState as model) =
         OnMove event ->
             case maybeState of
                 Nothing ->
-                    ( model, End )
+                    ( model, Up Drop )
 
                 Just state ->
                     ( { state | prev = state.current, current = event, type_ = MouseDrag }
@@ -100,16 +104,16 @@ update message (maybeState as model) =
         OnUp _ ->
             case maybeState of
                 Nothing ->
-                    ( model, End )
+                    ( model, Up Drop )
 
                 Just { type_ } ->
                     ( Nothing
                     , case type_ of
                         MouseDown ->
-                            Click
+                            Up Click
 
                         MouseDrag ->
-                            End
+                            Up Drop
                     )
 
 

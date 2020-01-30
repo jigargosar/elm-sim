@@ -59,23 +59,23 @@ mouseEventDecoderWhenBtn btn =
 
 
 subscriptions : (State -> Event -> msg) -> State -> Sub msg
-subscriptions updateDrag state =
+subscriptions updateState state =
     case state of
         Waiting ->
             Sub.none
 
         Down btn up ->
-            [ mouseEventDecoderWhenBtn btn
-                |> JD.map
-                    (\me ->
-                        updateDrag (Down btn Drop) (OnDrag me)
-                    )
-                |> BE.onMouseMove
-            , mouseEventDecoderWhenBtn btn
-                |> JD.map
-                    (\me ->
-                        updateDrag Waiting (OnUp up me)
-                    )
-                |> BE.onMouseUp
+            let
+                updateOnUp e =
+                    updateState Waiting (OnUp up e)
+
+                updateOnDrag e =
+                    updateState (Down btn Drop) (OnDrag e)
+
+                decoder =
+                    mouseEventDecoderWhenBtn btn
+            in
+            [ BE.onMouseMove (JD.map updateOnDrag decoder)
+            , BE.onMouseUp (JD.map updateOnUp decoder)
             ]
                 |> Sub.batch

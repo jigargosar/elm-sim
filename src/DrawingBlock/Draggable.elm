@@ -42,6 +42,17 @@ type alias Points =
     }
 
 
+type alias MouseEvent =
+    { pageXY : Float2
+    , movementXY : Float2
+    }
+
+
+mouseEventDecoder : Decoder MouseEvent
+mouseEventDecoder =
+    JD.map2 MouseEvent IO.pageXYDecoder IO.movementXYDecoder
+
+
 type Event
     = OnEnd Points End
     | OnDrag Points

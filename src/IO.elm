@@ -1,4 +1,4 @@
-module IO exposing (canvas, getBrowserWH, group, onBrowserWH, pageXYDecoder, scale2, text, textGroup, timeStampDecoder, transform, tspan)
+module IO exposing (canvas, getBrowserWH, group, movementXYDecoder, onBrowserWH, pageXYDecoder, scale2, text, textGroup, timeStampDecoder, transform, tspan)
 
 import Browser.Dom as BD
 import Browser.Events as BE
@@ -95,6 +95,13 @@ pageXYDecoder =
     JD.map2 Tuple.pair
         (JD.field "pageX" JD.float)
         (JD.field "pageY" JD.float)
+
+
+movementXYDecoder : JD.Decoder ( Float, Float )
+movementXYDecoder =
+    JD.map2 Tuple.pair
+        (JD.field "movementX" JD.float)
+        (JD.field "movementY" JD.float)
 
 
 timeStampDecoder : JD.Decoder Float

@@ -181,13 +181,11 @@ viewState model =
 
 viewZoomData : Bool -> Float -> S.Svg Msg
 viewZoomData forceHover zoom =
-    let
-        twoDecimalZoom =
-            zoom |> Round.round 2
-    in
-    [ IO.tspan "Zoom = " []
-    , IO.tspan (Debug.toString twoDecimalZoom)
-        [ SA.id "zoom-element"
+    [ IO.tspan "Zoom = "
+        [ SA.class "ns-resize"
+        ]
+    , IO.tspan (Round.round 2 zoom)
+        [ SA.id "zoom-value"
         , Draggable.onMouseDown (StartDrag (Zooming zoom))
         , SA.class "pointer"
         , if forceHover then
@@ -203,11 +201,32 @@ viewZoomData forceHover zoom =
     , S.style []
         [ S.text
             """
-                #zoom-element:hover{
+                .ns-resize,  hover-ns-resize:hover {
+                    cursor: ns-resize;
+                }
+
+                .fill-green, hover-fill-green:hover {
+                    fill: green;
+                }
+
+                #zoom-value:hover{
                     fill: green;
                     cursor: ns-resize;
                 }
             """
+        ]
+    , S.style []
+        [ S.text
+            (if forceHover then
+                """
+                    body {
+                        cursor: ns-resize;
+                    }
+                """
+
+             else
+                ""
+            )
         ]
     ]
         |> IO.textGroup []

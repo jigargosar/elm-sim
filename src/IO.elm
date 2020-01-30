@@ -1,4 +1,4 @@
-module IO exposing (MouseEvent, buttonDecoder, canvas, getBrowserWH, group, mouseEventDecoder, movementXYDecoder, onBrowserWH, pageXYDecoder, scale, scale2, stopAllOn, text, textGroup, timeStampDecoder, transform, tspan)
+module IO exposing (MouseEvent, buttonDecoder, canvas, getBrowserWH, group, mouseEventDecoder, movementXYDecoder, onBrowserWH, pageXYDecoder, scale, scale2, stopAllOn, styleNode, text, textGroup, timeStampDecoder, transform, tspan)
 
 import Browser.Dom as BD
 import Browser.Events as BE
@@ -58,6 +58,11 @@ scale2 sxy =
             ST.fromFloat sxy
     in
     "scale(" ++ x ++ "," ++ y ++ ")"
+
+
+styleNode : String -> VirtualDom.Node msg
+styleNode =
+    VirtualDom.text >> List.singleton >> VirtualDom.node "style" []
 
 
 scale : Float -> String

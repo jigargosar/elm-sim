@@ -161,7 +161,22 @@ subscriptions model =
 
 view : Model -> Html Msg
 view model =
-    canvas model.scene model.zoom (viewState model)
+    H.div []
+        [ IO.styleNode globalStyles
+        , canvas model.scene model.zoom (viewState model)
+        ]
+
+
+globalStyles =
+    """
+    .ns-resize,  .hover-ns-resize:hover {
+        cursor: ns-resize;
+    }
+
+    .fill-green, .hover-fill-green:hover {
+        fill: green;
+    }
+    """
 
 
 viewState : Model -> List (S.Svg Msg)
@@ -188,20 +203,6 @@ viewZoomData forceHover zoom =
 
           else
             SA.class "hover-fill-green"
-        ]
-    , S.style []
-        [ S.text
-            """
-                .ns-resize,  hover-ns-resize:hover {
-                    cursor: ns-resize;
-                }
-
-                .fill-green, hover-fill-green:hover {
-                    fill: green;
-                }
-
-
-            """
         ]
     , S.style []
         (if forceHover then

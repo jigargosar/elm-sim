@@ -15,7 +15,7 @@ import VirtualDom
 
 type State
     = Waiting
-    | Down Int Up
+    | BtnDown Int Up
 
 
 type Up
@@ -41,7 +41,7 @@ onMouseDown msg =
 onMouseBtnDown : Int -> (State -> value) -> VirtualDom.Attribute value
 onMouseBtnDown btn msg =
     mouseEventDecoderWhenBtn btn
-        |> JD.map (\_ -> msg (Down btn Click))
+        |> JD.map (\_ -> msg (BtnDown btn Click))
         |> IO.stopAllOn "mousedown"
 
 
@@ -64,13 +64,13 @@ subscriptions updateState state =
         Waiting ->
             Sub.none
 
-        Down btn up ->
+        BtnDown btn up ->
             let
                 updateOnUp e =
                     updateState Waiting (OnUp up e)
 
                 updateOnDrag e =
-                    updateState (Down btn Drop) (OnDrag e)
+                    updateState (BtnDown btn Drop) (OnDrag e)
 
                 decoder =
                     mouseEventDecoderWhenBtn btn

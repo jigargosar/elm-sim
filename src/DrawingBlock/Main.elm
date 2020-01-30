@@ -116,6 +116,9 @@ handleDragEvents event model =
             in
             { model | zoom = N2.add model.zoom zoomStep }
 
+        ( Draggable.OnUp _ _, _ ) ->
+            { model | editMode = NotEditing }
+
         _ ->
             model
 

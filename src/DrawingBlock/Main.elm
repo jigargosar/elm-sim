@@ -8,10 +8,8 @@ import DrawingBlock.Draggable as Draggable
 import Html as H exposing (Html)
 import IO
 import Json.Decode as JD
-import Number2 as N2 exposing (Float2, Int2)
-import PointFree exposing (mapEach)
+import Number2 exposing (Float2, Int2)
 import Round
-import String2 as S2
 import Svg as S
 import Svg.Attributes as SA
 import Task

@@ -38,7 +38,7 @@ type alias EventData =
 
 
 type alias Model =
-    { zoom : Float2
+    { zoom : Float
     , scene : Float2
     , drag : Draggable.State
     , editMode : EditMode
@@ -46,7 +46,7 @@ type alias Model =
 
 
 type EditMode
-    = Zooming Float2
+    = Zooming Float
     | NotEditing
 
 
@@ -56,7 +56,7 @@ type alias Flags =
 
 init : Flags -> ( Model, Cmd Msg )
 init _ =
-    ( { zoom = ( 1, 1 ) |> N2.scale 2.5
+    ( { zoom = 2.5
       , scene = ( 600, 600 )
       , drag = Draggable.intial
       , editMode = NotEditing
@@ -110,7 +110,7 @@ update message model =
                 _ =
                     Debug.log "datGUIModel" datGUIModel
             in
-            ( { model | zoom = datGUIModel.zoom |> N2.singleton }, Cmd.none )
+            ( { model | zoom = datGUIModel.zoom }, Cmd.none )
 
 
 handleDragEvents : Draggable.Event -> Model -> Model
@@ -122,9 +122,9 @@ handleDragEvents event model =
                     movementXY
 
                 zoomStep =
-                    ( dy, dy ) |> N2.scale 0.01 |> N2.mul model.zoom
+                    dy * 0.01 * model.zoom
             in
-            { model | zoom = N2.add model.zoom zoomStep }
+            { model | zoom = model.zoom + zoomStep }
 
         ( Draggable.OnUp _ _, _ ) ->
             { model | editMode = NotEditing }
@@ -134,11 +134,11 @@ handleDragEvents event model =
 
 
 zoomIn model =
-    { model | zoom = model.zoom |> mapEach (\s -> clamp 0.05 50 (s + s * 0.1)) }
+    { model | zoom = model.zoom |> (\s -> clamp 0.05 50 (s + s * 0.1)) }
 
 
 zoomOut model =
-    { model | zoom = model.zoom |> mapEach (\s -> clamp 0.05 50 (s + s * 0.1)) }
+    { model | zoom = model.zoom |> (\s -> clamp 0.05 50 (s + s * 0.1)) }
 
 
 keyDecoder =
@@ -179,11 +179,11 @@ viewState model =
     ]
 
 
-viewZoomData : Bool -> Float2 -> S.Svg Msg
+viewZoomData : Bool -> Float -> S.Svg Msg
 viewZoomData forceHover zoom =
     let
         twoDecimalZoom =
-            zoom |> mapEach (Round.round 2) |> S2.join " , "
+            zoom |> Round.round 2
     in
     [ IO.tspan "Zoom = " []
     , IO.tspan (Debug.toString twoDecimalZoom)
@@ -213,10 +213,10 @@ viewZoomData forceHover zoom =
         |> IO.textGroup []
 
 
-canvas : Float2 -> ( Float, Float ) -> List (S.Svg msg) -> Html msg
+canvas : Float2 -> Float -> List (S.Svg msg) -> Html msg
 canvas browserWH zoom children =
     IO.canvas browserWH
-        [ IO.group [ IO.transform [ IO.scale2 zoom ] ] children ]
+        [ IO.group [ IO.transform [ IO.scale zoom ] ] children ]
 
 
 empty : Html msg

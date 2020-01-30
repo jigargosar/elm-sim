@@ -169,7 +169,7 @@ view model =
 
 globalStyles =
     """
-    .ns-resize,  .hover-ns-resize:hover {
+    .ns-resize:hover {
         cursor: ns-resize;
     }
 
@@ -196,14 +196,9 @@ viewState model =
 
 viewZoomData : Bool -> Float -> S.Svg Msg
 viewZoomData forceHover zoom =
-    [ IO.tspan "Zoom = " []
+    [ IO.tspan "Zoom = " [ SA.fill "black" ]
     , IO.tspan (Round.round 2 zoom)
-        [ if forceHover then
-            SA.class "fill-green"
-
-          else
-            SA.class "hover-fill-green"
-        ]
+        []
     , S.style []
         (if forceHover then
             [ S.text
@@ -220,7 +215,12 @@ viewZoomData forceHover zoom =
     ]
         |> IO.textGroup
             [ Draggable.onMouseDown (StartDrag (Zooming zoom))
-            , SA.class "hover-ns-resize pointer"
+            , SA.class "ns-resize"
+            , if forceHover then
+                SA.class "fill-green"
+
+              else
+                SA.class "hover-fill-green"
             ]
 
 

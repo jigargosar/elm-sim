@@ -9,16 +9,11 @@ module DrawingBlock.Draggable exposing
 import Browser.Events as BE
 import IO
 import Json.Decode as JD exposing (Decoder)
-import Maybe.Extra
 import VirtualDom
 
 
 type alias State =
-    Maybe InternalState
-
-
-type InternalState
-    = InternalState MouseState
+    Maybe MouseState
 
 
 type MouseState
@@ -44,7 +39,7 @@ mouseTrigger msg =
             primaryMEDecoder
                 |> JD.map
                     (\_ ->
-                        Just (InternalState MouseDown)
+                        Just MouseDown
                     )
     in
     IO.stopAllOn "mousedown" (JD.map msg mouseDownStateDecoder)
@@ -76,48 +71,46 @@ primaryMEDecoder =
 
 subscriptions : (State -> Event -> msg) -> State -> Sub msg
 subscriptions updateDrag maybeState =
-    let
-        subs =
-            Maybe.Extra.unwrap []
-                (\(InternalState type_) ->
-                    [ BE.onMouseMove
-                        (primaryMEDecoder
-                            |> JD.map
-                                (\current ->
-                                    let
-                                        newState =
-                                            Just (InternalState MouseDrag)
+    case maybeState of
+        Nothing ->
+            Sub.none
 
-                                        msg =
-                                            OnDrag current
-                                    in
-                                    updateDrag newState msg
-                                )
-                        )
-                    , BE.onMouseUp
-                        (primaryMEDecoder
-                            |> JD.map
-                                (\current ->
-                                    let
-                                        newState =
-                                            Nothing
+        Just type_ ->
+            Sub.batch
+                [ BE.onMouseMove
+                    (primaryMEDecoder
+                        |> JD.map
+                            (\current ->
+                                let
+                                    newState =
+                                        Just MouseDrag
 
-                                        msg =
-                                            OnEnd
-                                                current
-                                                (case type_ of
-                                                    MouseDown ->
-                                                        Click
+                                    msg =
+                                        OnDrag current
+                                in
+                                updateDrag newState msg
+                            )
+                    )
+                , BE.onMouseUp
+                    (primaryMEDecoder
+                        |> JD.map
+                            (\current ->
+                                let
+                                    newState =
+                                        Nothing
 
-                                                    MouseDrag ->
-                                                        Drop
-                                                )
-                                    in
-                                    updateDrag newState msg
-                                )
-                        )
-                    ]
-                )
-                maybeState
-    in
-    Sub.batch subs
+                                    msg =
+                                        OnEnd
+                                            current
+                                            (case type_ of
+                                                MouseDown ->
+                                                    Click
+
+                                                MouseDrag ->
+                                                    Drop
+                                            )
+                                in
+                                updateDrag newState msg
+                            )
+                    )
+                ]

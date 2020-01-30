@@ -2,6 +2,7 @@ module DrawingBlock.Draggable exposing
     ( Draggable
     , Msg(..)
     , PageXY
+    , Points
     , delta
     , intial
     , onDown
@@ -68,13 +69,8 @@ onDown msg =
         (VirtualDom.Custom (fromEvent msg))
 
 
-delta : Draggable -> ( Float, Float )
-delta maybeState =
-    Maybe.map deltaHelp maybeState |> Maybe.withDefault ( 0, 0 )
-
-
-deltaHelp : InternalState -> ( Float, Float )
-deltaHelp (InternalState _ { current, prev }) =
+delta : Points -> ( Float, Float )
+delta { prev, current } =
     ( current, prev ) |> uncurry N2.sub
 
 

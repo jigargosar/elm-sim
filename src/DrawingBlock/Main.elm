@@ -4,7 +4,7 @@ port module DrawingBlock.Main exposing (main)
 
 import Browser
 import Browser.Events as BE
-import DrawingBlock.Draggable as Drag exposing (Draggable)
+import DrawingBlock.Draggable as Draggable
 import Html as H exposing (Html)
 import IO
 import Json.Decode as JD
@@ -40,7 +40,7 @@ type alias EventData =
 type alias Model =
     { zoom : Float2
     , scene : Float2
-    , drag : Draggable
+    , drag : Draggable.State
     , editMode : EditMode
     }
 
@@ -48,10 +48,6 @@ type alias Model =
 type EditMode
     = Zooming Float2
     | NotEditing
-
-
-type alias DragMsg =
-    Drag.Msg
 
 
 type alias Flags =
@@ -62,7 +58,7 @@ init : Flags -> ( Model, Cmd Msg )
 init _ =
     ( { zoom = ( 1, 1 ) |> N2.scale 2.5
       , scene = ( 600, 600 )
-      , drag = Drag.intial
+      , drag = Draggable.intial
       , editMode = NotEditing
       }
     , IO.getBrowserWH
@@ -75,17 +71,17 @@ init _ =
 
 
 type Msg
-    = OnDragMsg Draggable DragMsg
+    = UpdateDrag Draggable.State Draggable.Event
     | BrowserResized Float2
     | OnKeyDown String
-    | OnMouseDown EditMode Draggable
+    | OnMouseDown EditMode Draggable.State
     | OnDatGUIChange DatGUIModel
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update message model =
     case message of
-        OnDragMsg drag dragMsg ->
+        UpdateDrag drag dragMsg ->
             ( { model | drag = drag } |> handleDragEvents dragMsg
             , Cmd.none
             )
@@ -107,13 +103,13 @@ update message model =
             ( { model | zoom = datGUIModel.zoom |> N2.singleton }, Cmd.none )
 
 
-handleDragEvents : Drag.Msg -> Model -> Model
+handleDragEvents : Draggable.Event -> Model -> Model
 handleDragEvents out model =
     case ( out, model.editMode ) of
-        ( Drag.OnDrag points, Zooming _ ) ->
+        ( Draggable.OnDrag points, Zooming _ ) ->
             let
                 ( _, dy ) =
-                    Drag.delta points
+                    Draggable.delta points
 
                 zoomStep =
                     ( dy, dy ) |> N2.scale 0.01 |> N2.mul model.zoom
@@ -152,7 +148,7 @@ subscriptions : Model -> Sub Msg
 subscriptions model =
     [ IO.onBrowserWH BrowserResized
     , JD.map OnKeyDown keyDecoder |> BE.onKeyDown
-    , Drag.subscriptions OnDragMsg model.drag
+    , Draggable.subscriptions UpdateDrag model.drag
     , onDatGUIChange OnDatGUIChange
     ]
         |> Sub.batch
@@ -191,7 +187,7 @@ viewZoomData forceHover zoom =
     [ IO.tspan "Zoom = " []
     , IO.tspan (Debug.toString twoDecimalZoom)
         [ SA.id "zoom-element"
-        , Drag.onDown (OnMouseDown (Zooming zoom))
+        , Draggable.onDown (OnMouseDown (Zooming zoom))
         , SA.class "pointer"
         , if forceHover then
             SA.style """

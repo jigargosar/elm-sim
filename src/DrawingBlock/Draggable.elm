@@ -1,8 +1,8 @@
 module DrawingBlock.Draggable exposing
-    ( Draggable
-    , Msg(..)
+    ( Event(..)
     , PageXY
     , Points
+    , State
     , delta
     , intial
     , onDown
@@ -22,15 +22,15 @@ type alias PageXY =
     Float2
 
 
-type alias Draggable =
+type alias State =
     Maybe InternalState
 
 
 type InternalState
-    = InternalState EventType Points
+    = InternalState MouseState Points
 
 
-type EventType
+type MouseState
     = MouseDown
     | MouseDrag
 
@@ -42,12 +42,12 @@ type alias Points =
     }
 
 
-type Msg
+type Event
     = OnEnd Points End
     | OnDrag Points
 
 
-intial : Draggable
+intial : State
 intial =
     Nothing
 
@@ -63,7 +63,7 @@ fromEvent msg =
         IO.pageXYDecoder
 
 
-onDown : (Draggable -> msg) -> VirtualDom.Attribute msg
+onDown : (State -> msg) -> VirtualDom.Attribute msg
 onDown msg =
     VirtualDom.on "mousedown"
         (VirtualDom.Custom (fromEvent msg))
@@ -79,7 +79,7 @@ type End
     | Drop
 
 
-subscriptions : (Draggable -> Msg -> msg) -> Draggable -> Sub msg
+subscriptions : (State -> Event -> msg) -> State -> Sub msg
 subscriptions updateDrag maybeState =
     let
         subs =

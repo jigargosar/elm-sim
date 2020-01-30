@@ -34,13 +34,22 @@ intial =
 
 mouseTrigger : (State -> msg) -> VirtualDom.Attribute msg
 mouseTrigger msg =
+    mouseBtnTrigger 0 msg
+
+
+mouseBtnTrigger : Int -> (State -> value) -> VirtualDom.Attribute value
+mouseBtnTrigger btn msg =
     let
         mouseDownStateDecoder : Decoder State
         mouseDownStateDecoder =
-            primaryMEDecoder
-                |> JD.map
-                    (\_ ->
-                        SubState 0 JustDown
+            IO.mouseEventDecoder
+                |> JD.andThen
+                    (\e ->
+                        if e.button == btn then
+                            JD.succeed (SubState btn JustDown)
+
+                        else
+                            JD.fail "Not intrested"
                     )
     in
     IO.stopAllOn "mousedown" (JD.map msg mouseDownStateDecoder)

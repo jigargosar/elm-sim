@@ -40,9 +40,17 @@ type EventType
     | MouseDrag
 
 
+type alias Points =
+    { start : PageXY
+    , prev : PageXY
+    , current : PageXY
+    }
+
+
 type Msg
     = OnMove PageXY
     | OnUp PageXY
+    | OnEnd Draggable Points End
 
 
 intial : Draggable
@@ -79,10 +87,10 @@ deltaHelp { current, prev } =
 
 type OutMsg
     = Move
-    | Up Up
+    | Up End
 
 
-type Up
+type End
     = Click
     | Drop
 
@@ -116,6 +124,9 @@ update message (maybeState as model) =
                             Up Drop
                     )
 
+        OnEnd draggable _ up ->
+            ( draggable, Up up )
+
 
 subscriptions : Draggable -> Sub Msg
 subscriptions maybeState =
@@ -125,10 +136,32 @@ subscriptions maybeState =
 
         subs =
             Maybe.Extra.unwrap []
-                (\_ ->
-                    [ BE.onMouseUp (decoder OnUp)
-                    , BE.onMouseMove (decoder OnMove)
-                    ]
+                (\state ->
+                    let
+                        newPoints current =
+                            { start = state.start
+                            , prev = state.current
+                            , current = current
+                            }
+                    in
+                    case state.type_ of
+                        MouseDown ->
+                            [ BE.onMouseUp
+                                (IO.pageXYDecoder
+                                    |> JD.map
+                                        (\current ->
+                                            OnEnd Nothing
+                                                (newPoints current)
+                                                Click
+                                        )
+                                )
+                            , BE.onMouseMove (decoder OnMove)
+                            ]
+
+                        MouseDrag ->
+                            [ BE.onMouseUp (decoder OnUp)
+                            , BE.onMouseMove (decoder OnMove)
+                            ]
                 )
                 maybeState
     in

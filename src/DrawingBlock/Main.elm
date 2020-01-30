@@ -90,7 +90,17 @@ update message model =
             ( { model | scene = wh }, Cmd.none )
 
         OnKeyDown key ->
-            ( onKeyDown key model, Cmd.none )
+            ( case key of
+                "1" ->
+                    zoomIn model
+
+                "2" ->
+                    zoomOut model
+
+                _ ->
+                    model
+            , Cmd.none
+            )
 
         StartDrag editMode drag ->
             ( { model | editMode = editMode, drag = drag }, Cmd.none )
@@ -123,24 +133,12 @@ handleDragEvents event model =
             model
 
 
-onKeyDown : String -> Model -> Model
-onKeyDown key state =
-    let
-        _ =
-            Debug.log "key" key
+zoomIn model =
+    { model | zoom = model.zoom |> mapEach (\s -> clamp 0.05 50 (s + s * 0.1)) }
 
-        zoom =
-            case key of
-                "1" ->
-                    state.zoom |> mapEach (\s -> clamp 0.05 50 (s + s * 0.1))
 
-                "2" ->
-                    state.zoom |> mapEach (\s -> clamp 0.05 50 (s - s * 0.1))
-
-                _ ->
-                    state.zoom
-    in
-    { state | zoom = zoom }
+zoomOut model =
+    { model | zoom = model.zoom |> mapEach (\s -> clamp 0.05 50 (s + s * 0.1)) }
 
 
 keyDecoder =

@@ -14,7 +14,11 @@ import VirtualDom
 
 type State
     = Waiting
-    | JustDown
+    | SubState Int SubState
+
+
+type SubState
+    = JustDown
     | Dragging
 
 
@@ -36,7 +40,7 @@ mouseTrigger msg =
             primaryMEDecoder
                 |> JD.map
                     (\_ ->
-                        JustDown
+                        SubState 0 JustDown
                     )
     in
     IO.stopAllOn "mousedown" (JD.map msg mouseDownStateDecoder)
@@ -72,12 +76,12 @@ subscriptions updateDrag state =
         Waiting ->
             Sub.none
 
-        JustDown ->
+        SubState btn JustDown ->
             [ BE.onMouseMove
                 (primaryMEDecoder
                     |> JD.map
                         (\event ->
-                            updateDrag Dragging (OnDrag event)
+                            updateDrag (SubState btn Dragging) (OnDrag event)
                         )
                 )
             , BE.onMouseUp
@@ -90,12 +94,12 @@ subscriptions updateDrag state =
             ]
                 |> Sub.batch
 
-        Dragging ->
+        SubState btn Dragging ->
             [ BE.onMouseMove
                 (primaryMEDecoder
                     |> JD.map
                         (\current ->
-                            updateDrag Dragging (OnDrag current)
+                            updateDrag state (OnDrag current)
                         )
                 )
             , BE.onMouseUp

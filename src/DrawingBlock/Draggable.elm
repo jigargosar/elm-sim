@@ -51,6 +51,7 @@ type Msg
     = OnMove PageXY
     | OnUp PageXY
     | OnEnd Draggable Points End
+    | OnDrag Draggable Points
 
 
 intial : Draggable
@@ -127,6 +128,9 @@ update message (maybeState as model) =
         OnEnd draggable _ up ->
             ( draggable, Up up )
 
+        OnDrag draggable _ ->
+            ( draggable, Move )
+
 
 subscriptions : Draggable -> Sub Msg
 subscriptions maybeState =
@@ -144,24 +148,28 @@ subscriptions maybeState =
                             , current = current
                             }
                     in
-                    case state.type_ of
+                    [ BE.onMouseMove (decoder OnMove)
+                    , case state.type_ of
                         MouseDown ->
-                            [ BE.onMouseUp
+                            BE.onMouseUp
                                 (IO.pageXYDecoder
                                     |> JD.map
                                         (\current ->
                                             OnEnd Nothing
                                                 (newPoints current)
-                                                Click
+                                                (case state.type_ of
+                                                    MouseDown ->
+                                                        Click
+
+                                                    MouseDrag ->
+                                                        Drop
+                                                )
                                         )
                                 )
-                            , BE.onMouseMove (decoder OnMove)
-                            ]
 
                         MouseDrag ->
-                            [ BE.onMouseUp (decoder OnUp)
-                            , BE.onMouseMove (decoder OnMove)
-                            ]
+                            BE.onMouseUp (decoder OnUp)
+                    ]
                 )
                 maybeState
     in

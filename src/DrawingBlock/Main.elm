@@ -1,4 +1,4 @@
-module DrawingBlock.Main exposing (main)
+port module DrawingBlock.Main exposing (main)
 
 -- Browser.Element Scaffold
 
@@ -15,6 +15,14 @@ import String2 as S2
 import Svg as S
 import Svg.Attributes as SA
 import Task
+
+
+type alias DatGUIModel =
+    { zoom : Float
+    }
+
+
+port onDatGUIChange : (DatGUIModel -> msg) -> Sub msg
 
 
 
@@ -71,6 +79,7 @@ type Msg
     | BrowserResized Float2
     | OnKeyDown String
     | OnMouseDown EditMode DragModel
+    | OnDatGUIChange DatGUIModel
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -93,6 +102,13 @@ update message model =
 
         OnMouseDown editMode drag ->
             ( { model | editMode = editMode, drag = drag }, Cmd.none )
+
+        OnDatGUIChange datGUIModel ->
+            let
+                _ =
+                    Debug.log "datGUIModel" datGUIModel
+            in
+            ( model, Cmd.none )
 
 
 handleDragEvents : Drag.OutMsg -> Model -> Model
@@ -141,6 +157,7 @@ subscriptions model =
     [ IO.onBrowserWH BrowserResized
     , JD.map OnKeyDown keyDecoder |> BE.onKeyDown
     , Drag.subscriptions model.drag |> Sub.map OnDragMsg
+    , onDatGUIChange OnDatGUIChange
     ]
         |> Sub.batch
 

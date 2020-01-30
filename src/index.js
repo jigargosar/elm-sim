@@ -1,28 +1,58 @@
+const R = require('ramda')
+
 const Module = require('./Main.elm')
 require('tachyons')
 require('./styles.css')
 const dat = require('dat.gui')
 
 // console.log(Module)
-const gui = new dat.GUI()
 
-const elmData = { zoom: 1 }
+{
+  const app = initElmApp()
+  initDatGUI(app)
+}
 
-gui
-  .add(elmData, 'zoom')
-  .step(0.5)
-  .min(0.1)
-  .max(50)
-  .onChange(function(...args) {
-    console.log('zoomChange', this, args)
+function initDatGUI(elmApp) {
+  const gui = new dat.GUI()
+
+  const elmData = { zoom: 1 }
+  const ports = Ports(elmApp)
+
+  gui
+    .add(elmData, 'zoom')
+    .step(0.5)
+    .min(0.1)
+    .max(50)
+    .onChange(function(value) {
+      ports.send('onDatGUIChange', { [this.property]: value })
+    })
+    .onFinishChange(function(...args) {
+      // console.log('zoomFinishChange', this, args)
+    })
+}
+
+function initElmApp() {
+  const app = Module.Elm.Main.init({
+    node: document.getElementById('root'),
+    flags: {
+      now: Date.now(),
+    },
   })
-  .onFinishChange(function(...args) {
-    console.log('zoomFinishChange', this, args)
-  })
+  return app
+}
 
-const app = Module.Elm.Main.init({
-  node: document.getElementById('root'),
-  flags: {
-    now: Date.now(),
-  },
-})
+function Ports(elmApp) {
+  return {
+    send(subscriptionPortName, data) {
+      const subscriptionPort = R.path(
+        ['ports', subscriptionPortName, 'send'],
+        elmApp,
+      )
+      if (R.isNil(subscriptionPort)) {
+        console.warn(`PortNotFound: Ports.${subscriptionPortName}.send`)
+      } else {
+        subscriptionPort(data)
+      }
+    },
+  }
+}

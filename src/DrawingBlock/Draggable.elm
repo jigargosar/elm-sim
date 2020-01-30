@@ -1,7 +1,6 @@
 module DrawingBlock.Draggable exposing
     ( Event(..)
     , MouseEvent
-    , PageXY
     , State
     , intial
     , mouseTrigger
@@ -16,16 +15,12 @@ import Number2 exposing (Float2)
 import VirtualDom
 
 
-type alias PageXY =
-    Float2
-
-
 type alias State =
     Maybe InternalState
 
 
 type InternalState
-    = InternalState MouseState PageXY
+    = InternalState MouseState Float2
 
 
 type MouseState

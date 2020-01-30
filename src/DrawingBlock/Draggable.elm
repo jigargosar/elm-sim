@@ -88,38 +88,27 @@ subscriptions updateDrag state =
         Waiting ->
             Sub.none
 
-        BtnDown btn NotMoved ->
-            [ BE.onMouseMove
-                (primaryMEDecoder
-                    |> JD.map
-                        (\event ->
-                            updateDrag (BtnDown btn Moving) (OnDrag event)
-                        )
-                )
-            , BE.onMouseUp
-                (primaryMEDecoder
-                    |> JD.map
-                        (\event ->
-                            updateDrag Waiting (OnEnd event Click)
-                        )
-                )
-            ]
-                |> Sub.batch
+        BtnDown btn subState ->
+            [ mouseEventDecoderWhenBtn btn
+                |> JD.map
+                    (\me ->
+                        updateDrag (BtnDown btn Moving) (OnDrag me)
+                    )
+                |> BE.onMouseMove
+            , mouseEventDecoderWhenBtn btn
+                |> JD.map
+                    (\me ->
+                        updateDrag Waiting
+                            (OnEnd me
+                                (case subState of
+                                    NotMoved ->
+                                        Click
 
-        BtnDown btn Moving ->
-            [ BE.onMouseMove
-                (primaryMEDecoder
-                    |> JD.map
-                        (\current ->
-                            updateDrag state (OnDrag current)
-                        )
-                )
-            , BE.onMouseUp
-                (primaryMEDecoder
-                    |> JD.map
-                        (\event ->
-                            updateDrag Waiting (OnEnd event Drop)
-                        )
-                )
+                                    Moving ->
+                                        Drop
+                                )
+                            )
+                    )
+                |> BE.onMouseUp
             ]
                 |> Sub.batch

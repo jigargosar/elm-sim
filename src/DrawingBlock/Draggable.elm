@@ -2,8 +2,8 @@ module DrawingBlock.Draggable exposing
     ( Event(..)
     , State
     , intial
-    , mouseBtnTrigger
-    , mouseTrigger
+    , onMouseBtnDown
+    , onMouseDown
     , subscriptions
     )
 
@@ -15,16 +15,16 @@ import VirtualDom
 
 type State
     = Waiting
-    | BtnDown Int SubState
+    | Down Int Up
 
 
-type SubState
-    = NotMoved
-    | Moving
+type Up
+    = Click
+    | Drop
 
 
 type Event
-    = OnEnd IO.MouseEvent End
+    = OnUp Up IO.MouseEvent
     | OnDrag IO.MouseEvent
 
 
@@ -33,15 +33,15 @@ intial =
     Waiting
 
 
-mouseTrigger : (State -> msg) -> VirtualDom.Attribute msg
-mouseTrigger msg =
-    mouseBtnTrigger 0 msg
+onMouseDown : (State -> msg) -> VirtualDom.Attribute msg
+onMouseDown msg =
+    onMouseBtnDown 0 msg
 
 
-mouseBtnTrigger : Int -> (State -> value) -> VirtualDom.Attribute value
-mouseBtnTrigger btn msg =
+onMouseBtnDown : Int -> (State -> value) -> VirtualDom.Attribute value
+onMouseBtnDown btn msg =
     mouseEventDecoderWhenBtn btn
-        |> JD.map (\_ -> msg (BtnDown btn NotMoved))
+        |> JD.map (\_ -> msg (Down btn Click))
         |> IO.stopAllOn "mousedown"
 
 
@@ -56,11 +56,6 @@ mouseEventDecoderWhenBtn btn =
                 else
                     JD.fail "Not intrested"
             )
-
-
-type End
-    = Click
-    | Drop
 
 
 primaryMEDecoder : Decoder IO.MouseEvent
@@ -88,26 +83,17 @@ subscriptions updateDrag state =
         Waiting ->
             Sub.none
 
-        BtnDown btn subState ->
+        Down btn up ->
             [ mouseEventDecoderWhenBtn btn
                 |> JD.map
                     (\me ->
-                        updateDrag (BtnDown btn Moving) (OnDrag me)
+                        updateDrag (Down btn Drop) (OnDrag me)
                     )
                 |> BE.onMouseMove
             , mouseEventDecoderWhenBtn btn
                 |> JD.map
                     (\me ->
-                        updateDrag Waiting
-                            (OnEnd me
-                                (case subState of
-                                    NotMoved ->
-                                        Click
-
-                                    Moving ->
-                                        Drop
-                                )
-                            )
+                        updateDrag Waiting (OnUp up me)
                     )
                 |> BE.onMouseUp
             ]

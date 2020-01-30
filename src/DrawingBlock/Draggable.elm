@@ -42,8 +42,8 @@ type alias Points =
 
 
 type Msg
-    = OnEnd Draggable Points End
-    | OnDrag Draggable Points
+    = OnEnd Points End
+    | OnDrag Points
 
 
 intial : Draggable
@@ -105,7 +105,7 @@ subscriptions updateDrag maybeState =
                                             Just (InternalState MouseDrag (newPoints current))
 
                                         msg =
-                                            OnDrag newState (newPoints current)
+                                            OnDrag (newPoints current)
                                     in
                                     updateDrag newState msg
                                 )
@@ -119,7 +119,7 @@ subscriptions updateDrag maybeState =
                                             Nothing
 
                                         msg =
-                                            OnEnd Nothing
+                                            OnEnd
                                                 (newPoints current)
                                                 (case type_ of
                                                     MouseDown ->

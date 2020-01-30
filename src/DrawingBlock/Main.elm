@@ -110,7 +110,7 @@ update message model =
 handleDragEvents : Drag.Msg -> Model -> Model
 handleDragEvents out model =
     case ( out, model.editMode ) of
-        ( Drag.OnDrag _ _, Zooming _ ) ->
+        ( Drag.OnDrag _, Zooming _ ) ->
             let
                 ( _, dy ) =
                     Drag.delta model.drag

@@ -160,7 +160,10 @@ view : Model -> Html Msg
 view model =
     H.div []
         [ IO.styleNode globalStyles
-        , canvas model.scene model.zoom (viewState model)
+        , IO.canvas model.scene
+            [ IO.group [ IO.transform [ IO.scale model.zoom ] ]
+                (svgContent model)
+            ]
         ]
 
 
@@ -176,8 +179,8 @@ globalStyles =
     """
 
 
-viewState : Model -> List (S.Svg Msg)
-viewState model =
+svgContent : Model -> List (S.Svg Msg)
+svgContent model =
     let
         isDraggingZoom =
             model.dragging == Just Zooming
@@ -214,12 +217,6 @@ viewZoomData forceHover zoom =
               else
                 SA.class "hover-fill-green"
             ]
-
-
-canvas : Float2 -> Float -> List (S.Svg msg) -> Html msg
-canvas browserWH zoom children =
-    IO.canvas browserWH
-        [ IO.group [ IO.transform [ IO.scale zoom ] ] children ]
 
 
 empty : Html msg

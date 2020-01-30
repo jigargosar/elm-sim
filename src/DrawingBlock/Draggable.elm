@@ -5,7 +5,7 @@ module DrawingBlock.Draggable exposing
     , State
     , delta
     , intial
-    , startOnPrimaryMouseDown
+    , primartMouseTrigger
     , subscriptions
     )
 
@@ -52,21 +52,46 @@ intial =
     Nothing
 
 
-fromEvent msg =
-    JD.map
-        (\e ->
-            { message = msg (Just (InternalState MouseDown (Points e e e)))
-            , preventDefault = True
-            , stopPropagation = True
-            }
-        )
-        IO.pageXYDecoder
+type alias CustomHandler msg =
+    { message : msg, preventDefault : Bool, stopPropagation : Bool }
 
 
-startOnPrimaryMouseDown : (State -> msg) -> VirtualDom.Attribute msg
-startOnPrimaryMouseDown msg =
+stopAll : a -> CustomHandler a
+stopAll msg =
+    CustomHandler msg True True
+
+
+whenPrimaryMouseButton : a -> Decoder a
+whenPrimaryMouseButton msg =
+    JD.field "button" JD.int
+        |> JD.andThen
+            (\button ->
+                if button == 0 then
+                    JD.succeed msg
+
+                else
+                    JD.fail "not primary button"
+            )
+
+
+mouseDownStateDecoder : Decoder State
+mouseDownStateDecoder =
+    IO.pageXYDecoder
+        |> JD.andThen whenPrimaryMouseButton
+        |> JD.map
+            (\e ->
+                Just (InternalState MouseDown (Points e e e))
+            )
+
+
+primartMouseTrigger : (State -> msg) -> VirtualDom.Attribute msg
+primartMouseTrigger msg =
     VirtualDom.on "mousedown"
-        (VirtualDom.Custom (fromEvent msg))
+        (VirtualDom.Custom
+            (mouseDownStateDecoder
+                |> JD.map (msg >> stopAll)
+            )
+        )
 
 
 delta : Points -> ( Float, Float )

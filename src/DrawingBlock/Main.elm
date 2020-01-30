@@ -108,7 +108,7 @@ update message model =
                 _ =
                     Debug.log "datGUIModel" datGUIModel
             in
-            ( model, Cmd.none )
+            ( { model | zoom = datGUIModel.zoom |> N2.singleton }, Cmd.none )
 
 
 handleDragEvents : Drag.OutMsg -> Model -> Model

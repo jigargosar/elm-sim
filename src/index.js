@@ -20,7 +20,7 @@ function initDatGUI(elmApp) {
 
   gui
     .add(elmData, 'zoom')
-    .step(0.5)
+    .step(0.01)
     .min(0.1)
     .max(50)
     .onChange(function(value) {

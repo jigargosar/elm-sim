@@ -12,6 +12,11 @@ type alias Float2 =
     ( Basics.Float, Basics.Float )
 
 
+singleton : number -> ( number, number )
+singleton a =
+    ( a, a )
+
+
 scale : number -> ( number, number ) -> ( number, number )
 scale factor =
     mapEach (mulBy factor)

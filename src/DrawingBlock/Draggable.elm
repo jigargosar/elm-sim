@@ -1,6 +1,5 @@
 module DrawingBlock.Draggable exposing
     ( Event(..)
-    , MouseEvent
     , State
     , intial
     , mouseTrigger
@@ -28,34 +27,14 @@ type MouseState
     | MouseDrag
 
 
-type alias MouseEvent =
-    { pageXY : Float2
-    , movementXY : Float2
-    }
-
-
 type Event
-    = OnEnd MouseEvent End
-    | OnDrag MouseEvent
+    = OnEnd IO.MouseEvent End
+    | OnDrag IO.MouseEvent
 
 
 intial : State
 intial =
     Nothing
-
-
-type alias CustomHandler msg =
-    { message : msg, preventDefault : Bool, stopPropagation : Bool }
-
-
-stopAll : a -> CustomHandler a
-stopAll msg =
-    CustomHandler msg True True
-
-
-stopAllHandler : Decoder a -> VirtualDom.Handler a
-stopAllHandler decoder =
-    VirtualDom.Custom (JD.map stopAll decoder)
 
 
 mouseTrigger : (State -> msg) -> VirtualDom.Attribute msg
@@ -77,13 +56,9 @@ type End
     | Drop
 
 
-primaryMEDecoder : Decoder MouseEvent
+primaryMEDecoder : Decoder IO.MouseEvent
 primaryMEDecoder =
     let
-        mouseEventDecoder : Decoder MouseEvent
-        mouseEventDecoder =
-            JD.map2 MouseEvent IO.pageXYDecoder IO.movementXYDecoder
-
         whenPrimaryMouseButton : a -> Decoder a
         whenPrimaryMouseButton msg =
             JD.field "button" JD.int
@@ -96,7 +71,7 @@ primaryMEDecoder =
                             JD.fail "not primary button"
                     )
     in
-    mouseEventDecoder
+    IO.mouseEventDecoder
         |> JD.andThen whenPrimaryMouseButton
 
 

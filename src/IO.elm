@@ -1,4 +1,4 @@
-module IO exposing (canvas, getBrowserWH, group, movementXYDecoder, onBrowserWH, pageXYDecoder, scale2, stopAllOn, text, textGroup, timeStampDecoder, transform, tspan)
+module IO exposing (MouseEvent, buttonDecoder, canvas, getBrowserWH, group, mouseEventDecoder, movementXYDecoder, onBrowserWH, pageXYDecoder, scale2, stopAllOn, text, textGroup, timeStampDecoder, transform, tspan)
 
 import Browser.Dom as BD
 import Browser.Events as BE
@@ -105,9 +105,29 @@ movementXYDecoder =
         (JD.field "movementY" JD.float)
 
 
+buttonDecoder : Decoder Int
+buttonDecoder =
+    JD.field "button" JD.int
+
+
 timeStampDecoder : JD.Decoder Float
 timeStampDecoder =
     JD.field "timeStamp" JD.float
+
+
+type alias MouseEvent =
+    { pageXY : Float2
+    , movementXY : Float2
+    , button : Int
+    }
+
+
+mouseEventDecoder : Decoder MouseEvent
+mouseEventDecoder =
+    JD.map3 MouseEvent
+        pageXYDecoder
+        movementXYDecoder
+        buttonDecoder
 
 
 type alias CustomHandler msg =

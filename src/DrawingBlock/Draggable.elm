@@ -2,6 +2,7 @@ module DrawingBlock.Draggable exposing
     ( Event(..)
     , State
     , intial
+    , mouseBtnTrigger
     , mouseTrigger
     , subscriptions
     )
@@ -39,20 +40,22 @@ mouseTrigger msg =
 
 mouseBtnTrigger : Int -> (State -> value) -> VirtualDom.Attribute value
 mouseBtnTrigger btn msg =
-    let
-        mouseDownStateDecoder : Decoder State
-        mouseDownStateDecoder =
-            IO.mouseEventDecoder
-                |> JD.andThen
-                    (\e ->
-                        if e.button == btn then
-                            JD.succeed (SubState btn JustDown)
+    mouseEventDecoderWhenBtn btn
+        |> JD.map (\_ -> msg (SubState btn JustDown))
+        |> IO.stopAllOn "mousedown"
 
-                        else
-                            JD.fail "Not intrested"
-                    )
-    in
-    IO.stopAllOn "mousedown" (JD.map msg mouseDownStateDecoder)
+
+mouseEventDecoderWhenBtn : Int -> Decoder IO.MouseEvent
+mouseEventDecoderWhenBtn btn =
+    IO.mouseEventDecoder
+        |> JD.andThen
+            (\e ->
+                if e.button == btn then
+                    JD.succeed e
+
+                else
+                    JD.fail "Not intrested"
+            )
 
 
 type End

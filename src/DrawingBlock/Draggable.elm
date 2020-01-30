@@ -4,7 +4,7 @@ module DrawingBlock.Draggable exposing
     , PageXY
     , State
     , intial
-    , primartMouseTrigger
+    , mouseTrigger
     , subscriptions
     )
 
@@ -67,8 +67,8 @@ mouseDownStateDecoder =
             )
 
 
-primartMouseTrigger : (State -> msg) -> VirtualDom.Attribute msg
-primartMouseTrigger msg =
+mouseTrigger : (State -> msg) -> VirtualDom.Attribute msg
+mouseTrigger msg =
     VirtualDom.on "mousedown"
         (VirtualDom.Custom
             (mouseDownStateDecoder

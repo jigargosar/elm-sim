@@ -187,7 +187,7 @@ viewZoomData forceHover zoom =
     [ IO.tspan "Zoom = " []
     , IO.tspan (Debug.toString twoDecimalZoom)
         [ SA.id "zoom-element"
-        , Draggable.primartMouseTrigger (StartDrag (Zooming zoom))
+        , Draggable.mouseTrigger (StartDrag (Zooming zoom))
         , SA.class "pointer"
         , if forceHover then
             SA.style """

@@ -181,22 +181,13 @@ viewState model =
 
 viewZoomData : Bool -> Float -> S.Svg Msg
 viewZoomData forceHover zoom =
-    [ IO.tspan "Zoom = "
-        [ SA.class "ns-resize"
-        ]
+    [ IO.tspan "Zoom = " []
     , IO.tspan (Round.round 2 zoom)
-        [ SA.id "zoom-value"
-        , Draggable.onMouseDown (StartDrag (Zooming zoom))
-        , SA.class "pointer"
-        , if forceHover then
-            SA.style """
-                        fill: green;
-                        cursor: ns-resize;
-                     """
+        [ if forceHover then
+            SA.class "fill-green"
 
           else
-            SA.style """
-                     """
+            SA.class "hover-fill-green"
         ]
     , S.style []
         [ S.text
@@ -209,27 +200,27 @@ viewZoomData forceHover zoom =
                     fill: green;
                 }
 
-                #zoom-value:hover{
-                    fill: green;
-                    cursor: ns-resize;
-                }
+
             """
         ]
     , S.style []
-        [ S.text
-            (if forceHover then
+        (if forceHover then
+            [ S.text
                 """
                     body {
                         cursor: ns-resize;
                     }
                 """
+            ]
 
-             else
-                ""
-            )
-        ]
+         else
+            []
+        )
     ]
-        |> IO.textGroup []
+        |> IO.textGroup
+            [ Draggable.onMouseDown (StartDrag (Zooming zoom))
+            , SA.class "hover-ns-resize pointer"
+            ]
 
 
 canvas : Float2 -> Float -> List (S.Svg msg) -> Html msg

@@ -27,12 +27,8 @@ type alias Draggable =
     Maybe InternalState
 
 
-type alias InternalState =
-    { start : PageXY
-    , prev : PageXY
-    , current : PageXY
-    , type_ : EventType
-    }
+type InternalState
+    = InternalState EventType Points
 
 
 type EventType
@@ -62,7 +58,7 @@ intial =
 fromEvent msg =
     JD.map
         (\e ->
-            { message = msg (Just (InternalState e e e MouseDown))
+            { message = msg (Just (InternalState MouseDown (Points e e e)))
             , preventDefault = True
             , stopPropagation = True
             }
@@ -82,7 +78,7 @@ delta maybeState =
 
 
 deltaHelp : InternalState -> ( Float, Float )
-deltaHelp { current, prev } =
+deltaHelp (InternalState _ { current, prev }) =
     ( current, prev ) |> uncurry N2.sub
 
 
@@ -104,8 +100,8 @@ update message (maybeState as model) =
                 Nothing ->
                     ( model, Up Drop )
 
-                Just state ->
-                    ( { state | prev = state.current, current = event, type_ = MouseDrag }
+                Just (InternalState type_ points) ->
+                    ( InternalState MouseDrag { points | prev = points.current, current = event }
                         |> Just
                     , Move
                     )
@@ -115,7 +111,7 @@ update message (maybeState as model) =
                 Nothing ->
                     ( model, Up Drop )
 
-                Just { type_ } ->
+                Just (InternalState type_ _) ->
                     ( Nothing
                     , case type_ of
                         MouseDown ->
@@ -140,35 +136,38 @@ subscriptions maybeState =
 
         subs =
             Maybe.Extra.unwrap []
-                (\state ->
+                (\(InternalState type_ points) ->
                     let
                         newPoints current =
-                            { start = state.start
-                            , prev = state.current
+                            { start = points.start
+                            , prev = points.current
                             , current = current
                             }
                     in
                     [ BE.onMouseMove (decoder OnMove)
-                    , case state.type_ of
-                        MouseDown ->
-                            BE.onMouseUp
-                                (IO.pageXYDecoder
-                                    |> JD.map
-                                        (\current ->
-                                            OnEnd Nothing
-                                                (newPoints current)
-                                                (case state.type_ of
-                                                    MouseDown ->
-                                                        Click
+                    , BE.onMouseMove
+                        (IO.pageXYDecoder
+                            |> JD.map
+                                (\current ->
+                                    OnDrag (Just (InternalState MouseDrag (newPoints current)))
+                                        (newPoints current)
+                                )
+                        )
+                    , BE.onMouseUp
+                        (IO.pageXYDecoder
+                            |> JD.map
+                                (\current ->
+                                    OnEnd Nothing
+                                        (newPoints current)
+                                        (case type_ of
+                                            MouseDown ->
+                                                Click
 
-                                                    MouseDrag ->
-                                                        Drop
-                                                )
+                                            MouseDrag ->
+                                                Drop
                                         )
                                 )
-
-                        MouseDrag ->
-                            BE.onMouseUp (decoder OnUp)
+                        )
                     ]
                 )
                 maybeState

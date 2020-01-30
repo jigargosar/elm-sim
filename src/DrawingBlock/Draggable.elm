@@ -1,13 +1,11 @@
 module DrawingBlock.Draggable exposing
     ( Draggable
-    , Msg
-    , OutMsg(..)
+    , Msg(..)
     , PageXY
     , delta
     , intial
     , onDown
     , subscriptions
-    , update
     )
 
 import Basics.Extra exposing (uncurry)
@@ -44,9 +42,7 @@ type alias Points =
 
 
 type Msg
-    = OnMove PageXY
-    | OnUp PageXY
-    | OnEnd Draggable Points End
+    = OnEnd Draggable Points End
     | OnDrag Draggable Points
 
 
@@ -82,58 +78,14 @@ deltaHelp (InternalState _ { current, prev }) =
     ( current, prev ) |> uncurry N2.sub
 
 
-type OutMsg
-    = Move
-    | Up End
-
-
 type End
     = Click
     | Drop
 
 
-update : Msg -> Draggable -> ( Draggable, OutMsg )
-update message (maybeState as model) =
-    case message of
-        OnMove event ->
-            case maybeState of
-                Nothing ->
-                    ( model, Up Drop )
-
-                Just (InternalState type_ points) ->
-                    ( InternalState MouseDrag { points | prev = points.current, current = event }
-                        |> Just
-                    , Move
-                    )
-
-        OnUp _ ->
-            case maybeState of
-                Nothing ->
-                    ( model, Up Drop )
-
-                Just (InternalState type_ _) ->
-                    ( Nothing
-                    , case type_ of
-                        MouseDown ->
-                            Up Click
-
-                        MouseDrag ->
-                            Up Drop
-                    )
-
-        OnEnd draggable _ up ->
-            ( draggable, Up up )
-
-        OnDrag draggable _ ->
-            ( draggable, Move )
-
-
-subscriptions : Draggable -> Sub Msg
-subscriptions maybeState =
+subscriptions : (Draggable -> Msg -> msg) -> Draggable -> Sub msg
+subscriptions updateDrag maybeState =
     let
-        decoder x =
-            JD.map x IO.pageXYDecoder
-
         subs =
             Maybe.Extra.unwrap []
                 (\(InternalState type_ points) ->
@@ -144,28 +96,40 @@ subscriptions maybeState =
                             , current = current
                             }
                     in
-                    [ BE.onMouseMove (decoder OnMove)
-                    , BE.onMouseMove
+                    [ BE.onMouseMove
                         (IO.pageXYDecoder
                             |> JD.map
                                 (\current ->
-                                    OnDrag (Just (InternalState MouseDrag (newPoints current)))
-                                        (newPoints current)
+                                    let
+                                        newState =
+                                            Just (InternalState MouseDrag (newPoints current))
+
+                                        msg =
+                                            OnDrag newState (newPoints current)
+                                    in
+                                    updateDrag newState msg
                                 )
                         )
                     , BE.onMouseUp
                         (IO.pageXYDecoder
                             |> JD.map
                                 (\current ->
-                                    OnEnd Nothing
-                                        (newPoints current)
-                                        (case type_ of
-                                            MouseDown ->
-                                                Click
+                                    let
+                                        newState =
+                                            Nothing
 
-                                            MouseDrag ->
-                                                Drop
-                                        )
+                                        msg =
+                                            OnEnd Nothing
+                                                (newPoints current)
+                                                (case type_ of
+                                                    MouseDown ->
+                                                        Click
+
+                                                    MouseDrag ->
+                                                        Drop
+                                                )
+                                    in
+                                    updateDrag newState msg
                                 )
                         )
                     ]

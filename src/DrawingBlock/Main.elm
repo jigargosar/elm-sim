@@ -75,7 +75,7 @@ init _ =
 
 
 type Msg
-    = OnDragMsg DragMsg
+    = OnDragMsg Draggable DragMsg
     | BrowserResized Float2
     | OnKeyDown String
     | OnMouseDown EditMode Draggable
@@ -85,12 +85,8 @@ type Msg
 update : Msg -> Model -> ( Model, Cmd Msg )
 update message model =
     case message of
-        OnDragMsg dragMsg ->
-            let
-                ( drag, out ) =
-                    Drag.update dragMsg model.drag
-            in
-            ( { model | drag = drag } |> handleDragEvents out
+        OnDragMsg drag dragMsg ->
+            ( { model | drag = drag } |> handleDragEvents dragMsg
             , Cmd.none
             )
 
@@ -111,10 +107,10 @@ update message model =
             ( { model | zoom = datGUIModel.zoom |> N2.singleton }, Cmd.none )
 
 
-handleDragEvents : Drag.OutMsg -> Model -> Model
+handleDragEvents : Drag.Msg -> Model -> Model
 handleDragEvents out model =
     case ( out, model.editMode ) of
-        ( Drag.Move, Zooming _ ) ->
+        ( Drag.OnDrag _ _, Zooming _ ) ->
             let
                 ( _, dy ) =
                     Drag.delta model.drag
@@ -156,7 +152,7 @@ subscriptions : Model -> Sub Msg
 subscriptions model =
     [ IO.onBrowserWH BrowserResized
     , JD.map OnKeyDown keyDecoder |> BE.onKeyDown
-    , Drag.subscriptions model.drag |> Sub.map OnDragMsg
+    , Drag.subscriptions OnDragMsg model.drag
     , onDatGUIChange OnDatGUIChange
     ]
         |> Sub.batch

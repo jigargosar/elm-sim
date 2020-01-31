@@ -92,14 +92,7 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update message model =
     case message of
         TriggerDragZoom draggableState e ->
-            let
-                dxy =
-                    model.pan |> NT.scale model.zoom
-
-                zoomOrigin =
-                    NT.sub (IO.pageXYToCanvas model.scene e.pageXY) dxy
-            in
-            ( { model | dragging = Just (Zooming zoomOrigin), draggableState = draggableState }, Cmd.none )
+            ( { model | dragging = Just (Zooming ( 0, 0 )), draggableState = draggableState }, Cmd.none )
 
         TriggerDragPan draggableState _ ->
             ( { model | dragging = Just Panning, draggableState = draggableState }, Cmd.none )

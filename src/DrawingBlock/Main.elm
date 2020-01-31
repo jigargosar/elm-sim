@@ -74,21 +74,24 @@ view model =
         ( w, h ) =
             ( model.width, model.height )
     in
+    [ rectangle (w / 2) (h / 2)
+    ]
+        |> List.map toSvg
+        |> canvas w h
+
+
+canvas : Float -> Float -> List (S.Svg msg) -> Html msg
+canvas w h =
     S.svg
-        [ SA.viewBox ("0 0 " ++ fromFloat w ++ " " ++ fromFloat h)
+        [ SA.viewBox (fromFloat (-w / 2) ++ " " ++ fromFloat (-h / 2) ++ " " ++ fromFloat w ++ " " ++ fromFloat h)
         , SA.width "100%"
         , SA.height "100%"
         , SA.style
             """
-                left : 0;
-                top : 0;
-                position : fixed;
-            """
-        ]
-        [ S.g [ SA.transform ("translate(" ++ fromFloat (w / 2) ++ "," ++ fromFloat (h / 2) ++ ")") ]
-            [ rectangle (w / 2) (h / 2)
-                |> toSvg
-            ]
+                    left : 0;
+                    top : 0;
+                    position : fixed;
+                """
         ]
 
 

@@ -95,7 +95,7 @@ main =
 
 
 
--- SHAPES
+-- GRAPHICS
 
 
 canvas : Float -> Float -> List (S.Svg msg) -> Html msg

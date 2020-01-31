@@ -80,6 +80,24 @@ view model =
         |> canvas w h
 
 
+
+-- Main
+
+
+main : Program Flags Model Msg
+main =
+    Browser.element
+        { init = init
+        , view = view
+        , update = update
+        , subscriptions = subscriptions
+        }
+
+
+
+-- SHAPES
+
+
 canvas : Float -> Float -> List (S.Svg msg) -> Html msg
 canvas w h =
     S.svg
@@ -180,17 +198,3 @@ toTransformString shape =
         ++ ("scale(" ++ fromFloat shape.scale ++ ")")
         ++ " "
         ++ ("rotate(" ++ fromFloat shape.degrees ++ ")")
-
-
-
--- Main
-
-
-main : Program Flags Model Msg
-main =
-    Browser.element
-        { init = init
-        , view = view
-        , update = update
-        , subscriptions = subscriptions
-        }

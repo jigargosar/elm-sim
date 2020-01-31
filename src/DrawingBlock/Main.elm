@@ -116,14 +116,15 @@ rectangle w h =
     Rectangle w h |> initShape
 
 
-toSvg s =
-    case s.form of
+toSvg shape =
+    case shape.form of
         Rectangle w h ->
             S.rect
-                [ SA.width (fromFloat w)
-                , SA.height (fromFloat h)
-                , SA.transform (toTransformString s)
-                ]
+                (SA.width (fromFloat w)
+                    :: SA.height (fromFloat h)
+                    :: SA.transform (toTransformString shape)
+                    :: shape.attributes
+                )
                 []
 
 

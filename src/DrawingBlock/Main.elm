@@ -98,9 +98,9 @@ type Form
 
 
 type Shape msg
-    = Shape Form (ShapeAttributes msg)
+    = Shape (ShapeAttributes msg) Form
     | CustomShape (S.Svg msg)
-    | Group (List (Shape msg))
+    | Group (ShapeAttributes msg) (List (Shape msg))
 
 
 type alias ShapeAttributes msg =
@@ -108,44 +108,60 @@ type alias ShapeAttributes msg =
     , y : Float
     , scale : Float
     , degrees : Float
-    , attributes : List (S.Attribute msg)
-    , form : Form
+    , otherAttributes : List (S.Attribute msg)
     }
 
 
-initShape : Form -> ShapeAttributes msg
-initShape =
+initialShapeAttributes : ShapeAttributes msg
+initialShapeAttributes =
     ShapeAttributes 0 0 1 0 []
 
 
-rectangle : Float -> Float -> ShapeAttributes msg
+initShape : Form -> Shape msg
+initShape =
+    Shape initialShapeAttributes
+
+
+rectangle : Float -> Float -> Shape msg
 rectangle w h =
     let
         pt sx sy =
             ( w / 2 * sx, h / 2 * sy )
     in
-    Polygon [ pt -1 -1, pt -1 1, pt 1 1, pt 1 -1 ] |> initShape
+    initShape (Polygon [ pt -1 -1, pt -1 1, pt 1 1, pt 1 -1 ])
 
 
-toSvg : ShapeAttributes msg -> S.Svg msg
+toSvg : Shape msg -> S.Svg msg
 toSvg shape =
-    case shape.form of
-        Polygon points ->
-            S.polygon
-                (SA.points (List.foldl addPoint "" points)
-                    :: SA.transform (toTransformString shape)
-                    :: shape.attributes
-                )
-                []
+    case shape of
+        Shape shapeAttributes form ->
+            case form of
+                Polygon points ->
+                    S.polygon
+                        (SA.points (List.foldl addPoint "" points)
+                            :: SA.transform (toTransformString shapeAttributes)
+                            :: shapeAttributes.otherAttributes
+                        )
+                        []
 
-        Ellipse w h ->
-            S.ellipse
-                (SA.rx (fromFloat w)
-                    :: SA.ry (fromFloat h)
-                    :: SA.transform (toTransformString shape)
-                    :: shape.attributes
+                Ellipse w h ->
+                    S.ellipse
+                        (SA.rx (fromFloat w)
+                            :: SA.ry (fromFloat h)
+                            :: SA.transform (toTransformString shapeAttributes)
+                            :: shapeAttributes.otherAttributes
+                        )
+                        []
+
+        CustomShape svg ->
+            svg
+
+        Group shapeAttributes shapes ->
+            S.g
+                (SA.transform (toTransformString shapeAttributes)
+                    :: shapeAttributes.otherAttributes
                 )
-                []
+                (List.map toSvg shapes)
 
 
 addPoint : ( Float, Float ) -> String -> String

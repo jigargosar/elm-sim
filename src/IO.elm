@@ -1,4 +1,25 @@
-module IO exposing (MouseEvent, buttonDecoder, canvas, getBrowserSize, group, mouseEventDecoder, movementXYDecoder, onBrowserResize, pageXYDecoder, pageXYToCanvas, scale, scale2, shift, stopAllOn, styleNode, text, textGroup, timeStampDecoder, transform, tspan)
+module IO exposing
+    ( MouseEvent
+    , buttonDecoder
+    , canvas
+    , getBrowserSize
+    , group
+    , mouseEventDecoder
+    , movementXYDecoder
+    , onBrowserResize
+    , pageXYDecoder
+    , pageXYToCanvas
+    , scale
+    , scale2
+    , shift
+    , stopAllOn
+    , styleNode
+    , text
+    , textGroup
+    , timeStampDecoder
+    , transform
+    , tspan
+    )
 
 import Browser.Dom as BD
 import Browser.Events as BE

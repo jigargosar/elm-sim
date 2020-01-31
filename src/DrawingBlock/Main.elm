@@ -93,8 +93,7 @@ view model =
 
 
 type Form
-    = Rectangle Float Float
-    | Polygon (List ( Float, Float ))
+    = Polygon (List ( Float, Float ))
 
 
 type alias Shape msg =
@@ -114,21 +113,16 @@ initShape =
 
 rectangle : Float -> Float -> Shape msg
 rectangle w h =
-    Rectangle w h |> initShape
+    let
+        pt sx sy =
+            ( w / 2 * sx, h / 2 * sy )
+    in
+    Polygon [ pt -1 -1, pt -1 1, pt 1 1, pt 1 -1 ] |> initShape
 
 
 toSvg : Shape msg -> S.Svg msg
 toSvg shape =
     case shape.form of
-        Rectangle w h ->
-            S.rect
-                (SA.width (fromFloat w)
-                    :: SA.height (fromFloat h)
-                    :: SA.transform (toTransformString shape)
-                    :: shape.attributes
-                )
-                []
-
         Polygon points ->
             S.polygon
                 (SA.points (List.foldl addPoint "" points)

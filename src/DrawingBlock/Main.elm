@@ -74,7 +74,7 @@ view model =
         ( w, h ) =
             ( model.width, model.height )
     in
-    [ rectangle (w / 2) (h / 2)
+    [ rectangle (w / 2) (h / 2) |> fill "red"
     ]
         |> List.map toSvg
         |> canvas w h
@@ -111,6 +111,16 @@ canvas w h =
                     position : fixed;
             """
         ]
+
+
+addAttribute : S.Attribute msg -> Shape msg -> Shape msg
+addAttribute a (Shape t al f) =
+    Shape t (a :: al) f
+
+
+fill : String -> Shape msg -> Shape msg
+fill v =
+    addAttribute (SA.fill v)
 
 
 type Form msg

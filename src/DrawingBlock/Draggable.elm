@@ -16,16 +16,16 @@ import VirtualDom
 
 type State
     = Waiting
-    | BtnDown Float2 Int Up
+    | BtnDown Float2 Int End
 
 
-type Up
+type End
     = Click
     | Drop
 
 
 type Event
-    = OnUp Up IO.MouseEvent
+    = OnEnd End IO.MouseEvent
     | OnDrag Float2 IO.MouseEvent
 
 
@@ -68,7 +68,7 @@ subscriptions updateState state =
         BtnDown s btn up ->
             let
                 updateOnUp e =
-                    updateState Waiting (OnUp up e)
+                    updateState Waiting (OnEnd up e)
 
                 updateOnDrag e =
                     updateState (BtnDown s btn Drop) (OnDrag s e)

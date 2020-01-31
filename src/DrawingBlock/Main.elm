@@ -139,7 +139,7 @@ handleDragEvents event model =
             in
             { model | pan = NT.add model.pan panStep }
 
-        ( Draggable.OnUp _ _, _ ) ->
+        ( Draggable.OnEnd _ _, _ ) ->
             { model | dragging = Nothing }
 
         _ ->

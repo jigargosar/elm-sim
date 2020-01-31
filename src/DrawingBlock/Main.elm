@@ -116,6 +116,7 @@ rectangle w h =
     Rectangle w h |> initShape
 
 
+toSvg : Shape msg -> S.Svg msg
 toSvg shape =
     case shape.form of
         Rectangle w h ->

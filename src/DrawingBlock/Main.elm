@@ -91,7 +91,7 @@ canvas w h =
                     left : 0;
                     top : 0;
                     position : fixed;
-                """
+            """
         ]
 
 

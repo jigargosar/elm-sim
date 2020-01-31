@@ -49,6 +49,16 @@ type Dragging
     | Panning
 
 
+isDraggingZoom : { a | dragging : Maybe Dragging } -> Bool
+isDraggingZoom model =
+    case model.dragging of
+        Just Zooming ->
+            True
+
+        _ ->
+            False
+
+
 type alias Flags =
     ()
 
@@ -202,11 +212,7 @@ globalStyles =
 
 drawing : Model -> List (S.Svg Msg)
 drawing model =
-    let
-        isDraggingZoom =
-            model.dragging == Just Zooming
-    in
-    [ viewZoomData isDraggingZoom model.zoom
+    [ viewZoomData (isDraggingZoom model) model.zoom
     ]
 
 

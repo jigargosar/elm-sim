@@ -91,6 +91,27 @@ view model =
         ]
 
 
+type Form
+    = Rectangle Float Float
+
+
+type alias Transform =
+    { x : Float, y : Float, scale : Float, degrees : Float }
+
+
+type Shape
+    = Shape Transform Form
+
+
+initShape =
+    Shape (Transform 0 0 1 0)
+
+
+rectangle : Float -> Float -> Shape
+rectangle w h =
+    Rectangle w h |> initShape
+
+
 rect w h =
     S.rect
         [ floatAttribute SA.width w

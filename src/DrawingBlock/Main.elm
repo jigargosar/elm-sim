@@ -30,6 +30,11 @@ init _ =
     )
 
 
+setWidthHeight : Float -> Float -> Model -> Model
+setWidthHeight width height model =
+    { model | width = width, height = height }
+
+
 
 -- Update
 
@@ -42,15 +47,11 @@ type Msg
 update : Msg -> Model -> ( Model, Cmd Msg )
 update message model =
     case message of
-        GotViewport viewport ->
-            let
-                ( width, height ) =
-                    ( viewport.scene.width, viewport.scene.height )
-            in
-            ( { model | width = width, height = height }, Cmd.none )
+        GotViewport { scene } ->
+            ( setWidthHeight scene.width scene.height model, Cmd.none )
 
         OnBrowserResize width height ->
-            ( { model | width = toFloat width, height = toFloat height }, Cmd.none )
+            ( setWidthHeight (toFloat width) (toFloat height) model, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg

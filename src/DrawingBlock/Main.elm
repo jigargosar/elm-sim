@@ -4,6 +4,9 @@ import Browser
 import Browser.Dom as BD
 import Browser.Events as BE
 import Html as H exposing (Html)
+import String exposing (fromFloat)
+import Svg as S
+import Svg.Attributes as SA
 import Task
 
 
@@ -66,8 +69,9 @@ subscriptions _ =
 
 
 view : Model -> Html Msg
-view _ =
-    H.div [] []
+view model =
+    S.svg [ SA.viewBox ("0 0 " ++ fromFloat model.width ++ fromFloat model.height) ]
+        []
 
 
 empty : Html msg

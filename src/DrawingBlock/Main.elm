@@ -86,7 +86,8 @@ view model =
             """
         ]
         [ S.g [ SA.transform ("translate(" ++ fromFloat (w / 2) ++ "," ++ fromFloat (h / 2) ++ ")") ]
-            [ rect (w / 2) (h / 2)
+            [ rectangle (w / 2) (h / 2)
+                |> toSvg
             ]
         ]
 
@@ -95,36 +96,44 @@ type Form
     = Rectangle Float Float
 
 
-type alias Shape =
+type alias Shape msg =
     { x : Float
     , y : Float
     , scale : Float
     , degrees : Float
+    , attributes : List (S.Attribute msg)
     , form : Form
     }
 
 
-initShape : Form -> Shape
+initShape : Form -> Shape msg
 initShape =
-    Shape 0 0 1 0
+    Shape 0 0 1 0 []
 
 
-rectangle : Float -> Float -> Shape
+rectangle : Float -> Float -> Shape msg
 rectangle w h =
     Rectangle w h |> initShape
 
 
-rect w h =
-    S.rect
-        [ floatAttribute SA.width w
-        , floatAttribute SA.height h
-        , SA.transform ("translate(" ++ fromFloat (-w / 2) ++ "," ++ fromFloat (-h / 2) ++ ")")
-        ]
-        []
+toSvg s =
+    case s.form of
+        Rectangle w h ->
+            S.rect
+                [ SA.width (fromFloat w)
+                , SA.height (fromFloat h)
+                , SA.transform (toTransformString s)
+                ]
+                []
 
 
-floatAttribute func float =
-    func (String.fromFloat float)
+toTransformString : { a | x : Float, y : Float, scale : Float, degrees : Float } -> String
+toTransformString shape =
+    ("translate(" ++ fromFloat shape.x ++ "," ++ fromFloat shape.y ++ ")")
+        ++ " "
+        ++ ("scale(" ++ fromFloat shape.scale ++ ")")
+        ++ " "
+        ++ ("rotate(" ++ fromFloat shape.degrees ++ ")")
 
 
 

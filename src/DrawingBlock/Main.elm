@@ -98,28 +98,27 @@ type Form
 
 
 type Shape msg
-    = Shape (ShapeAttributes msg) Form
+    = Shape Transform (List (S.Attribute msg)) Form
     | CustomShape (S.Svg msg)
-    | Group (ShapeAttributes msg) (List (Shape msg))
+    | Group Transform (List (S.Attribute msg)) (List (Shape msg))
 
 
-type alias ShapeAttributes msg =
+type alias Transform =
     { x : Float
     , y : Float
     , scale : Float
     , degrees : Float
-    , otherAttributes : List (S.Attribute msg)
     }
 
 
-initialShapeAttributes : ShapeAttributes msg
-initialShapeAttributes =
-    ShapeAttributes 0 0 1 0 []
+identityTransform : Transform
+identityTransform =
+    Transform 0 0 1 0
 
 
 initShape : Form -> Shape msg
 initShape =
-    Shape initialShapeAttributes
+    Shape identityTransform []
 
 
 rectangle : Float -> Float -> Shape msg
@@ -134,13 +133,13 @@ rectangle w h =
 toSvg : Shape msg -> S.Svg msg
 toSvg shape =
     case shape of
-        Shape shapeAttributes form ->
+        Shape transform otherAttributes form ->
             case form of
                 Polygon points ->
                     S.polygon
                         (SA.points (List.foldl addPoint "" points)
-                            :: SA.transform (toTransformString shapeAttributes)
-                            :: shapeAttributes.otherAttributes
+                            :: SA.transform (toTransformString transform)
+                            :: otherAttributes
                         )
                         []
 
@@ -148,18 +147,18 @@ toSvg shape =
                     S.ellipse
                         (SA.rx (fromFloat w)
                             :: SA.ry (fromFloat h)
-                            :: SA.transform (toTransformString shapeAttributes)
-                            :: shapeAttributes.otherAttributes
+                            :: SA.transform (toTransformString transform)
+                            :: otherAttributes
                         )
                         []
 
         CustomShape svg ->
             svg
 
-        Group shapeAttributes shapes ->
+        Group transform otherAttributes shapes ->
             S.g
-                (SA.transform (toTransformString shapeAttributes)
-                    :: shapeAttributes.otherAttributes
+                (SA.transform (toTransformString transform)
+                    :: otherAttributes
                 )
                 (List.map toSvg shapes)
 

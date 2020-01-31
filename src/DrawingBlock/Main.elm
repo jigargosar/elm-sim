@@ -45,14 +45,14 @@ type alias Model =
 
 
 type Dragging
-    = Zooming
+    = Zooming Float2
     | Panning
 
 
 isDraggingZoom : { a | dragging : Maybe Dragging } -> Bool
 isDraggingZoom model =
     case model.dragging of
-        Just Zooming ->
+        Just (Zooming _) ->
             True
 
         _ ->
@@ -81,7 +81,8 @@ init _ =
 
 type Msg
     = UpdateDrag Draggable.State Draggable.Event
-    | StartDrag Dragging Draggable.State IO.MouseEvent
+    | TriggerDragZoom Draggable.State IO.MouseEvent
+    | TriggerDragPan Draggable.State IO.MouseEvent
     | GotBrowserSize Float2
     | OnKeyDown String
     | OnDatGUIChange DatGUIModel
@@ -90,8 +91,11 @@ type Msg
 update : Msg -> Model -> ( Model, Cmd Msg )
 update message model =
     case message of
-        StartDrag dragging draggableState _ ->
-            ( { model | dragging = Just dragging, draggableState = draggableState }, Cmd.none )
+        TriggerDragZoom draggableState e ->
+            ( { model | dragging = Just (Zooming e.pageXY), draggableState = draggableState }, Cmd.none )
+
+        TriggerDragPan draggableState _ ->
+            ( { model | dragging = Just Panning, draggableState = draggableState }, Cmd.none )
 
         UpdateDrag draggableState draggableMsg ->
             ( { model | draggableState = draggableState } |> handleDragEvents draggableMsg
@@ -125,7 +129,7 @@ update message model =
 handleDragEvents : Draggable.Event -> Model -> Model
 handleDragEvents event model =
     case ( event, model.dragging ) of
-        ( Draggable.OnDrag { movementXY }, Just Zooming ) ->
+        ( Draggable.OnDrag { movementXY }, Just (Zooming _) ) ->
             let
                 ( _, dy ) =
                     movementXY |> NT.negateSecond
@@ -133,10 +137,13 @@ handleDragEvents event model =
                 zoomStep =
                     dy * 0.01 * model.zoom
 
-                newZoom =
+                zoom =
                     model.zoom + zoomStep
             in
-            setZoomUpdatePan newZoom model
+            { model
+                | zoom = zoom
+                , pan = model.pan |> NT.scale model.zoom |> NT.scale (1 / zoom)
+            }
 
         ( Draggable.OnDrag { movementXY }, Just Panning ) ->
             let
@@ -190,7 +197,7 @@ view model =
     H.div []
         [ IO.styleNode globalStyles
         , IO.canvas model.scene
-            [ Draggable.onMouseDown (StartDrag Panning)
+            [ Draggable.onMouseDown TriggerDragPan
             ]
             [ IO.group [ IO.transform [ IO.scale model.zoom, IO.shift model.pan ] ]
                 (drawing model)
@@ -236,7 +243,7 @@ viewZoomData forceHover zoom =
         )
     ]
         |> IO.textGroup
-            [ Draggable.onMouseDown (StartDrag Zooming)
+            [ Draggable.onMouseDown TriggerDragZoom
             , SA.class "ns-resize"
             , if forceHover then
                 SA.class "fill-green"

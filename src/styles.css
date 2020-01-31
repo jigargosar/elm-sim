@@ -101,3 +101,15 @@ svg.cartesian > g {
 svg.cartesian > g text {
   transform: scaleY(-1);
 }
+
+
+@keyframes spin {
+    from { transform:rotate(0deg); }
+    to { transform:rotate(360deg); }
+}
+
+@keyframes spin-ccw {
+    from { transform:rotate(0deg); }
+    to { transform:rotate(-360deg); }
+}
+

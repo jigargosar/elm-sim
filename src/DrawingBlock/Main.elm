@@ -74,7 +74,9 @@ view model =
         ( w, h ) =
             ( model.width, model.height )
     in
-    [ rectangle (w / 2) (h / 2) |> fill "red"
+    [ rectangle (w / 2) (h / 2)
+        |> fill "red"
+        |> addAttribute (SA.style "animation: spin-ccw 3s linear infinite;")
     ]
         |> List.map toSvg
         |> canvas w h

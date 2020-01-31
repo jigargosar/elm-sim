@@ -71,7 +71,7 @@ subscriptions _ =
 view : Model -> Html Msg
 view model =
     S.svg
-        [ SA.viewBox ("0 0 " ++ fromFloat model.width ++ fromFloat model.height)
+        [ SA.viewBox ("0 0 " ++ fromFloat model.width ++ " " ++ fromFloat model.height)
         , SA.width "100%"
         , SA.height "100%"
         , SA.style
@@ -81,7 +81,12 @@ view model =
                 position : fixed;
             """
         ]
-        []
+        [ S.rect
+            [ SA.width (fromFloat (model.width / 2))
+            , SA.height (fromFloat (model.height / 2))
+            ]
+            []
+        ]
 
 
 

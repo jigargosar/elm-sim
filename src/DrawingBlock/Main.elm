@@ -102,7 +102,7 @@ type Form
 
 type Shape msg
     = Shape Transform (List (S.Attribute msg)) Form
-    | CustomShape (S.Svg msg)
+    | CustomShape Transform (List (S.Attribute msg)) (S.Svg msg)
     | Group Transform (List (S.Attribute msg)) (List (Shape msg))
 
 
@@ -136,8 +136,12 @@ rectangle w h =
 toSvg : Shape msg -> S.Svg msg
 toSvg shape =
     case shape of
-        CustomShape svg ->
-            svg
+        CustomShape transform otherAttributes svg ->
+            S.g
+                (SA.transform (toTransformString transform)
+                    :: otherAttributes
+                )
+                [ svg ]
 
         Shape transform otherAttributes form ->
             case form of

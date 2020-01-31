@@ -85,12 +85,19 @@ view model =
                 position : fixed;
             """
         ]
-        [ S.rect
-            [ floatAttribute SA.width (w / 2)
-            , floatAttribute SA.height (h / 2)
+        [ S.g [ SA.transform ("translate(" ++ fromFloat (w / 2) ++ "," ++ fromFloat (h / 2) ++ ")") ]
+            [ rect (w / 2) (h / 2)
             ]
-            []
         ]
+
+
+rect w h =
+    S.rect
+        [ floatAttribute SA.width w
+        , floatAttribute SA.height h
+        , SA.transform ("translate(" ++ fromFloat (-w / 2) ++ "," ++ fromFloat (-h / 2) ++ ")")
+        ]
+        []
 
 
 floatAttribute func float =

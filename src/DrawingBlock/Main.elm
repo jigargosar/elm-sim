@@ -95,15 +95,15 @@ canvas w h =
         ]
 
 
-type Form
+type Form msg
     = Polygon (List ( Float, Float ))
     | Ellipse Float Float
+    | Custom (S.Svg msg)
+    | Group (List (Shape msg))
 
 
 type Shape msg
-    = Shape Transform (List (S.Attribute msg)) Form
-    | CustomShape Transform (List (S.Attribute msg)) (S.Svg msg)
-    | Group Transform (List (S.Attribute msg)) (List (Shape msg))
+    = Shape Transform (List (S.Attribute msg)) (Form msg)
 
 
 type alias Transform =
@@ -119,7 +119,7 @@ identityTransform =
     Transform 0 0 1 0
 
 
-initShape : Form -> Shape msg
+initShape : Form msg -> Shape msg
 initShape =
     Shape identityTransform []
 
@@ -134,35 +134,33 @@ rectangle w h =
 
 
 toSvg : Shape msg -> S.Svg msg
-toSvg shape =
-    case shape of
-        CustomShape transform otherAttributes svg ->
+toSvg (Shape transform otherAttributes form) =
+    case form of
+        Custom svg ->
             S.g
                 (SA.transform (toTransformString transform)
                     :: otherAttributes
                 )
                 [ svg ]
 
-        Shape transform otherAttributes form ->
-            case form of
-                Polygon points ->
-                    S.polygon
-                        (SA.points (List.foldl addPoint "" points)
-                            :: SA.transform (toTransformString transform)
-                            :: otherAttributes
-                        )
-                        []
+        Polygon points ->
+            S.polygon
+                (SA.points (List.foldl addPoint "" points)
+                    :: SA.transform (toTransformString transform)
+                    :: otherAttributes
+                )
+                []
 
-                Ellipse w h ->
-                    S.ellipse
-                        (SA.rx (fromFloat w)
-                            :: SA.ry (fromFloat h)
-                            :: SA.transform (toTransformString transform)
-                            :: otherAttributes
-                        )
-                        []
+        Ellipse w h ->
+            S.ellipse
+                (SA.rx (fromFloat w)
+                    :: SA.ry (fromFloat h)
+                    :: SA.transform (toTransformString transform)
+                    :: otherAttributes
+                )
+                []
 
-        Group transform otherAttributes shapes ->
+        Group shapes ->
             S.g
                 (SA.transform (toTransformString transform)
                     :: otherAttributes

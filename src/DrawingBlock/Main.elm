@@ -94,6 +94,7 @@ view model =
 
 type Form
     = Rectangle Float Float
+    | Polygon (List ( Float, Float ))
 
 
 type alias Shape msg =
@@ -127,6 +128,19 @@ toSvg shape =
                     :: shape.attributes
                 )
                 []
+
+        Polygon points ->
+            S.polygon
+                (SA.points (List.foldl addPoint "" points)
+                    :: SA.transform (toTransformString shape)
+                    :: shape.attributes
+                )
+                []
+
+
+addPoint : ( Float, Float ) -> String -> String
+addPoint ( x, y ) str =
+    str ++ String.fromFloat x ++ "," ++ String.fromFloat y ++ " "
 
 
 toTransformString : { a | x : Float, y : Float, scale : Float, degrees : Float } -> String

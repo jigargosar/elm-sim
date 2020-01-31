@@ -10,13 +10,12 @@ module DrawingBlock.Draggable exposing
 import Browser.Events as BE
 import IO
 import Json.Decode as JD exposing (Decoder)
-import Number2 exposing (Float2)
 import VirtualDom
 
 
 type State
     = Waiting
-    | BtnDown Float2 Int End
+    | BtnDown Int End
 
 
 type End
@@ -26,7 +25,7 @@ type End
 
 type Event
     = OnEnd End IO.MouseEvent
-    | OnDrag Float2 IO.MouseEvent
+    | OnDrag IO.MouseEvent
 
 
 intial : State
@@ -34,15 +33,15 @@ intial =
     Waiting
 
 
-onMouseDown : (State -> msg) -> VirtualDom.Attribute msg
+onMouseDown : (State -> IO.MouseEvent -> msg) -> VirtualDom.Attribute msg
 onMouseDown msg =
     onMouseBtnDown 0 msg
 
 
-onMouseBtnDown : Int -> (State -> value) -> VirtualDom.Attribute value
+onMouseBtnDown : Int -> (State -> IO.MouseEvent -> msg) -> VirtualDom.Attribute msg
 onMouseBtnDown btn msg =
     mouseEventDecoderWhenBtn btn
-        |> JD.map (\e -> msg (BtnDown e.pageXY btn Click))
+        |> JD.map (msg (BtnDown btn Click))
         |> IO.stopAllOn "mousedown"
 
 
@@ -65,13 +64,13 @@ subscriptions updateState state =
         Waiting ->
             Sub.none
 
-        BtnDown s btn up ->
+        BtnDown btn up ->
             let
                 updateOnUp e =
                     updateState Waiting (OnEnd up e)
 
                 updateOnDrag e =
-                    updateState (BtnDown s btn Drop) (OnDrag s e)
+                    updateState (BtnDown btn Drop) (OnDrag e)
 
                 decoder =
                     mouseEventDecoderWhenBtn btn

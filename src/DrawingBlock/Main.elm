@@ -39,7 +39,7 @@ type alias Model =
     { zoom : Float
     , pan : Float2
     , scene : Float2
-    , drag : Draggable.State
+    , draggableState : Draggable.State
     , dragging : Maybe Dragging
     }
 
@@ -58,7 +58,7 @@ init _ =
     ( { zoom = 2.5
       , pan = ( 0, 0 )
       , scene = ( 600, 600 )
-      , drag = Draggable.intial
+      , draggableState = Draggable.intial
       , dragging = Nothing
       }
     , IO.getBrowserSize |> Task.perform GotBrowserSize
@@ -71,7 +71,7 @@ init _ =
 
 type Msg
     = UpdateDrag Draggable.State Draggable.Event
-    | StartDrag Dragging Draggable.State
+    | StartDrag Dragging Draggable.State IO.MouseEvent
     | GotBrowserSize Float2
     | OnKeyDown String
     | OnDatGUIChange DatGUIModel
@@ -80,11 +80,11 @@ type Msg
 update : Msg -> Model -> ( Model, Cmd Msg )
 update message model =
     case message of
-        StartDrag dragging dragState ->
-            ( { model | dragging = Just dragging, drag = dragState }, Cmd.none )
+        StartDrag dragging draggableState _ ->
+            ( { model | dragging = Just dragging, draggableState = draggableState }, Cmd.none )
 
-        UpdateDrag drag dragMsg ->
-            ( { model | drag = drag } |> handleDragEvents dragMsg
+        UpdateDrag draggableState draggableMsg ->
+            ( { model | draggableState = draggableState } |> handleDragEvents draggableMsg
             , Cmd.none
             )
 
@@ -115,14 +115,10 @@ update message model =
 handleDragEvents : Draggable.Event -> Model -> Model
 handleDragEvents event model =
     case ( event, model.dragging ) of
-        ( Draggable.OnDrag startXY { movementXY }, Just Zooming ) ->
+        ( Draggable.OnDrag { movementXY }, Just Zooming ) ->
             let
                 ( _, dy ) =
                     movementXY |> NT.negateSecond
-
-                canvasXY =
-                    IO.pageXYToCanvas model.scene startXY
-                        |> Debug.log "dragstart"
 
                 zoomStep =
                     dy * 0.01 * model.zoom
@@ -132,7 +128,7 @@ handleDragEvents event model =
             in
             setZoomUpdatePan newZoom model
 
-        ( Draggable.OnDrag _ { movementXY }, Just Panning ) ->
+        ( Draggable.OnDrag { movementXY }, Just Panning ) ->
             let
                 panStep =
                     movementXY |> NT.negateSecond |> NT.scale (1 / model.zoom)
@@ -169,7 +165,7 @@ subscriptions : Model -> Sub Msg
 subscriptions model =
     [ IO.onBrowserResize GotBrowserSize
     , JD.map OnKeyDown keyDecoder |> BE.onKeyDown
-    , Draggable.subscriptions UpdateDrag model.drag
+    , Draggable.subscriptions UpdateDrag model.draggableState
     , onDatGUIChange OnDatGUIChange
     ]
         |> Sub.batch

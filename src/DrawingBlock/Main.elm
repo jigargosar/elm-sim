@@ -70,8 +70,12 @@ subscriptions _ =
 
 view : Model -> Html Msg
 view model =
+    let
+        ( w, h ) =
+            ( model.width, model.height )
+    in
     S.svg
-        [ viewBoxTopLeft model.width model.height
+        [ SA.viewBox ("0 0 " ++ fromFloat w ++ " " ++ fromFloat h)
         , SA.width "100%"
         , SA.height "100%"
         , SA.style
@@ -82,16 +86,15 @@ view model =
             """
         ]
         [ S.rect
-            [ SA.width (fromFloat (model.width / 2))
-            , SA.height (fromFloat (model.height / 2))
+            [ floatAttribute SA.width (w / 2)
+            , floatAttribute SA.height (h / 2)
             ]
             []
         ]
 
 
-viewBoxTopLeft : Float -> Float -> S.Attribute msg
-viewBoxTopLeft width height =
-    SA.viewBox ("0 0 " ++ fromFloat width ++ " " ++ fromFloat height)
+floatAttribute func float =
+    func (String.fromFloat float)
 
 
 

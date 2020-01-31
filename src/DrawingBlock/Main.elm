@@ -97,7 +97,13 @@ type Form
     | Ellipse Float Float
 
 
-type alias Shape msg =
+type Shape msg
+    = Shape Form (ShapeAttributes msg)
+    | CustomShape (S.Svg msg)
+    | Group (List (Shape msg))
+
+
+type alias ShapeAttributes msg =
     { x : Float
     , y : Float
     , scale : Float
@@ -107,12 +113,12 @@ type alias Shape msg =
     }
 
 
-initShape : Form -> Shape msg
+initShape : Form -> ShapeAttributes msg
 initShape =
-    Shape 0 0 1 0 []
+    ShapeAttributes 0 0 1 0 []
 
 
-rectangle : Float -> Float -> Shape msg
+rectangle : Float -> Float -> ShapeAttributes msg
 rectangle w h =
     let
         pt sx sy =
@@ -121,7 +127,7 @@ rectangle w h =
     Polygon [ pt -1 -1, pt -1 1, pt 1 1, pt 1 -1 ] |> initShape
 
 
-toSvg : Shape msg -> S.Svg msg
+toSvg : ShapeAttributes msg -> S.Svg msg
 toSvg shape =
     case shape.form of
         Polygon points ->

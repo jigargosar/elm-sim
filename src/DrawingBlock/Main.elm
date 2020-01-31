@@ -95,16 +95,18 @@ type Form
     = Rectangle Float Float
 
 
-type alias Transform =
-    { x : Float, y : Float, scale : Float, degrees : Float }
+type alias Shape =
+    { x : Float
+    , y : Float
+    , scale : Float
+    , degrees : Float
+    , form : Form
+    }
 
 
-type Shape
-    = Shape Transform Form
-
-
+initShape : Form -> Shape
 initShape =
-    Shape (Transform 0 0 1 0)
+    Shape 0 0 1 0
 
 
 rectangle : Float -> Float -> Shape

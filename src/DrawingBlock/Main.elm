@@ -94,6 +94,7 @@ view model =
 
 type Form
     = Polygon (List ( Float, Float ))
+    | Ellipse Float Float
 
 
 type alias Shape msg =
@@ -126,6 +127,15 @@ toSvg shape =
         Polygon points ->
             S.polygon
                 (SA.points (List.foldl addPoint "" points)
+                    :: SA.transform (toTransformString shape)
+                    :: shape.attributes
+                )
+                []
+
+        Ellipse w h ->
+            S.ellipse
+                (SA.rx (fromFloat w)
+                    :: SA.ry (fromFloat h)
                     :: SA.transform (toTransformString shape)
                     :: shape.attributes
                 )

@@ -3,7 +3,7 @@ module DrawingBlock.Main exposing (main)
 import Browser
 import Browser.Dom as BD
 import Browser.Events as BE
-import Html as H exposing (Html)
+import Html exposing (Html)
 import String exposing (fromFloat)
 import Svg as S
 import Svg.Attributes as SA
@@ -82,11 +82,6 @@ view model =
             """
         ]
         []
-
-
-empty : Html msg
-empty =
-    H.text ""
 
 
 

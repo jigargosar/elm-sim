@@ -133,6 +133,9 @@ rectangle w h =
 toSvg : Shape msg -> S.Svg msg
 toSvg shape =
     case shape of
+        CustomShape svg ->
+            svg
+
         Shape transform otherAttributes form ->
             case form of
                 Polygon points ->
@@ -151,9 +154,6 @@ toSvg shape =
                             :: otherAttributes
                         )
                         []
-
-        CustomShape svg ->
-            svg
 
         Group transform otherAttributes shapes ->
             S.g

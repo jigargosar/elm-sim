@@ -263,6 +263,7 @@ failUnlessPrimaryBtn d =
 -- View
 
 
+computeCellWidth : Float2 -> Int2 -> Float
 computeCellWidth canvasD gridD =
     canvasD
         |> NT.scale 0.9

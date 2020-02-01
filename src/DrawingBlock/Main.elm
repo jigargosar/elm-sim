@@ -155,7 +155,7 @@ pageXYToGridIndex pageXY canvasD gridD =
         |> NT.round
 
 
-swapEmptyInDirection : D4.Label -> Dict Int2 Cell -> Dict Int2 Cell
+swapEmptyInDirection : D4.Label -> Grid -> Grid
 swapEmptyInDirection d4 grid =
     case getEmptyPosition grid of
         Just emptyIdx ->
@@ -194,7 +194,7 @@ findEmptyNeighbourOf ofIdx grid =
         |> List.Extra.find isEmpty
 
 
-getEmptyPosition : Dict a Cell -> Maybe a
+getEmptyPosition : Grid -> Maybe Int2
 getEmptyPosition grid =
     Dict.toList grid
         |> List.filter (Tuple.second >> is CellEmpty)

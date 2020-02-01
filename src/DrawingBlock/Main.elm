@@ -110,7 +110,7 @@ canvas w h attrs =
                     left : 0;
                     top : 0;
                     position : fixed;
-            """
+                """
             :: attrs
         )
 

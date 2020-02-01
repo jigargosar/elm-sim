@@ -70,11 +70,11 @@ subscriptions _ =
 
 view : Model -> Html Msg
 view model =
-    let
+    [ let
         ( w, h ) =
             ( model.width, model.height )
-    in
-    [ polyRect ( w / 2, h / 2 )
+      in
+      polyRect ( w / 2, h / 2 )
         [ fill "red"
         , T.identity
             |> T.scale 0.5
@@ -95,7 +95,12 @@ view model =
       in
       renderCell cellWidth [ cellTransform x y cellWidth ]
     ]
-        |> canvas w h []
+        |> (let
+                ( w, h ) =
+                    ( model.width, model.height )
+            in
+            canvas w h []
+           )
 
 
 cellTransform : Float -> Float -> Float -> S.Attribute msg

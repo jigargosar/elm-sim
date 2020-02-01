@@ -105,8 +105,8 @@ view model =
             NT.scale 0.5 cellViewWH
                 |> NT.add (NT.scale -0.5 gridViewWH)
 
-        cellIndexToCellShift : Int2 -> Float2
-        cellIndexToCellShift idx =
+        cellIndexToGridPosition : Int2 -> Float2
+        cellIndexToGridPosition idx =
             idx
                 |> NT.toFloat
                 |> NT.mul cellViewWH
@@ -115,7 +115,7 @@ view model =
         cellView : ( Int2, Cell ) -> S.Svg msg
         cellView ( idx, cell ) =
             renderCell cellWidth cell
-                |> wrapTransform [ shift (cellIndexToCellShift idx) ]
+                |> wrapTransform [ shift (cellIndexToGridPosition idx) ]
 
         grid =
             NT.toDict toCell gridWH

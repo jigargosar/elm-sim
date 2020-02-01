@@ -88,37 +88,19 @@ view model =
         cellWidth =
             100
 
-        gridWH =
+        gridD =
             ( 4, 3 )
 
-        cellViewWH =
+        cellViewD =
             ( cellWidth, cellWidth )
-
-        gridViewWH =
-            gridWH |> NT.toFloat |> NT.mul cellViewWH
-
-        gridShift : Float2
-        gridShift =
-            NT.scale 0.5 cellViewWH
-                |> NT.add (NT.scale -0.5 gridViewWH)
-
-        gridIndexToGridCordinate : Int2 -> Float2
-        gridIndexToGridCordinate idx =
-            idx
-                |> NT.toFloat
-                |> NT.mul cellViewWH
-                |> NT.add gridShift
 
         viewGridCell : ( Int2, Cell ) -> S.Svg msg
         viewGridCell ( idx, cell ) =
             renderCell cellWidth cell
-                |> transformGridCell idx
-
-        transformGridCell idx =
-            wrapTransform [ shift (gridIndexToGridCordinate idx) ]
+                |> wrapTransform [ shift (gridIndexToGridCordinate (toGridContext cellViewD gridD) idx) ]
 
         grid =
-            NT.toDict toCell gridWH
+            NT.toDict toCell gridD
                 |> Debug.log "foldl"
 
         viewGrid =
@@ -129,6 +111,40 @@ view model =
       viewGrid
     ]
         |> canvas ( model.width, model.height ) []
+
+
+type alias GridContext =
+    { cellShift : Float2
+    , cellViewD : Float2
+    , gridD : Int2
+    , gridViewD : Float2
+    }
+
+
+toGridContext : Float2 -> Int2 -> GridContext
+toGridContext cellViewD gridD =
+    let
+        gridViewD =
+            gridD |> NT.toFloat |> NT.mul cellViewD
+
+        cellShift : Float2
+        cellShift =
+            NT.scale 0.5 cellViewD
+                |> NT.add (NT.scale -0.5 gridViewD)
+    in
+    { cellShift = cellShift
+    , cellViewD = cellViewD
+    , gridD = gridD
+    , gridViewD = gridViewD
+    }
+
+
+gridIndexToGridCordinate : GridContext -> Int2 -> Float2
+gridIndexToGridCordinate { cellViewD, cellShift } idx =
+    idx
+        |> NT.toFloat
+        |> NT.mul cellViewD
+        |> NT.add cellShift
 
 
 toCell ( x, y ) =

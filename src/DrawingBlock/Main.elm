@@ -98,10 +98,16 @@ view model =
         gridViewWH =
             gridWH |> (NT.toFloat >> NT.scale cellWidth)
 
+        cellIndexToCellShift idx =
+            idx
+                |> NT.toFloat
+                |> NT.mul cellWH
+                |> NT.subBy cellWH
+
         cellView : Int2 -> S.Svg msg
         cellView idx =
             renderCell cellWidth
-                |> transformCell idx cellWidth
+                |> wrapTransform [ shift (cellIndexToCellShift idx) ]
 
         grid =
             NT.toDict (always ()) gridWH
@@ -112,7 +118,7 @@ view model =
                 |> List.map cellView
       in
       cellViews
-        |> groupTransform [ shift (NT.sub gridViewWH cellWH |> NT.scale -0.5) ]
+        |> groupTransform []
     ]
         |> canvas ( model.width, model.height ) []
 

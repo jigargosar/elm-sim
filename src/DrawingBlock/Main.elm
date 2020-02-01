@@ -26,9 +26,13 @@ import Task
 -- Model
 
 
+type alias Grid =
+    Dict Int2 Cell
+
+
 type alias Model =
     { canvasD : Float2
-    , grid : Dict Int2 Cell
+    , grid : Grid
     , gridD : Int2
     }
 
@@ -73,7 +77,10 @@ init { now } =
       , grid = Random.step gridGen (Random.initialSeed now) |> Tuple.first
       , gridD = gridD
       }
-    , BD.getViewport |> Task.perform GotViewport
+    , [ BD.getViewport |> Task.perform GotViewport
+      , Random.generate ShuffledGrid gridGen
+      ]
+        |> Cmd.batch
     )
 
 
@@ -101,6 +108,7 @@ type Msg
     = GotViewport BD.Viewport
     | OnBrowserResize Int Int
     | KeyDown D4.Label
+    | ShuffledGrid Grid
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -124,6 +132,9 @@ update message model =
             ( { model | grid = swapEmptyInDirection (D4.opposite d4) model.grid }
             , Cmd.none
             )
+
+        ShuffledGrid grid ->
+            ( { model | grid = grid }, Cmd.none )
 
 
 swapEmptyInDirection : D4.Label -> Dict Int2 Cell -> Dict Int2 Cell
@@ -220,11 +231,7 @@ renderCell width cell =
             renderCellNum width num
 
         CellEmpty ->
-            renderEmptyCell width
-
-
-renderEmptyCell width =
-    empty
+            empty
 
 
 renderCellNum width num =

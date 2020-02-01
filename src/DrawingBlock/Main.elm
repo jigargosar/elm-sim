@@ -103,16 +103,13 @@ view model =
         cellWidth =
             100
 
-        gridD =
-            ( 4, 3 )
-
         cellViewD =
             ( cellWidth, cellWidth )
 
         viewGridCell : Int2 -> Cell -> S.Svg msg
         viewGridCell idx cell =
             renderCell cellWidth cell
-                |> wrapTransform [ shift (gridIndexToWorldCordinate cellViewD gridD idx) ]
+                |> wrapTransform [ shift (gridIndexToWorldCordinate cellViewD model.gridD idx) ]
 
         viewGrid =
             Dict.toList model.grid

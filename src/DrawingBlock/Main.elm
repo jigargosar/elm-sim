@@ -74,7 +74,7 @@ view model =
         ( w, h ) =
             ( model.width, model.height )
     in
-    [ renderRect (w / 2) (h / 2) [ SA.fill "red" ]
+    [ polyRect (w / 2) (h / 2) [ SA.fill "red" ]
     ]
         |> canvas w h []
 
@@ -95,6 +95,29 @@ main =
 
 
 -- GRAPHICS
+
+
+polyRect : Float -> Float -> List (S.Attribute msg) -> S.Svg msg
+polyRect w h =
+    polygon (rectToPolygonPoints w h)
+
+
+rectToPolygonPoints : Float -> Float -> List ( Float, Float )
+rectToPolygonPoints w h =
+    let
+        pt sx sy =
+            ( w / 2 * sx, h / 2 * sy )
+    in
+    [ pt -1 -1, pt -1 1, pt 1 1, pt 1 -1 ]
+
+
+polygon : List ( Float, Float ) -> List (S.Attribute msg) -> S.Svg msg
+polygon points attrs =
+    S.polygon
+        (SA.points (List.foldl addPoint "" points)
+            :: attrs
+        )
+        []
 
 
 renderRect : Float -> Float -> List (S.Attribute msg) -> S.Svg msg

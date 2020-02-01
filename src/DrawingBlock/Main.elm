@@ -105,17 +105,17 @@ view model =
             NT.scale 0.5 cellViewWH
                 |> NT.add (NT.scale -0.5 gridViewWH)
 
-        cellIndexToGridCordinate : Int2 -> Float2
-        cellIndexToGridCordinate idx =
+        gridIndexToGridCordinate : Int2 -> Float2
+        gridIndexToGridCordinate idx =
             idx
                 |> NT.toFloat
                 |> NT.mul cellViewWH
                 |> NT.add gridShift
 
-        cellView : ( Int2, Cell ) -> S.Svg msg
-        cellView ( idx, cell ) =
+        viewGridCell : ( Int2, Cell ) -> S.Svg msg
+        viewGridCell ( idx, cell ) =
             renderCell cellWidth cell
-                |> wrapTransform [ shift (cellIndexToGridCordinate idx) ]
+                |> wrapTransform [ shift (gridIndexToGridCordinate idx) ]
 
         grid =
             NT.toDict toCell gridWH
@@ -123,7 +123,7 @@ view model =
 
         cellViews =
             Dict.toList grid
-                |> List.map cellView
+                |> List.map viewGridCell
       in
       cellViews
         |> groupTransform []

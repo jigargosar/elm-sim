@@ -46,6 +46,11 @@ initGrid (( w, _ ) as gridD) =
         |> Dict.insert (NT.dec gridD) CellEmpty
 
 
+shuffleGrid : Grid -> Random.Generator Grid
+shuffleGrid =
+    shuffleValues
+
+
 
 -- Model
 
@@ -83,7 +88,7 @@ init { now } =
 
 getShuffledGrid : Grid -> Cmd Msg
 getShuffledGrid grid =
-    Random.generate ShuffledGrid (shuffleValues grid)
+    Random.generate ShuffledGrid (shuffleGrid grid)
 
 
 setCanvasD : Float2 -> Model -> Model

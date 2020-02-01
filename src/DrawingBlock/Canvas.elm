@@ -126,6 +126,9 @@ canvas ( w, h ) attrs =
                     top : 0;
                     position : fixed;
                 """
+            -- :: SA.shapeRendering "geometricPrecision"
+            -- :: SA.shapeRendering "crispEdges"
+            :: SA.shapeRendering "optimizeSpeed"
             :: attrs
         )
 

@@ -7,6 +7,7 @@ import Browser.Events as BE
 import Dict exposing (Dict)
 import DrawingBlock.Canvas exposing (..)
 import Html exposing (Html)
+import Json.Decode as JD exposing (Decoder)
 import Number2 as NT exposing (Float2, Int2)
 import String exposing (fromInt)
 import String2 as ST
@@ -77,6 +78,7 @@ setCanvasD canvasD model =
 type Msg
     = GotViewport BD.Viewport
     | OnBrowserResize Int Int
+    | KeyDown ArrowKey
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -96,10 +98,45 @@ update message model =
             in
             ( setCanvasD canvasD model, Cmd.none )
 
+        KeyDown arrowKey ->
+            ( model, Cmd.none )
+
+
+type ArrowKey
+    = Up
+    | Down
+    | Left
+    | Right
+
+
+onKey key msg =
+    JD.andThen
+        (\actual ->
+            if actual == key then
+                JD.succeed msg
+
+            else
+                JD.fail ""
+        )
+        (JD.field "key" JD.string)
+
+
+arrowKeyDecoder : Decoder ArrowKey
+arrowKeyDecoder =
+    JD.oneOf
+        [ onKey "ArrowUp" Up
+        , onKey "ArrowDown" Down
+        , onKey "ArrowLeft" Left
+        , onKey "ArrowRight" Right
+        ]
+
 
 subscriptions : Model -> Sub Msg
 subscriptions _ =
     [ BE.onResize OnBrowserResize
+    , arrowKeyDecoder
+        |> JD.map KeyDown
+        |> BE.onKeyDown
     ]
         |> Sub.batch
 

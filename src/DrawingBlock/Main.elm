@@ -103,13 +103,10 @@ view model =
         cellWidth =
             100
 
-        cellViewD =
-            ( cellWidth, cellWidth )
-
         viewGridCell : Int2 -> Cell -> S.Svg msg
         viewGridCell idx cell =
             renderCell cellWidth cell
-                |> wrapTransform [ shift (gridIndexToWorldCordinate cellViewD model.gridD idx) ]
+                |> wrapTransform [ shift (gridIndexToWorldCordinate cellWidth model.gridD idx) ]
 
         viewGrid =
             Dict.toList model.grid
@@ -153,10 +150,10 @@ renderCell width (Cell x y) =
 -- Grid Transforms
 
 
-gridIndexToWorldCordinate : Float2 -> Int2 -> Int2 -> Float2
-gridIndexToWorldCordinate cellViewD gridD =
+gridIndexToWorldCordinate : Float -> Int2 -> Int2 -> Float2
+gridIndexToWorldCordinate cellWidth gridD =
     gridIndexToWorldCordinateHelp
-        (toGridContext cellViewD gridD)
+        (toGridContext ( cellWidth, cellWidth ) gridD)
 
 
 type alias GridContext =

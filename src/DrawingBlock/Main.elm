@@ -132,7 +132,8 @@ init { now } =
       , gridD = gridD
       }
     , [ BD.getViewport |> Task.perform GotViewport
-      , getShuffledGrid initialGrid
+
+      --, getShuffledGrid initialGrid
       ]
         |> Cmd.batch
     )

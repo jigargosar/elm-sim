@@ -4,7 +4,6 @@ import Browser
 import Browser.Dom as BD
 import Browser.Events as BE
 import DrawingBlock.Canvas exposing (..)
-import DrawingBlock.Transform as T
 import Html exposing (Html)
 import Number2 exposing (Float2)
 import Svg as S
@@ -77,15 +76,12 @@ view model =
       in
       polyRect ( w / 2, h / 2 )
         [ fill "red"
-        , T.identity
-            |> T.scale 0.5
-            |> T.shift ( -w / 4, -h / 4 )
-            |> T.render
+        , transform [ scale 0.5, shift ( -w / 4, -h / 4 ) ]
         ]
         |> group1
-            [ T.identity
-                --|> T.shift (-w / 4) (-h / 4)
-                |> T.render
+            [ transform
+                [-- shift (-w / 4) (-h / 4)
+                ]
             ]
     , let
         cellWidth =
@@ -101,9 +97,7 @@ view model =
 
 cellTransform : Float2 -> Float -> S.Attribute msg
 cellTransform ( x, y ) width =
-    T.identity
-        |> T.shift ( x * width, y * width )
-        |> T.render
+    transform [ shift ( x * width, y * width ) ]
 
 
 renderCell width attrs =

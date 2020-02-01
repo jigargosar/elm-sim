@@ -151,21 +151,15 @@ renderCell width (Cell x y) =
 
 
 gridIndexToWorldCordinate : Float -> Int2 -> Int2 -> Float2
-gridIndexToWorldCordinate cellWidth gridD =
-    gridIndexToWorldCordinateHelp
-        (toGridContext ( cellWidth, cellWidth ) gridD)
+gridIndexToWorldCordinate cellWidth gridD idx =
+    idx
+        |> NT.toFloat
+        |> NT.scale cellWidth
+        |> NT.add (computeCellShift ( cellWidth, cellWidth ) gridD)
 
 
-type alias GridContext =
-    { cellShift : Float2
-    , cellViewD : Float2
-    , gridD : Int2
-    , gridViewD : Float2
-    }
-
-
-toGridContext : Float2 -> Int2 -> GridContext
-toGridContext cellViewD gridD =
+computeCellShift : Float2 -> Int2 -> Float2
+computeCellShift cellViewD gridD =
     let
         gridViewD =
             gridD |> NT.toFloat |> NT.mul cellViewD
@@ -175,19 +169,7 @@ toGridContext cellViewD gridD =
             NT.scale 0.5 cellViewD
                 |> NT.add (NT.scale -0.5 gridViewD)
     in
-    { cellShift = cellShift
-    , cellViewD = cellViewD
-    , gridD = gridD
-    , gridViewD = gridViewD
-    }
-
-
-gridIndexToWorldCordinateHelp : GridContext -> Int2 -> Float2
-gridIndexToWorldCordinateHelp { cellViewD, cellShift } idx =
-    idx
-        |> NT.toFloat
-        |> NT.mul cellViewD
-        |> NT.add cellShift
+    cellShift
 
 
 

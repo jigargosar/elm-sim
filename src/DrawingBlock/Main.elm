@@ -148,16 +148,6 @@ renderCell width (Cell x y) =
 
 
 -- Grid Transforms
---noinspection ElmUnusedSymbol
-
-
-{-| -}
-gridIndexToWorldCordinate : Float -> Int2 -> Int2 -> Float2
-gridIndexToWorldCordinate cellWidth gridD idx =
-    idx
-        |> NT.toFloat
-        |> NT.scale cellWidth
-        |> NT.add (computeGridShift cellWidth gridD)
 
 
 computeGridShift : Float -> Int2 -> Float2

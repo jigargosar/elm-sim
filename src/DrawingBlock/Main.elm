@@ -4,6 +4,7 @@ import Browser
 import Browser.Dom as BD
 import Browser.Events as BE
 import DrawingBlock.Canvas exposing (..)
+import DrawingBlock.Transform as T
 import Html exposing (Html)
 import Svg.Attributes as SA
 import Task
@@ -76,10 +77,10 @@ view model =
     [ polyRect
         (w / 2)
         (h / 2)
-        [ SA.fill "red"
-        , identityTransform
-            |> move -10 -10
-            |> transform
+        [ fill "red"
+        , T.identity
+            |> T.move -10 -10
+            |> T.render
         ]
     ]
         |> canvas w h []

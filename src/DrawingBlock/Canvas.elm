@@ -1,13 +1,10 @@
 module DrawingBlock.Canvas exposing
-    ( Transform
-    , canvas
+    ( canvas
     , ellipse
+    , fill
     , group
-    , identityTransform
-    , move
     , polyRect
     , polygon
-    , transform
     )
 
 import Html exposing (Html)
@@ -16,14 +13,9 @@ import Svg as S
 import Svg.Attributes as SA
 
 
-transform : Transform -> S.Attribute msg
-transform transformModel =
-    SA.transform (toTransformString transformModel)
-
-
-move : Float -> Float -> Transform -> Transform
-move dx dy t =
-    { t | x = t.x + dx, y = t.y + dy }
+fill : String.String -> S.Attribute msg
+fill =
+    SA.fill
 
 
 polyRect : Float -> Float -> List (S.Attribute msg) -> S.Svg msg
@@ -47,6 +39,11 @@ polygon points attrs =
             :: attrs
         )
         []
+
+
+addPoint : ( Float, Float ) -> String -> String
+addPoint ( x, y ) str =
+    str ++ String.fromFloat x ++ "," ++ String.fromFloat y ++ " "
 
 
 ellipse : Float -> Float -> List (S.Attribute msg) -> S.Svg msg
@@ -78,30 +75,3 @@ canvas w h attrs =
                 """
             :: attrs
         )
-
-
-type alias Transform =
-    { x : Float
-    , y : Float
-    , scale : Float
-    , degrees : Float
-    }
-
-
-identityTransform : Transform
-identityTransform =
-    Transform 0 0 1 0
-
-
-addPoint : ( Float, Float ) -> String -> String
-addPoint ( x, y ) str =
-    str ++ String.fromFloat x ++ "," ++ String.fromFloat y ++ " "
-
-
-toTransformString : { a | x : Float, y : Float, scale : Float, degrees : Float } -> String
-toTransformString shape =
-    ("translate(" ++ fromFloat shape.x ++ "," ++ fromFloat shape.y ++ ")")
-        ++ " "
-        ++ ("scale(" ++ fromFloat shape.scale ++ ")")
-        ++ " "
-        ++ ("rotate(" ++ fromFloat shape.degrees ++ ")")

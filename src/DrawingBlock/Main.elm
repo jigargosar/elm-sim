@@ -5,7 +5,6 @@ import Browser
 import Browser.Dom as BD
 import Browser.Events as BE
 import Dict exposing (Dict)
-import Dict.Extra
 import DrawingBlock.Canvas exposing (..)
 import DrawingBlock.Direction4 as D4 exposing (Label(..))
 import Html exposing (Html)
@@ -15,7 +14,6 @@ import Number2 as NT exposing (Float2, Int2)
 import PointFree exposing (dictSwap, ignoreNothing, is, shuffleValues)
 import Random
 import String exposing (fromInt)
-import String2 as ST
 import Svg as S
 import Task
 
@@ -41,16 +39,11 @@ toCell width ( x, y ) =
         num =
             y * width + x + 1
     in
-    if num == width * width then
-        CellEmpty
-
-    else
-        CellNum num
+    CellNum num
 
 
 type Cell
-    = Cell Int Int
-    | CellNum Int
+    = CellNum Int
     | CellEmpty
 
 
@@ -58,17 +51,19 @@ type alias Flags =
     { now : Int }
 
 
+initGrid (( w, _ ) as gridD) =
+    NT.toDict (toCell w) gridD
+        |> Dict.insert (NT.dec gridD) CellEmpty
+
+
 init : Flags -> ( Model, Cmd Msg )
 init { now } =
     let
-        gridWidth =
-            3
-
         gridD =
-            NT.singleton gridWidth
+            ( 4, 4 )
 
         initialGrid =
-            NT.toDict (toCell gridWidth) gridD
+            initGrid gridD
     in
     ( { canvasD = ( 600, 600 )
       , grid = initialGrid
@@ -289,9 +284,6 @@ view model =
 renderCell : Float -> Cell -> S.Svg msg
 renderCell width cell =
     case cell of
-        Cell x y ->
-            renderCellXY width x y
-
         CellNum num ->
             renderCellNum width num
 
@@ -302,26 +294,6 @@ renderCell width cell =
 renderCellNum width num =
     [ polySquare width [ fill "black" ]
     , words (fromInt num) [ fill "white", transform [ scale (width / 32) ] ]
-    ]
-        |> group []
-
-
-renderCellXY : Float -> Int -> Int -> S.Svg msg
-renderCellXY width x y =
-    let
-        cellColor =
-            if x == 0 || y == 0 then
-                "red"
-
-            else
-                "green"
-
-        indexString =
-            ST.fromInt ( x, y )
-                |> ST.wrapJoin "(" "," ")"
-    in
-    [ polySquare width [ fill cellColor ]
-    , words indexString [ fill "black" ]
     ]
         |> group []
 

@@ -18,8 +18,7 @@ import Task
 
 
 type alias Model =
-    { width : Float
-    , height : Float
+    { canvasD : Float2
     , grid : Dict Int2 Cell
     , gridD : Int2
     }
@@ -35,8 +34,7 @@ init _ =
         gridD =
             ( 4, 3 )
     in
-    ( { width = 600
-      , height = 600
+    ( { canvasD = ( 600, 600 )
       , grid = NT.toDict toCell gridD
       , gridD = gridD
       }
@@ -44,9 +42,9 @@ init _ =
     )
 
 
-setWidthHeight : Float -> Float -> Model -> Model
-setWidthHeight width height model =
-    { model | width = width, height = height }
+setCanvasD : Float2 -> Model -> Model
+setCanvasD canvasD model =
+    { model | canvasD = canvasD }
 
 
 
@@ -62,10 +60,18 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update message model =
     case message of
         GotViewport { scene } ->
-            ( setWidthHeight scene.width scene.height model, Cmd.none )
+            let
+                canvasD =
+                    ( scene.width, scene.height )
+            in
+            ( setCanvasD canvasD model, Cmd.none )
 
         OnBrowserResize width height ->
-            ( setWidthHeight (toFloat width) (toFloat height) model, Cmd.none )
+            let
+                canvasD =
+                    ( width, height ) |> NT.toFloat
+            in
+            ( setCanvasD canvasD model, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg
@@ -83,7 +89,7 @@ view : Model -> Html Msg
 view model =
     [ let
         ( w, h ) =
-            ( model.width, model.height )
+            model.canvasD
       in
       polyRect ( w / 2, h / 2 )
         [ fill "red"
@@ -115,7 +121,7 @@ view model =
       in
       viewGrid
     ]
-        |> canvas ( model.width, model.height ) []
+        |> canvas model.canvasD []
 
 
 type alias GridContext =

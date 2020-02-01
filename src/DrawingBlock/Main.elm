@@ -19,18 +19,16 @@ import Task
 
 
 
--- Model
+-- Grid
 
 
 type alias Grid =
     Dict Int2 Cell
 
 
-type alias Model =
-    { canvasD : Float2
-    , grid : Grid
-    , gridD : Int2
-    }
+type Cell
+    = CellNum Int
+    | CellEmpty
 
 
 toCell : Int -> Int2 -> Cell
@@ -42,18 +40,25 @@ toCell width ( x, y ) =
     CellNum num
 
 
-type Cell
-    = CellNum Int
-    | CellEmpty
+initGrid : Int2 -> Grid
+initGrid (( w, _ ) as gridD) =
+    NT.toDict (toCell w) gridD
+        |> Dict.insert (NT.dec gridD) CellEmpty
+
+
+
+-- Model
+
+
+type alias Model =
+    { canvasD : Float2
+    , grid : Grid
+    , gridD : Int2
+    }
 
 
 type alias Flags =
     { now : Int }
-
-
-initGrid (( w, _ ) as gridD) =
-    NT.toDict (toCell w) gridD
-        |> Dict.insert (NT.dec gridD) CellEmpty
 
 
 init : Flags -> ( Model, Cmd Msg )

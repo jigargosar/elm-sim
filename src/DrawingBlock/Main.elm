@@ -100,10 +100,12 @@ view model =
         gridViewWH =
             gridWH |> NT.toFloat |> NT.mul cellViewWH
 
+        gridShift : Float2
         gridShift =
             NT.scale 0.5 cellViewWH
                 |> NT.add (NT.scale -0.5 gridViewWH)
 
+        cellIndexToCellShift : Int2 -> Float2
         cellIndexToCellShift idx =
             idx
                 |> NT.toFloat

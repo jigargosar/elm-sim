@@ -88,15 +88,15 @@ view model =
             100
 
         cellView ( x, y ) =
-            renderCell cellWidth [ cellTransform ( x, y ) cellWidth ]
+            renderCell cellWidth [ renderCellTransform ( x, y ) cellWidth ]
       in
       cellView ( 0, 0 )
     ]
         |> canvas ( model.width, model.height ) []
 
 
-cellTransform : Float2 -> Float -> S.Attribute msg
-cellTransform ( x, y ) width =
+renderCellTransform : Float2 -> Float -> S.Attribute msg
+renderCellTransform ( x, y ) width =
     transform [ shift ( x * width, y * width ) ]
 
 

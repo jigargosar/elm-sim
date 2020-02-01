@@ -131,12 +131,23 @@ update message model =
 swapEmptyInDirection : D4.Label -> Dict Int2 Cell -> Dict Int2 Cell
 swapEmptyInDirection d4 grid =
     case getEmptyPosition grid of
-        Just emptyPosition ->
+        Just emptyIdx ->
             let
-                newPosition =
-                    D4.step emptyPosition d4
+                newIdx =
+                    D4.step emptyIdx d4
             in
-            (dictSwap emptyPosition newPosition |> ignoreNothing)
+            (dictSwap emptyIdx newIdx |> ignoreNothing)
+                grid
+
+        Nothing ->
+            grid
+
+
+swapWithEmptyNeighbourOf : Int2 -> Grid -> Grid
+swapWithEmptyNeighbourOf ofIdx grid =
+    case findEmptyNeighbourOf ofIdx grid of
+        Just emptyNeighbourIdx ->
+            (dictSwap ofIdx emptyNeighbourIdx |> ignoreNothing)
                 grid
 
         Nothing ->

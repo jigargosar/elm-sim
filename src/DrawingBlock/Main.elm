@@ -74,10 +74,8 @@ view model =
         ( w, h ) =
             ( model.width, model.height )
     in
-    [ rectangle (w / 2) (h / 2)
-        |> fill "red"
+    [ renderRect (w / 2) (h / 2) [ SA.fill "red" ]
     ]
-        |> List.map toSvg
         |> canvas w h []
 
 
@@ -99,10 +97,10 @@ main =
 -- GRAPHICS
 
 
-type alias Canvas =
-    { width : Float
-    , height : Float
-    }
+renderRect : Float -> Float -> List (S.Attribute msg) -> S.Svg msg
+renderRect w h attrs =
+    List.foldl addAttribute (rectangle w h) attrs
+        |> toSvg
 
 
 canvas : Float -> Float -> List (S.Attribute msg) -> List (S.Svg msg) -> Html msg

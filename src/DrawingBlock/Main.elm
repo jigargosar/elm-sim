@@ -9,8 +9,13 @@ import DrawingBlock.Canvas exposing (..)
 import DrawingBlock.Direction4 as D4
 import Html exposing (Html)
 import Json.Decode as JD exposing (Decoder)
+import List.Extra
 import Number2 as NT exposing (Float2, Int2)
 import PointFree exposing (dictSwap, ignoreNothing, is)
+import Random
+import Random.Dict
+import Random.Extra
+import Random.List
 import String exposing (fromInt)
 import String2 as ST
 import Svg as S
@@ -59,6 +64,9 @@ init _ =
 
         gridD =
             NT.singleton gridWidth
+
+        _ =
+            Random.List.shuffle
     in
     ( { canvasD = ( 600, 600 )
       , grid = NT.toDict (toCell gridWidth) gridD
@@ -66,6 +74,17 @@ init _ =
       }
     , BD.getViewport |> Task.perform GotViewport
     )
+
+
+shuffleValues : Dict comparable v -> Random.Generator (Dict comparable v)
+shuffleValues dict =
+    let
+        ( keys, values ) =
+            Dict.toList dict
+                |> List.unzip
+    in
+    Random.List.shuffle values
+        |> Random.map (List.Extra.zip keys >> Dict.fromList)
 
 
 setCanvasD : Float2 -> Model -> Model

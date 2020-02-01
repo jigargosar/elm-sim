@@ -9,13 +9,9 @@ import DrawingBlock.Canvas exposing (..)
 import DrawingBlock.Direction4 as D4
 import Html exposing (Html)
 import Json.Decode as JD exposing (Decoder)
-import List.Extra
 import Number2 as NT exposing (Float2, Int2)
 import PointFree exposing (dictSwap, ignoreNothing, is, shuffleValues)
 import Random
-import Random.Dict
-import Random.Extra
-import Random.List
 import String exposing (fromInt)
 import String2 as ST
 import Svg as S

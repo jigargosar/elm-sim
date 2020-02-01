@@ -24,6 +24,15 @@ type alias Model =
     }
 
 
+toCell : ( Int, Int ) -> Cell
+toCell ( x, y ) =
+    Cell x y
+
+
+type Cell
+    = Cell Int Int
+
+
 type alias Flags =
     ()
 
@@ -107,14 +116,6 @@ view model =
       viewGrid
     ]
         |> canvas model.canvasD []
-
-
-toCell ( x, y ) =
-    Cell x y
-
-
-type Cell
-    = Cell Int Int
 
 
 renderCell : Float -> Cell -> S.Svg msg

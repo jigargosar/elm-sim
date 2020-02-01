@@ -69,19 +69,23 @@ init { now } =
         gridD =
             NT.singleton gridWidth
 
-        gridGen =
+        initialGrid =
             NT.toDict (toCell gridWidth) gridD
-                |> shuffleValues
     in
     ( { canvasD = ( 600, 600 )
-      , grid = Random.step gridGen (Random.initialSeed now) |> Tuple.first
+      , grid = initialGrid
       , gridD = gridD
       }
     , [ BD.getViewport |> Task.perform GotViewport
-      , Random.generate ShuffledGrid gridGen
+      , getShuffledGrid initialGrid
       ]
         |> Cmd.batch
     )
+
+
+getShuffledGrid : Grid -> Cmd Msg
+getShuffledGrid grid =
+    Random.generate ShuffledGrid (shuffleValues grid)
 
 
 shuffleValues : Dict comparable v -> Random.Generator (Dict comparable v)

@@ -6,6 +6,7 @@ module DrawingBlock.Canvas exposing
     , fill
     , group
     , groupTransform
+    , pageXYToCanvasXY
     , polyRect
     , polySquare
     , polygon
@@ -18,7 +19,7 @@ module DrawingBlock.Canvas exposing
     )
 
 import Html exposing (Html)
-import Number2 exposing (Float2)
+import Number2 as NT exposing (Float2)
 import String exposing (fromFloat)
 import Svg as S
 import Svg.Attributes as SA
@@ -106,6 +107,11 @@ wrap attrs =
 wrapTransform : List (Transform -> Transform) -> S.Svg msg -> S.Svg msg
 wrapTransform list =
     wrap [ transform list ]
+
+
+pageXYToCanvasXY : ( Float, Float ) -> ( Float, Float ) -> ( Float, Float )
+pageXYToCanvasXY pageXY canvasD =
+    NT.sub pageXY (NT.scale 0.5 canvasD)
 
 
 canvas : Float2 -> List (S.Attribute msg) -> List (S.Svg msg) -> Html msg

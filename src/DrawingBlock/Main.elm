@@ -100,6 +100,7 @@ type Msg
     | OnBrowserResize Int Int
     | KeyDown D4.Label
     | ShuffledGrid Grid
+    | OnTap Float2
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -126,6 +127,27 @@ update message model =
 
         ShuffledGrid grid ->
             ( { model | grid = grid }, Cmd.none )
+
+        OnTap pageXY ->
+            let
+                idx =
+                    pageXYToGridIndex pageXY model.canvasD model.gridD
+            in
+            ( { model | grid = swapWithEmptyNeighbourOf idx model.grid }, Cmd.none )
+
+
+pageXYToGridIndex pageXY canvasD gridD =
+    let
+        cellWidth =
+            computeCellWidth canvasD gridD
+
+        gridShift =
+            computeGridShift cellWidth gridD
+    in
+    pageXYToCanvasXY pageXY canvasD
+        |> NT.subBy gridShift
+        |> NT.scale (1 / cellWidth)
+        |> NT.round
 
 
 swapEmptyInDirection : D4.Label -> Dict Int2 Cell -> Dict Int2 Cell
@@ -157,6 +179,9 @@ swapWithEmptyNeighbourOf ofIdx grid =
 findEmptyNeighbourOf : Int2 -> Grid -> Maybe Int2
 findEmptyNeighbourOf ofIdx grid =
     let
+        _ =
+            Debug.log "ofIdx" ofIdx
+
         neighgourIndices =
             [ Left, Right, Up, Down ] |> List.map (D4.step ofIdx)
 
@@ -204,22 +229,50 @@ subscriptions _ =
     , arrowKeyDecoder
         |> JD.map KeyDown
         |> BE.onKeyDown
+    , pageXYDecoder
+        |> failUnlessPrimaryBtn
+        |> JD.map OnTap
+        |> BE.onClick
     ]
         |> Sub.batch
+
+
+pageXYDecoder : Decoder Float2
+pageXYDecoder =
+    JD.map2 Tuple.pair
+        (JD.field "pageX" JD.float)
+        (JD.field "pageY" JD.float)
+
+
+failUnlessPrimaryBtn : Decoder a -> Decoder a
+failUnlessPrimaryBtn d =
+    JD.field "button" JD.int
+        |> JD.andThen
+            (\btn ->
+                if btn == 0 then
+                    d
+
+                else
+                    JD.fail ""
+            )
 
 
 
 -- View
 
 
+computeCellWidth canvasD gridD =
+    canvasD
+        |> NT.scale 0.9
+        |> NT.divBy (NT.toFloat gridD)
+        |> uncurry min
+
+
 view : Model -> Html Msg
 view model =
     [ let
         cellWidth =
-            model.canvasD
-                |> NT.scale 0.9
-                |> NT.divBy (NT.toFloat model.gridD)
-                |> uncurry min
+            computeCellWidth model.canvasD model.gridD
 
         viewGridCell : Int2 -> Cell -> S.Svg msg
         viewGridCell idx cell =

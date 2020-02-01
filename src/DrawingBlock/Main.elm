@@ -97,7 +97,7 @@ view model =
         viewGridCell : ( Int2, Cell ) -> S.Svg msg
         viewGridCell ( idx, cell ) =
             renderCell cellWidth cell
-                |> wrapTransform [ shift (gridIndexToGridCordinate (toGridContext cellViewD gridD) idx) ]
+                |> wrapTransform [ shift (gridIndexToGridCordinate cellViewD gridD idx) ]
 
         grid =
             NT.toDict toCell gridD
@@ -139,8 +139,16 @@ toGridContext cellViewD gridD =
     }
 
 
-gridIndexToGridCordinate : GridContext -> Int2 -> Float2
-gridIndexToGridCordinate { cellViewD, cellShift } idx =
+gridIndexToGridCordinate : Float2 -> Int2 -> Int2 -> Float2
+gridIndexToGridCordinate cellViewD gridD idx =
+    idx
+        |> NT.toFloat
+        |> NT.mul cellViewD
+        |> NT.add (toGridContext cellViewD gridD).cellShift
+
+
+gridIndexToGridCordinateHelp : GridContext -> Int2 -> Float2
+gridIndexToGridCordinateHelp { cellViewD, cellShift } idx =
     idx
         |> NT.toFloat
         |> NT.mul cellViewD

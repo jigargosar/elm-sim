@@ -111,7 +111,7 @@ view model =
         viewGrid =
             Dict.toList model.grid
                 |> List.map (uncurry viewGridCell)
-                |> groupTransform [ shift (computeCellShift cellWidth model.gridD) ]
+                |> groupTransform [ shift (computeGridShift cellWidth model.gridD) ]
       in
       viewGrid
     ]
@@ -155,11 +155,11 @@ gridIndexToWorldCordinate cellWidth gridD idx =
     idx
         |> NT.toFloat
         |> NT.scale cellWidth
-        |> NT.add (computeCellShift cellWidth gridD)
+        |> NT.add (computeGridShift cellWidth gridD)
 
 
-computeCellShift : Float -> Int2 -> Float2
-computeCellShift cellWidth gridD =
+computeGridShift : Float -> Int2 -> Float2
+computeGridShift cellWidth gridD =
     let
         gridViewD =
             gridD |> NT.toFloat |> NT.scale cellWidth

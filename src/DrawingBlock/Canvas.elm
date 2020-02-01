@@ -10,6 +10,7 @@ module DrawingBlock.Canvas exposing
     )
 
 import Html exposing (Html)
+import Number2 exposing (Float2)
 import String exposing (fromFloat)
 import Svg as S
 import Svg.Attributes as SA
@@ -20,18 +21,18 @@ fill =
     SA.fill
 
 
-polyRect : Float -> Float -> List (S.Attribute msg) -> S.Svg msg
-polyRect w h =
-    polygon (rectToPolygonPoints w h)
+polyRect : Float2 -> List (S.Attribute msg) -> S.Svg msg
+polyRect wh =
+    polygon (rectToPolygonPoints wh)
 
 
 polySquare : Float -> List (S.Attribute msg) -> S.Svg msg
 polySquare w =
-    polyRect w w
+    polyRect ( w, w )
 
 
-rectToPolygonPoints : Float -> Float -> List ( Float, Float )
-rectToPolygonPoints w h =
+rectToPolygonPoints : Float2 -> List ( Float, Float )
+rectToPolygonPoints ( w, h ) =
     let
         pt sx sy =
             ( w / 2 * sx, h / 2 * sy )
@@ -53,8 +54,8 @@ addPoint ( x, y ) str =
     str ++ String.fromFloat x ++ "," ++ String.fromFloat y ++ " "
 
 
-ellipse : Float -> Float -> List (S.Attribute msg) -> S.Svg msg
-ellipse w h attrs =
+ellipse : Float2 -> List (S.Attribute msg) -> S.Svg msg
+ellipse ( w, h ) attrs =
     S.ellipse
         (SA.rx (fromFloat w)
             :: SA.ry (fromFloat h)

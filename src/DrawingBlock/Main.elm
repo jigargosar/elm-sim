@@ -73,9 +73,7 @@ view model =
         ( w, h ) =
             ( model.width, model.height )
     in
-    [ polyRect
-        (w / 2)
-        (h / 2)
+    [ polyRect ( w / 2, h / 2 )
         [ fill "red"
         , T.identity
             |> T.scale 0.5
@@ -94,13 +92,15 @@ view model =
         cellWidth =
             100
       in
-      renderCell cellWidth
-        [ T.identity
-            |> T.shift (x * cellWidth) (y * cellWidth)
-            |> T.render
-        ]
+      renderCell cellWidth [ cellTransform x y cellWidth ]
     ]
         |> canvas w h []
+
+
+cellTransform x y width =
+    T.identity
+        |> T.shift (x * width) (y * width)
+        |> T.render
 
 
 renderCell width attrs =

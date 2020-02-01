@@ -1,5 +1,6 @@
 module DrawingBlock.Transform exposing (identity, render, scale, shift)
 
+import Number2 exposing (Float2)
 import String exposing (fromFloat)
 import Svg as S
 import Svg.Attributes as SA
@@ -10,8 +11,8 @@ render transformModel =
     SA.transform (toTransformString transformModel)
 
 
-shift : Float -> Float -> Transform -> Transform
-shift dx dy t =
+shift : Float2 -> Transform -> Transform
+shift ( dx, dy ) t =
     { t | x = t.x + dx, y = t.y + dy }
 
 

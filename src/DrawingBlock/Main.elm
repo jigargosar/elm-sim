@@ -5,6 +5,7 @@ import Browser
 import Browser.Dom as BD
 import Browser.Events as BE
 import Dict exposing (Dict)
+import Dict.Extra
 import DrawingBlock.Canvas exposing (..)
 import DrawingBlock.Direction4 as D4 exposing (Label(..))
 import Html exposing (Html)
@@ -92,11 +93,8 @@ findEmptyNeighbourOf ofIdx grid =
 
 
 getEmptyPosition : Grid -> Maybe Int2
-getEmptyPosition grid =
-    Dict.toList grid
-        |> List.filter (Tuple.second >> is CellEmpty)
-        |> List.head
-        |> Maybe.map Tuple.first
+getEmptyPosition =
+    Dict.Extra.find (\_ -> is CellEmpty) >> Maybe.map Tuple.first
 
 
 isSolved : Int2 -> Grid -> Bool

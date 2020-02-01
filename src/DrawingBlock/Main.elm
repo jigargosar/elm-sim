@@ -148,8 +148,10 @@ renderCell width (Cell x y) =
 
 
 -- Grid Transforms
+--noinspection ElmUnusedSymbol
 
 
+{-| -}
 gridIndexToWorldCordinate : Float -> Int2 -> Int2 -> Float2
 gridIndexToWorldCordinate cellWidth gridD idx =
     idx

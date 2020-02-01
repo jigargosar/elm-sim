@@ -88,18 +88,6 @@ subscriptions _ =
 view : Model -> Html Msg
 view model =
     [ let
-        ( w, h ) =
-            model.canvasD
-      in
-      polyRect ( w / 2, h / 2 )
-        [ fill "red"
-        , transform [ scale 0.5, shift ( -w / 4, -h / 4 ) ]
-        ]
-        |> wrapTransform
-            [ --
-              shift ( -w / 4, -h / 4 )
-            ]
-    , let
         cellWidth =
             100
 

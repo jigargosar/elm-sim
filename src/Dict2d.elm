@@ -1,4 +1,4 @@
-module Dict2d exposing (decodeCSV, filled, fromListsWithDefault, maybeMapAt, maybeMapAt2)
+module Dict2d exposing (decodeCSV, filled, fromListsWithDefault)
 
 import Dict exposing (Dict)
 import List2d exposing (List2d)
@@ -43,29 +43,3 @@ decodeCSV decoder encoded =
                 >> List.map (String.split "," >> List.map decoder)
     in
     fromListsWithDefault (decoder "") tokens
-
-
-maybeMapAt : Int2 -> (a -> Maybe a) -> Dict Int2 a -> Maybe (Dict Int2 a)
-maybeMapAt idx func dict =
-    let
-        replace a2 =
-            Dict.insert idx a2 dict
-    in
-    Dict.get idx dict
-        |> Maybe.andThen (func >> Maybe.map replace)
-
-
-maybeMapAt2 : Int2 -> Int2 -> (a -> a -> Maybe ( a, a )) -> Dict Int2 a -> Maybe (Dict Int2 a)
-maybeMapAt2 idxA1 idxA2 func dict =
-    let
-        getAt idx =
-            Dict.get idx dict
-
-        insert2 ( a1, a2 ) =
-            dict
-                |> Dict.insert idxA1 a1
-                |> Dict.insert idxA2 a2
-    in
-    Maybe.map2 func (getAt idxA1) (getAt idxA2)
-        |> Maybe.andThen identity
-        |> Maybe.map insert2

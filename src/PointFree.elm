@@ -233,3 +233,29 @@ shuffleValues dict =
     in
     Random.List.shuffle values
         |> Random.map (List.Extra.zip keys >> Dict.fromList)
+
+
+maybeMapAt : comparable -> (a -> Maybe a) -> Dict comparable a -> Maybe (Dict comparable a)
+maybeMapAt idx func dict =
+    let
+        replace a2 =
+            Dict.insert idx a2 dict
+    in
+    Dict.get idx dict
+        |> Maybe.andThen (func >> Maybe.map replace)
+
+
+maybeMapAt2 : comparable -> comparable -> (a -> a -> Maybe ( a, a )) -> Dict comparable a -> Maybe (Dict comparable a)
+maybeMapAt2 idxA1 idxA2 func dict =
+    let
+        getAt idx =
+            Dict.get idx dict
+
+        insert2 ( a1, a2 ) =
+            dict
+                |> Dict.insert idxA1 a1
+                |> Dict.insert idxA2 a2
+    in
+    Maybe.map2 func (getAt idxA1) (getAt idxA2)
+        |> Maybe.andThen identity
+        |> Maybe.map insert2

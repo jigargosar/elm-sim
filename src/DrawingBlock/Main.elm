@@ -15,6 +15,7 @@ import PointFree exposing (dictSwap, ignoreNothing, is, shuffleValues)
 import Random
 import String exposing (fromInt)
 import Svg as S
+import Svg.Attributes as SA
 import Task
 
 
@@ -306,7 +307,12 @@ view model =
       in
       viewGrid
     ]
-        |> canvas model.canvasD []
+        |> canvas model.canvasD
+            [ --SA.shapeRendering "geometricPrecision"
+              --, SA.shapeRendering "crispEdges"
+              --,
+              SA.shapeRendering "optimizeSpeed"
+            ]
 
 
 renderCell : Float -> Cell -> S.Svg msg

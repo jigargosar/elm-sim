@@ -74,7 +74,13 @@ view model =
         ( w, h ) =
             ( model.width, model.height )
     in
-    [ polyRect (w / 2) (h / 2) [ SA.fill "red" ]
+    [ polyRect (w / 2)
+        (h / 2)
+        [ SA.fill "red"
+        , identityTransform
+            |> move -10 -10
+            |> transform
+        ]
     ]
         |> canvas w h []
 
@@ -95,6 +101,16 @@ main =
 
 
 -- GRAPHICS
+
+
+transform : Transform -> S.Attribute msg
+transform transformModel =
+    SA.transform (toTransformString transformModel)
+
+
+move : Float -> Float -> Transform -> Transform
+move dx dy t =
+    { t | x = t.x + dx, y = t.y + dy }
 
 
 polyRect : Float -> Float -> List (S.Attribute msg) -> S.Svg msg
@@ -190,11 +206,11 @@ rectangle w h =
 
 
 toSvg : Shape msg -> S.Svg msg
-toSvg (Shape transform otherAttributes form) =
+toSvg (Shape transformModel otherAttributes form) =
     case form of
         Custom svg ->
             S.g
-                (SA.transform (toTransformString transform)
+                (SA.transform (toTransformString transformModel)
                     :: otherAttributes
                 )
                 [ svg ]
@@ -202,7 +218,7 @@ toSvg (Shape transform otherAttributes form) =
         Polygon points ->
             S.polygon
                 (SA.points (List.foldl addPoint "" points)
-                    :: SA.transform (toTransformString transform)
+                    :: SA.transform (toTransformString transformModel)
                     :: otherAttributes
                 )
                 []
@@ -211,14 +227,14 @@ toSvg (Shape transform otherAttributes form) =
             S.ellipse
                 (SA.rx (fromFloat w)
                     :: SA.ry (fromFloat h)
-                    :: SA.transform (toTransformString transform)
+                    :: SA.transform (toTransformString transformModel)
                     :: otherAttributes
                 )
                 []
 
         Group shapes ->
             S.g
-                (SA.transform (toTransformString transform)
+                (SA.transform (toTransformString transformModel)
                     :: otherAttributes
                 )
                 (List.map toSvg shapes)

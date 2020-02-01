@@ -102,9 +102,7 @@ update message model =
         KeyDown ak ->
             ( { model
                 | grid =
-                    swapEmptyInDirection
-                        (arrowKeyToXY ak |> NT.negate)
-                        model.grid
+                    swapEmptyInDirection (arrowKeyToXY ak |> NT.negate) model.grid
               }
             , Cmd.none
             )

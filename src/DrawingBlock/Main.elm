@@ -4,7 +4,7 @@ import Basics.Extra exposing (uncurry)
 import Browser
 import Browser.Dom as BD
 import Browser.Events as BE
-import Dict
+import Dict exposing (Dict)
 import DrawingBlock.Canvas exposing (..)
 import Html exposing (Html)
 import Number2 as NT exposing (Float2, Int2)
@@ -20,6 +20,8 @@ import Task
 type alias Model =
     { width : Float
     , height : Float
+    , grid : Dict Int2 Cell
+    , gridD : Int2
     }
 
 
@@ -29,8 +31,14 @@ type alias Flags =
 
 init : Flags -> ( Model, Cmd Msg )
 init _ =
+    let
+        gridD =
+            ( 4, 3 )
+    in
     ( { width = 600
       , height = 600
+      , grid = NT.toDict toCell gridD
+      , gridD = gridD
       }
     , BD.getViewport |> Task.perform GotViewport
     )
@@ -100,12 +108,8 @@ view model =
             renderCell cellWidth cell
                 |> wrapTransform [ shift (gridIndexToGridCordinate cellViewD gridD idx) ]
 
-        grid =
-            NT.toDict toCell gridD
-                |> Debug.log "foldl"
-
         viewGrid =
-            Dict.toList grid
+            Dict.toList model.grid
                 |> List.map (uncurry viewGridCell)
                 |> groupTransform []
       in

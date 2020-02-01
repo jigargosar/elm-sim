@@ -53,11 +53,11 @@ type Cell
 
 
 type alias Flags =
-    ()
+    { now : Int }
 
 
 init : Flags -> ( Model, Cmd Msg )
-init _ =
+init { now } =
     let
         gridWidth =
             3
@@ -67,9 +67,14 @@ init _ =
 
         _ =
             Random.List.shuffle
+
+        gridGen =
+            NT.toDict (toCell gridWidth) gridD
+                |> shuffleValues
+                |> Random.step
     in
     ( { canvasD = ( 600, 600 )
-      , grid = NT.toDict (toCell gridWidth) gridD
+      , grid = gridGen (Random.initialSeed now) |> Tuple.first
       , gridD = gridD
       }
     , BD.getViewport |> Task.perform GotViewport

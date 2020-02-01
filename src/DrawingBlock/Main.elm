@@ -101,10 +101,7 @@ update message model =
             ( setCanvasD canvasD model, Cmd.none )
 
         KeyDown d4 ->
-            ( { model
-                | grid =
-                    swapEmptyInDirection (d4 |> D4.opposite) model.grid
-              }
+            ( { model | grid = swapEmptyInDirection (D4.opposite d4) model.grid }
             , Cmd.none
             )
 

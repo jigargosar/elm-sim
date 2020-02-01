@@ -74,8 +74,8 @@ group1 attrs =
     List.singleton >> S.g attrs
 
 
-canvas : Float -> Float -> List (S.Attribute msg) -> List (S.Svg msg) -> Html msg
-canvas w h attrs =
+canvas : Float2 -> List (S.Attribute msg) -> List (S.Svg msg) -> Html msg
+canvas ( w, h ) attrs =
     S.svg
         (SA.viewBox (fromFloat (-w / 2) ++ " " ++ fromFloat (-h / 2) ++ " " ++ fromFloat w ++ " " ++ fromFloat h)
             :: SA.width "100%"

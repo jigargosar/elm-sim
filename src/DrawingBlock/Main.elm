@@ -95,12 +95,7 @@ view model =
       in
       renderCell cellWidth [ cellTransform x y cellWidth ]
     ]
-        |> (let
-                ( w, h ) =
-                    ( model.width, model.height )
-            in
-            canvas w h []
-           )
+        |> canvas ( model.width, model.height ) []
 
 
 cellTransform : Float -> Float -> Float -> S.Attribute msg

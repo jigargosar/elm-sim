@@ -5,10 +5,12 @@ import Browser
 import Browser.Dom as BD
 import Browser.Events as BE
 import Dict exposing (Dict)
+import Dict.Extra
 import DrawingBlock.Canvas exposing (..)
-import DrawingBlock.Direction4 as D4
+import DrawingBlock.Direction4 as D4 exposing (Label(..))
 import Html exposing (Html)
 import Json.Decode as JD exposing (Decoder)
+import List.Extra
 import Number2 as NT exposing (Float2, Int2)
 import PointFree exposing (dictSwap, ignoreNothing, is, shuffleValues)
 import Random
@@ -139,6 +141,19 @@ swapEmptyInDirection d4 grid =
 
         Nothing ->
             grid
+
+
+findEmptyNeighbourOf : Int2 -> Grid -> Maybe Int2
+findEmptyNeighbourOf ofIdx grid =
+    let
+        neighgourIndices =
+            [ Left, Right, Up, Down ] |> List.map (D4.step ofIdx)
+
+        isEmpty idx =
+            Dict.get idx grid == Just CellEmpty
+    in
+    neighgourIndices
+        |> List.Extra.find isEmpty
 
 
 getEmptyPosition : Dict a Cell -> Maybe a

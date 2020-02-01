@@ -106,20 +106,31 @@ int2ToString =
 -- Int2 Dimension functions
 
 
-fold : (Int2 -> b -> b) -> b -> Int2 -> b
-fold func acc0 ( w, h ) =
-    List.range 0 (h - 1)
+foldl : (Int2 -> b -> b) -> b -> Int2 -> b
+foldl func acc0 ( w, h ) =
+    List.range 1 w
         |> List.foldl
-            (\y acc1 ->
-                List.range 0 (w - 1)
-                    |> List.foldl (\x -> func ( x, y )) acc1
+            (\x acc1 ->
+                List.range 1 h
+                    |> List.foldl (\y -> func ( x - 1, y - 1 )) acc1
+            )
+            acc0
+
+
+foldr : (Int2 -> b -> b) -> b -> Int2 -> b
+foldr func acc0 ( w, h ) =
+    List.range 1 w
+        |> List.foldl
+            (\x acc1 ->
+                List.range 1 h
+                    |> List.foldl (\y -> func ( w - x, h - y )) acc1
             )
             acc0
 
 
 toDict : (Int2 -> b) -> Int2 -> Dict Int2 b
 toDict func =
-    fold (\index -> Dict.insert index (func index)) Dict.empty
+    foldl (\index -> Dict.insert index (func index)) Dict.empty
 
 
 indexMemberOf : Int2 -> Int2 -> Bool

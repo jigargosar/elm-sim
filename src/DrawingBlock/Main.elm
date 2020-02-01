@@ -3,9 +3,11 @@ module DrawingBlock.Main exposing (main)
 import Browser
 import Browser.Dom as BD
 import Browser.Events as BE
+import Dict2d
 import DrawingBlock.Canvas exposing (..)
 import Html exposing (Html)
 import Number2 as NT exposing (Float2, Int2)
+import PointFree exposing (is)
 import Svg as S
 import Task
 
@@ -89,6 +91,11 @@ view model =
         cellView idx =
             renderCell cellWidth
                 |> transformCell idx cellWidth
+
+        _ =
+            NT.foldr (::) [] ( 3, 3 )
+                |> is (NT.foldl (::) [] ( 3, 3 ) |> List.reverse)
+                |> Debug.log "foldl"
       in
       cellView ( 0, 0 )
     ]

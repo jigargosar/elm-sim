@@ -78,7 +78,7 @@ view model =
         |> fill "red"
     ]
         |> List.map toSvg
-        |> canvas w h
+        |> canvas w h []
 
 
 
@@ -99,19 +99,20 @@ main =
 -- GRAPHICS
 
 
-canvas : Float -> Float -> List (S.Svg msg) -> Html msg
-canvas w h =
+canvas : Float -> Float -> List (S.Attribute msg) -> List (S.Svg msg) -> Html msg
+canvas w h attrs =
     S.svg
-        [ SA.viewBox (fromFloat (-w / 2) ++ " " ++ fromFloat (-h / 2) ++ " " ++ fromFloat w ++ " " ++ fromFloat h)
-        , SA.width "100%"
-        , SA.height "100%"
-        , SA.style
-            """
+        (SA.viewBox (fromFloat (-w / 2) ++ " " ++ fromFloat (-h / 2) ++ " " ++ fromFloat w ++ " " ++ fromFloat h)
+            :: SA.width "100%"
+            :: SA.height "100%"
+            :: SA.style
+                """
                     left : 0;
                     top : 0;
                     position : fixed;
             """
-        ]
+            :: attrs
+        )
 
 
 addAttribute : S.Attribute msg -> Shape msg -> Shape msg

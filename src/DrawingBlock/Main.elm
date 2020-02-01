@@ -87,8 +87,24 @@ view model =
                 --|> T.shift (-w / 4) (-h / 4)
                 |> T.render
             ]
+    , let
+        ( x, y ) =
+            ( 0, 0 )
+
+        cellWidth =
+            100
+      in
+      renderCell cellWidth
+        [ T.identity
+            |> T.shift (x * cellWidth) (y * cellWidth)
+            |> T.render
+        ]
     ]
         |> canvas w h []
+
+
+renderCell width attrs =
+    polySquare width (fill "red" :: attrs)
 
 
 

@@ -5,6 +5,7 @@ module DrawingBlock.Canvas exposing
     , group
     , group1
     , polyRect
+    , polySquare
     , polygon
     )
 
@@ -22,6 +23,11 @@ fill =
 polyRect : Float -> Float -> List (S.Attribute msg) -> S.Svg msg
 polyRect w h =
     polygon (rectToPolygonPoints w h)
+
+
+polySquare : Float -> List (S.Attribute msg) -> S.Svg msg
+polySquare w =
+    polyRect w w
 
 
 rectToPolygonPoints : Float -> Float -> List ( Float, Float )

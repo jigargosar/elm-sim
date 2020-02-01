@@ -106,12 +106,12 @@ view model =
         viewGridCell : Int2 -> Cell -> S.Svg msg
         viewGridCell idx cell =
             renderCell cellWidth cell
-                |> wrapTransform [ shift (gridIndexToWorldCordinate cellWidth model.gridD idx) ]
+                |> wrapTransform [ shift (idx |> NT.toFloat |> NT.scale cellWidth) ]
 
         viewGrid =
             Dict.toList model.grid
                 |> List.map (uncurry viewGridCell)
-                |> groupTransform []
+                |> groupTransform [ shift (computeCellShift cellWidth model.gridD) ]
       in
       viewGrid
     ]
@@ -155,21 +155,17 @@ gridIndexToWorldCordinate cellWidth gridD idx =
     idx
         |> NT.toFloat
         |> NT.scale cellWidth
-        |> NT.add (computeCellShift ( cellWidth, cellWidth ) gridD)
+        |> NT.add (computeCellShift cellWidth gridD)
 
 
-computeCellShift : Float2 -> Int2 -> Float2
-computeCellShift cellViewD gridD =
+computeCellShift : Float -> Int2 -> Float2
+computeCellShift cellWidth gridD =
     let
         gridViewD =
-            gridD |> NT.toFloat |> NT.mul cellViewD
-
-        cellShift : Float2
-        cellShift =
-            NT.scale 0.5 cellViewD
-                |> NT.add (NT.scale -0.5 gridViewD)
+            gridD |> NT.toFloat |> NT.scale cellWidth
     in
-    cellShift
+    NT.scale 0.5 ( cellWidth, cellWidth )
+        |> NT.add (NT.scale -0.5 gridViewD)
 
 
 

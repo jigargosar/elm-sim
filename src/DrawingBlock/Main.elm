@@ -107,6 +107,7 @@ update message model =
             )
 
 
+arrowKeyToXY : ArrowKey -> Int2
 arrowKeyToXY ak =
     case ak of
         Up ->
@@ -122,6 +123,7 @@ arrowKeyToXY ak =
             ( 1, 0 )
 
 
+swapEmptyInDirection : Int2 -> Dict Int2 Cell -> Dict Int2 Cell
 swapEmptyInDirection dxy grid =
     case getEmptyPosition grid of
         Just emptyPosition ->

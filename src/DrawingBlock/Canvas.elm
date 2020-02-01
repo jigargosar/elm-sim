@@ -3,6 +3,7 @@ module DrawingBlock.Canvas exposing
     , ellipse
     , fill
     , group
+    , group1
     , polyRect
     , polygon
     )
@@ -59,6 +60,11 @@ ellipse w h attrs =
 group : List (S.Attribute msg) -> List (S.Svg msg) -> S.Svg msg
 group =
     S.g
+
+
+group1 : List (S.Attribute msg) -> S.Svg msg -> S.Svg msg
+group1 attrs =
+    List.singleton >> S.g attrs
 
 
 canvas : Float -> Float -> List (S.Attribute msg) -> List (S.Svg msg) -> Html msg

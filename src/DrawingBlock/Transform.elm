@@ -1,4 +1,4 @@
-module DrawingBlock.Transform exposing (identity, move, render)
+module DrawingBlock.Transform exposing (identity, render, scale, shift)
 
 import String exposing (fromFloat)
 import Svg as S
@@ -10,9 +10,14 @@ render transformModel =
     SA.transform (toTransformString transformModel)
 
 
-move : Float -> Float -> Transform -> Transform
-move dx dy t =
+shift : Float -> Float -> Transform -> Transform
+shift dx dy t =
     { t | x = t.x + dx, y = t.y + dy }
+
+
+scale : Float -> Transform -> Transform
+scale s t =
+    { t | scale = s }
 
 
 type alias Transform =

@@ -6,7 +6,6 @@ import Browser.Events as BE
 import DrawingBlock.Canvas exposing (..)
 import DrawingBlock.Transform as T
 import Html exposing (Html)
-import Svg.Attributes as SA
 import Task
 
 
@@ -79,9 +78,15 @@ view model =
         (h / 2)
         [ fill "red"
         , T.identity
-            |> T.move -10 -10
+            |> T.scale 0.5
+            |> T.shift (-w / 4) (-h / 4)
             |> T.render
         ]
+        |> group1
+            [ T.identity
+                |> T.shift (-w / 4) (-h / 4)
+                |> T.render
+            ]
     ]
         |> canvas w h []
 

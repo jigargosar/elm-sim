@@ -92,7 +92,7 @@ view model =
             100
 
         gridWH =
-            ( 3, 3 )
+            ( 4, 3 )
 
         cellWH =
             ( cellWidth, cellWidth )
@@ -101,7 +101,8 @@ view model =
             idx
                 |> NT.toFloat
                 |> NT.mul cellWH
-                |> NT.subBy cellWH
+                |> NT.add (NT.scale 0.5 cellWH)
+                |> NT.add (NT.scale -0.5 (gridWH |> NT.toFloat |> NT.mul cellWH))
 
         cellView : ( Int2, Cell ) -> S.Svg msg
         cellView ( idx, cell ) =

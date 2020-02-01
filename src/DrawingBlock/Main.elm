@@ -98,6 +98,11 @@ getEmptyPosition grid =
         |> Maybe.map Tuple.first
 
 
+isSolved : Int2 -> Grid -> Bool
+isSolved gridD grid =
+    initGrid gridD == grid
+
+
 
 -- Model
 
@@ -280,7 +285,16 @@ view model =
         viewGridCell : Int2 -> Cell -> S.Svg msg
         viewGridCell idx cell =
             renderCell cellWidth cell
-                |> wrapTransform [ shift (idx |> NT.toFloat |> NT.scale cellWidth) ]
+                |> wrap
+                    [ fill
+                        (if isSolved model.gridD model.grid then
+                            "green"
+
+                         else
+                            "black"
+                        )
+                    , transform [ shift (idx |> NT.toFloat |> NT.scale cellWidth) ]
+                    ]
 
         viewGrid =
             Dict.toList model.grid
@@ -303,7 +317,7 @@ renderCell width cell =
 
 
 renderCellNum width num =
-    [ polySquare width [ fill "black" ]
+    [ polySquare width []
     , words (fromInt num) [ fill "white", transform [ scale (width / 32) ] ]
     ]
         |> group []

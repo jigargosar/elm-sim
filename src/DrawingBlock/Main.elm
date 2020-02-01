@@ -1,15 +1,12 @@
 module DrawingBlock.Main exposing (main)
 
-import Basics.Extra exposing (uncurry)
 import Browser
 import Browser.Dom as BD
 import Browser.Events as BE
 import Dict
-import Dict2d
 import DrawingBlock.Canvas exposing (..)
 import Html exposing (Html)
 import Number2 as NT exposing (Float2, Int2)
-import PointFree exposing (is)
 import String2 as ST
 import Svg as S
 import Task
@@ -115,7 +112,10 @@ view model =
         viewGridCell : ( Int2, Cell ) -> S.Svg msg
         viewGridCell ( idx, cell ) =
             renderCell cellWidth cell
-                |> wrapTransform [ shift (gridIndexToGridCordinate idx) ]
+                |> transformGridCell idx
+
+        transformGridCell idx =
+            wrapTransform [ shift (gridIndexToGridCordinate idx) ]
 
         grid =
             NT.toDict toCell gridWH
@@ -137,11 +137,6 @@ toCell ( x, y ) =
 
 type Cell
     = Cell Int Int
-
-
-transformCell : Int2 -> Float -> S.Svg msg -> S.Svg msg
-transformCell cellIdx width =
-    wrapTransform [ shift (cellIdx |> NT.toFloat |> NT.scale width) ]
 
 
 renderCell : Float -> Cell -> S.Svg msg

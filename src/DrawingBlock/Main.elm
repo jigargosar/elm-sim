@@ -8,6 +8,7 @@ import Dict exposing (Dict)
 import DrawingBlock.Canvas exposing (..)
 import Html exposing (Html)
 import Number2 as NT exposing (Float2, Int2)
+import String exposing (fromInt)
 import String2 as ST
 import Svg as S
 import Task
@@ -26,11 +27,13 @@ type alias Model =
 
 toCell : ( Int, Int ) -> Cell
 toCell ( x, y ) =
-    Cell x y
+    CellNum (x * y)
 
 
 type Cell
     = Cell Int Int
+    | CellNum Int
+    | Empty
 
 
 type alias Flags =
@@ -119,7 +122,31 @@ view model =
 
 
 renderCell : Float -> Cell -> S.Svg msg
-renderCell width (Cell x y) =
+renderCell width cell =
+    case cell of
+        Cell x y ->
+            renderCellXY width x y
+
+        CellNum num ->
+            renderCellNum width num
+
+        Empty ->
+            renderEmptyCell width
+
+
+renderEmptyCell width =
+    empty
+
+
+renderCellNum width num =
+    [ polySquare width [ fill "black" ]
+    , words (fromInt num) [ fill "white", transform [ scale (width / 32) ] ]
+    ]
+        |> group []
+
+
+renderCellXY : Float -> Int -> Int -> S.Svg msg
+renderCellXY width x y =
     let
         cellColor =
             if x == 0 || y == 0 then

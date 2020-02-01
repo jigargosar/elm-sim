@@ -2,6 +2,7 @@ module DrawingBlock.Canvas exposing
     ( Transform
     , canvas
     , ellipse
+    , empty
     , fill
     , group
     , groupTransform
@@ -21,6 +22,11 @@ import Number2 exposing (Float2)
 import String exposing (fromFloat)
 import Svg as S
 import Svg.Attributes as SA
+
+
+empty : S.Svg msg
+empty =
+    S.text ""
 
 
 fill : String.String -> S.Attribute msg

@@ -11,7 +11,7 @@ import Html exposing (Html)
 import Json.Decode as JD exposing (Decoder)
 import List.Extra
 import Number2 as NT exposing (Float2, Int2)
-import PointFree exposing (dictSwap, ignoreNothing, is)
+import PointFree exposing (dictSwap, ignoreNothing, is, shuffleValues)
 import Random
 import Random.Dict
 import Random.Extra
@@ -86,17 +86,6 @@ init { now } =
 getShuffledGrid : Grid -> Cmd Msg
 getShuffledGrid grid =
     Random.generate ShuffledGrid (shuffleValues grid)
-
-
-shuffleValues : Dict comparable v -> Random.Generator (Dict comparable v)
-shuffleValues dict =
-    let
-        ( keys, values ) =
-            Dict.toList dict
-                |> List.unzip
-    in
-    Random.List.shuffle values
-        |> Random.map (List.Extra.zip keys >> Dict.fromList)
 
 
 setCanvasD : Float2 -> Model -> Model

@@ -4,6 +4,7 @@ import Basics.Extra exposing (flip, swap)
 import Dict exposing (Dict)
 import List.Extra
 import Random exposing (Generator, Seed)
+import Random.List
 
 
 with : (a -> b) -> (b -> a -> c) -> a -> c
@@ -222,3 +223,13 @@ dictSwap k1 k2 dict =
     Maybe.map2 (\v1 v2 -> Dict.insert k1 v2 dict |> Dict.insert k2 v1)
         (Dict.get k1 dict)
         (Dict.get k2 dict)
+
+
+shuffleValues : Dict comparable v -> Random.Generator (Dict comparable v)
+shuffleValues dict =
+    let
+        ( keys, values ) =
+            Dict.toList dict |> List.unzip
+    in
+    Random.List.shuffle values
+        |> Random.map (List.Extra.zip keys >> Dict.fromList)

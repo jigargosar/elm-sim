@@ -120,12 +120,6 @@ polygon points attrs =
         []
 
 
-renderRect : Float -> Float -> List (S.Attribute msg) -> S.Svg msg
-renderRect w h attrs =
-    List.foldl addAttribute (rectangle w h) attrs
-        |> toSvg
-
-
 canvas : Float -> Float -> List (S.Attribute msg) -> List (S.Svg msg) -> Html msg
 canvas w h attrs =
     S.svg
@@ -140,16 +134,6 @@ canvas w h attrs =
                 """
             :: attrs
         )
-
-
-addAttribute : S.Attribute msg -> Shape msg -> Shape msg
-addAttribute a (Shape t al f) =
-    Shape t (a :: al) f
-
-
-fill : String -> Shape msg -> Shape msg
-fill v =
-    addAttribute (SA.fill v)
 
 
 type Form msg

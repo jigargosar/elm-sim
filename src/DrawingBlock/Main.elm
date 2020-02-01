@@ -9,6 +9,7 @@ import DrawingBlock.Canvas exposing (..)
 import Html exposing (Html)
 import Json.Decode as JD exposing (Decoder)
 import Number2 as NT exposing (Float2, Int2)
+import PointFree exposing (ignoreNothing, is)
 import String exposing (fromInt)
 import String2 as ST
 import Svg as S
@@ -98,8 +99,59 @@ update message model =
             in
             ( setCanvasD canvasD model, Cmd.none )
 
-        KeyDown arrowKey ->
-            ( model, Cmd.none )
+        KeyDown ak ->
+            ( { model
+                | grid = swapEmptyInDirection (arrowKeyToXY ak) model.grid
+              }
+            , Cmd.none
+            )
+
+
+arrowKeyToXY ak =
+    case ak of
+        Up ->
+            ( 0, -1 )
+
+        Down ->
+            ( 0, 1 )
+
+        Left ->
+            ( -1, 0 )
+
+        Right ->
+            ( 1, 0 )
+
+
+swapEmptyInDirection dxy grid =
+    case getEmptyPosition grid of
+        Just emptyPosition ->
+            let
+                newPosition =
+                    NT.add emptyPosition dxy
+            in
+            if Dict.member newPosition grid then
+                (dictSwap emptyPosition newPosition |> ignoreNothing)
+                    grid
+
+            else
+                grid
+
+        Nothing ->
+            grid
+
+
+dictSwap : comparable -> comparable -> Dict comparable a -> Maybe (Dict comparable a)
+dictSwap k1 k2 dict =
+    Maybe.map2 (\v1 v2 -> Dict.insert k1 v2 dict |> Dict.insert k2 v1)
+        (Dict.get k1 dict)
+        (Dict.get k2 dict)
+
+
+getEmptyPosition grid =
+    Dict.toList grid
+        |> List.filter (Tuple.second >> is CellEmpty)
+        |> List.head
+        |> Maybe.map Tuple.first
 
 
 type ArrowKey

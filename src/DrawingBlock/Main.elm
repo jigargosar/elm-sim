@@ -25,15 +25,23 @@ type alias Model =
     }
 
 
-toCell : ( Int, Int ) -> Cell
-toCell ( x, y ) =
-    CellNum (x * y)
+toCell : Int -> Int2 -> Cell
+toCell width ( x, y ) =
+    let
+        num =
+            y * width + x + 1
+    in
+    if num == width * width then
+        CellEmpty
+
+    else
+        CellNum num
 
 
 type Cell
     = Cell Int Int
     | CellNum Int
-    | Empty
+    | CellEmpty
 
 
 type alias Flags =
@@ -43,11 +51,14 @@ type alias Flags =
 init : Flags -> ( Model, Cmd Msg )
 init _ =
     let
+        gridWidth =
+            3
+
         gridD =
-            ( 4, 3 )
+            NT.singleton gridWidth
     in
     ( { canvasD = ( 600, 600 )
-      , grid = NT.toDict toCell gridD
+      , grid = NT.toDict (toCell gridWidth) gridD
       , gridD = gridD
       }
     , BD.getViewport |> Task.perform GotViewport
@@ -130,7 +141,7 @@ renderCell width cell =
         CellNum num ->
             renderCellNum width num
 
-        Empty ->
+        CellEmpty ->
             renderEmptyCell width
 
 

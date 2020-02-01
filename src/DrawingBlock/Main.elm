@@ -1,5 +1,6 @@
 module DrawingBlock.Main exposing (main)
 
+import Basics.Extra exposing (uncurry)
 import Browser
 import Browser.Dom as BD
 import Browser.Events as BE
@@ -94,8 +95,8 @@ view model =
         cellViewD =
             ( cellWidth, cellWidth )
 
-        viewGridCell : ( Int2, Cell ) -> S.Svg msg
-        viewGridCell ( idx, cell ) =
+        viewGridCell : Int2 -> Cell -> S.Svg msg
+        viewGridCell idx cell =
             renderCell cellWidth cell
                 |> wrapTransform [ shift (gridIndexToGridCordinate cellViewD gridD idx) ]
 
@@ -105,7 +106,7 @@ view model =
 
         viewGrid =
             Dict.toList grid
-                |> List.map viewGridCell
+                |> List.map (uncurry viewGridCell)
                 |> groupTransform []
       in
       viewGrid

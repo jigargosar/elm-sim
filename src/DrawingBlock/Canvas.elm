@@ -11,6 +11,7 @@ module DrawingBlock.Canvas exposing
     , scale
     , shift
     , transform
+    , words
     , wrap
     , wrapTransform
     )
@@ -68,6 +69,17 @@ ellipse ( w, h ) attrs =
             :: attrs
         )
         []
+
+
+words : String.String -> List (S.Attribute msg) -> S.Svg msg
+words string attrs =
+    S.text_
+        (SA.textAnchor "middle"
+            :: SA.dominantBaseline "central"
+            :: attrs
+        )
+        [ S.text string
+        ]
 
 
 group : List (S.Attribute msg) -> List (S.Svg msg) -> S.Svg msg

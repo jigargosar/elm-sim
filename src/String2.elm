@@ -1,4 +1,4 @@
-module String2 exposing (fromFloat, join)
+module String2 exposing (fromFloat, fromInt, join, wrapJoin)
 
 import PointFree exposing (mapEach)
 
@@ -12,6 +12,16 @@ fromFloat =
     mapEach String.fromFloat
 
 
+fromInt : ( Int, Int ) -> ( String, String )
+fromInt =
+    mapEach String.fromInt
+
+
 join : String -> ( String, String ) -> String
 join sep ( a, b ) =
     a ++ sep ++ b
+
+
+wrapJoin : String -> String -> String -> ( String, String ) -> String
+wrapJoin prefix sep suffix ( a, b ) =
+    prefix ++ a ++ sep ++ b ++ suffix

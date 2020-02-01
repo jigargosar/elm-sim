@@ -10,6 +10,7 @@ import DrawingBlock.Canvas exposing (..)
 import Html exposing (Html)
 import Number2 as NT exposing (Float2, Int2)
 import PointFree exposing (is)
+import String2 as ST
 import Svg as S
 import Task
 
@@ -143,8 +144,15 @@ renderCell width (Cell x y) =
 
             else
                 "green"
+
+        indexString =
+            ST.fromInt ( x, y )
+                |> ST.wrapJoin "(" "," ")"
     in
-    polySquare width [ fill cellColor ]
+    [ polySquare width [ fill cellColor ]
+    , words indexString [ fill "black" ]
+    ]
+        |> group []
 
 
 

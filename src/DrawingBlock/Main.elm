@@ -99,6 +99,12 @@ main =
 -- GRAPHICS
 
 
+type alias Canvas =
+    { width : Float
+    , height : Float
+    }
+
+
 canvas : Float -> Float -> List (S.Attribute msg) -> List (S.Svg msg) -> Html msg
 canvas w h attrs =
     S.svg

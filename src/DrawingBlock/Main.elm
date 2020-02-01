@@ -6,10 +6,11 @@ import Browser.Dom as BD
 import Browser.Events as BE
 import Dict exposing (Dict)
 import DrawingBlock.Canvas exposing (..)
+import DrawingBlock.Direction4 as D4
 import Html exposing (Html)
 import Json.Decode as JD exposing (Decoder)
 import Number2 as NT exposing (Float2, Int2)
-import PointFree exposing (ignoreNothing, is)
+import PointFree exposing (dictSwap, ignoreNothing, is)
 import String exposing (fromInt)
 import String2 as ST
 import Svg as S
@@ -79,7 +80,7 @@ setCanvasD canvasD model =
 type Msg
     = GotViewport BD.Viewport
     | OnBrowserResize Int Int
-    | KeyDown ArrowKey
+    | KeyDown D4.Label
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -99,55 +100,28 @@ update message model =
             in
             ( setCanvasD canvasD model, Cmd.none )
 
-        KeyDown ak ->
+        KeyDown d4 ->
             ( { model
                 | grid =
-                    swapEmptyInDirection (arrowKeyToXY ak |> NT.negate) model.grid
+                    swapEmptyInDirection (d4 |> D4.opposite) model.grid
               }
             , Cmd.none
             )
 
 
-arrowKeyToXY : ArrowKey -> Int2
-arrowKeyToXY ak =
-    case ak of
-        Up ->
-            ( 0, -1 )
-
-        Down ->
-            ( 0, 1 )
-
-        Left ->
-            ( -1, 0 )
-
-        Right ->
-            ( 1, 0 )
-
-
-swapEmptyInDirection : Int2 -> Dict Int2 Cell -> Dict Int2 Cell
-swapEmptyInDirection dxy grid =
+swapEmptyInDirection : D4.Label -> Dict Int2 Cell -> Dict Int2 Cell
+swapEmptyInDirection d4 grid =
     case getEmptyPosition grid of
         Just emptyPosition ->
             let
                 newPosition =
-                    NT.add emptyPosition dxy
+                    D4.step emptyPosition d4
             in
-            if Dict.member newPosition grid then
-                (dictSwap emptyPosition newPosition |> ignoreNothing)
-                    grid
-
-            else
+            (dictSwap emptyPosition newPosition |> ignoreNothing)
                 grid
 
         Nothing ->
             grid
-
-
-dictSwap : comparable -> comparable -> Dict comparable a -> Maybe (Dict comparable a)
-dictSwap k1 k2 dict =
-    Maybe.map2 (\v1 v2 -> Dict.insert k1 v2 dict |> Dict.insert k2 v1)
-        (Dict.get k1 dict)
-        (Dict.get k2 dict)
 
 
 getEmptyPosition grid =
@@ -155,13 +129,6 @@ getEmptyPosition grid =
         |> List.filter (Tuple.second >> is CellEmpty)
         |> List.head
         |> Maybe.map Tuple.first
-
-
-type ArrowKey
-    = Up
-    | Down
-    | Left
-    | Right
 
 
 onKey key msg =
@@ -176,13 +143,13 @@ onKey key msg =
         (JD.field "key" JD.string)
 
 
-arrowKeyDecoder : Decoder ArrowKey
+arrowKeyDecoder : Decoder D4.Label
 arrowKeyDecoder =
     JD.oneOf
-        [ onKey "ArrowUp" Up
-        , onKey "ArrowDown" Down
-        , onKey "ArrowLeft" Left
-        , onKey "ArrowRight" Right
+        [ onKey "ArrowUp" D4.Up
+        , onKey "ArrowDown" D4.Down
+        , onKey "ArrowLeft" D4.Left
+        , onKey "ArrowRight" D4.Right
         ]
 
 

@@ -1,6 +1,7 @@
 module PointFree exposing (..)
 
 import Basics.Extra exposing (flip, swap)
+import Dict exposing (Dict)
 import List.Extra
 import Random exposing (Generator, Seed)
 
@@ -214,3 +215,10 @@ indexMemberOf length index =
 t2ToList : ( b, b ) -> List b
 t2ToList ( a, b ) =
     [ a, b ]
+
+
+dictSwap : comparable -> comparable -> Dict comparable a -> Maybe (Dict comparable a)
+dictSwap k1 k2 dict =
+    Maybe.map2 (\v1 v2 -> Dict.insert k1 v2 dict |> Dict.insert k2 v1)
+        (Dict.get k1 dict)
+        (Dict.get k2 dict)

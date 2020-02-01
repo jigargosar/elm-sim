@@ -6,6 +6,7 @@ import Browser.Events as BE
 import DrawingBlock.Canvas exposing (..)
 import DrawingBlock.Transform as T
 import Html exposing (Html)
+import Number2 exposing (Float2)
 import Svg as S
 import Task
 
@@ -87,19 +88,19 @@ view model =
                 |> T.render
             ]
     , let
-        ( x, y ) =
-            ( 0, 0 )
-
         cellWidth =
             100
+
+        cellView ( x, y ) =
+            renderCell cellWidth [ cellTransform ( x, y ) cellWidth ]
       in
-      renderCell cellWidth [ cellTransform x y cellWidth ]
+      cellView ( 0, 0 )
     ]
         |> canvas ( model.width, model.height ) []
 
 
-cellTransform : Float -> Float -> Float -> S.Attribute msg
-cellTransform x y width =
+cellTransform : Float2 -> Float -> S.Attribute msg
+cellTransform ( x, y ) width =
     T.identity
         |> T.shift ( x * width, y * width )
         |> T.render

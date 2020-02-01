@@ -4,13 +4,14 @@ module DrawingBlock.Canvas exposing
     , ellipse
     , fill
     , group
-    , group1
     , polyRect
     , polySquare
     , polygon
     , scale
     , shift
     , transform
+    , wrap
+    , wrapTransform
     )
 
 import Html exposing (Html)
@@ -73,9 +74,14 @@ group =
     S.g
 
 
-group1 : List (S.Attribute msg) -> S.Svg msg -> S.Svg msg
-group1 attrs =
+wrap : List (S.Attribute msg) -> S.Svg msg -> S.Svg msg
+wrap attrs =
     List.singleton >> S.g attrs
+
+
+wrapTransform : List (Transform -> Transform) -> S.Svg msg -> S.Svg msg
+wrapTransform list =
+    wrap [ transform list ]
 
 
 canvas : Float2 -> List (S.Attribute msg) -> List (S.Svg msg) -> Html msg

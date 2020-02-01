@@ -5,7 +5,7 @@ import Browser.Dom as BD
 import Browser.Events as BE
 import DrawingBlock.Canvas exposing (..)
 import Html exposing (Html)
-import Number2 exposing (Float2)
+import Number2 as NT exposing (Float2, Int2)
 import Svg as S
 import Task
 
@@ -78,30 +78,31 @@ view model =
         [ fill "red"
         , transform [ scale 0.5, shift ( -w / 4, -h / 4 ) ]
         ]
-        |> group1
-            [ transform
-                [-- shift (-w / 4) (-h / 4)
-                ]
+        |> wrapTransform
+            [ --
+              shift ( -w / 4, -h / 4 )
             ]
     , let
         cellWidth =
             100
 
         cellView idx =
-            renderCell cellWidth [ renderCellTransform idx cellWidth ]
+            renderCell cellWidth
+                |> transformCell idx cellWidth
       in
       cellView ( 0, 0 )
     ]
         |> canvas ( model.width, model.height ) []
 
 
-renderCellTransform : Float2 -> Float -> S.Attribute msg
-renderCellTransform ( x, y ) width =
-    transform [ shift ( x * width, y * width ) ]
+transformCell : Int2 -> Float -> S.Svg msg -> S.Svg msg
+transformCell cellIdx width =
+    wrapTransform [ shift (cellIdx |> NT.toFloat |> NT.scale width) ]
 
 
-renderCell width attrs =
-    polySquare width (fill "red" :: attrs)
+renderCell : Float -> S.Svg msg
+renderCell width =
+    polySquare width [ fill "red" ]
 
 
 

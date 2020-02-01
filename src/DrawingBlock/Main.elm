@@ -121,12 +121,12 @@ view model =
             NT.toDict toCell gridWH
                 |> Debug.log "foldl"
 
-        cellViews =
+        viewGrid =
             Dict.toList grid
                 |> List.map viewGridCell
+                |> groupTransform []
       in
-      cellViews
-        |> groupTransform []
+      viewGrid
     ]
         |> canvas ( model.width, model.height ) []
 

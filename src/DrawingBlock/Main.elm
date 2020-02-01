@@ -1,5 +1,6 @@
 module DrawingBlock.Main exposing (main)
 
+import Basics.Extra exposing (uncurry)
 import Browser
 import Browser.Dom as BD
 import Browser.Events as BE
@@ -95,26 +96,23 @@ view model =
         cellWH =
             ( cellWidth, cellWidth )
 
-        gridViewWH =
-            gridWH |> (NT.toFloat >> NT.scale cellWidth)
-
         cellIndexToCellShift idx =
             idx
                 |> NT.toFloat
                 |> NT.mul cellWH
                 |> NT.subBy cellWH
 
-        cellView : Int2 -> S.Svg msg
-        cellView idx =
-            renderCell cellWidth
+        cellView : ( Int2, Int ) -> S.Svg msg
+        cellView ( idx, cell ) =
+            renderCell cellWidth cell
                 |> wrapTransform [ shift (cellIndexToCellShift idx) ]
 
         grid =
-            NT.toDict (always ()) gridWH
+            NT.toDict (uncurry (*)) gridWH
                 |> Debug.log "foldl"
 
         cellViews =
-            Dict.keys grid
+            Dict.toList grid
                 |> List.map cellView
       in
       cellViews
@@ -128,9 +126,17 @@ transformCell cellIdx width =
     wrapTransform [ shift (cellIdx |> NT.toFloat |> NT.scale width) ]
 
 
-renderCell : Float -> S.Svg msg
-renderCell width =
-    polySquare width [ fill "red" ]
+renderCell : Float -> Int -> S.Svg msg
+renderCell width cell =
+    let
+        cellColor =
+            if modBy 3 cell == 0 then
+                "red"
+
+            else
+                "green"
+    in
+    polySquare width [ fill cellColor ]
 
 
 

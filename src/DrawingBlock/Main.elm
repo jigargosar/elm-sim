@@ -84,7 +84,7 @@ view model =
         ]
         |> group1
             [ T.identity
-                |> T.shift (-w / 4) (-h / 4)
+                --|> T.shift (-w / 4) (-h / 4)
                 |> T.render
             ]
     ]

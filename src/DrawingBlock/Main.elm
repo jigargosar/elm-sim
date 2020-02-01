@@ -102,13 +102,13 @@ view model =
                 |> NT.mul cellWH
                 |> NT.subBy cellWH
 
-        cellView : ( Int2, Int ) -> S.Svg msg
+        cellView : ( Int2, Cell ) -> S.Svg msg
         cellView ( idx, cell ) =
             renderCell cellWidth cell
                 |> wrapTransform [ shift (cellIndexToCellShift idx) ]
 
         grid =
-            NT.toDict (uncurry (*)) gridWH
+            NT.toDict toCell gridWH
                 |> Debug.log "foldl"
 
         cellViews =
@@ -121,16 +121,24 @@ view model =
         |> canvas ( model.width, model.height ) []
 
 
+toCell ( x, y ) =
+    Cell x y
+
+
+type Cell
+    = Cell Int Int
+
+
 transformCell : Int2 -> Float -> S.Svg msg -> S.Svg msg
 transformCell cellIdx width =
     wrapTransform [ shift (cellIdx |> NT.toFloat |> NT.scale width) ]
 
 
-renderCell : Float -> Int -> S.Svg msg
-renderCell width cell =
+renderCell : Float -> Cell -> S.Svg msg
+renderCell width (Cell x y) =
     let
         cellColor =
-            if modBy 3 cell == 0 then
+            if modBy 3 x == 0 || modBy 3 y == 0 then
                 "red"
 
             else

@@ -91,18 +91,21 @@ view model =
         cellWidth =
             100
 
-        gridWH =
+        gridD =
             ( 4, 3 )
 
-        cellWH =
+        cellViewD =
             ( cellWidth, cellWidth )
+
+        gridViewD =
+            gridD |> NT.toFloat |> NT.mul cellViewD
 
         cellIndexToCellShift idx =
             idx
                 |> NT.toFloat
-                |> NT.mul cellWH
-                |> NT.add (NT.scale 0.5 cellWH)
-                |> NT.add (NT.scale -0.5 (gridWH |> NT.toFloat |> NT.mul cellWH))
+                |> NT.mul cellViewD
+                |> NT.add (NT.scale 0.5 cellViewD)
+                |> NT.add (NT.scale -0.5 gridViewD)
 
         cellView : ( Int2, Cell ) -> S.Svg msg
         cellView ( idx, cell ) =
@@ -110,7 +113,7 @@ view model =
                 |> wrapTransform [ shift (cellIndexToCellShift idx) ]
 
         grid =
-            NT.toDict toCell gridWH
+            NT.toDict toCell gridD
                 |> Debug.log "foldl"
 
         cellViews =

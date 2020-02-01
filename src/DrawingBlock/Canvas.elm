@@ -4,6 +4,7 @@ module DrawingBlock.Canvas exposing
     , ellipse
     , fill
     , group
+    , groupTransform
     , polyRect
     , polySquare
     , polygon
@@ -72,6 +73,11 @@ ellipse ( w, h ) attrs =
 group : List (S.Attribute msg) -> List (S.Svg msg) -> S.Svg msg
 group =
     S.g
+
+
+groupTransform : List (Transform -> Transform) -> List (S.Svg msg) -> S.Svg msg
+groupTransform =
+    transform >> List.singleton >> group
 
 
 wrap : List (S.Attribute msg) -> S.Svg msg -> S.Svg msg

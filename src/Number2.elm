@@ -17,6 +17,11 @@ singleton a =
     ( a, a )
 
 
+dec : ( number, number ) -> ( number, number )
+dec =
+    mapEach PointFree.dec
+
+
 scale : number -> ( number, number ) -> ( number, number )
 scale factor =
     mapEach (mulBy factor)

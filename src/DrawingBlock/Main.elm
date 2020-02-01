@@ -3,6 +3,7 @@ module DrawingBlock.Main exposing (main)
 import Browser
 import Browser.Dom as BD
 import Browser.Events as BE
+import Dict
 import Dict2d
 import DrawingBlock.Canvas exposing (..)
 import Html exposing (Html)
@@ -88,16 +89,30 @@ view model =
         cellWidth =
             100
 
+        gridWH =
+            ( 3, 3 )
+
+        cellWH =
+            ( cellWidth, cellWidth )
+
+        gridViewWH =
+            gridWH |> (NT.toFloat >> NT.scale cellWidth)
+
+        cellView : Int2 -> S.Svg msg
         cellView idx =
             renderCell cellWidth
                 |> transformCell idx cellWidth
 
-        _ =
-            NT.foldr (::) [] ( 3, 3 )
-                |> is (NT.foldl (::) [] ( 3, 3 ) |> List.reverse)
+        grid =
+            NT.toDict (always ()) gridWH
                 |> Debug.log "foldl"
+
+        cellViews =
+            Dict.keys grid
+                |> List.map cellView
       in
-      cellView ( 0, 0 )
+      cellViews
+        |> groupTransform [ shift (NT.sub gridViewWH cellWH |> NT.scale -0.5) ]
     ]
         |> canvas ( model.width, model.height ) []
 

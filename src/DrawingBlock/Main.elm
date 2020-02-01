@@ -121,46 +121,6 @@ view model =
         |> canvas model.canvasD []
 
 
-type alias GridContext =
-    { cellShift : Float2
-    , cellViewD : Float2
-    , gridD : Int2
-    , gridViewD : Float2
-    }
-
-
-toGridContext : Float2 -> Int2 -> GridContext
-toGridContext cellViewD gridD =
-    let
-        gridViewD =
-            gridD |> NT.toFloat |> NT.mul cellViewD
-
-        cellShift : Float2
-        cellShift =
-            NT.scale 0.5 cellViewD
-                |> NT.add (NT.scale -0.5 gridViewD)
-    in
-    { cellShift = cellShift
-    , cellViewD = cellViewD
-    , gridD = gridD
-    , gridViewD = gridViewD
-    }
-
-
-gridIndexToWorldCordinate : Float2 -> Int2 -> Int2 -> Float2
-gridIndexToWorldCordinate cellViewD gridD =
-    gridIndexToWorldCordinateHelp
-        (toGridContext cellViewD gridD)
-
-
-gridIndexToWorldCordinateHelp : GridContext -> Int2 -> Float2
-gridIndexToWorldCordinateHelp { cellViewD, cellShift } idx =
-    idx
-        |> NT.toFloat
-        |> NT.mul cellViewD
-        |> NT.add cellShift
-
-
 toCell ( x, y ) =
     Cell x y
 
@@ -187,6 +147,50 @@ renderCell width (Cell x y) =
     , words indexString [ fill "black" ]
     ]
         |> group []
+
+
+
+-- Grid Transforms
+
+
+gridIndexToWorldCordinate : Float2 -> Int2 -> Int2 -> Float2
+gridIndexToWorldCordinate cellViewD gridD =
+    gridIndexToWorldCordinateHelp
+        (toGridContext cellViewD gridD)
+
+
+type alias GridContext =
+    { cellShift : Float2
+    , cellViewD : Float2
+    , gridD : Int2
+    , gridViewD : Float2
+    }
+
+
+toGridContext : Float2 -> Int2 -> GridContext
+toGridContext cellViewD gridD =
+    let
+        gridViewD =
+            gridD |> NT.toFloat |> NT.mul cellViewD
+
+        cellShift : Float2
+        cellShift =
+            NT.scale 0.5 cellViewD
+                |> NT.add (NT.scale -0.5 gridViewD)
+    in
+    { cellShift = cellShift
+    , cellViewD = cellViewD
+    , gridD = gridD
+    , gridViewD = gridViewD
+    }
+
+
+gridIndexToWorldCordinateHelp : GridContext -> Int2 -> Float2
+gridIndexToWorldCordinateHelp { cellViewD, cellShift } idx =
+    idx
+        |> NT.toFloat
+        |> NT.mul cellViewD
+        |> NT.add cellShift
 
 
 

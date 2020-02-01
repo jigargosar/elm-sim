@@ -138,7 +138,7 @@ renderCell : Float -> Cell -> S.Svg msg
 renderCell width (Cell x y) =
     let
         cellColor =
-            if modBy 3 x == 0 || modBy 3 y == 0 then
+            if x == 0 || y == 0 then
                 "red"
 
             else

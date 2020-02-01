@@ -89,7 +89,10 @@ view : Model -> Html Msg
 view model =
     [ let
         cellWidth =
-            100
+            model.canvasD
+                |> NT.scale 0.9
+                |> NT.divBy (NT.toFloat model.gridD)
+                |> uncurry min
 
         viewGridCell : Int2 -> Cell -> S.Svg msg
         viewGridCell idx cell =

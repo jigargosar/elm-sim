@@ -29,6 +29,7 @@ function initDatGUI(elmApp) {
     .onFinishChange(function(...args) {
       // console.log('zoomFinishChange', this, args)
     })
+  gui.hide()
 }
 
 function initElmApp() {

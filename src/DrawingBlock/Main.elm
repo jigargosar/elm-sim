@@ -179,9 +179,6 @@ swapWithEmptyNeighbourOf ofIdx grid =
 findEmptyNeighbourOf : Int2 -> Grid -> Maybe Int2
 findEmptyNeighbourOf ofIdx grid =
     let
-        _ =
-            Debug.log "ofIdx" ofIdx
-
         neighgourIndices =
             [ Left, Right, Up, Down ] |> List.map (D4.step ofIdx)
 

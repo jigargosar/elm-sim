@@ -141,11 +141,9 @@ toGridContext cellViewD gridD =
 
 
 gridIndexToGridCordinate : Float2 -> Int2 -> Int2 -> Float2
-gridIndexToGridCordinate cellViewD gridD idx =
-    idx
-        |> NT.toFloat
-        |> NT.mul cellViewD
-        |> NT.add (toGridContext cellViewD gridD).cellShift
+gridIndexToGridCordinate cellViewD gridD =
+    gridIndexToGridCordinateHelp
+        (toGridContext cellViewD gridD)
 
 
 gridIndexToGridCordinateHelp : GridContext -> Int2 -> Float2

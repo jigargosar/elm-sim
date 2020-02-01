@@ -73,7 +73,8 @@ view model =
         ( w, h ) =
             ( model.width, model.height )
     in
-    [ polyRect (w / 2)
+    [ polyRect
+        (w / 2)
         (h / 2)
         [ SA.fill "red"
         , identityTransform

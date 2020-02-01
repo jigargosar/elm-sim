@@ -51,6 +51,53 @@ shuffleGrid =
     shuffleValues
 
 
+swapEmptyInDirection : D4.Label -> Grid -> Grid
+swapEmptyInDirection d4 grid =
+    case getEmptyPosition grid of
+        Just emptyIdx ->
+            let
+                newIdx =
+                    D4.step emptyIdx d4
+            in
+            (dictSwap emptyIdx newIdx |> ignoreNothing)
+                grid
+
+        Nothing ->
+            grid
+
+
+swapWithEmptyNeighbourOf : Int2 -> Grid -> Grid
+swapWithEmptyNeighbourOf ofIdx grid =
+    case findEmptyNeighbourOf ofIdx grid of
+        Just emptyNeighbourIdx ->
+            (dictSwap ofIdx emptyNeighbourIdx |> ignoreNothing)
+                grid
+
+        Nothing ->
+            grid
+
+
+findEmptyNeighbourOf : Int2 -> Grid -> Maybe Int2
+findEmptyNeighbourOf ofIdx grid =
+    let
+        neighgourIndices =
+            [ Left, Right, Up, Down ] |> List.map (D4.step ofIdx)
+
+        isEmpty idx =
+            Dict.get idx grid == Just CellEmpty
+    in
+    neighgourIndices
+        |> List.Extra.find isEmpty
+
+
+getEmptyPosition : Grid -> Maybe Int2
+getEmptyPosition grid =
+    Dict.toList grid
+        |> List.filter (Tuple.second >> is CellEmpty)
+        |> List.head
+        |> Maybe.map Tuple.first
+
+
 
 -- Model
 
@@ -153,53 +200,6 @@ pageXYToGridIndex pageXY canvasD gridD =
         |> NT.subBy gridShift
         |> NT.scale (1 / cellWidth)
         |> NT.round
-
-
-swapEmptyInDirection : D4.Label -> Grid -> Grid
-swapEmptyInDirection d4 grid =
-    case getEmptyPosition grid of
-        Just emptyIdx ->
-            let
-                newIdx =
-                    D4.step emptyIdx d4
-            in
-            (dictSwap emptyIdx newIdx |> ignoreNothing)
-                grid
-
-        Nothing ->
-            grid
-
-
-swapWithEmptyNeighbourOf : Int2 -> Grid -> Grid
-swapWithEmptyNeighbourOf ofIdx grid =
-    case findEmptyNeighbourOf ofIdx grid of
-        Just emptyNeighbourIdx ->
-            (dictSwap ofIdx emptyNeighbourIdx |> ignoreNothing)
-                grid
-
-        Nothing ->
-            grid
-
-
-findEmptyNeighbourOf : Int2 -> Grid -> Maybe Int2
-findEmptyNeighbourOf ofIdx grid =
-    let
-        neighgourIndices =
-            [ Left, Right, Up, Down ] |> List.map (D4.step ofIdx)
-
-        isEmpty idx =
-            Dict.get idx grid == Just CellEmpty
-    in
-    neighgourIndices
-        |> List.Extra.find isEmpty
-
-
-getEmptyPosition : Grid -> Maybe Int2
-getEmptyPosition grid =
-    Dict.toList grid
-        |> List.filter (Tuple.second >> is CellEmpty)
-        |> List.head
-        |> Maybe.map Tuple.first
 
 
 onKey : String.String -> a -> Decoder a

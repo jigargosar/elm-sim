@@ -87,8 +87,8 @@ view model =
         cellWidth =
             100
 
-        cellView ( x, y ) =
-            renderCell cellWidth [ renderCellTransform ( x, y ) cellWidth ]
+        cellView idx =
+            renderCell cellWidth [ renderCellTransform idx cellWidth ]
       in
       cellView ( 0, 0 )
     ]

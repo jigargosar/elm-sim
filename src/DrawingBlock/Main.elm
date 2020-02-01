@@ -65,16 +65,12 @@ init { now } =
         gridD =
             NT.singleton gridWidth
 
-        _ =
-            Random.List.shuffle
-
         gridGen =
             NT.toDict (toCell gridWidth) gridD
                 |> shuffleValues
-                |> Random.step
     in
     ( { canvasD = ( 600, 600 )
-      , grid = gridGen (Random.initialSeed now) |> Tuple.first
+      , grid = Random.step gridGen (Random.initialSeed now) |> Tuple.first
       , gridD = gridD
       }
     , BD.getViewport |> Task.perform GotViewport

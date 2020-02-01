@@ -120,6 +120,21 @@ polygon points attrs =
         []
 
 
+ellipse : Float -> Float -> List (S.Attribute msg) -> S.Svg msg
+ellipse w h attrs =
+    S.ellipse
+        (SA.rx (fromFloat w)
+            :: SA.ry (fromFloat h)
+            :: attrs
+        )
+        []
+
+
+group : List (S.Attribute msg) -> List (S.Svg msg) -> S.Svg msg
+group =
+    S.g
+
+
 canvas : Float -> Float -> List (S.Attribute msg) -> List (S.Svg msg) -> Html msg
 canvas w h attrs =
     S.svg

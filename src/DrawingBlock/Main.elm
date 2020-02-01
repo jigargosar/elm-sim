@@ -124,6 +124,7 @@ swapEmptyInDirection d4 grid =
             grid
 
 
+getEmptyPosition : Dict a Cell -> Maybe a
 getEmptyPosition grid =
     Dict.toList grid
         |> List.filter (Tuple.second >> is CellEmpty)
@@ -131,6 +132,7 @@ getEmptyPosition grid =
         |> Maybe.map Tuple.first
 
 
+onKey : String.String -> a -> Decoder a
 onKey key msg =
     JD.andThen
         (\actual ->

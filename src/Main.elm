@@ -5,6 +5,7 @@ import Browser.Dom
 import Browser.Events
 import Html exposing (Html)
 import Svg as S exposing (svg)
+import Svg.Attributes exposing (fill)
 import Task
 import Tuple exposing (mapBoth)
 import TypedSvg.Attributes as TA exposing (viewBox)
@@ -88,7 +89,7 @@ view : Model -> Html Msg
 view model =
     canvas model.screenD
         []
-        [ rect 100 100 []
+        [ rect "dodgerblue" 100 100 []
         ]
 
 
@@ -101,9 +102,14 @@ canvas ( w, h ) attrs =
     svg (viewBox x y w h :: attrs)
 
 
-rect width height attrs =
+rect color width height attrs =
     let
         ( x, y ) =
             ( width / 2, height / 2 )
     in
-    S.polygon (TA.points [ ( -x, -y ), ( x, -y ), ( x, y ), ( -x, y ) ] :: attrs) []
+    S.polygon
+        (TA.points [ ( -x, -y ), ( x, -y ), ( x, y ), ( -x, y ) ]
+            :: fill color
+            :: attrs
+        )
+        []

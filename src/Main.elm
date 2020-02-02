@@ -11,6 +11,10 @@ main =
         grid =
             initGrid 4
                 |> swapEmptyInDirection Up
+                |> swapEmptyInDirection Left
+                |> swapEmptyInDirection Up
+                |> swapEmptyInDirection Right
+                |> swapEmptyInDirection Down
     in
     div [ flexCenter, fixedFullscreen ]
         [ renderGlobalStyles
@@ -96,6 +100,22 @@ type Direction
     | Down
     | Left
     | Right
+
+
+oppositeDirection : Direction -> Direction
+oppositeDirection direction =
+    case direction of
+        Up ->
+            Down
+
+        Down ->
+            Up
+
+        Left ->
+            Right
+
+        Right ->
+            Left
 
 
 nextPositionInDirection : Direction -> ( number, number ) -> ( number, number )

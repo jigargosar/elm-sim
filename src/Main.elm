@@ -1,11 +1,13 @@
 module Main exposing (main)
 
 import Browser
+import Browser.Dom
 import Browser.Events
 import Html exposing (Html, div)
 import String exposing (fromFloat)
 import Svg exposing (svg)
 import Svg.Attributes exposing (viewBox)
+import Task
 import Tuple exposing (mapBoth)
 
 
@@ -50,7 +52,7 @@ init : () -> ( Model, Cmd Msg )
 init () =
     ( { screenD = ( 600, 600 )
       }
-    , Cmd.none
+    , Browser.Dom.getViewport |> Task.perform GotViewport
     )
 
 
@@ -60,6 +62,7 @@ init () =
 
 type Msg
     = OnResize Int Int
+    | GotViewport Browser.Dom.Viewport
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -67,6 +70,9 @@ update message model =
     case message of
         OnResize w h ->
             ( { model | screenD = ( w, h ) |> toFloat2 }, Cmd.none )
+
+        GotViewport { scene } ->
+            ( { model | screenD = ( scene.width, scene.height ) }, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg

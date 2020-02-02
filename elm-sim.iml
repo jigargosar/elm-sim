@@ -8,6 +8,7 @@
       <excludeFolder url="file://$MODULE_DIR$/.cache" />
       <excludeFolder url="file://$MODULE_DIR$/dist" />
       <excludeFolder url="file://$MODULE_DIR$/elm-stuff" />
+      <excludeFolder url="file://$MODULE_DIR$/out0" />
       <excludeFolder url="file://$MODULE_DIR$/src/ConnectFourV1" />
       <excludeFolder url="file://$MODULE_DIR$/src/ConnectFourV2" />
       <excludeFolder url="file://$MODULE_DIR$/src/ConnectFourV3" />
@@ -19,7 +20,7 @@
       <excludeFolder url="file://$MODULE_DIR$/src/GravitronV5" />
       <excludeFolder url="file://$MODULE_DIR$/src/GravitronV6" />
       <excludeFolder url="file://$MODULE_DIR$/src/MirrorPuzzleV1" />
-      <excludeFolder url="file://$MODULE_DIR$/surge-out" />
+      <excludeFolder url="file://$MODULE_DIR$/src0" />
       <excludePattern pattern="elm-stuff" />
     </content>
     <orderEntry type="inheritedJdk" />

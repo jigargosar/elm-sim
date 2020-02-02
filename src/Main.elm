@@ -1,7 +1,7 @@
 module Main exposing (main)
 
-import NumberPuzzle.Main as Main
+import Html as H
 
 
 main =
-    Main.main
+    H.text "Reset"

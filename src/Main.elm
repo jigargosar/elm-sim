@@ -10,11 +10,7 @@ main =
     let
         grid =
             initGrid 4
-                |> onDownPressed
-                |> onDownPressed
-                |> onDownPressed
-                |> onDownPressed
-                |> onDownPressed
+                |> swapEmptyInDirection Up
     in
     div [ flexCenter, fixedFullscreen ]
         [ renderGlobalStyles
@@ -55,6 +51,11 @@ gridToRows (Grid size dict) =
     times size getRow
 
 
+swapEmptyInDirection : Direction -> Grid -> Grid
+swapEmptyInDirection direction =
+    swapEmptyWith (nextPositionInDirection direction)
+
+
 swapEmptyWith nextPosFunc ((Grid size dict) as grid) =
     let
         getEmptyPosition =
@@ -90,20 +91,27 @@ inc =
     (+) 1
 
 
-onUpPressed =
-    swapEmptyWith (Tuple.mapFirst inc)
+type Direction
+    = Up
+    | Down
+    | Left
+    | Right
 
 
-onDownPressed =
-    swapEmptyWith (Tuple.mapFirst dec)
+nextPositionInDirection : Direction -> ( number, number ) -> ( number, number )
+nextPositionInDirection direction =
+    case direction of
+        Up ->
+            Tuple.mapFirst dec
 
+        Down ->
+            Tuple.mapFirst inc
 
-onLeftPressed =
-    swapEmptyWith (Tuple.mapSecond dec)
+        Left ->
+            Tuple.mapSecond dec
 
-
-onRightPressed =
-    swapEmptyWith (Tuple.mapSecond inc)
+        Right ->
+            Tuple.mapSecond inc
 
 
 renderGrid : Grid -> Html msg

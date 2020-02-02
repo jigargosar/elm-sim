@@ -97,5 +97,6 @@ view model =
     svg [ viewBox x y w h ] []
 
 
+viewBox : Float -> Float -> Float -> Float -> Svg.Attribute msg
 viewBox x y w h =
     SA.viewBox (fromFloat x ++ " " ++ fromFloat y ++ " " ++ fromFloat w ++ " " ++ fromFloat h)

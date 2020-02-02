@@ -55,7 +55,7 @@ gridToRows (Grid size dict) =
     times size getRow
 
 
-onDownPressed ((Grid size dict) as grid) =
+swapEmptyWith nextPosFunc ((Grid size dict) as grid) =
     let
         getEmptyPosition =
             Dict.filter (\_ cell -> cell == Empty) dict
@@ -63,16 +63,16 @@ onDownPressed ((Grid size dict) as grid) =
                 |> List.head
     in
     case getEmptyPosition of
-        Just ( r, c ) ->
+        Just emptyPos ->
             let
                 nextPos =
-                    ( r - 1, c )
+                    nextPosFunc emptyPos
             in
             case Dict.get nextPos dict of
                 Just nextCell ->
                     dict
                         |> Dict.insert nextPos Empty
-                        |> Dict.insert ( r, c ) nextCell
+                        |> Dict.insert emptyPos nextCell
                         |> Grid size
 
                 Nothing ->
@@ -80,6 +80,30 @@ onDownPressed ((Grid size dict) as grid) =
 
         Nothing ->
             grid
+
+
+dec =
+    (+) -1
+
+
+inc =
+    (+) 1
+
+
+onUpPressed =
+    swapEmptyWith (Tuple.mapFirst inc)
+
+
+onDownPressed =
+    swapEmptyWith (Tuple.mapFirst dec)
+
+
+onLeftPressed =
+    swapEmptyWith (Tuple.mapSecond dec)
+
+
+onRightPressed =
+    swapEmptyWith (Tuple.mapSecond inc)
 
 
 renderGrid : Grid -> Html msg

@@ -10,6 +10,11 @@ main =
     let
         grid =
             initGrid 4
+                |> onDownPressed
+                |> onDownPressed
+                |> onDownPressed
+                |> onDownPressed
+                |> onDownPressed
     in
     div [ flexCenter, fixedFullscreen ]
         [ renderGlobalStyles
@@ -48,6 +53,33 @@ gridToRows (Grid size dict) =
                 |> Dict.values
     in
     times size getRow
+
+
+onDownPressed ((Grid size dict) as grid) =
+    let
+        getEmptyPosition =
+            Dict.filter (\_ cell -> cell == Empty) dict
+                |> Dict.keys
+                |> List.head
+    in
+    case getEmptyPosition of
+        Just ( r, c ) ->
+            let
+                nextPos =
+                    ( r - 1, c )
+            in
+            case Dict.get nextPos dict of
+                Just nextCell ->
+                    dict
+                        |> Dict.insert nextPos Empty
+                        |> Dict.insert ( r, c ) nextCell
+                        |> Grid size
+
+                Nothing ->
+                    grid
+
+        Nothing ->
+            grid
 
 
 renderGrid : Grid -> Html msg

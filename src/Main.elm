@@ -13,6 +13,15 @@ main =
         ]
 
 
+type Grid
+    = Grid Int (Dict ( Int, Int ) Cell)
+
+
+type alias Cell =
+    Int
+
+
+initGrid : Int -> Grid
 initGrid size =
     let
         dict =
@@ -22,14 +31,16 @@ initGrid size =
                 |> Dict.fromList
     in
     Dict.insert ( size - 1, size - 1 ) -1 dict
+        |> Grid size
 
 
-getGridRow n grid =
-    Dict.filter (\( r, _ ) _ -> r == n) grid
+getGridRow : Int -> Grid -> List Cell
+getGridRow n (Grid _ dict) =
+    Dict.filter (\( r, _ ) _ -> r == n) dict
         |> Dict.values
 
 
-renderGrid : Int -> Dict ( Int, Int ) Int -> Html msg
+renderGrid : Int -> Grid -> Html msg
 renderGrid size grid =
     let
         renderRow rIdx =

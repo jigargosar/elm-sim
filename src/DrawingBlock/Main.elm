@@ -131,8 +131,7 @@ init { now } =
       , gridD = gridD
       }
     , [ BD.getViewport |> Task.perform GotViewport
-
-      --, getShuffledGrid initialGrid
+      , getShuffledGrid initialGrid
       ]
         |> Cmd.batch
     )
@@ -140,7 +139,7 @@ init { now } =
 
 getShuffledGrid : Grid -> Cmd Msg
 getShuffledGrid grid =
-    Random.generate ShuffledGrid (shuffleGrid grid)
+    Random.generate GotShuffledGrid (shuffleGrid grid)
 
 
 setCanvasD : Float2 -> Model -> Model
@@ -152,11 +151,17 @@ setCanvasD canvasD model =
 -- Update
 
 
+type KeyboardInput
+    = DirectionKey D4.Label
+    | ShuffleGrid
+    | ResetGrid
+
+
 type Msg
     = GotViewport BD.Viewport
     | OnBrowserResize Int Int
-    | KeyDown D4.Label
-    | ShuffledGrid Grid
+    | KeyDown KeyboardInput
+    | GotShuffledGrid Grid
     | OnTap Float2
 
 
@@ -177,12 +182,20 @@ update message model =
             in
             ( setCanvasD canvasD model, Cmd.none )
 
-        KeyDown d4 ->
-            ( { model | grid = swapEmptyInDirection (D4.opposite d4) model.grid }
-            , Cmd.none
-            )
+        KeyDown input ->
+            case input of
+                DirectionKey d4 ->
+                    ( { model | grid = swapEmptyInDirection (D4.opposite d4) model.grid }
+                    , Cmd.none
+                    )
 
-        ShuffledGrid grid ->
+                ShuffleGrid ->
+                    ( model, getShuffledGrid model.grid )
+
+                ResetGrid ->
+                    ( { model | grid = initGrid model.gridD }, Cmd.none )
+
+        GotShuffledGrid grid ->
             ( { model | grid = grid }, Cmd.none )
 
         OnTap pageXY ->
@@ -233,7 +246,11 @@ arrowKeyDecoder =
 subscriptions : Model -> Sub Msg
 subscriptions _ =
     [ BE.onResize OnBrowserResize
-    , arrowKeyDecoder
+    , JD.oneOf
+        [ JD.map DirectionKey arrowKeyDecoder
+        , onKey "s" ShuffleGrid
+        , onKey "r" ResetGrid
+        ]
         |> JD.map KeyDown
         |> BE.onKeyDown
     , pageXYDecoder

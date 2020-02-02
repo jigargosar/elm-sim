@@ -34,7 +34,7 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update message model =
     case message of
         DirectionKeyDown direction ->
-            ( swapEmptyInDirection (oppositeDirection direction) model, Cmd.none )
+            ( swapEmptyInOppositeDirection direction model, Cmd.none )
 
 
 subscriptions _ =
@@ -116,9 +116,9 @@ gridToRows (Grid size dict) =
     times size getRow
 
 
-swapEmptyInDirection : Direction -> Grid -> Grid
-swapEmptyInDirection direction =
-    swapEmptyWith (nextPositionInDirection direction)
+swapEmptyInOppositeDirection : Direction -> Grid -> Grid
+swapEmptyInOppositeDirection direction =
+    swapEmptyWith (nextPositionInDirection (oppositeDirection direction))
 
 
 swapEmptyWith nextPosFunc ((Grid size dict) as grid) =

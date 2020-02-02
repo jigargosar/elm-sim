@@ -274,8 +274,6 @@ computeCellWidth canvasD gridD =
         |> NT.scale 0.9
         |> NT.divBy (NT.toFloat gridD)
         |> uncurry min
-        |> round
-        |> toFloat
 
 
 view : Model -> Html Msg

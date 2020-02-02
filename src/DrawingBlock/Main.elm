@@ -151,18 +151,18 @@ setCanvasD canvasD model =
 -- Update
 
 
-type KeyboardInput
+type UserInput
     = DirectionKey D4.Label
     | ShuffleGrid
     | ResetGrid
+    | Tap Float2
 
 
 type Msg
     = GotViewport BD.Viewport
     | OnBrowserResize Int Int
-    | KeyDown KeyboardInput
+    | GotUserInput UserInput
     | GotShuffledGrid Grid
-    | OnTap Float2
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -182,7 +182,7 @@ update message model =
             in
             ( setCanvasD canvasD model, Cmd.none )
 
-        KeyDown input ->
+        GotUserInput input ->
             case input of
                 DirectionKey d4 ->
                     ( { model | grid = swapEmptyInDirection (D4.opposite d4) model.grid }
@@ -195,15 +195,15 @@ update message model =
                 ResetGrid ->
                     ( { model | grid = initGrid model.gridD }, Cmd.none )
 
+                Tap pageXY ->
+                    let
+                        idx =
+                            pageXYToGridIndex pageXY model.canvasD model.gridD
+                    in
+                    ( { model | grid = swapWithEmptyNeighbourOf idx model.grid }, Cmd.none )
+
         GotShuffledGrid grid ->
             ( { model | grid = grid }, Cmd.none )
-
-        OnTap pageXY ->
-            let
-                idx =
-                    pageXYToGridIndex pageXY model.canvasD model.gridD
-            in
-            ( { model | grid = swapWithEmptyNeighbourOf idx model.grid }, Cmd.none )
 
 
 pageXYToGridIndex pageXY canvasD gridD =
@@ -251,11 +251,11 @@ subscriptions _ =
         , onKey "s" ShuffleGrid
         , onKey "r" ResetGrid
         ]
-        |> JD.map KeyDown
+        |> JD.map GotUserInput
         |> BE.onKeyDown
     , pageXYDecoder
         |> failUnlessPrimaryBtn
-        |> JD.map OnTap
+        |> JD.map (Tap >> GotUserInput)
         |> BE.onClick
     ]
         |> Sub.batch

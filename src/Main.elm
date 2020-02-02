@@ -73,12 +73,14 @@ initPuzzle size =
 
 type alias Model =
     { screenD : Float2
+    , puzzle : Puzzle
     }
 
 
 init : () -> ( Model, Cmd Msg )
 init () =
     ( { screenD = ( 600, 600 )
+      , puzzle = initPuzzle 4
       }
     , Browser.Dom.getViewport |> Task.perform GotViewport
     )

@@ -24,23 +24,18 @@ initGrid size =
     Dict.insert ( size - 1, size - 1 ) -1 dict
 
 
+getGridRow n grid =
+    Dict.filter (\( r, _ ) _ -> r == n) grid
+        |> Dict.values
+
+
 renderGrid : Int -> Dict ( Int, Int ) Int -> Html msg
 renderGrid size grid =
     let
-        renderIndexedCell rowIdx colIdx =
-            let
-                cellContent =
-                    String.fromInt (rowIdx + 1) ++ "," ++ String.fromInt (colIdx + 1)
-
-                cellNumContent =
-                    Dict.get ( rowIdx, colIdx ) grid
-                        |> Maybe.map String.fromInt
-                        |> Maybe.withDefault "ERR"
-            in
-            renderCell cellNumContent
-
         renderRow rIdx =
-            rowLayout (times size (renderIndexedCell rIdx))
+            getGridRow rIdx grid
+                |> List.map (String.fromInt >> renderCell)
+                |> rowLayout
     in
     columnLayout (times size renderRow)
 

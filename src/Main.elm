@@ -58,15 +58,12 @@ renderGrid grid =
                 |> List.map renderCell
                 |> rowLayout
     in
-    columnLayout (times (getGridSize grid) renderRow)
+    div [ flex, flexColumn, cellBorder ]
+        (times (getGridSize grid) renderRow)
 
 
 rowLayout =
     div [ flex ]
-
-
-columnLayout =
-    div [ flex, flexColumn ]
 
 
 renderCell : Cell -> Html msg
@@ -85,7 +82,7 @@ renderCellString cellContent attrs =
     div
         ([ style "width" "200px"
          , style "height" "200px"
-         , style "border" "1px solid black"
+         , cellBorder
          , style "font-size" "80px"
          , style "font-family" "monospace"
          , flexCenter
@@ -93,6 +90,10 @@ renderCellString cellContent attrs =
             ++ attrs
         )
         [ H.text cellContent ]
+
+
+cellBorder =
+    style "border" "1px solid black"
 
 
 times n func =

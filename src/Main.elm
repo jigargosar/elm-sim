@@ -60,39 +60,37 @@ gridToRows (Grid size dict) =
     times size getRow
 
 
-swapEmptyInOppositeDirection : Direction -> Grid -> Grid
+swapEmptyInOppositeDirection : Direction -> Grid -> Maybe Grid
 swapEmptyInOppositeDirection direction =
     swapEmptyWith (nextPositionInDirection (oppositeDirection direction))
 
 
-swapEmptyWith : (( Int, Int ) -> ( Int, Int )) -> Grid -> Grid
+getEmptyPosition : Grid -> Maybe ( Int, Int )
+getEmptyPosition (Grid _ dict) =
+    Dict.filter (\_ cell -> cell == Empty) dict
+        |> Dict.keys
+        |> List.head
+
+
+swapEmptyWith : (( Int, Int ) -> ( Int, Int )) -> Grid -> Maybe Grid
 swapEmptyWith nextPosFunc ((Grid size dict) as grid) =
-    let
-        getEmptyPosition : Maybe ( Int, Int )
-        getEmptyPosition =
-            Dict.filter (\_ cell -> cell == Empty) dict
-                |> Dict.keys
-                |> List.head
-    in
-    case getEmptyPosition of
-        Just emptyPos ->
-            let
-                nextPos : ( Int, Int )
-                nextPos =
-                    nextPosFunc emptyPos
-            in
-            case Dict.get nextPos dict of
-                Just nextCell ->
-                    dict
-                        |> Dict.insert nextPos Empty
-                        |> Dict.insert emptyPos nextCell
-                        |> Grid size
-
-                Nothing ->
-                    grid
-
-        Nothing ->
-            grid
+    getEmptyPosition grid
+        |> Maybe.andThen
+            (\emptyPos ->
+                let
+                    nextPos : ( Int, Int )
+                    nextPos =
+                        nextPosFunc emptyPos
+                in
+                Dict.get nextPos dict
+                    |> Maybe.map
+                        (\nextCell ->
+                            dict
+                                |> Dict.insert nextPos Empty
+                                |> Dict.insert emptyPos nextCell
+                                |> Grid size
+                        )
+            )
 
 
 type Direction
@@ -163,7 +161,10 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update message model =
     case message of
         DirectionKeyDown direction ->
-            ( swapEmptyInOppositeDirection direction model, Cmd.none )
+            ( swapEmptyInOppositeDirection direction model
+                |> Maybe.withDefault model
+            , Cmd.none
+            )
 
 
 subscriptions : Model -> Sub Msg

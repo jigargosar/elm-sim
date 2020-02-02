@@ -21,8 +21,9 @@ type Grid
     = Grid Int (Dict ( Int, Int ) Cell)
 
 
-type alias Cell =
-    Int
+type Cell
+    = Num Int
+    | Empty
 
 
 initGrid : Int -> Grid
@@ -31,10 +32,10 @@ initGrid size =
         dict =
             times size (\r -> times size (Tuple.pair r))
                 |> List.concat
-                |> List.indexedMap (\i rc -> ( rc, i + 1 ))
+                |> List.indexedMap (\i rc -> ( rc, Num (i + 1) ))
                 |> Dict.fromList
     in
-    Dict.insert ( size - 1, size - 1 ) -1 dict
+    Dict.insert ( size - 1, size - 1 ) Empty dict
         |> Grid size
 
 
@@ -54,7 +55,7 @@ renderGrid grid =
     let
         renderRow rIdx =
             getGridRow rIdx grid
-                |> List.map (String.fromInt >> renderCell)
+                |> List.map renderCell
                 |> rowLayout
     in
     columnLayout (times (getGridSize grid) renderRow)
@@ -68,7 +69,16 @@ columnLayout =
     div [ flex, flexColumn ]
 
 
-renderCell cellContent =
+renderCell cell =
+    case cell of
+        Num num ->
+            renderCellString (String.fromInt num)
+
+        Empty ->
+            renderCellString ""
+
+
+renderCellString cellContent =
     div
         [ style "width" "200px"
         , style "height" "200px"

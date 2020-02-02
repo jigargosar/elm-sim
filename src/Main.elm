@@ -6,7 +6,7 @@ import Html as H exposing (Html, div)
 import Html.Attributes exposing (class, style)
 
 
-main : Program () Model ()
+main : Program () Model Msg
 main =
     Browser.sandbox { init = init, view = view, update = update }
 
@@ -20,7 +20,11 @@ init =
     initGrid 4
 
 
-update : () -> Model -> Model
+type Msg
+    = DirectionKeyDown Direction
+
+
+update : Msg -> Model -> Model
 update _ =
     identity
 

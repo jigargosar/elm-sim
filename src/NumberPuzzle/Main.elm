@@ -1,4 +1,4 @@
-module DrawingBlock.Main exposing (main)
+module NumberPuzzle.Main exposing (main)
 
 import Basics.Extra exposing (uncurry)
 import Browser
@@ -6,12 +6,12 @@ import Browser.Dom as BD
 import Browser.Events as BE
 import Dict exposing (Dict)
 import Dict.Extra
-import DrawingBlock.Canvas exposing (..)
-import DrawingBlock.Direction4 as D4 exposing (Label(..))
 import Html exposing (Html)
 import Json.Decode as JD exposing (Decoder)
 import List.Extra
 import Number2 as NT exposing (Float2, Int2)
+import NumberPuzzle.Canvas exposing (..)
+import NumberPuzzle.Direction4 as D4 exposing (Label(..))
 import PointFree exposing (dictSwap, ignoreNothing, is, shuffleValues)
 import Random
 import String exposing (fromInt)

@@ -1,4 +1,4 @@
-module DrawingBlock.Direction4 exposing (Label(..), opposite, step)
+module NumberPuzzle.Direction4 exposing (Label(..), opposite, step)
 
 import Number2 as NT exposing (Int2)
 

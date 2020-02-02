@@ -1,4 +1,4 @@
-module DrawingBlock.Canvas exposing
+module NumberPuzzle.Canvas exposing
     ( Transform
     , canvas
     , ellipse

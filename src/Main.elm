@@ -1,6 +1,6 @@
 module Main exposing (main)
 
-import DrawingBlock.Main as Main
+import NumberPuzzle.Main as Main
 
 
 main =

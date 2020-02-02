@@ -22,6 +22,7 @@ type alias Model =
     Grid
 
 
+init : () -> ( Grid, Cmd msg )
 init _ =
     ( initGrid 4, Cmd.none )
 
@@ -240,6 +241,7 @@ cellBorder =
     style "border" "1px solid black"
 
 
+times : Int -> (Int -> b) -> List b
 times n func =
     List.range 0 (n - 1) |> List.map func
 

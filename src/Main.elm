@@ -5,7 +5,7 @@ import Browser.Dom
 import Browser.Events
 import Html exposing (Html)
 import Svg as S exposing (svg, text, text_)
-import Svg.Attributes exposing (fill)
+import Svg.Attributes exposing (dominantBaseline, fill, textAnchor)
 import Task
 import Tuple exposing (mapBoth)
 import TypedSvg.Attributes as TA exposing (viewBox)
@@ -90,6 +90,7 @@ view model =
     canvas model.screenD
         []
         [ square "dodgerblue" 100 []
+        , words "black" "0" []
         ]
 
 
@@ -103,7 +104,13 @@ canvas ( w, h ) attrs =
 
 
 words color string attrs =
-    text_ (fill color :: attrs) [ text string ]
+    text_
+        (textAnchor "middle"
+            :: dominantBaseline "central"
+            :: fill color
+            :: attrs
+        )
+        [ text string ]
 
 
 square c w =

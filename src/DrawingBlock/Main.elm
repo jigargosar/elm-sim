@@ -199,7 +199,7 @@ pageXYToGridIndex pageXY canvasD gridD =
             computeCellWidth canvasD gridD
 
         gridShift =
-            topLeftCellCenterXY cellWidth gridD
+            computeGridShift cellWidth gridD
     in
     pageXYToCanvasXY pageXY canvasD
         |> NT.subBy gridShift
@@ -301,7 +301,7 @@ view model =
         viewGrid =
             Dict.toList model.grid
                 |> List.map (uncurry viewGridCell)
-                |> groupTransform [ shift (topLeftCellCenterXY cellWidth model.gridD) ]
+                |> groupTransform [ shift (computeGridShift cellWidth model.gridD) ]
       in
       viewGrid
     ]
@@ -334,8 +334,8 @@ renderCellNum width num =
 -- Grid Transforms
 
 
-topLeftCellCenterXY : Float -> Int2 -> Float2
-topLeftCellCenterXY cellWidth gridD =
+computeGridShift : Float -> Int2 -> Float2
+computeGridShift cellWidth gridD =
     let
         gridViewD =
             gridD |> NT.toFloat |> NT.scale cellWidth

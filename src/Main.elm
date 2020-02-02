@@ -3,12 +3,11 @@ module Main exposing (main)
 import Browser
 import Browser.Dom
 import Browser.Events
-import Html exposing (Html, div)
-import String exposing (fromFloat)
-import Svg exposing (svg)
-import Svg.Attributes as SA exposing (viewBox)
+import Html exposing (Html)
+import Svg as S exposing (svg)
 import Task
 import Tuple exposing (mapBoth)
+import TypedSvg.Attributes as TA exposing (viewBox)
 
 
 main : Program () Model Msg
@@ -87,16 +86,24 @@ subscriptions _ =
 
 view : Model -> Html Msg
 view model =
-    let
-        ( w, h ) =
-            model.screenD
+    canvas model.screenD
+        []
+        [ rect 100 100 []
+        ]
 
+
+canvas : Float2 -> List (S.Attribute a) -> List (S.Svg a) -> Html a
+canvas ( w, h ) attrs =
+    let
         ( x, y ) =
             ( -w / 2, -h / 2 )
     in
-    svg [ viewBox x y w h ] []
+    svg (viewBox x y w h :: attrs)
 
 
-viewBox : Float -> Float -> Float -> Float -> Svg.Attribute msg
-viewBox x y w h =
-    SA.viewBox (fromFloat x ++ " " ++ fromFloat y ++ " " ++ fromFloat w ++ " " ++ fromFloat h)
+rect width height attrs =
+    let
+        ( x, y ) =
+            ( width / 2, height / 2 )
+    in
+    S.polygon (TA.points [ ( -x, -y ), ( x, -y ), ( x, y ), ( -x, y ) ] :: attrs) []

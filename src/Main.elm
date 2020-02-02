@@ -1,6 +1,6 @@
 module Main exposing (main)
 
-import Dict
+import Dict exposing (Dict)
 import Html as H exposing (Html, div)
 import Html.Attributes exposing (class, style)
 
@@ -9,23 +9,23 @@ main : Html msg
 main =
     div [ flexCenter, fixedFullscreen ]
         [ renderGlobalStyles
-        , renderGrid 4
+        , renderGrid 4 (initGrid 4)
         ]
 
 
-grid : Dict.Dict ( Int, Int ) Int
-grid =
+initGrid size =
     let
-        entry r c =
-            ( ( r, c ), 0 )
+        dict =
+            times size (\r -> times size (Tuple.pair r))
+                |> List.concat
+                |> List.indexedMap (\i rc -> ( rc, i + 1 ))
+                |> Dict.fromList
     in
-    times 4 (\r -> times 4 (entry r))
-        |> List.concat
-        |> Dict.fromList
+    Dict.insert ( size - 1, size - 1 ) -1 dict
 
 
-renderGrid : Int -> Html msg
-renderGrid size =
+renderGrid : Int -> Dict ( Int, Int ) Int -> Html msg
+renderGrid size grid =
     let
         renderIndexedCell rowIdx colIdx =
             let

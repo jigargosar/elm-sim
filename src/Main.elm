@@ -69,25 +69,29 @@ columnLayout =
     div [ flex, flexColumn ]
 
 
+renderCell : Cell -> Html msg
 renderCell cell =
     case cell of
         Num num ->
             renderCellString (String.fromInt num)
+                [ style "background-color" "gray"
+                ]
 
         Empty ->
-            renderCellString ""
+            renderCellString "" []
 
 
-renderCellString cellContent =
+renderCellString cellContent attrs =
     div
-        [ style "width" "200px"
-        , style "height" "200px"
-        , style "background-color" "gray"
-        , style "font-size" "80px"
-        , style "font-family" "monospace"
-        , style "border" "1px solid black"
-        , flexCenter
-        ]
+        ([ style "width" "200px"
+         , style "height" "200px"
+         , style "border" "1px solid black"
+         , style "font-size" "80px"
+         , style "font-family" "monospace"
+         , flexCenter
+         ]
+            ++ attrs
+        )
         [ H.text cellContent ]
 
 

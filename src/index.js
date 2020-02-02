@@ -5,6 +5,7 @@ require('./styles.css')
 {
   initElmApp()
 }
+
 function initElmApp() {
   const app = Module.Elm.Main.init({
     node: document.getElementById('root'),

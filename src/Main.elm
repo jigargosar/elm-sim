@@ -15,8 +15,15 @@ main =
 renderGrid : Int -> Html msg
 renderGrid size =
     let
+        renderIndexedCell rowIdx colIdx =
+            let
+                cellContent =
+                    String.fromInt (rowIdx + 1) ++ "," ++ String.fromInt (colIdx + 1)
+            in
+            renderCell cellContent
+
         renderRow rIdx =
-            rowLayout (times size (renderCell rIdx))
+            rowLayout (times size (renderIndexedCell rIdx))
     in
     columnLayout (times size renderRow)
 
@@ -29,7 +36,7 @@ columnLayout =
     div [ flex, flexColumn ]
 
 
-renderCell rowIdx colIdx =
+renderCell cellContent =
     div
         [ style "width" "200px"
         , style "height" "200px"
@@ -39,7 +46,7 @@ renderCell rowIdx colIdx =
         , style "border" "1px solid black"
         , flexCenter
         ]
-        [ H.text (String.fromInt (rowIdx + 1) ++ "," ++ String.fromInt (colIdx + 1)) ]
+        [ H.text cellContent ]
 
 
 times n func =

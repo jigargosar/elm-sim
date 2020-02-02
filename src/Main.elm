@@ -39,27 +39,27 @@ initGrid size =
         |> Grid size
 
 
-getGridRow : Int -> Grid -> List Cell
-getGridRow n (Grid _ dict) =
-    Dict.filter (\( r, _ ) _ -> r == n) dict
-        |> Dict.values
-
-
-getGridSize : Grid -> Int
-getGridSize (Grid size _) =
-    size
+gridToRows : Grid -> List (List Cell)
+gridToRows (Grid size dict) =
+    let
+        getRow n =
+            dict
+                |> Dict.filter (\( rowIdx, _ ) _ -> rowIdx == n)
+                |> Dict.values
+    in
+    times size getRow
 
 
 renderGrid : Grid -> Html msg
 renderGrid grid =
     let
-        renderRow rIdx =
-            getGridRow rIdx grid
-                |> List.map renderCell
-                |> div [ flex ]
+        renderRow =
+            List.map renderCell
+                >> div [ flex ]
     in
-    div [ flex, flexColumn, cellBorder ]
-        (times (getGridSize grid) renderRow)
+    gridToRows grid
+        |> List.map renderRow
+        |> div [ flex, flexColumn, cellBorder ]
 
 
 renderCell : Cell -> Html msg

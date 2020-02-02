@@ -182,8 +182,8 @@ update message model =
             in
             ( setCanvasD canvasD model, Cmd.none )
 
-        GotUserInput input ->
-            case input of
+        GotUserInput userInput ->
+            case userInput of
                 DirectionKey d4 ->
                     ( { model | grid = swapEmptyInDirection (D4.opposite d4) model.grid }
                     , Cmd.none

@@ -1,36 +1,48 @@
 module Main exposing (main)
 
 import Browser
+import Browser.Events
 import Dict exposing (Dict)
 import Html as H exposing (Html, div)
-import Html.Attributes exposing (autofocus, class, style, tabindex)
-import Html.Events
+import Html.Attributes exposing (class, style)
 import Json.Decode as JD exposing (Decoder)
 
 
 main : Program () Model Msg
 main =
-    Browser.sandbox { init = init, view = view, update = update }
+    Browser.element
+        { init = init
+        , view = view
+        , update = update
+        , subscriptions = subscriptions
+        }
 
 
 type alias Model =
     Grid
 
 
-init : Model
-init =
-    initGrid 4
+init _ =
+    ( initGrid 4, Cmd.none )
 
 
 type Msg
     = DirectionKeyDown Direction
 
 
-update : Msg -> Model -> Model
+update : Msg -> Model -> ( Model, Cmd Msg )
 update message model =
     case message of
         DirectionKeyDown direction ->
-            swapEmptyInDirection (oppositeDirection direction) model
+            ( swapEmptyInDirection (oppositeDirection direction) model, Cmd.none )
+
+
+subscriptions _ =
+    [ directionKeyDecoder
+        |> JD.map DirectionKeyDown
+        |> Browser.Events.onKeyDown
+    ]
+        |> Sub.batch
 
 
 directionKeyDecoder : Decoder Direction
@@ -65,11 +77,6 @@ view model =
     div
         [ flexCenter
         , fixedFullscreen
-        , directionKeyDecoder
-            |> JD.map DirectionKeyDown
-            |> Html.Events.on "keydown"
-        , tabindex 0
-        , autofocus True
         ]
         [ renderGlobalStyles
         , renderGrid grid

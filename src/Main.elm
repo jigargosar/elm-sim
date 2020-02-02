@@ -56,14 +56,10 @@ renderGrid grid =
         renderRow rIdx =
             getGridRow rIdx grid
                 |> List.map renderCell
-                |> rowLayout
+                |> div [ flex ]
     in
     div [ flex, flexColumn, cellBorder ]
         (times (getGridSize grid) renderRow)
-
-
-rowLayout =
-    div [ flex ]
 
 
 renderCell : Cell -> Html msg

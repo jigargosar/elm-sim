@@ -38,6 +38,7 @@ update message model =
             ( swapEmptyInOppositeDirection direction model, Cmd.none )
 
 
+subscriptions : Model -> Sub Msg
 subscriptions _ =
     [ directionKeyDecoder
         |> JD.map DirectionKeyDown
@@ -152,14 +153,6 @@ swapEmptyWith nextPosFunc ((Grid size dict) as grid) =
             grid
 
 
-dec =
-    (+) -1
-
-
-inc =
-    (+) 1
-
-
 type Direction
     = Up
     | Down
@@ -197,6 +190,14 @@ nextPositionInDirection direction =
 
         Right ->
             Tuple.mapSecond inc
+
+
+dec =
+    (+) -1
+
+
+inc =
+    (+) 1
 
 
 renderGrid : Grid -> Html msg

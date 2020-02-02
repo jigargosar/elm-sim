@@ -1,15 +1,27 @@
 module Main exposing (main)
 
+import Browser
 import Dict exposing (Dict)
 import Html as H exposing (Html, div)
 import Html.Attributes exposing (class, style)
 
 
-main : Html msg
 main =
+    Browser.sandbox { init = init, view = view, update = update }
+
+
+init =
+    initGrid 4
+
+
+update =
+    identity
+
+
+view model =
     let
         grid =
-            initGrid 4
+            model
                 |> swapEmptyInDirection Up
                 |> swapEmptyInDirection Left
                 |> swapEmptyInDirection Up

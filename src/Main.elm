@@ -1,10 +1,12 @@
 module Main exposing (main)
 
 import Browser
+import Browser.Events
 import Html exposing (Html, div)
 import String exposing (fromFloat)
 import Svg exposing (svg)
 import Svg.Attributes exposing (viewBox)
+import Tuple exposing (mapBoth)
 
 
 main : Program () Model Msg
@@ -29,6 +31,16 @@ type alias Float2 =
     ( Float, Float )
 
 
+mapEach : (a -> x) -> ( a, a ) -> ( x, x )
+mapEach f =
+    mapBoth f f
+
+
+toFloat2 : Int2 -> Float2
+toFloat2 =
+    mapEach toFloat
+
+
 type alias Model =
     { screenD : Float2
     }
@@ -46,20 +58,20 @@ init () =
 -- Update
 
 
-type alias Msg =
-    ()
+type Msg
+    = OnResize Int Int
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update message model =
     case message of
-        () ->
-            ( model, Cmd.none )
+        OnResize w h ->
+            ( { model | screenD = ( w, h ) |> toFloat2 }, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg
 subscriptions _ =
-    []
+    [ Browser.Events.onResize OnResize ]
         |> Sub.batch
 
 

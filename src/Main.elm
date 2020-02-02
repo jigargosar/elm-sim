@@ -281,6 +281,14 @@ renderGlobalStyles =
 globalStyles : String
 globalStyles =
     """
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+        }
+
         .flex-center{
             display: flex;
             align-items: center;

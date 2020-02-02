@@ -1,6 +1,6 @@
 const Module = require('./Main.elm')
 // require('tachyons')
-// require('./styles.css')
+require('./styles.css')
 
 {
   initElmApp()

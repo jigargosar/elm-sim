@@ -60,16 +60,16 @@ gridToRows (Grid size dict) =
     times size getRow
 
 
-swapEmptyInOppositeDirection : Direction -> Grid -> Maybe Grid
-swapEmptyInOppositeDirection direction =
-    swapEmptyWith (nextPositionInDirection (oppositeDirection direction))
-
-
 getEmptyPosition : Grid -> Maybe ( Int, Int )
 getEmptyPosition (Grid _ dict) =
     Dict.filter (\_ cell -> cell == Empty) dict
         |> Dict.keys
         |> List.head
+
+
+swapEmptyInOppositeDirection : Direction -> Grid -> Maybe Grid
+swapEmptyInOppositeDirection direction =
+    swapEmptyWith (nextPositionInDirection (oppositeDirection direction))
 
 
 swapEmptyWith : (( Int, Int ) -> ( Int, Int )) -> Grid -> Maybe Grid

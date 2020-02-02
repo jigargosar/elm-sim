@@ -2,6 +2,9 @@ module Main exposing (main)
 
 import Browser
 import Html exposing (Html, div)
+import String exposing (fromFloat)
+import Svg exposing (svg)
+import Svg.Attributes exposing (viewBox)
 
 
 main : Program () Model Msg
@@ -18,13 +21,25 @@ main =
 -- Model
 
 
+type alias Int2 =
+    ( Int, Int )
+
+
+type alias Float2 =
+    ( Float, Float )
+
+
 type alias Model =
-    {}
+    { screenD : Float2
+    }
 
 
 init : () -> ( Model, Cmd Msg )
 init () =
-    ( {}, Cmd.none )
+    ( { screenD = ( 600, 600 )
+      }
+    , Cmd.none
+    )
 
 
 
@@ -53,5 +68,21 @@ subscriptions _ =
 
 
 view : Model -> Html Msg
-view _ =
-    div [] []
+view model =
+    let
+        ( width, height ) =
+            model.screenD
+
+        w =
+            fromFloat width
+
+        h =
+            fromFloat height
+
+        x =
+            fromFloat (-width / 2)
+
+        y =
+            fromFloat (-height / 2)
+    in
+    svg [ viewBox (x ++ " " ++ y ++ " " ++ w ++ " " ++ h) ] []

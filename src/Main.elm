@@ -6,7 +6,7 @@ import Browser.Events
 import Html exposing (Html, div)
 import String exposing (fromFloat)
 import Svg exposing (svg)
-import Svg.Attributes exposing (viewBox)
+import Svg.Attributes as SA exposing (viewBox)
 import Task
 import Tuple exposing (mapBoth)
 
@@ -88,19 +88,14 @@ subscriptions _ =
 view : Model -> Html Msg
 view model =
     let
-        ( width, height ) =
+        ( w, h ) =
             model.screenD
 
-        w =
-            fromFloat width
-
-        h =
-            fromFloat height
-
-        x =
-            fromFloat (-width / 2)
-
-        y =
-            fromFloat (-height / 2)
+        ( x, y ) =
+            ( -w / 2, -h / 2 )
     in
-    svg [ viewBox (x ++ " " ++ y ++ " " ++ w ++ " " ++ h) ] []
+    svg [ viewBox x y w h ] []
+
+
+viewBox x y w h =
+    SA.viewBox (fromFloat x ++ " " ++ fromFloat y ++ " " ++ fromFloat w ++ " " ++ fromFloat h)

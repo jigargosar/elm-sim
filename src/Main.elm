@@ -6,6 +6,7 @@ import Browser.Events
 import Dict exposing (Dict)
 import Html exposing (Html)
 import Set
+import String exposing (fromInt)
 import Svg as S exposing (svg, text, text_)
 import Svg.Attributes as SA exposing (dominantBaseline, fill, textAnchor)
 import Task
@@ -119,13 +120,42 @@ view : Model -> Html Msg
 view model =
     let
         w =
-            500
+            100
     in
     canvas model.screenD
-        []
-        [ square "dodgerblue" w []
-        , words "black" "0" [ transform [ scale (w / 16) ] ]
+        [ SA.shapeRendering "optimizeSpeed" ]
+        [ viewPuzzle w model.puzzle
         ]
+
+
+viewPuzzle w (Puzzle size dict) =
+    Dict.toList dict
+        |> List.map (renderCell w)
+        |> group []
+
+
+renderCell w ( idx, cell ) =
+    case cell of
+        Num n ->
+            [ square "dodgerblue" w []
+            , words "black" (fromInt n) [ transform [ scale (w / 16 * 0.8) ] ]
+            ]
+                |> group [ transform [ shift (idx |> toFloat2Scaled w) ] ]
+
+        Empty ->
+            empty
+
+
+toFloat2Scaled s =
+    mapEach (toFloat >> mul s)
+
+
+mul =
+    (*)
+
+
+empty =
+    text ""
 
 
 canvas : Float2 -> List (S.Attribute a) -> List (S.Svg a) -> Html a
@@ -135,6 +165,10 @@ canvas ( w, h ) attrs =
             ( -w / 2, -h / 2 )
     in
     svg (viewBox x y w h :: attrs)
+
+
+group =
+    S.g
 
 
 words color string attrs =
@@ -178,6 +212,10 @@ identityTransform =
 
 scale n t =
     { t | s = n }
+
+
+shift ( dx, dy ) t =
+    { t | x = t.x + dx, y = t.y + dy }
 
 
 transform =

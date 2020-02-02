@@ -87,10 +87,14 @@ subscriptions _ =
 
 view : Model -> Html Msg
 view model =
+    let
+        w =
+            500
+    in
     canvas model.screenD
         []
-        [ square "dodgerblue" 100 []
-        , words "black" "0" []
+        [ square "dodgerblue" w []
+        , words "black" "0" [ transform [ scale (w / 16) ] ]
         ]
 
 

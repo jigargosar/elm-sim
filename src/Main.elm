@@ -6,18 +6,26 @@ import Html as H exposing (Html, div)
 import Html.Attributes exposing (class, style)
 
 
+main : Program () Model ()
 main =
     Browser.sandbox { init = init, view = view, update = update }
 
 
+type alias Model =
+    Grid
+
+
+init : Model
 init =
     initGrid 4
 
 
-update =
+update : () -> Model -> Model
+update _ =
     identity
 
 
+view : Model -> Html msg
 view model =
     let
         grid =

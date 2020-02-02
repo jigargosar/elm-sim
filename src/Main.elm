@@ -3,7 +3,9 @@ module Main exposing (main)
 import Browser
 import Dict exposing (Dict)
 import Html as H exposing (Html, div)
-import Html.Attributes exposing (class, style)
+import Html.Attributes exposing (autofocus, class, style, tabindex)
+import Html.Events
+import Json.Decode as JD exposing (Decoder)
 
 
 main : Program () Model Msg
@@ -25,22 +27,50 @@ type Msg
 
 
 update : Msg -> Model -> Model
-update _ =
-    identity
+update message model =
+    case message of
+        DirectionKeyDown direction ->
+            swapEmptyInDirection (oppositeDirection direction) model
 
 
-view : Model -> Html msg
+directionKeyDecoder : Decoder Direction
+directionKeyDecoder =
+    JD.field "key" JD.string
+        |> JD.andThen
+            (\key ->
+                case key of
+                    "ArrowUp" ->
+                        JD.succeed Up
+
+                    "ArrowDown" ->
+                        JD.succeed Down
+
+                    "ArrowLeft" ->
+                        JD.succeed Left
+
+                    "ArrowRight" ->
+                        JD.succeed Right
+
+                    _ ->
+                        JD.fail "not direction key"
+            )
+
+
+view : Model -> Html Msg
 view model =
     let
         grid =
             model
-                |> swapEmptyInDirection Up
-                |> swapEmptyInDirection Left
-                |> swapEmptyInDirection Up
-                |> swapEmptyInDirection Right
-                |> swapEmptyInDirection Down
     in
-    div [ flexCenter, fixedFullscreen ]
+    div
+        [ flexCenter
+        , fixedFullscreen
+        , directionKeyDecoder
+            |> JD.map DirectionKeyDown
+            |> Html.Events.on "keydown"
+        , tabindex 0
+        , autofocus True
+        ]
         [ renderGlobalStyles
         , renderGrid grid
         ]

@@ -44,6 +44,11 @@ initGrid size =
         |> Grid size
 
 
+isSolved : Grid -> Bool
+isSolved ((Grid size _) as grid) =
+    initGrid size == grid
+
+
 times : Int -> (Int -> b) -> List b
 times n func =
     List.range 0 (n - 1) |> List.map func
@@ -218,25 +223,30 @@ view model =
 renderGrid : Grid -> Html msg
 renderGrid grid =
     let
+        cellBgColor =
+            if isSolved grid then
+                "green"
+
+            else
+                "gray"
+
+        renderCell : Cell -> Html msg
+        renderCell cell =
+            case cell of
+                Num num ->
+                    renderCellString (String.fromInt num)
+                        [ style "background-color" cellBgColor
+                        ]
+
+                Empty ->
+                    renderCellString "" []
+
         renderRow =
-            List.map renderCell
-                >> div [ flex ]
+            List.map renderCell >> div [ flex ]
     in
     gridToRows grid
         |> List.map renderRow
         |> div [ flex, flexColumn, cellBorder ]
-
-
-renderCell : Cell -> Html msg
-renderCell cell =
-    case cell of
-        Num num ->
-            renderCellString (String.fromInt num)
-                [ style "background-color" "gray"
-                ]
-
-        Empty ->
-            renderCellString "" []
 
 
 renderCellString : String -> List (H.Attribute msg) -> Html msg

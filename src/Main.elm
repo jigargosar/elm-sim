@@ -18,71 +18,8 @@ main =
         }
 
 
-type alias Model =
-    Grid
 
-
-init : () -> ( Grid, Cmd msg )
-init _ =
-    ( initGrid 4, Cmd.none )
-
-
-type Msg
-    = DirectionKeyDown Direction
-
-
-update : Msg -> Model -> ( Model, Cmd Msg )
-update message model =
-    case message of
-        DirectionKeyDown direction ->
-            ( swapEmptyInOppositeDirection direction model, Cmd.none )
-
-
-subscriptions : Model -> Sub Msg
-subscriptions _ =
-    [ directionKeyDecoder
-        |> JD.map DirectionKeyDown
-        |> Browser.Events.onKeyDown
-    ]
-        |> Sub.batch
-
-
-directionKeyDecoder : Decoder Direction
-directionKeyDecoder =
-    JD.field "key" JD.string
-        |> JD.andThen
-            (\key ->
-                case key of
-                    "ArrowUp" ->
-                        JD.succeed Up
-
-                    "ArrowDown" ->
-                        JD.succeed Down
-
-                    "ArrowLeft" ->
-                        JD.succeed Left
-
-                    "ArrowRight" ->
-                        JD.succeed Right
-
-                    _ ->
-                        JD.fail "not direction key"
-            )
-
-
-view : Model -> Html Msg
-view model =
-    let
-        grid =
-            model
-    in
-    div
-        [ flexCenter
-        , fixedFullscreen
-        ]
-        [ renderGlobalStyles
-        , renderGrid grid
-        ]
+-- Grid
 
 
 type Grid
@@ -105,6 +42,11 @@ initGrid size =
     in
     Dict.insert ( size - 1, size - 1 ) Empty dict
         |> Grid size
+
+
+times : Int -> (Int -> b) -> List b
+times n func =
+    List.range 0 (n - 1) |> List.map func
 
 
 gridToRows : Grid -> List (List Cell)
@@ -200,6 +142,81 @@ inc =
     (+) 1
 
 
+
+-- Model
+
+
+type alias Model =
+    Grid
+
+
+init : () -> ( Grid, Cmd msg )
+init _ =
+    ( initGrid 4, Cmd.none )
+
+
+type Msg
+    = DirectionKeyDown Direction
+
+
+update : Msg -> Model -> ( Model, Cmd Msg )
+update message model =
+    case message of
+        DirectionKeyDown direction ->
+            ( swapEmptyInOppositeDirection direction model, Cmd.none )
+
+
+subscriptions : Model -> Sub Msg
+subscriptions _ =
+    [ directionKeyDecoder
+        |> JD.map DirectionKeyDown
+        |> Browser.Events.onKeyDown
+    ]
+        |> Sub.batch
+
+
+directionKeyDecoder : Decoder Direction
+directionKeyDecoder =
+    JD.field "key" JD.string
+        |> JD.andThen
+            (\key ->
+                case key of
+                    "ArrowUp" ->
+                        JD.succeed Up
+
+                    "ArrowDown" ->
+                        JD.succeed Down
+
+                    "ArrowLeft" ->
+                        JD.succeed Left
+
+                    "ArrowRight" ->
+                        JD.succeed Right
+
+                    _ ->
+                        JD.fail "not direction key"
+            )
+
+
+
+-- View
+
+
+view : Model -> Html Msg
+view model =
+    let
+        grid =
+            model
+    in
+    div
+        [ flexCenter
+        , fixedFullscreen
+        ]
+        [ renderGlobalStyles
+        , renderGrid grid
+        ]
+
+
 renderGrid : Grid -> Html msg
 renderGrid grid =
     let
@@ -224,6 +241,7 @@ renderCell cell =
             renderCellString "" []
 
 
+renderCellString : String -> List (H.Attribute msg) -> Html msg
 renderCellString cellContent attrs =
     div
         ([ style "width" "200px"
@@ -238,23 +256,21 @@ renderCellString cellContent attrs =
         [ H.text cellContent ]
 
 
+cellBorder : H.Attribute msg
 cellBorder =
     style "border" "1px solid black"
-
-
-times : Int -> (Int -> b) -> List b
-times n func =
-    List.range 0 (n - 1) |> List.map func
 
 
 
 -- STYLES
 
 
+renderGlobalStyles : Html msg
 renderGlobalStyles =
     H.node "style" [] [ H.text globalStyles ]
 
 
+globalStyles : String
 globalStyles =
     """
         .flex-center{
@@ -273,17 +289,21 @@ globalStyles =
     """
 
 
+flexCenter : H.Attribute msg
 flexCenter =
     class "flex-center"
 
 
+fixedFullscreen : H.Attribute msg
 fixedFullscreen =
     class "fixed-fullscreen"
 
 
+flex : H.Attribute msg
 flex =
     style "display" "flex"
 
 
+flexColumn : H.Attribute msg
 flexColumn =
     style "flex-direction" "column"

@@ -7,9 +7,13 @@ import Html.Attributes exposing (class, style)
 
 main : Html msg
 main =
+    let
+        grid =
+            initGrid 4
+    in
     div [ flexCenter, fixedFullscreen ]
         [ renderGlobalStyles
-        , renderGrid 4 (initGrid 4)
+        , renderGrid grid
         ]
 
 
@@ -40,15 +44,20 @@ getGridRow n (Grid _ dict) =
         |> Dict.values
 
 
-renderGrid : Int -> Grid -> Html msg
-renderGrid size grid =
+getGridSize : Grid -> Int
+getGridSize (Grid size _) =
+    size
+
+
+renderGrid : Grid -> Html msg
+renderGrid grid =
     let
         renderRow rIdx =
             getGridRow rIdx grid
                 |> List.map (String.fromInt >> renderCell)
                 |> rowLayout
     in
-    columnLayout (times size renderRow)
+    columnLayout (times (getGridSize grid) renderRow)
 
 
 rowLayout =

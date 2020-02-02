@@ -121,8 +121,10 @@ swapEmptyInOppositeDirection direction =
     swapEmptyWith (nextPositionInDirection (oppositeDirection direction))
 
 
+swapEmptyWith : (( Int, Int ) -> ( Int, Int )) -> Grid -> Grid
 swapEmptyWith nextPosFunc ((Grid size dict) as grid) =
     let
+        getEmptyPosition : Maybe ( Int, Int )
         getEmptyPosition =
             Dict.filter (\_ cell -> cell == Empty) dict
                 |> Dict.keys
@@ -131,6 +133,7 @@ swapEmptyWith nextPosFunc ((Grid size dict) as grid) =
     case getEmptyPosition of
         Just emptyPos ->
             let
+                nextPos : ( Int, Int )
                 nextPos =
                     nextPosFunc emptyPos
             in

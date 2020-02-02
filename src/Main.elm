@@ -5,7 +5,7 @@ import Browser.Dom
 import Browser.Events
 import Html exposing (Html)
 import Svg as S exposing (svg, text, text_)
-import Svg.Attributes exposing (dominantBaseline, fill, textAnchor)
+import Svg.Attributes as SA exposing (dominantBaseline, fill, textAnchor)
 import Task
 import Tuple exposing (mapBoth)
 import TypedSvg.Attributes as TA exposing (viewBox)
@@ -128,3 +128,43 @@ rect color width height attrs =
             :: attrs
         )
         []
+
+
+type alias Transform =
+    { x : Float
+    , y : Float
+    , s : Float
+    , deg : Float
+    }
+
+
+identityTransform =
+    Transform 0 0 1 0
+
+
+scale n t =
+    { t | s = n }
+
+
+transform =
+    List.foldl (<|) identityTransform
+        >> transformToString
+        >> SA.transform
+
+
+transformToString : Transform -> String
+transformToString { x, y, s, deg } =
+    let
+        t name args =
+            String.concat
+                [ name
+                , "("
+                , String.join " " (List.map String.fromFloat args)
+                , ")"
+                ]
+    in
+    t "translate" [ x, y ]
+        ++ " "
+        ++ t "scale" [ s ]
+        ++ " "
+        ++ t "rotate" [ deg ]

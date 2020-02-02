@@ -3,7 +3,9 @@ module Main exposing (main)
 import Browser
 import Browser.Dom
 import Browser.Events
+import Dict exposing (Dict)
 import Html exposing (Html)
+import Set
 import Svg as S exposing (svg, text, text_)
 import Svg.Attributes as SA exposing (dominantBaseline, fill, textAnchor)
 import Task
@@ -41,6 +43,32 @@ mapEach f =
 toFloat2 : Int2 -> Float2
 toFloat2 =
     mapEach toFloat
+
+
+type Puzzle
+    = Puzzle Int (Dict Int2 Cell)
+
+
+type Cell
+    = Num Int
+    | Empty
+
+
+initPuzzle : Int -> Puzzle
+initPuzzle size =
+    let
+        lst =
+            List.range 0 (size - 1)
+
+        ins x y =
+            Set.insert ( x, y )
+    in
+    List.foldl (\x acc -> List.foldl (ins x) acc lst) Set.empty lst
+        |> Set.toList
+        |> List.indexedMap (\i p -> ( p, Num i ))
+        |> Dict.fromList
+        |> Dict.insert ( size - 1, size - 1 ) Empty
+        |> Puzzle size
 
 
 type alias Model =

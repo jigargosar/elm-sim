@@ -74,24 +74,13 @@ swapEmptyInOppositeDirection direction (Grid size dict) =
     maybeEmptyPosition
         |> Maybe.andThen
             (\emptyPos ->
-                let
-                    nextPos : ( Int, Int )
-                    nextPos =
-                        getNextPosition emptyPos
-                in
-                Dict.get nextPos dict
-                    |> Maybe.map
-                        (\nextCell ->
-                            dict
-                                |> Dict.insert nextPos Empty
-                                |> Dict.insert emptyPos nextCell
-                                |> Grid size
-                        )
+                swapValues emptyPos (getNextPosition emptyPos) dict
             )
+        |> Maybe.map (Grid size)
 
 
-swapValuesAt : comparable -> comparable -> Dict comparable a -> Maybe (Dict comparable a)
-swapValuesAt k1 k2 dict =
+swapValues : comparable -> comparable -> Dict comparable a -> Maybe (Dict comparable a)
+swapValues k1 k2 dict =
     let
         swapInsert v1 v2 =
             dict

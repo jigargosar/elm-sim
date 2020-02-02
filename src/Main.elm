@@ -4,7 +4,7 @@ import Browser
 import Browser.Dom
 import Browser.Events
 import Html exposing (Html)
-import Svg as S exposing (svg)
+import Svg as S exposing (svg, text, text_)
 import Svg.Attributes exposing (fill)
 import Task
 import Tuple exposing (mapBoth)
@@ -102,7 +102,10 @@ canvas ( w, h ) attrs =
     svg (viewBox x y w h :: attrs)
 
 
-square : String -> Float -> List (S.Attribute msg) -> S.Svg msg
+words color string attrs =
+    text_ (fill color :: attrs) [ text string ]
+
+
 square c w =
     rect c w w
 

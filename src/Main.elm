@@ -67,6 +67,9 @@ swapEmptyInOppositeDirection direction (Grid size dict) =
             Dict.filter (\_ cell -> cell == Empty) dict
                 |> Dict.keys
                 |> List.head
+
+        getNextPosition emptyPos =
+            nextPositionInDirection (oppositeDirection direction) emptyPos
     in
     maybeEmptyPosition
         |> Maybe.andThen
@@ -74,7 +77,7 @@ swapEmptyInOppositeDirection direction (Grid size dict) =
                 let
                     nextPos : ( Int, Int )
                     nextPos =
-                        nextPositionInDirection (oppositeDirection direction) emptyPos
+                        getNextPosition emptyPos
                 in
                 Dict.get nextPos dict
                     |> Maybe.map
@@ -85,6 +88,17 @@ swapEmptyInOppositeDirection direction (Grid size dict) =
                                 |> Grid size
                         )
             )
+
+
+swapValuesAt : comparable -> comparable -> Dict comparable a -> Maybe (Dict comparable a)
+swapValuesAt k1 k2 dict =
+    let
+        swapInsert v1 v2 =
+            dict
+                |> Dict.insert k1 v2
+                |> Dict.insert k2 v1
+    in
+    Maybe.map2 swapInsert (Dict.get k1 dict) (Dict.get k2 dict)
 
 
 type Direction

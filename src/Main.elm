@@ -89,7 +89,7 @@ view : Model -> Html Msg
 view model =
     canvas model.screenD
         []
-        [ rect "dodgerblue" 100 100 []
+        [ square "dodgerblue" 100 []
         ]
 
 
@@ -100,6 +100,11 @@ canvas ( w, h ) attrs =
             ( -w / 2, -h / 2 )
     in
     svg (viewBox x y w h :: attrs)
+
+
+square : String -> Float -> List (S.Attribute msg) -> S.Svg msg
+square c w =
+    rect c w w
 
 
 rect color width height attrs =

@@ -1,5 +1,6 @@
 module Main exposing (main)
 
+import Dict
 import Html as H exposing (Html, div)
 import Html.Attributes exposing (class, style)
 
@@ -12,6 +13,17 @@ main =
         ]
 
 
+grid : Dict.Dict ( Int, Int ) Int
+grid =
+    let
+        entry r c =
+            ( ( r, c ), 0 )
+    in
+    times 4 (\r -> times 4 (entry r))
+        |> List.concat
+        |> Dict.fromList
+
+
 renderGrid : Int -> Html msg
 renderGrid size =
     let
@@ -19,8 +31,13 @@ renderGrid size =
             let
                 cellContent =
                     String.fromInt (rowIdx + 1) ++ "," ++ String.fromInt (colIdx + 1)
+
+                cellNumContent =
+                    Dict.get ( rowIdx, colIdx ) grid
+                        |> Maybe.map String.fromInt
+                        |> Maybe.withDefault "ERR"
             in
-            renderCell cellContent
+            renderCell cellNumContent
 
         renderRow rIdx =
             rowLayout (times size (renderIndexedCell rIdx))

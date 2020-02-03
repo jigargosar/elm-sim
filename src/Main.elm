@@ -230,10 +230,10 @@ subscriptions _ =
 -- view
 
 
-getCellWidth ( sw, sh ) gridSize_ =
+getPuzzleCellWidth ( sw, sh ) puzzle =
     let
         ( gw, gh ) =
-            mapEach toFloat gridSize_
+            mapEach toFloat (puzzleGridSize puzzle)
     in
     min (sw * 0.9 / gw) (sh * 0.9 / gh)
 
@@ -242,7 +242,7 @@ view : Model -> Html Msg
 view model =
     let
         cellWidth =
-            getCellWidth model.screenSize (puzzleGridSize model.puzzle)
+            getPuzzleCellWidth model.screenSize model.puzzle
     in
     canvas model.screenSize
         []

@@ -76,22 +76,22 @@ isPuzzleSolved puzzle =
 
 swapEmptyInOppDir d ((Puzzle grid) as puzzle) =
     let
-        maybeEmptyPos =
+        maybeEmptyIdx =
             gridToList grid
                 |> List.filter (\( _, v ) -> v == Empty)
                 |> List.head
                 |> Maybe.map Tuple.first
     in
-    case maybeEmptyPos of
-        Just emptyPos ->
+    case maybeEmptyIdx of
+        Just emptyIdx ->
             let
-                newPos =
-                    d4StepPos emptyPos (d4Opposite d)
+                swapIdx =
+                    d4StepPos emptyIdx (d4Opposite d)
             in
-            case gridGet newPos grid of
-                Just newCell ->
-                    gridSet emptyPos newCell grid
-                        |> gridSet newPos Empty
+            case gridGet swapIdx grid of
+                Just swapCell ->
+                    gridSet emptyIdx swapCell grid
+                        |> gridSet swapIdx Empty
                         |> Puzzle
 
                 Nothing ->

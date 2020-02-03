@@ -54,12 +54,20 @@ initPuzzle size =
         |> Puzzle
 
 
-resetPuzzle (Puzzle grid) =
+resetPuzzle puzzle =
+    initPuzzle (puzzleSize puzzle)
+
+
+puzzleSize (Puzzle grid) =
     let
         ( size, _ ) =
             gridSize grid
     in
-    initPuzzle size
+    size
+
+
+puzzleGridSize (Puzzle grid) =
+    gridSize grid
 
 
 isPuzzleSolved puzzle =
@@ -222,15 +230,23 @@ subscriptions _ =
 -- view
 
 
+getCellWidth ( sw, sh ) gridSize_ =
+    let
+        ( gw, gh ) =
+            mapEach toFloat gridSize_
+    in
+    min (sw * 0.9 / gw) (sh * 0.9 / gh)
+
+
 view : Model -> Html Msg
 view model =
     let
-        w =
-            100
+        cellWidth =
+            getCellWidth model.screenSize (puzzleGridSize model.puzzle)
     in
     canvas model.screenSize
         []
-        [ viewPuzzle w model.puzzle
+        [ viewPuzzle cellWidth model.puzzle
         ]
 
 

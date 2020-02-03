@@ -66,10 +66,6 @@ puzzleSize (Puzzle grid) =
     size
 
 
-puzzleGridSize (Puzzle grid) =
-    gridSize grid
-
-
 isPuzzleSolved puzzle =
     resetPuzzle puzzle == puzzle
 

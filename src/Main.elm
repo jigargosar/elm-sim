@@ -48,7 +48,7 @@ initPuzzle size =
     let
         toCell : Int -> Int -> Cell
         toCell x y =
-            Num ((x * size) + y + 1)
+            Num (x + 1 + (y * size))
     in
     gridInit size size toCell
         |> gridSet ( size - 1, size - 1 ) Empty

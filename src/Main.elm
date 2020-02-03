@@ -230,12 +230,12 @@ subscriptions _ =
 -- view
 
 
-getPuzzleCellWidth ( sw, sh ) puzzle =
+getPuzzleCellWidth ( sw, sh ) (Puzzle grid) =
     let
-        gridWidth =
-            toFloat (puzzleSize puzzle)
+        ( gridWidth, gridHeight ) =
+            mapEach toFloat (gridSize grid)
     in
-    min (sw * 0.9 / gridWidth) (sh * 0.9 / gridWidth)
+    min (sw * 0.9 / gridWidth) (sh * 0.9 / gridHeight)
 
 
 view : Model -> Html Msg

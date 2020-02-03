@@ -6,6 +6,7 @@ import Browser.Events
 import Dict exposing (Dict)
 import Html exposing (Html)
 import Html.Attributes as HA
+import Json.Decode as JD
 import String exposing (fromInt)
 import Svg as S exposing (svg, text, text_)
 import Svg.Attributes as SA exposing (dominantBaseline, fill, textAnchor)
@@ -76,6 +77,7 @@ init () =
 type Msg
     = OnResize Int Int
     | GotViewport Browser.Dom.Viewport
+    | OnDirectionKeyDown Direction4
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -87,10 +89,43 @@ update message model =
         GotViewport { scene } ->
             ( { model | screenSize = ( scene.width, scene.height ) }, Cmd.none )
 
+        OnDirectionKeyDown direction4 ->
+            ( model, Cmd.none )
+
+
+type Direction4
+    = Up
+    | Down
+    | Left
+    | Right
+
+
+onKeyDownSubscription =
+    let
+        keyMap =
+            [ ( "w", Up )
+            , ( "s", Down )
+            , ( "a", Left )
+            , ( "d", Right )
+            ]
+                |> Dict.fromList
+
+        keyMsgDecoder key =
+            case Dict.get key keyMap of
+                Just msg ->
+                    JD.succeed (OnDirectionKeyDown msg)
+
+                Nothing ->
+                    JD.fail "nop"
+    in
+    JD.andThen keyMsgDecoder (JD.field "key" JD.string)
+
 
 subscriptions : Model -> Sub Msg
 subscriptions _ =
-    [ Browser.Events.onResize OnResize ]
+    [ Browser.Events.onResize OnResize
+    , Browser.Events.onKeyDown onKeyDownSubscription
+    ]
         |> Sub.batch
 
 

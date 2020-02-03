@@ -188,6 +188,28 @@ renderCell w _ cell =
 
 
 
+-- GRID LIB
+
+
+type Grid a
+    = Grid ( Int, Int ) (Dict ( Int, Int ) a)
+
+
+initGrid w h func =
+    let
+        foldXY x y =
+            Dict.insert ( x, y ) (func x y)
+
+        foldX x acc =
+            List.foldl (foldXY x) acc (List.range 0 (h - 1))
+
+        dict =
+            List.foldl foldX Dict.empty (List.range 0 (w - 1))
+    in
+    Grid ( w, h ) dict
+
+
+
 -- SVG CANVAS LIB
 
 

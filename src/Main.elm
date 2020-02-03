@@ -43,7 +43,6 @@ type Cell
     | Empty
 
 
-initPuzzle : Int -> Puzzle
 initPuzzle size =
     let
         toCell : Int -> Int -> Cell

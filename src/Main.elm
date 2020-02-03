@@ -49,7 +49,7 @@ initPuzzle size =
         toCell x y =
             Num ((x * size) + y + 1)
     in
-    initGrid size size toCell
+    gridInit size size toCell
         |> gridSet ( size - 1, size - 1 ) Empty
         |> Puzzle
 
@@ -136,7 +136,7 @@ type Grid a
     = Grid ( Int, Int ) (Dict ( Int, Int ) a)
 
 
-initGrid w h func =
+gridInit w h func =
     let
         foldXY x y =
             Dict.insert ( x, y ) (func x y)

@@ -172,6 +172,10 @@ onKeyDownSubscription =
             , ( "s", Down )
             , ( "a", Left )
             , ( "d", Right )
+            , ( "ArrowUp", Up )
+            , ( "ArrowDown", Down )
+            , ( "ArrowLeft", Left )
+            , ( "ArrowRight", Right )
             ]
                 |> Dict.fromList
 

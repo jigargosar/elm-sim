@@ -130,32 +130,6 @@ viewPuzzle cellWidth (Puzzle grid) =
         |> gridLayout ( cellWidth, cellWidth ) (gridSize grid)
 
 
-gridLayout cellDimension gridDimension =
-    let
-        transformCell ( idx, svgView ) =
-            let
-                ( x, y ) =
-                    mapEach toFloat idx
-            in
-            svgView
-                |> group [ transform [ shift ( x * cellWidth, y * cellHeight ) ] ]
-
-        ( cellWidth, cellHeight ) =
-            cellDimension
-
-        ( gridWidth, gridHeight ) =
-            mapEach toFloat gridDimension
-
-        dx =
-            (cellWidth - (gridWidth * cellWidth)) / 2
-
-        dy =
-            (cellHeight - (gridHeight * cellHeight)) / 2
-    in
-    List.map transformCell
-        >> group [ transform [ shift ( dx, dy ) ] ]
-
-
 renderCell w _ cell =
     case cell of
         Num n ->
@@ -211,6 +185,36 @@ gridSize (Grid size _) =
 
 isValidGridIndex ( x, y ) (Grid ( w, h ) _) =
     x >= 0 && y >= 0 && x < w && y < h
+
+
+
+-- Grid Layout
+
+
+gridLayout cellDimension gridDimension =
+    let
+        transformCell ( idx, svgView ) =
+            let
+                ( x, y ) =
+                    mapEach toFloat idx
+            in
+            svgView
+                |> group [ transform [ shift ( x * cellWidth, y * cellHeight ) ] ]
+
+        ( cellWidth, cellHeight ) =
+            cellDimension
+
+        ( gridWidth, gridHeight ) =
+            mapEach toFloat gridDimension
+
+        dx =
+            (cellWidth - (gridWidth * cellWidth)) / 2
+
+        dy =
+            (cellHeight - (gridHeight * cellHeight)) / 2
+    in
+    List.map transformCell
+        >> group [ transform [ shift ( dx, dy ) ] ]
 
 
 

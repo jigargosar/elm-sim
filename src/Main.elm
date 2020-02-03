@@ -272,7 +272,7 @@ viewPuzzle cellWidth ((Puzzle grid) as puzzle) =
 renderCell bgColor w _ cell =
     case cell of
         Num n ->
-            [ square bgColor w []
+            [ square bgColor (w * 0.95) []
             , words "black" (fromInt n) [ transform [ scale (w / 16 * 0.7) ] ]
             ]
 

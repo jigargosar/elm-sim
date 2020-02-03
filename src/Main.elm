@@ -138,7 +138,7 @@ view model =
             100
     in
     canvas model.screenD
-        [ SA.shapeRendering "optimizeSpeed" ]
+        []
         [ viewPuzzle w model.puzzle
         ]
 
@@ -196,6 +196,7 @@ canvas ( w, h ) attrs =
     in
     svg
         (viewBox x y w h
+            :: SA.shapeRendering "optimizeSpeed"
             :: HA.style "position" "fixed"
             :: HA.style "top" "0"
             :: HA.style "left" "0"

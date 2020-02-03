@@ -6,7 +6,6 @@ import Browser.Events
 import Dict exposing (Dict)
 import Html exposing (Html)
 import Html.Attributes as HA
-import Set
 import String exposing (fromInt)
 import Svg as S exposing (svg, text, text_)
 import Svg.Attributes as SA exposing (dominantBaseline, fill, textAnchor)
@@ -144,30 +143,35 @@ view model =
         ]
 
 
-viewPuzzle w (Puzzle size dict) =
-    Dict.toList dict
-        |> List.map (renderCell w)
+viewPuzzle cellWidth (Puzzle size dict) =
+    Dict.map (renderCell cellWidth) dict
+        |> Dict.toList
+        |> gridLayout cellWidth cellWidth size size
         |> group []
 
 
-renderCell w ( idx, cell ) =
+gridLayout cellWidth cellHeight gridWidth gridHeight =
+    let
+        transformCell ( idx, svgView ) =
+            let
+                ( x, y ) =
+                    mapEach toFloat idx
+            in
+            svgView
+                |> group [ transform [ shift ( x * cellWidth, y * cellHeight ) ] ]
+    in
+    List.map transformCell
+
+
+renderCell w _ cell =
     case cell of
         Num n ->
             [ square "dodgerblue" w []
             , words "black" (fromInt n) [ transform [ scale (w / 16 * 0.8) ] ]
             ]
-                |> group [ transform [ shift (idx |> mapEach (toFloat >> mul w)) ] ]
 
         Empty ->
-            empty
-
-
-mul =
-    (*)
-
-
-empty =
-    text ""
+            []
 
 
 canvas : Float2 -> List (S.Attribute a) -> List (S.Svg a) -> Html a

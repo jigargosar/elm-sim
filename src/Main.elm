@@ -58,18 +58,33 @@ type Cell
 initPuzzle : Int -> Puzzle
 initPuzzle size =
     let
-        lst =
-            List.range 0 (size - 1)
-
-        ins x y =
-            Set.insert ( x, y )
+        toCell : Int -> Int -> Cell
+        toCell x y =
+            Num ((x * size) + y + 1)
     in
-    List.foldl (\x acc -> List.foldl (ins x) acc lst) Set.empty lst
-        |> Set.toList
-        |> List.indexedMap (\i p -> ( p, Num i ))
-        |> Dict.fromList
+    initDict2d size size toCell
         |> Dict.insert ( size - 1, size - 1 ) Empty
         |> Puzzle size
+
+
+initDict2d : Int -> Int -> (Int -> Int -> v) -> Dict ( Int, Int ) v
+initDict2d w h func =
+    foldLIndices2d w h (\x y -> Dict.insert ( x, y ) (func x y)) Dict.empty
+
+
+foldLIndices2d : Int -> Int -> (Int -> Int -> c -> c) -> c -> c
+foldLIndices2d w h func =
+    foldLIndices w (\x -> foldLIndices h (func x))
+
+
+indexRange : Int -> List Int
+indexRange len =
+    List.range 0 (len - 1)
+
+
+foldLIndices : Int -> (Int -> c -> c) -> c -> c
+foldLIndices len func acc =
+    indexRange len |> List.foldl func acc
 
 
 type alias Model =

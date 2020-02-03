@@ -28,22 +28,9 @@ main =
 -- Model
 
 
-type alias Int2 =
-    ( Int, Int )
-
-
-type alias Float2 =
-    ( Float, Float )
-
-
 mapEach : (a -> x) -> ( a, a ) -> ( x, x )
 mapEach f =
     mapBoth f f
-
-
-toFloat2 : Int2 -> Float2
-toFloat2 =
-    mapEach toFloat
 
 
 type Puzzle
@@ -68,14 +55,14 @@ initPuzzle size =
 
 
 type alias Model =
-    { screenD : Float2
+    { screenSize : ( Float, Float )
     , puzzle : Puzzle
     }
 
 
 init : () -> ( Model, Cmd Msg )
 init () =
-    ( { screenD = ( 600, 600 )
+    ( { screenSize = ( 600, 600 )
       , puzzle = initPuzzle 4
       }
     , Browser.Dom.getViewport |> Task.perform GotViewport
@@ -95,10 +82,10 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update message model =
     case message of
         OnResize w h ->
-            ( { model | screenD = ( w, h ) |> toFloat2 }, Cmd.none )
+            ( { model | screenSize = ( toFloat w, toFloat h ) }, Cmd.none )
 
         GotViewport { scene } ->
-            ( { model | screenD = ( scene.width, scene.height ) }, Cmd.none )
+            ( { model | screenSize = ( scene.width, scene.height ) }, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg
@@ -117,7 +104,7 @@ view model =
         w =
             100
     in
-    canvas model.screenD
+    canvas model.screenSize
         []
         [ viewPuzzle w model.puzzle
         ]

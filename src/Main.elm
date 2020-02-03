@@ -191,7 +191,7 @@ isValidGridIndex ( x, y ) (Grid ( w, h ) _) =
 -- Grid Layout
 
 
-gridLayout cellDimension gridDimension =
+gridLayout cellSize gridSize_ =
     let
         transformCell ( idx, svgView ) =
             let
@@ -202,10 +202,10 @@ gridLayout cellDimension gridDimension =
                 |> group [ transform [ shift ( x * cellWidth, y * cellHeight ) ] ]
 
         ( cellWidth, cellHeight ) =
-            cellDimension
+            cellSize
 
         ( gridWidth, gridHeight ) =
-            mapEach toFloat gridDimension
+            mapEach toFloat gridSize_
 
         dx =
             (cellWidth - (gridWidth * cellWidth)) / 2

@@ -47,7 +47,7 @@ toFloat2 =
 
 
 type Puzzle
-    = Puzzle Int (Dict Int2 Cell)
+    = Puzzle (Grid Cell)
 
 
 type Cell
@@ -62,29 +62,9 @@ initPuzzle size =
         toCell x y =
             Num ((x * size) + y + 1)
     in
-    initDict2d size size toCell
-        |> Dict.insert ( size - 1, size - 1 ) Empty
-        |> Puzzle size
-
-
-initDict2d : Int -> Int -> (Int -> Int -> v) -> Dict ( Int, Int ) v
-initDict2d w h func =
-    foldLIndices2d w h (\x y -> Dict.insert ( x, y ) (func x y)) Dict.empty
-
-
-foldLIndices2d : Int -> Int -> (Int -> Int -> c -> c) -> c -> c
-foldLIndices2d w h func =
-    foldLIndices w (\x -> foldLIndices h (func x))
-
-
-indexRange : Int -> List Int
-indexRange len =
-    List.range 0 (len - 1)
-
-
-foldLIndices : Int -> (Int -> c -> c) -> c -> c
-foldLIndices len func acc =
-    indexRange len |> List.foldl func acc
+    initGrid size size toCell
+        |> gridSet ( size - 1, size - 1 ) Empty
+        |> Puzzle
 
 
 type alias Model =
@@ -144,10 +124,10 @@ view model =
 
 
 viewPuzzle : Float -> Puzzle -> S.Svg msg
-viewPuzzle cellWidth (Puzzle size dict) =
-    Dict.map (renderCell cellWidth) dict
-        |> Dict.toList
-        |> gridLayout ( cellWidth, cellWidth ) ( size, size )
+viewPuzzle cellWidth (Puzzle grid) =
+    gridMap (renderCell cellWidth) grid
+        |> gridToList
+        |> gridLayout ( cellWidth, cellWidth ) (gridSize grid)
 
 
 gridLayout cellDimension gridDimension =
@@ -207,6 +187,30 @@ initGrid w h func =
             List.foldl foldX Dict.empty (List.range 0 (w - 1))
     in
     Grid ( w, h ) dict
+
+
+gridSet idx v ((Grid size dict) as grid) =
+    if isValidGridIndex idx grid then
+        Grid size (Dict.insert idx v dict)
+
+    else
+        grid
+
+
+gridMap func (Grid size dict) =
+    Grid size (Dict.map func dict)
+
+
+gridToList (Grid _ dict) =
+    Dict.toList dict
+
+
+gridSize (Grid size _) =
+    size
+
+
+isValidGridIndex ( x, y ) (Grid ( w, h ) _) =
+    x >= 0 && y >= 0 && x < w && y < h
 
 
 

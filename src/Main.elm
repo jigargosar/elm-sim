@@ -150,7 +150,6 @@ viewPuzzle cellWidth (Puzzle size dict) =
         |> gridLayout ( cellWidth, cellWidth ) ( size, size )
 
 
-gridLayout : ( Float, Float ) -> ( Int, Int ) -> List ( ( Int, Int ), List (S.Svg msg) ) -> S.Svg msg
 gridLayout cellDimension gridDimension =
     let
         transformCell ( idx, svgView ) =
@@ -192,7 +191,6 @@ renderCell w _ cell =
 -- SVG CANVAS LIB
 
 
-canvas : Float2 -> List (S.Attribute a) -> List (S.Svg a) -> Html a
 canvas ( w, h ) attrs =
     let
         ( x, y ) =
@@ -267,7 +265,6 @@ transform =
         >> SA.transform
 
 
-transformToString : Transform -> String
 transformToString { x, y, s, deg } =
     let
         t name args =

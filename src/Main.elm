@@ -255,10 +255,14 @@ viewPuzzle cellWidth ((Puzzle grid) as puzzle) =
     let
         bgColor =
             if isPuzzleSolved puzzle then
-                "green"
+                -- green
+                --"#1BCC73"
+                "dodgerblue"
 
             else
-                "dodgerblue"
+                -- "dodgerblue"
+                -- "#1E90FF"
+                "gray"
     in
     gridMap (renderCell bgColor cellWidth) grid
         |> gridToList

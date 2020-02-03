@@ -167,7 +167,7 @@ d4StepPos ( x, y ) d =
 
 onKeyDownSubscription =
     let
-        keyMap =
+        directionKeyMap =
             [ ( "w", Up )
             , ( "s", Down )
             , ( "a", Left )
@@ -177,12 +177,16 @@ onKeyDownSubscription =
             , ( "ArrowLeft", Left )
             , ( "ArrowRight", Right )
             ]
+                |> List.map (Tuple.mapSecond OnDirectionKeyDown)
+
+        keyMap =
+            directionKeyMap
                 |> Dict.fromList
 
         keyMsgDecoder key =
             case Dict.get key keyMap of
                 Just msg ->
-                    JD.succeed (OnDirectionKeyDown msg)
+                    JD.succeed msg
 
                 Nothing ->
                     JD.fail "nop"

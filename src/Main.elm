@@ -164,16 +164,15 @@ gridLayout cellDimension gridDimension =
 
         ( gridWidth, gridHeight ) =
             mapEach toFloat gridDimension
+
+        dx =
+            (cellWidth - (gridWidth * cellWidth)) / 2
+
+        dy =
+            (cellHeight - (gridHeight * cellHeight)) / 2
     in
     List.map transformCell
-        >> group
-            [ transform
-                [ shift
-                    ( (cellWidth - (gridWidth * cellWidth)) / 2
-                    , (cellHeight - (gridHeight * cellHeight)) / 2
-                    )
-                ]
-            ]
+        >> group [ transform [ shift ( dx, dy ) ] ]
 
 
 renderCell w _ cell =

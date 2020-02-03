@@ -63,6 +63,10 @@ resetPuzzle (Puzzle grid) =
     initPuzzle size
 
 
+isPuzzleSolved puzzle =
+    resetPuzzle puzzle == puzzle
+
+
 swapInOppDir d ((Puzzle grid) as puzzle) =
     let
         maybeEmptyPos =
@@ -232,16 +236,24 @@ view model =
 
 
 viewPuzzle : Float -> Puzzle -> S.Svg msg
-viewPuzzle cellWidth (Puzzle grid) =
-    gridMap (renderCell cellWidth) grid
+viewPuzzle cellWidth ((Puzzle grid) as puzzle) =
+    let
+        bgColor =
+            if isPuzzleSolved puzzle then
+                "green"
+
+            else
+                "dodgerblue"
+    in
+    gridMap (renderCell bgColor cellWidth) grid
         |> gridToList
         |> gridLayout ( cellWidth, cellWidth ) (gridSize grid)
 
 
-renderCell w _ cell =
+renderCell bgColor w _ cell =
     case cell of
         Num n ->
-            [ square "dodgerblue" w []
+            [ square bgColor w []
             , words "black" (fromInt n) [ transform [ scale (w / 16 * 0.8) ] ]
             ]
 

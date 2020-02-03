@@ -143,12 +143,14 @@ view model =
         ]
 
 
+viewPuzzle : Float -> Puzzle -> S.Svg msg
 viewPuzzle cellWidth (Puzzle size dict) =
     Dict.map (renderCell cellWidth) dict
         |> Dict.toList
         |> gridLayout ( cellWidth, cellWidth ) ( size, size )
 
 
+gridLayout : ( Float, Float ) -> ( Int, Int ) -> List ( ( Int, Int ), List (S.Svg msg) ) -> S.Svg msg
 gridLayout cellDimension gridDimension =
     let
         transformCell ( idx, svgView ) =

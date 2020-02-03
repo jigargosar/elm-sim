@@ -156,14 +156,10 @@ renderCell w ( idx, cell ) =
             [ square "dodgerblue" w []
             , words "black" (fromInt n) [ transform [ scale (w / 16 * 0.8) ] ]
             ]
-                |> group [ transform [ shift (idx |> toFloat2Scaled w) ] ]
+                |> group [ transform [ shift (idx |> mapEach (toFloat >> mul w)) ] ]
 
         Empty ->
             empty
-
-
-toFloat2Scaled s =
-    mapEach (toFloat >> mul s)
 
 
 mul =

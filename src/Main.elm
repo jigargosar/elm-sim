@@ -146,11 +146,10 @@ view model =
 viewPuzzle cellWidth (Puzzle size dict) =
     Dict.map (renderCell cellWidth) dict
         |> Dict.toList
-        |> gridLayout cellWidth cellWidth size size
-        |> group []
+        |> gridLayout ( cellWidth, cellWidth ) ( size, size )
 
 
-gridLayout cellWidth cellHeight gridWidth gridHeight =
+gridLayout cellDimension gridDimension =
     let
         transformCell ( idx, svgView ) =
             let
@@ -159,8 +158,22 @@ gridLayout cellWidth cellHeight gridWidth gridHeight =
             in
             svgView
                 |> group [ transform [ shift ( x * cellWidth, y * cellHeight ) ] ]
+
+        ( cellWidth, cellHeight ) =
+            cellDimension
+
+        ( gridWidth, gridHeight ) =
+            mapEach toFloat gridDimension
     in
     List.map transformCell
+        >> group
+            [ transform
+                [ shift
+                    ( (cellWidth - (gridWidth * cellWidth)) / 2
+                    , (cellHeight - (gridHeight * cellHeight)) / 2
+                    )
+                ]
+            ]
 
 
 renderCell w _ cell =

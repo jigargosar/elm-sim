@@ -55,6 +55,14 @@ initPuzzle size =
         |> Puzzle
 
 
+resetPuzzle (Puzzle grid) =
+    let
+        ( size, _ ) =
+            gridSize grid
+    in
+    initPuzzle size
+
+
 swapInOppDir d ((Puzzle grid) as puzzle) =
     let
         maybeEmptyPos =
@@ -105,6 +113,7 @@ type Msg
     = OnResize Int Int
     | GotViewport Browser.Dom.Viewport
     | OnDirectionKeyDown Direction4
+    | ResetPuzzle
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -118,6 +127,9 @@ update message model =
 
         OnDirectionKeyDown direction4 ->
             ( { model | puzzle = swapInOppDir direction4 model.puzzle }, Cmd.none )
+
+        ResetPuzzle ->
+            ( { model | puzzle = resetPuzzle model.puzzle }, Cmd.none )
 
 
 type Direction4
@@ -180,7 +192,8 @@ onKeyDownSubscription =
                 |> List.map (Tuple.mapSecond OnDirectionKeyDown)
 
         keyMap =
-            directionKeyMap
+            ( "r", ResetPuzzle )
+                :: directionKeyMap
                 |> Dict.fromList
 
         keyMsgDecoder key =

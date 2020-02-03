@@ -7,9 +7,9 @@ import Dict exposing (Dict)
 import Html exposing (Html)
 import Html.Attributes as HA
 import Json.Decode as JD
-import String exposing (fromInt)
+import String exposing (fromFloat, fromInt)
 import Svg as S exposing (svg, text, text_)
-import Svg.Attributes as SA exposing (dominantBaseline, fill, textAnchor)
+import Svg.Attributes as SA exposing (dominantBaseline, fill, stroke, strokeWidth, textAnchor)
 import Task
 import Tuple exposing (mapBoth)
 import TypedSvg.Attributes as TA exposing (viewBox)
@@ -272,7 +272,7 @@ viewPuzzle cellWidth ((Puzzle grid) as puzzle) =
 renderCell bgColor w _ cell =
     case cell of
         Num n ->
-            [ square bgColor (w * 0.95) []
+            [ square bgColor w [ stroke "black", strokeWidth (fromFloat (w / 20)) ]
             , words "black" (fromInt n) [ transform [ scale (w / 16 * 0.7) ] ]
             ]
 

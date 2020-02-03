@@ -5,6 +5,7 @@ import Browser.Dom
 import Browser.Events
 import Dict exposing (Dict)
 import Html exposing (Html)
+import Html.Attributes as HA
 import Set
 import String exposing (fromInt)
 import Svg as S exposing (svg, text, text_)
@@ -179,7 +180,15 @@ canvas ( w, h ) attrs =
         ( x, y ) =
             ( -w / 2, -h / 2 )
     in
-    svg (viewBox x y w h :: attrs)
+    svg
+        (viewBox x y w h
+            :: HA.style "position" "fixed"
+            :: HA.style "top" "0"
+            :: HA.style "left" "0"
+            :: HA.style "width" "100%"
+            :: HA.style "height" "100%"
+            :: attrs
+        )
 
 
 group =

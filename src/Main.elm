@@ -188,6 +188,10 @@ renderCell w _ cell =
             []
 
 
+
+-- SVG CANVAS LIB
+
+
 canvas : Float2 -> List (S.Attribute a) -> List (S.Svg a) -> Html a
 canvas ( w, h ) attrs =
     let

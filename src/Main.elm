@@ -9,7 +9,7 @@ import Html.Attributes as HA
 import Json.Decode as JD
 import String exposing (fromFloat, fromInt)
 import Svg as S exposing (svg, text, text_)
-import Svg.Attributes as SA exposing (dominantBaseline, fill, stroke, strokeWidth, textAnchor)
+import Svg.Attributes as SA exposing (dominantBaseline, fill, stroke, textAnchor)
 import Task
 import Tuple exposing (mapBoth)
 import TypedSvg.Attributes as TA exposing (viewBox)
@@ -272,7 +272,7 @@ viewPuzzle cellWidth ((Puzzle grid) as puzzle) =
 renderCell bgColor w _ cell =
     case cell of
         Num n ->
-            [ square bgColor w [ stroke "black", strokeWidth (fromFloat (w / 20)) ]
+            [ square bgColor w [ stroke "black", strokeWidth (w / 20) ]
             , words "black" (fromInt n) [ transform [ scale (w / 16 * 0.7) ] ]
             ]
 
@@ -379,6 +379,10 @@ canvas ( w, h ) attrs =
             :: HA.style "height" "100%"
             :: attrs
         )
+
+
+strokeWidth =
+    fromFloat >> SA.strokeWidth
 
 
 group =

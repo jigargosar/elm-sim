@@ -74,7 +74,7 @@ isPuzzleSolved puzzle =
     resetPuzzle puzzle == puzzle
 
 
-swapInOppDir d ((Puzzle grid) as puzzle) =
+swapEmptyInOppDir d ((Puzzle grid) as puzzle) =
     let
         maybeEmptyPos =
             gridToList grid
@@ -137,7 +137,7 @@ update message model =
             ( { model | screenSize = ( scene.width, scene.height ) }, Cmd.none )
 
         OnDirectionKeyDown direction4 ->
-            ( { model | puzzle = swapInOppDir direction4 model.puzzle }, Cmd.none )
+            ( { model | puzzle = swapEmptyInOppDir direction4 model.puzzle }, Cmd.none )
 
         ResetPuzzle ->
             ( { model | puzzle = resetPuzzle model.puzzle }, Cmd.none )

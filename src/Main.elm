@@ -55,6 +55,33 @@ initPuzzle size =
         |> Puzzle
 
 
+swapInOppDir d ((Puzzle grid) as puzzle) =
+    let
+        maybeEmptyPos =
+            gridToList grid
+                |> List.filter (\( _, v ) -> v == Empty)
+                |> List.head
+                |> Maybe.map Tuple.first
+    in
+    case maybeEmptyPos of
+        Just emptyPos ->
+            let
+                newPos =
+                    d4StepPos emptyPos (d4Opposite d)
+            in
+            case gridGet newPos grid of
+                Just newCell ->
+                    gridSet emptyPos newCell grid
+                        |> gridSet newPos Empty
+                        |> Puzzle
+
+                Nothing ->
+                    puzzle
+
+        Nothing ->
+            puzzle
+
+
 type alias Model =
     { screenSize : ( Float, Float )
     , puzzle : Puzzle
@@ -90,7 +117,7 @@ update message model =
             ( { model | screenSize = ( scene.width, scene.height ) }, Cmd.none )
 
         OnDirectionKeyDown direction4 ->
-            ( model, Cmd.none )
+            ( { model | puzzle = swapInOppDir direction4 model.puzzle }, Cmd.none )
 
 
 type Direction4
@@ -98,6 +125,44 @@ type Direction4
     | Down
     | Left
     | Right
+
+
+d4Opposite d =
+    case d of
+        Up ->
+            Down
+
+        Down ->
+            Up
+
+        Left ->
+            Right
+
+        Right ->
+            Left
+
+
+d4ToVec d =
+    case d of
+        Up ->
+            ( 0, -1 )
+
+        Down ->
+            ( 0, 1 )
+
+        Left ->
+            ( -1, 0 )
+
+        Right ->
+            ( 1, 0 )
+
+
+d4StepPos ( x, y ) d =
+    let
+        ( dx, dy ) =
+            d4ToVec d
+    in
+    ( x + dx, y + dy )
 
 
 onKeyDownSubscription =
@@ -191,6 +256,10 @@ gridSet idx v ((Grid size dict) as grid) =
 
     else
         grid
+
+
+gridGet idx (Grid _ dict) =
+    Dict.get idx dict
 
 
 gridMap func (Grid size dict) =

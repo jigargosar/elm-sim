@@ -273,7 +273,7 @@ renderCell bgColor w _ cell =
     case cell of
         Num n ->
             [ square bgColor w []
-            , words "black" (fromInt n) [ transform [ scale (w / 16 * 0.8) ] ]
+            , words "black" (fromInt n) [ transform [ scale (w / 16 * 0.7) ] ]
             ]
 
         Empty ->

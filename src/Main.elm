@@ -104,7 +104,7 @@ renderBoardBackground cellWidth =
         |> gridLayout cellSize boardSize []
 
 
-renderBoardLayer color cellWidth board =
+renderInstructionLayer color cellWidth board =
     let
         { dict, start } =
             board
@@ -129,10 +129,10 @@ renderBoardLayer color cellWidth board =
 
 renderBoard cellWidth board =
     [ renderBoardBackground cellWidth
-    , renderBoardLayer "dodgerblue" cellWidth board
+    , renderInstructionLayer "dodgerblue" cellWidth board
         |> List.singleton
         |> group [ transform [ shift ( cellWidth / 5, cellWidth / 5 ) ] ]
-    , renderBoardLayer "#d74d2e" cellWidth board
+    , renderInstructionLayer "#d74d2e" cellWidth board
         |> List.singleton
         |> group [ transform [ shift ( -cellWidth / 5, -cellWidth / 5 ) ] ]
     ]

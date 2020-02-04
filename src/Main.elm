@@ -89,7 +89,9 @@ renderBoard cellWidth board =
                     []
 
                 Start direction ->
-                    [ circle "dodgerblue" (cellWidth * 0.5 * 0.8) [] ]
+                    [ circle "dodgerblue" (cellWidth * 0.5 * 0.8) []
+                    , words "white" "Start" [ transform [ scale (cellWidth / 16 / 4) ] ]
+                    ]
 
         renderCellBackground ( x, y ) =
             let
@@ -106,7 +108,7 @@ renderBoard cellWidth board =
             rect bgColor
                 cellSize
                 [ stroke "#191919"
-                , strokeWidth (cellWidth / 20)
+                , strokeWidth (cellWidth / 30)
                 ]
 
         renderCell p cell =
@@ -251,6 +253,7 @@ canvas ( w, h ) attrs =
     svg
         (viewBox x y w h
             :: TA.shapeRendering T.RenderGeometricPrecision
+            :: TA.textRendering T.TextRenderingOptimizeLegibility
             :: HA.style "position" "fixed"
             :: HA.style "top" "0"
             :: HA.style "left" "0"
@@ -272,6 +275,7 @@ words color string attrs =
     text_
         (textAnchor "middle"
             :: dominantBaseline "central"
+            :: TA.shapeRendering T.RenderGeometricPrecision
             :: fill color
             :: attrs
         )

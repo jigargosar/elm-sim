@@ -229,6 +229,56 @@ renderMoveArrowLayer color offset cellWidth board =
 
 
 
+-- RENDER MOVE PATH
+
+
+getMovePath board =
+    let
+        getNextMoveInstruction { pos, dir } =
+            let
+                ( x, y ) =
+                    pos
+
+                nextPos =
+                    dirToUnitVec dir |> (\( dx, dy ) -> ( x + dx, y + dy ))
+            in
+            if isValid nextPos then
+                case getMoveAt nextPos board of
+                    Just nextDir ->
+                        Just { pos = nextPos, dir = nextDir }
+
+                    Nothing ->
+                        getNextMoveInstruction { pos = nextPos, dir = dir }
+
+            else
+                Nothing
+
+        isValid ( x, y ) =
+            x >= 0 && y >= 0 && x < boardWidth && y < boardHeight
+
+        buildMovePath start path =
+            case getNextMoveInstruction start of
+                Just el ->
+                    buildMovePath el (el :: path)
+
+                Nothing ->
+                    path
+    in
+    buildMovePath board.start [ board.start ]
+
+
+renderMovePath color cellWidth board =
+    let
+        points =
+            getMovePath board
+                |> List.reverse
+                |> List.map (\el -> el.pos |> mapEach (toFloat >> mul cellWidth))
+    in
+    [ S.polyline [ TA.points points, stroke color, strokeWidth (cellWidth / 20) ] [] ]
+        |> groupGridTransform ( cellWidth, cellWidth ) boardSize []
+
+
+
 -- RENDER INSTRUCTIONS
 
 
@@ -284,6 +334,9 @@ renderBoard cellWidth board =
         shiftLayer factor =
             List.singleton
                 >> group [ transform [ shift ( factor, factor ) ] ]
+
+        _ =
+            getMovePath board |> Debug.log "debug"
     in
     [ renderBoardBackgroundTileLayer cellWidth
     , renderInstructionLayer "#1e90ff" cellWidth board
@@ -292,6 +345,9 @@ renderBoard cellWidth board =
         |> shiftLayer (-cellWidth / 5)
     , renderMoveArrowLayer "#1e90ff" (-cellWidth / 5) cellWidth board
     , renderMoveArrowLayer "#d74d2e" (cellWidth / 5) cellWidth board
+    , renderMovePath "#1e90ff" cellWidth board
+        |> List.singleton
+        >> group [ transform [ shift ( -cellWidth / 5, cellWidth / 5 ) ] ]
     ]
         |> group []
 
@@ -390,6 +446,23 @@ main =
 mapEach : (a -> x) -> ( a, a ) -> ( x, x )
 mapEach f =
     mapBoth f f
+
+
+groupGridTransform cellSize gridSize_ attrs =
+    let
+        ( cellWidth, cellHeight ) =
+            cellSize
+
+        ( gridWidth, gridHeight ) =
+            mapEach toFloat gridSize_
+
+        dx =
+            (cellWidth - (gridWidth * cellWidth)) / 2
+
+        dy =
+            (cellHeight - (gridHeight * cellHeight)) / 2
+    in
+    group (transform [ shift ( dx, dy ) ] :: attrs)
 
 
 gridLayout cellSize gridSize_ attrs =

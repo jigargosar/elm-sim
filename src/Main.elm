@@ -251,15 +251,19 @@ getMovePath board =
                         getNextMoveInstruction { pos = nextPos, dir = dir }
 
             else
-                Nothing
+                Just { pos = pos, dir = dir }
 
         isValid ( x, y ) =
             x >= 0 && y >= 0 && x < boardWidth && y < boardHeight
 
-        buildMovePath start path =
-            case getNextMoveInstruction start of
-                Just el ->
-                    buildMovePath el (el :: path)
+        buildMovePath from path =
+            case getNextMoveInstruction from of
+                Just to ->
+                    if from == to then
+                        path
+
+                    else
+                        buildMovePath to (to :: path)
 
                 Nothing ->
                     path
@@ -269,12 +273,15 @@ getMovePath board =
 
 renderMovePath color cellWidth board =
     let
-        points =
+        path =
             getMovePath board
+
+        points =
+            path
                 |> List.reverse
                 |> List.map (\el -> el.pos |> mapEach (toFloat >> mul cellWidth))
     in
-    [ S.polyline [ TA.points points, stroke color, strokeWidth (cellWidth / 20) ] [] ]
+    [ S.polyline [ fill "none", TA.points points, stroke color, strokeWidth (cellWidth / 30) ] [] ]
         |> groupGridTransform ( cellWidth, cellWidth ) boardSize []
 
 

@@ -137,7 +137,7 @@ renderBoardBackground cellWidth =
 renderCell color cellWidth cell =
     let
         radius =
-            cellWidth / 5
+            cellWidth / 6
     in
     case cell of
         Empty ->
@@ -159,7 +159,7 @@ renderCell color cellWidth cell =
 
                 --, transform [ shift ( cellWidth / 30, 0 ) ]
                 ]
-            , words "white" "Start" [ transform [ scale (cellWidth / 16 / 8) ] ]
+            , words "white" "Start" [ transform [ scale (radius / 16 * 0.75) ] ]
             ]
 
 

@@ -6,7 +6,7 @@ import Browser
 import Browser.Dom
 import Browser.Events
 import Html exposing (Html)
-import MainStage as S
+import MainSvgCanvas exposing (..)
 import Task
 
 
@@ -15,19 +15,11 @@ import Task
 
 
 type alias Model =
-    { root : S.Node }
+    { screenSize : ( Float, Float ) }
 
 
 type alias Flags =
     ()
-
-
-initRootNode ( w, h ) =
-    S.group
-        [ S.rect (w / 2) (h / 4)
-        , S.rect (w / 2) (h / 4)
-        ]
-        |> S.setSize ( w, h )
 
 
 init : Flags -> ( Model, Cmd Msg )
@@ -36,8 +28,7 @@ init _ =
         size =
             ( 600, 600 )
     in
-    ( { root = initRootNode size
-      }
+    ( { screenSize = size }
     , Browser.Dom.getViewport |> Task.perform GotViewport
     )
 
@@ -59,7 +50,7 @@ update message model =
             ( model, Cmd.none )
 
         GotViewport { scene } ->
-            ( { model | root = initRootNode ( scene.width, scene.height ) }, Cmd.none )
+            ( { model | screenSize = ( scene.width, scene.height ) }, Cmd.none )
 
         OnResize _ _ ->
             ( model, Browser.Dom.getViewport |> Task.perform GotViewport )
@@ -78,7 +69,10 @@ subscriptions _ =
 
 view : Model -> Html Msg
 view model =
-    S.render model.root
+    canvas model.screenSize
+        []
+        [ rect "dodgerblue" 100 100 []
+        ]
 
 
 empty : Html msg

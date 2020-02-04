@@ -3,8 +3,11 @@ module Main exposing (main)
 -- Browser.Element Scaffold
 
 import Browser
+import Browser.Dom
+import Browser.Events
 import Html exposing (Html)
 import MainStage as S
+import Task
 
 
 
@@ -24,7 +27,7 @@ initRootNode ( w, h ) =
         [ S.rect (w / 2) (h / 4)
         , S.rect (w / 2) (h / 4)
         ]
-        |> S.setSize ( 600, 600 )
+        |> S.setSize ( w, h )
 
 
 init : Flags -> ( Model, Cmd Msg )
@@ -35,7 +38,7 @@ init _ =
     in
     ( { root = initRootNode size
       }
-    , Cmd.none
+    , Browser.Dom.getViewport |> Task.perform GotViewport
     )
 
 
@@ -45,6 +48,8 @@ init _ =
 
 type Msg
     = NoOp
+    | GotViewport Browser.Dom.Viewport
+    | OnResize Int Int
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -53,10 +58,18 @@ update message model =
         NoOp ->
             ( model, Cmd.none )
 
+        GotViewport { scene } ->
+            ( { model | root = initRootNode ( scene.width, scene.height ) }, Cmd.none )
+
+        OnResize _ _ ->
+            ( model, Browser.Dom.getViewport |> Task.perform GotViewport )
+
 
 subscriptions : Model -> Sub Msg
 subscriptions _ =
-    Sub.batch []
+    Sub.batch
+        [ Browser.Events.onResize OnResize
+        ]
 
 
 

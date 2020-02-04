@@ -346,15 +346,16 @@ renderBoard cellWidth board =
             getMovePath board |> Debug.log "debug"
     in
     [ renderBoardBackgroundTileLayer cellWidth
+    , renderMovePath "#1e90ff" cellWidth board
+        |> shiftLayer (cellWidth / 5)
+    , renderMovePath "#d74d2e" cellWidth board
+        |> shiftLayer (-cellWidth / 5)
     , renderInstructionLayer "#1e90ff" cellWidth board
         |> shiftLayer (cellWidth / 5)
     , renderInstructionLayer "#d74d2e" cellWidth board
         |> shiftLayer (-cellWidth / 5)
-    , renderMoveArrowLayer "#1e90ff" (-cellWidth / 5) cellWidth board
-    , renderMoveArrowLayer "#d74d2e" (cellWidth / 5) cellWidth board
-    , renderMovePath "#1e90ff" cellWidth board
-        |> List.singleton
-        >> group [ transform [ shift ( -cellWidth / 5, cellWidth / 5 ) ] ]
+    , renderMoveArrowLayer "#1e90ff" (cellWidth / 5) cellWidth board
+    , renderMoveArrowLayer "#d74d2e" (-cellWidth / 5) cellWidth board
     ]
         |> group []
 

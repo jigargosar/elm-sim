@@ -29,6 +29,21 @@ type Direction
     | Right
 
 
+dirToDeg dir =
+    case dir of
+        Up ->
+            -90
+
+        Down ->
+            90
+
+        Left ->
+            180
+
+        Right ->
+            0
+
+
 type alias Board =
     { dict : Dict ( Int, Int ) Cell
     , start : { pos : ( Int, Int ), dir : Direction }
@@ -80,7 +95,7 @@ renderBoardBackground cellWidth =
         cellSize =
             ( cellWidth, cellWidth )
 
-        renderCellBackground ( x, y ) =
+        renderCellBackground ( x, _ ) =
             let
                 isCenterCell =
                     x == 5 || x == 4
@@ -118,13 +133,27 @@ renderInstructionLayer color cellWidth board =
                     []
 
                 Start direction ->
-                    [ circle color (cellWidth / 4) []
+                    [ empty
+
+                    --, circle color (cellWidth / 4) []
+                    , renderDir color (cellWidth / 8) direction
                     , words "white" "Start" [ transform [ scale (cellWidth / 16 / 6) ] ]
                     ]
     in
     boardCellList board
         |> List.map (\( p, c ) -> ( p, renderCell c ))
         |> gridLayout cellSize boardSize []
+
+
+renderDir color radius direction =
+    triangle color
+        radius
+        [ transform
+            [ rotate (dirToDeg direction + 90)
+
+            --, shift ( 0, -radius )
+            ]
+        ]
 
 
 renderBoard cellWidth board =
@@ -327,6 +356,15 @@ polyRect color ( width, height ) attrs =
         []
 
 
+polygon color points attrs =
+    S.polygon
+        (TA.points points
+            :: fill color
+            :: attrs
+        )
+        []
+
+
 rect color ( width, height ) attrs =
     let
         ( x, y ) =
@@ -356,6 +394,38 @@ ellipse color ( width, height ) attrs =
         []
 
 
+triangle color radius =
+    ngon color 3 radius
+
+
+ngon color sides radius attrs =
+    S.polygon
+        (SA.points (toNgonPoints 0 sides radius "")
+            :: fill color
+            :: attrs
+        )
+        []
+
+
+toNgonPoints : Int -> Int -> Float -> String -> String
+toNgonPoints i n radius string =
+    if i == n then
+        string
+
+    else
+        let
+            a =
+                turns (toFloat i / toFloat n - 0.25)
+
+            x =
+                radius * cos a
+
+            y =
+                radius * sin a
+        in
+        toNgonPoints (i + 1) n radius (string ++ String.fromFloat x ++ "," ++ String.fromFloat y ++ " ")
+
+
 type alias Transform =
     { x : Float
     , y : Float
@@ -370,6 +440,10 @@ identityTransform =
 
 scale n t =
     { t | s = n }
+
+
+rotate deg t =
+    { t | deg = deg }
 
 
 shift ( dx, dy ) t =

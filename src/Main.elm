@@ -161,7 +161,7 @@ renderInstructionLayer color cellWidth board =
             ( cellWidth, cellWidth )
     in
     boardCellList board
-        |> List.map (\( p, c ) -> ( p, renderCell color (cellWidth / 2) c ))
+        |> List.map (\( p, c ) -> ( p, renderCell color (cellWidth * 0.8) c ))
         |> gridLayout cellSize boardSize []
 
 

@@ -125,7 +125,7 @@ classifyBackground ( x, y ) =
         Darker
 
 
-renderCellBackground cellSize cellWidth p =
+renderCellBackgroundTile cellSize cellWidth p =
     let
         bgColor =
             case classifyBackground p of
@@ -146,13 +146,13 @@ renderCellBackground cellSize cellWidth p =
     ]
 
 
-renderBoardBackground cellWidth =
+renderBoardBackgroundTileLayer cellWidth =
     let
         cellSize =
             ( cellWidth, cellWidth )
     in
     boardPositions
-        |> List.map (\p -> ( p, renderCellBackground cellSize cellWidth p ))
+        |> List.map (\p -> ( p, renderCellBackgroundTile cellSize cellWidth p ))
         |> gridLayout cellSize boardSize []
 
 
@@ -208,7 +208,7 @@ renderBoard cellWidth board =
             List.singleton
                 >> group [ transform [ shift ( factor, factor ) ] ]
     in
-    [ renderBoardBackground cellWidth
+    [ renderBoardBackgroundTileLayer cellWidth
     , renderInstructionLayer "#1e90ff" cellWidth board
         |> shiftLayer (cellWidth / 5)
     , renderInstructionLayer "#d74d2e" cellWidth board

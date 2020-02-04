@@ -107,8 +107,9 @@ renderBoard cellWidth board =
             in
             rect bgColor
                 cellSize
-                [ SA.rx (fromFloat 20)
-                , SA.ry (fromFloat 10)
+                [ SA.rx (fromFloat 10)
+                , transform [ scale 0.99 ]
+                , geometricPrecision
                 ]
 
         renderCell p cell =
@@ -187,7 +188,7 @@ view model =
     in
     canvas model.screenSize
         [ HA.style "background-color" "black" ]
-        [ rect "dodgerblue" ( 100, 100 ) []
+        [ polyRect "dodgerblue" ( 100, 100 ) []
         , renderBoard cellWidth emptyBoard
         ]
 
@@ -252,7 +253,7 @@ canvas ( w, h ) attrs =
     in
     svg
         (viewBox x y w h
-            :: TA.shapeRendering T.RenderCrispEdges
+            :: TA.shapeRendering T.RenderGeometricPrecision
             :: TA.imageRendering T.RenderingOptimizeQuality
             :: TA.textRendering T.TextRenderingOptimizeLegibility
             :: HA.style "position" "fixed"
@@ -262,6 +263,14 @@ canvas ( w, h ) attrs =
             :: HA.style "height" "100%"
             :: attrs
         )
+
+
+geometricPrecision =
+    TA.shapeRendering T.RenderGeometricPrecision
+
+
+crispEdges =
+    TA.shapeRendering T.RenderCrispEdges
 
 
 strokeWidth =
@@ -276,7 +285,6 @@ words color string attrs =
     text_
         (textAnchor "middle"
             :: dominantBaseline "central"
-            :: TA.shapeRendering T.RenderGeometricPrecision
             :: fill color
             :: attrs
         )
@@ -284,7 +292,20 @@ words color string attrs =
 
 
 square c w =
-    rect c ( w, w )
+    polyRect c ( w, w )
+
+
+polyRect color ( width, height ) attrs =
+    let
+        ( x, y ) =
+            ( width / 2, height / 2 )
+    in
+    S.polygon
+        (TA.points [ ( -x, -y ), ( x, -y ), ( x, y ), ( -x, y ) ]
+            :: fill color
+            :: attrs
+        )
+        []
 
 
 rect color ( width, height ) attrs =
@@ -292,8 +313,9 @@ rect color ( width, height ) attrs =
         ( x, y ) =
             ( width / 2, height / 2 )
     in
-    S.polygon
-        (TA.points [ ( -x, -y ), ( x, -y ), ( x, y ), ( -x, y ) ]
+    S.rect
+        (SA.width (fromFloat width)
+            :: SA.height (fromFloat height)
             :: fill color
             :: attrs
         )

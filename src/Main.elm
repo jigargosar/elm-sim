@@ -181,13 +181,16 @@ mul =
 
 
 renderBoard cellWidth board =
+    let
+        shiftLayer factor =
+            List.singleton
+                >> group [ transform [ shift ( factor, factor ) ] ]
+    in
     [ renderBoardBackground cellWidth
     , renderInstructionLayer "#1e90ff" cellWidth board
-        |> List.singleton
-        |> group [ transform [ shift ( cellWidth / 5, cellWidth / 5 ) ] ]
+        |> shiftLayer (cellWidth / 5)
     , renderInstructionLayer "#d74d2e" cellWidth board
-        |> List.singleton
-        |> group [ transform [ shift ( -cellWidth / 5, -cellWidth / 5 ) ] ]
+        |> shiftLayer (-cellWidth / 5)
     ]
         |> group []
 

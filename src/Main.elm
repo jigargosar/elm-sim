@@ -8,7 +8,8 @@ import TypedSvg.Attributes as TA exposing (viewBox)
 
 
 type alias NodeAttributes =
-    { x : Float
+    { id : String
+    , x : Float
     , y : Float
     , width : Float
     , height : Float
@@ -23,11 +24,11 @@ type Node
 
 newLayer : List Node -> Node
 newLayer =
-    Layer (NodeAttributes 0 0 0 0 "")
+    Layer (NodeAttributes "" 0 0 0 0 "")
 
 
-newRect x y w h =
-    NodeAttributes x y w h "red" |> Node
+newRect w h =
+    NodeAttributes "" 0 0 w h "red" |> Node
 
 
 drawNode node =
@@ -46,7 +47,7 @@ drawNode node =
 main =
     let
         l1 =
-            newLayer [ newRect 0 0 300 400 ]
+            newLayer [ newRect 300 400 ]
     in
     canvas ( 600, 600 )
         []

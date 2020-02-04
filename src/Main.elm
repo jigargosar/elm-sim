@@ -88,7 +88,10 @@ emptyBoard =
     { dict = Dict.empty
     , move =
         Dict.empty
-            |> Dict.insert ( 2, 1 ) Down
+            |> Dict.insert ( 2, 0 ) Down
+            |> Dict.insert ( 2, 1 ) Up
+            |> Dict.insert ( 2, 2 ) Left
+            |> Dict.insert ( 1, 2 ) Right
     , start = { pos = ( 4, 1 ), dir = Left }
     }
 
@@ -202,7 +205,7 @@ renderCell color cellWidth cell =
             ]
 
 
-renderMove color cellWidth direction =
+renderMove color ( ox, oy ) cellWidth direction =
     let
         radius =
             cellWidth / 6
@@ -212,19 +215,35 @@ renderMove color cellWidth direction =
         [ stroke "white"
         , transform
             [ rotate (dirToDeg direction + 90)
-            , shift (dirToUnitVec direction |> mapEach (mul (radius * 0.5)))
+            , shift (dirToUnitVec direction |> mapBoth (mul (cellWidth / 3)) (mul (cellWidth / 3)))
+            , case direction of
+                Up ->
+                    shift ( ox, 0 )
+
+                Down ->
+                    shift ( ox, 0 )
+
+                Left ->
+                    shift ( 0, oy )
+
+                Right ->
+                    shift ( 0, oy )
             ]
         ]
     ]
 
 
-renderMovementLayer color cellWidth board =
+swap ( a, b ) =
+    ( b, a )
+
+
+renderMovementLayer color offset cellWidth board =
     let
         cellSize =
             ( cellWidth, cellWidth )
     in
     boardMoveList board
-        |> List.map (\( p, v ) -> ( p, renderMove color cellWidth v ))
+        |> List.map (\( p, v ) -> ( p, renderMove color offset cellWidth v ))
         |> gridLayout cellSize boardSize []
 
 
@@ -256,12 +275,9 @@ renderBoard cellWidth board =
         |> shiftLayer (cellWidth / 5)
     , renderInstructionLayer "#d74d2e" cellWidth board
         |> shiftLayer (-cellWidth / 5)
-    , renderMovementLayer "#1e90ff" cellWidth board
-        |> List.singleton
-        >> group [ transform [ shift ( -cellWidth / 5, cellWidth / 5 ) ] ]
-    , renderMovementLayer "#d74d2e" cellWidth board
-        |> List.singleton
-        >> group [ transform [ shift ( cellWidth / 5, -cellWidth / 5 ) ] ]
+    , renderMovementLayer "#1e90ff" ( -cellWidth / 5, -cellWidth / 5 ) cellWidth board
+
+    --, renderMovementLayer "#d74d2e" ( 0, cellWidth / 5 ) cellWidth board
     ]
         |> group []
 

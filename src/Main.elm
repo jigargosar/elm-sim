@@ -20,7 +20,6 @@ import TypedSvg.Types as T
 type Cell
     = Empty
     | Start Direction
-    | Move Direction
 
 
 type Direction
@@ -62,6 +61,7 @@ dirToUnitVec dir =
 
 type alias Board =
     { dict : Dict ( Int, Int ) Cell
+    , move : Dict ( Int, Int ) Direction
     , start : { pos : ( Int, Int ), dir : Direction }
     }
 
@@ -86,6 +86,9 @@ boardPositions =
 emptyBoard : Board
 emptyBoard =
     { dict = Dict.empty
+    , move =
+        Dict.empty
+            |> Dict.insert ( 2, 1 ) Down
     , start = { pos = ( 4, 1 ), dir = Left }
     }
 
@@ -98,11 +101,24 @@ getCellAt p board =
         Dict.get p board.dict |> Maybe.withDefault Empty
 
 
+getMoveAt p board =
+    Dict.get p board.move
+
+
 boardCellList board =
     boardPositions
         |> List.map
             (\p ->
                 ( p, getCellAt p board )
+            )
+
+
+boardMoveList board =
+    boardPositions
+        |> List.filterMap
+            (\p ->
+                getMoveAt p board
+                    |> Maybe.map (Tuple.pair p)
             )
 
 
@@ -185,16 +201,31 @@ renderCell color cellWidth cell =
             , words "white" "Start" [ transform [ scale (radius / 16 * 0.75) ] ]
             ]
 
-        Move direction ->
-            [ triangle color
-                radius
-                [ stroke "white"
-                , transform
-                    [ rotate (dirToDeg direction + 90)
-                    , shift (dirToUnitVec direction |> mapEach (mul (radius * 0.5)))
-                    ]
-                ]
+
+renderMove color cellWidth direction =
+    let
+        radius =
+            cellWidth / 6
+    in
+    [ triangle color
+        radius
+        [ stroke "white"
+        , transform
+            [ rotate (dirToDeg direction + 90)
+            , shift (dirToUnitVec direction |> mapEach (mul (radius * 0.5)))
             ]
+        ]
+    ]
+
+
+renderMovementLayer color cellWidth board =
+    let
+        cellSize =
+            ( cellWidth, cellWidth )
+    in
+    boardMoveList board
+        |> List.map (\( p, v ) -> ( p, renderMove color cellWidth v ))
+        |> gridLayout cellSize boardSize []
 
 
 renderInstructionLayer color cellWidth board =
@@ -225,6 +256,12 @@ renderBoard cellWidth board =
         |> shiftLayer (cellWidth / 5)
     , renderInstructionLayer "#d74d2e" cellWidth board
         |> shiftLayer (-cellWidth / 5)
+    , renderMovementLayer "#1e90ff" cellWidth board
+        |> List.singleton
+        >> group [ transform [ shift ( -cellWidth / 5, cellWidth / 5 ) ] ]
+    , renderMovementLayer "#d74d2e" cellWidth board
+        |> List.singleton
+        >> group [ transform [ shift ( cellWidth / 5, -cellWidth / 5 ) ] ]
     ]
         |> group []
 

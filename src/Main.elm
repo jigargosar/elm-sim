@@ -100,15 +100,15 @@ renderBoard cellWidth board =
 
                 bgColor =
                     if isCenterCell then
-                        "#555555"
+                        "#1f1f1f"
 
                     else
-                        "#343434"
+                        "#2e2e2e"
             in
             rect bgColor
                 cellSize
-                [ SA.rx (fromFloat 10)
-                , transform [ scale 0.99 ]
+                [ SA.rx (fromFloat (cellWidth / 15))
+                , transform [ scale 0.985 ]
                 , geometricPrecision
                 ]
 
@@ -253,7 +253,7 @@ canvas ( w, h ) attrs =
     in
     svg
         (viewBox x y w h
-            :: TA.shapeRendering T.RenderGeometricPrecision
+            :: geometricPrecision
             :: TA.imageRendering T.RenderingOptimizeQuality
             :: TA.textRendering T.TextRenderingOptimizeLegibility
             :: HA.style "position" "fixed"

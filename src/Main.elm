@@ -89,8 +89,8 @@ renderBoard cellWidth board =
                     []
 
                 Start direction ->
-                    [ circle "dodgerblue" (cellWidth * 0.5 * 0.8) []
-                    , words "white" "Start" [ transform [ scale (cellWidth / 16 / 4) ] ]
+                    [ circle "dodgerblue" (cellWidth / 4) []
+                    , words "white" "Start" [ transform [ scale (cellWidth / 16 / 6) ] ]
                     ]
 
         renderCellBackground ( x, y ) =

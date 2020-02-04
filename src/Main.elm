@@ -135,15 +135,26 @@ renderBoardBackground cellWidth =
 
 
 renderCell color cellWidth cell =
+    let
+        radius =
+            cellWidth / 5
+    in
     case cell of
         Empty ->
             []
 
         Start direction ->
             [ empty
-            , renderDirTriangle color (cellWidth / 5) direction
+            , triangle color
+                radius
+                [ stroke "white"
+                , transform
+                    [ rotate (dirToDeg direction + 90)
+                    , shift (dirToUnitVec direction |> mapEach (mul (radius * 0.5)))
+                    ]
+                ]
             , circle color
-                (cellWidth / 5)
+                radius
                 [ stroke "white"
 
                 --, transform [ shift ( cellWidth / 30, 0 ) ]
@@ -161,19 +172,8 @@ renderInstructionLayer color cellWidth board =
             ( cellWidth, cellWidth )
     in
     boardCellList board
-        |> List.map (\( p, c ) -> ( p, renderCell color (cellWidth * 0.8) c ))
+        |> List.map (\( p, c ) -> ( p, renderCell color cellWidth c ))
         |> gridLayout cellSize boardSize []
-
-
-renderDirTriangle color radius direction =
-    triangle color
-        radius
-        [ stroke "white"
-        , transform
-            [ rotate (dirToDeg direction + 90)
-            , shift (dirToUnitVec direction |> mapEach (mul (radius * 0.5)))
-            ]
-        ]
 
 
 mul =

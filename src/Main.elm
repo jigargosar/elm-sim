@@ -20,6 +20,7 @@ import TypedSvg.Types as T
 type Cell
     = Empty
     | Start Direction
+    | Move Direction
 
 
 type Direction
@@ -182,6 +183,17 @@ renderCell color cellWidth cell =
                 --, transform [ shift ( cellWidth / 30, 0 ) ]
                 ]
             , words "white" "Start" [ transform [ scale (radius / 16 * 0.75) ] ]
+            ]
+
+        Move direction ->
+            [ triangle color
+                radius
+                [ stroke "white"
+                , transform
+                    [ rotate (dirToDeg direction + 90)
+                    , shift (dirToUnitVec direction |> mapEach (mul (radius * 0.5)))
+                    ]
+                ]
             ]
 
 

@@ -128,6 +128,10 @@ boardMoveList board =
             )
 
 
+
+-- Render Background
+
+
 type Background
     = Light
     | Darker
@@ -179,6 +183,10 @@ renderBoardBackgroundTileLayer cellWidth =
         |> gridLayout cellSize boardSize []
 
 
+
+-- Render MoveArrow
+
+
 renderMove color offset cellWidth direction =
     let
         radius =
@@ -207,7 +215,7 @@ renderMove color offset cellWidth direction =
     ]
 
 
-renderMovementLayer color offset cellWidth board =
+renderMoveArrowLayer color offset cellWidth board =
     let
         cellSize =
             ( cellWidth, cellWidth )
@@ -215,6 +223,10 @@ renderMovementLayer color offset cellWidth board =
     boardMoveList board
         |> List.map (\( p, v ) -> ( p, renderMove color offset cellWidth v ))
         |> gridLayout cellSize boardSize []
+
+
+
+-- RENDER INSTRUCTIONS
 
 
 renderInstruction color cellWidth instruction =
@@ -260,6 +272,10 @@ mul =
     (*)
 
 
+
+-- RENDER BOARD
+
+
 renderBoard cellWidth board =
     let
         shiftLayer factor =
@@ -271,8 +287,8 @@ renderBoard cellWidth board =
         |> shiftLayer (cellWidth / 5)
     , renderInstructionLayer "#d74d2e" cellWidth board
         |> shiftLayer (-cellWidth / 5)
-    , renderMovementLayer "#1e90ff" (-cellWidth / 5) cellWidth board
-    , renderMovementLayer "#d74d2e" (cellWidth / 5) cellWidth board
+    , renderMoveArrowLayer "#1e90ff" (-cellWidth / 5) cellWidth board
+    , renderMoveArrowLayer "#d74d2e" (cellWidth / 5) cellWidth board
     ]
         |> group []
 

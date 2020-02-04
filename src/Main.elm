@@ -44,6 +44,21 @@ dirToDeg dir =
             0
 
 
+dirToUnitVec dir =
+    case dir of
+        Up ->
+            ( 0, -1 )
+
+        Down ->
+            ( 0, 1 )
+
+        Left ->
+            ( -1, 0 )
+
+        Right ->
+            ( 1, 0 )
+
+
 type alias Board =
     { dict : Dict ( Int, Int ) Cell
     , start : { pos : ( Int, Int ), dir : Direction }
@@ -119,6 +134,24 @@ renderBoardBackground cellWidth =
         |> gridLayout cellSize boardSize []
 
 
+renderCell color cellWidth cell =
+    case cell of
+        Empty ->
+            []
+
+        Start direction ->
+            [ empty
+            , renderDirTriangle color (cellWidth / 5) direction
+            , circle color
+                (cellWidth / 5)
+                [ stroke "white"
+
+                --, transform [ shift ( cellWidth / 30, 0 ) ]
+                ]
+            , words "white" "Start" [ transform [ scale (cellWidth / 16 / 8) ] ]
+            ]
+
+
 renderInstructionLayer color cellWidth board =
     let
         { dict, start } =
@@ -126,34 +159,25 @@ renderInstructionLayer color cellWidth board =
 
         cellSize =
             ( cellWidth, cellWidth )
-
-        renderCell cell =
-            case cell of
-                Empty ->
-                    []
-
-                Start direction ->
-                    [ empty
-
-                    --, circle color (cellWidth / 4) []
-                    , renderDir color (cellWidth / 8) direction
-                    , words "white" "Start" [ transform [ scale (cellWidth / 16 / 6) ] ]
-                    ]
     in
     boardCellList board
-        |> List.map (\( p, c ) -> ( p, renderCell c ))
+        |> List.map (\( p, c ) -> ( p, renderCell color (cellWidth / 2) c ))
         |> gridLayout cellSize boardSize []
 
 
-renderDir color radius direction =
+renderDirTriangle color radius direction =
     triangle color
         radius
-        [ transform
+        [ stroke "white"
+        , transform
             [ rotate (dirToDeg direction + 90)
-
-            --, shift ( 0, -radius )
+            , shift (dirToUnitVec direction |> mapEach (mul (radius * 0.5)))
             ]
         ]
+
+
+mul =
+    (*)
 
 
 renderBoard cellWidth board =

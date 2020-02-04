@@ -14,6 +14,7 @@ import Svg.Attributes as SA exposing (dominantBaseline, fill, stroke, textAnchor
 import Task
 import Tuple exposing (mapBoth)
 import TypedSvg.Attributes as TA exposing (viewBox)
+import TypedSvg.Types as T
 
 
 type Cell
@@ -88,7 +89,7 @@ renderBoard cellWidth board =
                     []
 
                 Start direction ->
-                    [ circle "dodgerblue" (cellWidth * 0.5 * 0.9) [] ]
+                    [ circle "dodgerblue" (cellWidth * 0.5 * 0.8) [] ]
 
         renderCellBackground ( x, y ) =
             let
@@ -250,7 +251,7 @@ canvas ( w, h ) attrs =
     in
     svg
         (viewBox x y w h
-            :: SA.shapeRendering "optimizeSpeed"
+            :: TA.shapeRendering T.RenderGeometricPrecision
             :: HA.style "position" "fixed"
             :: HA.style "top" "0"
             :: HA.style "left" "0"
@@ -303,6 +304,7 @@ ellipse color ( width, height ) attrs =
     S.ellipse
         (SA.rx (fromFloat width)
             :: SA.ry (fromFloat height)
+            :: TA.shapeRendering T.RenderGeometricPrecision
             :: fill color
             :: attrs
         )

@@ -1,25 +1,57 @@
 module Main exposing (main)
 
 import Html.Attributes as HA
-import NumPuzzle2
 import String exposing (fromFloat)
 import Svg as S exposing (svg, text, text_)
 import Svg.Attributes as SA exposing (dominantBaseline, fill, textAnchor)
 import TypedSvg.Attributes as TA exposing (viewBox)
 
 
-type alias Shape =
+type alias NodeAttributes =
     { x : Float
     , y : Float
     , width : Float
     , height : Float
+    , fill : String
     }
 
 
+type Node
+    = Layer NodeAttributes (List Node)
+    | Node NodeAttributes
+
+
+newLayer : List Node -> Node
+newLayer =
+    Layer (NodeAttributes 0 0 0 0 "")
+
+
+newRect x y w h =
+    NodeAttributes x y w h "red" |> Node
+
+
+drawNode node =
+    case node of
+        Node shape ->
+            let
+                { x, y, width, height } =
+                    shape
+            in
+            rect shape.fill width height [ transform [ shift ( x, y ) ] ]
+
+        Layer nodeAttributes nodes ->
+            group [] (List.map drawNode nodes)
+
+
 main =
+    let
+        l1 =
+            newLayer [ newRect 0 0 300 400 ]
+    in
     canvas ( 600, 600 )
         []
         [ rect "blue" 100 100 []
+        , drawNode l1
         ]
 
 

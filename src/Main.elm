@@ -190,14 +190,13 @@ renderBoardBackgroundTileLayer cellWidth =
 renderMove color offset cellWidth direction =
     let
         radius =
-            cellWidth / 6
+            cellWidth / 10
     in
     [ triangle color
         radius
         [ stroke "white"
         , transform
             [ rotate (dirToDeg direction + 90)
-            , shift (dirToUnitVec direction |> mapBoth (mul (cellWidth / 3)) (mul (cellWidth / 3)))
             , case direction of
                 Up ->
                     shift ( offset, 0 )
@@ -210,6 +209,10 @@ renderMove color offset cellWidth direction =
 
                 Right ->
                     shift ( 0, offset )
+            , shift
+                (dirToUnitVec direction
+                    |> mapEach (mul (cellWidth / 3))
+                )
             ]
         ]
     ]

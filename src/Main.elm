@@ -5,14 +5,100 @@ module Main exposing (main)
 import Browser
 import Browser.Dom
 import Browser.Events
+import Dict exposing (Dict)
 import Html exposing (Html)
 import Html.Attributes as HA
 import String exposing (fromFloat)
 import Svg as S exposing (svg, text, text_)
-import Svg.Attributes as SA exposing (dominantBaseline, fill, textAnchor)
+import Svg.Attributes as SA exposing (dominantBaseline, fill, stroke, textAnchor)
 import Task
 import Tuple exposing (mapBoth)
 import TypedSvg.Attributes as TA exposing (viewBox)
+
+
+type Cell
+    = Empty
+    | Start Direction
+
+
+type Direction
+    = Up
+    | Down
+    | Left
+    | Right
+
+
+type alias Board =
+    { dict : Dict ( Int, Int ) Cell
+    , start : { pos : ( Int, Int ), dir : Direction }
+    }
+
+
+boardWidth =
+    10
+
+
+boardHeight =
+    10
+
+
+boardSize =
+    ( 10, 10 )
+
+
+boardPositions =
+    List.range 0 (boardWidth - 1)
+        |> List.concatMap (\x -> List.range 0 (boardHeight - 1) |> List.map (Tuple.pair x))
+
+
+emptyBoard : Board
+emptyBoard =
+    { dict = Dict.empty
+    , start = { pos = ( 0, 0 ), dir = Left }
+    }
+
+
+getCellAt p board =
+    if p == board.start.pos then
+        Start board.start.dir
+
+    else
+        Dict.get p board.dict |> Maybe.withDefault Empty
+
+
+boardCellList board =
+    boardPositions
+        |> List.map
+            (\p ->
+                ( p, getCellAt p board )
+            )
+
+
+renderBoard cellWidth board =
+    let
+        { dict, start } =
+            board
+
+        cellSize =
+            ( cellWidth, cellWidth )
+
+        renderCellContent cell =
+            case cell of
+                Empty ->
+                    []
+
+                Start direction ->
+                    []
+
+        renderCellBackground p =
+            rect "none" cellSize [ stroke "gray", strokeWidth (cellWidth / 10) ]
+
+        renderCell p cell =
+            renderCellBackground p :: renderCellContent cell
+    in
+    boardCellList board
+        |> List.map (\( p, c ) -> ( p, renderCell p c ))
+        |> gridLayout cellSize boardSize []
 
 
 
@@ -74,9 +160,17 @@ subscriptions _ =
 
 view : Model -> Html Msg
 view model =
+    let
+        ( sw, sh ) =
+            model.screenSize
+
+        cellWidth =
+            min (sw / boardWidth) (sh / boardHeight)
+    in
     canvas model.screenSize
         []
-        [ rect "dodgerblue" 100 100 []
+        [ rect "dodgerblue" ( 100, 100 ) []
+        , renderBoard cellWidth emptyBoard
         ]
 
 
@@ -103,7 +197,7 @@ mapEach f =
     mapBoth f f
 
 
-gridLayout cellSize gridSize_ =
+gridLayout cellSize gridSize_ attrs =
     let
         transformCell ( idx, svgView ) =
             let
@@ -126,7 +220,7 @@ gridLayout cellSize gridSize_ =
             (cellHeight - (gridHeight * cellHeight)) / 2
     in
     List.map transformCell
-        >> group [ transform [ shift ( dx, dy ) ] ]
+        >> group (transform [ shift ( dx, dy ) ] :: attrs)
 
 
 
@@ -169,10 +263,10 @@ words color string attrs =
 
 
 square c w =
-    rect c w w
+    rect c ( w, w )
 
 
-rect color width height attrs =
+rect color ( width, height ) attrs =
     let
         ( x, y ) =
             ( width / 2, height / 2 )
@@ -226,3 +320,7 @@ transformToString { x, y, s, deg } =
         ++ t "scale" [ s ]
         ++ " "
         ++ t "rotate" [ deg ]
+
+
+empty =
+    S.text ""

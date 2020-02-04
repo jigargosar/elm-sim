@@ -88,7 +88,9 @@ emptyBoard =
     { dict = Dict.empty
     , move =
         Dict.empty
+            |> Dict.insert ( 1, 1 ) Down
 
+    --Dict.empty
     --|> Dict.insert ( 2, 0 ) Down
     --|> Dict.insert ( 2, 1 ) Up
     --|> Dict.insert ( 2, 2 ) Left

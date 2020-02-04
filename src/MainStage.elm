@@ -27,6 +27,24 @@ rect w h =
     NodeAttributes "" 0 0 w h "red" |> Node
 
 
+setSize ( w, h ) node =
+    case node of
+        Group na l ->
+            Group { na | width = w, height = h } l
+
+        Node na ->
+            Node { na | width = w, height = h }
+
+
+getSize node =
+    case node of
+        Group na _ ->
+            ( na.width, na.height )
+
+        Node na ->
+            ( na.width, na.height )
+
+
 drawNode node =
     case node of
         Node shape ->
@@ -40,7 +58,5 @@ drawNode node =
             MC.group [] (List.map drawNode nodes)
 
 
-stage ( w, h ) nodes =
-    MC.canvas ( w, h )
-        []
-        (List.map drawNode nodes)
+render node =
+    MC.canvas (getSize node) [] [ drawNode node ]

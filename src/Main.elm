@@ -4,7 +4,7 @@ module Main exposing (main)
 
 import Browser
 import Html exposing (Html)
-import MainStage exposing (group, rect, stage)
+import MainStage as S
 
 
 
@@ -12,16 +12,29 @@ import MainStage exposing (group, rect, stage)
 
 
 type alias Model =
-    {}
+    { root : S.Node }
 
 
 type alias Flags =
     ()
 
 
+initRootNode =
+    let
+        ( w, h ) =
+            ( 600, 600 )
+    in
+    S.group
+        [ S.rect (w / 2) (h / 4)
+        , S.rect (w / 2) (h / 4)
+        ]
+        |> S.setSize ( 600, 600 )
+
+
 init : Flags -> ( Model, Cmd Msg )
 init _ =
-    ( {}
+    ( { root = initRootNode
+      }
     , Cmd.none
     )
 
@@ -51,10 +64,8 @@ subscriptions _ =
 
 
 view : Model -> Html Msg
-view _ =
-    stage ( 600, 600 )
-        [ group [ rect 300 400 ]
-        ]
+view model =
+    S.render model.root
 
 
 empty : Html msg

@@ -5,13 +5,11 @@ module Main exposing (main)
 import Browser
 import Browser.Dom
 import Browser.Events
-import Dict exposing (Dict)
 import Html exposing (Html)
 import Html.Attributes as HA
-import Json.Decode as JD
-import String exposing (fromFloat, fromInt)
+import String exposing (fromFloat)
 import Svg as S exposing (svg, text, text_)
-import Svg.Attributes as SA exposing (dominantBaseline, fill, stroke, textAnchor)
+import Svg.Attributes as SA exposing (dominantBaseline, fill, textAnchor)
 import Task
 import Tuple exposing (mapBoth)
 import TypedSvg.Attributes as TA exposing (viewBox)

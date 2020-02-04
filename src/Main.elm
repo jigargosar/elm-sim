@@ -182,7 +182,7 @@ mul =
 
 renderBoard cellWidth board =
     [ renderBoardBackground cellWidth
-    , renderInstructionLayer "dodgerblue" cellWidth board
+    , renderInstructionLayer "#1e90ff" cellWidth board
         |> List.singleton
         |> group [ transform [ shift ( cellWidth / 5, cellWidth / 5 ) ] ]
     , renderInstructionLayer "#d74d2e" cellWidth board

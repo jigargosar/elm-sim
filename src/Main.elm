@@ -40,11 +40,11 @@ boardWidth =
 
 
 boardHeight =
-    10
+    8
 
 
 boardSize =
-    ( 10, 10 )
+    ( boardWidth, boardHeight )
 
 
 boardPositions =
@@ -96,7 +96,7 @@ renderBoard cellWidth board =
         renderCellBackground ( x, y ) =
             let
                 isCenterCell =
-                    x == 5 || x == 4 || y == 5 || y == 4
+                    x == 5 || x == 4
 
                 bgColor =
                     if isCenterCell then
@@ -107,8 +107,8 @@ renderBoard cellWidth board =
             in
             rect bgColor
                 cellSize
-                [ stroke "#191919"
-                , strokeWidth (cellWidth / 30)
+                [ SA.rx (fromFloat 20)
+                , SA.ry (fromFloat 10)
                 ]
 
         renderCell p cell =
@@ -252,7 +252,8 @@ canvas ( w, h ) attrs =
     in
     svg
         (viewBox x y w h
-            :: TA.shapeRendering T.RenderGeometricPrecision
+            :: TA.shapeRendering T.RenderCrispEdges
+            :: TA.imageRendering T.RenderingOptimizeQuality
             :: TA.textRendering T.TextRenderingOptimizeLegibility
             :: HA.style "position" "fixed"
             :: HA.style "top" "0"

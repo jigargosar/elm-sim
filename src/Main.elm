@@ -85,7 +85,7 @@ boardPositions =
 emptyBoard : Board
 emptyBoard =
     { dict = Dict.empty
-    , start = { pos = ( 0, 0 ), dir = Left }
+    , start = { pos = ( 4, 1 ), dir = Left }
     }
 
 

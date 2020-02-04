@@ -104,7 +104,7 @@ renderBoardBackground cellWidth =
         |> gridLayout cellSize boardSize []
 
 
-renderBoard cellWidth board =
+renderBoardLayer color cellWidth board =
     let
         { dict, start } =
             board
@@ -118,14 +118,23 @@ renderBoard cellWidth board =
                     []
 
                 Start direction ->
-                    [ circle "dodgerblue" (cellWidth / 4) []
+                    [ circle color (cellWidth / 4) []
                     , words "white" "Start" [ transform [ scale (cellWidth / 16 / 6) ] ]
                     ]
     in
-    [ renderBoardBackground cellWidth
-    , boardCellList board
+    boardCellList board
         |> List.map (\( p, c ) -> ( p, renderCell c ))
         |> gridLayout cellSize boardSize []
+
+
+renderBoard cellWidth board =
+    [ renderBoardBackground cellWidth
+    , renderBoardLayer "dodgerblue" cellWidth board
+        |> List.singleton
+        |> group [ transform [ shift ( cellWidth / 5, cellWidth / 5 ) ] ]
+    , renderBoardLayer "#d74d2e" cellWidth board
+        |> List.singleton
+        |> group [ transform [ shift ( -cellWidth / 5, -cellWidth / 5 ) ] ]
     ]
         |> group []
 

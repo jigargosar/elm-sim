@@ -75,23 +75,10 @@ boardCellList board =
             )
 
 
-renderBoard cellWidth board =
+renderBoardBackground cellWidth =
     let
-        { dict, start } =
-            board
-
         cellSize =
             ( cellWidth, cellWidth )
-
-        renderCellContent cell =
-            case cell of
-                Empty ->
-                    []
-
-                Start direction ->
-                    [ circle "dodgerblue" (cellWidth / 4) []
-                    , words "white" "Start" [ transform [ scale (cellWidth / 16 / 6) ] ]
-                    ]
 
         renderCellBackground ( x, y ) =
             let
@@ -105,18 +92,42 @@ renderBoard cellWidth board =
                     else
                         "#2e2e2e"
             in
-            rect bgColor
+            [ rect bgColor
                 cellSize
                 [ SA.rx (fromFloat (cellWidth / 15))
                 , transformRect cellSize [ scale 0.985 ]
                 ]
-
-        renderCell p cell =
-            renderCellBackground p :: renderCellContent cell
+            ]
     in
-    boardCellList board
-        |> List.map (\( p, c ) -> ( p, renderCell p c ))
+    boardPositions
+        |> List.map (\p -> ( p, renderCellBackground p ))
         |> gridLayout cellSize boardSize []
+
+
+renderBoard cellWidth board =
+    let
+        { dict, start } =
+            board
+
+        cellSize =
+            ( cellWidth, cellWidth )
+
+        renderCell cell =
+            case cell of
+                Empty ->
+                    []
+
+                Start direction ->
+                    [ circle "dodgerblue" (cellWidth / 4) []
+                    , words "white" "Start" [ transform [ scale (cellWidth / 16 / 6) ] ]
+                    ]
+    in
+    [ renderBoardBackground cellWidth
+    , boardCellList board
+        |> List.map (\( p, c ) -> ( p, renderCell c ))
+        |> gridLayout cellSize boardSize []
+    ]
+        |> group []
 
 
 

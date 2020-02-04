@@ -108,8 +108,7 @@ renderBoard cellWidth board =
             rect bgColor
                 cellSize
                 [ SA.rx (fromFloat (cellWidth / 15))
-                , transform [ scale 0.985 ]
-                , geometricPrecision
+                , transformRect cellSize [ scale 0.985 ]
                 ]
 
         renderCell p cell =
@@ -359,6 +358,13 @@ shift ( dx, dy ) t =
 
 transform =
     List.foldl (<|) identityTransform
+        >> transformToString
+        >> SA.transform
+
+
+transformRect ( w, h ) =
+    List.foldl (<|) identityTransform
+        >> shift ( -w / 2, -h / 2 )
         >> transformToString
         >> SA.transform
 

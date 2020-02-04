@@ -19,11 +19,7 @@ type alias Flags =
     ()
 
 
-initRootNode =
-    let
-        ( w, h ) =
-            ( 600, 600 )
-    in
+initRootNode ( w, h ) =
     S.group
         [ S.rect (w / 2) (h / 4)
         , S.rect (w / 2) (h / 4)
@@ -33,7 +29,11 @@ initRootNode =
 
 init : Flags -> ( Model, Cmd Msg )
 init _ =
-    ( { root = initRootNode
+    let
+        size =
+            ( 600, 600 )
+    in
+    ( { root = initRootNode size
       }
     , Cmd.none
     )

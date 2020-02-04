@@ -205,7 +205,7 @@ renderCell color cellWidth cell =
             ]
 
 
-renderMove color ( ox, oy ) cellWidth direction =
+renderMove color offset cellWidth direction =
     let
         radius =
             cellWidth / 6
@@ -218,16 +218,16 @@ renderMove color ( ox, oy ) cellWidth direction =
             , shift (dirToUnitVec direction |> mapBoth (mul (cellWidth / 3)) (mul (cellWidth / 3)))
             , case direction of
                 Up ->
-                    shift ( ox, 0 )
+                    shift ( offset, 0 )
 
                 Down ->
-                    shift ( ox, 0 )
+                    shift ( offset, 0 )
 
                 Left ->
-                    shift ( 0, oy )
+                    shift ( 0, offset )
 
                 Right ->
-                    shift ( 0, oy )
+                    shift ( 0, offset )
             ]
         ]
     ]
@@ -275,9 +275,8 @@ renderBoard cellWidth board =
         |> shiftLayer (cellWidth / 5)
     , renderInstructionLayer "#d74d2e" cellWidth board
         |> shiftLayer (-cellWidth / 5)
-    , renderMovementLayer "#1e90ff" ( -cellWidth / 5, -cellWidth / 5 ) cellWidth board
-
-    --, renderMovementLayer "#d74d2e" ( 0, cellWidth / 5 ) cellWidth board
+    , renderMovementLayer "#1e90ff" (-cellWidth / 5) cellWidth board
+    , renderMovementLayer "#d74d2e" (cellWidth / 5) cellWidth board
     ]
         |> group []
 

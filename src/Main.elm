@@ -88,10 +88,26 @@ renderBoard cellWidth board =
                     []
 
                 Start direction ->
-                    []
+                    [ circle "dodgerblue" (cellWidth * 0.5 * 0.9) [] ]
 
-        renderCellBackground p =
-            rect "none" cellSize [ stroke "gray", strokeWidth (cellWidth / 10) ]
+        renderCellBackground ( x, y ) =
+            let
+                isCenterCell =
+                    x == 5 || x == 4
+
+                bgFade =
+                    if isCenterCell then
+                        0.6
+
+                    else
+                        0.5
+            in
+            rect "gray"
+                cellSize
+                [ stroke "rgba(0,0,0,0.1)"
+                , strokeWidth (cellWidth / 20)
+                , fade bgFade
+                ]
 
         renderCell p cell =
             renderCellBackground p :: renderCellContent cell
@@ -279,6 +295,20 @@ rect color ( width, height ) attrs =
         []
 
 
+circle color r =
+    ellipse color ( r, r )
+
+
+ellipse color ( width, height ) attrs =
+    S.ellipse
+        (SA.rx (fromFloat width)
+            :: SA.ry (fromFloat height)
+            :: fill color
+            :: attrs
+        )
+        []
+
+
 type alias Transform =
     { x : Float
     , y : Float
@@ -320,6 +350,10 @@ transformToString { x, y, s, deg } =
         ++ t "scale" [ s ]
         ++ " "
         ++ t "rotate" [ deg ]
+
+
+fade =
+    fromFloat >> SA.opacity
 
 
 empty =

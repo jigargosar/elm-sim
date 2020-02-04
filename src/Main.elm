@@ -94,20 +94,19 @@ renderBoard cellWidth board =
         renderCellBackground ( x, y ) =
             let
                 isCenterCell =
-                    x == 5 || x == 4
+                    x == 5 || x == 4 || y == 5 || y == 4
 
-                bgFade =
+                bgColor =
                     if isCenterCell then
-                        0.6
+                        "#555555"
 
                     else
-                        0.5
+                        "#343434"
             in
-            rect "gray"
+            rect bgColor
                 cellSize
-                [ stroke "rgba(0,0,0,0.1)"
+                [ stroke "#191919"
                 , strokeWidth (cellWidth / 20)
-                , fade bgFade
                 ]
 
         renderCell p cell =
@@ -185,7 +184,7 @@ view model =
             min (sw / boardWidth) (sh / boardHeight)
     in
     canvas model.screenSize
-        []
+        [ HA.style "background-color" "black" ]
         [ rect "dodgerblue" ( 100, 100 ) []
         , renderBoard cellWidth emptyBoard
         ]

@@ -105,32 +105,54 @@ boardCellList board =
             )
 
 
+type Background
+    = Light
+    | Darker
+    | Dark
+
+
+classifyBackground ( x, y ) =
+    if x == 4 || x == 5 then
+        -- Center
+        Dark
+
+    else if (x < 4 && y < 4) || (x > 4 && y > 3) then
+        -- Quad 1
+        Light
+
+    else
+        -- Quad 2
+        Darker
+
+
+renderCellBackground cellSize cellWidth p =
+    let
+        bgColor =
+            case classifyBackground p of
+                Light ->
+                    "#383838"
+
+                Dark ->
+                    "#2e2e2e"
+
+                Darker ->
+                    "#242424"
+    in
+    [ rect bgColor
+        cellSize
+        [ SA.rx (fromFloat (cellWidth / 15))
+        , transformRect cellSize [ scale 0.985 ]
+        ]
+    ]
+
+
 renderBoardBackground cellWidth =
     let
         cellSize =
             ( cellWidth, cellWidth )
-
-        renderCellBackground ( x, _ ) =
-            let
-                isCenterCell =
-                    x == 5 || x == 4
-
-                bgColor =
-                    if isCenterCell then
-                        "#1f1f1f"
-
-                    else
-                        "#2e2e2e"
-            in
-            [ rect bgColor
-                cellSize
-                [ SA.rx (fromFloat (cellWidth / 15))
-                , transformRect cellSize [ scale 0.985 ]
-                ]
-            ]
     in
     boardPositions
-        |> List.map (\p -> ( p, renderCellBackground p ))
+        |> List.map (\p -> ( p, renderCellBackground cellSize cellWidth p ))
         |> gridLayout cellSize boardSize []
 
 

@@ -17,9 +17,8 @@ import TypedSvg.Attributes as TA exposing (viewBox)
 import TypedSvg.Types as T
 
 
-type Cell
-    = Empty
-    | Start Direction
+type Instruction
+    = Start Direction
 
 
 type Direction
@@ -60,7 +59,7 @@ dirToUnitVec dir =
 
 
 type alias Board =
-    { dict : Dict ( Int, Int ) Cell
+    { dict : Dict ( Int, Int ) Instruction
     , move : Dict ( Int, Int ) Direction
     , start : { pos : ( Int, Int ), dir : Direction }
     }
@@ -99,23 +98,24 @@ emptyBoard =
     }
 
 
-getCellAt p board =
+getInstructionAt p board =
     if p == board.start.pos then
-        Start board.start.dir
+        Just (Start board.start.dir)
 
     else
-        Dict.get p board.dict |> Maybe.withDefault Empty
+        Dict.get p board.dict
 
 
 getMoveAt p board =
     Dict.get p board.move
 
 
-boardCellList board =
+boardInstructions board =
     boardPositions
-        |> List.map
+        |> List.filterMap
             (\p ->
-                ( p, getCellAt p board )
+                getInstructionAt p board
+                    |> Maybe.map (Tuple.pair p)
             )
 
 
@@ -179,35 +179,6 @@ renderBoardBackgroundTileLayer cellWidth =
         |> gridLayout cellSize boardSize []
 
 
-renderCell color cellWidth cell =
-    let
-        radius =
-            cellWidth / 6
-    in
-    case cell of
-        Empty ->
-            []
-
-        Start direction ->
-            [ empty
-            , triangle color
-                radius
-                [ stroke "white"
-                , transform
-                    [ rotate (dirToDeg direction + 90)
-                    , shift (dirToUnitVec direction |> mapEach (mul (radius * 0.5)))
-                    ]
-                ]
-            , circle color
-                radius
-                [ stroke "white"
-
-                --, transform [ shift ( cellWidth / 30, 0 ) ]
-                ]
-            , words "white" "Start" [ transform [ scale (radius / 16 * 0.75) ] ]
-            ]
-
-
 renderMove color offset cellWidth direction =
     let
         radius =
@@ -236,10 +207,6 @@ renderMove color offset cellWidth direction =
     ]
 
 
-swap ( a, b ) =
-    ( b, a )
-
-
 renderMovementLayer color offset cellWidth board =
     let
         cellSize =
@@ -250,6 +217,32 @@ renderMovementLayer color offset cellWidth board =
         |> gridLayout cellSize boardSize []
 
 
+renderInstruction color cellWidth instruction =
+    let
+        radius =
+            cellWidth / 6
+    in
+    case instruction of
+        Start direction ->
+            [ empty
+            , triangle color
+                radius
+                [ stroke "white"
+                , transform
+                    [ rotate (dirToDeg direction + 90)
+                    , shift (dirToUnitVec direction |> mapEach (mul (radius * 0.5)))
+                    ]
+                ]
+            , circle color
+                radius
+                [ stroke "white"
+
+                --, transform [ shift ( cellWidth / 30, 0 ) ]
+                ]
+            , words "white" "Start" [ transform [ scale (radius / 16 * 0.75) ] ]
+            ]
+
+
 renderInstructionLayer color cellWidth board =
     let
         { dict, start } =
@@ -258,8 +251,8 @@ renderInstructionLayer color cellWidth board =
         cellSize =
             ( cellWidth, cellWidth )
     in
-    boardCellList board
-        |> List.map (\( p, c ) -> ( p, renderCell color cellWidth c ))
+    boardInstructions board
+        |> List.map (\( p, c ) -> ( p, renderInstruction color cellWidth c ))
         |> gridLayout cellSize boardSize []
 
 

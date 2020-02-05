@@ -28,6 +28,21 @@ type Direction
     | Right
 
 
+oppositeDir dir =
+    case dir of
+        Up ->
+            Down
+
+        Down ->
+            Up
+
+        Left ->
+            Right
+
+        Right ->
+            Left
+
+
 dirToDeg dir =
     case dir of
         Up ->
@@ -292,15 +307,25 @@ movePathIndices board =
         isValid ( x, y ) =
             x >= 0 && y >= 0 && x < boardWidth && y < boardHeight
 
-        buildMovePath from path =
-            case getNextPosDir from of
-                Just to ->
-                    buildMovePath to (from.pos :: path)
+        isOpposite a b =
+            a.dir == oppositeDir b.dir
+
+        buildMovePath current path journal =
+            case getNextPosDir current of
+                Just next ->
+                    if isOpposite current next then
+                        next.pos :: path
+
+                    else
+                        buildMovePath next (next.pos :: path) journal
 
                 Nothing ->
-                    from.pos :: path
+                    path
+
+        startBuildingMovePath from =
+            buildMovePath from [ from.pos ] (Dict.singleton from.pos from.dir)
     in
-    buildMovePath board.start []
+    startBuildingMovePath board.start
 
 
 renderMovePath : String -> Float -> Board -> S.Svg msg

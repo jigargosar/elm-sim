@@ -269,8 +269,8 @@ nextPosDir ({ pos, dir } as m) =
     { m | pos = movePosInDir dir pos }
 
 
-movePath : Board -> List Int2
-movePath board =
+movePathIndices : Board -> List Int2
+movePathIndices board =
     let
         getNextPosDir : PosDir -> Maybe PosDir
         getNextPosDir current =
@@ -308,7 +308,7 @@ renderMovePath : String -> Float -> Board -> S.Svg msg
 renderMovePath color cellWidth board =
     let
         path =
-            movePath board
+            movePathIndices board
 
         points =
             path
@@ -377,7 +377,7 @@ renderBoard cellWidth board =
                 >> group [ transform [ shift ( factor, factor ) ] ]
 
         _ =
-            movePath board |> Debug.log "debug"
+            movePathIndices board |> Debug.log "debug"
 
         blue =
             "#1e90ff"

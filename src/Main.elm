@@ -436,15 +436,15 @@ renderBoard cellWidth board =
     in
     [ renderBackgroundTileLayer cellWidth
     , renderMovePath blue cellWidth board
-        |> shiftLayer (cellWidth / 5)
+        |> shiftLayer (cellWidth / 6)
     , renderMovePath red cellWidth board
-        |> shiftLayer (-cellWidth / 5)
+        |> shiftLayer (-cellWidth / 6)
     , renderInstructionLayer blue cellWidth board
-        |> shiftLayer (cellWidth / 5)
+        |> shiftLayer (cellWidth / 6)
     , renderInstructionLayer red cellWidth board
-        |> shiftLayer (-cellWidth / 5)
-    , renderMoveLayer blue (cellWidth / 5) cellWidth board
-    , renderMoveLayer red (-cellWidth / 5) cellWidth board
+        |> shiftLayer (-cellWidth / 6)
+    , renderMoveLayer blue (cellWidth / 6) cellWidth board
+    , renderMoveLayer red (-cellWidth / 6) cellWidth board
     ]
         |> group []
 

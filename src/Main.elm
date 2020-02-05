@@ -295,13 +295,12 @@ movePathIndices board =
         buildMovePath from path =
             case getNextPosDir from of
                 Just to ->
-                    buildMovePath to (to :: path)
+                    buildMovePath to (from.pos :: path)
 
                 Nothing ->
-                    path
+                    from.pos :: path
     in
-    buildMovePath board.start [ board.start ]
-        |> List.map .pos
+    buildMovePath board.start []
 
 
 renderMovePath : String -> Float -> Board -> S.Svg msg

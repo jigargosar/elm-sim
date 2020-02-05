@@ -69,7 +69,7 @@ type alias Float2 =
 type alias Board =
     { insDict : Dict Int2 Instruction
     , moveDict : Dict Int2 Direction
-    , start : PathEl
+    , start : PosDir
     }
 
 
@@ -256,11 +256,11 @@ renderMoveArrowLayer color offset cellWidth board =
 -- RENDER MOVE PATH
 
 
-type alias PathEl =
+type alias PosDir =
     { pos : Int2, dir : Direction }
 
 
-getMovePath : Board -> List PathEl
+getMovePath : Board -> List PosDir
 getMovePath board =
     let
         getNextMoveInstruction current =
@@ -277,7 +277,7 @@ getMovePath board =
             if isValid nextPos then
                 case getMoveAt nextPos board of
                     Just nextDir ->
-                        Just (PathEl nextPos nextDir)
+                        Just (PosDir nextPos nextDir)
 
                     Nothing ->
                         getNextMoveInstruction { pos = nextPos, dir = dir }

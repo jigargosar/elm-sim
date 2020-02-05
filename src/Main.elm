@@ -291,6 +291,22 @@ nextPosDir ({ pos, dir } as m) =
 movePathIndices : Board -> List Int2
 movePathIndices board =
     let
+        getNextPosDirOrCurrent current =
+            let
+                next =
+                    nextPosDir current
+            in
+            if isValid next.pos then
+                case moveAt next.pos board of
+                    Just nextDir ->
+                        { next | dir = nextDir }
+
+                    Nothing ->
+                        getNextPosDirOrCurrent next
+
+            else
+                current
+
         getNextPosDir : PosDir -> Maybe PosDir
         getNextPosDir current =
             let
@@ -303,7 +319,7 @@ movePathIndices board =
                         Just { next | dir = nextDir }
 
                     Nothing ->
-                        Just next
+                        Just (getNextPosDirOrCurrent next)
 
             else
                 Nothing

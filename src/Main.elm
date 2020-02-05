@@ -8,7 +8,7 @@ import Browser.Events
 import Dict exposing (Dict)
 import Html exposing (Html)
 import Html.Attributes as HA
-import String exposing (fromFloat)
+import String exposing (String, fromFloat)
 import Svg as S exposing (svg, text, text_)
 import Svg.Attributes as SA exposing (dominantBaseline, fill, stroke, textAnchor)
 import Task
@@ -62,10 +62,14 @@ type alias Int2 =
     ( Int, Int )
 
 
+type alias Float2 =
+    ( Float, Float )
+
+
 type alias Board =
     { dict : Dict Int2 Instruction
     , move : Dict Int2 Direction
-    , start : { pos : Int2, dir : Direction }
+    , start : PathEl
     }
 
 
@@ -168,6 +172,7 @@ classifyBackground ( x, y ) =
         Darker
 
 
+renderCellBackgroundTile : Float2 -> Float -> Int2 -> List (S.Svg msg)
 renderCellBackgroundTile cellSize cellWidth p =
     let
         bgColor =
@@ -189,6 +194,7 @@ renderCellBackgroundTile cellSize cellWidth p =
     ]
 
 
+renderBoardBackgroundTileLayer : Float -> S.Svg msg
 renderBoardBackgroundTileLayer cellWidth =
     let
         cellSize =
@@ -203,6 +209,7 @@ renderBoardBackgroundTileLayer cellWidth =
 -- Render MoveArrow
 
 
+renderMove : String -> Float -> Float -> Direction -> List (S.Svg msg)
 renderMove color offset cellWidth direction =
     let
         radius =
@@ -234,6 +241,7 @@ renderMove color offset cellWidth direction =
     ]
 
 
+renderMoveArrowLayer : String -> Float -> Float -> Board -> S.Svg msg
 renderMoveArrowLayer color offset cellWidth board =
     let
         cellSize =
@@ -248,10 +256,18 @@ renderMoveArrowLayer color offset cellWidth board =
 -- RENDER MOVE PATH
 
 
+type alias PathEl =
+    { pos : Int2, dir : Direction }
+
+
+getMovePath : Board -> List PathEl
 getMovePath board =
     let
-        getNextMoveInstruction { pos, dir } =
+        getNextMoveInstruction current =
             let
+                { pos, dir } =
+                    current
+
                 ( x, y ) =
                     pos
 
@@ -261,13 +277,13 @@ getMovePath board =
             if isValid nextPos then
                 case getMoveAt nextPos board of
                     Just nextDir ->
-                        Just { pos = nextPos, dir = nextDir }
+                        Just (PathEl nextPos nextDir)
 
                     Nothing ->
                         getNextMoveInstruction { pos = nextPos, dir = dir }
 
             else
-                Just { pos = pos, dir = dir }
+                Just current
 
         isValid ( x, y ) =
             x >= 0 && y >= 0 && x < boardWidth && y < boardHeight
@@ -287,6 +303,7 @@ getMovePath board =
     buildMovePath board.start [ board.start ]
 
 
+renderMovePath : String -> Float -> Board -> S.Svg msg
 renderMovePath color cellWidth board =
     let
         path =
@@ -305,6 +322,7 @@ renderMovePath color cellWidth board =
 -- RENDER INSTRUCTIONS
 
 
+renderInstruction : String -> Float -> Instruction -> List (S.Svg msg)
 renderInstruction color cellWidth instruction =
     let
         radius =
@@ -589,6 +607,7 @@ polygon color points attrs =
         []
 
 
+rect : String -> Float2 -> List (S.Attribute msg) -> S.Svg msg
 rect color ( width, height ) attrs =
     let
         ( x, y ) =
@@ -680,6 +699,7 @@ transform =
         >> SA.transform
 
 
+transformRect : Float2 -> List (Transform -> Transform) -> S.Attribute msg
 transformRect ( w, h ) =
     List.foldl (<|) identityTransform
         >> shift ( -w / 2, -h / 2 )

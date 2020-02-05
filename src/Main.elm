@@ -67,8 +67,8 @@ type alias Float2 =
 
 
 type alias Board =
-    { dict : Dict Int2 Instruction
-    , move : Dict Int2 Direction
+    { insDict : Dict Int2 Instruction
+    , moveDict : Dict Int2 Direction
     , start : PathEl
     }
 
@@ -99,8 +99,8 @@ boardPositions =
 
 emptyBoard : Board
 emptyBoard =
-    { dict = Dict.empty
-    , move =
+    { insDict = Dict.empty
+    , moveDict =
         Dict.empty
             |> Dict.insert ( 1, 1 ) Down
 
@@ -119,12 +119,12 @@ getInstructionAt p board =
         Just (Start board.start.dir)
 
     else
-        Dict.get p board.dict
+        Dict.get p board.insDict
 
 
 getMoveAt : Int2 -> Board -> Maybe Direction
 getMoveAt p board =
-    Dict.get p board.move
+    Dict.get p board.moveDict
 
 
 boardInstructions : Board -> List ( Int2, Instruction )

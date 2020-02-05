@@ -260,27 +260,30 @@ type alias PosDir =
     { pos : Int2, dir : Direction }
 
 
+movePosInDir dir ( x, y ) =
+    dirToUnitVec dir |> (\( dx, dy ) -> ( x + dx, y + dy ))
+
+
+nextPosDir : PosDir -> PosDir
+nextPosDir ({ pos, dir } as m) =
+    { m | pos = movePosInDir dir pos }
+
+
 movePath : Board -> List PosDir
 movePath board =
     let
         getNextMoveInstruction current =
             let
-                { pos, dir } =
-                    current
-
-                ( x, y ) =
-                    pos
-
-                nextPos =
-                    dirToUnitVec dir |> (\( dx, dy ) -> ( x + dx, y + dy ))
+                next =
+                    nextPosDir current
             in
-            if isValid nextPos then
-                case moveAt nextPos board of
+            if isValid next.pos then
+                case moveAt next.pos board of
                     Just nextDir ->
-                        Just (PosDir nextPos nextDir)
+                        Just { next | dir = nextDir }
 
                     Nothing ->
-                        getNextMoveInstruction { pos = nextPos, dir = dir }
+                        getNextMoveInstruction next
 
             else
                 Just current

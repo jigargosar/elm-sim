@@ -120,6 +120,7 @@ emptyBoard =
             |> Dict.insert ( 1, 1 ) Down
             |> Dict.insert ( 1, 4 ) Right
             |> Dict.insert ( 6, 4 ) Up
+            |> Dict.insert ( 6, 4 ) Left
             |> Dict.insert ( 6, 1 ) Left
 
     --Dict.empty

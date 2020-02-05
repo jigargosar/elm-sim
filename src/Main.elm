@@ -113,8 +113,8 @@ emptyBoard =
     }
 
 
-getInstructionAt : Int2 -> Board -> Maybe Instruction
-getInstructionAt p board =
+instructionAt : Int2 -> Board -> Maybe Instruction
+instructionAt p board =
     if p == board.start.pos then
         Just (Start board.start.dir)
 
@@ -122,27 +122,27 @@ getInstructionAt p board =
         Dict.get p board.insDict
 
 
-getMoveAt : Int2 -> Board -> Maybe Direction
-getMoveAt p board =
+moveAt : Int2 -> Board -> Maybe Direction
+moveAt p board =
     Dict.get p board.moveDict
 
 
-boardInstructions : Board -> List ( Int2, Instruction )
-boardInstructions board =
+instructionList : Board -> List ( Int2, Instruction )
+instructionList board =
     boardPositions
         |> List.filterMap
             (\p ->
-                getInstructionAt p board
+                instructionAt p board
                     |> Maybe.map (Tuple.pair p)
             )
 
 
-boardMoveList : Board -> List ( Int2, Direction )
-boardMoveList board =
+moveList : Board -> List ( Int2, Direction )
+moveList board =
     boardPositions
         |> List.filterMap
             (\p ->
-                getMoveAt p board
+                moveAt p board
                     |> Maybe.map (Tuple.pair p)
             )
 
@@ -194,8 +194,8 @@ renderCellBackgroundTile cellSize cellWidth p =
     ]
 
 
-renderBoardBackgroundTileLayer : Float -> S.Svg msg
-renderBoardBackgroundTileLayer cellWidth =
+renderBackgroundTileLayer : Float -> S.Svg msg
+renderBackgroundTileLayer cellWidth =
     let
         cellSize =
             ( cellWidth, cellWidth )
@@ -241,13 +241,13 @@ renderMove color offset cellWidth direction =
     ]
 
 
-renderMoveArrowLayer : String -> Float -> Float -> Board -> S.Svg msg
-renderMoveArrowLayer color offset cellWidth board =
+renderMoveLayer : String -> Float -> Float -> Board -> S.Svg msg
+renderMoveLayer color offset cellWidth board =
     let
         cellSize =
             ( cellWidth, cellWidth )
     in
-    boardMoveList board
+    moveList board
         |> List.map (\( p, v ) -> ( p, renderMove color offset cellWidth v ))
         |> gridLayout cellSize boardSize []
 
@@ -260,8 +260,8 @@ type alias PosDir =
     { pos : Int2, dir : Direction }
 
 
-getMovePath : Board -> List PosDir
-getMovePath board =
+movePath : Board -> List PosDir
+movePath board =
     let
         getNextMoveInstruction current =
             let
@@ -275,7 +275,7 @@ getMovePath board =
                     dirToUnitVec dir |> (\( dx, dy ) -> ( x + dx, y + dy ))
             in
             if isValid nextPos then
-                case getMoveAt nextPos board of
+                case moveAt nextPos board of
                     Just nextDir ->
                         Just (PosDir nextPos nextDir)
 
@@ -307,7 +307,7 @@ renderMovePath : String -> Float -> Board -> S.Svg msg
 renderMovePath color cellWidth board =
     let
         path =
-            getMovePath board
+            movePath board
 
         points =
             path
@@ -355,7 +355,7 @@ renderInstructionLayer color cellWidth board =
         cellSize =
             ( cellWidth, cellWidth )
     in
-    boardInstructions board
+    instructionList board
         |> List.map (\( p, c ) -> ( p, renderInstruction color cellWidth c ))
         |> gridLayout cellSize boardSize []
 
@@ -376,19 +376,25 @@ renderBoard cellWidth board =
                 >> group [ transform [ shift ( factor, factor ) ] ]
 
         _ =
-            getMovePath board |> Debug.log "debug"
+            movePath board |> Debug.log "debug"
+
+        blue =
+            "#1e90ff"
+
+        red =
+            "#d74d2e"
     in
-    [ renderBoardBackgroundTileLayer cellWidth
-    , renderMovePath "#1e90ff" cellWidth board
+    [ renderBackgroundTileLayer cellWidth
+    , renderMovePath blue cellWidth board
         |> shiftLayer (cellWidth / 5)
-    , renderMovePath "#d74d2e" cellWidth board
+    , renderMovePath red cellWidth board
         |> shiftLayer (-cellWidth / 5)
-    , renderInstructionLayer "#1e90ff" cellWidth board
+    , renderInstructionLayer blue cellWidth board
         |> shiftLayer (cellWidth / 5)
-    , renderInstructionLayer "#d74d2e" cellWidth board
+    , renderInstructionLayer red cellWidth board
         |> shiftLayer (-cellWidth / 5)
-    , renderMoveArrowLayer "#1e90ff" (cellWidth / 5) cellWidth board
-    , renderMoveArrowLayer "#d74d2e" (-cellWidth / 5) cellWidth board
+    , renderMoveLayer blue (cellWidth / 5) cellWidth board
+    , renderMoveLayer red (-cellWidth / 5) cellWidth board
     ]
         |> group []
 

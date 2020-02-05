@@ -237,7 +237,7 @@ renderMove color offset cellWidth direction =
     [ triangle color
         radius
         [ stroke "white"
-        , strokeWidth (radius / 10)
+        , strokeWidth (radius / 20)
         , transform
             [ rotate (dirToDeg direction + 90)
             , case direction of
@@ -386,7 +386,7 @@ renderInstruction color cellWidth instruction =
             , triangle color
                 radius
                 [ stroke "white"
-                , strokeWidth (radius / 20)
+                , strokeWidth (radius / 30)
                 , transform
                     [ rotate (dirToDeg direction + 90)
                     , shift (dirToUnitVec direction |> mapEach (mul (radius * 0.5)))
@@ -395,7 +395,7 @@ renderInstruction color cellWidth instruction =
             , circle color
                 radius
                 [ stroke "white"
-                , strokeWidth (radius / 20)
+                , strokeWidth (radius / 30)
 
                 --, transform [ shift ( cellWidth / 30, 0 ) ]
                 ]

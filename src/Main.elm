@@ -118,10 +118,12 @@ getInstructionAt p board =
         Dict.get p board.dict
 
 
+getMoveAt : Int2 -> Board -> Maybe Direction
 getMoveAt p board =
     Dict.get p board.move
 
 
+boardInstructions : Board -> List ( Int2, Instruction )
 boardInstructions board =
     boardPositions
         |> List.filterMap
@@ -131,6 +133,7 @@ boardInstructions board =
             )
 
 
+boardMoveList : Board -> List ( Int2, Direction )
 boardMoveList board =
     boardPositions
         |> List.filterMap
@@ -150,6 +153,7 @@ type Background
     | Dark
 
 
+classifyBackground : Int2 -> Background
 classifyBackground ( x, y ) =
     if x == 4 || x == 5 then
         -- Center

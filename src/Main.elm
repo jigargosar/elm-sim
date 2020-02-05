@@ -316,10 +316,15 @@ movePathIndices board =
             case getNextPosDir current of
                 Just next ->
                     if isOpposite current next then
+                        -- Immediate Loop Node
+                        next.pos :: path
+
+                    else if Dict.get next.pos journal == Just next.dir then
+                        -- Cyclic path
                         next.pos :: path
 
                     else
-                        buildMovePath next (next.pos :: path) journal
+                        buildMovePath next (next.pos :: path) (Dict.insert next.pos next.dir journal)
 
                 Nothing ->
                     path

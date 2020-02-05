@@ -272,6 +272,7 @@ nextPosDir ({ pos, dir } as m) =
 movePath : Board -> List PosDir
 movePath board =
     let
+        getNextMoveInstruction : PosDir -> Maybe PosDir
         getNextMoveInstruction current =
             let
                 next =
@@ -283,10 +284,10 @@ movePath board =
                         Just { next | dir = nextDir }
 
                     Nothing ->
-                        getNextMoveInstruction next
+                        Just next
 
             else
-                Just current
+                Nothing
 
         isValid ( x, y ) =
             x >= 0 && y >= 0 && x < boardWidth && y < boardHeight
@@ -294,11 +295,7 @@ movePath board =
         buildMovePath from path =
             case getNextMoveInstruction from of
                 Just to ->
-                    if from == to then
-                        path
-
-                    else
-                        buildMovePath to (to :: path)
+                    buildMovePath to (to :: path)
 
                 Nothing ->
                     path

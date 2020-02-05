@@ -109,7 +109,7 @@ emptyBoard =
     --|> Dict.insert ( 2, 1 ) Up
     --|> Dict.insert ( 2, 2 ) Left
     --|> Dict.insert ( 1, 2 ) Right
-    , start = { pos = ( 4, 1 ), dir = Left }
+    , start = PosDir ( 4, 1 ) Left
     }
 
 

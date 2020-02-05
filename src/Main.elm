@@ -370,7 +370,7 @@ renderMovePath color cellWidth board =
         [ fill "none"
         , TA.points points
         , stroke color
-        , strokeWidth (cellWidth / 30)
+        , strokeWidth (cellWidth / 50)
         , TA.strokeLinejoin T.StrokeLinejoinRound
         ]
         []

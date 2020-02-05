@@ -269,11 +269,11 @@ nextPosDir ({ pos, dir } as m) =
     { m | pos = movePosInDir dir pos }
 
 
-movePath : Board -> List PosDir
+movePath : Board -> List Int2
 movePath board =
     let
-        getNextMoveInstruction : PosDir -> Maybe PosDir
-        getNextMoveInstruction current =
+        getNextPosDir : PosDir -> Maybe PosDir
+        getNextPosDir current =
             let
                 next =
                     nextPosDir current
@@ -293,7 +293,7 @@ movePath board =
             x >= 0 && y >= 0 && x < boardWidth && y < boardHeight
 
         buildMovePath from path =
-            case getNextMoveInstruction from of
+            case getNextPosDir from of
                 Just to ->
                     buildMovePath to (to :: path)
 
@@ -301,6 +301,7 @@ movePath board =
                     path
     in
     buildMovePath board.start [ board.start ]
+        |> List.map .pos
 
 
 renderMovePath : String -> Float -> Board -> S.Svg msg
@@ -312,7 +313,7 @@ renderMovePath color cellWidth board =
         points =
             path
                 |> List.reverse
-                |> List.map (\el -> el.pos |> mapEach (toFloat >> mul cellWidth))
+                |> List.map (mapEach (toFloat >> mul cellWidth))
     in
     [ S.polyline [ fill "none", TA.points points, stroke color, strokeWidth (cellWidth / 30) ] [] ]
         |> groupGridTransform ( cellWidth, cellWidth ) boardSize []

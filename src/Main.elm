@@ -58,10 +58,14 @@ dirToUnitVec dir =
             ( 1, 0 )
 
 
+type alias Int2 =
+    ( Int, Int )
+
+
 type alias Board =
-    { dict : Dict ( Int, Int ) Instruction
-    , move : Dict ( Int, Int ) Direction
-    , start : { pos : ( Int, Int ), dir : Direction }
+    { dict : Dict Int2 Instruction
+    , move : Dict Int2 Direction
+    , start : { pos : Int2, dir : Direction }
     }
 
 
@@ -73,13 +77,20 @@ boardHeight =
     8
 
 
+boardSize : Int2
 boardSize =
     ( boardWidth, boardHeight )
 
 
+int2 : Int -> Int -> Int2
+int2 x y =
+    ( x, y )
+
+
+boardPositions : List Int2
 boardPositions =
     List.range 0 (boardWidth - 1)
-        |> List.concatMap (\x -> List.range 0 (boardHeight - 1) |> List.map (Tuple.pair x))
+        |> List.concatMap (\x -> List.range 0 (boardHeight - 1) |> List.map (int2 x))
 
 
 emptyBoard : Board
@@ -98,6 +109,7 @@ emptyBoard =
     }
 
 
+getInstructionAt : Int2 -> Board -> Maybe Instruction
 getInstructionAt p board =
     if p == board.start.pos then
         Just (Start board.start.dir)
@@ -315,11 +327,9 @@ renderInstruction color cellWidth instruction =
             ]
 
 
+renderInstructionLayer : String -> Float -> Board -> S.Svg msg
 renderInstructionLayer color cellWidth board =
     let
-        { dict, start } =
-            board
-
         cellSize =
             ( cellWidth, cellWidth )
     in
@@ -336,6 +346,7 @@ mul =
 -- RENDER BOARD
 
 
+renderBoard : Float -> Board -> S.Svg msg
 renderBoard cellWidth board =
     let
         shiftLayer factor =

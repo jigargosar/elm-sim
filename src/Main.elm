@@ -232,7 +232,7 @@ renderMove : String -> Float -> Float -> Direction -> List (S.Svg msg)
 renderMove color offset cellWidth direction =
     let
         radius =
-            cellWidth / 10
+            cellWidth / 14
     in
     [ triangle color
         radius
@@ -253,7 +253,8 @@ renderMove color offset cellWidth direction =
                     shift ( 0, offset )
             , shift
                 (dirToUnitVec direction
-                    |> mapEach (mul (cellWidth / 3))
+                    -- Equation to touch the cell edge in given direction
+                    |> mapEach (mul (cellWidth / 2 - radius))
                 )
             ]
         ]

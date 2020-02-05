@@ -366,7 +366,15 @@ renderMovePath color cellWidth board =
                 |> List.reverse
                 |> List.map (mapEach (toFloat >> mul cellWidth))
     in
-    [ S.polyline [ fill "none", TA.points points, stroke color, strokeWidth (cellWidth / 30) ] [] ]
+    [ S.polyline
+        [ fill "none"
+        , TA.points points
+        , stroke color
+        , strokeWidth (cellWidth / 30)
+        , TA.strokeLinejoin T.StrokeLinejoinRound
+        ]
+        []
+    ]
         |> groupGridTransform ( cellWidth, cellWidth ) boardSize []
 
 

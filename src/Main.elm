@@ -419,7 +419,10 @@ renderInstruction color cellWidth instruction =
                 ]
 
         wordsHelp string =
-            words "white" string [ transform [ scale (radius / 16 * 0.75) ] ]
+            words "white"
+                string
+                [ transform [ scale (radius / 16 * 0.5) ]
+                ]
     in
     case instruction of
         Start direction ->
@@ -434,20 +437,20 @@ renderInstruction color cellWidth instruction =
                     ]
                 ]
             , circleHelp
-            , wordsHelp "Start"
+            , wordsHelp "START"
             ]
 
         Input ->
-            [ circleHelp, wordsHelp "In" ]
+            [ circleHelp, wordsHelp "IN" ]
 
         Grab ->
-            [ circleHelp, wordsHelp "Grab" ]
+            [ circleHelp, wordsHelp "GRAB" ]
 
         Drop ->
-            [ circleHelp, wordsHelp "Drop" ]
+            [ circleHelp, wordsHelp "DROP" ]
 
         Output ->
-            [ circleHelp, wordsHelp "Out" ]
+            [ circleHelp, wordsHelp "OUT" ]
 
 
 renderInstructionLayer : String -> Float -> Board -> S.Svg msg

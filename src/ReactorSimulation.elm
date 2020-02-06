@@ -4,8 +4,10 @@ module ReactorSimulation exposing (..)
 
 import Browser
 import Element exposing (..)
+import Element.Background as Background
 import Element.Border as Border
 import Element.Font as Font
+import Element.Input as Input
 import Html exposing (Html)
 import Html.Attributes
 
@@ -81,14 +83,31 @@ subscriptions _ =
 -- View
 
 
+blue =
+    Element.rgb255 238 238 238
+
+
 view : Model -> Html Msg
 view model =
     column
         [ width fill
         , centerX
         ]
-        [ viewState model.state ]
+        [ viewState model.state
+        , row [ spacing 10 ]
+            [ button Nothing "Start"
+            , button Nothing "Stop"
+            ]
+        ]
         |> layout []
+
+
+button onPress string =
+    Input.button
+        [ Background.color blue
+        , padding 10
+        ]
+        { onPress = onPress, label = text string }
 
 
 viewState state =

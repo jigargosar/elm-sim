@@ -5,7 +5,6 @@ module ReactorSimulation exposing (..)
 import Browser
 import Element exposing (..)
 import Element.Background as Background
-import Element.Border as Border
 import Element.Input as Input
 import Html exposing (Html)
 import Html.Attributes
@@ -19,15 +18,8 @@ type Location
     = Location Int Int
 
 
-type State
-    = Running
-    | Paused
-    | NotStarted
-
-
 type alias Model =
-    { location : Location
-    , state : State
+    { state : Location
     }
 
 
@@ -35,9 +27,13 @@ type alias Flags =
     ()
 
 
+initialState =
+    Location 0 0
+
+
 init : Flags -> ( Model, Cmd Msg )
 init _ =
-    ( { location = Location 0 0, state = NotStarted }
+    ( { state = initialState }
     , Cmd.none
     )
 
@@ -48,8 +44,6 @@ init _ =
 
 type Msg
     = NoOp
-    | Play
-    | Pause
     | Reset
     | Step
 
@@ -64,25 +58,18 @@ update message model =
         NoOp ->
             ( model, Cmd.none )
 
-        Play ->
-            ( setState Running model, Cmd.none )
-
-        Pause ->
-            ( setState Paused model, Cmd.none )
-
         Reset ->
-            ( setState NotStarted model, Cmd.none )
+            ( setState initialState model, Cmd.none )
 
         Step ->
             ( { model
-                | location = nextLocation model.location
-                , state = Running
+                | state = stepState model.state
               }
             , Cmd.none
             )
 
 
-nextLocation (Location x y) =
+stepState (Location x y) =
     Location (x + 1) y
 
 
@@ -124,18 +111,6 @@ button onPress string =
         , padding 10
         ]
         { onPress = onPress, label = text string }
-
-
-stateToString state =
-    case state of
-        NotStarted ->
-            "NotStarted"
-
-        Running ->
-            "Running"
-
-        Paused ->
-            "Paused"
 
 
 

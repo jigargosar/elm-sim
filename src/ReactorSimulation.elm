@@ -3,10 +3,10 @@ module ReactorSimulation exposing (..)
 -- Browser.Element Scaffold
 
 import Browser
-import Element exposing (centerX, centerY, column, fill, height, layout, row, width)
-import Element.Border
-import Element.Font
-import Html exposing (Html, div, text)
+import Element exposing (..)
+import Element.Border as Border
+import Element.Font as Font
+import Html exposing (Html)
 import Html.Attributes
 
 
@@ -84,12 +84,8 @@ subscriptions _ =
 view : Model -> Html Msg
 view model =
     column
-        [ Element.htmlAttribute (Html.Attributes.class "")
+        [ width fill
         , centerX
-
-        --, centerY
-        --, width fill
-        --, height fill
         ]
         [ viewState model.state ]
         |> layout []
@@ -97,12 +93,12 @@ view model =
 
 viewState state =
     Element.el
-        [ Element.Border.width 2
-        , width fill
+        [ Border.width 2
+
+        --, width shrink
         , centerX
-        , Element.Font.center
         ]
-        (Element.text (stateToString state))
+        (text (stateToString state))
 
 
 stateToString state =
@@ -129,3 +125,23 @@ main =
         , update = update
         , subscriptions = subscriptions
         }
+
+
+
+-- Element Helpers
+--
+--
+--
+--noinspection ElmUnusedSymbol
+
+
+noneA =
+    Element.htmlAttribute (Html.Attributes.class "")
+
+
+
+--noinspection ElmUnusedSymbol
+
+
+explain =
+    Element.explain Debug.todo

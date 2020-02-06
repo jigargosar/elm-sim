@@ -445,6 +445,10 @@ renderBoard cellWidth board =
 
         red =
             "#d74d2e"
+
+        gridLayoutHelp =
+            gridLayout ( cellWidth, cellWidth )
+                boardSize
     in
     [ renderBackgroundTileLayer cellWidth
     , renderMovePath blue cellWidth board
@@ -457,6 +461,8 @@ renderBoard cellWidth board =
         |> shiftLayer (-cellWidth / 6)
     , renderMoveLayer blue (cellWidth / 6) cellWidth board
     , renderMoveLayer red (-cellWidth / 6) cellWidth board
+    , gridLayoutHelp []
+        [ ( ( 0, 0 ), [ circle blue 10 [] ] ) ]
     ]
         |> group []
 

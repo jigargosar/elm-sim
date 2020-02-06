@@ -464,6 +464,7 @@ renderBoard cellWidth board =
         |> group []
 
 
+renderWaldo : String -> Float -> List (S.Svg msg)
 renderWaldo color cellWidth =
     [ ring color
         (cellWidth / 2)

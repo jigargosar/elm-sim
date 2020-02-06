@@ -62,7 +62,7 @@ update message model =
         Step ->
             case model of
                 Simulation prev current ->
-                    ( Simulation (current :: prev) (stepState current)
+                    ( step prev current
                     , Cmd.none
                     )
 
@@ -74,7 +74,7 @@ update message model =
                         ( newPrev, newCurrent ) =
                             List.foldl func ( prev, current ) next
                     in
-                    ( Simulation newPrev newCurrent
+                    ( step newPrev newCurrent
                     , Cmd.none
                     )
 
@@ -121,8 +121,12 @@ redo prev current next =
             History (current :: prev) newCurrent newNext
 
 
-stepState (Location x y) =
+stepLoc (Location x y) =
     Location (x + 1) y
+
+
+step prev current =
+    Simulation (current :: prev) (stepLoc current)
 
 
 subscriptions : Model -> Sub Msg

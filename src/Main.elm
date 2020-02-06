@@ -122,6 +122,7 @@ initialBoard =
     { insDict =
         Dict.empty
             |> Dict.insert ( 0, 0 ) (Start Up)
+            |> Dict.insert ( 3, 1 ) Input
     , moveDict =
         Dict.empty
             |> Dict.insert ( 1, 1 ) Down
@@ -583,32 +584,32 @@ update message model =
 
 
 stepWaldo model =
-    { model | waldo = stepWaldoHelp model.board model.waldo }
-
-
-stepWaldoHelp board waldo =
     let
-        getNextPosDir : PosDir -> Maybe PosDir
-        getNextPosDir current =
+        stepWaldoHelp board waldo =
             let
-                next =
-                    nextPosDir current
+                getNextPosDir : PosDir -> Maybe PosDir
+                getNextPosDir current =
+                    let
+                        next =
+                            nextPosDir current
+                    in
+                    if isValid next.pos then
+                        case moveAt next.pos board of
+                            Just nextDir ->
+                                Just { next | dir = nextDir }
+
+                            Nothing ->
+                                Just next
+
+                    else
+                        Nothing
+
+                isValid ( x, y ) =
+                    x >= 0 && y >= 0 && x < boardWidth && y < boardHeight
             in
-            if isValid next.pos then
-                case moveAt next.pos board of
-                    Just nextDir ->
-                        Just { next | dir = nextDir }
-
-                    Nothing ->
-                        Just next
-
-            else
-                Nothing
-
-        isValid ( x, y ) =
-            x >= 0 && y >= 0 && x < boardWidth && y < boardHeight
+            getNextPosDir waldo |> Maybe.withDefault waldo
     in
-    getNextPosDir waldo |> Maybe.withDefault waldo
+    { model | waldo = stepWaldoHelp model.board model.waldo }
 
 
 subscriptions : Model -> Sub Msg

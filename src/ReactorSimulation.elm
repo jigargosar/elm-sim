@@ -15,8 +15,8 @@ import Html.Attributes
 -- Model
 
 
-type Location
-    = Location Int Int
+type State
+    = State Int
 
 
 type alias Model =
@@ -28,7 +28,7 @@ type alias Flags =
 
 
 initialLocation =
-    Location 0 0
+    State 0
 
 
 init : Flags -> ( Model, Cmd Msg )
@@ -39,8 +39,8 @@ init _ =
 
 
 type Model2
-    = Simulation (List Location) Location
-    | History (List Location) Location (List Location)
+    = Simulation (List State) State
+    | History (List State) State (List State)
 
 
 
@@ -122,12 +122,12 @@ redo prev current next =
             History (current :: prev) newCurrent newNext
 
 
-stepLoc (Location x y) =
-    Location (x + 1) y
+stepState (State n) =
+    State (n + 1)
 
 
 step prev current =
-    Simulation (current :: prev) (stepLoc current)
+    Simulation (current :: prev) (stepState current)
 
 
 subscriptions : Model -> Sub Msg

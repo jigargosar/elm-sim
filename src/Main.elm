@@ -456,8 +456,8 @@ mul =
 -- RENDER BOARD
 
 
-renderBoard : Float -> Board -> Waldo -> S.Svg msg
-renderBoard cellWidth board waldo =
+renderBoard : Float -> Board -> Waldo -> Dict Int2 Atom -> S.Svg msg
+renderBoard cellWidth board waldo atomDict =
     let
         shiftLayer factor =
             List.singleton
@@ -485,8 +485,25 @@ renderBoard cellWidth board waldo =
     , renderMoveLayer red (-cellWidth / 6) cellWidth board
     , renderWaldoLayer blue cellWidth waldo
     , renderWaldoLayer red cellWidth waldo
+    , renderAtomLayer cellWidth atomDict
     ]
         |> group []
+
+
+renderAtomLayer cellWidth atomDict =
+    boardGridLayout cellWidth
+        []
+        (Dict.map (\_ _ -> renderAtom cellWidth) atomDict
+            |> Dict.toList
+        )
+
+
+renderAtom cellWidth =
+    [ circle "yellow"
+        (cellWidth / 2)
+        [ fade 0.5, transform [ scale 0.985 ] ]
+    , words "white" "Atom" []
+    ]
 
 
 renderWaldoLayer color cellWidth waldo =
@@ -665,7 +682,7 @@ view model =
     canvas model.screenSize
         [ HA.style "background-color" "black" ]
         [ polyRect "dodgerblue" ( 100, 100 ) []
-        , renderBoard cellWidth model.board model.waldo
+        , renderBoard cellWidth model.board model.waldo model.atomDict
         ]
 
 
@@ -885,7 +902,7 @@ identityTransform =
 
 
 scale n t =
-    { t | s = n }
+    { t | s = t.s * n }
 
 
 rotate deg t =

@@ -504,6 +504,7 @@ type alias Model =
     { screenSize : ( Float, Float )
     , board : Board
     , waldo : Waldo
+    , elapsed : Int
     }
 
 
@@ -523,6 +524,7 @@ init _ =
     ( { screenSize = size
       , board = board
       , waldo = board.start
+      , elapsed = 0
       }
     , Browser.Dom.getViewport |> Task.perform GotViewport
     )
@@ -536,6 +538,7 @@ type Msg
     = NoOp
     | GotViewport Browser.Dom.Viewport
     | OnResize Int Int
+    | StepWaldo
     | Tick
 
 
@@ -551,11 +554,23 @@ update message model =
         OnResize _ _ ->
             ( model, Browser.Dom.getViewport |> Task.perform GotViewport )
 
+        StepWaldo ->
+            ( stepWaldo model, Cmd.none )
+
         Tick ->
-            ( { model | waldo = stepWaldo model.board model.waldo }, Cmd.none )
+            --( List.range 0 0 |> List.foldl (\_ -> stepWaldo) model, Cmd.none )
+            if model.elapsed > 13 then
+                ( { model | elapsed = 0 } |> stepWaldo, Cmd.none )
+
+            else
+                ( { model | elapsed = model.elapsed + 1 }, Cmd.none )
 
 
-stepWaldo board waldo =
+stepWaldo model =
+    { model | waldo = stepWaldoHelp model.board model.waldo }
+
+
+stepWaldoHelp board waldo =
     let
         getNextPosDir : PosDir -> Maybe PosDir
         getNextPosDir current =
@@ -584,7 +599,9 @@ subscriptions : Model -> Sub Msg
 subscriptions _ =
     Sub.batch
         [ Browser.Events.onResize OnResize
-        , Browser.Events.onKeyDown (JD.succeed Tick)
+
+        --, Browser.Events.onKeyDown (JD.succeed StepWaldo)
+        , Browser.Events.onAnimationFrame (\_ -> Tick)
         ]
 
 

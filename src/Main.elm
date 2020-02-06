@@ -94,7 +94,7 @@ type alias Board =
 
 
 type alias Waldo =
-    PosDir
+    { pd : PosDir }
 
 
 boardWidth =
@@ -509,7 +509,7 @@ renderAtom cellWidth =
 renderWaldoLayer color cellWidth waldo =
     boardGridLayout cellWidth
         []
-        [ ( waldo.pos, renderWaldo color cellWidth ) ]
+        [ ( waldo.pd.pos, renderWaldo color cellWidth ) ]
 
 
 renderWaldo : String -> Float -> List (S.Svg msg)
@@ -562,7 +562,7 @@ init _ =
     in
     ( { screenSize = size
       , board = board
-      , waldo = board.start
+      , waldo = Waldo board.start
       , atomDict = Dict.empty
       , elapsed = 0
       }
@@ -635,7 +635,7 @@ stepWaldo model =
             stepWaldoPosDirMaybe waldo |> Maybe.withDefault waldo
 
         npd =
-            stepWaldoPosDir model.board model.waldo
+            stepWaldoPosDir model.board model.waldo.pd
 
         newAtomDict =
             case instructionAt npd.pos model.board of
@@ -651,7 +651,7 @@ stepWaldo model =
                     Nothing
     in
     { model
-        | waldo = stepWaldoPosDir model.board model.waldo
+        | waldo = Waldo npd
         , atomDict = newAtomDict |> Maybe.withDefault model.atomDict
     }
 

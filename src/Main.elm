@@ -22,6 +22,10 @@ type Instruction
     | Input
 
 
+type Atom
+    = Atom
+
+
 type Direction
     = Up
     | Down
@@ -521,6 +525,7 @@ type alias Model =
     { screenSize : ( Float, Float )
     , board : Board
     , waldo : Waldo
+    , atomDict : Dict Int2 Atom
     , elapsed : Int
     }
 
@@ -541,6 +546,7 @@ init _ =
     ( { screenSize = size
       , board = board
       , waldo = board.start
+      , atomDict = Dict.empty
       , elapsed = 0
       }
     , Browser.Dom.getViewport |> Task.perform GotViewport
@@ -583,12 +589,14 @@ update message model =
                 ( { model | elapsed = model.elapsed + 1 }, Cmd.none )
 
 
+stepWaldo : Model -> Model
 stepWaldo model =
     let
-        stepWaldoHelp board waldo =
+        stepWaldoPosDir : Board -> PosDir -> PosDir
+        stepWaldoPosDir board waldo =
             let
-                getNextPosDir : PosDir -> Maybe PosDir
-                getNextPosDir current =
+                stepWaldoPosDirMaybe : PosDir -> Maybe PosDir
+                stepWaldoPosDirMaybe current =
                     let
                         next =
                             nextPosDir current
@@ -607,9 +615,28 @@ stepWaldo model =
                 isValid ( x, y ) =
                     x >= 0 && y >= 0 && x < boardWidth && y < boardHeight
             in
-            getNextPosDir waldo |> Maybe.withDefault waldo
+            stepWaldoPosDirMaybe waldo |> Maybe.withDefault waldo
+
+        npd =
+            stepWaldoPosDir model.board model.waldo
+
+        newAtomDict =
+            case instructionAt npd.pos model.board of
+                Just ins ->
+                    case ins of
+                        Start _ ->
+                            Nothing
+
+                        Input ->
+                            Just (Dict.insert ( 1, 1 ) Atom model.atomDict)
+
+                Nothing ->
+                    Nothing
     in
-    { model | waldo = stepWaldoHelp model.board model.waldo }
+    { model
+        | waldo = stepWaldoPosDir model.board model.waldo
+        , atomDict = newAtomDict |> Maybe.withDefault model.atomDict
+    }
 
 
 subscriptions : Model -> Sub Msg

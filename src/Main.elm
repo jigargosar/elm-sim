@@ -457,11 +457,16 @@ renderBoard cellWidth board =
         |> shiftLayer (-cellWidth / 6)
     , renderMoveLayer blue (cellWidth / 6) cellWidth board
     , renderMoveLayer red (-cellWidth / 6) cellWidth board
-    , boardGridLayout cellWidth
-        []
-        [ ( board.start.pos, renderWaldo blue cellWidth ) ]
+    , renderWaldoLayer blue cellWidth board.start.pos
+    , renderWaldoLayer red cellWidth board.start.pos
     ]
         |> group []
+
+
+renderWaldoLayer color cellWidth position =
+    boardGridLayout cellWidth
+        []
+        [ ( position, renderWaldo color cellWidth ) ]
 
 
 renderWaldo : String -> Float -> List (S.Svg msg)
@@ -469,7 +474,7 @@ renderWaldo color cellWidth =
     [ ring color
         (cellWidth / 2)
         (cellWidth / 10)
-        [ transform [ scale 0.985 ] ]
+        [ fade 0.8, transform [ scale 0.985 ] ]
     ]
 
 

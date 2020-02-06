@@ -90,11 +90,9 @@ blue =
 view : Model -> Html Msg
 view model =
     column
-        [ width fill
-        , centerX
-        ]
+        [ centerX, spacing 10 ]
         [ viewState model.state
-        , row [ spacing 10 ]
+        , row [ spacing 10, padding 10, centerX ]
             [ button Nothing "Start"
             , button Nothing "Stop"
             ]
@@ -116,8 +114,9 @@ viewState state =
 
         --, width shrink
         , centerX
+        , padding 10
         ]
-        (text (stateToString state))
+        (text ("state: " ++ stateToString state))
 
 
 stateToString state =

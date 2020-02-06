@@ -19,6 +19,7 @@ import TypedSvg.Types as T
 
 type Instruction
     = Start Direction
+    | Input
 
 
 type Direction
@@ -391,6 +392,16 @@ renderInstruction color cellWidth instruction =
     let
         radius =
             cellWidth / 6
+
+        circleHelp =
+            circle color
+                radius
+                [ stroke "white"
+                , strokeWidth (radius / 30)
+                ]
+
+        wordsHelp string =
+            words "white" string [ transform [ scale (radius / 16 * 0.75) ] ]
     in
     case instruction of
         Start direction ->
@@ -404,14 +415,13 @@ renderInstruction color cellWidth instruction =
                     , shift (dirToUnitVec direction |> mapEach (mul (radius * 0.5)))
                     ]
                 ]
-            , circle color
-                radius
-                [ stroke "white"
-                , strokeWidth (radius / 30)
+            , circleHelp
+            , wordsHelp "Start"
+            ]
 
-                --, transform [ shift ( cellWidth / 30, 0 ) ]
-                ]
-            , words "white" "Start" [ transform [ scale (radius / 16 * 0.75) ] ]
+        Input ->
+            [ circleHelp
+            , wordsHelp "In"
             ]
 
 

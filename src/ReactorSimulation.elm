@@ -93,8 +93,9 @@ view model =
         [ centerX, spacing 10 ]
         [ viewState model.state
         , row [ spacing 10, padding 10, centerX ]
-            [ button Nothing "Start"
-            , button Nothing "Stop"
+            [ button (Just Play) "Play"
+            , button (Just Pause) "Pause"
+            , button (Just Reset) "Reset"
             ]
         ]
         |> layout []

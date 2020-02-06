@@ -88,6 +88,10 @@ type alias Board =
     }
 
 
+type alias Waldo =
+    PosDir
+
+
 boardWidth =
     10
 
@@ -112,8 +116,8 @@ boardPositions =
         |> List.concatMap (\x -> List.range 0 (boardHeight - 1) |> List.map (int2 x))
 
 
-emptyBoard : Board
-emptyBoard =
+initialBoard : Board
+initialBoard =
     { insDict = Dict.empty
     , moveDict =
         Dict.empty
@@ -430,8 +434,8 @@ mul =
 -- RENDER BOARD
 
 
-renderBoard : Float -> Board -> S.Svg msg
-renderBoard cellWidth board =
+renderBoard : Float -> Board -> Waldo -> S.Svg msg
+renderBoard cellWidth board waldo =
     let
         shiftLayer factor =
             List.singleton
@@ -457,16 +461,16 @@ renderBoard cellWidth board =
         |> shiftLayer (-cellWidth / 6)
     , renderMoveLayer blue (cellWidth / 6) cellWidth board
     , renderMoveLayer red (-cellWidth / 6) cellWidth board
-    , renderWaldoLayer blue cellWidth board.start.pos
-    , renderWaldoLayer red cellWidth board.start.pos
+    , renderWaldoLayer blue cellWidth waldo
+    , renderWaldoLayer red cellWidth waldo
     ]
         |> group []
 
 
-renderWaldoLayer color cellWidth position =
+renderWaldoLayer color cellWidth waldo =
     boardGridLayout cellWidth
         []
-        [ ( position, renderWaldo color cellWidth ) ]
+        [ ( waldo.pos, renderWaldo color cellWidth ) ]
 
 
 renderWaldo : String -> Float -> List (S.Svg msg)
@@ -496,7 +500,10 @@ ring color radius thickness attrs =
 
 
 type alias Model =
-    { screenSize : ( Float, Float ) }
+    { screenSize : ( Float, Float )
+    , board : Board
+    , waldo : Waldo
+    }
 
 
 type alias Flags =
@@ -508,8 +515,14 @@ init _ =
     let
         size =
             ( 600, 600 )
+
+        board =
+            initialBoard
     in
-    ( { screenSize = size }
+    ( { screenSize = size
+      , board = board
+      , waldo = board.start
+      }
     , Browser.Dom.getViewport |> Task.perform GotViewport
     )
 
@@ -560,7 +573,7 @@ view model =
     canvas model.screenSize
         [ HA.style "background-color" "black" ]
         [ polyRect "dodgerblue" ( 100, 100 ) []
-        , renderBoard cellWidth emptyBoard
+        , renderBoard cellWidth model.board model.waldo
         ]
 
 

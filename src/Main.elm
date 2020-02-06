@@ -119,7 +119,9 @@ boardPositions =
 
 initialBoard : Board
 initialBoard =
-    { insDict = Dict.empty
+    { insDict =
+        Dict.empty
+            |> Dict.insert ( 0, 0 ) (Start Up)
     , moveDict =
         Dict.empty
             |> Dict.insert ( 1, 1 ) Down
@@ -143,7 +145,12 @@ instructionAt p board =
         Just (Start board.start.dir)
 
     else
-        Dict.get p board.insDict
+        case Dict.get p board.insDict of
+            Just (Start _) ->
+                Nothing
+
+            ins ->
+                ins
 
 
 moveAt : Int2 -> Board -> Maybe Direction

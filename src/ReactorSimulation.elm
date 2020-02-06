@@ -19,7 +19,8 @@ type Location
 
 
 type alias Model =
-    { state : Location
+    { prev : List Location
+    , state : Location
     }
 
 
@@ -33,7 +34,7 @@ initialState =
 
 init : Flags -> ( Model, Cmd Msg )
 init _ =
-    ( { state = initialState }
+    ( { prev = [], state = initialState }
     , Cmd.none
     )
 
@@ -44,12 +45,7 @@ init _ =
 
 type Msg
     = NoOp
-    | Reset
     | Step
-
-
-setState state model =
-    { model | state = state }
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -58,12 +54,10 @@ update message model =
         NoOp ->
             ( model, Cmd.none )
 
-        Reset ->
-            ( setState initialState model, Cmd.none )
-
         Step ->
             ( { model
                 | state = stepState model.state
+                , prev = model.state :: model.prev
               }
             , Cmd.none
             )
@@ -99,7 +93,6 @@ view model =
             )
         , row [ spacing 10, padding 10, centerX ]
             [ button (Just Step) "Step"
-            , button (Just Reset) "Reset"
             ]
         ]
         |> layout []

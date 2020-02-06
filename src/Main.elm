@@ -512,16 +512,22 @@ renderAtom cellWidth =
 renderWaldoLayer color cellWidth waldo =
     boardGridLayout cellWidth
         []
-        [ ( waldo.pd.pos, renderWaldo color cellWidth ) ]
+        [ ( waldo.pd.pos, renderWaldo color cellWidth waldo ) ]
 
 
-renderWaldo : String -> Float -> List (S.Svg msg)
-renderWaldo color cellWidth =
-    [ ring color
-        (cellWidth / 2)
-        (cellWidth / 10)
-        [ fade 0.8, transform [ scale 0.985 ] ]
-    ]
+renderWaldo : String -> Float -> Waldo -> List (S.Svg msg)
+renderWaldo color cellWidth waldo =
+    (if waldo.hasAtom then
+        renderAtom cellWidth
+
+     else
+        []
+    )
+        ++ [ ring color
+                (cellWidth / 2)
+                (cellWidth / 10)
+                [ fade 0.8, transform [ scale 0.985 ] ]
+           ]
 
 
 boardGridLayout cellWidth =

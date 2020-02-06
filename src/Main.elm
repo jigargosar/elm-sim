@@ -578,7 +578,6 @@ type Msg
     = NoOp
     | GotViewport Browser.Dom.Viewport
     | OnResize Int Int
-    | StepWaldo
     | Tick
 
 
@@ -594,23 +593,30 @@ update message model =
         OnResize _ _ ->
             ( model, Browser.Dom.getViewport |> Task.perform GotViewport )
 
-        StepWaldo ->
-            ( stepWaldo model, Cmd.none )
-
         Tick ->
             --( List.range 0 0 |> List.foldl (\_ -> stepWaldo) model, Cmd.none )
             if model.elapsed > 13 then
-                ( { model | elapsed = 0 } |> stepWaldo, Cmd.none )
+                ( { model | elapsed = 0 } |> stepWaldo model.board, Cmd.none )
 
             else
                 ( { model | elapsed = model.elapsed + 1 }, Cmd.none )
 
 
-stepWaldo : Model -> Model
-stepWaldo model =
+stepWaldo :
+    Board
+    ->
+        { a
+            | atomDict : Dict Int2 Atom
+            , waldo : Waldo
+        }
+    ->
+        { a
+            | atomDict : Dict Int2 Atom
+            , waldo : Waldo
+        }
+stepWaldo board model =
     let
-        stepWaldoPosDir : Board -> PosDir -> PosDir
-        stepWaldoPosDir board waldo =
+        stepWaldoPosDir waldo =
             let
                 stepWaldoPosDirMaybe : PosDir -> Maybe PosDir
                 stepWaldoPosDirMaybe current =
@@ -634,29 +640,27 @@ stepWaldo model =
             in
             stepWaldoPosDirMaybe waldo |> Maybe.withDefault waldo
 
-        newAtomDict waldo =
-            case instructionAt waldo.pd.pos model.board of
-                Just ins ->
-                    case ins of
-                        Start _ ->
-                            Nothing
-
-                        Input ->
-                            Just (Dict.insert ( 1, 1 ) Atom model.atomDict)
-
-                Nothing ->
-                    Nothing
-
         getNewWaldo waldo =
-            { waldo | pd = stepWaldoPosDir model.board waldo.pd }
-
-        newWaldo =
-            getNewWaldo model.waldo
+            { waldo | pd = stepWaldoPosDir waldo.pd }
     in
     { model
-        | waldo = newWaldo
-        , atomDict = newAtomDict newWaldo |> Maybe.withDefault model.atomDict
+        | waldo = getNewWaldo model.waldo
     }
+        |> executeWaldoInstruction board
+
+
+executeWaldoInstruction board model =
+    case instructionAt model.waldo.pd.pos board of
+        Just ins ->
+            case ins of
+                Start _ ->
+                    model
+
+                Input ->
+                    { model | atomDict = Dict.insert ( 1, 1 ) Atom model.atomDict }
+
+        Nothing ->
+            model
 
 
 subscriptions : Model -> Sub Msg

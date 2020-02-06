@@ -512,9 +512,9 @@ renderAtomLayer cellWidth atomDict =
 
 
 renderAtom cellWidth =
-    [ circle "yellow"
-        (cellWidth / 2)
-        [ fade 0.5, transform [ scale 0.985 ] ]
+    [ circle "white"
+        (cellWidth / 2 - cellWidth / 10)
+        [ transform [ scale 0.985 ] ]
     , words "white" "Atom" []
     ]
 

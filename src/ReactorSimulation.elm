@@ -100,11 +100,6 @@ stateToString state =
             "Paused"
 
 
-empty : Html msg
-empty =
-    Html.text ""
-
-
 
 -- Main
 

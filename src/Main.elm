@@ -465,7 +465,11 @@ renderBoard cellWidth board =
 
 
 renderWaldo color cellWidth =
-    [ ring color (cellWidth / 2) (cellWidth / 10) [ transform [ scale 0.985 ] ] ]
+    [ ring color
+        (cellWidth / 2)
+        (cellWidth / 10)
+        [ transform [ scale 0.985 ] ]
+    ]
 
 
 boardGridLayout cellWidth =

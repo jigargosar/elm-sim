@@ -21,6 +21,7 @@ type Instruction
     = Start Direction
     | Input
     | Grab
+    | Drop
 
 
 type Atom
@@ -439,6 +440,9 @@ renderInstruction color cellWidth instruction =
         Grab ->
             [ circleHelp, wordsHelp "Grab" ]
 
+        Drop ->
+            [ circleHelp, wordsHelp "Drop" ]
+
 
 renderInstructionLayer : String -> Float -> Board -> S.Svg msg
 renderInstructionLayer color cellWidth board =
@@ -678,6 +682,16 @@ executeWaldoInstruction board ({ waldo, atomDict } as model) =
 
                         Nothing ->
                             model
+
+                Drop ->
+                    if waldo.hasAtom then
+                        { model
+                            | atomDict = Dict.insert waldo.pd.pos Atom atomDict
+                            , waldo = { waldo | hasAtom = False }
+                        }
+
+                    else
+                        model
 
         Nothing ->
             model

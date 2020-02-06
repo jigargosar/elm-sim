@@ -86,8 +86,9 @@ view model =
         [ centerX, spacing 10 ]
         [ column [ padding 10 ]
             (Debug.toString model
-                |> String.replace ", " "\n ,"
+                |> String.replace "," "\n,"
                 |> String.replace " }" " \n}"
+                |> String.replace "]" " \n]"
                 |> text
                 |> List.singleton
             )

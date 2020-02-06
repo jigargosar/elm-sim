@@ -445,10 +445,6 @@ renderBoard cellWidth board =
 
         red =
             "#d74d2e"
-
-        gridLayoutHelp =
-            gridLayout ( cellWidth, cellWidth )
-                boardSize
     in
     [ renderBackgroundTileLayer cellWidth
     , renderMovePath blue cellWidth board
@@ -461,10 +457,29 @@ renderBoard cellWidth board =
         |> shiftLayer (-cellWidth / 6)
     , renderMoveLayer blue (cellWidth / 6) cellWidth board
     , renderMoveLayer red (-cellWidth / 6) cellWidth board
-    , gridLayoutHelp []
-        [ ( board.start.pos, [ circle blue 10 [] ] ) ]
+    , boardGridLayout cellWidth
+        []
+        [ ( board.start.pos, renderWaldo blue cellWidth ) ]
     ]
         |> group []
+
+
+renderWaldo color cellWidth =
+    [ ring color (cellWidth / 2) (cellWidth / 10) [ transform [ scale 0.985 ] ] ]
+
+
+boardGridLayout cellWidth =
+    gridLayout ( cellWidth, cellWidth )
+        boardSize
+
+
+ring color radius thickness attrs =
+    circle "none"
+        (radius - (thickness / 2))
+        (stroke color
+            :: strokeWidth thickness
+            :: attrs
+        )
 
 
 
@@ -704,7 +719,7 @@ ellipse color ( width, height ) attrs =
     S.ellipse
         (SA.rx (fromFloat width)
             :: SA.ry (fromFloat height)
-            :: TA.shapeRendering T.RenderGeometricPrecision
+            :: geometricPrecision
             :: fill color
             :: attrs
         )
@@ -768,17 +783,28 @@ shift ( dx, dy ) t =
 
 
 transform =
-    List.foldl (<|) identityTransform
+    applyTransformsToIdentity
         >> transformToString
         >> SA.transform
+
+
+applyTransformsToIdentity =
+    List.foldl (<|) identityTransform
 
 
 transformRect : Float2 -> List (Transform -> Transform) -> S.Attribute msg
-transformRect ( w, h ) =
-    List.foldl (<|) identityTransform
-        >> shift ( -w / 2, -h / 2 )
-        >> transformToString
-        >> SA.transform
+transformRect ( w, h ) list =
+    let
+        t1 =
+            applyTransformsToIdentity list
+                |> transformToString
+
+        t2 =
+            applyTransformsToIdentity
+                [ shift ( -w / 2, -h / 2 ) ]
+                |> transformToString
+    in
+    SA.transform (t1 ++ " " ++ t2)
 
 
 transformToString { x, y, s, deg } =

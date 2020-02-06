@@ -20,6 +20,7 @@ import TypedSvg.Types as T
 type Instruction
     = Start Direction
     | Input
+    | Grab
 
 
 type Atom
@@ -432,9 +433,10 @@ renderInstruction color cellWidth instruction =
             ]
 
         Input ->
-            [ circleHelp
-            , wordsHelp "In"
-            ]
+            [ circleHelp, wordsHelp "In" ]
+
+        Grab ->
+            [ circleHelp, wordsHelp "Grab" ]
 
 
 renderInstructionLayer : String -> Float -> Board -> S.Svg msg
@@ -649,15 +651,26 @@ stepWaldo board model =
         |> executeWaldoInstruction board
 
 
-executeWaldoInstruction board model =
-    case instructionAt model.waldo.pd.pos board of
+executeWaldoInstruction board ({ waldo, atomDict } as model) =
+    case instructionAt waldo.pd.pos board of
         Just ins ->
             case ins of
                 Start _ ->
                     model
 
                 Input ->
-                    { model | atomDict = Dict.insert ( 1, 1 ) Atom model.atomDict }
+                    { model | atomDict = Dict.insert ( 1, 1 ) Atom atomDict }
+
+                Grab ->
+                    case atomDict |> Dict.get waldo.pd.pos of
+                        Just _ ->
+                            { model
+                                | atomDict = Dict.remove waldo.pd.pos atomDict
+                                , waldo = { waldo | hasAtom = True }
+                            }
+
+                        Nothing ->
+                            model
 
         Nothing ->
             model

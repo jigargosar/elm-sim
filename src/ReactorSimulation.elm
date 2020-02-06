@@ -46,6 +46,7 @@ init _ =
 type Msg
     = NoOp
     | Step
+    | Undo
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -61,6 +62,19 @@ update message model =
               }
             , Cmd.none
             )
+
+        Undo ->
+            case model.prev of
+                last :: prev ->
+                    ( { model
+                        | state = last
+                        , prev = prev
+                      }
+                    , Cmd.none
+                    )
+
+                [] ->
+                    ( model, Cmd.none )
 
 
 stepState (Location x y) =

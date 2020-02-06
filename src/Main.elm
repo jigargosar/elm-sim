@@ -469,8 +469,7 @@ renderWaldo color cellWidth =
 
 
 boardGridLayout cellWidth =
-    gridLayout ( cellWidth, cellWidth )
-        boardSize
+    gridLayout ( cellWidth, cellWidth ) boardSize
 
 
 ring color radius thickness attrs =

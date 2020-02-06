@@ -8,6 +8,7 @@ import Browser.Events
 import Dict exposing (Dict)
 import Html exposing (Html)
 import Html.Attributes as HA
+import Json.Decode as JD
 import String exposing (String, fromFloat)
 import Svg as S exposing (svg, text, text_)
 import Svg.Attributes as SA exposing (dominantBaseline, fill, stroke, textAnchor)
@@ -535,6 +536,7 @@ type Msg
     = NoOp
     | GotViewport Browser.Dom.Viewport
     | OnResize Int Int
+    | Tick
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -549,11 +551,40 @@ update message model =
         OnResize _ _ ->
             ( model, Browser.Dom.getViewport |> Task.perform GotViewport )
 
+        Tick ->
+            ( { model | waldo = stepWaldo model.board model.waldo }, Cmd.none )
+
+
+stepWaldo board waldo =
+    let
+        getNextPosDir : PosDir -> Maybe PosDir
+        getNextPosDir current =
+            let
+                next =
+                    nextPosDir current
+            in
+            if isValid next.pos then
+                case moveAt next.pos board of
+                    Just nextDir ->
+                        Just { next | dir = nextDir }
+
+                    Nothing ->
+                        Just next
+
+            else
+                Nothing
+
+        isValid ( x, y ) =
+            x >= 0 && y >= 0 && x < boardWidth && y < boardHeight
+    in
+    getNextPosDir waldo |> Maybe.withDefault waldo
+
 
 subscriptions : Model -> Sub Msg
 subscriptions _ =
     Sub.batch
         [ Browser.Events.onResize OnResize
+        , Browser.Events.onKeyDown (JD.succeed Tick)
         ]
 
 

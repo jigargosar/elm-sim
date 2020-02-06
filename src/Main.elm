@@ -128,6 +128,7 @@ initialBoard =
         Dict.empty
             |> Dict.insert ( 0, 0 ) (Start Up)
             |> Dict.insert ( 3, 1 ) Input
+            |> Dict.insert ( 1, 1 ) Grab
     , moveDict =
         Dict.empty
             |> Dict.insert ( 1, 1 ) Down

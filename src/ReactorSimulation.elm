@@ -6,7 +6,6 @@ import Browser
 import Element exposing (..)
 import Element.Background as Background
 import Element.Border as Border
-import Element.Font as Font
 import Element.Input as Input
 import Html exposing (Html)
 import Html.Attributes
@@ -17,7 +16,7 @@ import Html.Attributes
 
 
 type Location
-    = Location
+    = Location Int Int
 
 
 type State
@@ -27,7 +26,7 @@ type State
 
 
 type alias Model =
-    { initialLocation : Location
+    { location : Location
     , state : State
     }
 
@@ -38,7 +37,7 @@ type alias Flags =
 
 init : Flags -> ( Model, Cmd Msg )
 init _ =
-    ( { initialLocation = Location, state = NotStarted }
+    ( { location = Location 0 0, state = NotStarted }
     , Cmd.none
     )
 
@@ -52,6 +51,7 @@ type Msg
     | Play
     | Pause
     | Reset
+    | Step
 
 
 setState state model =
@@ -73,6 +73,18 @@ update message model =
         Reset ->
             ( setState NotStarted model, Cmd.none )
 
+        Step ->
+            ( { model
+                | location = nextLocation model.location
+                , state = Running
+              }
+            , Cmd.none
+            )
+
+
+nextLocation (Location x y) =
+    Location (x + 1) y
+
 
 subscriptions : Model -> Sub Msg
 subscriptions _ =
@@ -91,10 +103,15 @@ view : Model -> Html Msg
 view model =
     column
         [ centerX, spacing 10 ]
-        [ viewState model.state
+        [ column [ padding 10 ]
+            (Debug.toString model
+                |> String.replace ", " "\n ,"
+                |> String.replace " }" " \n}"
+                |> text
+                |> List.singleton
+            )
         , row [ spacing 10, padding 10, centerX ]
-            [ button (Just Play) "Play"
-            , button (Just Pause) "Pause"
+            [ button (Just Step) "Step"
             , button (Just Reset) "Reset"
             ]
         ]
@@ -107,17 +124,6 @@ button onPress string =
         , padding 10
         ]
         { onPress = onPress, label = text string }
-
-
-viewState state =
-    Element.el
-        [ Border.width 2
-
-        --, width shrink
-        , centerX
-        , padding 10
-        ]
-        (text ("state: " ++ stateToString state))
 
 
 stateToString state =

@@ -3,7 +3,7 @@ module ReactorSimulation exposing (..)
 -- Browser.Element Scaffold
 
 import Browser
-import Element exposing (layout, row)
+import Element exposing (column, layout, row)
 import Html exposing (Html, div, text)
 
 
@@ -80,7 +80,7 @@ subscriptions _ =
 
 view : Model -> Html Msg
 view model =
-    row [] [ viewState model.state ]
+    column [] [ viewState model.state ]
         |> layout []
 
 

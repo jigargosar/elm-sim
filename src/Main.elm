@@ -259,7 +259,7 @@ renderMove color offset cellWidth direction =
     in
     [ triangle color
         radius
-        [ stroke "white"
+        [ stroke "black"
         , strokeWidth (radius / 20)
         , transform
             [ rotate (dirToDeg direction + 90)
@@ -409,12 +409,12 @@ renderInstruction : String -> Float -> Instruction -> List (S.Svg msg)
 renderInstruction color cellWidth instruction =
     let
         radius =
-            cellWidth / 6
+            cellWidth / 5
 
         circleHelp =
             circle color
                 radius
-                [ stroke "white"
+                [ stroke "black"
                 , strokeWidth (radius / 30)
                 ]
 
@@ -426,7 +426,7 @@ renderInstruction color cellWidth instruction =
             [ empty
             , triangle color
                 radius
-                [ stroke "white"
+                [ stroke "black"
                 , strokeWidth (radius / 30)
                 , transform
                     [ rotate (dirToDeg direction + 90)
@@ -486,6 +486,9 @@ renderBoard cellWidth board waldo atomDict =
             "#d74d2e"
     in
     [ renderBackgroundTileLayer cellWidth
+    , renderAtomLayer cellWidth atomDict
+    , renderWaldoLayer blue cellWidth waldo
+    , renderWaldoLayer red cellWidth waldo
     , renderMovePath blue cellWidth board
         |> shiftLayer (cellWidth / 6)
     , renderMovePath red cellWidth board
@@ -496,9 +499,6 @@ renderBoard cellWidth board waldo atomDict =
         |> shiftLayer (-cellWidth / 6)
     , renderMoveLayer blue (cellWidth / 6) cellWidth board
     , renderMoveLayer red (-cellWidth / 6) cellWidth board
-    , renderWaldoLayer blue cellWidth waldo
-    , renderWaldoLayer red cellWidth waldo
-    , renderAtomLayer cellWidth atomDict
     ]
         |> group []
 
@@ -515,7 +515,7 @@ renderAtom cellWidth =
     [ circle "white"
         (cellWidth / 2 - cellWidth / 10)
         [ transform [ scale 0.985 ] ]
-    , words "white" "Atom" []
+    , words "black" "H" [ transform [ scale (cellWidth / 16 / 3) ] ]
     ]
 
 

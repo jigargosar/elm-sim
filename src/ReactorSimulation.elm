@@ -5,6 +5,7 @@ module ReactorSimulation exposing (..)
 import Browser
 import Element exposing (..)
 import Element.Background as Background
+import Element.Font as Font
 import Element.Input as Input
 import Html exposing (Html)
 import Html.Attributes
@@ -146,14 +147,8 @@ view : Model -> Html Msg
 view model =
     column
         [ centerX, spacing 10 ]
-        [ column [ padding 10 ]
-            (Debug.toString model
-                |> String.replace "," "\n,"
-                |> String.replace " }" " \n}"
-                |> String.replace "]" " \n]"
-                |> text
-                |> List.singleton
-            )
+        [ el [ padding 10 ]
+            (viewModel2 model)
         , row [ spacing 10, padding 10, centerX ]
             [ button (Just Step) "Step"
             , button (Just Undo) "Undo"
@@ -161,6 +156,24 @@ view model =
             ]
         ]
         |> layout []
+
+
+viewModel2 model =
+    case model of
+        Simulation prev current ->
+            column [ spacing 10 ]
+                [ el [ Font.bold ] (text "SIMULATION View")
+                , text ("Current: " ++ Debug.toString current)
+                , text ("PrevStateCount: " ++ Debug.toString (List.length prev))
+                ]
+
+        History prev current next ->
+            column [ spacing 10 ]
+                [ el [ Font.bold ] (text "History View")
+                , text ("Current: " ++ Debug.toString current)
+                , text ("PrevStateCount: " ++ Debug.toString (List.length prev))
+                , text ("NextStateCount: " ++ Debug.toString (List.length next))
+                ]
 
 
 button onPress string =

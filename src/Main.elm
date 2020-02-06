@@ -22,6 +22,7 @@ type Instruction
     | Input
     | Grab
     | Drop
+    | Output
 
 
 type Atom
@@ -130,14 +131,15 @@ initialBoard =
             |> Dict.insert ( 0, 0 ) (Start Up)
             |> Dict.insert ( 3, 1 ) Input
             |> Dict.insert ( 1, 1 ) Grab
-            |> Dict.insert ( 6, 3 ) Drop
+            |> Dict.insert ( 7, 3 ) Drop
+            |> Dict.insert ( 6, 1 ) Output
     , moveDict =
         Dict.empty
             |> Dict.insert ( 1, 1 ) Down
             |> Dict.insert ( 1, 4 ) Right
-            |> Dict.insert ( 6, 4 ) Left
-            |> Dict.insert ( 6, 4 ) Up
-            |> Dict.insert ( 6, 1 ) Left
+            |> Dict.insert ( 7, 4 ) Left
+            |> Dict.insert ( 7, 4 ) Up
+            |> Dict.insert ( 7, 1 ) Left
 
     --Dict.empty
     --|> Dict.insert ( 2, 0 ) Down
@@ -444,6 +446,9 @@ renderInstruction color cellWidth instruction =
         Drop ->
             [ circleHelp, wordsHelp "Drop" ]
 
+        Output ->
+            [ circleHelp, wordsHelp "Out" ]
+
 
 renderInstructionLayer : String -> Float -> Board -> S.Svg msg
 renderInstructionLayer color cellWidth board =
@@ -609,7 +614,7 @@ update message model =
 
         Tick ->
             --( List.range 0 0 |> List.foldl (\_ -> stepWaldo) model, Cmd.none )
-            if model.elapsed > 13 then
+            if model.elapsed > 20 then
                 ( { model | elapsed = 0 } |> stepWaldo model.board, Cmd.none )
 
             else
@@ -693,6 +698,11 @@ executeWaldoInstruction board ({ waldo, atomDict } as model) =
 
                     else
                         model
+
+                Output ->
+                    { model
+                        | atomDict = Dict.empty
+                    }
 
         Nothing ->
             model

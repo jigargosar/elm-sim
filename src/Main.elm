@@ -130,6 +130,7 @@ initialBoard =
             |> Dict.insert ( 0, 0 ) (Start Up)
             |> Dict.insert ( 3, 1 ) Input
             |> Dict.insert ( 1, 1 ) Grab
+            |> Dict.insert ( 6, 3 ) Drop
     , moveDict =
         Dict.empty
             |> Dict.insert ( 1, 1 ) Down

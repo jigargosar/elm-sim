@@ -462,7 +462,7 @@ renderBoard cellWidth board =
     , renderMoveLayer blue (cellWidth / 6) cellWidth board
     , renderMoveLayer red (-cellWidth / 6) cellWidth board
     , gridLayoutHelp []
-        [ ( ( 0, 0 ), [ circle blue 10 [] ] ) ]
+        [ ( board.start.pos, [ circle blue 10 [] ] ) ]
     ]
         |> group []
 

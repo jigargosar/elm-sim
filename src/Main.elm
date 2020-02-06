@@ -8,7 +8,6 @@ import Browser.Events
 import Dict exposing (Dict)
 import Html exposing (Html)
 import Html.Attributes as HA
-import Json.Decode as JD
 import String exposing (String, fromFloat)
 import Svg as S exposing (svg, text, text_)
 import Svg.Attributes as SA exposing (dominantBaseline, fill, stroke, textAnchor)

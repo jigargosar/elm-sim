@@ -19,24 +19,27 @@ type Location
 
 
 type alias Model =
-    { prev : List Location
-    , state : Location
-    }
+    Model2
 
 
 type alias Flags =
     ()
 
 
-initialState =
+initialLocation =
     Location 0 0
 
 
 init : Flags -> ( Model, Cmd Msg )
 init _ =
-    ( { prev = [], state = initialState }
+    ( Simulation [] initialLocation
     , Cmd.none
     )
+
+
+type Model2
+    = Simulation (List Location) Location
+    | History (List Location) Location (List Location)
 
 
 
@@ -47,6 +50,7 @@ type Msg
     = NoOp
     | Step
     | Undo
+    | Redo
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -56,25 +60,65 @@ update message model =
             ( model, Cmd.none )
 
         Step ->
-            ( { model
-                | state = stepState model.state
-                , prev = model.state :: model.prev
-              }
-            , Cmd.none
-            )
-
-        Undo ->
-            case model.prev of
-                last :: prev ->
-                    ( { model
-                        | state = last
-                        , prev = prev
-                      }
+            case model of
+                Simulation prev current ->
+                    ( Simulation (current :: prev) (stepState current)
                     , Cmd.none
                     )
 
-                [] ->
-                    ( model, Cmd.none )
+                History prev current next ->
+                    let
+                        func n ( p, c ) =
+                            ( c :: p, n )
+
+                        ( newPrev, newCurrent ) =
+                            List.foldl func ( prev, current ) next
+                    in
+                    ( Simulation newPrev newCurrent
+                    , Cmd.none
+                    )
+
+        Undo ->
+            case model of
+                Simulation prev current ->
+                    ( undo prev current []
+                    , Cmd.none
+                    )
+
+                History prev current next ->
+                    ( undo prev current next
+                    , Cmd.none
+                    )
+
+        Redo ->
+            case model of
+                Simulation prev current ->
+                    ( redo prev current []
+                    , Cmd.none
+                    )
+
+                History prev current next ->
+                    ( redo prev current next
+                    , Cmd.none
+                    )
+
+
+undo prev current next =
+    case prev of
+        [] ->
+            History prev current next
+
+        newCurrent :: newPrev ->
+            History newPrev newCurrent (current :: next)
+
+
+redo prev current next =
+    case next of
+        [] ->
+            History prev current next
+
+        newCurrent :: newNext ->
+            History (current :: prev) newCurrent newNext
 
 
 stepState (Location x y) =
@@ -108,6 +152,8 @@ view model =
             )
         , row [ spacing 10, padding 10, centerX ]
             [ button (Just Step) "Step"
+            , button (Just Undo) "Undo"
+            , button (Just Redo) "Redo"
             ]
         ]
         |> layout []

@@ -94,7 +94,7 @@ type alias Board =
 
 
 type alias Waldo =
-    { pd : PosDir }
+    { pd : PosDir, hasAtom : Bool }
 
 
 boardWidth =
@@ -562,7 +562,7 @@ init _ =
     in
     ( { screenSize = size
       , board = board
-      , waldo = Waldo board.start
+      , waldo = Waldo board.start False
       , atomDict = Dict.empty
       , elapsed = 0
       }
@@ -634,11 +634,8 @@ stepWaldo model =
             in
             stepWaldoPosDirMaybe waldo |> Maybe.withDefault waldo
 
-        npd =
-            stepWaldoPosDir model.board model.waldo.pd
-
-        newAtomDict =
-            case instructionAt npd.pos model.board of
+        newAtomDict waldo =
+            case instructionAt waldo.pd.pos model.board of
                 Just ins ->
                     case ins of
                         Start _ ->
@@ -649,10 +646,16 @@ stepWaldo model =
 
                 Nothing ->
                     Nothing
+
+        getNewWaldo waldo =
+            { waldo | pd = stepWaldoPosDir model.board waldo.pd }
+
+        newWaldo =
+            getNewWaldo model.waldo
     in
     { model
-        | waldo = Waldo npd
-        , atomDict = newAtomDict |> Maybe.withDefault model.atomDict
+        | waldo = newWaldo
+        , atomDict = newAtomDict newWaldo |> Maybe.withDefault model.atomDict
     }
 
 

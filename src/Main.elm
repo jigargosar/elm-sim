@@ -150,8 +150,8 @@ setStartInstruction x y direction board =
     { board | start = { x = x, y = y, direction = direction } }
 
 
-setI2 : Int -> Int -> Instruction -> MoveInstruction -> Board -> Maybe Board
-setI2 x y instruction moveInstruction board =
+setInstruction2 : Int -> Int -> Instruction -> MoveInstruction -> Board -> Maybe Board
+setInstruction2 x y instruction moveInstruction board =
     if isValidBoardLocation x y board then
         Just
             (mapIB
@@ -169,7 +169,7 @@ setI2List : List ( Int2, Instruction, MoveInstruction ) -> Board -> Maybe Board
 setI2List list board =
     List.foldl
         (\( ( x, y ), instruction, moveInstruction ) ->
-            Maybe.andThen (setI2 x y instruction moveInstruction)
+            Maybe.andThen (setInstruction2 x y instruction moveInstruction)
         )
         (Just board)
         list

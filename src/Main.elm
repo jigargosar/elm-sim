@@ -186,7 +186,13 @@ instructionAt x y board =
         p =
             ( x, y )
     in
-    Dict.get p board.instructions
+    if isValidBoardLocation x y board then
+        Dict.get p board.instructions
+            |> Maybe.withDefault NoInstruction
+            |> Just
+
+    else
+        Nothing
 
 
 moveInstructionAt : Int -> Int -> Board -> Maybe MoveInstruction

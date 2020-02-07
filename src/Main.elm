@@ -95,7 +95,7 @@ type alias Board =
     , height : Int
     , instructions : Instructions
     , moves : Moves
-    , start : PosDir
+    , start : { x : Int, y : Int, direction : Direction }
     }
 
 
@@ -133,11 +133,7 @@ boardPositions =
 
 setStartInstruction : Int -> Int -> Direction -> Board -> Board
 setStartInstruction x y direction board =
-    let
-        start =
-            PosDir ( x, y ) direction
-    in
-    { board | start = start }
+    { board | start = { x = x, y = y, direction = direction } }
 
 
 setInstruction : Int -> Int -> Instruction -> Board -> Maybe Board
@@ -235,7 +231,7 @@ emptyBoard =
     { width = boardWidth
     , height = boardHeight
     , instructions = Dict.empty
-    , start = PosDir ( 4, 1 ) Left
+    , start = { x = 4, y = 1, direction = Left }
     , moves = Dict.empty
     }
 
@@ -373,10 +369,6 @@ renderMoveLayer color offset cellWidth board =
 -- RENDER MOVE PATH
 
 
-type alias PosDir =
-    { pos : Int2, dir : Direction }
-
-
 type alias Journal =
     Dict Int2 Direction
 
@@ -426,16 +418,10 @@ buildMovePathAllIndices board x y direction journal path =
 movePathAllIndices : Board -> List Int2
 movePathAllIndices board =
     let
-        xy =
-            board.start.pos
-
-        ( x, y ) =
-            xy
-
-        direction =
-            board.start.dir
+        { x, y, direction } =
+            board.start
     in
-    buildMovePathAllIndices board x y direction (Dict.singleton xy direction) [ xy ]
+    buildMovePathAllIndices board x y direction (Dict.singleton ( x, y ) direction) [ ( x, y ) ]
         |> List.reverse
 
 
@@ -541,7 +527,7 @@ renderInstructionLayer color cellWidth board =
     in
     instructionList board
         |> List.map (\( p, c ) -> ( p, renderInstruction color cellWidth c ))
-        |> (::) ( board.start.pos, renderStartInstruction color cellWidth board.start.dir )
+        |> (::) ( ( board.start.x, board.start.y ), renderStartInstruction color cellWidth board.start.direction )
         |> gridLayout cellSize boardSize []
 
 
@@ -667,7 +653,7 @@ init _ =
     in
     ( { screenSize = size
       , board = board
-      , waldo = Waldo False (Tuple.first board.start.pos) (Tuple.second board.start.pos) board.start.dir
+      , waldo = Waldo False board.start.x board.start.y board.start.direction
       , atomDict = Dict.empty
       , elapsed = 0
       }

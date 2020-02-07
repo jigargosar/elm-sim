@@ -732,7 +732,7 @@ update message model =
             else
             --( List.range 0 0 |> List.foldl (\_ -> stepWaldo) model, Cmd.none )
             if
-                model.elapsed > 0
+                model.elapsed > 20
             then
                 ( { model | elapsed = 0 } |> stepWaldo model.board, Cmd.none )
 

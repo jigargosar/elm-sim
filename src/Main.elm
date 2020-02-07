@@ -449,11 +449,7 @@ movePathIndices board =
         buildMovePath current path journal =
             case getNextPosDir current of
                 Just next ->
-                    if isOpposite current next then
-                        -- Immediate Loop Node
-                        next.pos :: path
-
-                    else if Dict.get next.pos journal == Just next.dir then
+                    if Dict.get next.pos journal == Just next.dir then
                         -- Cyclic path
                         next.pos :: path
 
@@ -571,8 +567,9 @@ renderBoard cellWidth board waldo atomDict =
                 >> group [ transform [ shift ( factor, factor ) ] ]
 
         _ =
-            movePathIndices board |> Debug.log "debug"
+            1
 
+        --movePathIndices board |> Debug.log "debug"
         blue =
             "#1e90ff"
 

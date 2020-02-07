@@ -723,32 +723,32 @@ stepWaldo :
         }
 stepWaldo board model =
     let
-        stepWaldoPosDir waldo =
-            let
-                stepWaldoPosDirMaybe : PosDir -> Maybe PosDir
-                stepWaldoPosDirMaybe current =
-                    let
-                        next =
-                            nextPosDir current
-                    in
-                    if isValid next.pos then
-                        case moveAt next.pos board of
-                            Just nextDir ->
-                                Just { next | dir = nextDir }
-
-                            Nothing ->
-                                Just next
-
-                    else
-                        Nothing
-
-                isValid ( x, y ) =
-                    x >= 0 && y >= 0 && x < boardWidth && y < boardHeight
-            in
-            stepWaldoPosDirMaybe waldo |> Maybe.withDefault waldo
-
         getNewWaldo waldo =
-            { waldo | pd = stepWaldoPosDir waldo.pd }
+            let
+                ( x, y ) =
+                    waldo.pd.pos
+            in
+            case moveInstructionAt x y board of
+                Nothing ->
+                    waldo
+
+                Just mi ->
+                    let
+                        direction =
+                            case mi of
+                                ChangeDirection changeDirection ->
+                                    changeDirection
+
+                                NoChange ->
+                                    waldo.pd.dir
+
+                        ( dx, dy ) =
+                            dirToUnitVec direction
+
+                        newXY =
+                            ( x + dx, y + dy )
+                    in
+                    { waldo | pd = PosDir newXY direction }
     in
     { model
         | waldo = getNewWaldo model.waldo

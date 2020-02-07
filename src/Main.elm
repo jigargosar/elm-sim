@@ -410,8 +410,8 @@ type alias Journal =
     Dict Int2 Direction
 
 
-buildMovePath2 : Board -> Int -> Int -> Direction -> Journal -> List Int2 -> List Int2
-buildMovePath2 board x y direction journal path =
+buildMovePathAllIndices : Board -> Int -> Int -> Direction -> Journal -> List Int2 -> List Int2
+buildMovePathAllIndices board x y direction journal path =
     let
         ( dx, dy ) =
             dirToUnitVec direction
@@ -443,7 +443,7 @@ buildMovePath2 board x y direction journal path =
                 newPath
 
             else
-                buildMovePath2 board newX newY newDirection (Dict.insert newXY newDirection journal) newPath
+                buildMovePathAllIndices board newX newY newDirection (Dict.insert newXY newDirection journal) newPath
 
 
 movePathAllIndices : Board -> List Int2
@@ -458,7 +458,7 @@ movePathAllIndices board =
         direction =
             board.start.dir
     in
-    buildMovePath2 board x y direction (Dict.singleton xy direction) [ xy ]
+    buildMovePathAllIndices board x y direction (Dict.singleton xy direction) [ xy ]
 
 
 renderMovePath : String -> Float -> Board -> S.Svg msg

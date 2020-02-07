@@ -101,7 +101,11 @@ type alias Board =
 
 
 type alias Waldo =
-    { pd : PosDir, hasAtom : Bool }
+    { hasAtom : Bool
+    , x : Int
+    , y : Int
+    , direction : Direction
+    }
 
 
 boardWidth =
@@ -397,15 +401,6 @@ type alias PosDir =
     { pos : Int2, dir : Direction }
 
 
-movePosInDir dir ( x, y ) =
-    dirToUnitVec dir |> (\( dx, dy ) -> ( x + dx, y + dy ))
-
-
-nextPosDir : PosDir -> PosDir
-nextPosDir ({ pos, dir } as m) =
-    { m | pos = movePosInDir dir pos }
-
-
 type alias Journal =
     Dict Int2 Direction
 
@@ -607,10 +602,11 @@ renderAtom cellWidth =
     ]
 
 
+renderWaldoLayer : String -> Float -> Waldo -> S.Svg msg
 renderWaldoLayer color cellWidth waldo =
     boardGridLayout cellWidth
         []
-        [ ( waldo.pd.pos, renderWaldo color cellWidth waldo ) ]
+        [ ( ( waldo.x, waldo.y ), renderWaldo color cellWidth waldo ) ]
 
 
 renderWaldo : String -> Float -> Waldo -> List (S.Svg msg)
@@ -669,7 +665,7 @@ init _ =
     in
     ( { screenSize = size
       , board = board
-      , waldo = Waldo board.start False
+      , waldo = Waldo False (Tuple.first board.start.pos) (Tuple.second board.start.pos) board.start.dir
       , atomDict = Dict.empty
       , elapsed = 0
       }
@@ -723,10 +719,11 @@ stepWaldo :
         }
 stepWaldo board model =
     let
+        getNewWaldo : Waldo -> Waldo
         getNewWaldo waldo =
             let
-                ( x, y ) =
-                    waldo.pd.pos
+                { x, y } =
+                    waldo
             in
             case moveInstructionAt x y board of
                 Nothing ->
@@ -740,15 +737,12 @@ stepWaldo board model =
                                     changeDirection
 
                                 NoChange ->
-                                    waldo.pd.dir
+                                    waldo.direction
 
                         ( dx, dy ) =
                             dirToUnitVec direction
-
-                        newXY =
-                            ( x + dx, y + dy )
                     in
-                    { waldo | pd = PosDir newXY direction }
+                    { waldo | x = x + dx, y = y + dy, direction = direction }
     in
     { model
         | waldo = getNewWaldo model.waldo
@@ -756,8 +750,15 @@ stepWaldo board model =
         |> executeWaldoInstruction board
 
 
-executeWaldoInstruction board ({ waldo, atomDict } as model) =
-    case instructionAt waldo.pd.pos board of
+executeWaldoInstruction board model =
+    let
+        { waldo, atomDict } =
+            model
+
+        waldoPos =
+            ( waldo.x, waldo.y )
+    in
+    case instructionAt ( waldo.x, waldo.y ) board of
         Just ins ->
             case ins of
                 Start _ ->
@@ -767,10 +768,10 @@ executeWaldoInstruction board ({ waldo, atomDict } as model) =
                     { model | atomDict = Dict.insert ( 1, 1 ) Atom atomDict }
 
                 Grab ->
-                    case atomDict |> Dict.get waldo.pd.pos of
+                    case atomDict |> Dict.get waldoPos of
                         Just _ ->
                             { model
-                                | atomDict = Dict.remove waldo.pd.pos atomDict
+                                | atomDict = Dict.remove waldoPos atomDict
                                 , waldo = { waldo | hasAtom = True }
                             }
 
@@ -780,7 +781,7 @@ executeWaldoInstruction board ({ waldo, atomDict } as model) =
                 Drop ->
                     if waldo.hasAtom then
                         { model
-                            | atomDict = Dict.insert waldo.pd.pos Atom atomDict
+                            | atomDict = Dict.insert waldoPos Atom atomDict
                             , waldo = { waldo | hasAtom = False }
                         }
 

@@ -486,20 +486,6 @@ renderInstruction color cellWidth instruction =
                 ]
     in
     case instruction of
-        --Start_ direction ->
-        --    [ empty
-        --    , triangle color
-        --        radius
-        --        [ stroke "black"
-        --        , strokeWidth (radius / 30)
-        --        , transform
-        --            [ rotate (dirToDeg direction + 90)
-        --            , shift (dirToUnitVec direction |> mapEach (mul (radius * 0.5)))
-        --            ]
-        --        ]
-        --    , circleHelp
-        --    , wordsHelp "START"
-        --    ]
         Input ->
             [ circleHelp, wordsHelp "IN" ]
 
@@ -513,6 +499,40 @@ renderInstruction color cellWidth instruction =
             [ circleHelp, wordsHelp "OUT" ]
 
 
+renderStartInstruction : String -> Float -> Direction -> List (S.Svg msg)
+renderStartInstruction color cellWidth direction =
+    let
+        radius =
+            cellWidth / 5
+
+        circleHelp =
+            circle color
+                radius
+                [ stroke "black"
+                , strokeWidth (radius / 30)
+                ]
+
+        wordsHelp string =
+            words "white"
+                string
+                [ transform [ scale (radius / 16 * 0.5) ]
+                ]
+    in
+    [ empty
+    , triangle color
+        radius
+        [ stroke "black"
+        , strokeWidth (radius / 30)
+        , transform
+            [ rotate (dirToDeg direction + 90)
+            , shift (dirToUnitVec direction |> mapEach (mul (radius * 0.5)))
+            ]
+        ]
+    , circleHelp
+    , wordsHelp "START"
+    ]
+
+
 renderInstructionLayer : String -> Float -> Board -> S.Svg msg
 renderInstructionLayer color cellWidth board =
     let
@@ -521,6 +541,7 @@ renderInstructionLayer color cellWidth board =
     in
     instructionList board
         |> List.map (\( p, c ) -> ( p, renderInstruction color cellWidth c ))
+        |> (::) ( board.start.pos, renderStartInstruction color cellWidth board.start.dir )
         |> gridLayout cellSize boardSize []
 
 

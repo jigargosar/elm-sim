@@ -459,6 +459,7 @@ movePathAllIndices board =
             board.start.dir
     in
     buildMovePathAllIndices board x y direction (Dict.singleton xy direction) [ xy ]
+        |> List.reverse
 
 
 renderMovePath : String -> Float -> Board -> S.Svg msg
@@ -469,7 +470,7 @@ renderMovePath color cellWidth board =
 
         points =
             pathLong
-                |> List.reverse
+                --|> List.reverse
                 |> List.map (mapEach (toFloat >> mul cellWidth))
     in
     [ S.polyline

@@ -233,11 +233,6 @@ mapMoves func board =
     { board | moves = func board.moves }
 
 
-moveAt : Int2 -> Board -> Maybe Direction
-moveAt p board =
-    Dict.get p board.moves
-
-
 instructionList : Board -> List ( Int2, Instruction )
 instructionList board =
     board.instructions

@@ -252,7 +252,8 @@ initialBoard =
             , ( ( 1, 4 ), nop, cd Right )
             , ( ( 7, 4 ), nop, cd Left )
             , ( ( 7, 4 ), nop, cd Up )
-            , ( ( 7, 3 ), Drop, nod )
+
+            --, ( ( 7, 3 ), Drop, nod )
             , ( ( 6, 1 ), Output, nod )
             , ( ( 7, 1 ), nop, cd Left )
             ]
@@ -729,7 +730,7 @@ update message model =
             else
             --( List.range 0 0 |> List.foldl (\_ -> stepWaldo) model, Cmd.none )
             if
-                model.elapsed > 20
+                model.elapsed > 0
             then
                 ( { model | elapsed = 0 } |> stepWaldo model.board, Cmd.none )
 
@@ -859,7 +860,9 @@ view model =
                 empty
 
             Just error ->
-                words "red" (Debug.toString error) [ transform [ scale (cellWidth / 2) ] ]
+                [ words "red" (Debug.toString error) [ transform [ scale (cellWidth / 16) ] ]
+                ]
+                    |> group []
         ]
 
 

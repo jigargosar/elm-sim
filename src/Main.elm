@@ -165,8 +165,8 @@ setInstruction2 x y instruction moveInstruction board =
         Nothing
 
 
-setI2List : List ( Int2, Instruction, MoveInstruction ) -> Board -> Maybe Board
-setI2List list board =
+setInstruction2List : List ( Int2, Instruction, MoveInstruction ) -> Board -> Maybe Board
+setInstruction2List list board =
     List.foldl
         (\( ( x, y ), instruction, moveInstruction ) ->
             Maybe.andThen (setInstruction2 x y instruction moveInstruction)
@@ -258,7 +258,7 @@ initialBoard =
     in
     emptyBoard
         |> setStartInstruction 5 1 Right
-        |> setI2List
+        |> setInstruction2List
             [ ( ( 3, 1 ), Input, nod )
             , ( ( 1, 1 ), Grab, cd Down )
             , ( ( 1, 4 ), nop, cd Right )

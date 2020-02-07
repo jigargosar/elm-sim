@@ -17,14 +17,14 @@ import TypedSvg.Attributes as TA exposing (viewBox)
 import TypedSvg.Types as T
 
 
-type alias Cell =
+type alias InstructionCell =
     { instruction : Instruction
     , moveInstruction : MoveInstruction
     }
 
 
 type alias InstructionBoard =
-    Dict Int2 Cell
+    Dict Int2 InstructionCell
 
 
 emptyInstructionBoard : InstructionBoard
@@ -35,7 +35,7 @@ emptyInstructionBoard =
     in
     List.range 0 (w - 1)
         |> List.concatMap (\x -> List.range 0 (h - 1) |> List.map (\y -> ( x, y )))
-        |> List.map (\xy -> ( xy, Cell NoInstruction NoDirectionChange ))
+        |> List.map (\xy -> ( xy, InstructionCell NoInstruction NoDirectionChange ))
         |> Dict.fromList
 
 
@@ -150,15 +150,13 @@ setStartInstruction x y direction board =
     { board | start = { x = x, y = y, direction = direction } }
 
 
-setInstruction : Int -> Int -> Instruction -> Board -> Maybe Board
-setInstruction x y instruction board =
+setI2 : Int -> Int -> Instruction -> MoveInstruction -> Board -> Maybe Board
+setI2 x y instruction moveInstruction board =
     if isValidBoardLocation x y board then
         Just
             (mapIB
-                (Dict.update ( x, y )
-                    (Maybe.map
-                        (\c -> { c | instruction = instruction })
-                    )
+                (Dict.insert ( x, y )
+                    (InstructionCell instruction moveInstruction)
                 )
                 board
             )
@@ -167,11 +165,11 @@ setInstruction x y instruction board =
         Nothing
 
 
-setInstructions : List ( Int2, Instruction ) -> Board -> Maybe Board
-setInstructions list board =
+setI2List : List ( Int2, Instruction, MoveInstruction ) -> Board -> Maybe Board
+setI2List list board =
     List.foldl
-        (\( ( x, y ), instruction ) ->
-            Maybe.andThen (setInstruction x y instruction)
+        (\( ( x, y ), instruction, moveInstruction ) ->
+            Maybe.andThen (setI2 x y instruction moveInstruction)
         )
         (Just board)
         list
@@ -201,38 +199,9 @@ moveInstructionAt x y board =
         Nothing
 
 
-setMove : Int -> Int -> Direction -> Board -> Maybe Board
-setMove x y move board =
-    if isValidBoardLocation x y board then
-        Just
-            (mapIB
-                (Dict.update ( x, y )
-                    (Maybe.map
-                        (\c ->
-                            { c | moveInstruction = ChangeDirection move }
-                        )
-                    )
-                )
-                board
-            )
-
-    else
-        Nothing
-
-
 mapIB : (InstructionBoard -> InstructionBoard) -> Board -> Board
 mapIB func board =
     { board | ib = func board.ib }
-
-
-setMoves : List ( Int2, Direction ) -> Board -> Maybe Board
-setMoves list board =
-    List.foldl
-        (\( ( x, y ), move ) ->
-            Maybe.andThen (setMove x y move)
-        )
-        (Just board)
-        list
 
 
 isValidBoardLocation : Int -> Int -> Board -> Bool
@@ -277,23 +246,28 @@ emptyBoard =
 
 initialBoard : Board
 initialBoard =
+    let
+        nop =
+            NoInstruction
+
+        nod =
+            NoDirectionChange
+
+        cd =
+            ChangeDirection
+    in
     emptyBoard
         |> setStartInstruction 5 1 Right
-        |> setInstructions
-            [ ( ( 3, 1 ), Input )
-            , ( ( 1, 1 ), Grab )
-            , ( ( 7, 3 ), Drop )
-            , ( ( 6, 1 ), Output )
+        |> setI2List
+            [ ( ( 3, 1 ), Input, nod )
+            , ( ( 1, 1 ), Grab, cd Down )
+            , ( ( 1, 4 ), nop, cd Right )
+            , ( ( 7, 4 ), nop, cd Left )
+            , ( ( 7, 4 ), nop, cd Up )
+            , ( ( 7, 3 ), Drop, nod )
+            , ( ( 6, 1 ), Output, nod )
+            , ( ( 7, 1 ), nop, cd Left )
             ]
-        |> Maybe.andThen
-            (setMoves
-                [ ( ( 1, 1 ), Down )
-                , ( ( 1, 4 ), Right )
-                , ( ( 7, 4 ), Left )
-                , ( ( 7, 4 ), Up )
-                , ( ( 7, 1 ), Left )
-                ]
-            )
         |> Maybe.withDefault emptyBoard
 
 

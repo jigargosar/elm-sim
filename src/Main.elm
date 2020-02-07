@@ -24,12 +24,10 @@ type alias Cell =
 
 
 type alias InstructionBoard =
-    { dict : Dict Int2 Cell
-    , start : { x : Int, y : Int, direction : Direction }
-    }
+    Dict Int2 Cell
 
 
-emptyInstructionBoard : Dict Int2 Cell
+emptyInstructionBoard : InstructionBoard
 emptyInstructionBoard =
     let
         ( w, h ) =
@@ -120,6 +118,7 @@ type alias Board =
     , height : Int
     , instructions : Instructions
     , moves : Moves
+    , ib : InstructionBoard
     , start : { x : Int, y : Int, direction : Direction }
     }
 
@@ -262,6 +261,7 @@ emptyBoard =
     { width = boardWidth
     , height = boardHeight
     , instructions = Dict.empty
+    , ib = emptyInstructionBoard
     , start = { x = 4, y = 1, direction = Left }
     , moves = Dict.empty
     }

@@ -105,18 +105,9 @@ type alias Instructions =
     Dict Int2 Instruction
 
 
-type alias Move =
-    Direction
-
-
-type alias Moves =
-    Dict Int2 Move
-
-
 type alias Board =
     { width : Int
     , height : Int
-    , instructions : Instructions
     , ib : InstructionBoard
     , start : { x : Int, y : Int, direction : Direction }
     }
@@ -162,7 +153,15 @@ setStartInstruction x y direction board =
 setInstruction : Int -> Int -> Instruction -> Board -> Maybe Board
 setInstruction x y instruction board =
     if isValidBoardLocation x y board then
-        Just (mapInstructions (Dict.insert ( x, y ) instruction) board)
+        Just
+            (mapIB
+                (Dict.update ( x, y )
+                    (Maybe.map
+                        (\c -> { c | instruction = instruction })
+                    )
+                )
+                board
+            )
 
     else
         Nothing
@@ -185,9 +184,8 @@ instructionAt x y board =
             ( x, y )
     in
     if isValidBoardLocation x y board then
-        Dict.get p board.instructions
-            |> Maybe.withDefault NoInstruction
-            |> Just
+        Dict.get p board.ib
+            |> Maybe.map .instruction
 
     else
         Nothing
@@ -203,10 +201,20 @@ moveInstructionAt x y board =
         Nothing
 
 
-setMove : Int -> Int -> Move -> Board -> Maybe Board
+setMove : Int -> Int -> Direction -> Board -> Maybe Board
 setMove x y move board =
     if isValidBoardLocation x y board then
-        Just (mapIB (Dict.update ( x, y ) (Maybe.map (\c -> { c | moveInstruction = ChangeDirection move }))) board)
+        Just
+            (mapIB
+                (Dict.update ( x, y )
+                    (Maybe.map
+                        (\c ->
+                            { c | moveInstruction = ChangeDirection move }
+                        )
+                    )
+                )
+                board
+            )
 
     else
         Nothing
@@ -217,7 +225,7 @@ mapIB func board =
     { board | ib = func board.ib }
 
 
-setMoves : List ( Int2, Move ) -> Board -> Maybe Board
+setMoves : List ( Int2, Direction ) -> Board -> Maybe Board
 setMoves list board =
     List.foldl
         (\( ( x, y ), move ) ->
@@ -236,14 +244,10 @@ isValidBoardLocation x y board =
     isIndexValid x board.width && isIndexValid y board.height
 
 
-mapInstructions : (Instructions -> Instructions) -> Board -> Board
-mapInstructions func board =
-    { board | instructions = func board.instructions }
-
-
 instructionList : Board -> List ( Int2, Instruction )
 instructionList board =
-    board.instructions
+    board.ib
+        |> Dict.map (\_ -> .instruction)
         |> Dict.toList
 
 
@@ -266,7 +270,6 @@ emptyBoard : Board
 emptyBoard =
     { width = boardWidth
     , height = boardHeight
-    , instructions = Dict.empty
     , ib = emptyInstructionBoard
     , start = { x = 4, y = 1, direction = Left }
     }

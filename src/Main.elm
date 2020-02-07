@@ -733,39 +733,44 @@ update message model =
                 ( { model | elapsed = model.elapsed + 1 }, Cmd.none )
 
 
-stepWaldo board model =
+moveWaldo : Board -> Waldo -> Maybe Waldo
+moveWaldo board waldo =
     let
-        moveWaldo : Waldo -> Maybe Waldo
-        moveWaldo waldo =
-            let
-                { x, y } =
-                    waldo
-            in
-            moveInstructionAt x y board
-                |> Maybe.map
-                    (\mi ->
-                        let
-                            direction =
-                                case mi of
-                                    ChangeDirection changeDirection ->
-                                        changeDirection
-
-                                    NoDirectionChange ->
-                                        waldo.direction
-
-                            ( dx, dy ) =
-                                dirToUnitVec direction
-                        in
-                        { waldo | x = x + dx, y = y + dy, direction = direction }
-                    )
+        { x, y } =
+            waldo
     in
-    moveWaldo model.waldo
+    moveInstructionAt x y board
         |> Maybe.map
-            (\w ->
-                { model
-                    | waldo = w
-                }
-                    |> executeWaldoInstruction board
+            (\mi ->
+                let
+                    direction =
+                        case mi of
+                            ChangeDirection changeDirection ->
+                                changeDirection
+
+                            NoDirectionChange ->
+                                waldo.direction
+
+                    ( dx, dy ) =
+                        dirToUnitVec direction
+                in
+                { waldo | x = x + dx, y = y + dy, direction = direction }
+            )
+
+
+stepWaldo board model =
+    moveWaldo board model.waldo
+        |> Maybe.map
+            (\waldo ->
+                if
+                    waldo.hasAtom
+                        && (Dict.get ( waldo.x, waldo.y ) model.atomDict /= Nothing)
+                then
+                    { model | error = True }
+
+                else
+                    { model | waldo = waldo }
+                        |> executeWaldoInstruction board
             )
         |> Maybe.withDefault { model | error = True }
 

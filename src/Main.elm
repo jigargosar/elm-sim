@@ -101,10 +101,6 @@ type alias Float2 =
     ( Float, Float )
 
 
-type alias Instructions =
-    Dict Int2 Instruction
-
-
 type alias Board =
     { width : Int
     , height : Int

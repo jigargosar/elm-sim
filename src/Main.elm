@@ -539,7 +539,10 @@ renderInstructionLayer color cellWidth board =
     in
     instructionList board
         |> List.map (\( p, c ) -> ( p, renderInstruction color cellWidth c ))
-        |> (::) ( ( board.start.x, board.start.y ), renderStartInstruction color cellWidth board.start.direction )
+        |> (::)
+            ( ( board.start.x, board.start.y )
+            , renderStartInstruction color cellWidth board.start.direction
+            )
         |> gridLayout cellSize boardSize []
 
 

@@ -117,7 +117,6 @@ type alias Board =
     { width : Int
     , height : Int
     , instructions : Instructions
-    , moves : Moves
     , ib : InstructionBoard
     , start : { x : Int, y : Int, direction : Direction }
     }
@@ -197,10 +196,8 @@ instructionAt x y board =
 moveInstructionAt : Int -> Int -> Board -> Maybe MoveInstruction
 moveInstructionAt x y board =
     if isValidBoardLocation x y board then
-        Dict.get ( x, y ) board.moves
-            |> Maybe.map ChangeDirection
-            |> Maybe.withDefault NoDirectionChange
-            |> Just
+        Dict.get ( x, y ) board.ib
+            |> Maybe.map .moveInstruction
 
     else
         Nothing
@@ -209,10 +206,15 @@ moveInstructionAt x y board =
 setMove : Int -> Int -> Move -> Board -> Maybe Board
 setMove x y move board =
     if isValidBoardLocation x y board then
-        Just (mapMoves (Dict.insert ( x, y ) move) board)
+        Just (mapIB (Dict.update ( x, y ) (Maybe.map (\c -> { c | moveInstruction = ChangeDirection move }))) board)
 
     else
         Nothing
+
+
+mapIB : (InstructionBoard -> InstructionBoard) -> Board -> Board
+mapIB func board =
+    { board | ib = func board.ib }
 
 
 setMoves : List ( Int2, Move ) -> Board -> Maybe Board
@@ -239,11 +241,6 @@ mapInstructions func board =
     { board | instructions = func board.instructions }
 
 
-mapMoves : (Moves -> Moves) -> Board -> Board
-mapMoves func board =
-    { board | moves = func board.moves }
-
-
 instructionList : Board -> List ( Int2, Instruction )
 instructionList board =
     board.instructions
@@ -252,8 +249,17 @@ instructionList board =
 
 moveList : Board -> List ( Int2, Direction )
 moveList board =
-    board.moves
+    board.ib
         |> Dict.toList
+        |> List.filterMap
+            (\( i2, c ) ->
+                case c.moveInstruction of
+                    ChangeDirection d ->
+                        Just ( i2, d )
+
+                    NoDirectionChange ->
+                        Nothing
+            )
 
 
 emptyBoard : Board
@@ -263,7 +269,6 @@ emptyBoard =
     , instructions = Dict.empty
     , ib = emptyInstructionBoard
     , start = { x = 4, y = 1, direction = Left }
-    , moves = Dict.empty
     }
 
 

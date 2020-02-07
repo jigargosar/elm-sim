@@ -365,8 +365,8 @@ renderMoveInstruction color offset cellWidth moveInstruction =
             renderMove color offset cellWidth direction
 
 
-renderMoveLayer : String -> Float -> Float -> Board -> S.Svg msg
-renderMoveLayer color offset cellWidth board =
+renderMoveInstructionLayer : String -> Float -> Float -> Board -> S.Svg msg
+renderMoveInstructionLayer color offset cellWidth board =
     let
         cellSize =
             ( cellWidth, cellWidth )
@@ -597,8 +597,8 @@ renderBoard cellWidth board waldo atomDict =
         |> shiftLayer (cellWidth / 6)
     , renderInstructionLayer red cellWidth board
         |> shiftLayer (-cellWidth / 6)
-    , renderMoveLayer blue (cellWidth / 6) cellWidth board
-    , renderMoveLayer red (-cellWidth / 6) cellWidth board
+    , renderMoveInstructionLayer blue (cellWidth / 6) cellWidth board
+    , renderMoveInstructionLayer red (-cellWidth / 6) cellWidth board
     ]
         |> group []
 

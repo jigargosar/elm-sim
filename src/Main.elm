@@ -719,57 +719,55 @@ update message model =
             ( model, Browser.Dom.getViewport |> Task.perform GotViewport )
 
         Tick ->
+            if model.error then
+                ( model, Cmd.none )
+
+            else
             --( List.range 0 0 |> List.foldl (\_ -> stepWaldo) model, Cmd.none )
-            if model.elapsed > 20 then
+            if
+                model.elapsed > 20
+            then
                 ( { model | elapsed = 0 } |> stepWaldo model.board, Cmd.none )
 
             else
                 ( { model | elapsed = model.elapsed + 1 }, Cmd.none )
 
 
-stepWaldo :
-    Board
-    ->
-        { a
-            | atomDict : Dict Int2 Atom
-            , waldo : Waldo
-        }
-    ->
-        { a
-            | atomDict : Dict Int2 Atom
-            , waldo : Waldo
-        }
 stepWaldo board model =
     let
-        getNewWaldo : Waldo -> Waldo
-        getNewWaldo waldo =
+        moveWaldo : Waldo -> Maybe Waldo
+        moveWaldo waldo =
             let
                 { x, y } =
                     waldo
             in
-            case moveInstructionAt x y board of
-                Nothing ->
-                    waldo
+            moveInstructionAt x y board
+                |> Maybe.map
+                    (\mi ->
+                        let
+                            direction =
+                                case mi of
+                                    ChangeDirection changeDirection ->
+                                        changeDirection
 
-                Just mi ->
-                    let
-                        direction =
-                            case mi of
-                                ChangeDirection changeDirection ->
-                                    changeDirection
+                                    NoDirectionChange ->
+                                        waldo.direction
 
-                                NoDirectionChange ->
-                                    waldo.direction
-
-                        ( dx, dy ) =
-                            dirToUnitVec direction
-                    in
-                    { waldo | x = x + dx, y = y + dy, direction = direction }
+                            ( dx, dy ) =
+                                dirToUnitVec direction
+                        in
+                        { waldo | x = x + dx, y = y + dy, direction = direction }
+                    )
     in
-    { model
-        | waldo = getNewWaldo model.waldo
-    }
-        |> executeWaldoInstruction board
+    moveWaldo model.waldo
+        |> Maybe.map
+            (\w ->
+                { model
+                    | waldo = w
+                }
+                    |> executeWaldoInstruction board
+            )
+        |> Maybe.withDefault { model | error = True }
 
 
 executeWaldoInstruction board model =

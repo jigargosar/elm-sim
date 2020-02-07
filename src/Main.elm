@@ -29,6 +29,11 @@ type Atom
     = Atom
 
 
+type MoveInstruction
+    = ChangeDirection Direction
+    | NoChange
+
+
 type Direction
     = Up
     | Down
@@ -168,6 +173,18 @@ instructionAt p board =
 
             ins ->
                 ins
+
+
+moveInstructionAt : Int -> Int -> Board -> Maybe MoveInstruction
+moveInstructionAt x y board =
+    if isValidBoardLocation x y board then
+        Dict.get ( x, y ) board.moves
+            |> Maybe.map ChangeDirection
+            |> Maybe.withDefault NoChange
+            |> Just
+
+    else
+        Nothing
 
 
 setMove : Int -> Int -> Move -> Board -> Maybe Board
@@ -387,6 +404,61 @@ movePosInDir dir ( x, y ) =
 nextPosDir : PosDir -> PosDir
 nextPosDir ({ pos, dir } as m) =
     { m | pos = movePosInDir dir pos }
+
+
+type alias Journal =
+    Dict Int2 Direction
+
+
+buildMovePath2 : Board -> Int -> Int -> Direction -> Journal -> List Int2 -> List Int2
+buildMovePath2 board x y direction journal path =
+    let
+        ( dx, dy ) =
+            dirToUnitVec direction
+
+        newXY =
+            ( x + dx, y + dy )
+
+        ( newX, newY ) =
+            newXY
+    in
+    case moveInstructionAt newX newY board of
+        Nothing ->
+            path
+
+        Just moveInstruction ->
+            let
+                newDirection =
+                    case moveInstruction of
+                        NoChange ->
+                            direction
+
+                        ChangeDirection changeDirection ->
+                            changeDirection
+
+                newPath =
+                    newXY :: path
+            in
+            if Dict.get newXY journal == Just newDirection then
+                newPath
+
+            else
+                buildMovePath2 board newX newY newDirection (Dict.insert newXY newDirection journal) newPath
+
+
+movePathLocations : Board -> List Int2
+movePathLocations board =
+    let
+        xy =
+            board.start.pos
+
+        ( x, y ) =
+            xy
+
+        direction =
+            board.start.dir
+    in
+    buildMovePath2 board x y direction (Dict.singleton xy direction) [ xy ]
 
 
 movePathIndices : Board -> List Int2

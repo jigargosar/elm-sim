@@ -18,8 +18,7 @@ import TypedSvg.Types as T
 
 
 type Instruction
-    = Start Direction
-    | Input
+    = Input
     | Grab
     | Drop
     | Output
@@ -144,12 +143,7 @@ setStartInstruction x y direction board =
 setInstruction : Int -> Int -> Instruction -> Board -> Maybe Board
 setInstruction x y instruction board =
     if isValidBoardLocation x y board then
-        case instruction of
-            Start direction ->
-                Just (setStartInstruction x y direction board)
-
-            _ ->
-                Just (mapInstructions (Dict.insert ( x, y ) instruction) board)
+        Just (mapInstructions (Dict.insert ( x, y ) instruction) board)
 
     else
         Nothing
@@ -171,16 +165,7 @@ instructionAt x y board =
         p =
             ( x, y )
     in
-    if p == board.start.pos then
-        Just (Start board.start.dir)
-
-    else
-        case Dict.get p board.instructions of
-            Just (Start _) ->
-                Nothing
-
-            ins ->
-                ins
+    Dict.get p board.instructions
 
 
 moveInstructionAt : Int -> Int -> Board -> Maybe MoveInstruction
@@ -236,7 +221,6 @@ mapMoves func board =
 instructionList : Board -> List ( Int2, Instruction )
 instructionList board =
     board.instructions
-        |> Dict.insert board.start.pos (Start board.start.dir)
         |> Dict.toList
 
 
@@ -259,9 +243,9 @@ emptyBoard =
 initialBoard : Board
 initialBoard =
     emptyBoard
+        |> setStartInstruction 5 1 Right
         |> setInstructions
-            [ ( ( 5, 1 ), Start Right )
-            , ( ( 3, 1 ), Input )
+            [ ( ( 3, 1 ), Input )
             , ( ( 1, 1 ), Grab )
             , ( ( 7, 3 ), Drop )
             , ( ( 6, 1 ), Output )
@@ -430,7 +414,13 @@ buildMovePathAllIndices board x y direction journal path =
                 newPath
 
             else
-                buildMovePathAllIndices board newX newY newDirection (Dict.insert newXY newDirection journal) newPath
+                buildMovePathAllIndices
+                    board
+                    newX
+                    newY
+                    newDirection
+                    (Dict.insert newXY newDirection journal)
+                    newPath
 
 
 movePathAllIndices : Board -> List Int2
@@ -496,21 +486,20 @@ renderInstruction color cellWidth instruction =
                 ]
     in
     case instruction of
-        Start direction ->
-            [ empty
-            , triangle color
-                radius
-                [ stroke "black"
-                , strokeWidth (radius / 30)
-                , transform
-                    [ rotate (dirToDeg direction + 90)
-                    , shift (dirToUnitVec direction |> mapEach (mul (radius * 0.5)))
-                    ]
-                ]
-            , circleHelp
-            , wordsHelp "START"
-            ]
-
+        --Start_ direction ->
+        --    [ empty
+        --    , triangle color
+        --        radius
+        --        [ stroke "black"
+        --        , strokeWidth (radius / 30)
+        --        , transform
+        --            [ rotate (dirToDeg direction + 90)
+        --            , shift (dirToUnitVec direction |> mapEach (mul (radius * 0.5)))
+        --            ]
+        --        ]
+        --    , circleHelp
+        --    , wordsHelp "START"
+        --    ]
         Input ->
             [ circleHelp, wordsHelp "IN" ]
 
@@ -753,9 +742,6 @@ executeWaldoInstruction board model =
     case instructionAt waldo.x waldo.y board of
         Just ins ->
             case ins of
-                Start _ ->
-                    model
-
                 Input ->
                     { model | atomDict = Dict.insert ( 1, 1 ) Atom atomDict }
 
@@ -1098,6 +1084,10 @@ transformToString { x, y, s, deg } =
 
 fade =
     fromFloat >> SA.opacity
+
+
+
+--noinspection ElmUnusedSymbol
 
 
 empty =

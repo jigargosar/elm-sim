@@ -89,9 +89,23 @@ type alias Float2 =
     ( Float, Float )
 
 
+type alias Instructions =
+    Dict Int2 Instruction
+
+
+type alias Move =
+    Direction
+
+
+type alias Moves =
+    Dict Int2 Move
+
+
 type alias Board =
-    { insDict : Dict Int2 Instruction
-    , moveDict : Dict Int2 Direction
+    { width : Int
+    , height : Int
+    , instructions : Instructions
+    , moves : Moves
     , start : PosDir
     }
 
@@ -124,30 +138,92 @@ boardPositions =
         |> List.concatMap (\x -> List.range 0 (boardHeight - 1) |> List.map (int2 x))
 
 
+setInstruction : Int -> Int -> Instruction -> Board -> Maybe Board
+setInstruction x y ins board =
+    if isValidBoardLocation x y board then
+        Just (mapInstructions (Dict.insert ( x, y ) ins) board)
+
+    else
+        Nothing
+
+
+setInstructions : List ( Int2, Instruction ) -> Board -> Maybe Board
+setInstructions list board =
+    List.foldl
+        (\( ( x, y ), instruction ) ->
+            Maybe.andThen (setInstruction x y instruction)
+        )
+        (Just board)
+        list
+
+
+setMove : Int -> Int -> Move -> Board -> Maybe Board
+setMove x y ins board =
+    if isValidBoardLocation x y board then
+        Just (mapMoves (Dict.insert ( x, y ) ins) board)
+
+    else
+        Nothing
+
+
+setMoves : List ( Int2, Move ) -> Board -> Maybe Board
+setMoves list board =
+    List.foldl
+        (\( ( x, y ), move ) ->
+            Maybe.andThen (setMove x y move)
+        )
+        (Just board)
+        list
+
+
+isValidBoardLocation : Int -> Int -> Board -> Bool
+isValidBoardLocation x y board =
+    let
+        isIndexValid idx len =
+            idx >= 0 && idx < len
+    in
+    isIndexValid x board.width && isIndexValid y board.height
+
+
+mapInstructions : (Instructions -> Instructions) -> Board -> Board
+mapInstructions func board =
+    { board | instructions = func board.instructions }
+
+
+mapMoves : (Moves -> Moves) -> Board -> Board
+mapMoves func board =
+    { board | moves = func board.moves }
+
+
+emptyBoard =
+    { width = boardWidth
+    , height = boardHeight
+    , instructions = Dict.empty
+    , start = PosDir ( 4, 1 ) Left
+    , moves = Dict.empty
+    }
+
+
 initialBoard : Board
 initialBoard =
-    { insDict =
-        Dict.empty
-            |> Dict.insert ( 0, 0 ) (Start Up)
-            |> Dict.insert ( 3, 1 ) Input
-            |> Dict.insert ( 1, 1 ) Grab
-            |> Dict.insert ( 7, 3 ) Drop
-            |> Dict.insert ( 6, 1 ) Output
-    , moveDict =
-        Dict.empty
-            |> Dict.insert ( 1, 1 ) Down
-            |> Dict.insert ( 1, 4 ) Right
-            |> Dict.insert ( 7, 4 ) Left
-            |> Dict.insert ( 7, 4 ) Up
-            |> Dict.insert ( 7, 1 ) Left
-
-    --Dict.empty
-    --|> Dict.insert ( 2, 0 ) Down
-    --|> Dict.insert ( 2, 1 ) Up
-    --|> Dict.insert ( 2, 2 ) Left
-    --|> Dict.insert ( 1, 2 ) Right
-    , start = PosDir ( 4, 1 ) Left
-    }
+    emptyBoard
+        |> setInstructions
+            [ ( ( 0, 0 ), Start Up )
+            , ( ( 3, 1 ), Input )
+            , ( ( 1, 1 ), Grab )
+            , ( ( 7, 3 ), Drop )
+            , ( ( 6, 1 ), Output )
+            ]
+        |> Maybe.andThen
+            (setMoves
+                [ ( ( 1, 1 ), Down )
+                , ( ( 1, 4 ), Right )
+                , ( ( 7, 4 ), Left )
+                , ( ( 7, 4 ), Up )
+                , ( ( 7, 1 ), Left )
+                ]
+            )
+        |> Maybe.withDefault emptyBoard
 
 
 instructionAt : Int2 -> Board -> Maybe Instruction
@@ -156,7 +232,7 @@ instructionAt p board =
         Just (Start board.start.dir)
 
     else
-        case Dict.get p board.insDict of
+        case Dict.get p board.instructions of
             Just (Start _) ->
                 Nothing
 
@@ -166,7 +242,7 @@ instructionAt p board =
 
 moveAt : Int2 -> Board -> Maybe Direction
 moveAt p board =
-    Dict.get p board.moveDict
+    Dict.get p board.moves
 
 
 instructionList : Board -> List ( Int2, Instruction )

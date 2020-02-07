@@ -854,6 +854,12 @@ view model =
         [ HA.style "background-color" "black" ]
         [ polyRect "dodgerblue" ( 100, 100 ) []
         , renderBoard cellWidth model.board model.waldo model.atomDict
+        , case model.error of
+            Nothing ->
+                empty
+
+            Just error ->
+                words "red" (Debug.toString error) [ transform [ scale (cellWidth / 2) ] ]
         ]
 
 

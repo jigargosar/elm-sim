@@ -384,6 +384,12 @@ buildMovePathAllIndices board x y direction journal path =
 
         ( newX, newY ) =
             newXY
+
+        recordInJournal newDirection =
+            Dict.insert newXY newDirection journal
+
+        alreadyVisited newDirection =
+            Dict.get newXY journal == Just newDirection
     in
     case moveInstructionAt newX newY board of
         Nothing ->
@@ -402,7 +408,7 @@ buildMovePathAllIndices board x y direction journal path =
                 newPath =
                     newXY :: path
             in
-            if Dict.get newXY journal == Just newDirection then
+            if alreadyVisited newDirection then
                 newPath
 
             else
@@ -411,7 +417,7 @@ buildMovePathAllIndices board x y direction journal path =
                     newX
                     newY
                     newDirection
-                    (Dict.insert newXY newDirection journal)
+                    (recordInJournal newDirection)
                     newPath
 
 
@@ -420,8 +426,14 @@ movePathAllIndices board =
     let
         { x, y, direction } =
             board.start
+
+        initialJournal =
+            Dict.singleton ( x, y ) direction
+
+        initialPath =
+            [ ( x, y ) ]
     in
-    buildMovePathAllIndices board x y direction (Dict.singleton ( x, y ) direction) [ ( x, y ) ]
+    buildMovePathAllIndices board x y direction initialJournal initialPath
         |> List.reverse
 
 

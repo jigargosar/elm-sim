@@ -446,8 +446,8 @@ buildMovePath2 board x y direction journal path =
                 buildMovePath2 board newX newY newDirection (Dict.insert newXY newDirection journal) newPath
 
 
-movePathLocations : Board -> List Int2
-movePathLocations board =
+movePathAllIndices : Board -> List Int2
+movePathAllIndices board =
     let
         xy =
             board.start.pos
@@ -461,72 +461,14 @@ movePathLocations board =
     buildMovePath2 board x y direction (Dict.singleton xy direction) [ xy ]
 
 
-movePathIndices : Board -> List Int2
-movePathIndices board =
-    let
-        getNextPosDirOrCurrent current =
-            let
-                next =
-                    nextPosDir current
-            in
-            if isValid next.pos then
-                case moveAt next.pos board of
-                    Just nextDir ->
-                        { next | dir = nextDir }
-
-                    Nothing ->
-                        getNextPosDirOrCurrent next
-
-            else
-                current
-
-        getNextPosDir : PosDir -> Maybe PosDir
-        getNextPosDir current =
-            let
-                next =
-                    nextPosDir current
-            in
-            if isValid next.pos then
-                case moveAt next.pos board of
-                    Just nextDir ->
-                        Just { next | dir = nextDir }
-
-                    Nothing ->
-                        Just (getNextPosDirOrCurrent next)
-
-            else
-                Nothing
-
-        isValid ( x, y ) =
-            x >= 0 && y >= 0 && x < boardWidth && y < boardHeight
-
-        buildMovePath current path journal =
-            case getNextPosDir current of
-                Just next ->
-                    if Dict.get next.pos journal == Just next.dir then
-                        -- Cyclic path, first and last point are same
-                        next.pos :: path
-
-                    else
-                        buildMovePath next (next.pos :: path) (Dict.insert next.pos next.dir journal)
-
-                Nothing ->
-                    path
-
-        startBuildingMovePath from =
-            buildMovePath from [ from.pos ] (Dict.singleton from.pos from.dir)
-    in
-    startBuildingMovePath board.start
-
-
 renderMovePath : String -> Float -> Board -> S.Svg msg
 renderMovePath color cellWidth board =
     let
-        path =
-            movePathIndices board
+        pathLong =
+            movePathAllIndices board
 
         points =
-            path
+            pathLong
                 |> List.reverse
                 |> List.map (mapEach (toFloat >> mul cellWidth))
     in

@@ -154,7 +154,7 @@ setInstruction2 : Int -> Int -> Instruction -> MoveInstruction -> Board -> Maybe
 setInstruction2 x y instruction moveInstruction board =
     if isValidBoardLocation x y board then
         Just
-            (mapIB
+            (mapInstructionBoard
                 (Dict.insert ( x, y )
                     (InstructionCell instruction moveInstruction)
                 )
@@ -199,8 +199,8 @@ moveInstructionAt x y board =
         Nothing
 
 
-mapIB : (InstructionBoard -> InstructionBoard) -> Board -> Board
-mapIB func board =
+mapInstructionBoard : (InstructionBoard -> InstructionBoard) -> Board -> Board
+mapInstructionBoard func board =
     { board | ib = func board.ib }
 
 

@@ -165,8 +165,12 @@ setInstructions list board =
         list
 
 
-instructionAt : Int2 -> Board -> Maybe Instruction
-instructionAt p board =
+instructionAt : Int -> Int -> Board -> Maybe Instruction
+instructionAt x y board =
+    let
+        p =
+            ( x, y )
+    in
     if p == board.start.pos then
         Just (Start board.start.dir)
 
@@ -239,7 +243,11 @@ instructionList board =
     boardPositions
         |> List.filterMap
             (\p ->
-                instructionAt p board
+                let
+                    ( x, y ) =
+                        p
+                in
+                instructionAt x y board
                     |> Maybe.map (Tuple.pair p)
             )
 
@@ -758,7 +766,7 @@ executeWaldoInstruction board model =
         waldoPos =
             ( waldo.x, waldo.y )
     in
-    case instructionAt ( waldo.x, waldo.y ) board of
+    case instructionAt waldo.x waldo.y board of
         Just ins ->
             case ins of
                 Start _ ->

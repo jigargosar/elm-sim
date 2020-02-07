@@ -660,6 +660,7 @@ ring color radius thickness attrs =
 
 type Error
     = CollisionError
+    | InputOccupiedError
 
 
 type alias Model =
@@ -796,7 +797,14 @@ executeWaldoInstruction board model =
                     model
 
                 Input ->
-                    { model | atomDict = Dict.insert ( 1, 1 ) Atom atomDict }
+                    if Dict.get ( 1, 1 ) atomDict == Nothing then
+                        { model
+                            | atomDict =
+                                Dict.insert ( 1, 1 ) Atom atomDict
+                        }
+
+                    else
+                        { model | error = Just InputOccupiedError }
 
                 Grab ->
                     case atomDict |> Dict.get waldoPos of

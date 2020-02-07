@@ -432,7 +432,7 @@ movePathIndices board =
             case getNextPosDir current of
                 Just next ->
                     if Dict.get next.pos journal == Just next.dir then
-                        -- Cyclic path
+                        -- Cyclic path, first and last point are same
                         next.pos :: path
 
                     else

@@ -665,10 +665,13 @@ init _ =
 
         board =
             initialBoard
+
+        start =
+            board.start
     in
     ( { screenSize = size
       , board = board
-      , waldo = Waldo False board.start.x board.start.y board.start.direction
+      , waldo = { x = start.x, y = start.y, direction = start.direction, hasAtom = False }
       , atomDict = Dict.empty
       , elapsed = 0
       }

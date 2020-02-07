@@ -663,6 +663,7 @@ type alias Model =
     , board : Board
     , waldo : Waldo
     , atomDict : Dict Int2 Atom
+    , error : Bool
     , elapsed : Int
     }
 
@@ -687,6 +688,7 @@ init _ =
       , board = board
       , waldo = { x = start.x, y = start.y, direction = start.direction, hasAtom = False }
       , atomDict = Dict.empty
+      , error = True
       , elapsed = 0
       }
     , Browser.Dom.getViewport |> Task.perform GotViewport

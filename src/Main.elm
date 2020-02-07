@@ -138,10 +138,24 @@ boardPositions =
         |> List.concatMap (\x -> List.range 0 (boardHeight - 1) |> List.map (int2 x))
 
 
+setStartInstruction : Int -> Int -> Direction -> Board -> Board
+setStartInstruction x y direction board =
+    let
+        start =
+            PosDir ( x, y ) direction
+    in
+    { board | start = start }
+
+
 setInstruction : Int -> Int -> Instruction -> Board -> Maybe Board
 setInstruction x y instruction board =
     if isValidBoardLocation x y board then
-        Just (mapInstructions (Dict.insert ( x, y ) instruction) board)
+        case instruction of
+            Start direction ->
+                Just (setStartInstruction x y direction board)
+
+            _ ->
+                Just (mapInstructions (Dict.insert ( x, y ) instruction) board)
 
     else
         Nothing
@@ -155,6 +169,20 @@ setInstructions list board =
         )
         (Just board)
         list
+
+
+instructionAt : Int2 -> Board -> Maybe Instruction
+instructionAt p board =
+    if p == board.start.pos then
+        Just (Start board.start.dir)
+
+    else
+        case Dict.get p board.instructions of
+            Just (Start _) ->
+                Nothing
+
+            ins ->
+                ins
 
 
 setMove : Int -> Int -> Move -> Board -> Maybe Board
@@ -193,20 +221,6 @@ mapInstructions func board =
 mapMoves : (Moves -> Moves) -> Board -> Board
 mapMoves func board =
     { board | moves = func board.moves }
-
-
-instructionAt : Int2 -> Board -> Maybe Instruction
-instructionAt p board =
-    if p == board.start.pos then
-        Just (Start board.start.dir)
-
-    else
-        case Dict.get p board.instructions of
-            Just (Start _) ->
-                Nothing
-
-            ins ->
-                ins
 
 
 moveAt : Int2 -> Board -> Maybe Direction
@@ -248,7 +262,7 @@ initialBoard : Board
 initialBoard =
     emptyBoard
         |> setInstructions
-            [ ( ( 0, 0 ), Start Up )
+            [ ( ( 5, 1 ), Start Right )
             , ( ( 3, 1 ), Input )
             , ( ( 1, 1 ), Grab )
             , ( ( 7, 3 ), Drop )

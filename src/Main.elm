@@ -240,26 +240,15 @@ moveAt p board =
 
 instructionList : Board -> List ( Int2, Instruction )
 instructionList board =
-    boardPositions
-        |> List.filterMap
-            (\p ->
-                let
-                    ( x, y ) =
-                        p
-                in
-                instructionAt x y board
-                    |> Maybe.map (Tuple.pair p)
-            )
+    board.instructions
+        |> Dict.insert board.start.pos (Start board.start.dir)
+        |> Dict.toList
 
 
 moveList : Board -> List ( Int2, Direction )
 moveList board =
-    boardPositions
-        |> List.filterMap
-            (\p ->
-                moveAt p board
-                    |> Maybe.map (Tuple.pair p)
-            )
+    board.moves
+        |> Dict.toList
 
 
 emptyBoard : Board

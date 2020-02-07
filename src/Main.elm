@@ -36,21 +36,6 @@ type Direction
     | Right
 
 
-oppositeDir dir =
-    case dir of
-        Up ->
-            Down
-
-        Down ->
-            Up
-
-        Left ->
-            Right
-
-        Right ->
-            Left
-
-
 dirToDeg dir =
     case dir of
         Up ->
@@ -442,9 +427,6 @@ movePathIndices board =
 
         isValid ( x, y ) =
             x >= 0 && y >= 0 && x < boardWidth && y < boardHeight
-
-        isOpposite a b =
-            a.dir == oppositeDir b.dir
 
         buildMovePath current path journal =
             case getNextPosDir current of
@@ -922,6 +904,10 @@ geometricPrecision =
     TA.shapeRendering T.RenderGeometricPrecision
 
 
+
+--noinspection ElmUnusedSymbol
+
+
 crispEdges =
     TA.shapeRendering T.RenderCrispEdges
 
@@ -944,6 +930,10 @@ words color string attrs =
         [ text string ]
 
 
+
+--noinspection ElmUnusedSymbol
+
+
 square c w =
     polyRect c ( w, w )
 
@@ -961,6 +951,10 @@ polyRect color ( width, height ) attrs =
         []
 
 
+
+--noinspection ElmUnusedSymbol
+
+
 polygon color points attrs =
     S.polygon
         (TA.points points
@@ -972,10 +966,6 @@ polygon color points attrs =
 
 rect : String -> Float2 -> List (S.Attribute msg) -> S.Svg msg
 rect color ( width, height ) attrs =
-    let
-        ( x, y ) =
-            ( width / 2, height / 2 )
-    in
     S.rect
         (SA.width (fromFloat width)
             :: SA.height (fromFloat height)

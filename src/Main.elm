@@ -658,12 +658,16 @@ ring color radius thickness attrs =
 -- Model
 
 
+type Error
+    = CollisionError
+
+
 type alias Model =
     { screenSize : ( Float, Float )
     , board : Board
     , waldo : Waldo
     , atomDict : Dict Int2 Atom
-    , error : Bool
+    , error : Maybe Error
     , elapsed : Int
     }
 
@@ -688,7 +692,7 @@ init _ =
       , board = board
       , waldo = { x = start.x, y = start.y, direction = start.direction, hasAtom = False }
       , atomDict = Dict.empty
-      , error = False
+      , error = Nothing
       , elapsed = 0
       }
     , Browser.Dom.getViewport |> Task.perform GotViewport
@@ -719,7 +723,7 @@ update message model =
             ( model, Browser.Dom.getViewport |> Task.perform GotViewport )
 
         Tick ->
-            if model.error then
+            if model.error /= Nothing then
                 ( model, Cmd.none )
 
             else
@@ -733,8 +737,8 @@ update message model =
                 ( { model | elapsed = model.elapsed + 1 }, Cmd.none )
 
 
-moveWaldo : Board -> Waldo -> Maybe Waldo
-moveWaldo board waldo =
+updateWaldoPosition : Board -> Waldo -> Maybe Waldo
+updateWaldoPosition board waldo =
     let
         { x, y } =
             waldo
@@ -758,21 +762,22 @@ moveWaldo board waldo =
             )
 
 
+stepWaldo : Board -> Model -> Model
 stepWaldo board model =
-    moveWaldo board model.waldo
+    updateWaldoPosition board model.waldo
         |> Maybe.map
             (\waldo ->
                 if
                     waldo.hasAtom
                         && (Dict.get ( waldo.x, waldo.y ) model.atomDict /= Nothing)
                 then
-                    { model | error = True }
+                    { model | error = Just CollisionError }
 
                 else
                     { model | waldo = waldo }
                         |> executeWaldoInstruction board
             )
-        |> Maybe.withDefault { model | error = True }
+        |> Maybe.withDefault model
 
 
 executeWaldoInstruction board model =

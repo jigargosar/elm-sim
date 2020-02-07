@@ -248,6 +248,8 @@ initialBoard =
         |> setStartInstruction 5 1 Right
         |> setInstruction2List
             [ ( ( 3, 1 ), Input, nod )
+
+            --, ( ( 2, 1 ), Input, nod )
             , ( ( 1, 1 ), Grab, cd Down )
             , ( ( 1, 4 ), nop, cd Right )
             , ( ( 7, 4 ), nop, cd Left )

@@ -216,19 +216,11 @@ instructionList board =
         |> Dict.toList
 
 
-moveList : Board -> List ( Int2, Direction )
-moveList board =
+moveInstructionList : Board -> List ( Int2, MoveInstruction )
+moveInstructionList board =
     board.ib
+        |> Dict.map (\_ -> .moveInstruction)
         |> Dict.toList
-        |> List.filterMap
-            (\( i2, c ) ->
-                case c.moveInstruction of
-                    ChangeDirection d ->
-                        Just ( i2, d )
-
-                    NoDirectionChange ->
-                        Nothing
-            )
 
 
 emptyBoard : Board
@@ -363,14 +355,24 @@ renderMove color offset cellWidth direction =
     ]
 
 
+renderMoveInstruction : String -> Float -> Float -> MoveInstruction -> List (S.Svg msg)
+renderMoveInstruction color offset cellWidth moveInstruction =
+    case moveInstruction of
+        NoDirectionChange ->
+            []
+
+        ChangeDirection direction ->
+            renderMove color offset cellWidth direction
+
+
 renderMoveLayer : String -> Float -> Float -> Board -> S.Svg msg
 renderMoveLayer color offset cellWidth board =
     let
         cellSize =
             ( cellWidth, cellWidth )
     in
-    moveList board
-        |> List.map (\( p, v ) -> ( p, renderMove color offset cellWidth v ))
+    moveInstructionList board
+        |> List.map (\( p, v ) -> ( p, renderMoveInstruction color offset cellWidth v ))
         |> gridLayout cellSize boardSize []
 
 

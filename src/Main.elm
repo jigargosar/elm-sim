@@ -139,9 +139,9 @@ boardPositions =
 
 
 setInstruction : Int -> Int -> Instruction -> Board -> Maybe Board
-setInstruction x y ins board =
+setInstruction x y instruction board =
     if isValidBoardLocation x y board then
-        Just (mapInstructions (Dict.insert ( x, y ) ins) board)
+        Just (mapInstructions (Dict.insert ( x, y ) instruction) board)
 
     else
         Nothing
@@ -158,9 +158,9 @@ setInstructions list board =
 
 
 setMove : Int -> Int -> Move -> Board -> Maybe Board
-setMove x y ins board =
+setMove x y move board =
     if isValidBoardLocation x y board then
-        Just (mapMoves (Dict.insert ( x, y ) ins) board)
+        Just (mapMoves (Dict.insert ( x, y ) move) board)
 
     else
         Nothing
@@ -193,37 +193,6 @@ mapInstructions func board =
 mapMoves : (Moves -> Moves) -> Board -> Board
 mapMoves func board =
     { board | moves = func board.moves }
-
-
-emptyBoard =
-    { width = boardWidth
-    , height = boardHeight
-    , instructions = Dict.empty
-    , start = PosDir ( 4, 1 ) Left
-    , moves = Dict.empty
-    }
-
-
-initialBoard : Board
-initialBoard =
-    emptyBoard
-        |> setInstructions
-            [ ( ( 0, 0 ), Start Up )
-            , ( ( 3, 1 ), Input )
-            , ( ( 1, 1 ), Grab )
-            , ( ( 7, 3 ), Drop )
-            , ( ( 6, 1 ), Output )
-            ]
-        |> Maybe.andThen
-            (setMoves
-                [ ( ( 1, 1 ), Down )
-                , ( ( 1, 4 ), Right )
-                , ( ( 7, 4 ), Left )
-                , ( ( 7, 4 ), Up )
-                , ( ( 7, 1 ), Left )
-                ]
-            )
-        |> Maybe.withDefault emptyBoard
 
 
 instructionAt : Int2 -> Board -> Maybe Instruction
@@ -263,6 +232,38 @@ moveList board =
                 moveAt p board
                     |> Maybe.map (Tuple.pair p)
             )
+
+
+emptyBoard : Board
+emptyBoard =
+    { width = boardWidth
+    , height = boardHeight
+    , instructions = Dict.empty
+    , start = PosDir ( 4, 1 ) Left
+    , moves = Dict.empty
+    }
+
+
+initialBoard : Board
+initialBoard =
+    emptyBoard
+        |> setInstructions
+            [ ( ( 0, 0 ), Start Up )
+            , ( ( 3, 1 ), Input )
+            , ( ( 1, 1 ), Grab )
+            , ( ( 7, 3 ), Drop )
+            , ( ( 6, 1 ), Output )
+            ]
+        |> Maybe.andThen
+            (setMoves
+                [ ( ( 1, 1 ), Down )
+                , ( ( 1, 4 ), Right )
+                , ( ( 7, 4 ), Left )
+                , ( ( 7, 4 ), Up )
+                , ( ( 7, 1 ), Left )
+                ]
+            )
+        |> Maybe.withDefault emptyBoard
 
 
 

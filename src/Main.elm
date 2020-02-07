@@ -780,6 +780,7 @@ stepWaldo board model =
         |> Maybe.withDefault model
 
 
+executeWaldoInstruction : Board -> Model -> Model
 executeWaldoInstruction board model =
     let
         { waldo, atomDict } =

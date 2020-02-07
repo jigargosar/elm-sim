@@ -17,11 +17,36 @@ import TypedSvg.Attributes as TA exposing (viewBox)
 import TypedSvg.Types as T
 
 
+type alias Cell =
+    { instruction : Instruction
+    , moveInstruction : MoveInstruction
+    }
+
+
+type alias InstructionBoard =
+    { dict : Dict Int2 Cell
+    , start : { x : Int, y : Int, direction : Direction }
+    }
+
+
+emptyInstructionBoard : Dict Int2 Cell
+emptyInstructionBoard =
+    let
+        ( w, h ) =
+            boardSize
+    in
+    List.range 0 (w - 1)
+        |> List.concatMap (\x -> List.range 0 (h - 1) |> List.map (\y -> ( x, y )))
+        |> List.map (\xy -> ( xy, Cell NoInstruction NoDirectionChange ))
+        |> Dict.fromList
+
+
 type Instruction
     = Input
     | Grab
     | Drop
     | Output
+    | NoInstruction
 
 
 type Atom
@@ -30,7 +55,7 @@ type Atom
 
 type MoveInstruction
     = ChangeDirection Direction
-    | NoChange
+    | NoDirectionChange
 
 
 type Direction
@@ -169,7 +194,7 @@ moveInstructionAt x y board =
     if isValidBoardLocation x y board then
         Dict.get ( x, y ) board.moves
             |> Maybe.map ChangeDirection
-            |> Maybe.withDefault NoChange
+            |> Maybe.withDefault NoDirectionChange
             |> Just
 
     else
@@ -399,7 +424,7 @@ buildMovePathAllIndices board x y direction journal path =
             let
                 newDirection =
                     case moveInstruction of
-                        NoChange ->
+                        NoDirectionChange ->
                             direction
 
                         ChangeDirection changeDirection ->
@@ -495,6 +520,9 @@ renderInstruction color cellWidth instruction =
 
         Output ->
             [ circleHelp, wordsHelp "OUT" ]
+
+        NoInstruction ->
+            []
 
 
 renderStartInstruction : String -> Float -> Direction -> List (S.Svg msg)
@@ -742,7 +770,7 @@ stepWaldo board model =
                                 ChangeDirection changeDirection ->
                                     changeDirection
 
-                                NoChange ->
+                                NoDirectionChange ->
                                     waldo.direction
 
                         ( dx, dy ) =
@@ -767,6 +795,9 @@ executeWaldoInstruction board model =
     case instructionAt waldo.x waldo.y board of
         Just ins ->
             case ins of
+                NoInstruction ->
+                    model
+
                 Input ->
                     { model | atomDict = Dict.insert ( 1, 1 ) Atom atomDict }
 

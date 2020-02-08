@@ -47,9 +47,14 @@ type alias Flags =
 
 init : Flags -> ( Model, Cmd Msg )
 init _ =
+    let
+        dirGrid =
+            Dict.fromList
+                [ ( ( 0, 0 ), Down ) ]
+    in
     ( { width = 10
       , height = 8
-      , dirGrid = Dict.empty
+      , dirGrid = dirGrid
       }
     , Cmd.none
     )

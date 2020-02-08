@@ -119,7 +119,7 @@ view model =
                     fromInt x ++ "," ++ fromInt y
 
                 indexEl =
-                    E.el [ Font.color lightGray ] (E.text indexStr)
+                    E.el [ Font.size 14, Font.color lightGray ] (E.text indexStr)
             in
             E.column
                 [ E.padding 5

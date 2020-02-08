@@ -3,6 +3,7 @@ module BoardEditor exposing (main)
 -- Browser.Element Scaffold
 
 import Browser
+import Dict exposing (Dict)
 import Element as E
 import Element.Border as Border
 import Element.Font as Font
@@ -14,9 +15,29 @@ import String exposing (fromInt)
 -- Model
 
 
+type alias Int2 =
+    ( Int, Int )
+
+
+type alias GridDict a =
+    Dict Int2 a
+
+
+type alias DirectionGrid =
+    GridDict Direction
+
+
+type Direction
+    = Up
+    | Down
+    | Left
+    | Right
+
+
 type alias Model =
     { width : Int
     , height : Int
+    , dirGrid : DirectionGrid
     }
 
 
@@ -28,6 +49,7 @@ init : Flags -> ( Model, Cmd Msg )
 init _ =
     ( { width = 10
       , height = 8
+      , dirGrid = Dict.empty
       }
     , Cmd.none
     )

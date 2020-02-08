@@ -204,6 +204,7 @@ view model =
         )
 
 
+viewCell : Int -> Int -> DirectionInstruction -> Bool -> E.Element Msg
 viewCell x y di showDIEditor =
     let
         dirEl =

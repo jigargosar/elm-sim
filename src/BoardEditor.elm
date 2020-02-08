@@ -58,13 +58,16 @@ subscriptions _ =
 view : Model -> Html Msg
 view model =
     E.layout []
-        (E.column [] (List.map viewRow (List.range 0 (model.height - 1))))
+        (E.column [] (List.map (viewRow model.height) (List.range 0 (model.height - 1))))
 
 
-viewRow r =
+viewRow height y =
+    let
+        viewCell x =
+            E.text ("(" ++ fromInt y ++ "," ++ fromInt x ++ ")")
+    in
     E.row []
-        [ E.text ("Row Num: " ++ fromInt (r + 1))
-        ]
+        (List.map viewCell (List.range 0 (height - 1)))
 
 
 empty : Html msg

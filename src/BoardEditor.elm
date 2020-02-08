@@ -241,7 +241,6 @@ view model =
                 [ Border.width 1
                 , Border.color lightGray
                 , E.padding 5
-                , E.height E.fill
                 ]
                 [ indexEl
                 , dirEl

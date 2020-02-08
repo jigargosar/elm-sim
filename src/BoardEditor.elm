@@ -6,6 +6,7 @@ import Browser
 import Dict exposing (Dict)
 import Element as E
 import Element.Border as Border
+import Element.Events as Events
 import Element.Font as Font
 import Html exposing (Html)
 import String exposing (fromInt)
@@ -66,12 +67,16 @@ init _ =
 
 type Msg
     = NoOp
+    | DirClicked Int Int
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update message model =
     case message of
         NoOp ->
+            ( model, Cmd.none )
+
+        DirClicked x y ->
             ( model, Cmd.none )
 
 
@@ -116,6 +121,7 @@ view model =
                             , E.width E.fill
                             , E.height E.fill
                             , E.padding 5
+                            , Events.onClick (DirClicked x y)
                             ]
                     in
                     case dirAt x y model.dirGrid of

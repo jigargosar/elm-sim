@@ -94,46 +94,64 @@ dirAt =
     getAt
 
 
+black =
+    E.rgb255 0 0 0
+
+
+lightGray =
+    E.rgb255 200 200 200
+
+
 view : Model -> Html Msg
 view model =
     let
         viewCell x y =
             let
-                maybeDir =
-                    dirAt x y model.dirGrid
-            in
-            case maybeDir of
-                Nothing ->
-                    E.el
-                        [ E.padding 10
-                        , Font.center
-                        , Border.width 1
-                        ]
-                        (E.text (fromInt x ++ "," ++ fromInt y))
+                dirEl =
+                    case dirAt x y model.dirGrid of
+                        Just dir ->
+                            E.el [ Font.color black ] (E.text (Debug.toString dir))
 
-                Just dir ->
-                    E.el
-                        [ E.padding 10
-                        , Font.center
-                        , Border.width 1
-                        ]
-                        (E.text (Debug.toString dir))
+                        Nothing ->
+                            E.el [ Font.color lightGray ] (E.text "noc")
+
+                indexStr =
+                    fromInt x ++ "," ++ fromInt y
+
+                indexEl =
+                    E.el [ Font.color lightGray ] (E.text indexStr)
+            in
+            E.column
+                [ E.padding 5
+                , Font.center
+                , Border.width 1
+                , Border.color lightGray
+                , E.spacing 5
+                , E.height E.fill
+                ]
+                [ indexEl
+                , dirEl
+                ]
     in
     E.layout []
         (E.column []
-            [ viewTable model.width model.height viewCell
+            [ viewTable
+                [ Border.width 1
+                , Border.color lightGray
+                ]
+                model.width
+                model.height
+                viewCell
             ]
         )
 
 
-viewTable width height viewFunc =
+viewTable attrs width height viewFunc =
     let
         column x =
             E.Column E.none E.fill (viewFunc x)
     in
-    E.table
-        [ Border.width 1
-        ]
+    E.table attrs
         { data = List.range 0 (height - 1)
         , columns =
             List.range 0 (width - 1)

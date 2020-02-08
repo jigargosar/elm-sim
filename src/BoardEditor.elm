@@ -286,7 +286,7 @@ viewCell x y di showDIEditor ri showRIEditor =
                     E.inFront (viewRIEditor ri)
 
                   else
-                    Events.onClick (StartEditDI x y)
+                    Events.onClick (StartEditRI x y)
                 ]
                 (E.text riString)
 

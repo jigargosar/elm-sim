@@ -179,54 +179,19 @@ view model =
     let
         viewCell x y =
             let
-                dirEl =
-                    let
-                        di =
-                            directionInstructionAt x y model.dirGrid
+                di =
+                    directionInstructionAt x y model.dirGrid
 
-                        ( diString, diColor ) =
-                            case di of
-                                DirectionChange d ->
-                                    ( Debug.toString d, black )
-
-                                DirectionNoChange ->
-                                    ( "noc", lightGray )
-                    in
-                    E.el
-                        [ Font.color diColor
-                        , E.pointer
-                        , E.padding 5
-                        , if isEditingDIAt x y model.edit then
-                            E.inFront (viewDIEditor di)
-
-                          else
-                            Events.onClick (StartEditDI x y)
-                        ]
-                        (E.text diString)
-
-                indexEl =
-                    E.el
-                        [ E.padding 5
-                        , Font.size 14
-                        , Font.color lightGray
-                        ]
-                        (E.text (fromInt x ++ "," ++ fromInt y))
+                showDIEditor =
+                    isEditingDIAt x y model.edit
             in
-            E.column
-                [ Border.width 1
-                , Border.color lightGray
-                , E.padding 5
-                , E.width (E.minimum 80 E.fill)
-                ]
-                [ indexEl
-                , dirEl
-                ]
+            viewCell2 x y di showDIEditor
     in
     E.layout []
         (E.column
             [ E.width E.fill
             ]
-            [ viewGrid
+            [ renderGrid
                 [ Border.width 1
                 , Border.color lightGray
                 , E.centerX
@@ -237,6 +202,49 @@ view model =
                 viewCell
             ]
         )
+
+
+viewCell2 x y di showDIEditor =
+    let
+        dirEl =
+            let
+                ( diString, diColor ) =
+                    case di of
+                        DirectionChange d ->
+                            ( Debug.toString d, black )
+
+                        DirectionNoChange ->
+                            ( "noc", lightGray )
+            in
+            E.el
+                [ Font.color diColor
+                , E.pointer
+                , E.padding 5
+                , if showDIEditor then
+                    E.inFront (viewDIEditor di)
+
+                  else
+                    Events.onClick (StartEditDI x y)
+                ]
+                (E.text diString)
+
+        indexEl =
+            E.el
+                [ E.padding 5
+                , Font.size 14
+                , Font.color lightGray
+                ]
+                (E.text (fromInt x ++ "," ++ fromInt y))
+    in
+    E.column
+        [ Border.width 1
+        , Border.color lightGray
+        , E.padding 5
+        , E.width (E.minimum 80 E.fill)
+        ]
+        [ indexEl
+        , dirEl
+        ]
 
 
 viewDIEditor di =
@@ -259,7 +267,7 @@ viewDIEditor di =
         }
 
 
-viewGrid attrs width height viewFunc =
+renderGrid attrs width height viewFunc =
     let
         column x =
             E.Column E.none E.fill (viewFunc x)

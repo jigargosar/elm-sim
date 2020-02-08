@@ -63,6 +63,7 @@ type alias Model =
 type Edit
     = NoEdit
     | EditDI Int Int
+    | EditRI Int Int
 
 
 type alias Flags =
@@ -97,7 +98,8 @@ init _ =
 type Msg
     = NoOp
     | StartEditDI Int Int
-    | DIClicked DirectionInstruction
+    | DISelected DirectionInstruction
+    | RISelected ReactorInstruction
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -109,11 +111,8 @@ update message model =
         StartEditDI x y ->
             ( { model | edit = EditDI x y }, Cmd.none )
 
-        DIClicked di ->
+        DISelected di ->
             case model.edit of
-                NoEdit ->
-                    ( model, Cmd.none )
-
                 EditDI x y ->
                     ( { model
                         | dirGrid = setDirectionInstruction x y di model.dirGrid
@@ -121,6 +120,22 @@ update message model =
                       }
                     , Cmd.none
                     )
+
+                _ ->
+                    ( model, Cmd.none )
+
+        RISelected ri ->
+            case model.edit of
+                EditRI x y ->
+                    ( { model
+                        | riGrid = setRI x y ri model.riGrid
+                        , edit = NoEdit
+                      }
+                    , Cmd.none
+                    )
+
+                _ ->
+                    ( model, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg
@@ -156,6 +171,15 @@ setDirectionInstruction x y di =
             Dict.insert ( x, y ) direction
 
 
+type alias RIGrid =
+    GridDict ReactorInstruction
+
+
+setRI : Int -> Int -> ReactorInstruction -> RIGrid -> RIGrid
+setRI x y =
+    Dict.insert ( x, y )
+
+
 black =
     E.rgb255 0 0 0
 
@@ -180,7 +204,7 @@ view model =
                 showDIEditor =
                     isEditingDIAt x y model.edit
             in
-            viewCell x y di showDIEditor
+            viewCell x y di showDIEditor Start False
     in
     E.layout []
         (E.column
@@ -199,10 +223,10 @@ view model =
         )
 
 
-viewCell : Int -> Int -> DirectionInstruction -> Bool -> E.Element Msg
-viewCell x y di showDIEditor =
+viewCell : Int -> Int -> DirectionInstruction -> Bool -> ReactorInstruction -> Bool -> E.Element Msg
+viewCell x y di showDIEditor ri showRIEditor =
     let
-        dirEl =
+        viewDI =
             let
                 ( diString, diColor ) =
                     case di of
@@ -224,7 +248,29 @@ viewCell x y di showDIEditor =
                 ]
                 (E.text diString)
 
-        indexEl =
+        viewRI =
+            let
+                ( riString, riColor ) =
+                    case ri of
+                        NOP ->
+                            ( "nop", lightGray )
+
+                        _ ->
+                            ( Debug.toString ri, black )
+            in
+            E.el
+                [ Font.color riColor
+                , E.pointer
+                , E.padding 5
+                , if showRIEditor then
+                    E.inFront (viewRIEditor ri)
+
+                  else
+                    Events.onClick (StartEditDI x y)
+                ]
+                (E.text riString)
+
+        viewIdx =
             E.el
                 [ E.padding 5
                 , Font.size 14
@@ -238,8 +284,9 @@ viewCell x y di showDIEditor =
         , E.padding 5
         , E.width (E.minimum 80 E.fill)
         ]
-        [ indexEl
-        , dirEl
+        [ viewIdx
+        , viewDI
+        , viewRI
         ]
 
 
@@ -250,7 +297,7 @@ viewDIEditor di =
         , Background.color lightGray
         , Font.color black
         ]
-        { onChange = DIClicked
+        { onChange = DISelected
         , selected = Just di
         , label = Input.labelHidden ""
         , options =
@@ -259,6 +306,24 @@ viewDIEditor di =
             , Input.option (DirectionChange Left) (text "Left")
             , Input.option (DirectionChange Right) (text "Right")
             , Input.option DirectionNoChange (text "noc")
+            ]
+        }
+
+
+viewRIEditor : ReactorInstruction -> E.Element Msg
+viewRIEditor ri =
+    Input.radio
+        [ padding 10
+        , spacing 20
+        , Background.color lightGray
+        , Font.color black
+        ]
+        { onChange = RISelected
+        , selected = Just ri
+        , label = Input.labelHidden ""
+        , options =
+            [ Input.option Start (text "Start")
+            , Input.option NOP (text "nop")
             ]
         }
 

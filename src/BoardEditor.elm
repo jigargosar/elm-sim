@@ -174,15 +174,11 @@ view model =
                     let
                         common dirOpt =
                             [ E.pointer
-
-                            --, Border.width 1
-                            , E.width E.fill
-                            , E.height E.fill
                             , E.padding 5
                             , case model.edit of
                                 EditDir x_ y_ dirOpt_ ->
                                     if x == x_ && y == y_ then
-                                        E.below (rad dirOpt_)
+                                        E.inFront (rad dirOpt_)
 
                                     else
                                         Events.onClick (StartEditDir x y dirOpt)
@@ -197,7 +193,6 @@ view model =
                                 , spacing 20
                                 , Background.color lightGray
                                 , Font.color black
-                                , E.moveRight 9
                                 ]
                                 { onChange = DirOptClicked
                                 , selected = Just dirOpt
@@ -242,7 +237,7 @@ view model =
                 , Border.color lightGray
                 , E.padding 5
                 , E.width (E.minimum 80 E.fill)
-                , E.height (E.minimum 80 E.fill)
+                , E.height (E.minimum 150 E.fill)
                 ]
                 [ indexEl
                 , dirEl

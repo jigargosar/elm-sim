@@ -4,6 +4,8 @@ module BoardEditor exposing (..)
 
 import Browser
 import Element as E
+import Element.Border as Border
+import Element.Font as Font
 import Html exposing (Html)
 import String exposing (fromInt)
 
@@ -58,7 +60,31 @@ subscriptions _ =
 view : Model -> Html Msg
 view model =
     E.layout []
-        (E.column [] (List.map (viewRow model.height) (List.range 0 (model.height - 1))))
+        -- (E.column [] (List.map (viewRow model.height) (List.range 0 (model.height - 1))))
+        (E.column [] [ viewTable model.width model.height ])
+
+
+viewTable width height =
+    let
+        viewCell x y =
+            E.el
+                [ E.padding 10
+                , Font.center
+                , Border.width 1
+                ]
+                (E.text (fromInt x ++ "," ++ fromInt y))
+
+        column x =
+            E.Column E.none E.fill (viewCell x)
+    in
+    E.table
+        [ Border.width 1
+        ]
+        { data = List.range 0 (height - 1)
+        , columns =
+            List.range 0 (width - 1)
+                |> List.map column
+        }
 
 
 viewRow height y =

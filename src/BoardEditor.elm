@@ -1,4 +1,4 @@
-module BoardEditor exposing (..)
+module BoardEditor exposing (main)
 
 -- Browser.Element Scaffold
 
@@ -60,7 +60,6 @@ subscriptions _ =
 view : Model -> Html Msg
 view model =
     E.layout []
-        -- (E.column [] (List.map (viewRow model.height) (List.range 0 (model.height - 1))))
         (E.column [] [ viewTable model.width model.height ])
 
 
@@ -85,20 +84,6 @@ viewTable width height =
             List.range 0 (width - 1)
                 |> List.map column
         }
-
-
-viewRow height y =
-    let
-        viewCell x =
-            E.text ("(" ++ fromInt y ++ "," ++ fromInt x ++ ")")
-    in
-    E.row []
-        (List.map viewCell (List.range 0 (height - 1)))
-
-
-empty : Html msg
-empty =
-    Html.text ""
 
 
 

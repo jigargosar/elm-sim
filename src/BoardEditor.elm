@@ -37,9 +37,9 @@ type Direction
     | Right
 
 
-type DirOption
-    = DirOption Direction
-    | NOC
+type DirectionInstruction
+    = DirectionChange Direction
+    | DirectionNoChange
 
 
 type alias Model =
@@ -52,7 +52,7 @@ type alias Model =
 
 type Edit
     = NoEdit
-    | EditDir Int Int DirOption
+    | EditDir Int Int DirectionInstruction
 
 
 type alias Flags =
@@ -81,8 +81,8 @@ init _ =
 
 type Msg
     = NoOp
-    | StartEditDir Int Int DirOption
-    | DirOptClicked DirOption
+    | StartEditDir Int Int DirectionInstruction
+    | DirOptClicked DirectionInstruction
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -101,7 +101,7 @@ update message model =
 
                 EditDir x y _ ->
                     case dirOption of
-                        NOC ->
+                        DirectionNoChange ->
                             ( { model
                                 | dirGrid = setNOCDirAt x y model.dirGrid
                                 , edit = NoEdit
@@ -109,7 +109,7 @@ update message model =
                             , Cmd.none
                             )
 
-                        DirOption direction ->
+                        DirectionChange direction ->
                             ( { model
                                 | dirGrid = setDirAt x y direction model.dirGrid
                                 , edit = NoEdit
@@ -198,11 +198,11 @@ view model =
                                 , selected = Just dirOpt
                                 , label = Input.labelHidden ""
                                 , options =
-                                    [ Input.option (DirOption Up) (text "Up")
-                                    , Input.option (DirOption Down) (text "Down")
-                                    , Input.option (DirOption Left) (text "Left")
-                                    , Input.option (DirOption Right) (text "Right")
-                                    , Input.option NOC (text "noc")
+                                    [ Input.option (DirectionChange Up) (text "Up")
+                                    , Input.option (DirectionChange Down) (text "Down")
+                                    , Input.option (DirectionChange Left) (text "Left")
+                                    , Input.option (DirectionChange Right) (text "Right")
+                                    , Input.option DirectionNoChange (text "noc")
                                     ]
                                 }
                     in
@@ -210,14 +210,14 @@ view model =
                         Just dir ->
                             E.el
                                 (Font.color black
-                                    :: common (DirOption dir)
+                                    :: common (DirectionChange dir)
                                 )
                                 (E.text (Debug.toString dir))
 
                         Nothing ->
                             E.el
                                 (Font.color lightGray
-                                    :: common NOC
+                                    :: common DirectionNoChange
                                 )
                                 (E.text "noc")
 

@@ -48,12 +48,14 @@ type ReactorInstruction
     | Out
     | Grab
     | Drop
+    | NOP
 
 
 type alias Model =
     { width : Int
     , height : Int
     , dirGrid : DirectionGrid
+    , riGrid : GridDict ReactorInstruction
     , edit : Edit
     }
 
@@ -73,10 +75,15 @@ init _ =
         dirGrid =
             Dict.fromList
                 [ ( ( 0, 0 ), Down ) ]
+
+        riGrid =
+            Dict.fromList
+                [ ( ( 0, 0 ), Start ) ]
     in
     ( { width = 10
       , height = 8
       , dirGrid = dirGrid
+      , riGrid = riGrid
       , edit = NoEdit
       }
     , Cmd.none

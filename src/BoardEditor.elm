@@ -42,6 +42,14 @@ type DirectionInstruction
     | DirectionNoChange
 
 
+type ReactorInstruction
+    = Start
+    | In
+    | Out
+    | Grab
+    | Drop
+
+
 type alias Model =
     { width : Int
     , height : Int

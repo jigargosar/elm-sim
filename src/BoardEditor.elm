@@ -237,7 +237,6 @@ view model =
                 , Border.color lightGray
                 , E.padding 5
                 , E.width (E.minimum 80 E.fill)
-                , E.height (E.minimum 150 E.fill)
                 ]
                 [ indexEl
                 , dirEl

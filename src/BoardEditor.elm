@@ -211,16 +211,13 @@ view model =
                                 )
                                 (E.text "noc")
 
-                indexStr =
-                    fromInt x ++ "," ++ fromInt y
-
                 indexEl =
                     E.el
                         [ E.padding 5
                         , Font.size 14
                         , Font.color lightGray
                         ]
-                        (E.text indexStr)
+                        (E.text (fromInt x ++ "," ++ fromInt y))
             in
             E.column
                 [ Border.width 1

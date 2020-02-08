@@ -52,7 +52,7 @@ type alias Model =
 
 type Edit
     = NoEdit
-    | EditDI Int Int DirectionInstruction
+    | EditDI Int Int
 
 
 type alias Flags =
@@ -81,7 +81,7 @@ init _ =
 
 type Msg
     = NoOp
-    | StartEditDI Int Int DirectionInstruction
+    | StartEditDI Int Int
     | DIClicked DirectionInstruction
 
 
@@ -91,15 +91,15 @@ update message model =
         NoOp ->
             ( model, Cmd.none )
 
-        StartEditDI x y dirOption ->
-            ( { model | edit = EditDI x y dirOption }, Cmd.none )
+        StartEditDI x y ->
+            ( { model | edit = EditDI x y }, Cmd.none )
 
         DIClicked di ->
             case model.edit of
                 NoEdit ->
                     ( model, Cmd.none )
 
-                EditDI x y _ ->
+                EditDI x y ->
                     ( { model
                         | dirGrid = setDirectionInstruction x y di model.dirGrid
                         , edit = NoEdit
@@ -137,6 +137,20 @@ dirAt =
     getAt
 
 
+directionInstructionAt : Int -> Int -> DirectionGrid -> DirectionInstruction
+directionInstructionAt x y =
+    Dict.get ( x, y ) >> unwrap DirectionNoChange DirectionChange
+
+
+unwrap default func maybe =
+    case maybe of
+        Just a ->
+            func a
+
+        Nothing ->
+            default
+
+
 setDirectionInstruction : Int -> Int -> DirectionInstruction -> DirectionGrid -> DirectionGrid
 setDirectionInstruction x y di =
     case di of
@@ -155,6 +169,11 @@ lightGray =
     E.rgb255 200 200 200
 
 
+isEditingDIAt : Int -> Int -> Edit -> Bool
+isEditingDIAt x y edit =
+    EditDI x y == edit
+
+
 view : Model -> Html Msg
 view model =
     let
@@ -162,54 +181,28 @@ view model =
             let
                 dirEl =
                     let
-                        common dirOpt =
-                            [ E.pointer
-                            , E.padding 5
-                            , case model.edit of
-                                EditDI x_ y_ dirOpt_ ->
-                                    if x == x_ && y == y_ then
-                                        E.inFront (rad dirOpt_)
+                        di =
+                            directionInstructionAt x y model.dirGrid
 
-                                    else
-                                        Events.onClick (StartEditDI x y dirOpt)
+                        ( diString, diColor ) =
+                            case di of
+                                DirectionChange d ->
+                                    ( Debug.toString d, black )
 
-                                _ ->
-                                    Events.onClick (StartEditDI x y dirOpt)
-                            ]
-
-                        rad dirOpt =
-                            Input.radio
-                                [ padding 10
-                                , spacing 20
-                                , Background.color lightGray
-                                , Font.color black
-                                ]
-                                { onChange = DIClicked
-                                , selected = Just dirOpt
-                                , label = Input.labelHidden ""
-                                , options =
-                                    [ Input.option (DirectionChange Up) (text "Up")
-                                    , Input.option (DirectionChange Down) (text "Down")
-                                    , Input.option (DirectionChange Left) (text "Left")
-                                    , Input.option (DirectionChange Right) (text "Right")
-                                    , Input.option DirectionNoChange (text "noc")
-                                    ]
-                                }
+                                DirectionNoChange ->
+                                    ( "noc", lightGray )
                     in
-                    case dirAt x y model.dirGrid of
-                        Just dir ->
-                            E.el
-                                (Font.color black
-                                    :: common (DirectionChange dir)
-                                )
-                                (E.text (Debug.toString dir))
+                    E.el
+                        [ Font.color diColor
+                        , E.pointer
+                        , E.padding 5
+                        , if isEditingDIAt x y model.edit then
+                            E.inFront (viewDIEditor di)
 
-                        Nothing ->
-                            E.el
-                                (Font.color lightGray
-                                    :: common DirectionNoChange
-                                )
-                                (E.text "noc")
+                          else
+                            Events.onClick (StartEditDI x y)
+                        ]
+                        (E.text diString)
 
                 indexEl =
                     E.el
@@ -244,6 +237,26 @@ view model =
                 viewCell
             ]
         )
+
+
+viewDIEditor di =
+    Input.radio
+        [ padding 10
+        , spacing 20
+        , Background.color lightGray
+        , Font.color black
+        ]
+        { onChange = DIClicked
+        , selected = Just di
+        , label = Input.labelHidden ""
+        , options =
+            [ Input.option (DirectionChange Up) (text "Up")
+            , Input.option (DirectionChange Down) (text "Down")
+            , Input.option (DirectionChange Left) (text "Left")
+            , Input.option (DirectionChange Right) (text "Right")
+            , Input.option DirectionNoChange (text "noc")
+            ]
+        }
 
 
 viewGrid attrs width height viewFunc =

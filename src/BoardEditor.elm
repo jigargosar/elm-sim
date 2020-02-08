@@ -81,11 +81,6 @@ subscriptions _ =
 
 view : Model -> Html Msg
 view model =
-    E.layout []
-        (E.column [] [ viewTable model.width model.height ])
-
-
-viewTable width height =
     let
         viewCell x y =
             E.el
@@ -94,9 +89,18 @@ viewTable width height =
                 , Border.width 1
                 ]
                 (E.text (fromInt x ++ "," ++ fromInt y))
+    in
+    E.layout []
+        (E.column []
+            [ viewTable model.width model.height viewCell
+            ]
+        )
 
+
+viewTable width height viewFunc =
+    let
         column x =
-            E.Column E.none E.fill (viewCell x)
+            E.Column E.none E.fill (viewFunc x)
     in
     E.table
         [ Border.width 1

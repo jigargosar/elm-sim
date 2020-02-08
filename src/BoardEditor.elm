@@ -254,7 +254,7 @@ viewCell x y di showDIEditor ri showRIEditor =
                             ( Debug.toString d, black )
 
                         DirectionNoChange ->
-                            ( "noc", lightGray )
+                            ( "noc", black )
             in
             E.el
                 [ Font.color diColor
@@ -273,7 +273,7 @@ viewCell x y di showDIEditor ri showRIEditor =
                 ( riString, riColor ) =
                     case ri of
                         NOP ->
-                            ( "nop", lightGray )
+                            ( "nop", black )
 
                         _ ->
                             ( Debug.toString ri, black )

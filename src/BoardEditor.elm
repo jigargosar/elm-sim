@@ -108,25 +108,46 @@ view model =
         viewCell x y =
             let
                 dirEl =
+                    let
+                        common =
+                            [ E.pointer
+
+                            --, Border.width 1
+                            , E.width E.fill
+                            , E.height E.fill
+                            , E.padding 5
+                            ]
+                    in
                     case dirAt x y model.dirGrid of
                         Just dir ->
-                            E.el [ Font.color black ] (E.text (Debug.toString dir))
+                            E.el
+                                (Font.color black
+                                    :: common
+                                )
+                                (E.text (Debug.toString dir))
 
                         Nothing ->
-                            E.el [ Font.color lightGray ] (E.text "noc")
+                            E.el
+                                (Font.color lightGray
+                                    :: common
+                                )
+                                (E.text "noc")
 
                 indexStr =
                     fromInt x ++ "," ++ fromInt y
 
                 indexEl =
-                    E.el [ Font.size 14, Font.color lightGray ] (E.text indexStr)
+                    E.el
+                        [ E.padding 5
+                        , Font.size 14
+                        , Font.color lightGray
+                        ]
+                        (E.text indexStr)
             in
             E.column
-                [ E.padding 5
-                , Font.center
-                , Border.width 1
+                [ Border.width 1
                 , Border.color lightGray
-                , E.spacing 5
+                , E.padding 5
                 , E.height E.fill
                 ]
                 [ indexEl

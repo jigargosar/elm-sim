@@ -52,7 +52,7 @@ type alias Model =
 
 type Edit
     = NoEdit
-    | EditDir Int Int DirectionInstruction
+    | EditDI Int Int DirectionInstruction
 
 
 type alias Flags =
@@ -81,8 +81,8 @@ init _ =
 
 type Msg
     = NoOp
-    | StartEditDir Int Int DirectionInstruction
-    | DirOptClicked DirectionInstruction
+    | StartEditDI Int Int DirectionInstruction
+    | DIClicked DirectionInstruction
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -91,31 +91,21 @@ update message model =
         NoOp ->
             ( model, Cmd.none )
 
-        StartEditDir x y dirOption ->
-            ( { model | edit = EditDir x y dirOption }, Cmd.none )
+        StartEditDI x y dirOption ->
+            ( { model | edit = EditDI x y dirOption }, Cmd.none )
 
-        DirOptClicked dirOption ->
+        DIClicked di ->
             case model.edit of
                 NoEdit ->
                     ( model, Cmd.none )
 
-                EditDir x y _ ->
-                    case dirOption of
-                        DirectionNoChange ->
-                            ( { model
-                                | dirGrid = setNOCDirAt x y model.dirGrid
-                                , edit = NoEdit
-                              }
-                            , Cmd.none
-                            )
-
-                        DirectionChange direction ->
-                            ( { model
-                                | dirGrid = setDirAt x y direction model.dirGrid
-                                , edit = NoEdit
-                              }
-                            , Cmd.none
-                            )
+                EditDI x y _ ->
+                    ( { model
+                        | dirGrid = setDirectionInstruction x y di model.dirGrid
+                        , edit = NoEdit
+                      }
+                    , Cmd.none
+                    )
 
 
 subscriptions : Model -> Sub Msg
@@ -147,14 +137,14 @@ dirAt =
     getAt
 
 
-setNOCDirAt : Int -> Int -> DirectionGrid -> DirectionGrid
-setNOCDirAt =
-    removeAt
+setDirectionInstruction : Int -> Int -> DirectionInstruction -> DirectionGrid -> DirectionGrid
+setDirectionInstruction x y di =
+    case di of
+        DirectionNoChange ->
+            Dict.remove ( x, y )
 
-
-setDirAt : Int -> Int -> Direction -> DirectionGrid -> DirectionGrid
-setDirAt =
-    setAt
+        DirectionChange direction ->
+            Dict.insert ( x, y ) direction
 
 
 black =
@@ -176,15 +166,15 @@ view model =
                             [ E.pointer
                             , E.padding 5
                             , case model.edit of
-                                EditDir x_ y_ dirOpt_ ->
+                                EditDI x_ y_ dirOpt_ ->
                                     if x == x_ && y == y_ then
                                         E.inFront (rad dirOpt_)
 
                                     else
-                                        Events.onClick (StartEditDir x y dirOpt)
+                                        Events.onClick (StartEditDI x y dirOpt)
 
                                 _ ->
-                                    Events.onClick (StartEditDir x y dirOpt)
+                                    Events.onClick (StartEditDI x y dirOpt)
                             ]
 
                         rad dirOpt =
@@ -194,7 +184,7 @@ view model =
                                 , Background.color lightGray
                                 , Font.color black
                                 ]
-                                { onChange = DirOptClicked
+                                { onChange = DIClicked
                                 , selected = Just dirOpt
                                 , label = Input.labelHidden ""
                                 , options =

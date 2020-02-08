@@ -243,10 +243,14 @@ view model =
                 ]
     in
     E.layout []
-        (E.column []
-            [ viewTable
+        (E.column
+            [ E.width E.fill
+            ]
+            [ viewGrid
                 [ Border.width 1
                 , Border.color lightGray
+                , E.centerX
+                , E.width E.shrink
                 ]
                 model.width
                 model.height
@@ -255,7 +259,7 @@ view model =
         )
 
 
-viewTable attrs width height viewFunc =
+viewGrid attrs width height viewFunc =
     let
         column x =
             E.Column E.none E.fill (viewFunc x)

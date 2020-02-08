@@ -98,6 +98,7 @@ init _ =
 type Msg
     = NoOp
     | StartEditDI Int Int
+    | StartEditRI Int Int
     | DISelected DirectionInstruction
     | RISelected ReactorInstruction
 
@@ -110,6 +111,9 @@ update message model =
 
         StartEditDI x y ->
             ( { model | edit = EditDI x y }, Cmd.none )
+
+        StartEditRI x y ->
+            ( { model | edit = EditRI x y }, Cmd.none )
 
         DISelected di ->
             case model.edit of
@@ -150,6 +154,11 @@ subscriptions _ =
 directionInstructionAt : Int -> Int -> DirectionGrid -> DirectionInstruction
 directionInstructionAt x y =
     Dict.get ( x, y ) >> unwrap DirectionNoChange DirectionChange
+
+
+riAt : Int -> Int -> RIGrid -> ReactorInstruction
+riAt x y =
+    Dict.get ( x, y ) >> Maybe.withDefault NOP
 
 
 unwrap default func maybe =
@@ -193,6 +202,11 @@ isEditingDIAt x y edit =
     EditDI x y == edit
 
 
+isEditingRIAt : Int -> Int -> Edit -> Bool
+isEditingRIAt x y edit =
+    EditRI x y == edit
+
+
 view : Model -> Html Msg
 view model =
     let
@@ -203,8 +217,14 @@ view model =
 
                 showDIEditor =
                     isEditingDIAt x y model.edit
+
+                ri =
+                    riAt x y model.riGrid
+
+                showRIEditor =
+                    isEditingRIAt x y model.edit
             in
-            viewCell x y di showDIEditor Start False
+            viewCell x y di showDIEditor ri showRIEditor
     in
     E.layout []
         (E.column
@@ -287,6 +307,7 @@ viewCell x y di showDIEditor ri showRIEditor =
         [ viewIdx
         , viewDI
         , viewRI
+        , E.text "HH"
         ]
 
 

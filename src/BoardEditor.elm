@@ -177,7 +177,7 @@ isEditingDIAt x y edit =
 view : Model -> Html Msg
 view model =
     let
-        viewCell x y =
+        viewCellHelp x y =
             let
                 di =
                     directionInstructionAt x y model.dirGrid
@@ -185,7 +185,7 @@ view model =
                 showDIEditor =
                     isEditingDIAt x y model.edit
             in
-            viewCell2 x y di showDIEditor
+            viewCell x y di showDIEditor
     in
     E.layout []
         (E.column
@@ -199,12 +199,12 @@ view model =
                 ]
                 model.width
                 model.height
-                viewCell
+                viewCellHelp
             ]
         )
 
 
-viewCell2 x y di showDIEditor =
+viewCell x y di showDIEditor =
     let
         dirEl =
             let

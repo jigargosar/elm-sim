@@ -4,10 +4,12 @@ module BoardEditor exposing (main)
 
 import Browser
 import Dict exposing (Dict)
-import Element as E
+import Element as E exposing (padding, spacing, text)
+import Element.Background as Background
 import Element.Border as Border
 import Element.Events as Events
 import Element.Font as Font
+import Element.Input as Input
 import Html exposing (Html)
 import String exposing (fromInt)
 
@@ -35,11 +37,22 @@ type Direction
     | Right
 
 
+type DirOption
+    = DirOption Direction
+    | NOC
+
+
 type alias Model =
     { width : Int
     , height : Int
     , dirGrid : DirectionGrid
+    , edit : Edit
     }
+
+
+type Edit
+    = NoEdit
+    | EditDir Int Int DirOption
 
 
 type alias Flags =
@@ -56,6 +69,7 @@ init _ =
     ( { width = 10
       , height = 8
       , dirGrid = dirGrid
+      , edit = NoEdit
       }
     , Cmd.none
     )
@@ -67,7 +81,8 @@ init _ =
 
 type Msg
     = NoOp
-    | DirClicked Int Int
+    | StartEditDir Int Int DirOption
+    | DirOptClicked DirOption
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -76,8 +91,31 @@ update message model =
         NoOp ->
             ( model, Cmd.none )
 
-        DirClicked x y ->
-            ( model, Cmd.none )
+        StartEditDir x y dirOption ->
+            ( { model | edit = EditDir x y dirOption }, Cmd.none )
+
+        DirOptClicked dirOption ->
+            case model.edit of
+                NoEdit ->
+                    ( model, Cmd.none )
+
+                EditDir x y _ ->
+                    case dirOption of
+                        NOC ->
+                            ( { model
+                                | dirGrid = setNOCDirAt x y model.dirGrid
+                                , edit = NoEdit
+                              }
+                            , Cmd.none
+                            )
+
+                        DirOption direction ->
+                            ( { model
+                                | dirGrid = setDirAt x y direction model.dirGrid
+                                , edit = NoEdit
+                              }
+                            , Cmd.none
+                            )
 
 
 subscriptions : Model -> Sub Msg
@@ -89,14 +127,34 @@ subscriptions _ =
 -- View
 
 
+setAt : Int -> Int -> a -> GridDict a -> GridDict a
+setAt x y a =
+    Dict.insert ( x, y ) a
+
+
 getAt : Int -> Int -> GridDict a -> Maybe a
 getAt x y =
     Dict.get ( x, y )
 
 
+removeAt : Int -> Int -> GridDict a -> GridDict a
+removeAt x y =
+    Dict.remove ( x, y )
+
+
 dirAt : Int -> Int -> DirectionGrid -> Maybe Direction
 dirAt =
     getAt
+
+
+setNOCDirAt : Int -> Int -> DirectionGrid -> DirectionGrid
+setNOCDirAt =
+    removeAt
+
+
+setDirAt : Int -> Int -> Direction -> DirectionGrid -> DirectionGrid
+setDirAt =
+    setAt
 
 
 black =
@@ -114,28 +172,57 @@ view model =
             let
                 dirEl =
                     let
-                        common =
+                        common dirOpt =
                             [ E.pointer
 
                             --, Border.width 1
                             , E.width E.fill
                             , E.height E.fill
                             , E.padding 5
-                            , Events.onClick (DirClicked x y)
+                            , case model.edit of
+                                EditDir x_ y_ dirOpt_ ->
+                                    if x == x_ && y == y_ then
+                                        E.below (rad dirOpt_)
+
+                                    else
+                                        Events.onClick (StartEditDir x y dirOpt)
+
+                                _ ->
+                                    Events.onClick (StartEditDir x y dirOpt)
                             ]
+
+                        rad dirOpt =
+                            Input.radio
+                                [ padding 10
+                                , spacing 20
+                                , Background.color lightGray
+                                , Font.color black
+                                , E.moveRight 9
+                                ]
+                                { onChange = DirOptClicked
+                                , selected = Just dirOpt
+                                , label = Input.labelHidden ""
+                                , options =
+                                    [ Input.option (DirOption Up) (text "Up")
+                                    , Input.option (DirOption Down) (text "Down")
+                                    , Input.option (DirOption Left) (text "Left")
+                                    , Input.option (DirOption Right) (text "Right")
+                                    , Input.option NOC (text "noc")
+                                    ]
+                                }
                     in
                     case dirAt x y model.dirGrid of
                         Just dir ->
                             E.el
                                 (Font.color black
-                                    :: common
+                                    :: common (DirOption dir)
                                 )
                                 (E.text (Debug.toString dir))
 
                         Nothing ->
                             E.el
                                 (Font.color lightGray
-                                    :: common
+                                    :: common NOC
                                 )
                                 (E.text "noc")
 

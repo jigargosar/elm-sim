@@ -117,26 +117,6 @@ subscriptions _ =
 -- View
 
 
-setAt : Int -> Int -> a -> GridDict a -> GridDict a
-setAt x y a =
-    Dict.insert ( x, y ) a
-
-
-getAt : Int -> Int -> GridDict a -> Maybe a
-getAt x y =
-    Dict.get ( x, y )
-
-
-removeAt : Int -> Int -> GridDict a -> GridDict a
-removeAt x y =
-    Dict.remove ( x, y )
-
-
-dirAt : Int -> Int -> DirectionGrid -> Maybe Direction
-dirAt =
-    getAt
-
-
 directionInstructionAt : Int -> Int -> DirectionGrid -> DirectionInstruction
 directionInstructionAt x y =
     Dict.get ( x, y ) >> unwrap DirectionNoChange DirectionChange

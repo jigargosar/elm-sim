@@ -79,16 +79,40 @@ subscriptions _ =
 -- View
 
 
+getAt : Int -> Int -> GridDict a -> Maybe a
+getAt x y =
+    Dict.get ( x, y )
+
+
+dirAt : Int -> Int -> DirectionGrid -> Maybe Direction
+dirAt =
+    getAt
+
+
 view : Model -> Html Msg
 view model =
     let
         viewCell x y =
-            E.el
-                [ E.padding 10
-                , Font.center
-                , Border.width 1
-                ]
-                (E.text (fromInt x ++ "," ++ fromInt y))
+            let
+                maybeDir =
+                    dirAt x y model.dirGrid
+            in
+            case maybeDir of
+                Nothing ->
+                    E.el
+                        [ E.padding 10
+                        , Font.center
+                        , Border.width 1
+                        ]
+                        (E.text (fromInt x ++ "," ++ fromInt y))
+
+                Just dir ->
+                    E.el
+                        [ E.padding 10
+                        , Font.center
+                        , Border.width 1
+                        ]
+                        (E.text (Debug.toString dir))
     in
     E.layout []
         (E.column []

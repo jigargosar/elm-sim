@@ -1,4 +1,4 @@
-module Program.Builder exposing (Builder, build, exe, init, startAt, step, stepIn)
+module Program.Builder exposing (Builder, Config, LayerConfig, Step, build, build2, exe, init, startAt, step, stepIn)
 
 import CD exposing (Arrow)
 import Inst exposing (Inst)
@@ -6,12 +6,63 @@ import Prog exposing (Prog)
 
 
 type alias Builder =
-    { x : Int, y : Int, arrow : Arrow, prog : Prog }
+    { x : Int
+    , y : Int
+    , arrow : Arrow
+    , layer : Prog.LayerName
+    , prog : Prog
+    }
 
 
 init : Int -> Int -> Builder
 init w h =
-    Builder 0 0 CD.Left (Prog.init w h)
+    Builder 0 0 CD.Left Prog.red (Prog.init w h)
+
+
+type alias Config =
+    { width : Int
+    , height : Int
+    , blue : LayerConfig
+    , red : LayerConfig
+    }
+
+
+type alias LayerConfig =
+    { x : Int
+    , y : Int
+    , arrow : Arrow
+    , steps : List Step
+    }
+
+
+type alias Step =
+    Builder -> Builder
+
+
+build2 : Config -> Prog
+build2 config =
+    init config.width config.height
+        |> switchRed
+        |> startAt config.red.x config.red.y config.red.arrow
+        |> applyAll config.red.steps
+        |> switchBlue
+        |> startAt config.blue.x config.blue.y config.blue.arrow
+        |> applyAll config.blue.steps
+        |> build
+
+
+applyAll : List Step -> Builder -> Builder
+applyAll steps b =
+    List.foldl (<|) b steps
+
+
+switchRed : Builder -> Builder
+switchRed b =
+    { b | layer = Prog.red }
+
+
+switchBlue b =
+    { b | layer = Prog.blue }
 
 
 startAt : Int -> Int -> Arrow -> Builder -> Builder
@@ -34,10 +85,10 @@ step b =
 stepIn : Arrow -> Builder -> Builder
 stepIn arrow b =
     let
-        { x, y, prog } =
+        { x, y, layer, prog } =
             b
     in
-    { b | x = x, y = y, arrow = arrow, prog = Prog.setArrow Prog.blue x y arrow prog }
+    { b | x = x, y = y, arrow = arrow, prog = Prog.setArrow layer x y arrow prog }
         |> step
 
 
@@ -54,10 +105,10 @@ build =
 setI : Inst -> Builder -> Builder
 setI inst b =
     let
-        { x, y, prog } =
+        { x, y, layer, prog } =
             b
     in
-    { b | prog = Prog.setInst Prog.blue x y inst prog }
+    { b | prog = Prog.setInst layer x y inst prog }
 
 
 setXY : Int -> Int -> Builder -> Builder

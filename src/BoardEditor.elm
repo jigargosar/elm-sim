@@ -205,6 +205,14 @@ black =
     E.rgb255 0 0 0
 
 
+blue =
+    E.rgb255 49 98 179
+
+
+red =
+    E.rgb255 179 17 25
+
+
 lightGray =
     E.rgb255 200 200 200
 
@@ -266,15 +274,15 @@ viewProg =
                 , E.width (E.minimum 80 E.fill)
                 , E.height (E.minimum 80 E.fill)
                 ]
-                [ E.column []
+                [ E.column [ Font.color red ]
                     [ E.text
-                        (Prog.instAt Prog.blue x y prog
+                        (Prog.instAt Prog.red x y prog2
                             |> Maybe.map Debug.toString
                             |> Maybe.withDefault ""
                         )
                     , E.el [ E.padding 5 ] (E.text "-")
                     , E.text
-                        (Prog.arrowAt Prog.blue x y prog
+                        (Prog.arrowAt Prog.red x y prog2
                             |> Maybe.map Debug.toString
                             |> Maybe.withDefault ""
                         )
@@ -305,6 +313,40 @@ viewProg =
                 |> B.stepIn CD.Left
                 |> B.build
                 |> Debug.log "b"
+
+        prog2 : Prog.Prog
+        prog2 =
+            B.build2
+                { width = 10
+                , height = 8
+                , red =
+                    { x = 4
+                    , y = 1
+                    , arrow = CD.Left
+                    , steps =
+                        [ B.exe Inst.alphaInput
+                        , B.step
+                        , B.step
+                        , B.exe Inst.grab
+                        , B.stepIn CD.Down
+                        , B.step
+                        , B.step
+                        , B.stepIn CD.Right
+                        , B.step
+                        , B.step
+                        , B.step
+                        , B.step
+                        , B.step
+                        , B.stepIn CD.Up
+                        , B.exe Inst.drop
+                        , B.step
+                        , B.exe Inst.psiOutput
+                        , B.step
+                        , B.stepIn CD.Left
+                        ]
+                    }
+                , blue = { x = 4, y = 7, arrow = CD.Left, steps = [] }
+                }
     in
     renderGrid
         [ Border.width 1

@@ -6,7 +6,7 @@ import Browser
 import Browser.Dom
 import CD
 import Dict exposing (Dict)
-import Element as E exposing (none, padding, spacing, text)
+import Element as E exposing (none, padding, paddingXY, spacing, text)
 import Element.Background as Background
 import Element.Border as Border
 import Element.Events as Events
@@ -133,7 +133,7 @@ type Msg
     | StartEditRI Int Int
     | DISelected DirectionInstruction
     | RISelected ReactorInstruction
-    | ShowDialog
+    | ToggleDialog
     | GotScrollbarSize Int2
 
 
@@ -175,8 +175,8 @@ update message model =
                 _ ->
                     ( model, Cmd.none )
 
-        ShowDialog ->
-            ( { model | showDialog = True }, Cmd.none )
+        ToggleDialog ->
+            ( { model | showDialog = not model.showDialog }, Cmd.none )
 
         GotScrollbarSize s ->
             ( { model | scrollbarSize = s }, Cmd.none )
@@ -286,12 +286,41 @@ view model =
                 (E.el
                     [ E.width E.fill
                     , E.height E.fill
-                    , Background.color black
-                    , Font.color white
-                    , E.alpha 0.5
-                    , Font.center
+                    , Background.color (E.rgba 0 0 0 0.5)
+                    , E.inFront
+                        (E.el
+                            [ E.centerX
+                            , E.centerY
+                            , Background.color white
+                            , Font.color black
+                            , Border.rounded 10
+                            , paddingXY 0 10
+                            ]
+                            (E.column
+                                [ padding 10
+                                , E.width (E.shrink |> E.minimum 200)
+                                , E.height (E.shrink |> E.maximum 200)
+                                , E.scrollbars
+                                ]
+                                [ E.text "DIALOG"
+                                , E.text "DIALOG"
+                                , E.text "DIALOG"
+                                , E.text "DIALOG"
+                                , E.text "DIALOG"
+                                , E.text "DIALOG"
+                                , E.text "DIALOG"
+                                , E.text "DIALOG"
+                                , E.text "DIALOG"
+                                , E.text "DIALOG"
+                                , E.text "DIALOG"
+                                , E.text "DIALOG"
+                                , E.text "DIALOG"
+                                , E.text "DIALOG"
+                                ]
+                            )
+                        )
                     ]
-                    (E.text "DIALOG")
+                    (E.el [ E.width E.fill, E.height E.fill, Events.onClick ToggleDialog ] none)
                 )
             , E.clip
             , E.height E.fill
@@ -366,7 +395,7 @@ viewProg =
                         )
                         |> E.el
                             [ E.centerX
-                            , Events.onClick ShowDialog
+                            , Events.onClick ToggleDialog
                             ]
                     , E.text
                         (Prog.arrowAt Prog.blue x y prog

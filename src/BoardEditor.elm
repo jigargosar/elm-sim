@@ -103,8 +103,8 @@ init _ =
                 |> B.step
                 |> B.step
                 |> B.stepIn CD.Left
-                |> Debug.log "b"
                 |> B.build
+                |> Debug.log "b"
     in
     ( { width = 10
       , height = 8

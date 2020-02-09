@@ -70,6 +70,8 @@ type alias Model =
     , dirGrid : DirectionGrid
     , riGrid : GridDict ReactorInstruction
     , edit : Edit
+    , showDialog : Bool
+    , scrollbarSize : ( Int, Int )
     }
 
 
@@ -111,6 +113,8 @@ init flags =
       , dirGrid = dirGrid
       , riGrid = riGrid
       , edit = NoEdit
+      , showDialog = False
+      , scrollbarSize = flags.scrollbarSize
       }
     , Cmd.batch
         [ Browser.Dom.getViewport |> Task.perform (Debug.log "vp" >> always NoOp)
@@ -129,6 +133,8 @@ type Msg
     | StartEditRI Int Int
     | DISelected DirectionInstruction
     | RISelected ReactorInstruction
+    | ShowDialog
+    | GotScrollbarSize Int2
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -169,11 +175,17 @@ update message model =
                 _ ->
                     ( model, Cmd.none )
 
+        ShowDialog ->
+            ( { model | showDialog = True }, Cmd.none )
+
+        GotScrollbarSize s ->
+            ( { model | scrollbarSize = s }, Cmd.none )
+
 
 subscriptions : Model -> Sub Msg
 subscriptions _ =
     Sub.batch
-        [ gotScrollbarSize (Debug.log "gotScrollbarSize" >> always NoOp)
+        [ gotScrollbarSize (Debug.log "gotScrollbarSize" >> GotScrollbarSize)
         ]
 
 
@@ -310,7 +322,7 @@ viewProg =
                             |> Maybe.map CD.arrowSymbol
                             |> Maybe.withDefault " "
                         )
-                        |> E.el [ E.centerX, E.scale 2.5 ]
+                        |> E.el [ E.centerX ]
                     ]
                 , E.column
                     [ Font.color blue
@@ -323,13 +335,16 @@ viewProg =
                             |> Maybe.map Debug.toString
                             |> Maybe.withDefault " "
                         )
-                        |> E.el [ E.centerX ]
+                        |> E.el
+                            [ E.centerX
+                            , Events.onClick ShowDialog
+                            ]
                     , E.text
                         (Prog.arrowAt Prog.blue x y prog
                             |> Maybe.map CD.arrowSymbol
                             |> Maybe.withDefault " "
                         )
-                        |> E.el [ E.centerX, E.scale 2.5 ]
+                        |> E.el [ E.centerX, Font.heavy ]
                     ]
                 ]
 

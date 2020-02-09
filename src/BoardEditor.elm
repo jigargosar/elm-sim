@@ -70,7 +70,6 @@ type alias Model =
     , dirGrid : DirectionGrid
     , riGrid : GridDict ReactorInstruction
     , edit : Edit
-    , showDialog : Bool
     , scrollbarSize : ( Int, Int )
     , dialog : Dialog
     }
@@ -119,7 +118,6 @@ init flags =
       , dirGrid = dirGrid
       , riGrid = riGrid
       , edit = NoEdit
-      , showDialog = False
       , scrollbarSize = flags.scrollbarSize
       , dialog = NoDialog
       }
@@ -140,7 +138,6 @@ type Msg
     | StartEditRI Int Int
     | DISelected DirectionInstruction
     | RISelected ReactorInstruction
-    | ToggleDialog
     | ShowArrowDialog Prog.LayerName Int Int
     | DialogBackgroundClicked
     | GotScrollbarSize Int2
@@ -183,9 +180,6 @@ update message model =
 
                 _ ->
                     ( model, Cmd.none )
-
-        ToggleDialog ->
-            ( { model | showDialog = not model.showDialog }, Cmd.none )
 
         GotScrollbarSize s ->
             ( { model | scrollbarSize = s }, Cmd.none )
@@ -409,10 +403,7 @@ viewProg =
                             |> Maybe.map Debug.toString
                             |> Maybe.withDefault " "
                         )
-                        |> E.el
-                            [ E.centerX
-                            , Events.onClick ToggleDialog
-                            ]
+                        |> E.el [ E.centerX ]
                     , E.text
                         (Prog.arrowAt Prog.blue x y prog
                             |> Maybe.map CD.arrowSymbol

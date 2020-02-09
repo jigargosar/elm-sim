@@ -12,7 +12,7 @@ import Element.Events as Events
 import Element.Font as Font
 import Html exposing (Html)
 import Inst
-import Prog exposing (LayerName)
+import Prog exposing (LayerName, Prog)
 import Program.Builder as B
 import String exposing (fromInt)
 import Task
@@ -37,6 +37,7 @@ type alias Model =
     , height : Int
     , scrollbarSize : ( Int, Int )
     , dialog : Dialog
+    , prog : Prog
     }
 
 
@@ -51,6 +52,44 @@ type alias Flags =
     }
 
 
+initialProg : Prog
+initialProg =
+    B.build
+        { width = 10
+        , height = 8
+        , red =
+            { x = 4
+            , y = 1
+            , arrow = CD.Left
+            , steps =
+                [ B.exe Inst.alphaInput
+                , B.step
+                , B.exe2 Inst.grab CD.Down
+                , B.step
+                , B.step
+                , B.stepIn CD.Right
+                , B.step
+                , B.step
+                , B.step
+                , B.step
+                , B.step
+                , B.stepIn CD.Up
+                , B.exe Inst.drop
+                , B.exe Inst.psiOutput
+                , B.stepIn CD.Left
+                ]
+            }
+        , blue =
+            { x = 4
+            , y = 1
+            , arrow = CD.Left
+            , steps =
+                [ B.exe Inst.alphaInput
+                ]
+            }
+        }
+
+
 init : Flags -> ( Model, Cmd Msg )
 init flags =
     let
@@ -61,6 +100,7 @@ init flags =
       , height = 8
       , scrollbarSize = flags.scrollbarSize
       , dialog = NoDialog
+      , prog = initialProg
       }
     , Cmd.batch
         [ Browser.Dom.getViewport |> Task.perform (Debug.log "vp" >> always NoOp)
@@ -136,7 +176,7 @@ view model =
         (E.column
             [ E.width E.fill
             ]
-            [ viewProg ]
+            [ viewProg model.prog ]
         )
 
 
@@ -191,7 +231,7 @@ viewArrowDialogContent =
         ]
 
 
-viewProg =
+viewProg prog =
     let
         viewCellHelp x y =
             E.row
@@ -241,43 +281,6 @@ viewProg =
                         |> E.el [ E.centerX, Events.onClick (ShowArrowDialog Prog.blue x y) ]
                     ]
                 ]
-
-        prog : Prog.Prog
-        prog =
-            B.build
-                { width = 10
-                , height = 8
-                , red =
-                    { x = 4
-                    , y = 1
-                    , arrow = CD.Left
-                    , steps =
-                        [ B.exe Inst.alphaInput
-                        , B.step
-                        , B.exe2 Inst.grab CD.Down
-                        , B.step
-                        , B.step
-                        , B.stepIn CD.Right
-                        , B.step
-                        , B.step
-                        , B.step
-                        , B.step
-                        , B.step
-                        , B.stepIn CD.Up
-                        , B.exe Inst.drop
-                        , B.exe Inst.psiOutput
-                        , B.stepIn CD.Left
-                        ]
-                    }
-                , blue =
-                    { x = 4
-                    , y = 1
-                    , arrow = CD.Left
-                    , steps =
-                        [ B.exe Inst.alphaInput
-                        ]
-                    }
-                }
     in
     renderGrid
         [ Border.width 1

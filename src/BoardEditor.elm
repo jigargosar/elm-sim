@@ -267,20 +267,20 @@ view model =
 viewProg =
     let
         viewCellHelp x y =
-            E.column
+            E.row
                 [ Border.width 1
                 , Border.color lightGray
                 , E.padding 5
                 , E.width (E.minimum 80 E.fill)
                 , E.height (E.minimum 80 E.fill)
                 ]
-                [ E.column [ Font.color red ]
+                [ E.column [ Font.color red, E.height E.fill ]
                     [ E.text
                         (Prog.instAt Prog.red x y prog2
                             |> Maybe.map Debug.toString
                             |> Maybe.withDefault ""
                         )
-                    , E.el [ E.padding 5 ] (E.text "-")
+                    , E.el [ E.padding 5 ] (E.text " | ")
                     , E.text
                         (Prog.arrowAt Prog.red x y prog2
                             |> Maybe.map Debug.toString

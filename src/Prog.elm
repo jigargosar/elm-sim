@@ -1,15 +1,17 @@
 module Prog exposing
     ( LayerName
     , Prog
+    , arrowAt
     , blue
     , init
     , instAt
     , red
+    , setArrow
     , setCD
     , setInst
     )
 
-import CD exposing (CD)
+import CD exposing (Arrow, CD)
 import Inst exposing (Inst)
 import Program.Layer as Layer exposing (Layer)
 
@@ -50,9 +52,19 @@ setCD name x y cd =
     mapLayer name (Layer.setCD x y cd)
 
 
+setArrow : LayerName -> Int -> Int -> Arrow -> Prog -> Prog
+setArrow name x y cd =
+    mapLayer name (Layer.setArrow x y cd)
+
+
 instAt : LayerName -> Int -> Int -> Prog -> Maybe Inst
 instAt name x y =
     getLayer name >> Layer.instAt x y
+
+
+arrowAt : LayerName -> Int -> Int -> Prog -> Maybe Arrow
+arrowAt name x y =
+    getLayer name >> Layer.arrowAt x y
 
 
 getLayer name =

@@ -1,12 +1,6 @@
 module Inst exposing (..)
 
 
-type GrabDrop
-    = Grab
-    | Drop
-    | GrabOrDrop
-
-
 type InputChannel
     = Alpha
     | Beta
@@ -19,7 +13,8 @@ type OutputChannel
 
 type Inst
     = Start
-    | GrabDrop GrabDrop
+    | Grab
+    | Drop
     | In InputChannel
     | Out OutputChannel
 
@@ -29,4 +24,16 @@ start =
 
 
 grab =
-    GrabDrop Grab
+    Grab
+
+
+alphaInput =
+    In Alpha
+
+
+psiOutput =
+    Out Psi
+
+
+drop =
+    Drop

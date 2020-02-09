@@ -1,12 +1,12 @@
 module Program.Builder exposing (Builder, build, exe, init, startAt, step, stepIn)
 
-import CD
+import CD exposing (Arrow)
 import Inst exposing (Inst)
 import Prog exposing (Prog)
 
 
 type alias Builder =
-    { x : Int, y : Int, arrow : CD.Arrow, prog : Prog }
+    { x : Int, y : Int, arrow : Arrow, prog : Prog }
 
 
 init : Int -> Int -> Builder
@@ -14,9 +14,9 @@ init w h =
     Builder 0 0 CD.Left (Prog.init w h)
 
 
-startAt : Int -> Int -> Builder -> Builder
-startAt x y =
-    setXY x y >> setI Inst.start
+startAt : Int -> Int -> Arrow -> Builder -> Builder
+startAt x y arrow =
+    setXY x y >> setI Inst.start >> stepIn arrow
 
 
 step : Builder -> Builder
@@ -31,13 +31,13 @@ step b =
     { b | x = nx, y = ny }
 
 
-stepIn : CD.Arrow -> Builder -> Builder
+stepIn : Arrow -> Builder -> Builder
 stepIn arrow b =
     let
         { x, y, prog } =
             b
     in
-    { b | x = x, y = y, arrow = arrow, prog = Prog.setCD Prog.blue x y (CD.fromArrow arrow) prog }
+    { b | x = x, y = y, arrow = arrow, prog = Prog.setArrow Prog.blue x y arrow prog }
         |> step
 
 

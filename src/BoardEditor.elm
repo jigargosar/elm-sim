@@ -266,9 +266,15 @@ viewProg =
                 , E.width (E.minimum 80 E.fill)
                 , E.height (E.minimum 80 E.fill)
                 ]
-                [ E.paragraph []
+                [ E.column []
                     [ E.text
                         (Prog.instAt Prog.blue x y prog
+                            |> Maybe.map Debug.toString
+                            |> Maybe.withDefault ""
+                        )
+                    , E.el [ E.padding 5 ] (E.text "-")
+                    , E.text
+                        (Prog.arrowAt Prog.blue x y prog
                             |> Maybe.map Debug.toString
                             |> Maybe.withDefault ""
                         )
@@ -277,13 +283,24 @@ viewProg =
 
         prog =
             B.init 10 8
-                |> B.startAt 4 1
-                |> B.step
+                |> B.startAt 4 1 CD.Left
+                |> B.exe Inst.alphaInput
                 |> B.step
                 |> B.step
                 |> B.exe Inst.grab
                 |> B.stepIn CD.Down
                 |> B.step
+                |> B.step
+                |> B.stepIn CD.Right
+                |> B.step
+                |> B.step
+                |> B.step
+                |> B.step
+                |> B.step
+                |> B.stepIn CD.Up
+                |> B.exe Inst.drop
+                |> B.step
+                |> B.exe Inst.psiOutput
                 |> B.step
                 |> B.stepIn CD.Left
                 |> B.build

@@ -21,6 +21,16 @@ fromArrow =
     CD
 
 
+toArrow : CD -> Maybe Arrow
+toArrow cd =
+    case cd of
+        CD arrow ->
+            Just arrow
+
+        Cont ->
+            Nothing
+
+
 arrowToVec arrow =
     case arrow of
         Up ->

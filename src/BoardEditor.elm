@@ -107,15 +107,6 @@ subscriptions _ =
 -- View
 
 
-unwrap default func maybe =
-    case maybe of
-        Just a ->
-            func a
-
-        Nothing ->
-            default
-
-
 black =
     E.rgb255 0 0 0
 

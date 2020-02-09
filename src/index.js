@@ -15,6 +15,7 @@ function initElmApp() {
     node: document.getElementById('root'),
     flags: {
       now: Date.now(),
+      scrollbarSize: [0,0]
     },
   })
   return app

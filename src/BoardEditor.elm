@@ -3,6 +3,7 @@ module BoardEditor exposing (main)
 -- Browser.Element Scaffold
 
 import Browser
+import Browser.Dom
 import CD
 import Dict exposing (Dict)
 import Element as E exposing (padding, spacing, text)
@@ -17,6 +18,7 @@ import Prog
 import Program.Builder as B
 import Program.Zipper as Z
 import String exposing (fromInt)
+import Task
 
 
 
@@ -72,12 +74,17 @@ type Edit
 
 
 type alias Flags =
-    ()
+    { scrollbarSize : ( Int, Int )
+    , now : Int
+    }
 
 
 init : Flags -> ( Model, Cmd Msg )
-init _ =
+init flags =
     let
+        _ =
+            Debug.log "flags" flags
+
         dirGrid =
             Dict.fromList
                 [ ( ( 0, 0 ), Down ) ]
@@ -99,7 +106,9 @@ init _ =
       , riGrid = riGrid
       , edit = NoEdit
       }
-    , Cmd.none
+    , Cmd.batch
+        [ Browser.Dom.getViewport |> Task.perform (Debug.log "vp" >> always NoOp)
+        ]
     )
 
 

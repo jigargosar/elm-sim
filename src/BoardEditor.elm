@@ -297,13 +297,7 @@ view model =
     in
     E.layout
         [ E.inFront
-            (case model.dialog of
-                NoDialog ->
-                    none
-
-                ArrowDialog layerName x y ->
-                    viewDialog model.scrollbarSize viewArrowDialogContent
-            )
+            (viewDialog model)
         , E.height E.fill
         ]
         (E.column
@@ -323,7 +317,16 @@ view model =
         )
 
 
-viewDialog ( scrollbarXWidth, _ ) content =
+viewDialog model =
+    case model.dialog of
+        NoDialog ->
+            none
+
+        ArrowDialog layerName x y ->
+            dialogContainer model.scrollbarSize viewArrowDialogContent
+
+
+dialogContainer ( scrollbarXWidth, _ ) content =
     E.el
         [ E.width E.fill
         , E.height E.fill

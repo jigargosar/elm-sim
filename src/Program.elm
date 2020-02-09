@@ -1,4 +1,14 @@
-module Program exposing (CD, Inst, LayerName, Program, blue, init, red, setCD, setInst)
+module Program exposing
+    ( CD
+    , Inst
+    , LayerName
+    , Program
+    , blue
+    , init
+    , red
+    , setCD
+    , setInst
+    )
 
 import CD
 import Grid exposing (Grid)

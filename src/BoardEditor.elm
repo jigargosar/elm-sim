@@ -14,7 +14,7 @@ import Element.Font as Font
 import Element.Input as Input
 import Html exposing (Html)
 import Inst
-import Prog
+import Prog exposing (LayerName)
 import Program.Builder as B
 import Program.Zipper as Z
 import String exposing (fromInt)
@@ -72,7 +72,13 @@ type alias Model =
     , edit : Edit
     , showDialog : Bool
     , scrollbarSize : ( Int, Int )
+    , dialog : Dialog
     }
+
+
+type Dialog
+    = ArrowDialog LayerName Int Int
+    | NoDialog
 
 
 type Edit
@@ -115,6 +121,7 @@ init flags =
       , edit = NoEdit
       , showDialog = False
       , scrollbarSize = flags.scrollbarSize
+      , dialog = NoDialog
       }
     , Cmd.batch
         [ Browser.Dom.getViewport |> Task.perform (Debug.log "vp" >> always NoOp)
@@ -134,6 +141,7 @@ type Msg
     | DISelected DirectionInstruction
     | RISelected ReactorInstruction
     | ToggleDialog
+    | ShowArrowDialog Prog.LayerName Int Int
     | GotScrollbarSize Int2
 
 
@@ -180,6 +188,9 @@ update message model =
 
         GotScrollbarSize s ->
             ( { model | scrollbarSize = s }, Cmd.none )
+
+        ShowArrowDialog layerName x y ->
+            ( { model | dialog = ArrowDialog layerName x y }, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg

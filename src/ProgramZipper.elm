@@ -1,6 +1,21 @@
-module ProgramZipper exposing (ProgramZipper, go, goD, goL, goR, goU, init, set, setCD, setInst, switchToBlue, switchToRed)
+module ProgramZipper exposing
+    ( ProgramZipper
+    , go
+    , goD
+    , goL
+    , goR
+    , goU
+    , init
+    , set
+    , setCD
+    , setInst
+    , switchToBlue
+    , switchToRed
+    )
 
-import Program exposing (CD, Inst, Program)
+import CD exposing (CD)
+import Inst exposing (Inst)
+import Program exposing (Program)
 
 
 type alias ProgramZipper =

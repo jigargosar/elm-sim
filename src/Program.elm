@@ -1,7 +1,5 @@
 module Program exposing
-    ( CD
-    , Inst
-    , LayerName
+    ( LayerName
     , Program
     , blue
     , init
@@ -10,28 +8,9 @@ module Program exposing
     , setInst
     )
 
-import CD
-import Grid exposing (Grid)
-import Inst
-
-
-type alias Inst =
-    Inst.Inst
-
-
-type alias CD =
-    CD.CD
-
-
-type alias Layer =
-    { instG : Grid Inst
-    , moveG : Grid CD
-    }
-
-
-emptyLayer : Int -> Int -> Layer
-emptyLayer w h =
-    Layer (Grid.empty w h) (Grid.empty w h)
+import CD exposing (CD)
+import Inst exposing (Inst)
+import Program.Layer as Layer exposing (Layer)
 
 
 type LayerName
@@ -57,27 +36,17 @@ type alias Program =
 
 init : Int -> Int -> Program
 init w h =
-    Program (emptyLayer w h) (emptyLayer w h)
+    Program (Layer.empty w h) (Layer.empty w h)
 
 
 setInst : LayerName -> Int -> Int -> Inst -> Program -> Program
 setInst name x y inst =
-    mapLayer name (setInstInLayer x y inst)
+    mapLayer name (Layer.setInst x y inst)
 
 
 setCD : LayerName -> Int -> Int -> CD -> Program -> Program
 setCD name x y cd =
-    mapLayer name (setCDInLayer x y cd)
-
-
-setInstInLayer : Int -> Int -> Inst -> Layer -> Layer
-setInstInLayer x y inst l =
-    { l | instG = Grid.set x y inst l.instG }
-
-
-setCDInLayer : Int -> Int -> CD -> Layer -> Layer
-setCDInLayer x y cd l =
-    { l | moveG = Grid.set x y cd l.moveG }
+    mapLayer name (Layer.setCD x y cd)
 
 
 mapLayer : LayerName -> (Layer -> Layer) -> Program -> Program

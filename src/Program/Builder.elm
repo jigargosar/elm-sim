@@ -1,4 +1,4 @@
-module Program.Builder exposing (Builder, Config, LayerConfig, Step, build, build2, exe, init, startAt, step, stepIn)
+module Program.Builder exposing (Builder, Config, LayerConfig, Step, build, exe, init, startAt, step, stepIn)
 
 import CD exposing (Arrow)
 import Inst exposing (Inst)
@@ -39,8 +39,8 @@ type alias Step =
     Builder -> Builder
 
 
-build2 : Config -> Prog
-build2 config =
+build : Config -> Prog
+build config =
     init config.width config.height
         |> switchRed
         |> startAt config.red.x config.red.y config.red.arrow
@@ -48,7 +48,7 @@ build2 config =
         |> switchBlue
         |> startAt config.blue.x config.blue.y config.blue.arrow
         |> applyAll config.blue.steps
-        |> build
+        |> .prog
 
 
 applyAll : List Step -> Builder -> Builder
@@ -95,11 +95,6 @@ stepIn arrow b =
 exe : Inst -> Builder -> Builder
 exe =
     setI
-
-
-build : Builder -> Prog
-build =
-    .prog
 
 
 setI : Inst -> Builder -> Builder

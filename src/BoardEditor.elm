@@ -282,13 +282,13 @@ viewProg =
                     , E.alignTop
                     ]
                     [ E.text
-                        (Prog.instAt Prog.red x y prog2
+                        (Prog.instAt Prog.red x y prog
                             |> Maybe.map Debug.toString
                             |> Maybe.withDefault " "
                         )
                         |> E.el [ E.centerX ]
                     , E.text
-                        (Prog.arrowAt Prog.red x y prog2
+                        (Prog.arrowAt Prog.red x y prog
                             |> Maybe.map CD.arrowSymbol
                             |> Maybe.withDefault " "
                         )
@@ -301,13 +301,13 @@ viewProg =
                     , E.alignBottom
                     ]
                     [ E.text
-                        (Prog.instAt Prog.blue x y prog2
+                        (Prog.instAt Prog.blue x y prog
                             |> Maybe.map Debug.toString
                             |> Maybe.withDefault " "
                         )
                         |> E.el [ E.centerX ]
                     , E.text
-                        (Prog.arrowAt Prog.blue x y prog2
+                        (Prog.arrowAt Prog.blue x y prog
                             |> Maybe.map CD.arrowSymbol
                             |> Maybe.withDefault " "
                         )
@@ -315,34 +315,9 @@ viewProg =
                     ]
                 ]
 
+        prog : Prog.Prog
         prog =
-            B.init 10 8
-                |> B.startAt 4 1 CD.Left
-                |> B.exe Inst.alphaInput
-                |> B.step
-                |> B.step
-                |> B.exe Inst.grab
-                |> B.stepIn CD.Down
-                |> B.step
-                |> B.step
-                |> B.stepIn CD.Right
-                |> B.step
-                |> B.step
-                |> B.step
-                |> B.step
-                |> B.step
-                |> B.stepIn CD.Up
-                |> B.exe Inst.drop
-                |> B.step
-                |> B.exe Inst.psiOutput
-                |> B.step
-                |> B.stepIn CD.Left
-                |> B.build
-                |> Debug.log "b"
-
-        prog2 : Prog.Prog
-        prog2 =
-            B.build2
+            B.build
                 { width = 10
                 , height = 8
                 , red =

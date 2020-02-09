@@ -1,4 +1,4 @@
-module ProgramGrid exposing (Arrow, Inst, LayerLabel, ProgramGrid, init, setInst, setMove)
+module ProgramGrid exposing (CD, Inst, LayerLabel, ProgramGrid, init, setInst, setMove)
 
 import Grid exposing (Grid)
 
@@ -33,14 +33,14 @@ type Arrow
     | Right
 
 
-type Move
+type CD
     = CD Arrow
     | Cont
 
 
 type alias Layer =
     { instG : Grid Inst
-    , moveG : Grid Move
+    , moveG : Grid CD
     }
 
 
@@ -70,6 +70,6 @@ setInst =
     Debug.todo "impl"
 
 
-setMove : Int -> Int -> Move -> ProgramGrid -> ProgramGrid
+setMove : Int -> Int -> CD -> ProgramGrid -> ProgramGrid
 setMove =
     Debug.todo "impl"

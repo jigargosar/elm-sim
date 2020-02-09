@@ -1,6 +1,6 @@
-module ProgramBuilder exposing (ProgramBuilder, down, init)
+module ProgramBuilder exposing (ProgramBuilder, down, init, left, right, setCD, setInst, up)
 
-import ProgramGrid exposing (Inst, ProgramGrid)
+import ProgramGrid exposing (CD, Inst, ProgramGrid)
 
 
 type alias ProgramBuilder =
@@ -45,9 +45,14 @@ right =
     mapX inc
 
 
-inst : Inst -> ProgramBuilder -> ProgramBuilder
-inst inst_ =
+setInst : Inst -> ProgramBuilder -> ProgramBuilder
+setInst inst_ =
     mapPGXYA ProgramGrid.setInst inst_
+
+
+setCD : CD -> ProgramBuilder -> ProgramBuilder
+setCD inst_ =
+    mapPGXYA ProgramGrid.setMove inst_
 
 
 mapPGXYA : (Int -> Int -> a -> ProgramGrid -> ProgramGrid) -> a -> ProgramBuilder -> ProgramBuilder

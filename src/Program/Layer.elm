@@ -1,4 +1,4 @@
-module Program.Layer exposing (Layer, empty, setCD, setInst)
+module Program.Layer exposing (Layer, empty, instAt, setCD, setInst)
 
 import CD exposing (CD)
 import Grid exposing (Grid)
@@ -24,3 +24,8 @@ setInst x y inst l =
 setCD : Int -> Int -> CD -> Layer -> Layer
 setCD x y cd l =
     { l | moveG = Grid.set x y cd l.moveG }
+
+
+instAt : Int -> Int -> Layer -> Maybe Inst
+instAt x y =
+    .instG >> Grid.get x y

@@ -3,6 +3,7 @@ module Prog exposing
     , Prog
     , blue
     , init
+    , instAt
     , red
     , setCD
     , setInst
@@ -47,6 +48,20 @@ setInst name x y inst =
 setCD : LayerName -> Int -> Int -> CD -> Prog -> Prog
 setCD name x y cd =
     mapLayer name (Layer.setCD x y cd)
+
+
+instAt : LayerName -> Int -> Int -> Prog -> Maybe Inst
+instAt name x y =
+    getLayer name >> Layer.instAt x y
+
+
+getLayer name =
+    case name of
+        Red ->
+            .red
+
+        Blue ->
+            .blue
 
 
 mapLayer : LayerName -> (Layer -> Layer) -> Prog -> Prog

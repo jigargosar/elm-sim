@@ -13,6 +13,7 @@ import Element.Font as Font
 import Element.Input as Input
 import Html exposing (Html)
 import Inst
+import Prog
 import Program.Builder as B
 import Program.Zipper as Z
 import String exposing (fromInt)
@@ -91,20 +92,6 @@ init _ =
                 |> Z.switchToRed
                 |> Z.go 4 1
                 |> Z.set Inst.Start CD.left
-
-        prog =
-            B.init 10 8
-                |> B.startAt 4 1
-                |> B.step
-                |> B.step
-                |> B.step
-                |> B.exe Inst.grab
-                |> B.stepIn CD.Down
-                |> B.step
-                |> B.step
-                |> B.stepIn CD.Left
-                |> B.build
-                |> Debug.log "b"
     in
     ( { width = 10
       , height = 8
@@ -255,7 +242,8 @@ view model =
         (E.column
             [ E.width E.fill
             ]
-            [ renderGrid
+            [ viewProg
+            , renderGrid
                 [ Border.width 1
                 , Border.color lightGray
                 , E.centerX
@@ -266,6 +254,50 @@ view model =
                 viewCellHelp
             ]
         )
+
+
+viewProg =
+    let
+        viewCellHelp x y =
+            E.column
+                [ Border.width 1
+                , Border.color lightGray
+                , E.padding 5
+                , E.width (E.minimum 80 E.fill)
+                , E.height (E.minimum 80 E.fill)
+                ]
+                [ E.paragraph []
+                    [ E.text
+                        (Prog.instAt Prog.blue x y prog
+                            |> Maybe.map Debug.toString
+                            |> Maybe.withDefault ""
+                        )
+                    ]
+                ]
+
+        prog =
+            B.init 10 8
+                |> B.startAt 4 1
+                |> B.step
+                |> B.step
+                |> B.step
+                |> B.exe Inst.grab
+                |> B.stepIn CD.Down
+                |> B.step
+                |> B.step
+                |> B.stepIn CD.Left
+                |> B.build
+                |> Debug.log "b"
+    in
+    renderGrid
+        [ Border.width 1
+        , Border.color lightGray
+        , E.centerX
+        , E.width E.shrink
+        ]
+        10
+        8
+        viewCellHelp
 
 
 viewCell : Int -> Int -> DirectionInstruction -> Bool -> ReactorInstruction -> Bool -> E.Element Msg

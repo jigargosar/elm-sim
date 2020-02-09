@@ -5,7 +5,15 @@ const Module = require('./BoardEditor.elm')
 require('./styles.css')
 
 {
-  initElmApp()
+  const app = initElmApp()
+  app.ports.getScrollbarSize.subscribe(function() {
+    app.ports.gotScrollbarSize.send([
+              window.innerWidth - document.body.clientWidth,
+              window.innerHeight - document.body.clientHeight,
+          ])
+  })
+
+
 }
 
 function initElmApp() {
@@ -15,8 +23,12 @@ function initElmApp() {
     node: document.getElementById('root'),
     flags: {
       now: Date.now(),
-      scrollbarSize: [0,0]
+      scrollbarSize: [
+          window.innerWidth - document.body.clientWidth,
+          window.innerHeight - document.body.clientHeight,
+      ]
     },
   })
   return app
 }
+

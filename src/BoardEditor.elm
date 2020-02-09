@@ -1,4 +1,4 @@
-module BoardEditor exposing (main)
+port module BoardEditor exposing (main)
 
 -- Browser.Element Scaffold
 
@@ -19,6 +19,12 @@ import Program.Builder as B
 import Program.Zipper as Z
 import String exposing (fromInt)
 import Task
+
+
+port getScrollbarSize : () -> Cmd msg
+
+
+port gotScrollbarSize : (( Int, Int ) -> msg) -> Sub msg
 
 
 
@@ -108,6 +114,7 @@ init flags =
       }
     , Cmd.batch
         [ Browser.Dom.getViewport |> Task.perform (Debug.log "vp" >> always NoOp)
+        , getScrollbarSize ()
         ]
     )
 
@@ -165,7 +172,9 @@ update message model =
 
 subscriptions : Model -> Sub Msg
 subscriptions _ =
-    Sub.batch []
+    Sub.batch
+        [ gotScrollbarSize (Debug.log "gotScrollbarSize" >> always NoOp)
+        ]
 
 
 

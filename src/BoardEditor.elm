@@ -142,6 +142,7 @@ type Msg
     | RISelected ReactorInstruction
     | ToggleDialog
     | ShowArrowDialog Prog.LayerName Int Int
+    | DialogBackgroundClicked
     | GotScrollbarSize Int2
 
 
@@ -191,6 +192,9 @@ update message model =
 
         ShowArrowDialog layerName x y ->
             ( { model | dialog = ArrowDialog layerName x y }, Cmd.none )
+
+        DialogBackgroundClicked ->
+            ( { model | dialog = NoDialog }, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg
@@ -292,60 +296,16 @@ view model =
             viewCell x y di showDIEditor ri showRIEditor
     in
     E.layout
-        (if model.showDialog then
-            [ E.inFront
-                (E.el
-                    [ E.width E.fill
-                    , E.height E.fill
-                    , Background.color (E.rgba 0 0 0 0.5)
-                    , E.inFront
-                        (E.el
-                            [ E.centerX
-                            , E.centerY
-                            , Background.color white
-                            , Font.color black
-                            , Border.rounded 10
-                            , paddingXY 0 10
-                            ]
-                            (E.column
-                                [ padding 10
-                                , E.width (E.shrink |> E.minimum 200)
-                                , E.height (E.shrink |> E.maximum 200)
-                                , E.scrollbars
-                                ]
-                                [ E.text "DIALOG"
-                                , E.text "DIALOG"
-                                , E.text "DIALOG"
-                                , E.text "DIALOG"
-                                , E.text "DIALOG"
-                                , E.text "DIALOG"
-                                , E.text "DIALOG"
-                                , E.text "DIALOG"
-                                , E.text "DIALOG"
-                                , E.text "DIALOG"
-                                , E.text "DIALOG"
-                                , E.text "DIALOG"
-                                , E.text "DIALOG"
-                                , E.text "DIALOG"
-                                ]
-                            )
-                        )
-                    ]
-                    (E.el [ E.width E.fill, E.height E.fill, Events.onClick ToggleDialog ] none)
-                )
-            , E.clip
-            , E.height E.fill
-            , E.paddingEach
-                { top = 0
-                , right = model.scrollbarSize |> Tuple.first
-                , bottom = 0
-                , left = 0
-                }
-            ]
+        [ E.inFront
+            (case model.dialog of
+                NoDialog ->
+                    none
 
-         else
-            []
-        )
+                ArrowDialog layerName x y ->
+                    viewDialog model.scrollbarSize viewArrowDialogContent
+            )
+        , E.height E.fill
+        ]
         (E.column
             [ E.width E.fill
             ]
@@ -361,6 +321,48 @@ view model =
                 viewCellHelp
             ]
         )
+
+
+viewDialog ( scrollbarXWidth, _ ) content =
+    E.el
+        [ E.width E.fill
+        , E.height E.fill
+        , Background.color (E.rgba 0 0 0 0.5)
+        , E.inFront
+            (E.el
+                [ E.centerX
+                , E.centerY
+                , Background.color white
+                , Font.color black
+                , Border.rounded 10
+                , paddingXY 0 10
+                ]
+                content
+            )
+        , E.below
+            (E.html
+                (Html.node "style"
+                    []
+                    [ Html.text <|
+                        "body{overflow:hidden;padding-right:"
+                            ++ fromInt scrollbarXWidth
+                            ++ "px}"
+                    ]
+                )
+            )
+        ]
+        (E.el [ E.width E.fill, E.height E.fill, Events.onClick DialogBackgroundClicked ] none)
+
+
+viewArrowDialogContent =
+    E.column
+        [ padding 10
+        , E.width (E.shrink |> E.minimum 200)
+        , E.height (E.shrink |> E.minimum 200)
+        , E.scrollbars
+        ]
+        [ E.text "ArrowDialog"
+        ]
 
 
 viewProg =

@@ -287,17 +287,15 @@ viewProg =
                     [ E.text
                         (Prog.instAt Prog.red x y prog2
                             |> Maybe.map Debug.toString
-                            |> Maybe.withDefault "-"
+                            |> Maybe.withDefault " "
                         )
-                        |> E.el [ E.centerX ]
-                    , E.text "|"
                         |> E.el [ E.centerX ]
                     , E.text
                         (Prog.arrowAt Prog.red x y prog2
-                            |> Maybe.map Debug.toString
-                            |> Maybe.withDefault "-"
+                            |> Maybe.map CD.arrowSymbol
+                            |> Maybe.withDefault " "
                         )
-                        |> E.el [ E.centerX ]
+                        |> E.el [ E.centerX, Font.size 20 ]
                     ]
                 , E.column
                     [ Font.color blue
@@ -308,17 +306,15 @@ viewProg =
                     [ E.text
                         (Prog.instAt Prog.blue x y prog2
                             |> Maybe.map Debug.toString
-                            |> Maybe.withDefault "-"
+                            |> Maybe.withDefault " "
                         )
-                        |> E.el [ E.centerX ]
-                    , E.text "|"
                         |> E.el [ E.centerX ]
                     , E.text
                         (Prog.arrowAt Prog.blue x y prog2
-                            |> Maybe.map Debug.toString
-                            |> Maybe.withDefault "-"
+                            |> Maybe.map CD.arrowSymbol
+                            |> Maybe.withDefault " "
                         )
-                        |> E.el [ E.centerX ]
+                        |> E.el [ E.centerX, Font.size 20 ]
                     ]
                 ]
 
@@ -378,7 +374,7 @@ viewProg =
                         , B.stepIn CD.Left
                         ]
                     }
-                , blue = { x = 4, y = 7, arrow = CD.Left, steps = [] }
+                , blue = { x = 4, y = 1, arrow = CD.Left, steps = [] }
                 }
     in
     renderGrid

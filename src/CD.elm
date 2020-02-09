@@ -8,6 +8,21 @@ type Arrow
     | Right
 
 
+arrowSymbol arrow =
+    case arrow of
+        Left ->
+            "←"
+
+        Right ->
+            "→"
+
+        Up ->
+            "↑"
+
+        Down ->
+            "↓"
+
+
 stepByArrow arrow x y =
     arrowToVec arrow |> stepByVec x y
 

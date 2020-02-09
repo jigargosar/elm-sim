@@ -273,19 +273,52 @@ viewProg =
                 , E.padding 5
                 , E.width (E.minimum 80 E.fill)
                 , E.height (E.minimum 80 E.fill)
+                , Font.size 16
+
+                --, E.spaceEvenly
+                , E.spacing 10
                 ]
-                [ E.column [ Font.color red, E.height E.fill ]
+                [ E.column
+                    [ Font.color red
+                    , E.width E.fill
+                    , spacing 5
+                    , E.alignTop
+                    ]
                     [ E.text
                         (Prog.instAt Prog.red x y prog2
                             |> Maybe.map Debug.toString
-                            |> Maybe.withDefault ""
+                            |> Maybe.withDefault "-"
                         )
-                    , E.el [ E.padding 5 ] (E.text " | ")
+                        |> E.el [ E.centerX ]
+                    , E.text "|"
+                        |> E.el [ E.centerX ]
                     , E.text
                         (Prog.arrowAt Prog.red x y prog2
                             |> Maybe.map Debug.toString
-                            |> Maybe.withDefault ""
+                            |> Maybe.withDefault "-"
                         )
+                        |> E.el [ E.centerX ]
+                    ]
+                , E.column
+                    [ Font.color blue
+                    , E.width E.fill
+                    , spacing 5
+                    , E.alignBottom
+                    ]
+                    [ E.text
+                        (Prog.instAt Prog.blue x y prog2
+                            |> Maybe.map Debug.toString
+                            |> Maybe.withDefault "-"
+                        )
+                        |> E.el [ E.centerX ]
+                    , E.text "|"
+                        |> E.el [ E.centerX ]
+                    , E.text
+                        (Prog.arrowAt Prog.blue x y prog2
+                            |> Maybe.map Debug.toString
+                            |> Maybe.withDefault "-"
+                        )
+                        |> E.el [ E.centerX ]
                     ]
                 ]
 

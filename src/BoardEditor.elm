@@ -86,13 +86,10 @@ init _ =
 
         _ =
             Z.init 10 8
-                |> Z.down
-                |> Z.right
-                |> Z.right
-                |> Z.right
-                |> Z.right
-                |> Z.setInst Inst.start
-                |> Z.setCD CD.left
+                |> Z.switchToBlue
+                |> Z.switchToRed
+                |> Z.go 4 1
+                |> Z.set Inst.Start CD.left
     in
     ( { width = 10
       , height = 8

@@ -1,4 +1,4 @@
-module Program exposing (CD, Inst, LayerLabel, Program, init, setCD, setInst)
+module Program exposing (CD, Inst, LayerName, Program, blue, init, red, setCD, setInst)
 
 import CD
 import Grid exposing (Grid)
@@ -24,9 +24,19 @@ emptyLayer w h =
     Layer (Grid.empty w h) (Grid.empty w h)
 
 
-type LayerLabel
+type LayerName
     = Red
     | Blue
+
+
+blue : LayerName
+blue =
+    Blue
+
+
+red : LayerName
+red =
+    Red
 
 
 type alias Program =
@@ -40,11 +50,11 @@ init w h =
     Program (emptyLayer w h) (emptyLayer w h)
 
 
-setInst : Int -> Int -> Inst -> Program -> Program
+setInst : LayerName -> Int -> Int -> Inst -> Program -> Program
 setInst =
     Debug.todo "impl"
 
 
-setCD : Int -> Int -> CD -> Program -> Program
+setCD : LayerName -> Int -> Int -> CD -> Program -> Program
 setCD =
     Debug.todo "impl"

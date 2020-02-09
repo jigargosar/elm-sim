@@ -273,9 +273,6 @@ viewProg =
                 , E.padding 5
                 , E.width (E.minimum 80 E.fill)
                 , E.height (E.minimum 80 E.fill)
-                , Font.size 16
-
-                --, E.spaceEvenly
                 , E.spacing 10
                 ]
                 [ E.column
@@ -295,7 +292,7 @@ viewProg =
                             |> Maybe.map CD.arrowSymbol
                             |> Maybe.withDefault " "
                         )
-                        |> E.el [ E.centerX, Font.size 20 ]
+                        |> E.el [ E.centerX, E.scale 2.5 ]
                     ]
                 , E.column
                     [ Font.color blue
@@ -314,7 +311,7 @@ viewProg =
                             |> Maybe.map CD.arrowSymbol
                             |> Maybe.withDefault " "
                         )
-                        |> E.el [ E.centerX, Font.size 20 ]
+                        |> E.el [ E.centerX, E.scale 2.5 ]
                     ]
                 ]
 
@@ -374,7 +371,14 @@ viewProg =
                         , B.stepIn CD.Left
                         ]
                     }
-                , blue = { x = 4, y = 1, arrow = CD.Left, steps = [] }
+                , blue =
+                    { x = 4
+                    , y = 1
+                    , arrow = CD.Left
+                    , steps =
+                        [ B.exe Inst.alphaInput
+                        ]
+                    }
                 }
     in
     renderGrid

@@ -15,16 +15,6 @@ init w h =
     ProgramBuilder (ProgramGrid.init w h) 0 0
 
 
-mapX : (Int -> Int) -> ProgramBuilder -> ProgramBuilder
-mapX func b =
-    { b | x = func b.x }
-
-
-mapY : (Int -> Int) -> ProgramBuilder -> ProgramBuilder
-mapY func b =
-    { b | y = func b.y }
-
-
 down : ProgramBuilder -> ProgramBuilder
 down =
     mapY inc
@@ -53,6 +43,16 @@ setInst inst_ =
 setCD : CD -> ProgramBuilder -> ProgramBuilder
 setCD inst_ =
     mapPGXYA ProgramGrid.setMove inst_
+
+
+mapX : (Int -> Int) -> ProgramBuilder -> ProgramBuilder
+mapX func b =
+    { b | x = func b.x }
+
+
+mapY : (Int -> Int) -> ProgramBuilder -> ProgramBuilder
+mapY func b =
+    { b | y = func b.y }
 
 
 mapPGXYA : (Int -> Int -> a -> ProgramGrid -> ProgramGrid) -> a -> ProgramBuilder -> ProgramBuilder

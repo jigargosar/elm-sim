@@ -5,10 +5,10 @@ port module BoardEditor exposing (main)
 import Browser
 import Browser.Dom
 import CD
-import Element as E exposing (none, padding, paddingXY, spacing)
+import Element as E exposing (centerX, centerY, column, el, fill, height, inFront, none, padding, paddingXY, row, spacing, width)
 import Element.Background as Background
 import Element.Border as Border
-import Element.Events as Events
+import Element.Events as Events exposing (onClick)
 import Element.Font as Font
 import Html exposing (Html)
 import Inst
@@ -190,14 +190,14 @@ viewDialog model =
 
 
 dialogContainer ( scrollbarXWidth, _ ) content =
-    E.el
-        [ E.width E.fill
-        , E.height E.fill
+    el
+        [ width fill
+        , height fill
         , Background.color (E.rgba 0 0 0 0.5)
-        , E.inFront
-            (E.el
-                [ E.centerX
-                , E.centerY
+        , inFront
+            (el
+                [ centerX
+                , centerY
                 , Background.color white
                 , Font.color black
                 , Border.rounded 10
@@ -217,71 +217,20 @@ dialogContainer ( scrollbarXWidth, _ ) content =
                 )
             )
         ]
-        (E.el [ E.width E.fill, E.height E.fill, Events.onClick DialogBackgroundClicked ] none)
+        (el [ width fill, height fill, onClick DialogBackgroundClicked ] none)
 
 
 viewArrowDialogContent =
-    E.column
+    column
         [ padding 10
-        , E.width (E.shrink |> E.minimum 200)
-        , E.height (E.shrink |> E.minimum 200)
-        , E.scrollbars
+        , width (E.shrink |> E.minimum 200)
+        , height (E.shrink |> E.minimum 200)
         ]
         [ E.text "ArrowDialog"
         ]
 
 
 viewProg prog =
-    let
-        viewCellHelp x y =
-            E.row
-                [ Border.width 1
-                , Border.color lightGray
-                , E.padding 5
-                , E.width (E.minimum 80 E.fill)
-                , E.height (E.minimum 80 E.fill)
-                , E.spacing 10
-                ]
-                [ E.column
-                    [ Font.color red
-                    , E.width E.fill
-                    , spacing 5
-                    , E.alignTop
-                    ]
-                    [ E.text
-                        (Prog.instAt Prog.red x y prog
-                            |> Maybe.map Debug.toString
-                            |> Maybe.withDefault " "
-                        )
-                        |> E.el [ E.centerX ]
-                    , E.text
-                        (Prog.arrowAt Prog.red x y prog
-                            |> Maybe.map CD.arrowSymbol
-                            |> Maybe.withDefault " "
-                        )
-                        |> E.el [ E.centerX, Events.onClick (ShowArrowDialog Prog.red x y) ]
-                    ]
-                , E.column
-                    [ Font.color blue
-                    , E.width E.fill
-                    , spacing 5
-                    , E.alignBottom
-                    ]
-                    [ E.text
-                        (Prog.instAt Prog.blue x y prog
-                            |> Maybe.map Debug.toString
-                            |> Maybe.withDefault " "
-                        )
-                        |> E.el [ E.centerX ]
-                    , E.text
-                        (Prog.arrowAt Prog.blue x y prog
-                            |> Maybe.map CD.arrowSymbol
-                            |> Maybe.withDefault " "
-                        )
-                        |> E.el [ E.centerX, Events.onClick (ShowArrowDialog Prog.blue x y) ]
-                    ]
-                ]
-    in
     renderGrid
         [ Border.width 1
         , Border.color lightGray
@@ -290,7 +239,51 @@ viewProg prog =
         ]
         10
         8
-        viewCellHelp
+        (viewProgCell prog)
+
+
+viewProgCell prog x y =
+    row
+        [ Border.width 1
+        , Border.color lightGray
+        , E.padding 5
+        , E.width (E.minimum 80 E.fill)
+        , E.height (E.minimum 80 E.fill)
+        , E.spacing 10
+        ]
+        [ layerCellColumn Prog.red x y prog
+        , layerCellColumn Prog.blue x y prog
+        ]
+
+
+layerCellColumn layerName x y prog =
+    let
+        color =
+            if layerName == Prog.red then
+                red
+
+            else
+                blue
+    in
+    E.column
+        [ Font.color color
+        , E.width E.fill
+        , spacing 5
+        , E.alignTop
+        ]
+        [ E.text
+            (Prog.instAt layerName x y prog
+                |> Maybe.map Debug.toString
+                |> Maybe.withDefault " "
+            )
+            |> E.el [ E.centerX ]
+        , E.text
+            (Prog.arrowAt layerName x y prog
+                |> Maybe.map CD.arrowSymbol
+                |> Maybe.withDefault " "
+            )
+            |> E.el [ E.centerX, Events.onClick (ShowArrowDialog layerName x y) ]
+        ]
 
 
 renderGrid attrs width height viewFunc =

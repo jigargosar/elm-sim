@@ -1,6 +1,6 @@
-module Program exposing
+module Prog exposing
     ( LayerName
-    , Program
+    , Prog
     , blue
     , init
     , red
@@ -28,28 +28,28 @@ red =
     Red
 
 
-type alias Program =
+type alias Prog =
     { red : Layer
     , blue : Layer
     }
 
 
-init : Int -> Int -> Program
+init : Int -> Int -> Prog
 init w h =
-    Program (Layer.empty w h) (Layer.empty w h)
+    Prog (Layer.empty w h) (Layer.empty w h)
 
 
-setInst : LayerName -> Int -> Int -> Inst -> Program -> Program
+setInst : LayerName -> Int -> Int -> Inst -> Prog -> Prog
 setInst name x y inst =
     mapLayer name (Layer.setInst x y inst)
 
 
-setCD : LayerName -> Int -> Int -> CD -> Program -> Program
+setCD : LayerName -> Int -> Int -> CD -> Prog -> Prog
 setCD name x y cd =
     mapLayer name (Layer.setCD x y cd)
 
 
-mapLayer : LayerName -> (Layer -> Layer) -> Program -> Program
+mapLayer : LayerName -> (Layer -> Layer) -> Prog -> Prog
 mapLayer name func p =
     case name of
         Red ->

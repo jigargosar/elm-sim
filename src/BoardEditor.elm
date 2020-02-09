@@ -13,6 +13,7 @@ import Element.Font as Font
 import Element.Input as Input
 import Html exposing (Html)
 import Inst
+import Program.Builder as B
 import Program.Zipper as Z
 import String exposing (fromInt)
 
@@ -90,6 +91,20 @@ init _ =
                 |> Z.switchToRed
                 |> Z.go 4 1
                 |> Z.set Inst.Start CD.left
+
+        prog =
+            B.init 10 8
+                |> B.startAt 4 1
+                |> B.step
+                |> B.step
+                |> B.step
+                |> B.exe Inst.grab
+                |> B.stepIn CD.Down
+                |> B.step
+                |> B.step
+                |> B.stepIn CD.Left
+                |> Debug.log "b"
+                |> B.build
     in
     ( { width = 10
       , height = 8

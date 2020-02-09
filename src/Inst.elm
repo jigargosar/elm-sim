@@ -26,3 +26,7 @@ type Inst
 
 start =
     Start
+
+
+grab =
+    GrabDrop Grab

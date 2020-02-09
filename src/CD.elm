@@ -8,6 +8,34 @@ type Arrow
     | Right
 
 
+stepByArrow arrow x y =
+    arrowToVec arrow |> stepByVec x y
+
+
+stepByVec x y ( dx, dy ) =
+    ( x + dx, y + dy )
+
+
+fromArrow : Arrow -> CD
+fromArrow =
+    CD
+
+
+arrowToVec arrow =
+    case arrow of
+        Up ->
+            ( 0, -1 )
+
+        Down ->
+            ( 0, 1 )
+
+        Left ->
+            ( -1, 0 )
+
+        Right ->
+            ( 1, 0 )
+
+
 type CD
     = CD Arrow
     | Cont

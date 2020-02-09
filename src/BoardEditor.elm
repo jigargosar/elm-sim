@@ -6,7 +6,7 @@ import Browser
 import Browser.Dom
 import CD
 import Dict exposing (Dict)
-import Element as E exposing (padding, spacing, text)
+import Element as E exposing (none, padding, spacing, text)
 import Element.Background as Background
 import Element.Border as Border
 import Element.Events as Events
@@ -243,6 +243,10 @@ red =
     E.rgb255 179 17 25
 
 
+white =
+    E.rgb255 255 255 255
+
+
 lightGray =
     E.rgb255 200 200 200
 
@@ -276,7 +280,32 @@ view model =
             in
             viewCell x y di showDIEditor ri showRIEditor
     in
-    E.layout []
+    E.layout
+        (if model.showDialog then
+            [ E.inFront
+                (E.el
+                    [ E.width E.fill
+                    , E.height E.fill
+                    , Background.color black
+                    , Font.color white
+                    , E.alpha 0.5
+                    , Font.center
+                    ]
+                    (E.text "DIALOG")
+                )
+            , E.clip
+            , E.height E.fill
+            , E.paddingEach
+                { top = 0
+                , right = model.scrollbarSize |> Tuple.first
+                , bottom = 0
+                , left = 0
+                }
+            ]
+
+         else
+            []
+        )
         (E.column
             [ E.width E.fill
             ]

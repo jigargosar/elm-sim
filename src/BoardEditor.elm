@@ -13,7 +13,7 @@ import Element.Font as Font
 import Element.Input as Input
 import Html exposing (Html)
 import Inst
-import ProgramZipper as Z
+import Program.Zipper as Z
 import String exposing (fromInt)
 
 

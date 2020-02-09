@@ -1,5 +1,5 @@
-module ProgramZipper exposing
-    ( ProgramZipper
+module Program.Zipper exposing
+    ( Zipper
     , go
     , goD
     , goL
@@ -18,7 +18,7 @@ import Inst exposing (Inst)
 import Program exposing (Program)
 
 
-type alias ProgramZipper =
+type alias Zipper =
     { prog : Program
     , x : Int
     , y : Int
@@ -26,82 +26,82 @@ type alias ProgramZipper =
     }
 
 
-init : Int -> Int -> ProgramZipper
+init : Int -> Int -> Zipper
 init w h =
-    ProgramZipper (Program.init w h) 0 0 Program.red
+    Zipper (Program.init w h) 0 0 Program.red
 
 
-switchToBlue : ProgramZipper -> ProgramZipper
+switchToBlue : Zipper -> Zipper
 switchToBlue =
     setLayerName Program.blue
 
 
-switchToRed : ProgramZipper -> ProgramZipper
+switchToRed : Zipper -> Zipper
 switchToRed =
     setLayerName Program.red
 
 
-go : Int -> Int -> ProgramZipper -> ProgramZipper
+go : Int -> Int -> Zipper -> Zipper
 go x y =
     mapX (always x) >> mapY (always y)
 
 
-setLayerName : Program.LayerName -> ProgramZipper -> ProgramZipper
+setLayerName : Program.LayerName -> Zipper -> Zipper
 setLayerName n z =
     { z | layerName = n }
 
 
-goU : ProgramZipper -> ProgramZipper
+goU : Zipper -> Zipper
 goU =
     mapY dec
 
 
-goD : ProgramZipper -> ProgramZipper
+goD : Zipper -> Zipper
 goD =
     mapY inc
 
 
-goL : ProgramZipper -> ProgramZipper
+goL : Zipper -> Zipper
 goL =
     mapX dec
 
 
-goR : ProgramZipper -> ProgramZipper
+goR : Zipper -> Zipper
 goR =
     mapX inc
 
 
-setInst : Inst -> ProgramZipper -> ProgramZipper
+setInst : Inst -> Zipper -> Zipper
 setInst inst_ =
     mapPGXYLA Program.setInst inst_
 
 
-setCD : CD -> ProgramZipper -> ProgramZipper
+setCD : CD -> Zipper -> Zipper
 setCD inst_ =
     mapPGXYLA Program.setCD inst_
 
 
-set : Inst -> CD -> ProgramZipper -> ProgramZipper
+set : Inst -> CD -> Zipper -> Zipper
 set inst cd =
     setInst inst >> setCD cd
 
 
-mapX : (Int -> Int) -> ProgramZipper -> ProgramZipper
+mapX : (Int -> Int) -> Zipper -> Zipper
 mapX func b =
     { b | x = func b.x }
 
 
-mapY : (Int -> Int) -> ProgramZipper -> ProgramZipper
+mapY : (Int -> Int) -> Zipper -> Zipper
 mapY func b =
     { b | y = func b.y }
 
 
-mapPGXYLA : (Program.LayerName -> Int -> Int -> a -> Program -> Program) -> a -> ProgramZipper -> ProgramZipper
+mapPGXYLA : (Program.LayerName -> Int -> Int -> a -> Program -> Program) -> a -> Zipper -> Zipper
 mapPGXYLA func val b =
     { b | prog = func b.layerName b.x b.y val b.prog }
 
 
-mapPG : (Program -> Program) -> ProgramZipper -> ProgramZipper
+mapPG : (Program -> Program) -> Zipper -> Zipper
 mapPG func b =
     { b | prog = b.prog }
 

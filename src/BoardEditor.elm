@@ -186,7 +186,7 @@ viewDialog model =
             none
 
         ArrowDialog layerName x y ->
-            dialogContainer model.scrollbarSize viewArrowDialogContent
+            dialogContainer model.scrollbarSize (viewArrowDialogContent layerName x y)
 
 
 dialogContainer ( scrollbarXWidth, _ ) content =
@@ -220,7 +220,7 @@ dialogContainer ( scrollbarXWidth, _ ) content =
         (el [ width fill, height fill, onClick DialogBackgroundClicked ] none)
 
 
-viewArrowDialogContent =
+viewArrowDialogContent layerName x y =
     column
         [ padding 10
         , width (E.shrink |> E.minimum 200)

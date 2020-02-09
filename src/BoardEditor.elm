@@ -391,7 +391,7 @@ viewProg =
                             |> Maybe.map CD.arrowSymbol
                             |> Maybe.withDefault " "
                         )
-                        |> E.el [ E.centerX ]
+                        |> E.el [ E.centerX, Events.onClick (ShowArrowDialog Prog.red x y) ]
                     ]
                 , E.column
                     [ Font.color blue
@@ -413,7 +413,7 @@ viewProg =
                             |> Maybe.map CD.arrowSymbol
                             |> Maybe.withDefault " "
                         )
-                        |> E.el [ E.centerX, Font.heavy ]
+                        |> E.el [ E.centerX, Events.onClick (ShowArrowDialog Prog.blue x y) ]
                     ]
                 ]
 

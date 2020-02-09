@@ -1,4 +1,4 @@
-module Program.Builder exposing (Builder, Config, LayerConfig, Step, build, exe, init, startAt, step, stepIn)
+module Program.Builder exposing (Builder, Config, LayerConfig, Step, build, exe, exe2, init, startAt, step, stepIn)
 
 import CD exposing (Arrow)
 import Inst exposing (Inst)
@@ -93,8 +93,13 @@ stepIn arrow b =
 
 
 exe : Inst -> Builder -> Builder
-exe =
-    setI
+exe i =
+    setI i >> step
+
+
+exe2 : Inst -> Arrow -> Builder -> Builder
+exe2 i a =
+    setI i >> stepIn a
 
 
 setI : Inst -> Builder -> Builder

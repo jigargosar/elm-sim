@@ -327,9 +327,7 @@ viewProg =
                     , steps =
                         [ B.exe Inst.alphaInput
                         , B.step
-                        , B.step
-                        , B.exe Inst.grab
-                        , B.stepIn CD.Down
+                        , B.exe2 Inst.grab CD.Down
                         , B.step
                         , B.step
                         , B.stepIn CD.Right
@@ -340,9 +338,7 @@ viewProg =
                         , B.step
                         , B.stepIn CD.Up
                         , B.exe Inst.drop
-                        , B.step
                         , B.exe Inst.psiOutput
-                        , B.step
                         , B.stepIn CD.Left
                         ]
                     }

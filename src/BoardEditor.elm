@@ -3,6 +3,7 @@ module BoardEditor exposing (main)
 -- Browser.Element Scaffold
 
 import Browser
+import CD
 import Dict exposing (Dict)
 import Element as E exposing (padding, spacing, text)
 import Element.Background as Background
@@ -11,6 +12,8 @@ import Element.Events as Events
 import Element.Font as Font
 import Element.Input as Input
 import Html exposing (Html)
+import Inst
+import ProgramZipper as Z
 import String exposing (fromInt)
 
 
@@ -80,6 +83,16 @@ init _ =
         riGrid =
             Dict.fromList
                 [ ( ( 0, 0 ), Start ) ]
+
+        _ =
+            Z.init 10 8
+                |> Z.down
+                |> Z.right
+                |> Z.right
+                |> Z.right
+                |> Z.right
+                |> Z.setInst Inst.start
+                |> Z.setCD CD.left
     in
     ( { width = 10
       , height = 8

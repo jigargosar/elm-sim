@@ -51,10 +51,30 @@ init w h =
 
 
 setInst : LayerName -> Int -> Int -> Inst -> Program -> Program
-setInst =
-    Debug.todo "impl"
+setInst name x y inst =
+    mapLayer name (setInstInLayer x y inst)
 
 
 setCD : LayerName -> Int -> Int -> CD -> Program -> Program
-setCD =
-    Debug.todo "impl"
+setCD name x y cd =
+    mapLayer name (setCDInLayer x y cd)
+
+
+setInstInLayer : Int -> Int -> Inst -> Layer -> Layer
+setInstInLayer x y inst l =
+    { l | instG = Grid.set x y inst l.instG }
+
+
+setCDInLayer : Int -> Int -> CD -> Layer -> Layer
+setCDInLayer x y cd l =
+    { l | moveG = Grid.set x y cd l.moveG }
+
+
+mapLayer : LayerName -> (Layer -> Layer) -> Program -> Program
+mapLayer name func p =
+    case name of
+        Red ->
+            { p | red = func p.red }
+
+        Blue ->
+            { p | blue = func p.blue }

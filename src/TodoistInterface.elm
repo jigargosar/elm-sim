@@ -325,34 +325,30 @@ viewItem item =
 
 viewEditItem : List UserProject -> Item -> Html Msg
 viewEditItem projects item =
-    div [ class "df-row" ]
-        [ div [ class "p5" ] [ input [ type_ "checkbox", class "p5" ] [] ]
+    div [ class "df-row sp10 p5" ]
+        [ input [ type_ "checkbox", class "p5" ] []
         , div [ class "df-col fg1" ]
-            [ div [ class "df-row" ]
-                [ div [ class "p5 fg1 df-row" ]
-                    [ input
-                        [ hid "item-editor"
-                        , class "fg1"
-                        , value item.title
-                        , onInput OnInput
-                        , onKey [ enter OnInputEnter ]
-                        ]
-                        []
+            [ div [ class "df-row sp10 p5" ]
+                [ input
+                    [ hid "item-editor"
+                    , class "fg1"
+                    , value item.title
+                    , onInput OnInput
+                    , onKey [ enter OnInputEnter ]
                     ]
-                , div [ class "p5 fg1 df-row" ]
-                    [ select [ class "fg1", onInput OnSelectInput ]
-                        (option [ value "", selected (item.projectId == InboxProjectId) ] [ text "Inbox" ]
-                            :: List.map
-                                (\project ->
-                                    option
-                                        [ value project.id
-                                        , selected (UserProjectId project.id == item.projectId)
-                                        ]
-                                        [ text project.title ]
-                                )
-                                projects
-                        )
-                    ]
+                    []
+                , select [ class "fg1", onInput OnSelectInput ]
+                    (option [ value "", selected (item.projectId == InboxProjectId) ] [ text "Inbox" ]
+                        :: List.map
+                            (\project ->
+                                option
+                                    [ value project.id
+                                    , selected (UserProjectId project.id == item.projectId)
+                                    ]
+                                    [ text project.title ]
+                            )
+                            projects
+                    )
                 ]
             , div [ class "df-row sp10 p5" ]
                 [ button [ onClick OnSave ] [ text "save" ]

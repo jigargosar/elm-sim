@@ -167,6 +167,24 @@ type Msg
     | OnSelectInput String
 
 
+startEditItem ( m, c ) =
+    let
+        msg =
+            getAllItems m.itemDict
+                |> List.drop 4
+                |> List.head
+                |> Maybe.map OnEditItem
+                |> Maybe.withDefault NoOp
+    in
+    andThenUpdate msg ( m, c )
+
+
+andThenUpdate : Msg -> ( Model, Cmd Msg ) -> ( Model, Cmd Msg )
+andThenUpdate msg ( m, c ) =
+    update msg m
+        |> Tuple.mapSecond (\c2 -> Cmd.batch [ c, c2 ])
+
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update message model =
     case message of
@@ -175,6 +193,7 @@ update message model =
 
         GotItems items ->
             ( { model | itemDict = addItems items model.itemDict }, Cmd.none )
+                |> startEditItem
 
         GotProjects projects ->
             ( { model | projectDict = addProjects projects model.projectDict }, Cmd.none )
@@ -335,9 +354,9 @@ viewEditItem projects item =
                         )
                     ]
                 ]
-            , div [ class "df-row" ]
-                [ div [ class "p5" ] [ button [ onClick OnSave ] [ text "save" ] ]
-                , div [ class "p5" ] [ button [ onClick OnCancel ] [ text "cancel" ] ]
+            , div [ class "df-row sp10 p5" ]
+                [ button [ onClick OnSave ] [ text "save" ]
+                , button [ onClick OnCancel ] [ text "cancel" ]
                 ]
             ]
         ]

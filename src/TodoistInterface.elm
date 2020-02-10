@@ -364,7 +364,7 @@ el attrs child =
 
 
 viewEditItem : List UserProject -> Item -> Html Msg
-viewEditItem projects item =
+viewEditItem userProjects item =
     row [ sp5, p5 ]
         [ el [] (input [ type_ "checkbox" ] [])
         , col [ fg1, sp10 ]
@@ -381,14 +381,14 @@ viewEditItem projects item =
                 , select [ fg1, onInput OnSelectInput ]
                     (option [ value "", selected (item.projectId == InboxProjectId) ] [ text "Inbox" ]
                         :: List.map
-                            (\project ->
+                            (\userProject ->
                                 option
-                                    [ value project.id
-                                    , selected (item.projectId == UserProjectId project.id)
+                                    [ value userProject.id
+                                    , selected (item.projectId == UserProjectId userProject.id)
                                     ]
-                                    [ text project.title ]
+                                    [ text userProject.title ]
                             )
-                            projects
+                            userProjects
                     )
                 ]
             , row [ sp10 ]

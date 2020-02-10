@@ -24,6 +24,9 @@ port getScrollbarSize : () -> Cmd msg
 port gotScrollbarSize : (( Int, Int ) -> msg) -> Sub msg
 
 
+port gotViewSize : (( Int, Int ) -> msg) -> Sub msg
+
+
 
 -- Model
 
@@ -33,8 +36,7 @@ type alias Int2 =
 
 
 type alias Model =
-    { width : Int
-    , height : Int
+    { viewSize : Int2
     , scrollbarSize : ( Int, Int )
     , dialog : Dialog
     , prog : Prog
@@ -47,7 +49,8 @@ type Dialog
 
 
 type alias Flags =
-    { scrollbarSize : ( Int, Int )
+    { viewSize : Int2
+    , scrollbarSize : ( Int, Int )
     , now : Int
     }
 
@@ -96,8 +99,7 @@ init flags =
         _ =
             Debug.log "flags" flags
     in
-    ( { width = 10
-      , height = 8
+    ( { viewSize = flags.viewSize
       , scrollbarSize = flags.scrollbarSize
       , dialog = NoDialog
       , prog = initialProg
@@ -118,6 +120,7 @@ type Msg
     | ShowArrowDialog Prog.LayerName Int Int
     | DialogBackgroundClicked
     | GotScrollbarSize Int2
+    | GotViewSize Int2
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -128,6 +131,9 @@ update message model =
 
         GotScrollbarSize s ->
             ( { model | scrollbarSize = s }, Cmd.none )
+
+        GotViewSize s ->
+            ( { model | viewSize = s }, Cmd.none )
 
         ShowArrowDialog layerName x y ->
             ( { model | dialog = ArrowDialog layerName x y }, Cmd.none )
@@ -140,6 +146,7 @@ subscriptions : Model -> Sub Msg
 subscriptions _ =
     Sub.batch
         [ gotScrollbarSize (Debug.log "gotScrollbarSize" >> GotScrollbarSize)
+        , gotViewSize GotViewSize
         ]
 
 

@@ -4,8 +4,8 @@ module TodoistInterface exposing (main)
 
 import Browser
 import Dict exposing (Dict)
-import Html exposing (Html, div, text)
-import Html.Attributes exposing (class)
+import Html exposing (Html, div, input, text)
+import Html.Attributes exposing (class, type_)
 import Random exposing (Generator)
 import String exposing (String, fromInt, isEmpty, trim)
 
@@ -165,7 +165,10 @@ viewItem item =
             else
                 ( item.title, "fg-inherit" )
     in
-    div [ class colorClass, class "ph5 pv5" ] [ text displayTitle ]
+    div [ class colorClass, class "df-row" ]
+        [ div [ class "p5" ] [ input [ type_ "checkbox", class "p5" ] [] ]
+        , div [ class "p5" ] [ text displayTitle ]
+        ]
 
 
 

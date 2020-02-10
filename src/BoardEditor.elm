@@ -5,7 +5,7 @@ port module BoardEditor exposing (main)
 import Browser
 import Browser.Dom
 import CD
-import Element as E exposing (centerX, centerY, column, el, fill, height, inFront, none, padding, paddingXY, row, spacing, width)
+import Element exposing (..)
 import Element.Background as Background
 import Element.Border as Border
 import Element.Events as Events exposing (onClick)
@@ -148,33 +148,33 @@ subscriptions _ =
 
 
 black =
-    E.rgb255 0 0 0
+    rgb255 0 0 0
 
 
 blue =
-    E.rgb255 49 98 179
+    rgb255 49 98 179
 
 
 red =
-    E.rgb255 179 17 25
+    rgb255 179 17 25
 
 
 white =
-    E.rgb255 255 255 255
+    rgb255 255 255 255
 
 
 lightGray =
-    E.rgb255 200 200 200
+    rgb255 200 200 200
 
 
 view : Model -> Html Msg
 view model =
-    E.layout
-        [ E.inFront (viewDialog model)
-        , E.height E.fill
+    layout
+        [ inFront (viewDialog model)
+        , height fill
         ]
-        (E.column
-            [ E.width E.fill
+        (column
+            [ width fill
             ]
             [ viewProg model.prog ]
         )
@@ -193,7 +193,7 @@ dialogContainer ( scrollbarXWidth, _ ) content =
     el
         [ width fill
         , height fill
-        , Background.color (E.rgba 0 0 0 0.5)
+        , Background.color (rgba 0 0 0 0.5)
         , inFront
             (el
                 [ centerX
@@ -205,8 +205,8 @@ dialogContainer ( scrollbarXWidth, _ ) content =
                 ]
                 content
             )
-        , E.below
-            (E.html
+        , below
+            (html
                 (Html.node "style"
                     []
                     [ Html.text <|
@@ -223,10 +223,10 @@ dialogContainer ( scrollbarXWidth, _ ) content =
 viewArrowDialogContent layerName x y =
     column
         [ padding 10
-        , width (E.shrink |> E.minimum 200)
-        , height (E.shrink |> E.minimum 200)
+        , width (shrink |> minimum 200)
+        , height (shrink |> minimum 200)
         ]
-        [ E.text "ArrowDialog"
+        [ text "ArrowDialog"
         ]
 
 
@@ -234,8 +234,8 @@ viewProg prog =
     renderCellGrid
         [ Border.width 1
         , Border.color lightGray
-        , E.centerX
-        , E.width E.shrink
+        , centerX
+        , width shrink
         ]
         10
         8
@@ -246,11 +246,11 @@ viewProgCell prog x y =
     row
         [ Border.width 1
         , Border.color lightGray
-        , E.padding 5
-        , E.width (E.minimum 30 E.fill |> E.maximum 100)
-        , E.height (E.minimum 30 E.fill |> E.maximum 100)
-        , E.spacing 10
-        , E.scrollbars
+        , padding 5
+        , width (minimum 30 fill |> maximum 100)
+        , height (minimum 30 fill |> maximum 100)
+        , spacing 10
+        , scrollbars
         ]
         [ layerCellColumn Prog.red x y prog
         , layerCellColumn Prog.blue x y prog
@@ -266,33 +266,33 @@ layerCellColumn layerName x y prog =
             else
                 blue
     in
-    E.column
+    column
         [ Font.color color
-        , E.width E.fill
+        , width fill
         , spacing 5
-        , E.alignTop
+        , alignTop
         ]
-        [ E.text
+        [ text
             (Prog.instAt layerName x y prog
                 |> Maybe.map Debug.toString
                 |> Maybe.withDefault " "
             )
-            |> E.el [ E.centerX ]
-        , E.text
+            |> el [ centerX ]
+        , text
             (Prog.arrowAt layerName x y prog
                 |> Maybe.map CD.arrowSymbol
                 |> Maybe.withDefault " "
             )
-            |> E.el [ E.centerX, Events.onClick (ShowArrowDialog layerName x y) ]
+            |> el [ centerX, Events.onClick (ShowArrowDialog layerName x y) ]
         ]
 
 
 renderCellGrid attrs width height func =
     let
         column x =
-            E.Column E.none E.fill (func x)
+            Column none fill (func x)
     in
-    E.table attrs
+    table attrs
         { data = List.range 0 (height - 1)
         , columns =
             List.range 0 (width - 1)

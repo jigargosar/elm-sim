@@ -5,7 +5,7 @@ module TodoistInterface exposing (main)
 import Browser
 import Dict exposing (Dict)
 import Html exposing (Html, div, input, text)
-import Html.Attributes exposing (class, type_)
+import Html.Attributes exposing (class, type_, value)
 import Random exposing (Generator)
 import String exposing (String, fromInt, isEmpty, trim)
 
@@ -179,6 +179,14 @@ viewItem item =
     div [ class colorClass, class "df-row" ]
         [ div [ class "p5" ] [ input [ type_ "checkbox", class "p5" ] [] ]
         , div [ class "p5 fg1" ] [ text displayTitle ]
+        ]
+
+
+viewEditItem : Item -> Html Msg
+viewEditItem item =
+    div [ class "df-row" ]
+        [ div [ class "p5" ] [ input [ type_ "checkbox", class "p5" ] [] ]
+        , div [ class "p5 fg1" ] [ input [ value item.title ] [] ]
         ]
 
 

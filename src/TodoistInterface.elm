@@ -156,10 +156,31 @@ update message model =
             )
 
         OnEnter ->
-            ( model, Cmd.none )
+            ( handleInputEnter model, Cmd.none )
 
         OnInput string ->
-            ( model, Cmd.none )
+            ( { model | edit = handleInput string model.edit }, Cmd.none )
+
+
+handleInputEnter model =
+    case model.edit of
+        NoEdit ->
+            model
+
+        EditItem item ->
+            { model
+                | itemDict = Dict.insert item.id item model.itemDict
+                , edit = NoEdit
+            }
+
+
+handleInput string edit =
+    case edit of
+        NoEdit ->
+            edit
+
+        EditItem item ->
+            EditItem { item | title = string }
 
 
 subscriptions : Model -> Sub Msg
@@ -251,7 +272,7 @@ succeedWhenEq expected msg =
                 JD.succeed msg
 
             else
-                JD.fail "unexpected"
+                JD.fail ("unexpected" |> Debug.log "fail")
         )
 
 

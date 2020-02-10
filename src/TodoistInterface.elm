@@ -4,12 +4,13 @@ port module TodoistInterface exposing (main)
 
 import Browser
 import Dict exposing (Dict)
-import Html exposing (Html, button, div, input, option, select, text)
+import Html exposing (Html, button, input, option, select, text)
 import Html.Attributes exposing (class, selected, type_, value)
 import Html.Events exposing (onClick, onInput)
 import Json.Decode as JD
 import Random exposing (Generator)
 import String exposing (String, fromInt, isEmpty, trim)
+import ViewHelpers exposing (..)
 
 
 port focusIdNextTick : String -> Cmd msg
@@ -275,9 +276,9 @@ subscriptions _ =
 
 view : Model -> Html Msg
 view model =
-    div [ class "df-column w600 mx-auto" ]
+    col [ class "w600 mx-auto" ]
         [ viewStyles
-        , div [ class "fw-bold fz-large ph5 pv10 " ] [ text "Items" ]
+        , el [ class "fw-bold fz-large ph5 pv10 " ] (text "Items")
         , viewItemsList model
         ]
 
@@ -301,10 +302,10 @@ viewItemsList model =
                     else
                         viewItem item
             in
-            div [] (List.map viewItemHelp items)
+            col [] (List.map viewItemHelp items)
 
         NoEdit ->
-            div [] (List.map viewItem (getAllItems model.itemDict))
+            col [] (List.map viewItem (getAllItems model.itemDict))
 
 
 viewItem : Item -> Html Msg
@@ -317,50 +318,10 @@ viewItem item =
             else
                 ( item.title, "fg-inherit" )
     in
-    div [ class colorClass, class "df-row" ]
-        [ div [ class "p5" ] [ input [ type_ "checkbox", class "p5" ] [] ]
-        , div [ class "p5 fg1", onClick (OnEditItem item) ] [ text displayTitle ]
+    row [ class colorClass ]
+        [ el [ class "p5" ] (input [ type_ "checkbox", class "p5" ] [])
+        , el [ class "p5 fg1", onClick (OnEditItem item) ] (text displayTitle)
         ]
-
-
-row attrs =
-    div (class "df-row" :: attrs)
-
-
-col attrs =
-    div (class "df-col" :: attrs)
-
-
-fg1 =
-    class "fg1"
-
-
-p5 =
-    class "p5"
-
-
-ph5 =
-    class "ph5"
-
-
-ph10 =
-    class "ph10"
-
-
-pv5 =
-    class "pv5"
-
-
-sp10 =
-    class "sp10"
-
-
-sp5 =
-    class "sp5"
-
-
-el attrs child =
-    row attrs [ child ]
 
 
 viewEditItem : List UserProject -> Item -> Html Msg

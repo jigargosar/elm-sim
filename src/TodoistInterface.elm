@@ -56,8 +56,8 @@ initItemWithIdAndTitle id title =
     Item id title False InboxProjectId
 
 
-randomNewItem : Generator Item
-randomNewItem =
+randomIdItemWithRandomSampleTitle : Generator Item
+randomIdItemWithRandomSampleTitle =
     Random.map2 initItemWithIdAndTitle
         randomIdString
         randomSampleItemTitle
@@ -67,6 +67,17 @@ type alias UserProject =
     { id : String
     , title : String
     }
+
+
+initProjectWithIdAndTitle : String -> String -> UserProject
+initProjectWithIdAndTitle id title =
+    UserProject id title
+
+
+randomIdProjectWithTitle : String -> Generator UserProject
+randomIdProjectWithTitle title =
+    randomIdString
+        |> Random.map (\id -> initProjectWithIdAndTitle id title)
 
 
 randomIdString : Generator String
@@ -106,20 +117,33 @@ init _ =
       , edit = NoEdit
       }
     , Cmd.batch
-        [ randomNewItem
+        [ randomIdItemWithRandomSampleTitle
             |> Random.list 10
             |> Random.generate GotItems
+        , [ "P1", "P2", "P3" ]
+            |> List.map randomIdProjectWithTitle
+            |> List.foldr (Random.map2 (::)) (Random.constant [])
+            |> Random.generate GotProjects
         ]
     )
 
 
 addItems : List Item -> ItemDict -> ItemDict
-addItems items itemDict =
+addItems =
+    insertAllById
+
+
+addProjects : List UserProject -> ProjectDict -> ProjectDict
+addProjects =
+    insertAllById
+
+
+insertAllById list dict =
     let
         insertItem item =
             Dict.insert item.id item
     in
-    List.foldl insertItem itemDict items
+    List.foldl insertItem dict list
 
 
 getAllItems : ItemDict -> List Item
@@ -134,6 +158,7 @@ getAllItems =
 type Msg
     = NoOp
     | GotItems (List Item)
+    | GotProjects (List UserProject)
     | EditItemClicked Item
     | OnEnter
     | OnInput String
@@ -147,6 +172,9 @@ update message model =
 
         GotItems items ->
             ( { model | itemDict = addItems items model.itemDict }, Cmd.none )
+
+        GotProjects projects ->
+            ( { model | projectDict = addProjects projects model.projectDict }, Cmd.none )
 
         EditItemClicked item ->
             case model.edit of

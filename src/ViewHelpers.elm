@@ -12,7 +12,7 @@ col attrs =
     div (class "df-col" :: attrs)
 
 
-fg1 =
+fill =
     class "fg1"
 
 

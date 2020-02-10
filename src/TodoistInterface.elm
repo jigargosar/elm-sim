@@ -323,18 +323,18 @@ viewEditItem : List UserProject -> Item -> Html Msg
 viewEditItem userProjects item =
     row [ sp5, p5 ]
         [ el [] (input [ type_ "checkbox" ] [])
-        , col [ fg1, sp10 ]
+        , col [ fill, sp10 ]
             [ row [ sp10 ]
                 [ input
                     [ hid "item-editor"
-                    , fg1
+                    , fill
                     , p5
                     , value item.title
                     , onInput OnInput
                     , onKey [ enter OnInputEnter ]
                     ]
                     []
-                , select [ fg1, onInput OnSelectInput ]
+                , select [ fill, onInput OnSelectInput ]
                     (option [ value "", selected (item.projectId == InboxProjectId) ] [ text "Inbox" ]
                         :: List.map
                             (\userProject ->

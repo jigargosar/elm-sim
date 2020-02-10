@@ -323,21 +323,62 @@ viewItem item =
         ]
 
 
+row attrs =
+    div (class "df-row" :: attrs)
+
+
+col attrs =
+    div (class "df-col" :: attrs)
+
+
+fg1 =
+    class "fg1"
+
+
+p5 =
+    class "p5"
+
+
+ph5 =
+    class "ph5"
+
+
+ph10 =
+    class "ph10"
+
+
+pv5 =
+    class "pv5"
+
+
+sp10 =
+    class "sp10"
+
+
+sp5 =
+    class "sp5"
+
+
+el attrs child =
+    row attrs [ child ]
+
+
 viewEditItem : List UserProject -> Item -> Html Msg
 viewEditItem projects item =
-    div [ class "df-row sp10 p5" ]
-        [ input [ type_ "checkbox", class "p5" ] []
-        , div [ class "df-col fg1" ]
-            [ div [ class "df-row sp10 p5" ]
+    row [ sp5, p5 ]
+        [ el [] (input [ type_ "checkbox" ] [])
+        , col [ fg1, sp10 ]
+            [ row [ sp10 ]
                 [ input
                     [ hid "item-editor"
-                    , class "fg1"
+                    , fg1
+                    , p5
                     , value item.title
                     , onInput OnInput
                     , onKey [ enter OnInputEnter ]
                     ]
                     []
-                , select [ class "fg1", onInput OnSelectInput ]
+                , select [ fg1, onInput OnSelectInput ]
                     (option [ value "", selected (item.projectId == InboxProjectId) ] [ text "Inbox" ]
                         :: List.map
                             (\project ->
@@ -350,9 +391,9 @@ viewEditItem projects item =
                             projects
                     )
                 ]
-            , div [ class "df-row sp10 p5" ]
-                [ button [ onClick OnSave ] [ text "save" ]
-                , button [ onClick OnCancel ] [ text "cancel" ]
+            , row [ sp10 ]
+                [ button [ pv5, ph10, onClick OnSave ] [ text "save" ]
+                , button [ pv5, ph10, onClick OnCancel ] [ text "cancel" ]
                 ]
             ]
         ]

@@ -247,10 +247,10 @@ viewProgCell prog x y =
         [ Border.width 1
         , Border.color lightGray
         , padding 5
-        , width (minimum 30 fill |> maximum 100)
-        , height (minimum 30 fill |> maximum 100)
+        , width (shrink |> minimum 100 |> maximum 100)
+        , height (shrink |> minimum 100 |> maximum 100)
         , spacing 10
-        , scrollbars
+        , clip
         ]
         [ layerCellColumn Prog.red x y prog
         , layerCellColumn Prog.blue x y prog

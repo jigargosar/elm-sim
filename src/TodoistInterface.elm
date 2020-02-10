@@ -91,7 +91,7 @@ type alias Model =
 
 
 type Edit
-    = EditItem Item
+    = EditItem Item (List Item)
     | NoEdit
 
 
@@ -149,7 +149,7 @@ update message model =
             ( { model | itemDict = addItems items model.itemDict }, Cmd.none )
 
         EditItemClicked item ->
-            ( { model | edit = EditItem item }
+            ( { model | edit = EditItem item (getAllItems model.itemDict) }
             , Cmd.batch
                 [ focusIdNextTick "item-editor"
                 ]
@@ -167,7 +167,7 @@ handleInputEnter model =
         NoEdit ->
             model
 
-        EditItem item ->
+        EditItem item _ ->
             { model
                 | itemDict = Dict.insert item.id item model.itemDict
                 , edit = NoEdit
@@ -179,8 +179,8 @@ handleInput string edit =
         NoEdit ->
             edit
 
-        EditItem item ->
-            EditItem { item | title = string }
+        EditItem item itemList ->
+            EditItem { item | title = string } itemList
 
 
 subscriptions : Model -> Sub Msg
@@ -196,7 +196,7 @@ view : Model -> Html Msg
 view model =
     div [ class "df-column w600 mx-auto" ]
         [ div [ class "fw-bold fz-large ph5 pv10 " ] [ text "Items" ]
-        , div [] (List.map (viewItemOrEditItem model.edit) (getAllItems model.itemDict))
+        , viewItemsList model
         ]
 
 
@@ -204,21 +204,21 @@ isBlank =
     trim >> isEmpty
 
 
-viewItemOrEditItem edit item =
-    let
-        viewDefault =
-            viewItem item
-    in
-    case edit of
-        EditItem editItem ->
-            if editItem.id == item.id then
-                viewEditItem editItem
+viewItemsList model =
+    case model.edit of
+        EditItem editItem items ->
+            let
+                viewItemHelp item =
+                    if item.id == editItem.id then
+                        viewEditItem editItem
 
-            else
-                viewDefault
+                    else
+                        viewItem item
+            in
+            div [] (List.map viewItemHelp items)
 
-        _ ->
-            viewDefault
+        NoEdit ->
+            div [] (List.map viewItem (getAllItems model.itemDict))
 
 
 viewItem : Item -> Html Msg
@@ -251,6 +251,10 @@ viewEditItem item =
                 []
             ]
         ]
+
+
+
+-- VIEW HELPERS
 
 
 enter : a -> JD.Decoder a

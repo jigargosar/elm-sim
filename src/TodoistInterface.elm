@@ -6,7 +6,8 @@ import Browser
 import Dict exposing (Dict)
 import Html exposing (Html, div, input, text)
 import Html.Attributes exposing (class, type_, value)
-import Html.Events exposing (onClick)
+import Html.Events exposing (onClick, onInput)
+import Json.Decode as JD
 import Random exposing (Generator)
 import String exposing (String, fromInt, isEmpty, trim)
 
@@ -134,6 +135,8 @@ type Msg
     = NoOp
     | GotItems (List Item)
     | EditItemClicked Item
+    | OnEnter
+    | OnInput String
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -151,6 +154,12 @@ update message model =
                 [ focusIdNextTick "item-editor"
                 ]
             )
+
+        OnEnter ->
+            ( model, Cmd.none )
+
+        OnInput string ->
+            ( model, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg
@@ -211,8 +220,43 @@ viewEditItem : Item -> Html Msg
 viewEditItem item =
     div [ class "df-row" ]
         [ div [ class "p5" ] [ input [ type_ "checkbox", class "p5" ] [] ]
-        , div [ class "p5 fg1" ] [ input [ hid "item-editor", value item.title ] [] ]
+        , div [ class "p5 fg1" ]
+            [ input
+                [ hid "item-editor"
+                , value item.title
+                , onInput OnInput
+                , onKey [ enter OnEnter ]
+                ]
+                []
+            ]
         ]
+
+
+enter : a -> JD.Decoder a
+enter msg =
+    keyEqDecoder "Enter" msg
+
+
+keyEqDecoder : String -> b -> JD.Decoder b
+keyEqDecoder keyName msg =
+    JD.field "key" JD.string
+        |> succeedWhenEq keyName msg
+
+
+succeedWhenEq : a -> b -> JD.Decoder a -> JD.Decoder b
+succeedWhenEq expected msg =
+    JD.andThen
+        (\actual ->
+            if expected == actual then
+                JD.succeed msg
+
+            else
+                JD.fail "unexpected"
+        )
+
+
+onKey decoders =
+    Html.Events.on "keydown" (JD.oneOf decoders)
 
 
 hid =

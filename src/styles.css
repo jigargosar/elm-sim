@@ -113,3 +113,18 @@
 .fg1{
   flex-grow: 1;
 }
+
+.df-col.sp5 > * {
+  margin-bottom: 5px;
+}
+.df-col.sp5 > :last-child {
+  margin-bottom: 0;
+}
+
+.df-row.sp5 > * {
+  margin-right: 5px;
+}
+
+.df-row.sp5 > :last-child {
+  margin-right: 0;
+}

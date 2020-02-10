@@ -257,9 +257,14 @@ subscriptions _ =
 view : Model -> Html Msg
 view model =
     div [ class "df-column w600 mx-auto" ]
-        [ div [ class "fw-bold fz-large ph5 pv10 " ] [ text "Items" ]
+        [ viewStyles
+        , div [ class "fw-bold fz-large ph5 pv10 " ] [ text "Items" ]
         , viewItemsList model
         ]
+
+
+viewStyles =
+    Html.node "style" [] []
 
 
 isBlank =

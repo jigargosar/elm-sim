@@ -334,18 +334,7 @@ viewEditItem userProjects item =
                     , onKey [ enter OnInputEnter ]
                     ]
                     []
-                , select [ fill, onInput OnSelectInput ]
-                    (option [ value "", selected (item.projectId == InboxProjectId) ] [ text "Inbox" ]
-                        :: List.map
-                            (\userProject ->
-                                option
-                                    [ value userProject.id
-                                    , selected (item.projectId == UserProjectId userProject.id)
-                                    ]
-                                    [ text userProject.title ]
-                            )
-                            userProjects
-                    )
+                , selectProject item.projectId userProjects
                 ]
             , row [ sp10 ]
                 [ btn2 OnSave "SAVE"
@@ -353,6 +342,21 @@ viewEditItem userProjects item =
                 ]
             ]
         ]
+
+
+selectProject selectedProjectId userProjects =
+    select [ fill, onInput OnSelectInput ]
+        (option [ value "", selected (selectedProjectId == InboxProjectId) ] [ text "Inbox" ]
+            :: List.map
+                (\userProject ->
+                    option
+                        [ value userProject.id
+                        , selected (selectedProjectId == UserProjectId userProject.id)
+                        ]
+                        [ text userProject.title ]
+                )
+                userProjects
+        )
 
 
 btn2 msg txt =

@@ -81,7 +81,13 @@ type alias ProjectDict =
 type alias Model =
     { projectDict : ProjectDict
     , itemDict : ItemDict
+    , edit : Edit
     }
+
+
+type Edit
+    = EditItem Item
+    | NoEdit
 
 
 type alias Flags =
@@ -92,6 +98,7 @@ init : Flags -> ( Model, Cmd Msg )
 init _ =
     ( { projectDict = Dict.empty
       , itemDict = Dict.empty
+      , edit = NoEdit
       }
     , Cmd.batch
         [ randomNewItem
@@ -122,6 +129,7 @@ getAllItems =
 type Msg
     = NoOp
     | GotItems (List Item)
+    | EditItemClicked Item
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -132,6 +140,9 @@ update message model =
 
         GotItems items ->
             ( { model | itemDict = addItems items model.itemDict }, Cmd.none )
+
+        EditItemClicked item ->
+            ( { model | edit = EditItem item }, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg
@@ -167,7 +178,7 @@ viewItem item =
     in
     div [ class colorClass, class "df-row" ]
         [ div [ class "p5" ] [ input [ type_ "checkbox", class "p5" ] [] ]
-        , div [ class "p5" ] [ text displayTitle ]
+        , div [ class "p5 fg1" ] [ text displayTitle ]
         ]
 
 

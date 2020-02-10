@@ -108,3 +108,8 @@
   padding-top: 20px;
   padding-bottom: 20px;
 }
+
+
+.fg1{
+  flex-grow: 1;
+}

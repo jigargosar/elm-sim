@@ -247,9 +247,10 @@ viewProgCell prog x y =
         [ Border.width 1
         , Border.color lightGray
         , E.padding 5
-        , E.width (E.minimum 80 E.fill)
-        , E.height (E.minimum 80 E.fill)
+        , E.width (E.minimum 30 E.fill |> E.maximum 100)
+        , E.height (E.minimum 30 E.fill |> E.maximum 100)
         , E.spacing 10
+        , E.scrollbars
         ]
         [ layerCellColumn Prog.red x y prog
         , layerCellColumn Prog.blue x y prog

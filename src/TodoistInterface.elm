@@ -384,7 +384,7 @@ viewEditItem projects item =
                             (\project ->
                                 option
                                     [ value project.id
-                                    , selected (UserProjectId project.id == item.projectId)
+                                    , selected (item.projectId == UserProjectId project.id)
                                     ]
                                     [ text project.title ]
                             )
@@ -397,6 +397,13 @@ viewEditItem projects item =
                 ]
             ]
         ]
+
+
+type alias ProjectOption =
+    { value : String
+    , text : String
+    , id : ProjectId
+    }
 
 
 

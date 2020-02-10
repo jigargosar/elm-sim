@@ -18,3 +18,11 @@
 .fg-inherit{
   color: inherit;
 }
+
+.fw-bold{
+  font-weight: bold;
+}
+
+.fz-large{
+  font-size: large;
+}

@@ -146,7 +146,7 @@ subscriptions _ =
 view : Model -> Html Msg
 view model =
     div []
-        [ div [] [ text "Items" ]
+        [ div [ class "fw-bold fz-large" ] [ text "Items" ]
         , div [] (List.map viewItem (getAllItems model.itemDict))
         ]
 

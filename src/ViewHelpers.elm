@@ -13,6 +13,10 @@ col attrs =
 
 
 fill =
+    fg1
+
+
+fg1 =
     class "fg1"
 
 

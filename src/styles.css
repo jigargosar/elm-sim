@@ -9,3 +9,12 @@
   pointer-events: all;
 }
 
+/* Todoist Interface Styles */
+
+.fg-gray{
+  color: gray;
+}
+
+.fg-inherit{
+  color: inherit;
+}

@@ -392,8 +392,8 @@ viewEditItem projects item =
                     )
                 ]
             , row [ sp10 ]
-                [ button [ pv5, ph10, onClick OnSave ] [ text "save" ]
-                , button [ pv5, ph10, onClick OnCancel ] [ text "cancel" ]
+                [ button [ pv5, ph10, onClick OnSave ] [ text "SAVE" ]
+                , button [ pv5, ph10, onClick OnCancel ] [ text "CANCEL" ]
                 ]
             ]
         ]

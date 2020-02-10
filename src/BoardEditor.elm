@@ -16,7 +16,6 @@ import Prog exposing (LayerName, Prog)
 import Program.Builder as B
 import String exposing (fromInt)
 import Task
-import Tuple exposing (mapBoth)
 
 
 port getScrollbarSize : () -> Cmd msg
@@ -193,9 +192,6 @@ view model =
                 |> floor
                 |> toFloat
                 |> Debug.log "cw"
-
-        cellScale =
-            cellWidth / 100
     in
     layout
         [ inFront (viewDialog model)
@@ -218,10 +214,6 @@ ofT2 func =
 
 apT2 ( a, b ) ( fa, fb ) =
     ( fa a, fb b )
-
-
-divBy b a =
-    a / b
 
 
 viewDialog model =
@@ -262,6 +254,10 @@ dialogContainer ( scrollbarXWidth, _ ) content =
             )
         ]
         (el [ width fill, height fill, onClick DialogBackgroundClicked ] none)
+
+
+
+--noinspection ElmUnusedSymbol
 
 
 viewArrowDialogContent layerName x y =

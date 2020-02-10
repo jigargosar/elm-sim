@@ -146,7 +146,7 @@ subscriptions _ =
 view : Model -> Html Msg
 view model =
     div [ class "df-column w600 mx-auto" ]
-        [ div [ class "fw-bold fz-large" ] [ text "Items" ]
+        [ div [ class "fw-bold fz-large ph5 pv10 " ] [ text "Items" ]
         , div [] (List.map viewItem (getAllItems model.itemDict))
         ]
 
@@ -165,7 +165,7 @@ viewItem item =
             else
                 ( item.title, "fg-inherit" )
     in
-    div [ class colorClass ] [ text displayTitle ]
+    div [ class colorClass, class "ph5 pv5" ] [ text displayTitle ]
 
 
 

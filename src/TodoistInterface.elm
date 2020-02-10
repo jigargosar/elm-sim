@@ -4,7 +4,7 @@ port module TodoistInterface exposing (main)
 
 import Browser
 import Dict exposing (Dict)
-import Html exposing (Html, div, input, option, select, text)
+import Html exposing (Html, button, div, input, option, select, text)
 import Html.Attributes exposing (class, type_, value)
 import Html.Events exposing (onClick, onInput)
 import Json.Decode as JD
@@ -274,18 +274,26 @@ viewEditItem : List UserProject -> Item -> Html Msg
 viewEditItem projects item =
     div [ class "df-row" ]
         [ div [ class "p5" ] [ input [ type_ "checkbox", class "p5" ] [] ]
-        , input
-            [ hid "item-editor"
-            , class "fg1"
-            , value item.title
-            , onInput OnInput
-            , onKey [ enter OnEnter ]
+        , div [ class "df-col" ]
+            [ div [ class "df-row" ]
+                [ input
+                    [ hid "item-editor"
+                    , class "fg1"
+                    , value item.title
+                    , onInput OnInput
+                    , onKey [ enter OnEnter ]
+                    ]
+                    []
+                , select [ class "fg1" ]
+                    (option [] [ text "Inbox" ]
+                        :: List.map viewProjectOption projects
+                    )
+                ]
+            , div [ class "df-row" ]
+                [ div [ class "p5" ] [ button [ class "" ] [ text "save" ] ]
+                , div [ class "p5" ] [ button [ class "" ] [ text "cancel" ] ]
+                ]
             ]
-            []
-        , select [ class "fg1" ]
-            (option [] [ text "Inbox" ]
-                :: List.map viewProjectOption projects
-            )
         ]
 
 

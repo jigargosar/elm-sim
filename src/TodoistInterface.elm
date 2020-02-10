@@ -5,7 +5,7 @@ port module TodoistInterface exposing (main)
 import Browser
 import Dict exposing (Dict)
 import Html exposing (Html, button, div, input, option, select, text)
-import Html.Attributes exposing (class, type_, value)
+import Html.Attributes exposing (class, selected, type_, value)
 import Html.Events exposing (onClick, onInput)
 import Json.Decode as JD
 import Random exposing (Generator)
@@ -164,6 +164,7 @@ type Msg
     | OnSave
     | OnCancel
     | OnInput String
+    | OnSelectInput String
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -196,6 +197,9 @@ update message model =
         OnInput string ->
             ( { model | edit = handleInput string model.edit }, Cmd.none )
 
+        OnSelectInput string ->
+            ( { model | edit = handleSelectInput string model.edit }, Cmd.none )
+
         OnCancel ->
             ( { model | edit = NoEdit }, Cmd.none )
 
@@ -222,6 +226,23 @@ handleInput string edit =
 
         EditItem item itemList ->
             EditItem { item | title = string } itemList
+
+
+projectIdFromString string =
+    if isBlank string then
+        InboxProjectId
+
+    else
+        UserProjectId (String.trim string)
+
+
+handleSelectInput string edit =
+    case edit of
+        NoEdit ->
+            edit
+
+        EditItem item itemList ->
+            EditItem { item | projectId = projectIdFromString string } itemList
 
 
 subscriptions : Model -> Sub Msg
@@ -295,9 +316,17 @@ viewEditItem projects item =
                         []
                     ]
                 , div [ class "p5 fg1 df-row" ]
-                    [ select [ class "fg1" ]
-                        (option [] [ text "Inbox" ]
-                            :: List.map viewProjectOption projects
+                    [ select [ class "fg1", onInput OnSelectInput ]
+                        (option [ value "", selected (item.projectId == InboxProjectId) ] [ text "Inbox" ]
+                            :: List.map
+                                (\project ->
+                                    option
+                                        [ value project.id
+                                        , selected (UserProjectId project.id == item.projectId)
+                                        ]
+                                        [ text project.title ]
+                                )
+                                projects
                         )
                     ]
                 ]
@@ -307,10 +336,6 @@ viewEditItem projects item =
                 ]
             ]
         ]
-
-
-viewProjectOption project =
-    option [] [ text project.title ]
 
 
 

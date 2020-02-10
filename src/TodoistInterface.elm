@@ -145,7 +145,7 @@ subscriptions _ =
 
 view : Model -> Html Msg
 view model =
-    div [ class "df-column w600 mlr-auto" ]
+    div [ class "df-column w600 mx-auto" ]
         [ div [ class "fw-bold fz-large" ] [ text "Items" ]
         , div [] (List.map viewItem (getAllItems model.itemDict))
         ]

@@ -399,13 +399,6 @@ viewEditItem userProjects item =
         ]
 
 
-type alias ProjectOption =
-    { value : String
-    , text : String
-    , id : ProjectId
-    }
-
-
 
 -- VIEW HELPERS
 

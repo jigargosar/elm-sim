@@ -282,7 +282,10 @@ viewEditItem projects item =
             , onKey [ enter OnEnter ]
             ]
             []
-        , select [ class "fg1" ] (option [] [ text "Inbox" ] :: List.map viewProjectOption projects)
+        , select [ class "fg1" ]
+            (option [] [ text "Inbox" ]
+                :: List.map viewProjectOption projects
+            )
         ]
 
 

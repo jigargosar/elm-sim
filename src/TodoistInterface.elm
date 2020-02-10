@@ -160,7 +160,9 @@ type Msg
     | GotItems (List Item)
     | GotProjects (List UserProject)
     | EditItemClicked Item
-    | OnEnter
+    | OnInputEnter
+    | OnSave
+    | OnCancel
     | OnInput String
 
 
@@ -188,14 +190,20 @@ update message model =
                 _ ->
                     ( model, Cmd.none )
 
-        OnEnter ->
-            ( handleInputEnter model, Cmd.none )
+        OnInputEnter ->
+            ( handleSave model, Cmd.none )
 
         OnInput string ->
             ( { model | edit = handleInput string model.edit }, Cmd.none )
 
+        OnCancel ->
+            ( { model | edit = NoEdit }, Cmd.none )
 
-handleInputEnter model =
+        OnSave ->
+            ( handleSave model, Cmd.none )
+
+
+handleSave model =
     case model.edit of
         NoEdit ->
             model
@@ -274,20 +282,24 @@ viewEditItem : List UserProject -> Item -> Html Msg
 viewEditItem projects item =
     div [ class "df-row" ]
         [ div [ class "p5" ] [ input [ type_ "checkbox", class "p5" ] [] ]
-        , div [ class "df-col" ]
+        , div [ class "df-col fg1" ]
             [ div [ class "df-row" ]
-                [ input
-                    [ hid "item-editor"
-                    , class "fg1"
-                    , value item.title
-                    , onInput OnInput
-                    , onKey [ enter OnEnter ]
+                [ div [ class "p5 fg1 df-row" ]
+                    [ input
+                        [ hid "item-editor"
+                        , class "fg1"
+                        , value item.title
+                        , onInput OnInput
+                        , onKey [ enter OnInputEnter ]
+                        ]
+                        []
                     ]
-                    []
-                , select [ class "fg1" ]
-                    (option [] [ text "Inbox" ]
-                        :: List.map viewProjectOption projects
-                    )
+                , div [ class "p5 fg1 df-row" ]
+                    [ select [ class "fg1" ]
+                        (option [] [ text "Inbox" ]
+                            :: List.map viewProjectOption projects
+                        )
+                    ]
                 ]
             , div [ class "df-row" ]
                 [ div [ class "p5" ] [ button [ class "" ] [ text "save" ] ]

@@ -4,7 +4,7 @@ port module TodoistInterface exposing (main)
 
 import Browser
 import Dict exposing (Dict)
-import Html exposing (Html, div, input, text)
+import Html exposing (Html, div, input, option, select, text)
 import Html.Attributes exposing (class, type_, value)
 import Html.Events exposing (onClick, onInput)
 import Json.Decode as JD
@@ -149,11 +149,16 @@ update message model =
             ( { model | itemDict = addItems items model.itemDict }, Cmd.none )
 
         EditItemClicked item ->
-            ( { model | edit = EditItem item (getAllItems model.itemDict) }
-            , Cmd.batch
-                [ focusIdNextTick "item-editor"
-                ]
-            )
+            case model.edit of
+                NoEdit ->
+                    ( { model | edit = EditItem item (getAllItems model.itemDict) }
+                    , Cmd.batch
+                        [ focusIdNextTick "item-editor"
+                        ]
+                    )
+
+                _ ->
+                    ( model, Cmd.none )
 
         OnEnter ->
             ( handleInputEnter model, Cmd.none )
@@ -244,12 +249,14 @@ viewEditItem item =
         , div [ class "p5 fg1" ]
             [ input
                 [ hid "item-editor"
+                , class "w-100"
                 , value item.title
                 , onInput OnInput
                 , onKey [ enter OnEnter ]
                 ]
                 []
             ]
+        , div [ class "p5 fg1" ] [ select [] [ option [] [ text "Inbox" ] ] ]
         ]
 
 

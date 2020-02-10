@@ -246,17 +246,15 @@ viewEditItem : Item -> Html Msg
 viewEditItem item =
     div [ class "df-row" ]
         [ div [ class "p5" ] [ input [ type_ "checkbox", class "p5" ] [] ]
-        , div [ class "p5 fg1" ]
-            [ input
-                [ hid "item-editor"
-                , class "w-100"
-                , value item.title
-                , onInput OnInput
-                , onKey [ enter OnEnter ]
-                ]
-                []
+        , input
+            [ hid "item-editor"
+            , class "fg1"
+            , value item.title
+            , onInput OnInput
+            , onKey [ enter OnEnter ]
             ]
-        , div [ class "p5 fg1" ] [ select [] [ option [] [ text "Inbox" ] ] ]
+            []
+        , select [ class "fg1" ] [ option [] [ text "Inbox" ] ]
         ]
 
 

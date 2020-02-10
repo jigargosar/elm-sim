@@ -243,7 +243,7 @@ viewItemsList model =
             let
                 viewItemHelp item =
                     if item.id == editItem.id then
-                        viewEditItem editItem
+                        viewEditItem (model.projectDict |> Dict.values) editItem
 
                     else
                         viewItem item
@@ -270,8 +270,8 @@ viewItem item =
         ]
 
 
-viewEditItem : Item -> Html Msg
-viewEditItem item =
+viewEditItem : List UserProject -> Item -> Html Msg
+viewEditItem projects item =
     div [ class "df-row" ]
         [ div [ class "p5" ] [ input [ type_ "checkbox", class "p5" ] [] ]
         , input
@@ -282,8 +282,12 @@ viewEditItem item =
             , onKey [ enter OnEnter ]
             ]
             []
-        , select [ class "fg1" ] [ option [] [ text "Inbox" ] ]
+        , select [ class "fg1" ] (option [] [ text "Inbox" ] :: List.map viewProjectOption projects)
         ]
+
+
+viewProjectOption project =
+    option [] [ text project.title ]
 
 
 

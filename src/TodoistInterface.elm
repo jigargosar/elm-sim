@@ -159,7 +159,7 @@ type Msg
     = NoOp
     | GotItems (List Item)
     | GotProjects (List UserProject)
-    | EditItemClicked Item
+    | OnEditItem Item
     | OnInputEnter
     | OnSave
     | OnCancel
@@ -178,7 +178,7 @@ update message model =
         GotProjects projects ->
             ( { model | projectDict = addProjects projects model.projectDict }, Cmd.none )
 
-        EditItemClicked item ->
+        OnEditItem item ->
             case model.edit of
                 NoEdit ->
                     ( { model | edit = EditItem item (getAllItems model.itemDict) }
@@ -274,7 +274,7 @@ viewItem item =
     in
     div [ class colorClass, class "df-row" ]
         [ div [ class "p5" ] [ input [ type_ "checkbox", class "p5" ] [] ]
-        , div [ class "p5 fg1", onClick (EditItemClicked item) ] [ text displayTitle ]
+        , div [ class "p5 fg1", onClick (OnEditItem item) ] [ text displayTitle ]
         ]
 
 
@@ -302,8 +302,8 @@ viewEditItem projects item =
                     ]
                 ]
             , div [ class "df-row" ]
-                [ div [ class "p5" ] [ button [ class "" ] [ text "save" ] ]
-                , div [ class "p5" ] [ button [ class "" ] [ text "cancel" ] ]
+                [ div [ class "p5" ] [ button [ onClick OnSave ] [ text "save" ] ]
+                , div [ class "p5" ] [ button [ onClick OnCancel ] [ text "cancel" ] ]
                 ]
             ]
         ]

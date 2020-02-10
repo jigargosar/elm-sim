@@ -1,4 +1,4 @@
-module TodoistInterface exposing (main)
+port module TodoistInterface exposing (main)
 
 -- Browser.Element Scaffold
 
@@ -6,8 +6,12 @@ import Browser
 import Dict exposing (Dict)
 import Html exposing (Html, div, input, text)
 import Html.Attributes exposing (class, type_, value)
+import Html.Events exposing (onClick)
 import Random exposing (Generator)
 import String exposing (String, fromInt, isEmpty, trim)
+
+
+port focusIdNextTick : String -> Cmd msg
 
 
 
@@ -142,7 +146,11 @@ update message model =
             ( { model | itemDict = addItems items model.itemDict }, Cmd.none )
 
         EditItemClicked item ->
-            ( { model | edit = EditItem item }, Cmd.none )
+            ( { model | edit = EditItem item }
+            , Cmd.batch
+                [ focusIdNextTick "item-editor"
+                ]
+            )
 
 
 subscriptions : Model -> Sub Msg
@@ -195,7 +203,7 @@ viewItem item =
     in
     div [ class colorClass, class "df-row" ]
         [ div [ class "p5" ] [ input [ type_ "checkbox", class "p5" ] [] ]
-        , div [ class "p5 fg1" ] [ text displayTitle ]
+        , div [ class "p5 fg1", onClick (EditItemClicked item) ] [ text displayTitle ]
         ]
 
 
@@ -203,8 +211,12 @@ viewEditItem : Item -> Html Msg
 viewEditItem item =
     div [ class "df-row" ]
         [ div [ class "p5" ] [ input [ type_ "checkbox", class "p5" ] [] ]
-        , div [ class "p5 fg1" ] [ input [ value item.title ] [] ]
+        , div [ class "p5 fg1" ] [ input [ hid "item-editor", value item.title ] [] ]
         ]
+
+
+hid =
+    Html.Attributes.id
 
 
 

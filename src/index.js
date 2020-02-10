@@ -16,6 +16,17 @@ require('./styles.css')
   window.addEventListener('resize', function() {
     // app.ports.gotViewSize.send([window.innerWidth, window.innerHeight])
   })
+
+  app.ports.focusIdNextTick.subscribe(function(hid) {
+    setTimeout(function() {
+      const el = document.getElementById(hid)
+      if (el) {
+        el.focus()
+      } else {
+        console.warn('Focus Failed: NotFound ' + hid)
+      }
+    }, 0)
+  })
 }
 
 function initElmApp() {

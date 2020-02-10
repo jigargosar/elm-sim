@@ -231,7 +231,7 @@ viewArrowDialogContent layerName x y =
 
 
 viewProg prog =
-    renderGrid
+    renderCellGrid
         [ Border.width 1
         , Border.color lightGray
         , E.centerX
@@ -287,10 +287,10 @@ layerCellColumn layerName x y prog =
         ]
 
 
-renderGrid attrs width height viewFunc =
+renderCellGrid attrs width height func =
     let
         column x =
-            E.Column E.none E.fill (viewFunc x)
+            E.Column E.none E.fill (func x)
     in
     E.table attrs
         { data = List.range 0 (height - 1)

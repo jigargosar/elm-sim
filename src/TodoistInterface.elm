@@ -277,14 +277,9 @@ subscriptions _ =
 view : Model -> Html Msg
 view model =
     col [ class "w600 mx-auto" ]
-        [ viewStyles
-        , el [ class "fw-bold fz-large ph5 pv10 " ] (text "Items")
+        [ el [ class "fw-bold fz-large ph5 pv10 " ] (text "Items")
         , viewItemsList model
         ]
-
-
-viewStyles =
-    Html.node "style" [] []
 
 
 isBlank =
@@ -353,11 +348,15 @@ viewEditItem userProjects item =
                     )
                 ]
             , row [ sp10 ]
-                [ button [ pv5, ph10, onClick OnSave ] [ text "SAVE" ]
-                , button [ pv5, ph10, onClick OnCancel ] [ text "CANCEL" ]
+                [ btn2 OnSave "SAVE"
+                , btn2 OnCancel "CANCEL"
                 ]
             ]
         ]
+
+
+btn2 msg txt =
+    button [ pv5, ph10, onClick msg ] [ text txt ]
 
 
 

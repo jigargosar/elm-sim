@@ -26,3 +26,34 @@
 .fz-large{
   font-size: large;
 }
+
+.df-row{
+  display: flex;
+  flex-direction: row;
+}
+
+.df-col{
+  display: flex;
+  flex-direction: column;
+}
+
+.items-center{
+  align-items: center;
+}
+
+.justify-center{
+  justify-content: center;
+}
+
+.w-100{
+  width: 100%;
+}
+
+.w600{
+  width: 600px;
+}
+
+.mlr-auto{
+  margin-left: auto;
+  margin-right: auto;
+}

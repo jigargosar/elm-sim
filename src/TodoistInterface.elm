@@ -158,12 +158,29 @@ view : Model -> Html Msg
 view model =
     div [ class "df-column w600 mx-auto" ]
         [ div [ class "fw-bold fz-large ph5 pv10 " ] [ text "Items" ]
-        , div [] (List.map viewItem (getAllItems model.itemDict))
+        , div [] (List.map (viewItemOrEditItem model.edit) (getAllItems model.itemDict))
         ]
 
 
 isBlank =
     trim >> isEmpty
+
+
+viewItemOrEditItem edit item =
+    let
+        viewDefault =
+            viewItem item
+    in
+    case edit of
+        EditItem editItem ->
+            if editItem.id == item.id then
+                viewEditItem editItem
+
+            else
+                viewDefault
+
+        _ ->
+            viewDefault
 
 
 viewItem : Item -> Html Msg

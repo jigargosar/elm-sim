@@ -16,6 +16,7 @@ import Prog exposing (LayerName, Prog)
 import Program.Builder as B
 import String exposing (fromInt)
 import Task
+import Tuple exposing (mapBoth)
 
 
 port getScrollbarSize : () -> Cmd msg
@@ -24,7 +25,7 @@ port getScrollbarSize : () -> Cmd msg
 port gotScrollbarSize : (( Int, Int ) -> msg) -> Sub msg
 
 
-port gotViewSize : (( Int, Int ) -> msg) -> Sub msg
+port gotViewSize : (Float2 -> msg) -> Sub msg
 
 
 
@@ -35,8 +36,12 @@ type alias Int2 =
     ( Int, Int )
 
 
+type alias Float2 =
+    ( Float, Float )
+
+
 type alias Model =
-    { viewSize : Int2
+    { viewSize : Float2
     , scrollbarSize : ( Int, Int )
     , dialog : Dialog
     , prog : Prog
@@ -49,7 +54,7 @@ type Dialog
 
 
 type alias Flags =
-    { viewSize : Int2
+    { viewSize : Float2
     , scrollbarSize : ( Int, Int )
     , now : Int
     }
@@ -120,7 +125,7 @@ type Msg
     | ShowArrowDialog Prog.LayerName Int Int
     | DialogBackgroundClicked
     | GotScrollbarSize Int2
-    | GotViewSize Int2
+    | GotViewSize Float2
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -176,6 +181,22 @@ lightGray =
 
 view : Model -> Html Msg
 view model =
+    let
+        progSize =
+            ( 10, 8 )
+
+        cellWidth =
+            ofT2 (/)
+                |> apT2 model.viewSize
+                |> apT2 progSize
+                |> joinT2 min
+                |> floor
+                |> toFloat
+                |> Debug.log "cw"
+
+        cellScale =
+            cellWidth / 100
+    in
     layout
         [ inFront (viewDialog model)
         , height fill
@@ -183,8 +204,24 @@ view model =
         (column
             [ width fill
             ]
-            [ viewProg model.prog ]
+            [ viewProg cellWidth model.prog ]
         )
+
+
+joinT2 func ( a, b ) =
+    func a b
+
+
+ofT2 func =
+    ( func, func )
+
+
+apT2 ( a, b ) ( fa, fb ) =
+    ( fa a, fb b )
+
+
+divBy b a =
+    a / b
 
 
 viewDialog model =
@@ -237,12 +274,13 @@ viewArrowDialogContent layerName x y =
         ]
 
 
-viewProg prog =
+viewProg cellWidth prog =
     renderCellGrid
         [ Border.width 1
         , Border.color lightGray
         , centerX
         , width shrink
+        , scale (cellWidth / 100 |> Debug.log "scale")
         ]
         10
         8

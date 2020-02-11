@@ -15,13 +15,6 @@ allShapes =
     [ Square, HLine, VLine ]
 
 
-allShapePoints : Set.Set ( Int, Int )
-allShapePoints =
-    List.range 0 3
-        |> List.concatMap (\r -> List.range 0 3 |> List.map (Tuple.pair r))
-        |> Set.fromList
-
-
 shapeStringListToPoints list =
     list
         |> List.indexedMap

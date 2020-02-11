@@ -143,3 +143,11 @@
 .df-row.sp10 > :last-child {
   margin-right: 0;
 }
+
+.mono-board{
+  font-family: monospace;
+  white-space: pre;
+  font-size: 30px;
+  padding: 2em;
+  line-height: 1;
+}

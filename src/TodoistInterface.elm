@@ -29,9 +29,15 @@ type alias Model =
     }
 
 
+type alias ListItemView =
+    { list : List Item
+    , hasNews : Bool
+    }
+
+
 type ViewModel
     = EditItem (List Item) Item (List Item)
-    | ListItems (List Item)
+    | ListItems ListItemView
     | FetchingItems
 
 
@@ -39,19 +45,38 @@ type alias Flags =
     ()
 
 
+type alias Data =
+    { items : List Item
+    , projects : List UserProject
+    }
+
+
 init : Flags -> ( Model, Cmd Msg )
 init _ =
+    let
+        randomItems =
+            randomIdItemWithRandomSampleTitle
+                |> Random.list 10
+
+        randomProjects =
+            [ "P1", "P2", "P3" ]
+                |> List.map randomIdProjectWithTitle
+                |> List.foldr (Random.map2 (::)) (Random.constant [])
+
+        randomData =
+            Random.map2 Data
+                randomItems
+                randomProjects
+    in
     ( { projectDict = Dict.empty
       , itemDict = Dict.empty
       , edit = FetchingItems
       }
     , Cmd.batch
-        [ randomIdItemWithRandomSampleTitle
-            |> Random.list 10
+        [ randomData |> Random.generate GotData
+        , randomItems
             |> Random.generate GotItems
-        , [ "P1", "P2", "P3" ]
-            |> List.map randomIdProjectWithTitle
-            |> List.foldr (Random.map2 (::)) (Random.constant [])
+        , randomProjects
             |> Random.generate GotProjects
         ]
     )
@@ -86,6 +111,8 @@ getAllItems =
 
 type Msg
     = NoOp
+    | ShowNewsClicked
+    | GotData Data
     | GotItems (List Item)
     | GotProjects (List UserProject)
     | OnEditItem Item
@@ -96,22 +123,38 @@ type Msg
     | OnSelectInput String
 
 
-startEditItem ( m, c ) =
-    let
-        msg =
-            getAllItems m.itemDict
-                |> List.drop 4
-                |> List.head
-                |> Maybe.map OnEditItem
-                |> Maybe.withDefault NoOp
-    in
-    andThenUpdate msg ( m, c )
+
+--startEditItem ( m, c ) =
+--    let
+--        msg =
+--            getAllItems m.itemDict
+--                |> List.drop 4
+--                |> List.head
+--                |> Maybe.map OnEditItem
+--                |> Maybe.withDefault NoOp
+--    in
+--    andThenUpdate msg ( m, c )
+--andThenUpdate : Msg -> ( Model, Cmd Msg ) -> ( Model, Cmd Msg )
+--andThenUpdate msg ( m, c ) =
+--    update msg m
+--        |> Tuple.mapSecond (\c2 -> Cmd.batch [ c, c2 ])
 
 
-andThenUpdate : Msg -> ( Model, Cmd Msg ) -> ( Model, Cmd Msg )
-andThenUpdate msg ( m, c ) =
-    update msg m
-        |> Tuple.mapSecond (\c2 -> Cmd.batch [ c, c2 ])
+updateView : Data -> Model -> ( Model, Cmd Msg )
+updateView data model =
+    case model.edit of
+        EditItem _ _ _ ->
+            ( model, Cmd.none )
+
+        ListItems vm ->
+            if List.isEmpty vm.list then
+                ( { model | edit = ListItems { vm | list = getAllItems model.itemDict } }, Cmd.none )
+
+            else
+                ( { model | edit = ListItems { vm | hasNews = True } }, Cmd.none )
+
+        FetchingItems ->
+            ( { model | edit = ListItems (ListItemView (getAllItems model.itemDict) False) }, Cmd.none )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -120,29 +163,33 @@ update message model =
         NoOp ->
             ( model, Cmd.none )
 
-        GotItems items ->
+        ShowNewsClicked ->
             case model.edit of
-                FetchingItems ->
-                    let
-                        itemDict =
-                            addItems items model.itemDict
-                    in
-                    ( { model
-                        | itemDict = itemDict
-                        , edit = ListItems (getAllItems itemDict)
-                      }
-                    , Cmd.none
-                    )
-                        |> startEditItem
-
                 EditItem _ _ _ ->
                     ( model, Cmd.none )
 
                 ListItems _ ->
+                    ( { model | edit = ListItems (ListItemView (getAllItems model.itemDict) False) }, Cmd.none )
+
+                FetchingItems ->
                     ( model, Cmd.none )
 
+        GotData ({ items, projects } as data) ->
+            { model
+                | itemDict = addItems items model.itemDict
+                , projectDict = addProjects projects model.projectDict
+            }
+                |> updateView data
+
+        GotItems items ->
+            { model
+                | itemDict = addItems items model.itemDict
+            }
+                |> updateView (Data items [])
+
         GotProjects projects ->
-            ( { model | projectDict = addProjects projects model.projectDict }, Cmd.none )
+            { model | projectDict = addProjects projects model.projectDict }
+                |> updateView (Data [] projects)
 
         OnEditItem item ->
             let
@@ -150,8 +197,8 @@ update message model =
                     func a == func b
             in
             case model.edit of
-                ListItems items ->
-                    case findSplit (eqBy .id item) items of
+                ListItems { list } ->
+                    case findSplit (eqBy .id item) list of
                         Just ( l, c, r ) ->
                             ( { model | edit = EditItem l c r }
                             , Cmd.batch
@@ -175,7 +222,7 @@ update message model =
             ( { model | edit = handleSelectInput string model.edit }, Cmd.none )
 
         OnCancel ->
-            ( { model | edit = ListItems (getAllItems model.itemDict) }, Cmd.none )
+            ( { model | edit = ListItems (ListItemView (getAllItems model.itemDict) False) }, Cmd.none )
 
         OnSave ->
             ( handleSave model, Cmd.none )
@@ -189,7 +236,7 @@ handleSave model =
         EditItem _ item _ ->
             { model
                 | itemDict = Dict.insert item.id item model.itemDict
-                , edit = ListItems (getAllItems model.itemDict)
+                , edit = ListItems (ListItemView (getAllItems model.itemDict) False)
             }
 
         FetchingItems ->
@@ -280,8 +327,15 @@ viewItemsList model =
                             :: AllItemsListView.viewItemsList { onTitleClick = OnEditItem } r
                        )
 
-            ListItems items ->
-                AllItemsListView.viewItemsList { onTitleClick = OnEditItem } items
+            ListItems { list, hasNews } ->
+                [ if hasNews then
+                    btn2 ShowNewsClicked "new changes available"
+
+                  else
+                    text ""
+                , col []
+                    (AllItemsListView.viewItemsList { onTitleClick = OnEditItem } list)
+                ]
 
             FetchingItems ->
                 [ el [] (text "Feching...") ]

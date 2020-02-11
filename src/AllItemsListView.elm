@@ -13,9 +13,9 @@ type alias Config msg =
     }
 
 
-viewItemsList : Config msg -> List Item -> Html msg
+viewItemsList : Config msg -> List Item -> List (Html msg)
 viewItemsList config items =
-    col [] (List.map (viewItem config) items)
+    List.map (viewItem config) items
 
 
 viewItem : Config msg -> Item -> Html msg

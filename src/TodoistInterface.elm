@@ -30,7 +30,7 @@ type alias Model =
 
 
 type Edit
-    = EditItem Item (List Item)
+    = EditItem (List Item) Item (List Item)
     | NoEdit
 
 
@@ -127,13 +127,22 @@ update message model =
             ( { model | projectDict = addProjects projects model.projectDict }, Cmd.none )
 
         OnEditItem item ->
+            let
+                eqBy func a b =
+                    func a == func b
+            in
             case model.edit of
                 NoEdit ->
-                    ( { model | edit = EditItem item (getAllItems model.itemDict) }
-                    , Cmd.batch
-                        [ focusIdNextTick "item-editor"
-                        ]
-                    )
+                    case findSplit (eqBy .id item) (getAllItems model.itemDict) of
+                        Just ( l, c, r ) ->
+                            ( { model | edit = EditItem l c r }
+                            , Cmd.batch
+                                [ focusIdNextTick "item-editor"
+                                ]
+                            )
+
+                        Nothing ->
+                            ( model, Cmd.none )
 
                 _ ->
                     ( model, Cmd.none )
@@ -159,7 +168,7 @@ handleSave model =
         NoEdit ->
             model
 
-        EditItem item _ ->
+        EditItem _ item _ ->
             { model
                 | itemDict = Dict.insert item.id item model.itemDict
                 , edit = NoEdit
@@ -171,8 +180,8 @@ handleInput string edit =
         NoEdit ->
             edit
 
-        EditItem item itemList ->
-            EditItem { item | title = string } itemList
+        EditItem l item r ->
+            EditItem l { item | title = string } r
 
 
 projectIdFromString string =
@@ -188,8 +197,8 @@ handleSelectInput string edit =
         NoEdit ->
             edit
 
-        EditItem item itemList ->
-            EditItem { item | projectId = projectIdFromString string } itemList
+        EditItem l item r ->
+            EditItem l { item | projectId = projectIdFromString string } r
 
 
 subscriptions : Model -> Sub Msg
@@ -236,36 +245,17 @@ findSplit pred list =
 
 
 viewItemsList model =
-    case model.edit of
-        EditItem editItem items ->
-            let
-                viewItemHelp item =
-                    if item.id == editItem.id then
-                        viewEditItem (model.projectDict |> Dict.values) editItem
+    col []
+        (case model.edit of
+            EditItem l editItem r ->
+                AllItemsListView.viewItemsList { onTitleClick = OnEditItem } l
+                    ++ (viewEditItem (model.projectDict |> Dict.values) editItem
+                            :: AllItemsListView.viewItemsList { onTitleClick = OnEditItem } r
+                       )
 
-                    else
-                        viewItem item
-            in
-            col [] (List.map viewItemHelp items)
-
-        NoEdit ->
-            AllItemsListView.viewItemsList { onTitleClick = OnEditItem } (getAllItems model.itemDict)
-
-
-viewItem : Item -> Html Msg
-viewItem item =
-    let
-        ( displayTitle, colorClass ) =
-            if isBlank item.title then
-                ( "<empty>", "fg-gray" )
-
-            else
-                ( item.title, "fg-inherit" )
-    in
-    row [ class colorClass ]
-        [ el [ class "p5" ] (input [ type_ "checkbox", class "p5" ] [])
-        , el [ class "p5 fg1", onClick (OnEditItem item) ] (text displayTitle)
-        ]
+            NoEdit ->
+                AllItemsListView.viewItemsList { onTitleClick = OnEditItem } (getAllItems model.itemDict)
+        )
 
 
 viewEditItem : List UserProject -> Item -> Html Msg

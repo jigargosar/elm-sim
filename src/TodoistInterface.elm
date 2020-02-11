@@ -25,13 +25,14 @@ port focusIdNextTick : String -> Cmd msg
 type alias Model =
     { projectDict : ProjectDict
     , itemDict : ItemDict
-    , edit : Edit
+    , edit : ViewModel
     }
 
 
-type Edit
+type ViewModel
     = EditItem (List Item) Item (List Item)
-    | NoEdit
+    | ListItems (List Item)
+    | FetchingItems
 
 
 type alias Flags =
@@ -42,7 +43,7 @@ init : Flags -> ( Model, Cmd Msg )
 init _ =
     ( { projectDict = Dict.empty
       , itemDict = Dict.empty
-      , edit = NoEdit
+      , edit = FetchingItems
       }
     , Cmd.batch
         [ randomIdItemWithRandomSampleTitle
@@ -120,8 +121,25 @@ update message model =
             ( model, Cmd.none )
 
         GotItems items ->
-            ( { model | itemDict = addItems items model.itemDict }, Cmd.none )
-                |> startEditItem
+            case model.edit of
+                FetchingItems ->
+                    let
+                        itemDict =
+                            addItems items model.itemDict
+                    in
+                    ( { model
+                        | itemDict = itemDict
+                        , edit = ListItems (getAllItems itemDict)
+                      }
+                    , Cmd.none
+                    )
+                        |> startEditItem
+
+                EditItem _ _ _ ->
+                    ( model, Cmd.none )
+
+                ListItems _ ->
+                    ( model, Cmd.none )
 
         GotProjects projects ->
             ( { model | projectDict = addProjects projects model.projectDict }, Cmd.none )
@@ -132,8 +150,8 @@ update message model =
                     func a == func b
             in
             case model.edit of
-                NoEdit ->
-                    case findSplit (eqBy .id item) (getAllItems model.itemDict) of
+                ListItems items ->
+                    case findSplit (eqBy .id item) items of
                         Just ( l, c, r ) ->
                             ( { model | edit = EditItem l c r }
                             , Cmd.batch
@@ -157,7 +175,7 @@ update message model =
             ( { model | edit = handleSelectInput string model.edit }, Cmd.none )
 
         OnCancel ->
-            ( { model | edit = NoEdit }, Cmd.none )
+            ( { model | edit = ListItems (getAllItems model.itemDict) }, Cmd.none )
 
         OnSave ->
             ( handleSave model, Cmd.none )
@@ -165,23 +183,29 @@ update message model =
 
 handleSave model =
     case model.edit of
-        NoEdit ->
+        ListItems _ ->
             model
 
         EditItem _ item _ ->
             { model
                 | itemDict = Dict.insert item.id item model.itemDict
-                , edit = NoEdit
+                , edit = ListItems (getAllItems model.itemDict)
             }
+
+        FetchingItems ->
+            model
 
 
 handleInput string edit =
     case edit of
-        NoEdit ->
+        ListItems _ ->
             edit
 
         EditItem l item r ->
             EditItem l { item | title = string } r
+
+        FetchingItems ->
+            edit
 
 
 projectIdFromString string =
@@ -194,11 +218,14 @@ projectIdFromString string =
 
 handleSelectInput string edit =
     case edit of
-        NoEdit ->
+        ListItems _ ->
             edit
 
         EditItem l item r ->
             EditItem l { item | projectId = projectIdFromString string } r
+
+        FetchingItems ->
+            edit
 
 
 subscriptions : Model -> Sub Msg
@@ -253,8 +280,11 @@ viewItemsList model =
                             :: AllItemsListView.viewItemsList { onTitleClick = OnEditItem } r
                        )
 
-            NoEdit ->
-                AllItemsListView.viewItemsList { onTitleClick = OnEditItem } (getAllItems model.itemDict)
+            ListItems items ->
+                AllItemsListView.viewItemsList { onTitleClick = OnEditItem } items
+
+            FetchingItems ->
+                [ el [] (text "Feching...") ]
         )
 
 

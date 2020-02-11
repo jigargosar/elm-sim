@@ -2,14 +2,16 @@ port module TodoistInterface exposing (main)
 
 -- Browser.Element Scaffold
 
+import AllItemsListView
 import Browser
+import DataModels exposing (..)
 import Dict exposing (Dict)
 import Html exposing (Html, button, input, option, select, text)
 import Html.Attributes exposing (class, selected, type_, value)
 import Html.Events exposing (onClick, onInput)
 import Json.Decode as JD
 import Random exposing (Generator)
-import String exposing (String, fromInt, isEmpty, trim)
+import String exposing (String, isEmpty, trim)
 import ViewHelpers exposing (..)
 
 
@@ -18,81 +20,6 @@ port focusIdNextTick : String -> Cmd msg
 
 
 -- Model
-
-
-type ProjectId
-    = InboxProjectId
-    | UserProjectId String
-
-
-sampleItemTitles =
-    [ "Remember The Milk!"
-    , "Read Elm In Action"
-    , "Study NeoVim lession 3.1"
-    ]
-
-
-randomSampleItemTitle =
-    let
-        sampleItemTitleAt idx =
-            sampleItemTitles
-                |> List.drop idx
-                |> List.head
-                |> Maybe.withDefault "Error: SampleItemTitle Not Found"
-    in
-    Random.int 0 (List.length sampleItemTitles - 1)
-        |> Random.map sampleItemTitleAt
-
-
-type alias Item =
-    { id : String
-    , title : String
-    , completed : Bool
-    , projectId : ProjectId
-    }
-
-
-initItemWithIdAndTitle : String -> String -> Item
-initItemWithIdAndTitle id title =
-    Item id title False InboxProjectId
-
-
-randomIdItemWithRandomSampleTitle : Generator Item
-randomIdItemWithRandomSampleTitle =
-    Random.map2 initItemWithIdAndTitle
-        randomIdString
-        randomSampleItemTitle
-
-
-type alias UserProject =
-    { id : String
-    , title : String
-    }
-
-
-initProjectWithIdAndTitle : String -> String -> UserProject
-initProjectWithIdAndTitle id title =
-    UserProject id title
-
-
-randomIdProjectWithTitle : String -> Generator UserProject
-randomIdProjectWithTitle title =
-    randomIdString
-        |> Random.map (\id -> initProjectWithIdAndTitle id title)
-
-
-randomIdString : Generator String
-randomIdString =
-    Random.int 100 100000
-        |> Random.map fromInt
-
-
-type alias ItemDict =
-    Dict String Item
-
-
-type alias ProjectDict =
-    Dict String UserProject
 
 
 type alias Model =
@@ -286,6 +213,28 @@ isBlank =
     trim >> isEmpty
 
 
+findSplit : (a -> Bool) -> List a -> Maybe ( List a, a, List a )
+findSplit pred list =
+    let
+        func item ( left, mc, right ) =
+            case mc of
+                Nothing ->
+                    if pred item then
+                        ( left, Just item, right )
+
+                    else
+                        ( item :: left, mc, right )
+
+                Just _ ->
+                    ( left, mc, item :: right )
+
+        convertResult ( l, mc, r ) =
+            Maybe.map (\c -> ( List.reverse l, c, List.reverse r )) mc
+    in
+    List.foldl func ( [], Nothing, [] ) list
+        |> convertResult
+
+
 viewItemsList model =
     case model.edit of
         EditItem editItem items ->
@@ -300,7 +249,7 @@ viewItemsList model =
             col [] (List.map viewItemHelp items)
 
         NoEdit ->
-            col [] (List.map viewItem (getAllItems model.itemDict))
+            AllItemsListView.viewItemsList { onTitleClick = OnEditItem } (getAllItems model.itemDict)
 
 
 viewItem : Item -> Html Msg

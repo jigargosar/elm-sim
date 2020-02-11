@@ -1,3 +1,6 @@
+/* Functional CSS Styles */
+
+
 .lh-0 {
   line-height: 0;
 }
@@ -8,8 +11,6 @@
 .pe-all {
   pointer-events: all;
 }
-
-/* Todoist Interface Styles */
 
 .fg-gray{
   color: gray;

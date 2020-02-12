@@ -100,23 +100,29 @@ view m =
             40
     in
     div [ class "df-row sp10 items-center" ]
-        [ [ viewMask cellWidth "red" lineMask
-                |> wrapSvg
-          , viewMask cellWidth "red" (rotateMask lineMask)
-                |> wrapSvg
-          , viewMask cellWidth "blue" sMask
-                |> wrapSvg
-          , viewMask cellWidth "blue" (rotateMask sMask)
-                |> wrapSvg
-          , viewMask cellWidth "blue" (rotateMask sMask |> rotateMask)
-                |> wrapSvg
-          , viewMask cellWidth "blue" (rotateMask sMask |> rotateMask |> rotateMask)
-                |> wrapSvg
-          ]
-            |> div [ class "df-col items-center sp10" ]
+        [ [ lineMask, sMask, zMask ]
+            |> List.map (viewMaskRotations cellWidth "red")
+            |> div [ class "df-row sp10 items-center" ]
         , viewGrid cellWidth m.width m.height m.grid
             |> wrapSvg
         ]
+
+
+viewMaskRotations cw color mask =
+    List.range 0 3
+        |> List.map
+            (\n ->
+                applyN n rotateMask mask
+                    |> viewMask cw color
+                    |> wrapSvg
+            )
+        |> div [ class "df-col sp10" ]
+
+
+applyN : Int -> (c -> c) -> c -> c
+applyN n func val =
+    List.range 0 (n - 1)
+        |> List.foldl (always func) val
 
 
 wrapSvg s =

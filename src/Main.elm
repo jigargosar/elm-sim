@@ -4,7 +4,7 @@ module Main exposing (main)
 
 import Browser
 import Dict exposing (Dict)
-import Html exposing (Html, div)
+import Html exposing (Html)
 import Svg exposing (g, rect, svg)
 import Svg.Attributes exposing (fill)
 import Tuple exposing (mapBoth)
@@ -38,6 +38,7 @@ init _ =
             Dict.empty
                 |> Dict.insert ( 0, 0 ) "blue"
                 |> Dict.insert ( 1, 1 ) "red"
+                |> Dict.insert ( 10 - 1, 20 - 1 ) "black"
                 |> Dict.insert ( 10, 20 ) "black"
       , width = 10
       , height = 20
@@ -70,38 +71,33 @@ subscriptions _ =
 -- View
 
 
-cellWidth =
-    50
-
-
-scaleInt2 =
-    mapEach (toFloat >> mul cellWidth)
-
-
-square pos color =
-    let
-        ( x, y ) =
-            pos |> scaleInt2
-    in
-    rect [ width cellWidth, height cellWidth, fill color, transform [ Translate x y ] ]
-        []
-
-
 view : Model -> Html Msg
 view m =
+    viewGrid m.width m.height m.grid
+
+
+viewGrid gridWidth gridHeight grid =
     let
+        cw =
+            40
+
+        square ( x, y ) color =
+            rect
+                [ width cw
+                , height cw
+                , fill color
+                , transform [ Translate (toFloat x * cw) (toFloat y * cw) ]
+                ]
+                []
+
         ( w, h ) =
-            ( m.width, m.height ) |> scaleInt2
+            ( toFloat gridWidth * cw, toFloat gridHeight * cw )
     in
-    svg [ viewBox 0 0 w h ]
-        [ g [] (renderGrid m.grid)
+    svg [ viewBox 0 0 w h, width w, height h ]
+        [ Dict.map square grid
+            |> Dict.values
+            |> g []
         ]
-
-
-renderGrid : Dict ( Int, Int ) String -> List (Svg.Svg msg)
-renderGrid grid =
-    Dict.map square grid
-        |> Dict.values
 
 
 mul =

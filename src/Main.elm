@@ -26,13 +26,17 @@ type Mask
     = Mask Int (Set Int2)
 
 
+maskToList (Mask _ set) =
+    Set.toList set
+
+
 rotateMask (Mask w set) =
     Set.map (\( x, y ) -> ( y, w - 1 - x )) set
         |> Mask w
 
 
 lineMask =
-    Mask 4 (Set.fromList [ ( 1, 0 ), ( 1, 1 ), ( 1, 2 ), ( 1, 3 ) ])
+    Mask 4 (Set.fromList [ ( 0, 1 ), ( 1, 1 ), ( 2, 1 ), ( 3, 1 ) ])
 
 
 sMask =
@@ -135,6 +139,23 @@ subscriptions _ =
 -- View
 
 
+activeGrid m =
+    let
+        isValid w h ( x, y ) =
+            x >= 0 && x <= w && y >= 0 && y < h
+
+        pairTo b a =
+            ( a, b )
+    in
+    m.active.mask
+        |> maskToList
+        |> List.map (\( x, y ) -> ( x + m.x, y + m.y ))
+        |> List.filter (isValid m.width m.height)
+        |> List.map (pairTo m.active.color)
+        |> Dict.fromList
+        |> Dict.union m.grid
+
+
 view : Model -> Html Msg
 view m =
     let
@@ -143,7 +164,7 @@ view m =
     in
     div [ class "df-row sp10 items-center" ]
         [ viewShapesDemo cellWidth
-        , viewGrid cellWidth m.width m.height m.grid
+        , viewGrid cellWidth m.width m.height (activeGrid m)
             |> wrapSvg
         ]
 

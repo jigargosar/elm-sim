@@ -1,161 +1,131 @@
 module Main exposing (main)
 
+-- Browser.Element Scaffold
+
+import Browser
 import Dict exposing (Dict)
 import Html exposing (Html, div)
-import Html.Attributes exposing (style)
+import Svg exposing (g, rect, svg)
+import Svg.Attributes exposing (fill)
+import Tuple exposing (mapBoth)
+import TypedSvg.Attributes exposing (transform, viewBox)
+import TypedSvg.Attributes.InPx exposing (height, width)
+import TypedSvg.Types exposing (Transform(..))
 
 
+
+-- Model
+
+
+type alias Int2 =
+    ( Int, Int )
+
+
+type alias Model =
+    { grid : Dict Int2 String
+    , width : Int
+    , height : Int
+    }
+
+
+type alias Flags =
+    ()
+
+
+init : Flags -> ( Model, Cmd Msg )
+init _ =
+    ( { grid =
+            Dict.empty
+                |> Dict.insert ( 0, 0 ) "blue"
+                |> Dict.insert ( 1, 1 ) "red"
+                |> Dict.insert ( 10, 20 ) "black"
+      , width = 10
+      , height = 20
+      }
+    , Cmd.none
+    )
+
+
+
+-- Update
+
+
+type Msg
+    = NoOp
+
+
+update : Msg -> Model -> ( Model, Cmd Msg )
+update message model =
+    case message of
+        NoOp ->
+            ( model, Cmd.none )
+
+
+subscriptions : Model -> Sub Msg
+subscriptions _ =
+    Sub.batch []
+
+
+
+-- View
+
+
+cellWidth =
+    50
+
+
+scaleInt2 =
+    mapEach (toFloat >> mul cellWidth)
+
+
+square pos color =
+    let
+        ( x, y ) =
+            pos |> scaleInt2
+    in
+    rect [ width cellWidth, height cellWidth, fill color, transform [ Translate x y ] ]
+        []
+
+
+view : Model -> Html Msg
+view m =
+    let
+        ( w, h ) =
+            ( m.width, m.height ) |> scaleInt2
+    in
+    svg [ viewBox 0 0 w h ]
+        [ g [] (renderGrid m.grid)
+        ]
+
+
+renderGrid : Dict ( Int, Int ) String -> List (Svg.Svg msg)
+renderGrid grid =
+    Dict.map square grid
+        |> Dict.values
+
+
+mul =
+    (*)
+
+
+mapEach func =
+    mapBoth func func
+
+
+empty : Html msg
+empty =
+    Html.text ""
+
+
+
+-- Main
+
+
+main : Program Flags Model Msg
 main =
-    div []
-        [ viewLineGrid
-        , viewBoardGrid
-        ]
-
-
-viewGridCells : Int -> Int -> Grid Bool -> Html msg
-viewGridCells w h grid =
-    List.range 0 (h - 1)
-        |> List.map
-            (\y ->
-                List.range 0 (w - 1)
-                    |> List.map
-                        (\x ->
-                            case getOr False x y grid of
-                                Ok True ->
-                                    viewOn
-
-                                Ok False ->
-                                    viewOff
-
-                                Err _ ->
-                                    viewError
-                        )
-            )
-        |> List.map (div [ style "display" "flex" ])
-        |> div
-            [ wsPre
-            , fontMono
-            , fz "30px"
-            , pa "10px"
-            , style "line-height" "1"
-            ]
-
-
-viewOn =
-    div
-        [ style "width" "30px"
-        , style "height" "30px"
-        , style "background-color" "black"
-        , style "opacity" "0.8"
-        , style "margin" "1px"
-        ]
-        []
-
-
-viewOff =
-    div
-        [ style "width" "30px"
-        , style "height" "30px"
-        , style "background-color" "black"
-        , style "opacity" "0.2"
-        , style "margin" "1px"
-        ]
-        []
-
-
-viewError =
-    div
-        [ style "width" "30px"
-        , style "height" "30px"
-        , style "background-color" "red"
-        , style "opacity" "0.8"
-        , style "margin" "1px"
-        ]
-        []
-
-
-
--- Board
-
-
-boardGrid : Grid Bool
-boardGrid =
-    empty 9 18
-
-
-viewBoardGrid =
-    viewGridCells 9 18 boardGrid
-
-
-
--- Line
-
-
-lineGrid : Grid Bool
-lineGrid =
-    empty 4 4
-        |> set 1 0 True
-        |> Result.andThen (set 1 1 True)
-        |> Result.andThen (set 1 2 True)
-        |> Result.andThen (set 1 3 True)
-        |> Result.withDefault (empty 4 4)
-
-
-viewLineGrid =
-    viewGridCells 4 4 lineGrid
-
-
-wsPre =
-    style "white-space" "pre"
-
-
-fontMono =
-    style "font-family" "monospace"
-
-
-fz =
-    style "font-size"
-
-
-pa =
-    style "padding"
-
-
-
--- GRID
-
-
-type Grid a
-    = Grid Int Int (Dict ( Int, Int ) a)
-
-
-type Error
-    = OutOfBounds
-
-
-empty : Int -> Int -> Grid a
-empty w h =
-    Grid w h Dict.empty
-
-
-set : Int -> Int -> a -> Grid a -> Result Error (Grid a)
-set x y a (Grid w h dict) =
-    if x >= 0 && y >= 0 && x <= w && y <= h then
-        Ok (Grid w h (Dict.insert ( x, y ) a dict))
-
-    else
-        Err OutOfBounds
-
-
-get_ : Int -> Int -> Grid a -> Result Error (Maybe a)
-get_ x y (Grid w h dict) =
-    if x >= 0 && y >= 0 && x <= w && y <= h then
-        Ok (Dict.get ( x, y ) dict)
-
-    else
-        Err OutOfBounds
-
-
-getOr : a -> Int -> Int -> Grid a -> Result Error a
-getOr a x y =
-    get_ x y >> Result.map (Maybe.withDefault a)
+    Browser.element
+        { init = init
+        , view = view
+        , update = update
+        , subscriptions = subscriptions
+        }

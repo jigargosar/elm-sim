@@ -27,7 +27,7 @@ type Mask
 
 
 rotateMask (Mask w set) =
-    Set.map (\( x, y ) -> ( y, x )) set
+    Set.map (\( x, y ) -> ( y, w - 1 - x )) set
         |> Mask w
 
 
@@ -36,7 +36,11 @@ lineMask =
 
 
 sMask =
-    Mask 4 (Set.fromList [ ( 0, 0 ), ( 1, 1 ), ( 0, 1 ), ( 1, 2 ) ])
+    Mask 3 (Set.fromList [ ( 1, 1 ), ( 2, 1 ), ( 0, 2 ), ( 1, 2 ) ])
+
+
+zMask =
+    Mask 3 (Set.fromList [ ( 0, 1 ), ( 1, 1 ), ( 1, 2 ), ( 2, 2 ) ])
 
 
 type alias Model =
@@ -98,14 +102,18 @@ view m =
     div [ class "df-row sp10 items-center" ]
         [ [ viewMask cellWidth "red" lineMask
                 |> wrapSvg
-          , viewMask cellWidth "blue" (rotateMask lineMask)
+          , viewMask cellWidth "red" (rotateMask lineMask)
                 |> wrapSvg
-          , viewMask cellWidth "red" sMask
+          , viewMask cellWidth "blue" sMask
                 |> wrapSvg
           , viewMask cellWidth "blue" (rotateMask sMask)
                 |> wrapSvg
+          , viewMask cellWidth "blue" (rotateMask sMask |> rotateMask)
+                |> wrapSvg
+          , viewMask cellWidth "blue" (rotateMask sMask |> rotateMask |> rotateMask)
+                |> wrapSvg
           ]
-            |> div [ class "df-col sp10" ]
+            |> div [ class "df-col items-center sp10" ]
         , viewGrid cellWidth m.width m.height m.grid
             |> wrapSvg
         ]

@@ -103,6 +103,7 @@ init _ =
       , active = initTetron Line
       }
         |> insertShape Line
+        |> tick
     , Cmd.none
     )
 
@@ -113,6 +114,10 @@ insertShape shape model =
         , y = -2
         , active = initTetron shape
     }
+
+
+tick model =
+    { model | y = model.y + 1 }
 
 
 

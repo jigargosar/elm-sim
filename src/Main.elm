@@ -121,23 +121,6 @@ init _ =
         |> tick
         |> tick
         |> tick
-        |> tick
-        |> tick
-        |> tick
-        |> tick
-        |> tick
-        |> tick
-        |> tick
-        |> tick
-        |> tick
-        |> tick
-        |> tick
-        |> tick
-        |> tick
-        |> tick
-        |> tick
-        |> tick
-        |> tick
     , Cmd.none
     )
 

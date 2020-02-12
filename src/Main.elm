@@ -1,7 +1,7 @@
 module Main exposing (main)
 
 import Dict exposing (Dict)
-import Html exposing (div, text)
+import Html exposing (Html, div, text)
 import Html.Attributes exposing (class, style)
 import Set
 
@@ -13,6 +13,7 @@ main =
         ]
 
 
+viewGridCells : Int -> Int -> Grid () -> Html msg
 viewGridCells w h grid =
     List.range 0 (h - 1)
         |> List.map
@@ -39,19 +40,6 @@ viewGridCells w h grid =
             , pa "10px"
             , style "line-height" "1"
             ]
-
-
-
--- Board
-
-
-boardGrid : Grid ()
-boardGrid =
-    empty 9 18
-
-
-viewBoardGrid =
-    viewGridCells 9 18 boardGrid
 
 
 viewOn =
@@ -85,6 +73,19 @@ viewError =
         , style "margin" "1px"
         ]
         []
+
+
+
+-- Board
+
+
+boardGrid : Grid ()
+boardGrid =
+    empty 9 18
+
+
+viewBoardGrid =
+    viewGridCells 9 18 boardGrid
 
 
 

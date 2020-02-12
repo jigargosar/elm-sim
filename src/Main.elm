@@ -1,9 +1,8 @@
 module Main exposing (main)
 
 import Dict exposing (Dict)
-import Html exposing (Html, div, text)
-import Html.Attributes exposing (class, style)
-import Set
+import Html exposing (Html, div)
+import Html.Attributes exposing (style)
 
 
 main =
@@ -13,7 +12,7 @@ main =
         ]
 
 
-viewGridCells : Int -> Int -> Grid () -> Html msg
+viewGridCells : Int -> Int -> Grid Bool -> Html msg
 viewGridCells w h grid =
     List.range 0 (h - 1)
         |> List.map
@@ -21,11 +20,11 @@ viewGridCells w h grid =
                 List.range 0 (w - 1)
                     |> List.map
                         (\x ->
-                            case get x y grid of
-                                Ok (Just _) ->
+                            case getOr False x y grid of
+                                Ok True ->
                                     viewOn
 
-                                Ok Nothing ->
+                                Ok False ->
                                     viewOff
 
                                 Err _ ->
@@ -79,7 +78,7 @@ viewError =
 -- Board
 
 
-boardGrid : Grid ()
+boardGrid : Grid Bool
 boardGrid =
     empty 9 18
 
@@ -92,13 +91,13 @@ viewBoardGrid =
 -- Line
 
 
-lineGrid : Grid ()
+lineGrid : Grid Bool
 lineGrid =
     empty 4 4
-        |> set 1 0 ()
-        |> Result.andThen (set 1 1 ())
-        |> Result.andThen (set 1 2 ())
-        |> Result.andThen (set 1 3 ())
+        |> set 1 0 True
+        |> Result.andThen (set 1 1 True)
+        |> Result.andThen (set 1 2 True)
+        |> Result.andThen (set 1 3 True)
         |> Result.withDefault (empty 4 4)
 
 
@@ -148,10 +147,15 @@ set x y a (Grid w h dict) =
         Err OutOfBounds
 
 
-get : Int -> Int -> Grid a -> Result Error (Maybe a)
-get x y (Grid w h dict) =
+get_ : Int -> Int -> Grid a -> Result Error (Maybe a)
+get_ x y (Grid w h dict) =
     if x >= 0 && y >= 0 && x <= w && y <= h then
         Ok (Dict.get ( x, y ) dict)
 
     else
         Err OutOfBounds
+
+
+getOr : a -> Int -> Int -> Grid a -> Result Error a
+getOr a x y =
+    get_ x y >> Result.map (Maybe.withDefault a)

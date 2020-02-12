@@ -43,6 +43,33 @@ zMask =
     Mask 3 (Set.fromList [ ( 0, 1 ), ( 1, 1 ), ( 1, 2 ), ( 2, 2 ) ])
 
 
+type Shape
+    = Line
+    | S
+    | Z
+
+
+type alias ShapeView =
+    { shape : Shape, mask : Mask, color : String }
+
+
+toShapeView : Shape -> ShapeView
+toShapeView shape =
+    let
+        create =
+            ShapeView shape
+    in
+    case shape of
+        Line ->
+            create lineMask "red"
+
+        S ->
+            create sMask "blue"
+
+        Z ->
+            create zMask "green"
+
+
 type alias Model =
     { grid : Dict Int2 String
     , width : Int
@@ -112,6 +139,15 @@ viewMasksDemo cw =
     , ( "green", zMask )
     ]
         |> List.map (uncurry (viewMaskRotations cw))
+        |> div [ class "df-row sp10 items-center" ]
+
+
+viewShapesDemo cw =
+    [ Line
+    , S
+    , Z
+    ]
+        |> List.map (toShapeView >> viewShapeRotations cw)
         |> div [ class "df-row sp10 items-center" ]
 
 

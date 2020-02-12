@@ -98,8 +98,17 @@ init _ =
       , y = -2
       , active = initTetron Line
       }
+        |> insertShape Line
     , Cmd.none
     )
+
+
+insertShape shape model =
+    { model
+        | x = 4
+        , y = -2
+        , active = initTetron shape
+    }
 
 
 

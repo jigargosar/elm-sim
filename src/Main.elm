@@ -90,6 +90,7 @@ type alias Model =
     , x : Int
     , y : Int
     , active : Tetron
+    , next : Shape
     }
 
 
@@ -110,18 +111,19 @@ init _ =
       , x = 4
       , y = -2
       , active = initTetron Line
+      , next = Line
       }
-        |> insertShape Line
+        |> insertNextShape
         |> tick
     , Cmd.none
     )
 
 
-insertShape shape model =
+insertNextShape model =
     { model
         | x = 4
         , y = -2
-        , active = initTetron shape
+        , active = initTetron model.next
     }
 
 
@@ -130,21 +132,15 @@ tick model =
 
 
 moveActiveDown m =
-    let
-        newMask =
-            translateMask m.x (m.y + 1) m.active.mask
+    if
+        translateMask m.x (m.y + 1) m.active.mask
+            |> maskContainsAny (Dict.keys m.grid |> Set.fromList)
+    then
+        { m | grid = activeGrid m }
+            |> insertNextShape
 
-        _ =
-            if
-                newMask
-                    |> maskContainsAny (Dict.keys m.grid |> Set.fromList)
-            then
-                { m | grid = activeGrid m }
-
-            else
-                { m | y = m.y + 1 }
-    in
-    { m | y = m.y + 1 }
+    else
+        { m | y = m.y + 1 }
 
 
 

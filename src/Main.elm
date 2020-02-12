@@ -100,19 +100,6 @@ viewGrid gridWidth gridHeight grid =
         ]
 
 
-mul =
-    (*)
-
-
-mapEach func =
-    mapBoth func func
-
-
-empty : Html msg
-empty =
-    Html.text ""
-
-
 
 -- Main
 

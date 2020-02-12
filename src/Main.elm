@@ -100,12 +100,16 @@ view m =
             40
     in
     div [ class "df-row sp10 items-center" ]
-        [ [ lineMask, sMask, zMask ]
-            |> List.map (viewMaskRotations cellWidth "red")
+        [ [ ( "red", lineMask ), ( "blue", sMask ), ( "green", zMask ) ]
+            |> List.map (uncurry (viewMaskRotations cellWidth))
             |> div [ class "df-row sp10 items-center" ]
         , viewGrid cellWidth m.width m.height m.grid
             |> wrapSvg
         ]
+
+
+uncurry func ( a, b ) =
+    func a b
 
 
 viewMaskRotations cw color mask =

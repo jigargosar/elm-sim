@@ -30,6 +30,11 @@ maskToList (Mask _ set) =
     Set.toList set
 
 
+translateMask dx dy (Mask w set) =
+    Set.map (\( x, y ) -> ( x + dx, y + dy )) set
+        |> Mask w
+
+
 rotateMask (Mask w set) =
     Set.map (\( x, y ) -> ( y, w - 1 - x )) set
         |> Mask w
@@ -144,12 +149,6 @@ subscriptions _ =
 -- View
 
 
-activeLocations m =
-    m.active.mask
-        |> maskToList
-        |> List.map (\( x, y ) -> ( x + m.x, y + m.y ))
-
-
 activeGrid m =
     let
         isValid w h ( x, y ) =
@@ -158,7 +157,8 @@ activeGrid m =
         pairTo b a =
             ( a, b )
     in
-    activeLocations m
+    translateMask m.x m.y m.active.mask
+        |> maskToList
         |> List.filter (isValid m.width m.height)
         |> List.map (pairTo m.active.color)
         |> Dict.fromList

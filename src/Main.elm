@@ -100,12 +100,19 @@ view m =
             40
     in
     div [ class "df-row sp10 items-center" ]
-        [ [ ( "red", lineMask ), ( "blue", sMask ), ( "green", zMask ) ]
-            |> List.map (uncurry (viewMaskRotations cellWidth))
-            |> div [ class "df-row sp10 items-center" ]
+        [ viewMasksDemo cellWidth
         , viewGrid cellWidth m.width m.height m.grid
             |> wrapSvg
         ]
+
+
+viewMasksDemo cw =
+    [ ( "red", lineMask )
+    , ( "blue", sMask )
+    , ( "green", zMask )
+    ]
+        |> List.map (uncurry (viewMaskRotations cw))
+        |> div [ class "df-row sp10 items-center" ]
 
 
 uncurry func ( a, b ) =

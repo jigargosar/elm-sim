@@ -9,7 +9,6 @@ import Html.Attributes exposing (class, style)
 import Set exposing (Set)
 import Svg exposing (g, rect, svg)
 import Svg.Attributes exposing (fill, stroke)
-import Tuple exposing (mapBoth)
 import TypedSvg.Attributes exposing (transform, viewBox)
 import TypedSvg.Attributes.InPx exposing (height, strokeWidth, width)
 import TypedSvg.Types exposing (Transform(..))
@@ -27,8 +26,17 @@ type Mask
     = Mask Int (Set Int2)
 
 
+rotateMask (Mask w set) =
+    Set.map (\( x, y ) -> ( y, x )) set
+        |> Mask w
+
+
 lineMask =
     Mask 4 (Set.fromList [ ( 1, 0 ), ( 1, 1 ), ( 1, 2 ), ( 1, 3 ) ])
+
+
+sMask =
+    Mask 4 (Set.fromList [ ( 0, 0 ), ( 1, 1 ), ( 0, 1 ), ( 1, 2 ) ])
 
 
 type alias Model =
@@ -88,17 +96,27 @@ view m =
             40
     in
     div [ class "df-row sp10 items-center" ]
-        [ div
-            [ style "border" "1px dotted gray"
-            , class "lh0"
-            ]
-            [ viewMask cellWidth "red" lineMask ]
-        , div
-            [ style "border" "1px dotted gray"
-            , class "lh0"
-            ]
-            [ viewGrid cellWidth m.width m.height m.grid ]
+        [ [ viewMask cellWidth "red" lineMask
+                |> wrapSvg
+          , viewMask cellWidth "blue" (rotateMask lineMask)
+                |> wrapSvg
+          , viewMask cellWidth "red" sMask
+                |> wrapSvg
+          , viewMask cellWidth "blue" (rotateMask sMask)
+                |> wrapSvg
+          ]
+            |> div [ class "df-col sp10" ]
+        , viewGrid cellWidth m.width m.height m.grid
+            |> wrapSvg
         ]
+
+
+wrapSvg s =
+    div
+        [ style "border" "1px dotted gray"
+        , class "lh0"
+        ]
+        [ s ]
 
 
 viewMask cw color (Mask maskWidth set) =

@@ -30,6 +30,10 @@ maskToList (Mask _ set) =
     Set.toList set
 
 
+maskContainsAny setB (Mask _ setA) =
+    Set.intersect setA setB |> Set.isEmpty
+
+
 translateMask dx dy (Mask w set) =
     Set.map (\( x, y ) -> ( x + dx, y + dy )) set
         |> Mask w
@@ -122,7 +126,25 @@ insertShape shape model =
 
 
 tick model =
-    { model | y = model.y + 1 }
+    moveActiveDown model
+
+
+moveActiveDown m =
+    let
+        newMask =
+            translateMask m.x (m.y + 1) m.active.mask
+
+        _ =
+            if
+                newMask
+                    |> maskContainsAny (Dict.keys m.grid |> Set.fromList)
+            then
+                { m | grid = activeGrid m }
+
+            else
+                { m | y = m.y + 1 }
+    in
+    { m | y = m.y + 1 }
 
 
 

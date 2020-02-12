@@ -27,9 +27,6 @@
   font-size: large;
 }
 
-.dif {
-  display: inline-flex;
-}
 .df-row {
   display: flex;
   flex-direction: row;

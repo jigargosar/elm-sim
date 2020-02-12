@@ -87,13 +87,17 @@ view m =
         cellWidth =
             40
     in
-    div []
+    div [ class "df-row sp10 items-center" ]
         [ div
             [ style "border" "1px dotted gray"
-            , class "lh0 p10 dif"
+            , class "lh0"
             ]
             [ viewMask cellWidth "red" lineMask ]
-        , div [ class "lh0 p10" ] [ viewGrid cellWidth m.width m.height m.grid ]
+        , div
+            [ style "border" "1px dotted gray"
+            , class "lh0"
+            ]
+            [ viewGrid cellWidth m.width m.height m.grid ]
         ]
 
 

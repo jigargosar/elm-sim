@@ -1,7 +1,6 @@
 /* Functional CSS Styles */
 
-
-.lh-0 {
+.lh0 {
   line-height: 0;
 }
 
@@ -12,106 +11,107 @@
   pointer-events: all;
 }
 
-.fg-gray{
+.fg-gray {
   color: gray;
 }
 
-.fg-inherit{
+.fg-inherit {
   color: inherit;
 }
 
-.fw-bold{
+.fw-bold {
   font-weight: bold;
 }
 
-.fz-large{
+.fz-large {
   font-size: large;
 }
 
-.df-row{
+.dif {
+  display: inline-flex;
+}
+.df-row {
   display: flex;
   flex-direction: row;
 }
 
-.df-col{
+.df-col {
   display: flex;
   flex-direction: column;
 }
 
-.items-center{
+.items-center {
   align-items: center;
 }
 
-.justify-center{
+.justify-center {
   justify-content: center;
 }
 
-.w-100{
+.w-100 {
   width: 100%;
 }
 
-.w600{
+.w600 {
   width: 600px;
 }
 
-.mx-auto{
+.mx-auto {
   margin-left: auto;
   margin-right: auto;
 }
 
-.p5{
+.p5 {
   padding: 5px;
 }
-.p10{
+.p10 {
   padding: 10px;
 }
-.p15{
+.p15 {
   padding: 15px;
 }
 
-.p20{
+.p20 {
   padding: 20px;
 }
 
-.ph5{
+.ph5 {
   padding-left: 5px;
   padding-right: 5px;
 }
-.ph10{
+.ph10 {
   padding-left: 10px;
   padding-right: 10px;
 }
-.ph15{
+.ph15 {
   padding-left: 15px;
   padding-right: 15px;
 }
 
-.ph20{
+.ph20 {
   padding-left: 20px;
   padding-right: 20px;
 }
 
-
-.pv5{
+.pv5 {
   padding-top: 5px;
   padding-bottom: 5px;
 }
-.pv10{
+.pv10 {
   padding-top: 10px;
   padding-bottom: 10px;
 }
-.pv15{
+.pv15 {
   padding-top: 15px;
   padding-bottom: 15px;
 }
 
-.pv20{
+.pv20 {
   padding-top: 20px;
   padding-bottom: 20px;
 }
 
-
-.fg1{
+.fg1 {
   flex-grow: 1;
 }
 
@@ -144,7 +144,7 @@
   margin-right: 0;
 }
 
-.mono-board{
+.mono-board {
   font-family: monospace;
   white-space: pre;
   font-size: 30px;

@@ -4,7 +4,9 @@ module Main exposing (main)
 
 import Browser
 import Dict exposing (Dict)
-import Html exposing (Html)
+import Html exposing (Html, div)
+import Html.Attributes exposing (class, style)
+import Set exposing (Set)
 import Svg exposing (g, rect, svg)
 import Svg.Attributes exposing (fill)
 import Tuple exposing (mapBoth)
@@ -19,6 +21,14 @@ import TypedSvg.Types exposing (Transform(..))
 
 type alias Int2 =
     ( Int, Int )
+
+
+type Mask
+    = Mask Int (Set Int2)
+
+
+lineMask =
+    Mask 4 (Set.fromList [ ( 1, 0 ), ( 1, 1 ), ( 1, 2 ), ( 1, 3 ) ])
 
 
 type alias Model =
@@ -73,14 +83,43 @@ subscriptions _ =
 
 view : Model -> Html Msg
 view m =
-    viewGrid m.width m.height m.grid
-
-
-viewGrid gridWidth gridHeight grid =
     let
-        cw =
+        cellWidth =
             40
+    in
+    div []
+        [ div
+            [ style "border" "1px dotted gray"
+            , class "lh0 p10 dif"
+            ]
+            [ viewMask cellWidth "red" lineMask ]
+        , div [ class "lh0 p10" ] [ viewGrid cellWidth m.width m.height m.grid ]
+        ]
 
+
+viewMask cw color (Mask maskWidth set) =
+    let
+        w =
+            toFloat maskWidth * cw
+
+        square ( x, y ) =
+            rect
+                [ width cw
+                , height cw
+                , fill color
+                , transform [ Translate (toFloat x * cw) (toFloat y * cw) ]
+                ]
+                []
+    in
+    svg [ viewBox 0 0 w w, width w, height w ]
+        [ Set.toList set
+            |> List.map square
+            |> g []
+        ]
+
+
+viewGrid cw gridWidth gridHeight grid =
+    let
         square ( x, y ) color =
             rect
                 [ width cw

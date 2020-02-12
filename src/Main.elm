@@ -8,10 +8,10 @@ import Html exposing (Html, div)
 import Html.Attributes exposing (class, style)
 import Set exposing (Set)
 import Svg exposing (g, rect, svg)
-import Svg.Attributes exposing (fill)
+import Svg.Attributes exposing (fill, stroke)
 import Tuple exposing (mapBoth)
 import TypedSvg.Attributes exposing (transform, viewBox)
-import TypedSvg.Attributes.InPx exposing (height, width)
+import TypedSvg.Attributes.InPx exposing (height, strokeWidth, width)
 import TypedSvg.Types exposing (Transform(..))
 
 
@@ -111,6 +111,8 @@ viewMask cw color (Mask maskWidth set) =
                 [ width cw
                 , height cw
                 , fill color
+                , strokeWidth 1
+                , stroke "white"
                 , transform [ Translate (toFloat x * cw) (toFloat y * cw) ]
                 ]
                 []

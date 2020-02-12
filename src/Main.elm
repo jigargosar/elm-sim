@@ -49,15 +49,15 @@ type Shape
     | Z
 
 
-type alias ShapeView =
+type alias Tetron =
     { shape : Shape, mask : Mask, color : String }
 
 
-toShapeView : Shape -> ShapeView
-toShapeView shape =
+initTetron : Shape -> Tetron
+initTetron shape =
     let
         create =
-            ShapeView shape
+            Tetron shape
     in
     case shape of
         Line ->
@@ -74,6 +74,9 @@ type alias Model =
     { grid : Dict Int2 String
     , width : Int
     , height : Int
+    , x : Int
+    , y : Int
+    , active : Tetron
     }
 
 
@@ -91,6 +94,9 @@ init _ =
                 |> Dict.insert ( 10, 20 ) "black"
       , width = 10
       , height = 20
+      , x = 4
+      , y = -2
+      , active = initTetron Line
       }
     , Cmd.none
     )
@@ -138,7 +144,7 @@ viewShapesDemo cw =
     , S
     , Z
     ]
-        |> List.map (toShapeView >> viewShapeRotations cw)
+        |> List.map (initTetron >> viewShapeRotations cw)
         |> div [ class "df-row sp10 items-center" ]
 
 

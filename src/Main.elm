@@ -31,7 +31,11 @@ maskToList (Mask _ set) =
 
 
 maskContainsAny setB (Mask _ setA) =
-    Set.intersect setA setB |> Set.isEmpty
+    Set.intersect setA setB |> Set.isEmpty |> not
+
+
+maskAny pred (Mask _ setA) =
+    Set.toList setA |> List.any pred
 
 
 translateMask dx dy (Mask w set) =
@@ -115,6 +119,25 @@ init _ =
       }
         |> insertNextShape
         |> tick
+        |> tick
+        |> tick
+        |> tick
+        |> tick
+        |> tick
+        |> tick
+        |> tick
+        |> tick
+        |> tick
+        |> tick
+        |> tick
+        |> tick
+        |> tick
+        |> tick
+        |> tick
+        |> tick
+        |> tick
+        |> tick
+        |> tick
     , Cmd.none
     )
 
@@ -132,9 +155,13 @@ tick model =
 
 
 moveActiveDown m =
+    let
+        newMask =
+            translateMask m.x (m.y + 1) m.active.mask
+    in
     if
-        translateMask m.x (m.y + 1) m.active.mask
-            |> maskContainsAny (Dict.keys m.grid |> Set.fromList)
+        maskContainsAny (Dict.keys m.grid |> Set.fromList) newMask
+            || maskAny (\( _, y ) -> y >= m.height) newMask
     then
         { m | grid = activeGrid m }
             |> insertNextShape

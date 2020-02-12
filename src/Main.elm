@@ -124,22 +124,13 @@ view : Model -> Html Msg
 view m =
     let
         cellWidth =
-            40
+            30
     in
     div [ class "df-row sp10 items-center" ]
-        [ viewMasksDemo cellWidth
+        [ viewShapesDemo cellWidth
         , viewGrid cellWidth m.width m.height m.grid
             |> wrapSvg
         ]
-
-
-viewMasksDemo cw =
-    [ ( "red", lineMask )
-    , ( "blue", sMask )
-    , ( "green", zMask )
-    ]
-        |> List.map (uncurry (viewMaskRotations cw))
-        |> div [ class "df-row sp10 items-center" ]
 
 
 viewShapesDemo cw =
@@ -151,11 +142,7 @@ viewShapesDemo cw =
         |> div [ class "df-row sp10 items-center" ]
 
 
-uncurry func ( a, b ) =
-    func a b
-
-
-viewMaskRotations cw color mask =
+viewShapeRotations cw { color, mask } =
     List.range 0 3
         |> List.map
             (\n ->

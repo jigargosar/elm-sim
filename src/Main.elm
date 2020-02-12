@@ -144,6 +144,12 @@ subscriptions _ =
 -- View
 
 
+activeLocations m =
+    m.active.mask
+        |> maskToList
+        |> List.map (\( x, y ) -> ( x + m.x, y + m.y ))
+
+
 activeGrid m =
     let
         isValid w h ( x, y ) =
@@ -152,9 +158,7 @@ activeGrid m =
         pairTo b a =
             ( a, b )
     in
-    m.active.mask
-        |> maskToList
-        |> List.map (\( x, y ) -> ( x + m.x, y + m.y ))
+    activeLocations m
         |> List.filter (isValid m.width m.height)
         |> List.map (pairTo m.active.color)
         |> Dict.fromList

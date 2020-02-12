@@ -13,23 +13,14 @@ main =
         ]
 
 
-
--- Board
-
-
-boardGrid : Grid ()
-boardGrid =
-    empty 9 18
-
-
-viewBoardGrid =
-    List.range 0 (18 - 1)
+viewGridCells w h grid =
+    List.range 0 (h - 1)
         |> List.map
             (\y ->
-                List.range 0 (9 - 1)
+                List.range 0 (w - 1)
                     |> List.map
                         (\x ->
-                            case get x y boardGrid of
+                            case get x y grid of
                                 Ok (Just _) ->
                                     viewOn
 
@@ -48,6 +39,19 @@ viewBoardGrid =
             , pa "10px"
             , style "line-height" "1"
             ]
+
+
+
+-- Board
+
+
+boardGrid : Grid ()
+boardGrid =
+    empty 9 18
+
+
+viewBoardGrid =
+    viewGridCells 9 18 boardGrid
 
 
 viewOn =
@@ -98,33 +102,7 @@ lineGrid =
 
 
 viewLineGrid =
-    List.range 0 3
-        |> List.map
-            (\y ->
-                List.range 0 3
-                    |> List.map
-                        (\x ->
-                            case get x y lineGrid of
-                                Ok (Just _) ->
-                                    "1"
-
-                                Ok Nothing ->
-                                    "0"
-
-                                Err _ ->
-                                    "X"
-                        )
-            )
-        |> List.map (String.join "")
-        |> String.join "\n"
-        |> text
-        |> List.singleton
-        |> div
-            [ wsPre
-            , fontMono
-            , fz "30px"
-            , pa "10px"
-            ]
+    viewGridCells 4 4 lineGrid
 
 
 wsPre =

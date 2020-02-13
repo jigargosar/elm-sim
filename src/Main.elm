@@ -369,6 +369,15 @@ viewGrid cw state gridWidth gridHeight grid =
         ( w, h ) =
             ( toFloat gridWidth * cw, toFloat gridHeight * cw )
 
+        filledText string color attrs =
+            text_
+                (TypedSvg.Attributes.dominantBaseline TypedSvg.Types.DominantBaselineCentral
+                    :: TypedSvg.Attributes.textAnchor TypedSvg.Types.AnchorMiddle
+                    :: fill color
+                    :: attrs
+                )
+                [ text string ]
+
         viewBoxCentered width_ height_ =
             viewBox (width_ * -0.5) (height_ * -0.5) width_ height_
     in
@@ -385,11 +394,7 @@ viewGrid cw state gridWidth gridHeight grid =
                             ( w * 0.75, w / 10 )
                       in
                       filledRect rw rh "rgba(166, 166, 166, .902)" [] []
-                    , text_
-                        [ TypedSvg.Attributes.dominantBaseline TypedSvg.Types.DominantBaselineCentral
-                        , TypedSvg.Attributes.textAnchor TypedSvg.Types.AnchorMiddle
-                        ]
-                        [ text "GAME OVER" ]
+                    , filledText "GAME OVER" "" []
                     ]
         ]
 

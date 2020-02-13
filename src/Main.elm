@@ -185,14 +185,19 @@ tick model =
     case model.state of
         Running ->
             tickFall model
+                |> tickRotate
 
         GameOver ->
             model
 
 
-onRotate : Model -> Model
-onRotate m =
-    { m | active = rotateMask m.active }
+tickRotate : Model -> Model
+tickRotate m =
+    if m.shouldRotate then
+        { m | active = rotateMask m.active, shouldRotate = False }
+
+    else
+        { m | shouldRotate = False }
 
 
 tickFall : Model -> Model
@@ -283,7 +288,7 @@ update message model =
             )
 
         OnRotate ->
-            ( onRotate model, Cmd.none )
+            ( { model | shouldRotate = True }, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg

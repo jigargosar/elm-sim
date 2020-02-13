@@ -29,8 +29,12 @@ maskToList (Mask _ list) =
     list
 
 
+shiftNum2 dx dy ( x, y ) =
+    ( x + dx, y + dy )
+
+
 translateMask dx dy (Mask w list) =
-    List.map (\( x, y ) -> ( x + dx, y + dy )) list
+    List.map (shiftNum2 dx dy) list
         |> Mask w
 
 
@@ -152,16 +156,12 @@ tick model =
     moveActiveDown model
 
 
-shiftNum2 dx dy ( x, y ) =
-    ( x + dx, y + dy )
-
-
 moveActiveDown : Model -> Model
 moveActiveDown m =
     let
-        newPoints =
-            maskToList m.active
-                |> List.map (shiftNum2 m.x m.y)
+        nextMaskPoints =
+            translateMask m.x (m.y + 1) m.active
+                |> maskToList
 
         beyondBottom ( _, y ) =
             y >= m.height
@@ -172,7 +172,7 @@ moveActiveDown m =
         isInvalid p =
             gridMember p || beyondBottom p
     in
-    if List.any isInvalid newPoints then
+    if List.any isInvalid nextMaskPoints then
         { m | grid = gridWithActiveMask m }
             |> insertNext
 

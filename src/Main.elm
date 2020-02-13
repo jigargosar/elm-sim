@@ -202,22 +202,18 @@ tickRotate m =
 
 tickShiftX : Model -> Model
 tickShiftX m =
-    let
-        newModel =
-            case ( m.leftPressed, m.rightPressed ) of
-                ( True, True ) ->
-                    m
+    case ( m.leftPressed, m.rightPressed ) of
+        ( True, True ) ->
+            m
 
-                ( False, False ) ->
-                    m
+        ( False, False ) ->
+            m
 
-                ( True, False ) ->
-                    tryShiftX -1 m
+        ( True, False ) ->
+            tryShiftX -1 m
 
-                ( False, True ) ->
-                    tryShiftX 1 m
-    in
-    { newModel | leftPressed = False, rightPressed = False }
+        ( False, True ) ->
+            tryShiftX 1 m
 
 
 tryRotate : Model -> Model

@@ -134,7 +134,7 @@ init _ =
       , active = emptyMask
       , next = Line
       , ticks = 0
-      , fall = { ticks = 0, delay = 0 }
+      , fall = { ticks = 0, delay = 10 }
       , leftPressed = False
       , rightPressed = False
       , upPressed = False

@@ -102,8 +102,6 @@ type alias Model =
     , next : TetronName
     , ticks : Int
     , fall : { ticks : Int, delay : Int }
-    , leftPressed : Bool
-    , rightPressed : Bool
     , keys : Set String
     , state : State
     , seed : Seed
@@ -136,8 +134,6 @@ init _ =
       , next = Line
       , ticks = 0
       , fall = { ticks = 0, delay = 10 }
-      , leftPressed = False
-      , rightPressed = False
       , keys = Set.empty
       , state = Running
       , seed = Random.initialSeed 0
@@ -197,7 +193,7 @@ isPressed string m =
 
 tickShiftX : Model -> Model
 tickShiftX m =
-    case ( m.leftPressed, m.rightPressed ) of
+    case ( isPressed "ArrowLeft" m, isPressed "ArrowRight" m ) of
         ( True, True ) ->
             m
 

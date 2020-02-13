@@ -150,7 +150,7 @@ tick model =
     moveActiveDown model
 
 
-shiftPoint dx dy ( x, y ) =
+shiftNum2 dx dy ( x, y ) =
     ( x + dx, y + dy )
 
 
@@ -159,7 +159,7 @@ moveActiveDown m =
     let
         newPoints =
             maskToList m.active
-                |> List.map (shiftPoint m.x m.y)
+                |> List.map (shiftNum2 m.x m.y)
 
         beyondBottom ( _, y ) =
             y >= m.height

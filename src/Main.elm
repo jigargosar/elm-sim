@@ -236,12 +236,12 @@ moveActiveDown m =
 
         gridMember p =
             Dict.member p m.grid
-
-        isInvalid p =
-            gridMember p || beyondBottom p
     in
-    if List.any isInvalid nextMaskPoints then
-        if List.all beyondTop currentMaskPoints then
+    if
+        List.any gridMember (nextMaskPoints ++ currentMaskPoints)
+            || List.any beyondBottom nextMaskPoints
+    then
+        if List.any beyondTop currentMaskPoints then
             { m | state = GameOver }
 
         else

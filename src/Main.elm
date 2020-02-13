@@ -101,7 +101,6 @@ type alias Model =
     , next : TetronName
     , ticks : Int
     , fall : { ticks : Int, delay : Int }
-    , shouldRotate : Bool
     , leftPressed : Bool
     , rightPressed : Bool
     , upPressed : Bool
@@ -136,7 +135,6 @@ init _ =
       , next = Line
       , ticks = 0
       , fall = { ticks = 0, delay = 0 }
-      , shouldRotate = False
       , leftPressed = False
       , rightPressed = False
       , upPressed = False
@@ -334,7 +332,7 @@ gridWithActiveMask m =
 
 type Msg
     = Tick
-    | OnRotate
+    | OnUpPressed
     | OnLeft
     | OnRight
 
@@ -348,8 +346,8 @@ update message model =
             , Cmd.none
             )
 
-        OnRotate ->
-            ( { model | shouldRotate = True }, Cmd.none )
+        OnUpPressed ->
+            ( { model | upPressed = True }, Cmd.none )
 
         OnLeft ->
             ( { model | leftPressed = True }, Cmd.none )
@@ -363,7 +361,7 @@ subscriptions _ =
     Sub.batch
         [ Browser.Events.onAnimationFrame (always Tick)
         , JD.oneOf
-            [ key "ArrowUp" OnRotate
+            [ key "ArrowUp" OnUpPressed
             , key "ArrowLeft" OnLeft
             , key "ArrowRight" OnRight
             ]

@@ -23,33 +23,33 @@ type alias Int2 =
 
 
 type Mask
-    = Mask Int (Set Int2)
+    = Mask Int (List Int2)
 
 
-maskToSet (Mask _ set) =
-    set
+maskToList (Mask _ list) =
+    list
 
 
-translateMask dx dy (Mask w set) =
-    Set.map (\( x, y ) -> ( x + dx, y + dy )) set
+translateMask dx dy (Mask w list) =
+    List.map (\( x, y ) -> ( x + dx, y + dy )) list
         |> Mask w
 
 
-rotateMask (Mask w set) =
-    Set.map (\( x, y ) -> ( y, w - 1 - x )) set
+rotateMask (Mask w list) =
+    List.map (\( x, y ) -> ( y, w - 1 - x )) list
         |> Mask w
 
 
 lineMask =
-    Mask 4 (Set.fromList [ ( 0, 1 ), ( 1, 1 ), ( 2, 1 ), ( 3, 1 ) ])
+    Mask 4 [ ( 0, 1 ), ( 1, 1 ), ( 2, 1 ), ( 3, 1 ) ]
 
 
 sMask =
-    Mask 3 (Set.fromList [ ( 1, 1 ), ( 2, 1 ), ( 0, 2 ), ( 1, 2 ) ])
+    Mask 3 [ ( 1, 1 ), ( 2, 1 ), ( 0, 2 ), ( 1, 2 ) ]
 
 
 zMask =
-    Mask 3 (Set.fromList [ ( 0, 1 ), ( 1, 1 ), ( 1, 2 ), ( 2, 2 ) ])
+    Mask 3 [ ( 0, 1 ), ( 1, 1 ), ( 1, 2 ), ( 2, 2 ) ]
 
 
 type TetronName
@@ -158,12 +158,12 @@ moveActiveDown m =
             ( x + dx, y + dy )
 
         foo =
-            maskToSet m.active
-                |> Set.map (shiftPoint m.x m.y)
+            maskToList m.active
+                |> List.map (shiftPoint m.x m.y)
     in
     if
-        Set.isEmpty (Set.intersect (Dict.keys m.grid |> Set.fromList) foo)
-            || List.any (\( _, y ) -> y >= m.height) (Set.toList foo)
+        List.any (List.member >> (|>) (Dict.keys m.grid)) foo
+            || List.any (\( _, y ) -> y >= m.height) foo
     then
         { m | grid = activeGrid m }
             |> insertNext
@@ -206,8 +206,7 @@ activeGrid m =
             ( a, b )
     in
     translateMask m.x m.y m.active
-        |> maskToSet
-        |> Set.toList
+        |> maskToList
         |> List.filter (isValid m.width m.height)
         |> List.map (pairTo m.color)
         |> Dict.fromList
@@ -261,7 +260,7 @@ wrapSvg s =
         [ s ]
 
 
-viewMask cw color (Mask maskWidth set) =
+viewMask cw color (Mask maskWidth list) =
     let
         w =
             toFloat maskWidth * cw
@@ -278,7 +277,7 @@ viewMask cw color (Mask maskWidth set) =
                 []
     in
     svg [ viewBox 0 0 w w, width w, height w ]
-        [ Set.toList set
+        [ list
             |> List.map square
             |> g []
         ]

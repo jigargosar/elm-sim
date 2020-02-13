@@ -121,7 +121,7 @@ init _ =
       , active = emptyMask
       , next = Line
       , ticks = 0
-      , fall = { ticks = 0, delay = 10 }
+      , fall = { ticks = 0, delay = 1 }
       }
         |> insertNext
         |> tick
@@ -166,7 +166,7 @@ tickFall model =
         newFall =
             { fall | ticks = fall.ticks + 1 }
     in
-    if modBy fall.delay fall.ticks == 0 then
+    if fall.delay <= 0 || modBy fall.delay fall.ticks == 0 then
         { model | fall = newFall }
             |> moveActiveDown
 

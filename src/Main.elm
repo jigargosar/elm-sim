@@ -56,6 +56,10 @@ zMask =
     Mask 3 [ ( 0, 1 ), ( 1, 1 ), ( 1, 2 ), ( 2, 2 ) ]
 
 
+emptyMask =
+    Mask 0 []
+
+
 type TetronName
     = Line
     | S
@@ -103,13 +107,6 @@ type alias Flags =
 
 init : Flags -> ( Model, Cmd Msg )
 init _ =
-    let
-        activeMask =
-            (tetronFromName Line).mask
-
-        activeColor =
-            (tetronFromName Line).color
-    in
     ( { grid =
             Dict.empty
                 |> Dict.insert ( 0, 0 ) "blue"
@@ -120,8 +117,8 @@ init _ =
       , height = 20
       , x = 4
       , y = -2
-      , color = activeColor
-      , active = activeMask
+      , color = ""
+      , active = emptyMask
       , next = Line
       , ticks = 0
       , fall = { ticks = 0, delay = 10 }

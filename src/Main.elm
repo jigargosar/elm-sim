@@ -333,8 +333,8 @@ gridWithActiveMask m =
 type Msg
     = Tick
     | OnUpPressed
-    | OnLeft
-    | OnRight
+    | OnLeftPressed
+    | OnRightPressed
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -349,10 +349,10 @@ update message model =
         OnUpPressed ->
             ( { model | upPressed = True }, Cmd.none )
 
-        OnLeft ->
+        OnLeftPressed ->
             ( { model | leftPressed = True }, Cmd.none )
 
-        OnRight ->
+        OnRightPressed ->
             ( { model | rightPressed = True }, Cmd.none )
 
 
@@ -362,8 +362,8 @@ subscriptions _ =
         [ Browser.Events.onAnimationFrame (always Tick)
         , JD.oneOf
             [ key "ArrowUp" OnUpPressed
-            , key "ArrowLeft" OnLeft
-            , key "ArrowRight" OnRight
+            , key "ArrowLeft" OnLeftPressed
+            , key "ArrowRight" OnRightPressed
             ]
             |> Browser.Events.onKeyDown
         ]

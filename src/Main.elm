@@ -211,7 +211,7 @@ moveActiveDown m =
     in
     if List.any isInvalid nextMaskPoints then
         if List.all beyondTop currentMaskPoints then
-            Debug.todo "GAMEOVER"
+            { m | state = GameOver }
 
         else
             { m | grid = gridWithActiveMask m }

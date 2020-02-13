@@ -9,6 +9,7 @@ import Html exposing (Html, div, text)
 import Html.Attributes exposing (style)
 import Json.Decode as JD
 import Random exposing (Seed)
+import Set exposing (Set)
 import String
 import Svg exposing (g, rect, svg, text_)
 import Svg.Attributes exposing (class, fill, stroke)
@@ -104,6 +105,7 @@ type alias Model =
     , leftPressed : Bool
     , rightPressed : Bool
     , upPressed : Bool
+    , keys : Set String
     , state : State
     , seed : Seed
     }
@@ -138,6 +140,7 @@ init _ =
       , leftPressed = False
       , rightPressed = False
       , upPressed = False
+      , keys = Set.empty
       , state = Running
       , seed = Random.initialSeed 0
       }
@@ -332,6 +335,8 @@ gridWithActiveMask m =
 
 type Msg
     = Tick
+    | OnKeyDown String
+    | OnKeyUp String
     | OnArrowUp Bool
     | OnArrowLeft Bool
     | OnArrowRigh Bool
@@ -354,6 +359,12 @@ update message model =
 
         OnArrowRigh isPressed ->
             ( { model | rightPressed = isPressed }, Cmd.none )
+
+        OnKeyDown k ->
+            ( { model | keys = Set.insert k model.keys }, Cmd.none )
+
+        OnKeyUp k ->
+            ( { model | keys = Set.remove k model.keys }, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg

@@ -5,10 +5,10 @@ module Main exposing (main)
 import Browser
 import Browser.Events
 import Dict exposing (Dict)
-import Html exposing (Html, div)
-import Html.Attributes exposing (class, style)
-import Svg exposing (g, rect, svg)
-import Svg.Attributes exposing (fill, stroke)
+import Html exposing (Html, div, text)
+import Html.Attributes exposing (style)
+import Svg exposing (g, rect, svg, text_)
+import Svg.Attributes exposing (class, fill, stroke)
 import TypedSvg.Attributes exposing (transform, viewBox)
 import TypedSvg.Attributes.InPx exposing (height, strokeWidth, width)
 import TypedSvg.Types exposing (Transform(..))
@@ -275,7 +275,7 @@ view m =
     in
     div [ class "df-row sp10 items-center" ]
         [ viewShapesDemo cellWidth
-        , viewGrid cellWidth m.width m.height (gridWithActiveMask m)
+        , viewGrid cellWidth m.state m.width m.height (gridWithActiveMask m)
             |> wrapSvg
         ]
 
@@ -337,7 +337,7 @@ viewMask cw color (Mask maskWidth list) =
         ]
 
 
-viewGrid cw gridWidth gridHeight grid =
+viewGrid cw state gridWidth gridHeight grid =
     let
         square ( x, y ) color =
             rect
@@ -355,6 +355,12 @@ viewGrid cw gridWidth gridHeight grid =
         [ Dict.map square grid
             |> Dict.values
             |> g []
+        , case state of
+            Running ->
+                g [] []
+
+            GameOver ->
+                text_ [ transform [ Translate 100 100 ] ] [ text "game over" ]
         ]
 
 

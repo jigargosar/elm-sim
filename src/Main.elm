@@ -390,11 +390,14 @@ viewGrid cw state gridWidth gridHeight grid =
             |> Dict.values
             |> groupGrid
         , case state of
-            _ ->
+            GameOver ->
                 [ filledRect (w * 0.75) (w / 10) "rgba(166, 166, 166, .902)" [] []
                 , filledText "GAME OVER" "" []
                 ]
                     |> group [] []
+
+            Running ->
+                text ""
         ]
 
 

@@ -340,54 +340,51 @@ viewMask cw color (Mask maskWidth list) =
 
 viewGrid cw state gridWidth gridHeight grid =
     let
-        square ( x, y ) color =
+        filledSquare sideWidth color transforms attrs =
             rect
-                [ width cw
-                , height cw
-                , fill color
-                , transform [ Translate (toFloat x * cw) (toFloat y * cw) ]
-                ]
+                (width sideWidth
+                    :: height sideWidth
+                    :: fill color
+                    :: transform (transforms ++ [ Translate (sideWidth * -0.5) (sideWidth * -0.5) ])
+                    :: attrs
+                )
+                []
+
+        filledRect width_ height_ color transforms attrs =
+            rect
+                (width width_
+                    :: height height_
+                    :: fill color
+                    :: transform (transforms ++ [ Translate (width_ * -0.5) (height_ * -0.5) ])
+                    :: attrs
+                )
+                []
+
+        square ( x, y ) color =
+            filledSquare cw
+                color
+                [ Translate (toFloat x * cw) (toFloat y * cw) ]
                 []
 
         ( w, h ) =
             ( toFloat gridWidth * cw, toFloat gridHeight * cw )
+
+        viewBoxCentered width_ height_ =
+            viewBox (width_ * -0.5) (height_ * -0.5) width_ height_
     in
-    svg [ viewBox 0 0 w h, width w, height h ]
+    svg [ viewBoxCentered w h, width w, height h ]
         [ Dict.map square grid
             |> Dict.values
-            |> g []
+            |> g [ transform [ Translate ((cw - w) * 0.5) ((cw - h) * 0.5) ] ]
         , case state of
             _ ->
                 g
-                    [--style "transform-origin" "center"
-                     --, style "transform"
-                     --    ("translate(" ++ fromFloat (w / 2) ++ "px," ++ fromFloat (h / 2) ++ "px)")
-                    ]
+                    []
                     [ let
                         ( rw, rh ) =
                             ( w * 0.75, w / 10 )
-
-                        ( x, y ) =
-                            ( w / 2 - rw / 2, h / 2 - rh / 2 )
                       in
-                      rect
-                        [ styleInPx "width" rw
-                        , styleInPx "height" rh
-
-                        --, InPx.x (-w * 0.75 * 0.5)
-                        --, InPx.y (-w / 10 * 0.5)
-                        , InPx.x x
-                        , InPx.y y
-                        , fill "rgba(166, 166, 166, .902)"
-                        , style "transform-origin" "center"
-                        , [ translatePx (-rw / 2) (-rh / 2)
-                          , scale 1.5
-                          , translatePx (rw / 2) (rh / 2)
-                          ]
-                            |> String.join " "
-                            |> style "transform"
-                        ]
-                        []
+                      filledRect rw rh "rgba(166, 166, 166, .902)" [] []
                     , text_
                         [ TypedSvg.Attributes.dominantBaseline TypedSvg.Types.DominantBaselineCentral
                         , TypedSvg.Attributes.textAnchor TypedSvg.Types.AnchorMiddle
@@ -395,14 +392,6 @@ viewGrid cw state gridWidth gridHeight grid =
                         [ text "GAME OVER" ]
                     ]
         ]
-
-
-translatePx dx dy =
-    "translate(" ++ fromFloat dx ++ "px," ++ fromFloat dy ++ "px)"
-
-
-scale s =
-    [ "scale(", fromFloat s, ")" ] |> String.join ""
 
 
 styleInPx name float =

@@ -120,12 +120,7 @@ type alias Flags =
 
 init : Flags -> ( Model, Cmd Msg )
 init _ =
-    ( { grid =
-            Dict.empty
-                |> Dict.insert ( 0, 0 ) "blue"
-                |> Dict.insert ( 1, 1 ) "red"
-                |> Dict.insert ( 10 - 1, 20 - 1 ) "black"
-                |> Dict.insert ( 10, 20 ) "black"
+    ( { grid = Dict.empty
       , width = 10
       , height = 20
       , x = 4

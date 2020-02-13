@@ -383,6 +383,8 @@ subscriptions _ =
             , key "ArrowRight" (OnArrowRigh False)
             ]
             |> Browser.Events.onKeyUp
+        , Browser.Events.onKeyDown (JD.map OnKeyDown (JD.field "key" JD.string))
+        , Browser.Events.onKeyUp (JD.map OnKeyUp (JD.field "key" JD.string))
         ]
 
 

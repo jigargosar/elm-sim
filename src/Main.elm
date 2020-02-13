@@ -180,6 +180,23 @@ moveActiveDown m =
         { m | y = m.y + 1 }
 
 
+gridWithActiveMask : Model -> Dict ( Int, Int ) String
+gridWithActiveMask m =
+    let
+        isValid w h ( x, y ) =
+            x >= 0 && x <= w && y >= 0 && y < h
+
+        pairTo b a =
+            ( a, b )
+    in
+    translateMask m.x m.y m.active
+        |> maskToList
+        |> List.filter (isValid m.width m.height)
+        |> List.map (pairTo m.color)
+        |> Dict.fromList
+        |> Dict.union m.grid
+
+
 
 -- Update
 
@@ -202,23 +219,6 @@ subscriptions _ =
 
 
 -- View
-
-
-gridWithActiveMask : Model -> Dict ( Int, Int ) String
-gridWithActiveMask m =
-    let
-        isValid w h ( x, y ) =
-            x >= 0 && x <= w && y >= 0 && y < h
-
-        pairTo b a =
-            ( a, b )
-    in
-    translateMask m.x m.y m.active
-        |> maskToList
-        |> List.filter (isValid m.width m.height)
-        |> List.map (pairTo m.color)
-        |> Dict.fromList
-        |> Dict.union m.grid
 
 
 view : Model -> Html Msg

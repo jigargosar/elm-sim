@@ -134,13 +134,17 @@ init _ =
     )
 
 
+insertNext : Model -> Model
 insertNext model =
     let
+        nextTetron =
+            tetronFromName model.next
+
         activeMask =
-            (tetronFromName model.next).mask
+            nextTetron.mask
 
         activeColor =
-            (tetronFromName model.next).color
+            nextTetron.color
     in
     { model
         | x = 4
@@ -150,10 +154,12 @@ insertNext model =
     }
 
 
+tick : Model -> Model
 tick model =
     moveActiveDown model
 
 
+moveActiveDown : Model -> Model
 moveActiveDown m =
     let
         newMask =
@@ -194,6 +200,7 @@ subscriptions _ =
 -- View
 
 
+activeGrid : Model -> Dict ( Int, Int ) String
 activeGrid m =
     let
         isValid w h ( x, y ) =

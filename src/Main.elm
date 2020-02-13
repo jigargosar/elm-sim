@@ -26,16 +26,8 @@ type Mask
     = Mask Int (Set Int2)
 
 
-maskToList (Mask _ set) =
-    Set.toList set
-
-
-maskContainsAny setB (Mask _ setA) =
-    Set.intersect setA setB |> Set.isEmpty |> not
-
-
-maskAny pred (Mask _ setA) =
-    Set.toList setA |> List.any pred
+maskToSet (Mask _ set) =
+    set
 
 
 translateMask dx dy (Mask w set) =
@@ -162,12 +154,16 @@ tick model =
 moveActiveDown : Model -> Model
 moveActiveDown m =
     let
-        newMask =
-            translateMask m.x (m.y + 1) m.active
+        shiftPoint dx dy ( x, y ) =
+            ( x + dx, y + dy )
+
+        foo =
+            maskToSet m.active
+                |> Set.map (shiftPoint m.x m.y)
     in
     if
-        maskContainsAny (Dict.keys m.grid |> Set.fromList) newMask
-            || maskAny (\( _, y ) -> y >= m.height) newMask
+        Set.isEmpty (Set.intersect (Dict.keys m.grid |> Set.fromList) foo)
+            || List.any (\( _, y ) -> y >= m.height) (Set.toList foo)
     then
         { m | grid = activeGrid m }
             |> insertNext
@@ -210,7 +206,8 @@ activeGrid m =
             ( a, b )
     in
     translateMask m.x m.y m.active
-        |> maskToList
+        |> maskToSet
+        |> Set.toList
         |> List.filter (isValid m.width m.height)
         |> List.map (pairTo m.color)
         |> Dict.fromList

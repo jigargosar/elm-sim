@@ -7,6 +7,7 @@ import Browser.Events
 import Dict exposing (Dict)
 import Html exposing (Html, div, text)
 import Html.Attributes exposing (style)
+import Json.Decode as JD
 import Random exposing (Seed)
 import String
 import Svg exposing (g, rect, svg, text_)
@@ -261,6 +262,7 @@ gridWithActiveMask m =
 
 type Msg
     = Tick
+    | OnRotate
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -272,12 +274,29 @@ update message model =
             , Cmd.none
             )
 
+        OnRotate ->
+            ( model, Cmd.none )
+
 
 subscriptions : Model -> Sub Msg
 subscriptions _ =
     Sub.batch
         [ Browser.Events.onAnimationFrame (always Tick)
+        , JD.oneOf [ key "ArrowUp" OnRotate ]
+            |> Browser.Events.onKeyDown
         ]
+
+
+key expected msg =
+    JD.field "key" JD.string
+        |> JD.andThen
+            (\actual ->
+                if actual == expected then
+                    JD.succeed msg
+
+                else
+                    JD.fail "unexpected"
+            )
 
 
 

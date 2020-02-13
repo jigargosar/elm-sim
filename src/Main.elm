@@ -240,11 +240,11 @@ tryShiftX : Int -> Model -> Model
 tryShiftX dx m =
     let
         newMask =
-            rotateMask m.active
+            translateMask dx 0 m.active
 
         newMaskPoints =
             newMask
-                |> translateMask (m.x + dx) m.y
+                |> translateMask m.x m.y
                 |> maskToList
     in
     if List.all (isValidMaskPosition m) newMaskPoints then

@@ -216,17 +216,8 @@ moveActiveDown m =
         currentMaskPoints =
             translateMask m.x m.y m.active
                 |> maskToList
-
-        gridMember p =
-            Dict.member p m.grid
-
-        withingBoundsIgnoringMinY ( x, y ) =
-            x >= 0 && x < m.width && y < m.height
-
-        isValidMaskPosition p =
-            not (gridMember p) && withingBoundsIgnoringMinY p
     in
-    if List.all isValidMaskPosition nextMaskPoints then
+    if List.all (isValidMaskPosition m) nextMaskPoints then
         { m | y = m.y + 1 }
 
     else if List.all (isValidInsertPosition m) currentMaskPoints then
@@ -235,6 +226,17 @@ moveActiveDown m =
 
     else
         { m | state = GameOver }
+
+
+isValidMaskPosition m p =
+    let
+        gridMember =
+            Dict.member p m.grid
+
+        withingBoundsIgnoringMinY ( x, y ) =
+            x >= 0 && x < m.width && y < m.height
+    in
+    not gridMember && withingBoundsIgnoringMinY p
 
 
 isValidInsertPosition : Model -> Int2 -> Bool

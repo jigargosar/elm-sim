@@ -162,7 +162,12 @@ insertNext model =
 
 tick : Model -> Model
 tick model =
-    tickFall model
+    case model.state of
+        Running ->
+            tickFall model
+
+        GameOver ->
+            model
 
 
 tickFall model =

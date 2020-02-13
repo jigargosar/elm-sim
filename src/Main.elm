@@ -380,17 +380,20 @@ viewGrid cw state gridWidth gridHeight grid =
 
         viewBoxCentered width_ height_ =
             viewBox (width_ * -0.5) (height_ * -0.5) width_ height_
+
+        group transforms attrs =
+            g (transform transforms :: attrs)
     in
     svg [ viewBoxCentered w h, width w, height h ]
         [ Dict.map gridSquare grid
             |> Dict.values
-            |> g [ transform [ Translate ((cw - w) * 0.5) ((cw - h) * 0.5) ] ]
+            |> group [ Translate ((cw - w) * 0.5) ((cw - h) * 0.5) ] []
         , case state of
             _ ->
                 [ filledRect (w * 0.75) (w / 10) "rgba(166, 166, 166, .902)" [] []
                 , filledText "GAME OVER" "" []
                 ]
-                    |> g []
+                    |> group [] []
         ]
 
 

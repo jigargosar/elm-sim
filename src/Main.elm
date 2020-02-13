@@ -137,7 +137,7 @@ init _ =
       , state = Running
       , seed = Random.initialSeed 0
       }
-        |> insertNext
+        |> activateNext
         |> tick
         |> tick
         |> tick
@@ -147,23 +147,17 @@ init _ =
     )
 
 
-insertNext : Model -> Model
-insertNext model =
+activateNext : Model -> Model
+activateNext model =
     let
         nextTetron =
             tetronFromName model.next
-
-        activeMask =
-            nextTetron.mask
-
-        activeColor =
-            nextTetron.color
     in
     { model
         | x = 4
         , y = -2
-        , color = activeColor
-        , active = activeMask
+        , color = nextTetron.color
+        , active = nextTetron.mask
     }
         |> updateNext
 
@@ -246,7 +240,7 @@ moveActiveDown m =
 
         else
             { m | grid = gridWithActiveMask m }
-                |> insertNext
+                |> activateNext
 
     else
         { m | y = m.y + 1 }

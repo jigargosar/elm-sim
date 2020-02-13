@@ -7,11 +7,12 @@ import Browser.Events
 import Dict exposing (Dict)
 import Html exposing (Html, div, text)
 import Html.Attributes exposing (style)
-import String exposing (fromFloat)
+import Random exposing (Seed)
+import String
 import Svg exposing (g, rect, svg, text_)
 import Svg.Attributes exposing (class, fill, stroke)
 import TypedSvg.Attributes exposing (transform, viewBox)
-import TypedSvg.Attributes.InPx as InPx exposing (height, strokeWidth, width)
+import TypedSvg.Attributes.InPx exposing (height, strokeWidth, width)
 import TypedSvg.Types exposing (Transform(..))
 
 
@@ -100,6 +101,7 @@ type alias Model =
     , ticks : Int
     , fall : { ticks : Int, delay : Int }
     , state : State
+    , seed : Seed
     }
 
 
@@ -130,6 +132,7 @@ init _ =
       , ticks = 0
       , fall = { ticks = 0, delay = 1 }
       , state = Running
+      , seed = Random.initialSeed 0
       }
         |> insertNext
         |> tick
@@ -159,6 +162,19 @@ insertNext model =
         , color = activeColor
         , active = activeMask
     }
+        |> updateNext
+
+
+updateNext : Model -> Model
+updateNext m =
+    let
+        randomNext =
+            Random.uniform Line [ S, Z ]
+
+        ( next, seed ) =
+            Random.step randomNext m.seed
+    in
+    { m | seed = seed, next = next }
 
 
 tick : Model -> Model

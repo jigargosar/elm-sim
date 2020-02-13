@@ -189,15 +189,11 @@ tick model =
 
 tickRotate : Model -> Model
 tickRotate m =
-    let
-        newModel =
-            if m.shouldRotate then
-                tryRotate m
+    if m.upPressed then
+        tryRotate m
 
-            else
-                m
-    in
-    { newModel | shouldRotate = False }
+    else
+        m
 
 
 tickShiftX : Model -> Model

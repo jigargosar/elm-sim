@@ -132,7 +132,7 @@ init _ =
       , active = emptyMask
       , next = Line
       , ticks = 0
-      , fall = { ticks = 0, delay = 10 }
+      , fall = { ticks = 0, delay = 0 }
       , shouldRotate = False
       , state = Running
       , seed = Random.initialSeed 0

@@ -238,7 +238,7 @@ moveActiveDown m =
             Dict.member p m.grid
     in
     if
-        List.any gridMember (nextMaskPoints ++ currentMaskPoints)
+        List.any gridMember nextMaskPoints
             || List.any beyondBottom nextMaskPoints
     then
         if List.any beyondTop currentMaskPoints then

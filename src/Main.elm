@@ -103,6 +103,7 @@ type alias Model =
     , ticks : Int
     , fall : { ticks : Int, delay : Int }
     , keys : Set String
+    , prevKeys : Set String
     , state : State
     , seed : Seed
     }
@@ -135,6 +136,7 @@ init _ =
       , ticks = 0
       , fall = { ticks = 0, delay = 10 }
       , keys = Set.empty
+      , prevKeys = Set.empty
       , state = Running
       , seed = Random.initialSeed 0
       }
@@ -189,6 +191,11 @@ tickRotate m =
 isPressed : String -> Model -> Bool
 isPressed string m =
     Set.member string m.keys
+
+
+isJustPressed : String -> Model -> Bool
+isJustPressed string m =
+    Set.member string m.keys && not (Set.member string m.prevKeys)
 
 
 tickShiftX : Model -> Model
@@ -336,6 +343,7 @@ update message model =
         Tick ->
             ( { model | ticks = model.ticks + 1 }
                 |> tick
+                |> (\m -> { m | prevKeys = m.keys })
             , Cmd.none
             )
 

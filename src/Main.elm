@@ -98,7 +98,13 @@ type alias Model =
     , next : TetronName
     , ticks : Int
     , fall : { ticks : Int, delay : Int }
+    , state : State
     }
+
+
+type State
+    = Running
+    | GameOver
 
 
 type alias Flags =
@@ -122,6 +128,7 @@ init _ =
       , next = Line
       , ticks = 0
       , fall = { ticks = 0, delay = 1 }
+      , state = Running
       }
         |> insertNext
         |> tick

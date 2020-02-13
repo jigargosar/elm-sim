@@ -179,6 +179,7 @@ tick model =
         Running ->
             tickFall model
                 |> tickRotate
+                |> tickShiftX
 
         GameOver ->
             model
@@ -197,6 +198,26 @@ tickRotate m =
     { newModel | shouldRotate = False }
 
 
+tickShiftX : Model -> Model
+tickShiftX m =
+    let
+        newModel =
+            case ( m.leftDown, m.rightDown ) of
+                ( True, True ) ->
+                    m
+
+                ( False, False ) ->
+                    m
+
+                ( True, False ) ->
+                    tryShiftX -1 m
+
+                ( False, True ) ->
+                    tryShiftX 1 m
+    in
+    { newModel | leftDown = False, rightDown = False }
+
+
 tryRotate : Model -> Model
 tryRotate m =
     let
@@ -206,6 +227,24 @@ tryRotate m =
         newMaskPoints =
             newMask
                 |> translateMask m.x m.y
+                |> maskToList
+    in
+    if List.all (isValidMaskPosition m) newMaskPoints then
+        { m | active = newMask }
+
+    else
+        m
+
+
+tryShiftX : Int -> Model -> Model
+tryShiftX dx m =
+    let
+        newMask =
+            rotateMask m.active
+
+        newMaskPoints =
+            newMask
+                |> translateMask (m.x + dx) m.y
                 |> maskToList
     in
     if List.all (isValidMaskPosition m) newMaskPoints then

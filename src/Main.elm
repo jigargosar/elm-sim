@@ -60,18 +60,18 @@ zMask =
     Mask 3 (Set.fromList [ ( 0, 1 ), ( 1, 1 ), ( 1, 2 ), ( 2, 2 ) ])
 
 
-type Shape
+type TetronName
     = Line
     | S
     | Z
 
 
 type alias Tetron =
-    { shape : Shape, mask : Mask, color : String }
+    { name : TetronName, mask : Mask, color : String }
 
 
-initTetron : Shape -> Tetron
-initTetron shape =
+tetronFromName : TetronName -> Tetron
+tetronFromName shape =
     let
         create =
             Tetron shape
@@ -94,7 +94,7 @@ type alias Model =
     , x : Int
     , y : Int
     , active : Tetron
-    , next : Shape
+    , next : TetronName
     }
 
 
@@ -114,10 +114,10 @@ init _ =
       , height = 20
       , x = 4
       , y = -2
-      , active = initTetron Line
+      , active = tetronFromName Line
       , next = Line
       }
-        |> insertNextShape
+        |> insertNext
         |> tick
         |> tick
         |> tick
@@ -125,11 +125,11 @@ init _ =
     )
 
 
-insertNextShape model =
+insertNext model =
     { model
         | x = 4
         , y = -2
-        , active = initTetron model.next
+        , active = tetronFromName model.next
     }
 
 
@@ -147,7 +147,7 @@ moveActiveDown m =
             || maskAny (\( _, y ) -> y >= m.height) newMask
     then
         { m | grid = activeGrid m }
-            |> insertNextShape
+            |> insertNext
 
     else
         { m | y = m.y + 1 }
@@ -211,7 +211,7 @@ viewShapesDemo cw =
     , S
     , Z
     ]
-        |> List.map (initTetron >> viewShapeRotations cw)
+        |> List.map (tetronFromName >> viewShapeRotations cw)
         |> div [ class "df-row sp10 items-center" ]
 
 

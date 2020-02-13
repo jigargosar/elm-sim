@@ -93,7 +93,8 @@ type alias Model =
     , height : Int
     , x : Int
     , y : Int
-    , active : Tetron
+    , color : String
+    , active : Mask
     , next : TetronName
     }
 
@@ -104,6 +105,13 @@ type alias Flags =
 
 init : Flags -> ( Model, Cmd Msg )
 init _ =
+    let
+        activeMask =
+            (tetronFromName Line).mask
+
+        activeColor =
+            (tetronFromName Line).color
+    in
     ( { grid =
             Dict.empty
                 |> Dict.insert ( 0, 0 ) "blue"
@@ -114,7 +122,8 @@ init _ =
       , height = 20
       , x = 4
       , y = -2
-      , active = tetronFromName Line
+      , color = activeColor
+      , active = activeMask
       , next = Line
       }
         |> insertNext
@@ -126,10 +135,18 @@ init _ =
 
 
 insertNext model =
+    let
+        activeMask =
+            (tetronFromName model.next).mask
+
+        activeColor =
+            (tetronFromName model.next).color
+    in
     { model
         | x = 4
         , y = -2
-        , active = tetronFromName model.next
+        , color = activeColor
+        , active = activeMask
     }
 
 
@@ -140,7 +157,7 @@ tick model =
 moveActiveDown m =
     let
         newMask =
-            translateMask m.x (m.y + 1) m.active.mask
+            translateMask m.x (m.y + 1) m.active
     in
     if
         maskContainsAny (Dict.keys m.grid |> Set.fromList) newMask
@@ -185,10 +202,10 @@ activeGrid m =
         pairTo b a =
             ( a, b )
     in
-    translateMask m.x m.y m.active.mask
+    translateMask m.x m.y m.active
         |> maskToList
         |> List.filter (isValid m.width m.height)
-        |> List.map (pairTo m.active.color)
+        |> List.map (pairTo m.color)
         |> Dict.fromList
         |> Dict.union m.grid
 

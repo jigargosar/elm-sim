@@ -182,27 +182,33 @@ tick model =
 
 tickRotate : Model -> Model
 tickRotate m =
-    if m.shouldRotate then
-        let
-            newMask =
-                rotateMask m.active
+    let
+        newModel =
+            if m.shouldRotate then
+                tryRotate m
 
-            newMaskPoints =
-                newMask
-                    |> translateMask m.x m.y
-                    |> maskToList
+            else
+                m
+    in
+    { newModel | shouldRotate = False }
 
-            newModel =
-                if List.all (isValidMaskPosition m) newMaskPoints then
-                    { m | active = newMask }
 
-                else
-                    m
-        in
-        { newModel | shouldRotate = False }
+tryRotate : Model -> Model
+tryRotate m =
+    let
+        newMask =
+            rotateMask m.active
+
+        newMaskPoints =
+            newMask
+                |> translateMask m.x m.y
+                |> maskToList
+    in
+    if List.all (isValidMaskPosition m) newMaskPoints then
+        { m | active = newMask }
 
     else
-        { m | shouldRotate = False }
+        m
 
 
 tickFall : Model -> Model

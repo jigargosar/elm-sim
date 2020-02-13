@@ -195,7 +195,7 @@ isJustPressed string m =
 
 tickShiftX : Model -> Model
 tickShiftX m =
-    case ( isPressed "ArrowLeft" m, isPressed "ArrowRight" m ) of
+    case ( isJustPressed "ArrowLeft" m, isJustPressed "ArrowRight" m ) of
         ( True, True ) ->
             m
 

@@ -387,20 +387,11 @@ viewGrid cw state gridWidth gridHeight grid =
             |> g [ transform [ Translate ((cw - w) * 0.5) ((cw - h) * 0.5) ] ]
         , case state of
             _ ->
-                g
-                    []
-                    [ let
-                        ( rw, rh ) =
-                            ( w * 0.75, w / 10 )
-                      in
-                      filledRect rw rh "rgba(166, 166, 166, .902)" [] []
-                    , filledText "GAME OVER" "" []
-                    ]
+                [ filledRect (w * 0.75) (w / 10) "rgba(166, 166, 166, .902)" [] []
+                , filledText "GAME OVER" "" []
+                ]
+                    |> g []
         ]
-
-
-styleInPx name float =
-    style name (fromFloat float ++ "px")
 
 
 

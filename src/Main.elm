@@ -102,6 +102,7 @@ type alias Model =
     , ticks : Int
     , fall : { ticks : Int, delay : Int }
     , shouldRotate : Bool
+    , shiftBy : Int
     , state : State
     , seed : Seed
     }
@@ -134,6 +135,7 @@ init _ =
       , ticks = 0
       , fall = { ticks = 0, delay = 0 }
       , shouldRotate = False
+      , shiftBy = 0
       , state = Running
       , seed = Random.initialSeed 0
       }

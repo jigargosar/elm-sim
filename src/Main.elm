@@ -104,8 +104,7 @@ type alias Model =
     , fall : { ticks : Int, delay : Int }
     , leftPressed : Bool
     , rightPressed : Bool
-    , upPressed : Bool
-    , pressed : Set String
+    , keys : Set String
     , state : State
     , seed : Seed
     }
@@ -139,8 +138,7 @@ init _ =
       , fall = { ticks = 0, delay = 10 }
       , leftPressed = False
       , rightPressed = False
-      , upPressed = False
-      , pressed = Set.empty
+      , keys = Set.empty
       , state = Running
       , seed = Random.initialSeed 0
       }
@@ -185,11 +183,16 @@ tick model =
 
 tickRotate : Model -> Model
 tickRotate m =
-    if m.upPressed then
+    if isPressed "ArrowUp" m then
         tryRotate m
 
     else
         m
+
+
+isPressed : String -> Model -> Bool
+isPressed string m =
+    Set.member string m.keys
 
 
 tickShiftX : Model -> Model
@@ -329,9 +332,6 @@ type Msg
     = Tick
     | OnKeyDown String
     | OnKeyUp String
-    | OnArrowUp Bool
-    | OnArrowLeft Bool
-    | OnArrowRigh Bool
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -343,56 +343,34 @@ update message model =
             , Cmd.none
             )
 
-        OnArrowUp isPressed ->
-            ( { model | upPressed = isPressed }, Cmd.none )
-
-        OnArrowLeft isPressed ->
-            ( { model | leftPressed = isPressed }, Cmd.none )
-
-        OnArrowRigh isPressed ->
-            ( { model | rightPressed = isPressed }, Cmd.none )
-
         OnKeyDown k ->
-            ( { model | pressed = Set.insert k model.pressed }, Cmd.none )
+            ( { model | keys = Set.insert k model.keys }, Cmd.none )
 
         OnKeyUp k ->
-            ( { model | pressed = Set.remove k model.pressed }, Cmd.none )
+            ( { model | keys = Set.remove k model.keys }, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg
 subscriptions _ =
     Sub.batch
         [ Browser.Events.onAnimationFrame (always Tick)
-        , JD.oneOf
-            [ key "ArrowUp" (OnArrowUp True)
-            , key "ArrowLeft" (OnArrowLeft True)
-            , key "ArrowRight" (OnArrowRigh True)
-            ]
-            |> Browser.Events.onKeyDown
-        , JD.oneOf
-            [ key "ArrowUp" (OnArrowUp False)
-            , key "ArrowLeft" (OnArrowLeft False)
-            , key "ArrowRight" (OnArrowRigh False)
-            ]
-            |> Browser.Events.onKeyUp
         , Browser.Events.onKeyDown (JD.map OnKeyDown (JD.field "key" JD.string))
         , Browser.Events.onKeyUp (JD.map OnKeyUp (JD.field "key" JD.string))
         ]
 
 
-key expected msg =
-    JD.field "key" JD.string
-        |> JD.andThen
-            (\actual ->
-                if actual == expected then
-                    JD.succeed msg
 
-                else
-                    JD.fail "unexpected"
-            )
-
-
-
+--key expected msg =
+--    JD.field "key" JD.string
+--        |> JD.andThen
+--            (\actual ->
+--                if actual == expected then
+--                    JD.succeed msg
+--
+--                else
+--                    JD.fail "unexpected"
+--            )
+--
 -- View
 
 

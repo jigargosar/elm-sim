@@ -281,24 +281,25 @@ view m =
         ]
 
 
+viewShapesDemo : Float -> Html msg
 viewShapesDemo cw =
+    let
+        viewShapeRotations { color, mask } =
+            List.range 0 3
+                |> List.map
+                    (\n ->
+                        applyN n rotateMask mask
+                            |> viewMask cw color
+                            |> wrapSvg
+                    )
+                |> div [ class "df-col sp10" ]
+    in
     [ Line
     , S
     , Z
     ]
-        |> List.map (tetronFromName >> viewShapeRotations cw)
+        |> List.map (tetronFromName >> viewShapeRotations)
         |> div [ class "df-row sp10 items-center" ]
-
-
-viewShapeRotations cw { color, mask } =
-    List.range 0 3
-        |> List.map
-            (\n ->
-                applyN n rotateMask mask
-                    |> viewMask cw color
-                    |> wrapSvg
-            )
-        |> div [ class "df-col sp10" ]
 
 
 applyN : Int -> (c -> c) -> c -> c

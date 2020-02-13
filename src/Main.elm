@@ -7,10 +7,11 @@ import Browser.Events
 import Dict exposing (Dict)
 import Html exposing (Html, div, text)
 import Html.Attributes exposing (style)
+import String exposing (fromFloat)
 import Svg exposing (g, rect, svg, text_)
 import Svg.Attributes exposing (class, fill, stroke)
 import TypedSvg.Attributes exposing (transform, viewBox)
-import TypedSvg.Attributes.InPx exposing (height, strokeWidth, width)
+import TypedSvg.Attributes.InPx as InPx exposing (height, strokeWidth, width)
 import TypedSvg.Types exposing (Transform(..))
 
 
@@ -356,12 +357,56 @@ viewGrid cw state gridWidth gridHeight grid =
             |> Dict.values
             |> g []
         , case state of
-            Running ->
-                text ""
+            _ ->
+                g
+                    [--style "transform-origin" "center"
+                     --, style "transform"
+                     --    ("translate(" ++ fromFloat (w / 2) ++ "px," ++ fromFloat (h / 2) ++ "px)")
+                    ]
+                    [ let
+                        ( rw, rh ) =
+                            ( w * 0.75, w / 10 )
 
-            GameOver ->
-                text_ [ transform [ Translate 100 100 ] ] [ text "game over" ]
+                        ( x, y ) =
+                            ( w / 2 - rw / 2, h / 2 - rh / 2 )
+                      in
+                      rect
+                        [ styleInPx "width" rw
+                        , styleInPx "height" rh
+
+                        --, InPx.x (-w * 0.75 * 0.5)
+                        --, InPx.y (-w / 10 * 0.5)
+                        , InPx.x x
+                        , InPx.y y
+                        , fill "rgba(166, 166, 166, .902)"
+                        , style "transform-origin" "center"
+                        , [ translatePx (-rw / 2) (-rh / 2)
+                          , scale 1.5
+                          , translatePx (rw / 2) (rh / 2)
+                          ]
+                            |> String.join " "
+                            |> style "transform"
+                        ]
+                        []
+                    , text_
+                        [ TypedSvg.Attributes.dominantBaseline TypedSvg.Types.DominantBaselineCentral
+                        , TypedSvg.Attributes.textAnchor TypedSvg.Types.AnchorMiddle
+                        ]
+                        [ text "GAME OVER" ]
+                    ]
         ]
+
+
+translatePx dx dy =
+    "translate(" ++ fromFloat dx ++ "px," ++ fromFloat dy ++ "px)"
+
+
+scale s =
+    [ "scale(", fromFloat s, ")" ] |> String.join ""
+
+
+styleInPx name float =
+    style name (fromFloat float ++ "px")
 
 
 

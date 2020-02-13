@@ -171,7 +171,7 @@ moveActiveDown m =
             gridMember p || beyondBottom p
     in
     if List.any isInvalid newPoints then
-        { m | grid = activeGrid m }
+        { m | grid = gridWithActiveMask m }
             |> insertNext
 
     else
@@ -202,8 +202,8 @@ subscriptions _ =
 -- View
 
 
-activeGrid : Model -> Dict ( Int, Int ) String
-activeGrid m =
+gridWithActiveMask : Model -> Dict ( Int, Int ) String
+gridWithActiveMask m =
     let
         isValid w h ( x, y ) =
             x >= 0 && x <= w && y >= 0 && y < h
@@ -227,7 +227,7 @@ view m =
     in
     div [ class "df-row sp10 items-center" ]
         [ viewShapesDemo cellWidth
-        , viewGrid cellWidth m.width m.height (activeGrid m)
+        , viewGrid cellWidth m.width m.height (gridWithActiveMask m)
             |> wrapSvg
         ]
 

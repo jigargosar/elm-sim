@@ -241,6 +241,23 @@ moveActiveDown m =
         { m | y = m.y + 1 }
 
 
+type InsertError
+    = NotEmpty
+    | OutOfBounds
+
+
+type alias Grid a =
+    { dict : Dict Int2 a
+    , width : Int
+    , height : Int
+    }
+
+
+gridInsert : Int -> Int -> String -> Grid a -> Result InsertError (Grid a)
+gridInsert =
+    Debug.todo "impl"
+
+
 gridWithActiveMask : Model -> Dict ( Int, Int ) String
 gridWithActiveMask m =
     let

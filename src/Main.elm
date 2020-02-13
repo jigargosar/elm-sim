@@ -181,7 +181,7 @@ tick model =
 
 tickRotate : Model -> Model
 tickRotate m =
-    if isPressed "ArrowUp" m then
+    if isJustPressed "ArrowUp" m then
         tryRotate m
 
     else
@@ -200,7 +200,7 @@ isJustPressed string m =
 
 tickShiftX : Model -> Model
 tickShiftX m =
-    case ( isJustPressed "ArrowLeft" m, isJustPressed "ArrowRight" m ) of
+    case ( isPressed "ArrowLeft" m, isPressed "ArrowRight" m ) of
         ( True, True ) ->
             m
 

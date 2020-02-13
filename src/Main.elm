@@ -378,16 +378,17 @@ viewGrid cw state gridWidth gridHeight grid =
                 )
                 [ text string ]
 
-        viewBoxCentered width_ height_ =
-            viewBox (width_ * -0.5) (height_ * -0.5) width_ height_
-
         group transforms attrs =
             g (transform transforms :: attrs)
+
+        groupGrid =
+            group [ Translate ((cw - w) * 0.5) ((cw - h) * 0.5) ] []
     in
-    svg [ viewBoxCentered w h, width w, height h ]
+    canvas w
+        h
         [ Dict.map gridSquare grid
             |> Dict.values
-            |> group [ Translate ((cw - w) * 0.5) ((cw - h) * 0.5) ] []
+            |> groupGrid
         , case state of
             _ ->
                 [ filledRect (w * 0.75) (w / 10) "rgba(166, 166, 166, .902)" [] []
@@ -395,6 +396,14 @@ viewGrid cw state gridWidth gridHeight grid =
                 ]
                     |> group [] []
         ]
+
+
+canvas w h =
+    svg [ viewBoxCentered w h, width w, height h ]
+
+
+viewBoxCentered width_ height_ =
+    viewBox (width_ * -0.5) (height_ * -0.5) width_ height_
 
 
 

@@ -217,45 +217,30 @@ moveActiveDown m =
             translateMask m.x m.y m.active
                 |> maskToList
 
-        beyondBottom ( _, y ) =
-            y >= m.height
-
-        beyondTop ( _, y ) =
-            y < 0
-
         gridMember p =
             Dict.member p m.grid
+
+        withingBoundsIgnoringMinY ( x, y ) =
+            x >= 0 && x < m.width && y < m.height
+
+        withingBounds ( x, y ) =
+            withingBoundsIgnoringMinY ( x, y ) && y >= 0
+
+        isValidMaskPosition p =
+            not (gridMember p) && withingBoundsIgnoringMinY p
+
+        isValidInsertPosition p =
+            not (gridMember p) && withingBounds p
     in
-    if
-        List.any gridMember nextMaskPoints
-            || List.any beyondBottom nextMaskPoints
-    then
-        if List.any beyondTop currentMaskPoints then
-            { m | state = GameOver }
-
-        else
-            { m | grid = gridWithActiveMask m }
-                |> activateNext
-
-    else
+    if List.all isValidMaskPosition nextMaskPoints then
         { m | y = m.y + 1 }
 
+    else if List.all isValidInsertPosition currentMaskPoints then
+        { m | grid = gridWithActiveMask m }
+            |> activateNext
 
-type InsertError
-    = NotEmpty
-    | OutOfBounds
-
-
-type alias Grid a =
-    { dict : Dict Int2 a
-    , width : Int
-    , height : Int
-    }
-
-
-gridInsert : Int -> Int -> String -> Grid a -> Result InsertError (Grid a)
-gridInsert =
-    Debug.todo "impl"
+    else
+        { m | state = GameOver }
 
 
 gridWithActiveMask : Model -> Dict ( Int, Int ) String

@@ -360,7 +360,7 @@ viewGrid cw state gridWidth gridHeight grid =
                 )
                 []
 
-        square ( x, y ) color =
+        gridSquare ( x, y ) color =
             filledSquare cw
                 color
                 [ Translate (toFloat x * cw) (toFloat y * cw) ]
@@ -373,7 +373,7 @@ viewGrid cw state gridWidth gridHeight grid =
             viewBox (width_ * -0.5) (height_ * -0.5) width_ height_
     in
     svg [ viewBoxCentered w h, width w, height h ]
-        [ Dict.map square grid
+        [ Dict.map gridSquare grid
             |> Dict.values
             |> g [ transform [ Translate ((cw - w) * 0.5) ((cw - h) * 0.5) ] ]
         , case state of

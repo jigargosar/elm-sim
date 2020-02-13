@@ -302,6 +302,8 @@ gridWithActiveMask m =
 type Msg
     = Tick
     | OnRotate
+    | OnLeft
+    | OnRight
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -316,12 +318,22 @@ update message model =
         OnRotate ->
             ( { model | shouldRotate = True }, Cmd.none )
 
+        OnLeft ->
+            ( { model | leftDown = True }, Cmd.none )
+
+        OnRight ->
+            ( { model | rightDown = True }, Cmd.none )
+
 
 subscriptions : Model -> Sub Msg
 subscriptions _ =
     Sub.batch
         [ Browser.Events.onAnimationFrame (always Tick)
-        , JD.oneOf [ key "ArrowUp" OnRotate ]
+        , JD.oneOf
+            [ key "ArrowUp" OnRotate
+            , key "ArrowLeft" OnLeft
+            , key "ArrowRight" OnRight
+            ]
             |> Browser.Events.onKeyDown
         ]
 

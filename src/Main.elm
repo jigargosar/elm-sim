@@ -181,6 +181,10 @@ moveActiveDown m =
             translateMask m.x (m.y + 1) m.active
                 |> maskToList
 
+        currentMaskPoints =
+            translateMask m.x m.y m.active
+                |> maskToList
+
         beyondBottom ( _, y ) =
             y >= m.height
 
@@ -194,7 +198,7 @@ moveActiveDown m =
             gridMember p || beyondBottom p
     in
     if List.any isInvalid nextMaskPoints then
-        if List.all beyondTop nextMaskPoints then
+        if List.all beyondTop currentMaskPoints then
             Debug.todo "GAMEOVER"
 
         else

@@ -184,6 +184,9 @@ moveActiveDown m =
         beyondBottom ( _, y ) =
             y >= m.height
 
+        beyondTop ( _, y ) =
+            y < 0
+
         gridMember p =
             Dict.member p m.grid
 
@@ -191,8 +194,12 @@ moveActiveDown m =
             gridMember p || beyondBottom p
     in
     if List.any isInvalid nextMaskPoints then
-        { m | grid = gridWithActiveMask m }
-            |> insertNext
+        if List.all beyondTop nextMaskPoints then
+            Debug.todo "GAMEOVER"
+
+        else
+            { m | grid = gridWithActiveMask m }
+                |> insertNext
 
     else
         { m | y = m.y + 1 }

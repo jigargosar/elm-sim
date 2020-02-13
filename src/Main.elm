@@ -6,7 +6,6 @@ import Browser
 import Dict exposing (Dict)
 import Html exposing (Html, div)
 import Html.Attributes exposing (class, style)
-import Set exposing (Set)
 import Svg exposing (g, rect, svg)
 import Svg.Attributes exposing (fill, stroke)
 import TypedSvg.Attributes exposing (transform, viewBox)
@@ -151,20 +150,27 @@ tick model =
     moveActiveDown model
 
 
+shiftPoint dx dy ( x, y ) =
+    ( x + dx, y + dy )
+
+
 moveActiveDown : Model -> Model
 moveActiveDown m =
     let
-        shiftPoint dx dy ( x, y ) =
-            ( x + dx, y + dy )
-
-        foo =
+        newPoints =
             maskToList m.active
                 |> List.map (shiftPoint m.x m.y)
+
+        beyondBottom ( _, y ) =
+            y >= m.height
+
+        gridMember p =
+            Dict.member p m.grid
+
+        isInvalid p =
+            gridMember p || beyondBottom p
     in
-    if
-        List.any (List.member >> (|>) (Dict.keys m.grid)) foo
-            || List.any (\( _, y ) -> y >= m.height) foo
-    then
+    if List.any isInvalid newPoints then
         { m | grid = activeGrid m }
             |> insertNext
 

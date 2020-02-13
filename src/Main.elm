@@ -3,6 +3,7 @@ module Main exposing (main)
 -- Browser.Element Scaffold
 
 import Browser
+import Browser.Events
 import Dict exposing (Dict)
 import Html exposing (Html, div)
 import Html.Attributes exposing (class, style)
@@ -91,6 +92,8 @@ type alias Model =
     , color : String
     , active : Mask
     , next : TetronName
+    , ticks : Int
+    , fall : { ticks : Int, delay : Int }
     }
 
 
@@ -120,6 +123,8 @@ init _ =
       , color = activeColor
       , active = activeMask
       , next = Line
+      , ticks = 0
+      , fall = { ticks = 0, delay = 10 }
       }
         |> insertNext
         |> tick
@@ -153,7 +158,23 @@ insertNext model =
 
 tick : Model -> Model
 tick model =
-    moveActiveDown model
+    tickFall model
+
+
+tickFall model =
+    let
+        fall =
+            model.fall
+
+        newFall =
+            { fall | ticks = fall.ticks + 1 }
+    in
+    if modBy fall.delay fall.ticks == 0 then
+        { model | fall = newFall }
+            |> moveActiveDown
+
+    else
+        { model | fall = newFall }
 
 
 moveActiveDown : Model -> Model
@@ -202,19 +223,24 @@ gridWithActiveMask m =
 
 
 type Msg
-    = NoOp
+    = Tick
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update message model =
     case message of
-        NoOp ->
-            ( model, Cmd.none )
+        Tick ->
+            ( { model | ticks = model.ticks + 1 }
+                |> tick
+            , Cmd.none
+            )
 
 
 subscriptions : Model -> Sub Msg
 subscriptions _ =
-    Sub.batch []
+    Sub.batch
+        [ Browser.Events.onAnimationFrame (always Tick)
+        ]
 
 
 

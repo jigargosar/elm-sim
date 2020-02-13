@@ -152,26 +152,21 @@ activateNext model =
     let
         nextTetron =
             tetronFromName model.next
-    in
-    { model
-        | x = 4
-        , y = -2
-        , color = nextTetron.color
-        , active = nextTetron.mask
-    }
-        |> updateNext
 
-
-updateNext : Model -> Model
-updateNext m =
-    let
         randomNext =
             Random.uniform Line [ S, Z ]
 
         ( next, seed ) =
-            Random.step randomNext m.seed
+            Random.step randomNext model.seed
     in
-    { m | seed = seed, next = next }
+    { model
+        | x = 3
+        , y = -2
+        , color = nextTetron.color
+        , active = nextTetron.mask
+        , next = next
+        , seed = seed
+    }
 
 
 tick : Model -> Model

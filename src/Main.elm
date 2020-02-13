@@ -357,7 +357,7 @@ viewGrid cw state gridWidth gridHeight grid =
             |> g []
         , case state of
             Running ->
-                g [] []
+                text ""
 
             GameOver ->
                 text_ [ transform [ Translate 100 100 ] ] [ text "game over" ]

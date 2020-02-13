@@ -101,6 +101,7 @@ type alias Model =
     , next : TetronName
     , ticks : Int
     , fall : { ticks : Int, delay : Int }
+    , shouldRotate : Bool
     , state : State
     , seed : Seed
     }
@@ -131,7 +132,8 @@ init _ =
       , active = emptyMask
       , next = Line
       , ticks = 0
-      , fall = { ticks = 0, delay = 1 }
+      , fall = { ticks = 0, delay = 10 }
+      , shouldRotate = False
       , state = Running
       , seed = Random.initialSeed 0
       }
@@ -188,6 +190,12 @@ tick model =
             model
 
 
+onRotate : Model -> Model
+onRotate m =
+    { m | active = rotateMask m.active }
+
+
+tickFall : Model -> Model
 tickFall model =
     let
         fall =
@@ -275,7 +283,7 @@ update message model =
             )
 
         OnRotate ->
-            ( model, Cmd.none )
+            ( onRotate model, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg

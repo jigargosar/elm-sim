@@ -105,7 +105,8 @@ type alias Model =
     , leftPressed : Bool
     , rightPressed : Bool
     , upPressed : Bool
-    , keys : Set String
+    , pressed : Set String
+    , justPressed : Set String
     , state : State
     , seed : Seed
     }
@@ -140,16 +141,12 @@ init _ =
       , leftPressed = False
       , rightPressed = False
       , upPressed = False
-      , keys = Set.empty
+      , pressed = Set.empty
+      , justPressed = Set.empty
       , state = Running
       , seed = Random.initialSeed 0
       }
         |> activateNext
-        |> tick
-        |> tick
-        |> tick
-        |> tick
-        |> tick
     , Cmd.none
     )
 
@@ -358,10 +355,10 @@ update message model =
             ( { model | rightPressed = isPressed }, Cmd.none )
 
         OnKeyDown k ->
-            ( { model | keys = Set.insert k model.keys }, Cmd.none )
+            ( { model | pressed = Set.insert k model.pressed }, Cmd.none )
 
         OnKeyUp k ->
-            ( { model | keys = Set.remove k model.keys }, Cmd.none )
+            ( { model | pressed = Set.remove k model.pressed }, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg

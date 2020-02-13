@@ -67,14 +67,14 @@ type TetronName
 
 
 type alias Tetron =
-    { name : TetronName, mask : Mask, color : String }
+    { mask : Mask, color : String }
 
 
 tetronFromName : TetronName -> Tetron
 tetronFromName shape =
     let
         create =
-            Tetron shape
+            Tetron
     in
     case shape of
         Line ->

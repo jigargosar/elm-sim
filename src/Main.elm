@@ -106,7 +106,6 @@ type alias Model =
     , rightPressed : Bool
     , upPressed : Bool
     , pressed : Set String
-    , justPressed : Set String
     , state : State
     , seed : Seed
     }
@@ -142,7 +141,6 @@ init _ =
       , rightPressed = False
       , upPressed = False
       , pressed = Set.empty
-      , justPressed = Set.empty
       , state = Running
       , seed = Random.initialSeed 0
       }

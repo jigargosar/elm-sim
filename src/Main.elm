@@ -332,9 +332,9 @@ gridWithActiveMask m =
 
 type Msg
     = Tick
-    | OnUpPressed
-    | OnLeftPressed
-    | OnRightPressed
+    | OnArrowUp Bool
+    | OnArrowLeft Bool
+    | OnArrowRigh Bool
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -346,14 +346,14 @@ update message model =
             , Cmd.none
             )
 
-        OnUpPressed ->
-            ( { model | upPressed = True }, Cmd.none )
+        OnArrowUp isPressed ->
+            ( { model | upPressed = isPressed }, Cmd.none )
 
-        OnLeftPressed ->
-            ( { model | leftPressed = True }, Cmd.none )
+        OnArrowLeft isPressed ->
+            ( { model | leftPressed = isPressed }, Cmd.none )
 
-        OnRightPressed ->
-            ( { model | rightPressed = True }, Cmd.none )
+        OnArrowRigh isPressed ->
+            ( { model | rightPressed = isPressed }, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg
@@ -361,11 +361,17 @@ subscriptions _ =
     Sub.batch
         [ Browser.Events.onAnimationFrame (always Tick)
         , JD.oneOf
-            [ key "ArrowUp" OnUpPressed
-            , key "ArrowLeft" OnLeftPressed
-            , key "ArrowRight" OnRightPressed
+            [ key "ArrowUp" (OnArrowUp True)
+            , key "ArrowLeft" (OnArrowLeft True)
+            , key "ArrowRight" (OnArrowRigh True)
             ]
             |> Browser.Events.onKeyDown
+        , JD.oneOf
+            [ key "ArrowUp" (OnArrowUp False)
+            , key "ArrowLeft" (OnArrowLeft False)
+            , key "ArrowRight" (OnArrowRigh False)
+            ]
+            |> Browser.Events.onKeyUp
         ]
 
 

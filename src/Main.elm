@@ -183,7 +183,23 @@ tick model =
 tickRotate : Model -> Model
 tickRotate m =
     if m.shouldRotate then
-        { m | active = rotateMask m.active, shouldRotate = False }
+        let
+            newMask =
+                rotateMask m.active
+
+            newMaskPoints =
+                newMask
+                    |> translateMask m.x m.y
+                    |> maskToList
+
+            newModel =
+                if List.all (isValidMaskPosition m) newMaskPoints then
+                    { m | active = newMask }
+
+                else
+                    m
+        in
+        { newModel | shouldRotate = False }
 
     else
         { m | shouldRotate = False }

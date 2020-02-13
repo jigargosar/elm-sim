@@ -102,8 +102,9 @@ type alias Model =
     , ticks : Int
     , fall : { ticks : Int, delay : Int }
     , shouldRotate : Bool
-    , leftDown : Bool
-    , rightDown : Bool
+    , leftPressed : Bool
+    , rightPressed : Bool
+    , upPressed : Bool
     , state : State
     , seed : Seed
     }
@@ -136,8 +137,9 @@ init _ =
       , ticks = 0
       , fall = { ticks = 0, delay = 0 }
       , shouldRotate = False
-      , leftDown = False
-      , rightDown = False
+      , leftPressed = False
+      , rightPressed = False
+      , upPressed = False
       , state = Running
       , seed = Random.initialSeed 0
       }
@@ -202,7 +204,7 @@ tickShiftX : Model -> Model
 tickShiftX m =
     let
         newModel =
-            case ( m.leftDown, m.rightDown ) of
+            case ( m.leftPressed, m.rightPressed ) of
                 ( True, True ) ->
                     m
 
@@ -215,7 +217,7 @@ tickShiftX m =
                 ( False, True ) ->
                     tryShiftX 1 m
     in
-    { newModel | leftDown = False, rightDown = False }
+    { newModel | leftPressed = False, rightPressed = False }
 
 
 tryRotate : Model -> Model
@@ -358,10 +360,10 @@ update message model =
             ( { model | shouldRotate = True }, Cmd.none )
 
         OnLeft ->
-            ( { model | leftDown = True }, Cmd.none )
+            ( { model | leftPressed = True }, Cmd.none )
 
         OnRight ->
-            ( { model | rightDown = True }, Cmd.none )
+            ( { model | rightPressed = True }, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg

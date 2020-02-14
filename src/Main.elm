@@ -54,8 +54,8 @@ resetRepeatTrigger rt =
 
 
 stepRepeatTrigger : Bool -> RepeatTrigger -> ( Bool, RepeatTrigger )
-stepRepeatTrigger isDown kt =
-    case ( isDown, kt.state ) of
+stepRepeatTrigger isHeldDown kt =
+    case ( isHeldDown, kt.state ) of
         ( True, NotTriggered ) ->
             ( True, { kt | state = TriggeredOnce 0 } )
 
@@ -296,7 +296,7 @@ tickSpeedUp : Model -> Model
 tickSpeedUp m =
     let
         ( isTriggered, kt ) =
-            stepRepeatTrigger (isPressed "ArrowDown" m) m.speedUpTrigger
+            stepRepeatTrigger (keyDown "ArrowDown" m) m.speedUpTrigger
 
         newModel =
             { m | speedUpTrigger = kt }
@@ -308,7 +308,7 @@ tickRotate : Model -> Model
 tickRotate model =
     let
         ( isTriggered, kt ) =
-            stepRepeatTrigger (isPressed "ArrowUp" model) model.rotateTrigger
+            stepRepeatTrigger (keyDown "ArrowUp" model) model.rotateTrigger
 
         newModel =
             { model | rotateTrigger = kt }
@@ -324,8 +324,8 @@ whenTrue bool func arg =
         arg
 
 
-isPressed : String -> Model -> Bool
-isPressed string m =
+keyDown : String -> Model -> Bool
+keyDown string m =
     Set.member string m.keys
 
 
@@ -333,10 +333,10 @@ tickShiftX : Model -> Model
 tickShiftX m =
     let
         leftPressed =
-            isPressed "ArrowLeft" m
+            keyDown "ArrowLeft" m
 
         rightPressed =
-            isPressed "ArrowRight" m
+            keyDown "ArrowRight" m
 
         ( isTriggered, kt ) =
             stepRepeatTrigger (leftPressed || rightPressed) m.shiftXTrigger

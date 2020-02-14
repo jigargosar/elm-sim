@@ -16,7 +16,7 @@ module.exports = (_, config) => {
           include: /\.elm/,
           use: [
             //'elm-hot-webpack-loader',
-            { loader: 'elm-webpack-loader', options: { optimize: isProd , debug: true} },
+            { loader: 'elm-webpack-loader', options: { optimize: isProd , debug: !isProd} },
           ],
         },
         { include: /\.css/, use: ['style-loader', 'css-loader'] },

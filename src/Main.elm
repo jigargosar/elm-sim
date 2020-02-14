@@ -278,10 +278,11 @@ type Btn
 
 
 btnDown : Btn -> Model -> Bool
-btnDown =
-    Debug.todo "impl"
+btnDown btn =
+    .btns >> List.member btn
 
 
+updateRunning : Model -> Model
 updateRunning m =
     let
         ( shouldRotate, rotateTrigger ) =
@@ -324,15 +325,7 @@ tick : Model -> Model
 tick model =
     case model.state of
         Running ->
-            tickFall model
-                |> whenTriggered stepRotateTrigger tryRotate
-                |> whenTriggered stepSpeedUpTrigger moveActiveDown
-                |> tickShiftX
-                |> when .rotateClicked tryRotate
-                |> when .leftClicked (tryShiftX -1)
-                |> when .rightClicked (tryShiftX 1)
-                |> when .speedUpClicked moveActiveDown
-                |> resetClicks
+            updateRunning model
 
         GameOver ->
             model

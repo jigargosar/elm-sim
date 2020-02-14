@@ -7,7 +7,8 @@
     "parcel-start": "parcel src/index-parcel.html -o index.html",
     "start": "webpack-dev-server",
     "build": "webpack -p",
-    "parcel-build": "parcel build src/index-parcel.html --no-source-maps -o index.html"
+    "parcel-build": "parcel build src/index-parcel.html --no-source-maps -o index.html",
+    "bd": "webpack -p && surge dist qwedsa.surge.sh"
   },
   "keywords": [],
   "author": "Jigar Gosar <jigar.gosar@gmail.com>",

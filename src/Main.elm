@@ -151,7 +151,6 @@ type alias Model =
     , next : TetronName
     , ticks : Int
     , fall : { ticks : Int, delay : Int }
-    , rotate : { elapsed : Int, delay : Int }
     , rotateKT : KeyTrigger
     , movementKT : KeyTrigger
     , keys : Set String
@@ -182,7 +181,6 @@ init _ =
       , next = Line
       , ticks = 0
       , fall = { ticks = 0, delay = 10 }
-      , rotate = { elapsed = 0, delay = 10 }
       , rotateKT = initKeyTrigger 10
       , movementKT = initKeyTrigger 10
       , keys = Set.empty

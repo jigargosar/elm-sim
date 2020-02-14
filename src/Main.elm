@@ -182,7 +182,7 @@ init _ =
       , ticks = 0
       , fall = { ticks = 0, delay = 10 }
       , rotateKT = initKeyTrigger 5
-      , movementKT = initKeyTrigger 3
+      , movementKT = initKeyTrigger 5
       , keys = Set.empty
       , prevKeys = Set.empty
       , state = Running

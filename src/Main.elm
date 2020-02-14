@@ -19,6 +19,55 @@ import TypedSvg.Types exposing (Transform(..))
 
 
 
+-- track how long key is held down, and trigger event at *delayed* rate.
+-- also trigger first time key is pressed
+-- KeyTrigger
+
+
+type alias KeyTrigger =
+    { delay : Int
+    , elapsed : Int
+    , wasDown : Bool
+    }
+
+
+initKeyTrigger : Int -> KeyTrigger
+initKeyTrigger delay =
+    KeyTrigger delay 0 False
+
+
+stepKeyTrigger : Bool -> KeyTrigger -> ( Bool, KeyTrigger )
+stepKeyTrigger isDown kt =
+    case ( isDown, kt.wasDown ) of
+        ( True, False ) ->
+            -- Just Pressed.
+            ( True, { kt | elapsed = 0, wasDown = True } )
+
+        ( True, True ) ->
+            -- Repeat Press
+            let
+                isTriggered =
+                    kt.elapsed /= 0 && modBy kt.delay kt.elapsed == 0
+
+                newElapsed =
+                    if isTriggered then
+                        0
+
+                    else
+                        kt.elapsed + 1
+            in
+            ( isTriggered, { kt | elapsed = newElapsed } )
+
+        ( False, True ) ->
+            -- Just Released
+            ( False, { kt | elapsed = 0, wasDown = False } )
+
+        ( False, False ) ->
+            -- No Change
+            ( False, kt )
+
+
+
 -- Model
 
 
@@ -103,6 +152,7 @@ type alias Model =
     , ticks : Int
     , fall : { ticks : Int, delay : Int }
     , rotate : { elapsed : Int, delay : Int }
+    , rotateKT : KeyTrigger
     , keys : Set String
     , prevKeys : Set String
     , state : State
@@ -132,6 +182,7 @@ init _ =
       , ticks = 0
       , fall = { ticks = 0, delay = 10 }
       , rotate = { elapsed = 0, delay = 10 }
+      , rotateKT = initKeyTrigger 10
       , keys = Set.empty
       , prevKeys = Set.empty
       , state = Running
@@ -177,67 +228,28 @@ tick model =
 
 
 tickRotate : Model -> Model
-tickRotate m =
-    if isJustPressed "ArrowUp" m then
-        tryRotate m
-            |> resetRotate
-
-    else if isPressed "ArrowUp" m then
-        stepRotate m
-
-    else
-        m
-
-
-stepRotate : Model -> Model
-stepRotate m =
+tickRotate model =
     let
-        rotate =
-            m.rotate
-
-        { elapsed, delay } =
-            rotate
-
-        isTriggered =
-            elapsed /= 0 && modBy delay elapsed == 0
-
-        newRotate =
-            { rotate
-                | elapsed =
-                    if isTriggered then
-                        0
-
-                    else
-                        elapsed + 1
-            }
+        ( isTriggered, kt ) =
+            stepKeyTrigger (isPressed "ArrowUp" model) model.rotateKT
 
         newModel =
-            { m | rotate = newRotate }
+            { model | rotateKT = kt }
     in
-    if isTriggered then
-        tryRotate newModel
+    whenTrue isTriggered tryRotate newModel
+
+
+whenTrue bool func arg =
+    if bool then
+        func arg
 
     else
-        newModel
-
-
-resetRotate : Model -> Model
-resetRotate m =
-    let
-        rotate =
-            m.rotate
-    in
-    { m | rotate = { rotate | elapsed = 0 } }
+        arg
 
 
 isPressed : String -> Model -> Bool
 isPressed string m =
     Set.member string m.keys
-
-
-isJustPressed : String -> Model -> Bool
-isJustPressed string m =
-    Set.member string m.keys && not (Set.member string m.prevKeys)
 
 
 tickShiftX : Model -> Model

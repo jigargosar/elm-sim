@@ -256,12 +256,26 @@ tick model =
                 |> tickRotate
                 |> tickShiftX
                 |> tickSpeedUp
+                |> when .rotateClicked tryRotate
+                |> resetClicks
 
         GameOver ->
             model
 
         Paused ->
             model
+
+
+resetClicks m =
+    { m | rotateClicked = False }
+
+
+when pred true val =
+    if pred val then
+        true val
+
+    else
+        val
 
 
 tickSpeedUp : Model -> Model

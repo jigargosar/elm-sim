@@ -272,9 +272,16 @@ tick model =
             model
 
 
-resetClicks : Model -> Model
+resetClicks :
+    { a | rotateClicked : Bool, leftClicked : Bool, rightClicked : Bool, speedUpClicked : Bool }
+    -> { a | rotateClicked : Bool, leftClicked : Bool, rightClicked : Bool, speedUpClicked : Bool }
 resetClicks m =
-    { m | rotateClicked = False }
+    { m
+        | rotateClicked = False
+        , leftClicked = False
+        , rightClicked = False
+        , speedUpClicked = False
+    }
 
 
 when pred true val =
@@ -477,6 +484,9 @@ type Msg
     | OnKeyDown String
     | OnKeyUp String
     | RotateClicked
+    | LeftClicked
+    | RightClicked
+    | SpeedUpClicked
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -497,6 +507,15 @@ update message model =
 
         RotateClicked ->
             ( { model | rotateClicked = True }, Cmd.none )
+
+        LeftClicked ->
+            ( { model | leftClicked = True }, Cmd.none )
+
+        RightClicked ->
+            ( { model | rightClicked = True }, Cmd.none )
+
+        SpeedUpClicked ->
+            ( { model | speedUpClicked = True }, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg

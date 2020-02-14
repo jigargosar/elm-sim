@@ -102,6 +102,7 @@ type alias Model =
     , next : TetronName
     , ticks : Int
     , fall : { ticks : Int, delay : Int }
+    , rotate : { elapsed : Int, delay : Int }
     , keys : Set String
     , prevKeys : Set String
     , state : State
@@ -130,6 +131,7 @@ init _ =
       , next = Line
       , ticks = 0
       , fall = { ticks = 0, delay = 10 }
+      , rotate = { elapsed = 0, delay = 10 }
       , keys = Set.empty
       , prevKeys = Set.empty
       , state = Running
@@ -178,9 +180,19 @@ tickRotate : Model -> Model
 tickRotate m =
     if isJustPressed "ArrowUp" m then
         tryRotate m
+            |> resetRotate
 
     else
         m
+
+
+resetRotate : Model -> Model
+resetRotate m =
+    let
+        rotate =
+            m.rotate
+    in
+    { m | rotate = { rotate | elapsed = 0 } }
 
 
 isPressed : String -> Model -> Bool

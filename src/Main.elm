@@ -263,13 +263,6 @@ activateNext model =
     }
 
 
-type Key
-    = ArrowUp
-    | ArrowLeft
-    | ArrowRight
-    | ArrowDown
-
-
 type Btn
     = RotateBtn
     | LeftBtn
@@ -549,6 +542,8 @@ btn2 btnName string =
     button
         [ Html.Events.onMouseDown (OnBtnDown btnName)
         , Html.Events.onMouseUp (OnBtnUp btnName)
+        , Html.Events.onMouseLeave (OnBtnUp btnName)
+        , Html.Events.onMouseOut (OnBtnUp btnName)
         ]
         [ text string ]
 

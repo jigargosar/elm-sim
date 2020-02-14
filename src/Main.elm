@@ -43,6 +43,11 @@ initKeyTrigger firstRepeatDelay repeatDelay =
     KeyTrigger firstRepeatDelay repeatDelay 0 NoTrigger
 
 
+defaultKeyTrigger : KeyTrigger
+defaultKeyTrigger =
+    initKeyTrigger 10 2
+
+
 stepKeyTrigger : Bool -> KeyTrigger -> ( Bool, KeyTrigger )
 stepKeyTrigger isDown kt =
     case ( isDown, kt.state ) of
@@ -201,8 +206,8 @@ init _ =
       , next = Line
       , ticks = 0
       , fall = { ticks = 0, delay = 20 }
-      , rotateKT = initKeyTrigger 10 5
-      , movementKT = initKeyTrigger 10 5
+      , rotateKT = defaultKeyTrigger
+      , movementKT = defaultKeyTrigger
       , keys = Set.empty
       , prevKeys = Set.empty
       , state = Running

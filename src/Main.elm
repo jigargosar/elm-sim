@@ -261,6 +261,63 @@ activateNext model =
     }
 
 
+type Key
+    = ArrowUp
+    | ArrowLeft
+    | ArrowRight
+    | ArrowDown
+
+
+type Btn
+    = RotateBtn
+    | LeftBtn
+    | RightBtn
+    | SpeedUpBtn
+
+
+btnDown : Btn -> Model -> Bool
+btnDown =
+    Debug.todo "impl"
+
+
+updateInput m =
+    let
+        ( shouldRotate, rotateTrigger ) =
+            stepRepeatTrigger (keyDown "ArrowUp" m || btnDown RotateBtn m) m.rotateTrigger
+
+        leftPressed =
+            keyDown "ArrowLeft" m || btnDown LeftBtn m
+
+        rightPressed =
+            keyDown "ArrowRight" m || btnDown RightBtn m
+
+        ( shouldShiftX, shiftXTrigger ) =
+            stepRepeatTrigger (leftPressed || rightPressed) m.shiftXTrigger
+
+        dx =
+            case ( leftPressed, rightPressed ) of
+                ( True, True ) ->
+                    0
+
+                ( False, False ) ->
+                    0
+
+                ( True, False ) ->
+                    -1
+
+                ( False, True ) ->
+                    1
+
+        ( shouldSpeedUp, speedUpTrigger ) =
+            stepRepeatTrigger (keyDown "ArrowDown" m || btnDown SpeedUpBtn m) m.speedUpTrigger
+    in
+    { m | rotateTrigger = rotateTrigger, shiftXTrigger = shiftXTrigger, speedUpTrigger = speedUpTrigger }
+        |> tickFall
+        |> whenTrue shouldRotate tryRotate
+        |> whenTrue shouldShiftX (tryShiftX dx)
+        |> whenTrue shouldSpeedUp moveActiveDown
+
+
 tick : Model -> Model
 tick model =
     case model.state of

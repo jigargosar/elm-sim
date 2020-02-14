@@ -153,6 +153,7 @@ type alias Model =
     , fall : { ticks : Int, delay : Int }
     , rotate : { elapsed : Int, delay : Int }
     , rotateKT : KeyTrigger
+    , movementKT : KeyTrigger
     , keys : Set String
     , prevKeys : Set String
     , state : State
@@ -183,6 +184,7 @@ init _ =
       , fall = { ticks = 0, delay = 10 }
       , rotate = { elapsed = 0, delay = 10 }
       , rotateKT = initKeyTrigger 10
+      , movementKT = initKeyTrigger 10
       , keys = Set.empty
       , prevKeys = Set.empty
       , state = Running
@@ -254,18 +256,35 @@ isPressed string m =
 
 tickShiftX : Model -> Model
 tickShiftX m =
-    case ( isPressed "ArrowLeft" m, isPressed "ArrowRight" m ) of
-        ( True, True ) ->
-            m
+    let
+        leftPressed =
+            isPressed "ArrowLeft" m
 
-        ( False, False ) ->
-            m
+        rightPressed =
+            isPressed "ArrowRight" m
 
-        ( True, False ) ->
-            tryShiftX -1 m
+        ( isTriggered, kt ) =
+            stepKeyTrigger (leftPressed || rightPressed) m.movementKT
 
-        ( False, True ) ->
-            tryShiftX 1 m
+        newModel =
+            { m | movementKT = kt }
+    in
+    if isTriggered then
+        case ( leftPressed, rightPressed ) of
+            ( True, True ) ->
+                newModel
+
+            ( False, False ) ->
+                newModel
+
+            ( True, False ) ->
+                tryShiftX -1 newModel
+
+            ( False, True ) ->
+                tryShiftX 1 newModel
+
+    else
+        newModel
 
 
 tryRotate : Model -> Model

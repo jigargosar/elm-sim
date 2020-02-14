@@ -47,6 +47,11 @@ defaultRepeatTrigger =
     initRepeatTrigger 10 2
 
 
+resetRepeatTrigger : RepeatTrigger -> RepeatTrigger
+resetRepeatTrigger rt =
+    { rt | state = NotTriggered }
+
+
 stepRepeatTrigger : Bool -> RepeatTrigger -> ( Bool, RepeatTrigger )
 stepRepeatTrigger isDown kt =
     case ( isDown, kt.state ) of
@@ -235,7 +240,7 @@ activateNext model =
         , active = nextTetron.mask
         , next = next
         , seed = seed
-        , speedUpTrigger = defaultRepeatTrigger
+        , speedUpTrigger = resetRepeatTrigger model.speedUpTrigger
     }
 
 

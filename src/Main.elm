@@ -491,15 +491,23 @@ view m =
             30
     in
     div [ class "df-row sp10 items-center" ]
-        [ div [ class "df-col" ]
+        [ div [ class "df-col sp10" ]
             [ viewGrid cellWidth m.state m.width m.height (gridWithActiveMask m)
                 |> wrapSvg
-            , div [ class "df-row sp10 p10" ]
-                [ button [] [ text "Rotate" ] ]
+            , div [ class "df-row justify-center sp10" ]
+                [ btn1 "Rotate"
+                , btn1 "Left"
+                , btn1 "Right"
+                , btn1 "Down"
+                ]
             ]
 
         -- ,viewShapesDemo cellWidth
         ]
+
+
+btn1 string =
+    button [] [ text string ]
 
 
 viewShapesDemo : Float -> Html msg

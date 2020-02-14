@@ -7,7 +7,7 @@ import Browser.Events
 import Dict exposing (Dict)
 import Html exposing (Html, button, div, text)
 import Html.Attributes exposing (style)
-import Html.Events exposing (onClick)
+import Html.Events
 import Json.Decode as JD
 import Random exposing (Seed)
 import Set exposing (Set)
@@ -334,46 +334,6 @@ tick model =
             model
 
 
-resetClicks :
-    { a | rotateClicked : Bool, leftClicked : Bool, rightClicked : Bool, speedUpClicked : Bool }
-    -> { a | rotateClicked : Bool, leftClicked : Bool, rightClicked : Bool, speedUpClicked : Bool }
-resetClicks m =
-    { m
-        | rotateClicked = False
-        , leftClicked = False
-        , rightClicked = False
-        , speedUpClicked = False
-    }
-
-
-when pred true val =
-    if pred val then
-        true val
-
-    else
-        val
-
-
-whenTriggered updateTrigger onTrigger model =
-    let
-        ( didTrigger, newModel ) =
-            updateTrigger model
-    in
-    whenTrue didTrigger onTrigger newModel
-
-
-stepSpeedUpTrigger : Model -> ( Bool, Model )
-stepSpeedUpTrigger m =
-    stepRepeatTrigger (keyDown "ArrowDown" m) m.speedUpTrigger
-        |> Tuple.mapSecond (\t -> { m | speedUpTrigger = t })
-
-
-stepRotateTrigger : Model -> ( Bool, Model )
-stepRotateTrigger m =
-    stepRepeatTrigger (keyDown "ArrowUp" m) m.rotateTrigger
-        |> Tuple.mapSecond (\t -> { m | rotateTrigger = t })
-
-
 whenTrue bool func arg =
     if bool then
         func arg
@@ -385,39 +345,6 @@ whenTrue bool func arg =
 keyDown : String -> Model -> Bool
 keyDown string m =
     Set.member string m.keys
-
-
-tickShiftX : Model -> Model
-tickShiftX m =
-    let
-        leftPressed =
-            keyDown "ArrowLeft" m
-
-        rightPressed =
-            keyDown "ArrowRight" m
-
-        ( isTriggered, kt ) =
-            stepRepeatTrigger (leftPressed || rightPressed) m.shiftXTrigger
-
-        newModel =
-            { m | shiftXTrigger = kt }
-    in
-    if isTriggered then
-        case ( leftPressed, rightPressed ) of
-            ( True, True ) ->
-                newModel
-
-            ( False, False ) ->
-                newModel
-
-            ( True, False ) ->
-                tryShiftX -1 newModel
-
-            ( False, True ) ->
-                tryShiftX 1 newModel
-
-    else
-        newModel
 
 
 tryRotate : Model -> Model

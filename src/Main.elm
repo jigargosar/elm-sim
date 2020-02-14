@@ -186,6 +186,7 @@ type alias Model =
     , shiftXTrigger : RepeatTrigger
     , speedUpTrigger : RepeatTrigger
     , keys : Set String
+    , btns : List Btn
     , prevKeys : Set String
     , state : State
     , seed : Seed
@@ -229,6 +230,7 @@ init _ =
       , shiftXTrigger = defaultRepeatTrigger
       , speedUpTrigger = initRepeatTrigger 10 1
       , keys = Set.empty
+      , btns = []
       , prevKeys = Set.empty
       , state = Running
       , seed = Random.initialSeed 0
@@ -546,6 +548,8 @@ type Msg
     = Tick
     | OnKeyDown String
     | OnKeyUp String
+    | OnBtnDown Btn
+    | OnBtnUp Btn
     | RotateClicked
     | LeftClicked
     | RightClicked
@@ -579,6 +583,12 @@ update message model =
 
         SpeedUpClicked ->
             ( { model | speedUpClicked = True }, Cmd.none )
+
+        OnBtnDown btn ->
+            ( { model | btns = btn :: List.filter ((/=) btn) model.btns }, Cmd.none )
+
+        OnBtnUp btn ->
+            ( { model | btns = List.filter ((/=) btn) model.btns }, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg

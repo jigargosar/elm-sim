@@ -253,11 +253,14 @@ tick model =
 
 tickSpeedUp : Model -> Model
 tickSpeedUp m =
-    if isPressed "ArrowDown" m then
-        moveActiveDown m
+    let
+        ( isTriggered, kt ) =
+            stepRepeatTrigger (isPressed "ArrowDown" m) m.speedUpTrigger
 
-    else
-        m
+        newModel =
+            { m | speedUpTrigger = kt }
+    in
+    whenTrue isTriggered moveActiveDown newModel
 
 
 tickRotate : Model -> Model

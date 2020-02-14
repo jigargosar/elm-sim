@@ -304,6 +304,15 @@ tickSpeedUp m =
     whenTrue isTriggered moveActiveDown newModel
 
 
+stepSpeedUpTrigger : Model -> ( Bool, Model )
+stepSpeedUpTrigger m =
+    let
+        ( isTriggered, kt ) =
+            stepRepeatTrigger (keyDown "ArrowDown" m) m.speedUpTrigger
+    in
+    ( isTriggered, { m | speedUpTrigger = kt } )
+
+
 tickRotate : Model -> Model
 tickRotate model =
     let

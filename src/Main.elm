@@ -189,6 +189,7 @@ type alias Model =
 
 type State
     = Running
+    | Paused
     | GameOver
 
 
@@ -254,6 +255,9 @@ tick model =
                 |> tickSpeedUp
 
         GameOver ->
+            model
+
+        Paused ->
             model
 
 
@@ -622,6 +626,12 @@ viewGrid cw state gridWidth gridHeight grid =
 
             Running ->
                 text ""
+
+            Paused ->
+                [ filledRect (w * 0.75) (w / 10) "rgba(166, 166, 166, .902)" [] []
+                , filledText "Paused" "" []
+                ]
+                    |> group [] []
         ]
 
 

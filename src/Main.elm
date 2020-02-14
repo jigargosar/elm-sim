@@ -245,9 +245,19 @@ tick model =
             tickFall model
                 |> tickRotate
                 |> tickShiftX
+                |> tickSpeedUp
 
         GameOver ->
             model
+
+
+tickSpeedUp : Model -> Model
+tickSpeedUp m =
+    if isPressed "ArrowDown" m then
+        moveActiveDown m
+
+    else
+        m
 
 
 tickRotate : Model -> Model

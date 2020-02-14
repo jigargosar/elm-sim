@@ -24,7 +24,7 @@ import TypedSvg.Types exposing (Transform(..))
 -- KeyTrigger
 
 
-type alias KeyTrigger =
+type alias RepeatTrigger =
     { firstRepeatDelay : Int
     , repeatDelay : Int
     , state : TriggerState
@@ -37,18 +37,18 @@ type TriggerState
     | TriggeredMoreThanOnce Int
 
 
-initKeyTrigger : Int -> Int -> KeyTrigger
-initKeyTrigger firstRepeatDelay repeatDelay =
-    KeyTrigger firstRepeatDelay repeatDelay NotTriggered
+initRepeatTrigger : Int -> Int -> RepeatTrigger
+initRepeatTrigger firstRepeatDelay repeatDelay =
+    RepeatTrigger firstRepeatDelay repeatDelay NotTriggered
 
 
-defaultKeyTrigger : KeyTrigger
-defaultKeyTrigger =
-    initKeyTrigger 10 2
+defaultRepeatTrigger : RepeatTrigger
+defaultRepeatTrigger =
+    initRepeatTrigger 10 2
 
 
-stepKeyTrigger : Bool -> KeyTrigger -> ( Bool, KeyTrigger )
-stepKeyTrigger isDown kt =
+stepRepeatTrigger : Bool -> RepeatTrigger -> ( Bool, RepeatTrigger )
+stepRepeatTrigger isDown kt =
     case ( isDown, kt.state ) of
         ( True, NotTriggered ) ->
             ( True, { kt | state = TriggeredOnce 0 } )
@@ -172,8 +172,8 @@ type alias Model =
     , next : TetronName
     , ticks : Int
     , fall : { ticks : Int, delay : Int }
-    , rotateKT : KeyTrigger
-    , movementKT : KeyTrigger
+    , rotateTrigger : RepeatTrigger
+    , movementTrigger : RepeatTrigger
     , keys : Set String
     , prevKeys : Set String
     , state : State
@@ -202,8 +202,8 @@ init _ =
       , next = Line
       , ticks = 0
       , fall = { ticks = 0, delay = 20 }
-      , rotateKT = defaultKeyTrigger
-      , movementKT = defaultKeyTrigger
+      , rotateTrigger = defaultRepeatTrigger
+      , movementTrigger = defaultRepeatTrigger
       , keys = Set.empty
       , prevKeys = Set.empty
       , state = Running
@@ -252,10 +252,10 @@ tickRotate : Model -> Model
 tickRotate model =
     let
         ( isTriggered, kt ) =
-            stepKeyTrigger (isPressed "ArrowUp" model) model.rotateKT
+            stepRepeatTrigger (isPressed "ArrowUp" model) model.rotateTrigger
 
         newModel =
-            { model | rotateKT = kt }
+            { model | rotateTrigger = kt }
     in
     whenTrue isTriggered tryRotate newModel
 
@@ -283,10 +283,10 @@ tickShiftX m =
             isPressed "ArrowRight" m
 
         ( isTriggered, kt ) =
-            stepKeyTrigger (leftPressed || rightPressed) m.movementKT
+            stepRepeatTrigger (leftPressed || rightPressed) m.movementTrigger
 
         newModel =
-            { m | movementKT = kt }
+            { m | movementTrigger = kt }
     in
     if isTriggered then
         case ( leftPressed, rightPressed ) of

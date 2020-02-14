@@ -182,8 +182,43 @@ tickRotate m =
         tryRotate m
             |> resetRotate
 
+    else if isPressed "ArrowUp" m then
+        stepRotate m
+
     else
         m
+
+
+stepRotate : Model -> Model
+stepRotate m =
+    let
+        rotate =
+            m.rotate
+
+        { elapsed, delay } =
+            rotate
+
+        isTriggered =
+            elapsed /= 0 && modBy delay elapsed == 0
+
+        newRotate =
+            { rotate
+                | elapsed =
+                    if isTriggered then
+                        0
+
+                    else
+                        elapsed + 1
+            }
+
+        newModel =
+            { m | rotate = newRotate }
+    in
+    if isTriggered then
+        tryRotate newModel
+
+    else
+        newModel
 
 
 resetRotate : Model -> Model

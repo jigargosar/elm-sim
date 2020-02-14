@@ -173,7 +173,8 @@ type alias Model =
     , ticks : Int
     , fall : { ticks : Int, delay : Int }
     , rotateTrigger : RepeatTrigger
-    , movementTrigger : RepeatTrigger
+    , shiftXTrigger : RepeatTrigger
+    , speedUpTrigger : RepeatTrigger
     , keys : Set String
     , prevKeys : Set String
     , state : State
@@ -203,7 +204,8 @@ init _ =
       , ticks = 0
       , fall = { ticks = 0, delay = 20 }
       , rotateTrigger = defaultRepeatTrigger
-      , movementTrigger = defaultRepeatTrigger
+      , shiftXTrigger = defaultRepeatTrigger
+      , speedUpTrigger = defaultRepeatTrigger
       , keys = Set.empty
       , prevKeys = Set.empty
       , state = Running
@@ -283,10 +285,10 @@ tickShiftX m =
             isPressed "ArrowRight" m
 
         ( isTriggered, kt ) =
-            stepRepeatTrigger (leftPressed || rightPressed) m.movementTrigger
+            stepRepeatTrigger (leftPressed || rightPressed) m.shiftXTrigger
 
         newModel =
-            { m | movementTrigger = kt }
+            { m | shiftXTrigger = kt }
     in
     if isTriggered then
         case ( leftPressed, rightPressed ) of

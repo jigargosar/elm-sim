@@ -557,8 +557,7 @@ view m =
                 , btn1 "Down"
                 ]
             ]
-
-        -- ,viewShapesDemo cellWidth
+        , viewShapesDemo cellWidth
         ]
 
 

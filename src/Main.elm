@@ -481,17 +481,6 @@ subscriptions _ =
 
 
 
---key expected msg =
---    JD.field "key" JD.string
---        |> JD.andThen
---            (\actual ->
---                if actual == expected then
---                    JD.succeed msg
---
---                else
---                    JD.fail "unexpected"
---            )
---
 -- View
 
 

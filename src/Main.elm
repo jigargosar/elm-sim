@@ -615,18 +615,22 @@ view m =
             [ viewGrid cellWidth m.state m.width m.height (gridWithActiveMask m)
                 |> wrapSvg
             , div [ class "df-row justify-center sp10" ]
-                [ btn2 RotateClicked "Rotate"
-                , btn2 LeftClicked "Left"
-                , btn2 RightClicked "Right"
-                , btn2 SpeedUpClicked "Down"
+                [ btn2 RotateBtn "Rotate"
+                , btn2 LeftBtn "Left"
+                , btn2 RightBtn "Right"
+                , btn2 SpeedUpBtn "Down"
                 ]
             ]
         , viewShapesDemo cellWidth
         ]
 
 
-btn2 msg string =
-    button [ onClick msg ] [ text string ]
+btn2 btnName string =
+    button
+        [ Html.Events.onMouseDown (OnBtnDown btnName)
+        , Html.Events.onMouseUp (OnBtnUp btnName)
+        ]
+        [ text string ]
 
 
 viewShapesDemo : Float -> Html msg

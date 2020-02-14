@@ -266,6 +266,7 @@ tick model =
             model
 
 
+resetClicks : Model -> Model
 resetClicks m =
     { m | rotateClicked = False }
 

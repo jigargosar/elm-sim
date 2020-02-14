@@ -235,6 +235,7 @@ activateNext model =
         , active = nextTetron.mask
         , next = next
         , seed = seed
+        , speedUpTrigger = defaultRepeatTrigger
     }
 
 

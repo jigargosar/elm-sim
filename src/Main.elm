@@ -27,20 +27,19 @@ import TypedSvg.Types exposing (Transform(..))
 type alias KeyTrigger =
     { firstRepeatDelay : Int
     , repeatDelay : Int
-    , elapsed : Int
     , state : TriggerState
     }
 
 
 type TriggerState
     = NotTriggered
-    | TriggeredOnce
-    | TriggeredMoreThanOnce
+    | TriggeredOnce Int
+    | TriggeredMoreThanOnce Int
 
 
 initKeyTrigger : Int -> Int -> KeyTrigger
 initKeyTrigger firstRepeatDelay repeatDelay =
-    KeyTrigger firstRepeatDelay repeatDelay 0 NotTriggered
+    KeyTrigger firstRepeatDelay repeatDelay NotTriggered
 
 
 defaultKeyTrigger : KeyTrigger
@@ -52,44 +51,41 @@ stepKeyTrigger : Bool -> KeyTrigger -> ( Bool, KeyTrigger )
 stepKeyTrigger isDown kt =
     case ( isDown, kt.state ) of
         ( True, NotTriggered ) ->
-            ( True, { kt | elapsed = 0, state = TriggeredOnce } )
+            ( True, { kt | state = TriggeredOnce 0 } )
 
-        ( True, TriggeredOnce ) ->
+        ( True, TriggeredOnce elapsed ) ->
             let
                 isTriggered =
-                    kt.elapsed /= 0 && modBy kt.firstRepeatDelay kt.elapsed == 0
+                    elapsed /= 0 && modBy kt.firstRepeatDelay elapsed == 0
 
-                ( newElapsed, newState ) =
+                newState =
                     if isTriggered then
-                        ( 0, TriggeredMoreThanOnce )
+                        TriggeredMoreThanOnce 0
 
                     else
-                        ( kt.elapsed + 1, kt.state )
+                        TriggeredOnce (elapsed + 1)
             in
-            ( isTriggered, { kt | elapsed = newElapsed, state = newState } )
+            ( isTriggered, { kt | state = newState } )
 
-        ( True, TriggeredMoreThanOnce ) ->
+        ( True, TriggeredMoreThanOnce elapsed ) ->
             let
-                isTriggered =
-                    kt.elapsed /= 0 && modBy kt.repeatDelay kt.elapsed == 0
+                justTriggered =
+                    elapsed /= 0 && modBy kt.repeatDelay elapsed == 0
 
-                newElapsed =
-                    if isTriggered then
-                        0
+                newState =
+                    if justTriggered then
+                        TriggeredMoreThanOnce 0
 
                     else
-                        kt.elapsed + 1
+                        TriggeredMoreThanOnce (elapsed + 1)
             in
-            ( isTriggered, { kt | elapsed = newElapsed } )
+            ( justTriggered, { kt | state = newState } )
 
         ( False, NotTriggered ) ->
             ( False, kt )
 
-        ( False, TriggeredOnce ) ->
-            ( False, { kt | elapsed = 0, state = NotTriggered } )
-
-        ( False, TriggeredMoreThanOnce ) ->
-            ( False, { kt | elapsed = 0, state = NotTriggered } )
+        ( False, _ ) ->
+            ( False, { kt | state = NotTriggered } )
 
 
 

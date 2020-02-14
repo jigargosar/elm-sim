@@ -5,7 +5,7 @@ module Main exposing (main)
 import Browser
 import Browser.Events
 import Dict exposing (Dict)
-import Html exposing (Html, div, text)
+import Html exposing (Html, button, div, text)
 import Html.Attributes exposing (style)
 import Json.Decode as JD
 import Random exposing (Seed)
@@ -491,9 +491,14 @@ view m =
             30
     in
     div [ class "df-row sp10 items-center" ]
-        [ viewGrid cellWidth m.state m.width m.height (gridWithActiveMask m)
-            |> wrapSvg
-        , viewShapesDemo cellWidth
+        [ div [ class "df-col" ]
+            [ viewGrid cellWidth m.state m.width m.height (gridWithActiveMask m)
+                |> wrapSvg
+            , div [ class "df-row sp10 p10" ]
+                [ button [] [ text "Rotate" ] ]
+            ]
+
+        -- ,viewShapesDemo cellWidth
         ]
 
 

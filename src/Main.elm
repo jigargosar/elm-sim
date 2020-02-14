@@ -28,24 +28,42 @@ type alias KeyTrigger =
     { firstRepeatDelay : Int
     , repeatDelay : Int
     , elapsed : Int
-    , wasDown : Bool
+    , state : TriggerState
     }
+
+
+type TriggerState
+    = NoTrigger
+    | FirstTrigger
+    | RepeatTrigger
 
 
 initKeyTrigger : Int -> Int -> KeyTrigger
 initKeyTrigger firstRepeatDelay repeatDelay =
-    KeyTrigger firstRepeatDelay repeatDelay 0 False
+    KeyTrigger firstRepeatDelay repeatDelay 0 NoTrigger
 
 
 stepKeyTrigger : Bool -> KeyTrigger -> ( Bool, KeyTrigger )
 stepKeyTrigger isDown kt =
-    case ( isDown, kt.wasDown ) of
-        ( True, False ) ->
-            -- Just Pressed.
-            ( True, { kt | elapsed = 0, wasDown = True } )
+    case ( isDown, kt.state ) of
+        ( True, NoTrigger ) ->
+            ( True, { kt | elapsed = 0, state = FirstTrigger } )
 
-        ( True, True ) ->
-            -- Repeat Press
+        ( True, FirstTrigger ) ->
+            let
+                isTriggered =
+                    kt.elapsed /= 0 && modBy kt.firstRepeatDelay kt.elapsed == 0
+
+                ( newElapsed, newState ) =
+                    if isTriggered then
+                        ( 0, RepeatTrigger )
+
+                    else
+                        ( kt.elapsed + 1, kt.state )
+            in
+            ( isTriggered, { kt | elapsed = newElapsed, state = newState } )
+
+        ( True, RepeatTrigger ) ->
             let
                 isTriggered =
                     kt.elapsed /= 0 && modBy kt.repeatDelay kt.elapsed == 0
@@ -59,13 +77,14 @@ stepKeyTrigger isDown kt =
             in
             ( isTriggered, { kt | elapsed = newElapsed } )
 
-        ( False, True ) ->
-            -- Just Released
-            ( False, { kt | elapsed = 0, wasDown = False } )
-
-        ( False, False ) ->
-            -- No Change
+        ( False, NoTrigger ) ->
             ( False, kt )
+
+        ( False, FirstTrigger ) ->
+            ( False, { kt | elapsed = 0, state = NoTrigger } )
+
+        ( False, RepeatTrigger ) ->
+            ( False, { kt | elapsed = 0, state = NoTrigger } )
 
 
 

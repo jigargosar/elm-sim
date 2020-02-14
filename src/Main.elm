@@ -259,7 +259,7 @@ tick model =
     case model.state of
         Running ->
             tickFall model
-                |> tickRotate
+                |> whenTriggered stepRotateTrigger tryRotate
                 |> tickShiftX
                 |> whenTriggered stepSpeedUpTrigger moveActiveDown
                 |> when .rotateClicked tryRotate
@@ -306,16 +306,10 @@ stepSpeedUpTrigger m =
         |> Tuple.mapSecond (\t -> { m | speedUpTrigger = t })
 
 
-tickRotate : Model -> Model
-tickRotate model =
-    let
-        ( isTriggered, kt ) =
-            stepRepeatTrigger (keyDown "ArrowUp" model) model.rotateTrigger
-
-        newModel =
-            { model | rotateTrigger = kt }
-    in
-    whenTrue isTriggered tryRotate newModel
+stepRotateTrigger : Model -> ( Bool, Model )
+stepRotateTrigger m =
+    stepRepeatTrigger (keyDown "ArrowUp" m) m.rotateTrigger
+        |> Tuple.mapSecond (\t -> { m | rotateTrigger = t })
 
 
 whenTrue bool func arg =

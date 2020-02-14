@@ -55,31 +55,31 @@ stepKeyTrigger isDown kt =
 
         ( True, TriggeredOnce elapsed ) ->
             let
-                isTriggered =
+                didTrigger =
                     elapsed /= 0 && modBy kt.firstRepeatDelay elapsed == 0
 
                 newState =
-                    if isTriggered then
+                    if didTrigger then
                         TriggeredMoreThanOnce 0
 
                     else
                         TriggeredOnce (elapsed + 1)
             in
-            ( isTriggered, { kt | state = newState } )
+            ( didTrigger, { kt | state = newState } )
 
         ( True, TriggeredMoreThanOnce elapsed ) ->
             let
-                justTriggered =
+                didTrigger =
                     elapsed /= 0 && modBy kt.repeatDelay elapsed == 0
 
                 newState =
-                    if justTriggered then
+                    if didTrigger then
                         TriggeredMoreThanOnce 0
 
                     else
                         TriggeredMoreThanOnce (elapsed + 1)
             in
-            ( justTriggered, { kt | state = newState } )
+            ( didTrigger, { kt | state = newState } )
 
         ( False, NotTriggered ) ->
             ( False, kt )

@@ -181,8 +181,8 @@ init _ =
       , next = Line
       , ticks = 0
       , fall = { ticks = 0, delay = 20 }
-      , rotateKT = initKeyTrigger 5
-      , movementKT = initKeyTrigger 5
+      , rotateKT = initKeyTrigger 10
+      , movementKT = initKeyTrigger 4
       , keys = Set.empty
       , prevKeys = Set.empty
       , state = Running

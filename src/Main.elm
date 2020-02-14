@@ -7,6 +7,7 @@ import Browser.Events
 import Dict exposing (Dict)
 import Html exposing (Html, button, div, text)
 import Html.Attributes exposing (style)
+import Html.Events exposing (onClick)
 import Json.Decode as JD
 import Random exposing (Seed)
 import Set exposing (Set)
@@ -177,6 +178,7 @@ type alias Model =
     , next : TetronName
     , ticks : Int
     , fallSpeed : { ticks : Int, delay : Int }
+    , rotateClicked : Bool
     , rotateTrigger : RepeatTrigger
     , shiftXTrigger : RepeatTrigger
     , speedUpTrigger : RepeatTrigger
@@ -210,6 +212,7 @@ init _ =
       , ticks = 0
       , fallSpeed = { ticks = 0, delay = 20 }
       , rotateTrigger = defaultRepeatTrigger
+      , rotateClicked = False
       , shiftXTrigger = defaultRepeatTrigger
       , speedUpTrigger = initRepeatTrigger 10 1
       , keys = Set.empty
@@ -452,6 +455,7 @@ type Msg
     = Tick
     | OnKeyDown String
     | OnKeyUp String
+    | RotateClicked
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -469,6 +473,9 @@ update message model =
 
         OnKeyUp k ->
             ( { model | keys = Set.remove k model.keys }, Cmd.none )
+
+        RotateClicked ->
+            ( { model | rotateClicked = True }, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg
@@ -495,7 +502,7 @@ view m =
             [ viewGrid cellWidth m.state m.width m.height (gridWithActiveMask m)
                 |> wrapSvg
             , div [ class "df-row justify-center sp10" ]
-                [ btn1 "Rotate"
+                [ btn2 RotateClicked "Rotate"
                 , btn1 "Left"
                 , btn1 "Right"
                 , btn1 "Down"
@@ -508,6 +515,10 @@ view m =
 
 btn1 string =
     button [] [ text string ]
+
+
+btn2 msg string =
+    button [ onClick msg ] [ text string ]
 
 
 viewShapesDemo : Float -> Html msg

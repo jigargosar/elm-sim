@@ -174,8 +174,8 @@ type alias Model =
     , x : Int
     , y : Int
     , color : String
-    , active : Mask
-    , next : TetronName
+    , activeMask : Mask
+    , nextTetronName : TetronName
     , ticks : Int
     , fallSpeed : { ticks : Int, delay : Int }
     , rotateClicked : Bool
@@ -210,8 +210,8 @@ init _ =
       , x = 4
       , y = -2
       , color = ""
-      , active = emptyMask
-      , next = Line
+      , activeMask = emptyMask
+      , nextTetronName = Line
       , ticks = 0
       , fallSpeed = { ticks = 0, delay = 20 }
       , rotateTrigger = defaultRepeatTrigger
@@ -235,7 +235,7 @@ activateNext : Model -> Model
 activateNext model =
     let
         nextTetron =
-            tetronFromName model.next
+            tetronFromName model.nextTetronName
 
         randomNext =
             Random.uniform Line [ S, Z ]
@@ -247,8 +247,8 @@ activateNext model =
         | x = 3
         , y = -2
         , color = nextTetron.color
-        , active = nextTetron.mask
-        , next = next
+        , activeMask = nextTetron.mask
+        , nextTetronName = next
         , seed = seed
         , speedUpTrigger = resetRepeatTrigger model.speedUpTrigger
     }
@@ -366,7 +366,7 @@ tryRotate : Model -> Model
 tryRotate m =
     let
         newMask =
-            rotateMask m.active
+            rotateMask m.activeMask
 
         newMaskPoints =
             newMask
@@ -374,7 +374,7 @@ tryRotate m =
                 |> maskToList
     in
     if List.all (isValidMaskPosition m) newMaskPoints then
-        { m | active = newMask }
+        { m | activeMask = newMask }
 
     else
         m
@@ -384,7 +384,7 @@ tryShiftX : Int -> Model -> Model
 tryShiftX dx m =
     let
         newMaskPoints =
-            m.active
+            m.activeMask
                 |> translateMask (m.x + dx) m.y
                 |> maskToList
     in
@@ -416,11 +416,11 @@ moveActiveDown : Model -> Model
 moveActiveDown m =
     let
         nextMaskPoints =
-            translateMask m.x (m.y + 1) m.active
+            translateMask m.x (m.y + 1) m.activeMask
                 |> maskToList
 
         currentMaskPoints =
-            translateMask m.x m.y m.active
+            translateMask m.x m.y m.activeMask
                 |> maskToList
     in
     if List.all (isValidMaskPosition m) nextMaskPoints then
@@ -467,7 +467,7 @@ gridWithActiveMask m =
         pairTo b a =
             ( a, b )
     in
-    translateMask m.x m.y m.active
+    translateMask m.x m.y m.activeMask
         |> maskToList
         |> List.filter (isValid m.width m.height)
         |> List.map (pairTo m.color)

@@ -542,17 +542,13 @@ view m =
                 |> wrapSvg
             , div [ class "df-row justify-center sp10" ]
                 [ btn2 RotateClicked "Rotate"
-                , btn1 "Left"
-                , btn1 "Right"
-                , btn1 "Down"
+                , btn2 LeftClicked "Left"
+                , btn2 RightClicked "Right"
+                , btn2 SpeedUpClicked "Down"
                 ]
             ]
         , viewShapesDemo cellWidth
         ]
-
-
-btn1 string =
-    button [] [ text string ]
 
 
 btn2 msg string =

@@ -179,6 +179,9 @@ type alias Model =
     , ticks : Int
     , fallSpeed : { ticks : Int, delay : Int }
     , rotateClicked : Bool
+    , leftClicked : Bool
+    , rightClicked : Bool
+    , speedUpClicked : Bool
     , rotateTrigger : RepeatTrigger
     , shiftXTrigger : RepeatTrigger
     , speedUpTrigger : RepeatTrigger
@@ -213,6 +216,9 @@ init _ =
       , fallSpeed = { ticks = 0, delay = 20 }
       , rotateTrigger = defaultRepeatTrigger
       , rotateClicked = False
+      , leftClicked = False
+      , rightClicked = False
+      , speedUpClicked = False
       , shiftXTrigger = defaultRepeatTrigger
       , speedUpTrigger = initRepeatTrigger 10 1
       , keys = Set.empty

@@ -491,9 +491,9 @@ view m =
             30
     in
     div [ class "df-row sp10 items-center" ]
-        [ viewShapesDemo cellWidth
-        , viewGrid cellWidth m.state m.width m.height (gridWithActiveMask m)
+        [ viewGrid cellWidth m.state m.width m.height (gridWithActiveMask m)
             |> wrapSvg
+        , viewShapesDemo cellWidth
         ]
 
 

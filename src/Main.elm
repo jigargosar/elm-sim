@@ -261,7 +261,7 @@ tick model =
             tickFall model
                 |> tickRotate
                 |> tickShiftX
-                |> tickSpeedUp
+                |> whenTriggered stepSpeedUpTrigger moveActiveDown
                 |> when .rotateClicked tryRotate
                 |> resetClicks
 
@@ -292,25 +292,18 @@ when pred true val =
         val
 
 
-tickSpeedUp : Model -> Model
-tickSpeedUp m =
+whenTriggered updateTrigger onTrigger model =
     let
-        ( isTriggered, kt ) =
-            stepRepeatTrigger (keyDown "ArrowDown" m) m.speedUpTrigger
-
-        newModel =
-            { m | speedUpTrigger = kt }
+        ( didTrigger, newModel ) =
+            updateTrigger model
     in
-    whenTrue isTriggered moveActiveDown newModel
+    whenTrue didTrigger onTrigger newModel
 
 
 stepSpeedUpTrigger : Model -> ( Bool, Model )
 stepSpeedUpTrigger m =
-    let
-        ( isTriggered, triggerModel ) =
-            stepRepeatTrigger (keyDown "ArrowDown" m) m.speedUpTrigger
-    in
-    ( isTriggered, { m | speedUpTrigger = triggerModel } )
+    stepRepeatTrigger (keyDown "ArrowDown" m) m.speedUpTrigger
+        |> Tuple.mapSecond (\t -> { m | speedUpTrigger = t })
 
 
 tickRotate : Model -> Model

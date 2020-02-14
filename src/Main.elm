@@ -33,14 +33,14 @@ type alias KeyTrigger =
 
 
 type TriggerState
-    = NoTrigger
-    | FirstTrigger
-    | RepeatTrigger
+    = NotTriggered
+    | TriggeredOnce
+    | TriggeredMoreThanOnce
 
 
 initKeyTrigger : Int -> Int -> KeyTrigger
 initKeyTrigger firstRepeatDelay repeatDelay =
-    KeyTrigger firstRepeatDelay repeatDelay 0 NoTrigger
+    KeyTrigger firstRepeatDelay repeatDelay 0 NotTriggered
 
 
 defaultKeyTrigger : KeyTrigger
@@ -51,24 +51,24 @@ defaultKeyTrigger =
 stepKeyTrigger : Bool -> KeyTrigger -> ( Bool, KeyTrigger )
 stepKeyTrigger isDown kt =
     case ( isDown, kt.state ) of
-        ( True, NoTrigger ) ->
-            ( True, { kt | elapsed = 0, state = FirstTrigger } )
+        ( True, NotTriggered ) ->
+            ( True, { kt | elapsed = 0, state = TriggeredOnce } )
 
-        ( True, FirstTrigger ) ->
+        ( True, TriggeredOnce ) ->
             let
                 isTriggered =
                     kt.elapsed /= 0 && modBy kt.firstRepeatDelay kt.elapsed == 0
 
                 ( newElapsed, newState ) =
                     if isTriggered then
-                        ( 0, RepeatTrigger )
+                        ( 0, TriggeredMoreThanOnce )
 
                     else
                         ( kt.elapsed + 1, kt.state )
             in
             ( isTriggered, { kt | elapsed = newElapsed, state = newState } )
 
-        ( True, RepeatTrigger ) ->
+        ( True, TriggeredMoreThanOnce ) ->
             let
                 isTriggered =
                     kt.elapsed /= 0 && modBy kt.repeatDelay kt.elapsed == 0
@@ -82,14 +82,14 @@ stepKeyTrigger isDown kt =
             in
             ( isTriggered, { kt | elapsed = newElapsed } )
 
-        ( False, NoTrigger ) ->
+        ( False, NotTriggered ) ->
             ( False, kt )
 
-        ( False, FirstTrigger ) ->
-            ( False, { kt | elapsed = 0, state = NoTrigger } )
+        ( False, TriggeredOnce ) ->
+            ( False, { kt | elapsed = 0, state = NotTriggered } )
 
-        ( False, RepeatTrigger ) ->
-            ( False, { kt | elapsed = 0, state = NoTrigger } )
+        ( False, TriggeredMoreThanOnce ) ->
+            ( False, { kt | elapsed = 0, state = NotTriggered } )
 
 
 

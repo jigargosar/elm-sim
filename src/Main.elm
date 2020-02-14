@@ -56,7 +56,7 @@ stepKeyTrigger isDown kt =
         ( True, TriggeredOnce elapsed ) ->
             let
                 didTrigger =
-                    elapsed /= 0 && modBy kt.firstRepeatDelay elapsed == 0
+                    elapsed >= kt.firstRepeatDelay
 
                 newState =
                     if didTrigger then
@@ -70,7 +70,7 @@ stepKeyTrigger isDown kt =
         ( True, TriggeredMoreThanOnce elapsed ) ->
             let
                 didTrigger =
-                    elapsed /= 0 && modBy kt.repeatDelay elapsed == 0
+                    elapsed >= kt.repeatDelay
 
                 newState =
                     if didTrigger then

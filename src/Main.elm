@@ -25,15 +25,16 @@ import TypedSvg.Types exposing (Transform(..))
 
 
 type alias KeyTrigger =
-    { delay : Int
+    { firstRepeatDelay : Int
+    , repeatDelay : Int
     , elapsed : Int
     , wasDown : Bool
     }
 
 
-initKeyTrigger : Int -> KeyTrigger
-initKeyTrigger delay =
-    KeyTrigger delay 0 False
+initKeyTrigger : Int -> Int -> KeyTrigger
+initKeyTrigger firstRepeatDelay repeatDelay =
+    KeyTrigger firstRepeatDelay repeatDelay 0 False
 
 
 stepKeyTrigger : Bool -> KeyTrigger -> ( Bool, KeyTrigger )
@@ -47,7 +48,7 @@ stepKeyTrigger isDown kt =
             -- Repeat Press
             let
                 isTriggered =
-                    kt.elapsed /= 0 && modBy kt.delay kt.elapsed == 0
+                    kt.elapsed /= 0 && modBy kt.repeatDelay kt.elapsed == 0
 
                 newElapsed =
                     if isTriggered then
@@ -181,8 +182,8 @@ init _ =
       , next = Line
       , ticks = 0
       , fall = { ticks = 0, delay = 20 }
-      , rotateKT = initKeyTrigger 10
-      , movementKT = initKeyTrigger 4
+      , rotateKT = initKeyTrigger 10 5
+      , movementKT = initKeyTrigger 10 5
       , keys = Set.empty
       , prevKeys = Set.empty
       , state = Running

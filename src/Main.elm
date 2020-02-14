@@ -192,6 +192,13 @@ type alias Model =
     }
 
 
+type Input
+    = MoveLeft
+    | MoveRight
+    | Rotate
+    | SpeedUp
+
+
 type State
     = Running
     | Paused

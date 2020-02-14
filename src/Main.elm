@@ -210,7 +210,7 @@ init _ =
       , fall = { ticks = 0, delay = 20 }
       , rotateTrigger = defaultRepeatTrigger
       , shiftXTrigger = defaultRepeatTrigger
-      , speedUpTrigger = defaultRepeatTrigger
+      , speedUpTrigger = initRepeatTrigger 10 1
       , keys = Set.empty
       , prevKeys = Set.empty
       , state = Running

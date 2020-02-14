@@ -260,9 +260,12 @@ tick model =
         Running ->
             tickFall model
                 |> whenTriggered stepRotateTrigger tryRotate
-                |> tickShiftX
                 |> whenTriggered stepSpeedUpTrigger moveActiveDown
+                |> tickShiftX
                 |> when .rotateClicked tryRotate
+                |> when .leftClicked (tryShiftX -1)
+                |> when .rightClicked (tryShiftX 1)
+                |> when .speedUpClicked moveActiveDown
                 |> resetClicks
 
         GameOver ->

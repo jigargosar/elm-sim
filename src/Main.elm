@@ -176,7 +176,7 @@ type alias Model =
     , active : Mask
     , next : TetronName
     , ticks : Int
-    , fall : { ticks : Int, delay : Int }
+    , fallSpeed : { ticks : Int, delay : Int }
     , rotateTrigger : RepeatTrigger
     , shiftXTrigger : RepeatTrigger
     , speedUpTrigger : RepeatTrigger
@@ -207,7 +207,7 @@ init _ =
       , active = emptyMask
       , next = Line
       , ticks = 0
-      , fall = { ticks = 0, delay = 20 }
+      , fallSpeed = { ticks = 0, delay = 20 }
       , rotateTrigger = defaultRepeatTrigger
       , shiftXTrigger = defaultRepeatTrigger
       , speedUpTrigger = initRepeatTrigger 10 1
@@ -364,17 +364,17 @@ tickFall : Model -> Model
 tickFall model =
     let
         fall =
-            model.fall
+            model.fallSpeed
 
         newFall =
             { fall | ticks = fall.ticks + 1 }
     in
     if fall.delay <= 0 || modBy fall.delay fall.ticks == 0 then
-        { model | fall = newFall }
+        { model | fallSpeed = newFall }
             |> moveActiveDown
 
     else
-        { model | fall = newFall }
+        { model | fallSpeed = newFall }
 
 
 moveActiveDown : Model -> Model

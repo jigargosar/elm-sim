@@ -280,7 +280,7 @@ btnDown =
     Debug.todo "impl"
 
 
-updateInput m =
+updateRunning m =
     let
         ( shouldRotate, rotateTrigger ) =
             stepRepeatTrigger (keyDown "ArrowUp" m || btnDown RotateBtn m) m.rotateTrigger

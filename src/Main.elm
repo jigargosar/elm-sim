@@ -307,10 +307,10 @@ tickSpeedUp m =
 stepSpeedUpTrigger : Model -> ( Bool, Model )
 stepSpeedUpTrigger m =
     let
-        ( isTriggered, kt ) =
+        ( isTriggered, triggerModel ) =
             stepRepeatTrigger (keyDown "ArrowDown" m) m.speedUpTrigger
     in
-    ( isTriggered, { m | speedUpTrigger = kt } )
+    ( isTriggered, { m | speedUpTrigger = triggerModel } )
 
 
 tickRotate : Model -> Model

@@ -303,9 +303,9 @@ updateRunning m =
         , shiftXTrigger = shiftXTrigger
         , speedUpTrigger = speedUpTrigger
     }
-        |> whenTrue (shouldFall || shouldSpeedUp) moveActiveDown
-        |> whenTrue shouldRotate tryRotate
-        |> whenTrue shouldShiftX (tryShiftX dx)
+        |> whenTrue (shouldFall || keyDown "ArrowDown" m) moveActiveDown
+        |> whenTrue (keyDown "ArrowUp" m) tryRotate
+        |> whenTrue (dx /= 0) (tryShiftX dx)
         |> when (.grid >> (/=) m.grid) resetSpeedUpTrigger
 
 
@@ -471,14 +471,20 @@ update message model =
     case message of
         Tick ->
             ( tick model
+                |> resetKeys
             , Cmd.none
             )
 
-        OnKeyDown k repeat ->
+        OnKeyDown k _ ->
             ( { model | keys = Set.insert k model.keys }, Cmd.none )
 
         OnKeyUp k ->
             ( { model | keys = Set.remove k model.keys }, Cmd.none )
+
+
+resetKeys : Model -> Model
+resetKeys m =
+    { m | keys = Set.empty }
 
 
 subscriptions : Model -> Sub Msg

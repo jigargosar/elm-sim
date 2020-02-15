@@ -192,10 +192,10 @@ updateRunning : Model -> Model
 updateRunning m =
     let
         leftPressed =
-            keyDown "ArrowLeft" m
+            onKeyDown "ArrowLeft" m
 
         rightPressed =
-            keyDown "ArrowRight" m
+            onKeyDown "ArrowRight" m
 
         dx =
             case ( leftPressed, rightPressed ) of
@@ -217,8 +217,8 @@ updateRunning m =
     { m
         | fallTrigger = fallTrigger
     }
-        |> whenTrue (shouldFall || keyDown "ArrowDown" m) moveActiveDown
-        |> whenTrue (keyDown "ArrowUp" m) tryRotate
+        |> whenTrue (shouldFall || onKeyDown "ArrowDown" m) moveActiveDown
+        |> whenTrue (onKeyDown "ArrowUp" m) tryRotate
         |> whenTrue (dx /= 0) (tryShiftX dx)
 
 
@@ -243,8 +243,8 @@ whenTrue bool func arg =
         arg
 
 
-keyDown : String -> Model -> Bool
-keyDown string m =
+onKeyDown : String -> Model -> Bool
+onKeyDown string m =
     Set.member string m.keyDowns
 
 

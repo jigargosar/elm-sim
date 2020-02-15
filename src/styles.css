@@ -1,9 +1,12 @@
-body{
+body {
   padding: 0;
   margin: 0;
   width: 100%;
 }
 
+*, *::before, *::after {
+  box-sizing: border-box;
+}
 
 /* Functional CSS Styles */
 
@@ -30,7 +33,7 @@ body{
   font-weight: bold;
 }
 
-.dn{
+.dn {
   display: none;
 }
 
@@ -52,7 +55,7 @@ body{
   flex-direction: column;
 }
 
-.f-wrap{
+.f-wrap {
   flex-wrap: wrap;
 }
 

@@ -192,7 +192,7 @@ type alias Model =
     , color : String
     , activeMask : Mask
     , nextTetronName : TetronName
-    , fallSpeed : { ticks : Int, delay : Int }
+    , fallSpeed : FallTrigger
     , rotateTrigger : RepeatTrigger
     , shiftXTrigger : RepeatTrigger
     , speedUpTrigger : RepeatTrigger
@@ -200,6 +200,10 @@ type alias Model =
     , state : State
     , seed : Seed
     }
+
+
+type alias FallTrigger =
+    { ticks : Int, delay : Int }
 
 
 type State
@@ -354,6 +358,18 @@ tryShiftX dx m =
 
     else
         m
+
+
+stepFallTrigger : FallTrigger -> ( Bool, FallTrigger )
+stepFallTrigger fall =
+    let
+        newFall =
+            { fall | ticks = fall.ticks + 1 }
+
+        isTriggered =
+            fall.delay <= 0 || modBy fall.delay fall.ticks == 0
+    in
+    ( isTriggered, newFall )
 
 
 tickFall : Model -> Model

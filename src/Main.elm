@@ -38,81 +38,6 @@ type alias Board a =
 
 
 
--- track how long key is held down, and trigger event at *delayed* rate.
--- also trigger first time key is pressed
--- KeyTrigger
-
-
-type alias RepeatTrigger =
-    { firstRepeatDelay : Int
-    , repeatDelay : Int
-    , state : TriggerState
-    }
-
-
-type TriggerState
-    = NotTriggered
-    | TriggeredOnce Int
-    | TriggeredMoreThanOnce Int
-
-
-initRepeatTrigger : Int -> Int -> RepeatTrigger
-initRepeatTrigger firstRepeatDelay repeatDelay =
-    RepeatTrigger firstRepeatDelay repeatDelay NotTriggered
-
-
-defaultRepeatTrigger : RepeatTrigger
-defaultRepeatTrigger =
-    initRepeatTrigger 10 2
-
-
-resetRepeatTrigger : RepeatTrigger -> RepeatTrigger
-resetRepeatTrigger rt =
-    { rt | state = NotTriggered }
-
-
-stepRepeatTrigger : Bool -> RepeatTrigger -> ( Bool, RepeatTrigger )
-stepRepeatTrigger isHeldDown kt =
-    case ( isHeldDown, kt.state ) of
-        ( True, NotTriggered ) ->
-            ( True, { kt | state = TriggeredOnce 0 } )
-
-        ( True, TriggeredOnce elapsed ) ->
-            let
-                didTrigger =
-                    elapsed >= kt.firstRepeatDelay
-
-                newState =
-                    if didTrigger then
-                        TriggeredMoreThanOnce 0
-
-                    else
-                        TriggeredOnce (elapsed + 1)
-            in
-            ( didTrigger, { kt | state = newState } )
-
-        ( True, TriggeredMoreThanOnce elapsed ) ->
-            let
-                didTrigger =
-                    elapsed >= kt.repeatDelay
-
-                newState =
-                    if didTrigger then
-                        TriggeredMoreThanOnce 0
-
-                    else
-                        TriggeredMoreThanOnce (elapsed + 1)
-            in
-            ( didTrigger, { kt | state = newState } )
-
-        ( False, NotTriggered ) ->
-            ( False, kt )
-
-        ( False, _ ) ->
-            ( False, { kt | state = NotTriggered } )
-
-
-
 -- Model
 
 
@@ -195,9 +120,6 @@ type alias Model =
     , activeMask : Mask
     , nextTetronName : TetronName
     , fallTrigger : FallTrigger
-    , rotateTrigger : RepeatTrigger
-    , shiftXTrigger : RepeatTrigger
-    , speedUpTrigger : RepeatTrigger
     , keys : Set String
     , state : State
     , seed : Seed
@@ -231,9 +153,6 @@ init _ =
       , state = Running
       , seed = Random.initialSeed 0
       , fallTrigger = { ticks = 0, delay = 20 }
-      , rotateTrigger = defaultRepeatTrigger
-      , shiftXTrigger = defaultRepeatTrigger
-      , speedUpTrigger = initRepeatTrigger 10 1
       , keys = Set.empty
       }
         |> activateNext
@@ -265,17 +184,11 @@ activateNext model =
 updateRunning : Model -> Model
 updateRunning m =
     let
-        ( shouldRotate, rotateTrigger ) =
-            stepRepeatTrigger (keyDown "ArrowUp" m) m.rotateTrigger
-
         leftPressed =
             keyDown "ArrowLeft" m
 
         rightPressed =
             keyDown "ArrowRight" m
-
-        ( shouldShiftX, shiftXTrigger ) =
-            stepRepeatTrigger (leftPressed || rightPressed) m.shiftXTrigger
 
         dx =
             case ( leftPressed, rightPressed ) of
@@ -291,35 +204,15 @@ updateRunning m =
                 ( False, True ) ->
                     1
 
-        ( shouldSpeedUp, speedUpTrigger ) =
-            stepRepeatTrigger (keyDown "ArrowDown" m) m.speedUpTrigger
-
         ( shouldFall, fallTrigger ) =
             stepFallTrigger m.fallTrigger
     in
     { m
         | fallTrigger = fallTrigger
-        , rotateTrigger = rotateTrigger
-        , shiftXTrigger = shiftXTrigger
-        , speedUpTrigger = speedUpTrigger
     }
         |> whenTrue (shouldFall || keyDown "ArrowDown" m) moveActiveDown
         |> whenTrue (keyDown "ArrowUp" m) tryRotate
         |> whenTrue (dx /= 0) (tryShiftX dx)
-        |> when (.grid >> (/=) m.grid) resetSpeedUpTrigger
-
-
-when pred true val =
-    if pred val then
-        true val
-
-    else
-        val
-
-
-resetSpeedUpTrigger : Model -> Model
-resetSpeedUpTrigger m =
-    { m | speedUpTrigger = resetRepeatTrigger m.speedUpTrigger }
 
 
 tick : Model -> Model

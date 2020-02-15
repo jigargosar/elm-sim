@@ -5,9 +5,11 @@ module Main exposing (main)
 import Browser
 import Browser.Events
 import Dict exposing (Dict)
+import Dict.Extra
 import Html exposing (Html, div, text)
 import Html.Attributes exposing (style)
 import Json.Decode as JD
+import List.Extra
 import Random exposing (Seed)
 import Set exposing (Set)
 import String
@@ -108,10 +110,79 @@ moveActiveDown m =
 
     else if List.all (isValidInsertPosition m) currentMaskPoints then
         { m | grid = gridWithActiveMask m }
+            |> clearAndShiftRows
             |> activateNext
 
     else
         { m | state = GameOver }
+
+
+justWhen : (a -> Bool) -> a -> Maybe a
+justWhen pred val =
+    if pred val then
+        Just val
+
+    else
+        Nothing
+
+
+clearRow : Int -> List ( Int2, a ) -> List ( Int2, a )
+clearRow rn =
+    List.filter (Tuple.first >> rowIs rn)
+
+
+rowIs : Int -> Int2 -> Bool
+rowIs rn ( _, y ) =
+    rn == y
+
+
+clearRowAndShiftDown : Int -> List ( Int2, a ) -> List ( Int2, a )
+clearRowAndShiftDown rn =
+    let
+        fm ( ( x, y ), v ) =
+            if y == rn then
+                Nothing
+
+            else if y < rn then
+                Just ( ( x, y + 1 ), v )
+
+            else
+                Just ( ( x, y ), v )
+    in
+    List.filterMap fm
+
+
+propEq func expected val =
+    func val == expected
+
+
+clearAndShiftRows : Board a -> Board a
+clearAndShiftRows m =
+    let
+        is =
+            (==)
+
+        isRowFilled : Int -> Bool
+        isRowFilled y =
+            Dict.keys m.grid
+                |> List.Extra.count (propEq Tuple.second y)
+                |> is m.width
+
+        setGridFromList list =
+            { m | grid = Dict.fromList list }
+    in
+    case
+        List.range 0 (m.height - 1)
+            |> List.Extra.find isRowFilled
+    of
+        Just rn ->
+            clearAndShiftRows
+                (clearRowAndShiftDown rn (Dict.toList m.grid)
+                    |> setGridFromList
+                )
+
+        Nothing ->
+            m
 
 
 isValidMaskPosition : Board a -> Int2 -> Bool

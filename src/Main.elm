@@ -120,7 +120,7 @@ type alias Model =
     , activeMask : Mask
     , nextTetronName : TetronName
     , fallTrigger : FallTrigger
-    , keys : Set String
+    , keyDowns : Set String
     , state : State
     , seed : Seed
     }
@@ -156,7 +156,7 @@ init _ =
             , state = Running
             , seed = Random.initialSeed 0
             , fallTrigger = { ticks = 0, delay = 20 }
-            , keys = Set.empty
+            , keyDowns = Set.empty
             }
     in
     ( model |> activateNext
@@ -243,7 +243,7 @@ whenTrue bool func arg =
 
 keyDown : String -> Model -> Bool
 keyDown string m =
-    Set.member string m.keys
+    Set.member string m.keyDowns
 
 
 tryRotate : Board a -> Board a
@@ -374,15 +374,15 @@ update message model =
             )
 
         OnKeyDown k _ ->
-            ( { model | keys = Set.insert k model.keys }, Cmd.none )
+            ( { model | keyDowns = Set.insert k model.keyDowns }, Cmd.none )
 
         OnKeyUp k ->
-            ( { model | keys = Set.remove k model.keys }, Cmd.none )
+            ( { model | keyDowns = Set.remove k model.keyDowns }, Cmd.none )
 
 
 resetKeys : Model -> Model
 resetKeys m =
-    { m | keys = Set.empty }
+    { m | keyDowns = Set.empty }
 
 
 subscriptions : Model -> Sub Msg

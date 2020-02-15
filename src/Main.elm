@@ -5,9 +5,8 @@ module Main exposing (main)
 import Browser
 import Browser.Events
 import Dict exposing (Dict)
-import Html exposing (Html, button, div, text)
+import Html exposing (Html, div, text)
 import Html.Attributes exposing (style)
-import Html.Events
 import Json.Decode as JD
 import Random exposing (Seed)
 import Set exposing (Set)
@@ -176,24 +175,14 @@ type alias Model =
     , color : String
     , activeMask : Mask
     , nextTetronName : TetronName
-    , ticks : Int
     , fallSpeed : { ticks : Int, delay : Int }
     , rotateTrigger : RepeatTrigger
     , shiftXTrigger : RepeatTrigger
     , speedUpTrigger : RepeatTrigger
     , keys : Set String
-    , btns : List Btn
-    , prevKeys : Set String
     , state : State
     , seed : Seed
     }
-
-
-type Input
-    = MoveLeft
-    | MoveRight
-    | Rotate
-    | SpeedUp
 
 
 type State
@@ -216,14 +205,11 @@ init _ =
       , color = ""
       , activeMask = emptyMask
       , nextTetronName = Line
-      , ticks = 0
       , fallSpeed = { ticks = 0, delay = 20 }
       , rotateTrigger = defaultRepeatTrigger
       , shiftXTrigger = defaultRepeatTrigger
       , speedUpTrigger = initRepeatTrigger 10 1
       , keys = Set.empty
-      , btns = []
-      , prevKeys = Set.empty
       , state = Running
       , seed = Random.initialSeed 0
       }
@@ -255,29 +241,17 @@ activateNext model =
     }
 
 
-type Btn
-    = RotateBtn
-    | LeftBtn
-    | RightBtn
-    | SpeedUpBtn
-
-
-btnDown : Btn -> Model -> Bool
-btnDown btn =
-    .btns >> List.member btn
-
-
 updateRunning : Model -> Model
 updateRunning m =
     let
         ( shouldRotate, rotateTrigger ) =
-            stepRepeatTrigger (keyDown "ArrowUp" m || btnDown RotateBtn m) m.rotateTrigger
+            stepRepeatTrigger (keyDown "ArrowUp" m) m.rotateTrigger
 
         leftPressed =
-            keyDown "ArrowLeft" m || btnDown LeftBtn m
+            keyDown "ArrowLeft" m
 
         rightPressed =
-            keyDown "ArrowRight" m || btnDown RightBtn m
+            keyDown "ArrowRight" m
 
         ( shouldShiftX, shiftXTrigger ) =
             stepRepeatTrigger (leftPressed || rightPressed) m.shiftXTrigger
@@ -297,7 +271,7 @@ updateRunning m =
                     1
 
         ( shouldSpeedUp, speedUpTrigger ) =
-            stepRepeatTrigger (keyDown "ArrowDown" m || btnDown SpeedUpBtn m) m.speedUpTrigger
+            stepRepeatTrigger (keyDown "ArrowDown" m) m.speedUpTrigger
     in
     { m | rotateTrigger = rotateTrigger, shiftXTrigger = shiftXTrigger, speedUpTrigger = speedUpTrigger }
         |> tickFall
@@ -453,31 +427,19 @@ type Msg
     = Tick
     | OnKeyDown String
     | OnKeyUp String
-    | OnBtnDown Btn
-    | OnBtnUp Btn
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update message model =
     case message of
         Tick ->
-            ( { model | ticks = model.ticks + 1 }
-                |> tick
-                |> (\m -> { m | prevKeys = m.keys })
-            , Cmd.none
-            )
+            ( tick model, Cmd.none )
 
         OnKeyDown k ->
             ( { model | keys = Set.insert k model.keys }, Cmd.none )
 
         OnKeyUp k ->
             ( { model | keys = Set.remove k model.keys }, Cmd.none )
-
-        OnBtnDown btn ->
-            ( { model | btns = btn :: List.filter ((/=) btn) model.btns }, Cmd.none )
-
-        OnBtnUp btn ->
-            ( { model | btns = List.filter ((/=) btn) model.btns }, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg
@@ -503,25 +465,9 @@ view m =
         [ div [ class "df-col sp10" ]
             [ viewGrid cellWidth m.state m.width m.height (gridWithActiveMask m)
                 |> wrapSvg
-            , div [ class "df-row justify-center sp10" ]
-                [ btn2 RotateBtn "Rotate"
-                , btn2 LeftBtn "Left"
-                , btn2 RightBtn "Right"
-                , btn2 SpeedUpBtn "Down"
-                ]
             ]
         , viewShapesDemo cellWidth
         ]
-
-
-btn2 btnName string =
-    button
-        [ Html.Events.onMouseDown (OnBtnDown btnName)
-        , Html.Events.onMouseUp (OnBtnUp btnName)
-        , Html.Events.onMouseLeave (OnBtnUp btnName)
-        , Html.Events.onMouseOut (OnBtnUp btnName)
-        ]
-        [ text string ]
 
 
 viewShapesDemo : Float -> Html msg

@@ -148,9 +148,9 @@ updateKeyboardOnKeyDown k m =
     }
 
 
-clearKeyEvents : Keyboard a -> Keyboard a
-clearKeyEvents m =
-    { m | keyDowns = Set.empty, keyUps = Set.empty }
+tickKeyboard : Keyboard a -> Keyboard a
+tickKeyboard m =
+    { m | keyDowns = Set.empty, keyUps = Set.empty, prevKeys = m.keys }
 
 
 
@@ -398,7 +398,7 @@ update message model =
     case message of
         Tick ->
             ( tick model
-                |> clearKeyEvents
+                |> tickKeyboard
             , Cmd.none
             )
 

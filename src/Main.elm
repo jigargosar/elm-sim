@@ -228,10 +228,6 @@ tetronFromName shape =
             create zMask "green"
 
 
-type alias Model =
-    Keyboard (Board { fallTrigger : FallTrigger })
-
-
 
 -- Keyboard
 
@@ -272,7 +268,11 @@ tickKeyboard m =
 
 
 
--- END KEYBOARD
+-- MODEL
+
+
+type alias Model =
+    Keyboard (Board { fallTrigger : FallTrigger })
 
 
 type alias FallTrigger =

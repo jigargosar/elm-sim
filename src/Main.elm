@@ -246,6 +246,11 @@ keyWentDown string m =
     Dict.member string m.keyDowns
 
 
+keyWentDownNoRepeat : String -> Model -> Bool
+keyWentDownNoRepeat string m =
+    Dict.get string m.keyDowns == Just False
+
+
 updateKeyboardOnKeyUp : String -> Keyboard a -> Keyboard a
 updateKeyboardOnKeyUp k m =
     { m
@@ -330,11 +335,18 @@ init _ =
 updateRunning : Model -> Model
 updateRunning m =
     let
+        checkKey k =
+            if m.allowRepeat then
+                keyWentDown k m
+
+            else
+                keyWentDownNoRepeat k m
+
         leftPressed =
-            keyWentDown "ArrowLeft" m
+            checkKey "ArrowLeft"
 
         rightPressed =
-            keyWentDown "ArrowRight" m
+            checkKey "ArrowRight"
 
         dx =
             case ( leftPressed, rightPressed ) of
@@ -356,8 +368,8 @@ updateRunning m =
     { m
         | fallTrigger = fallTrigger
     }
-        |> whenTrue (shouldFall || keyWentDown "ArrowDown" m) moveActiveDown
-        |> whenTrue (keyWentDown "ArrowUp" m) tryRotate
+        |> whenTrue (shouldFall || checkKey "ArrowDown") moveActiveDown
+        |> whenTrue (checkKey "ArrowUp") tryRotate
         |> whenTrue (dx /= 0) (tryShiftX dx)
         |> when (notEqBy .grid m) disableRepeatKeys
 

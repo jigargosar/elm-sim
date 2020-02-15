@@ -34,6 +34,7 @@ type alias Board a =
         , nextTetronName : TetronName
         , state : State
         , seed : Seed
+        , speedUpTrigger : RepeatTrigger
     }
 
 

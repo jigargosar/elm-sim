@@ -571,7 +571,7 @@ viewNext cw tn =
             tetronFromName tn
     in
     viewMask cw color mask
-        |> wrapSvg
+        |> wrapSvg2 [ class "alignTop" ]
 
 
 remove _ =
@@ -606,6 +606,15 @@ applyN : Int -> (c -> c) -> c -> c
 applyN n func val =
     List.range 0 (n - 1)
         |> List.foldl (always func) val
+
+
+wrapSvg2 attrs s =
+    div
+        (style "border" "1px dotted gray"
+            :: class "lh0"
+            :: attrs
+        )
+        [ s ]
 
 
 wrapSvg s =

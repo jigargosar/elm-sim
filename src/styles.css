@@ -73,6 +73,9 @@ html {
   justify-content: center;
 }
 
+.alignTop{
+  align-self: flex-start;
+}
 
 .f-wrap {
   flex-wrap: wrap;

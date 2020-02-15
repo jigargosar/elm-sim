@@ -121,6 +121,7 @@ type alias Model =
     , nextTetronName : TetronName
     , fallTrigger : FallTrigger
     , keyDowns : Set String
+    , keyUps : Set String
     , state : State
     , seed : Seed
     }
@@ -157,6 +158,7 @@ init _ =
             , seed = Random.initialSeed 0
             , fallTrigger = { ticks = 0, delay = 20 }
             , keyDowns = Set.empty
+            , keyUps = Set.empty
             }
     in
     ( model |> activateNext
@@ -369,20 +371,20 @@ update message model =
     case message of
         Tick ->
             ( tick model
-                |> resetKeys
+                |> resetKeyEvents
             , Cmd.none
             )
 
         OnKeyDown k _ ->
             ( { model | keyDowns = Set.insert k model.keyDowns }, Cmd.none )
 
-        OnKeyUp _ ->
-            ( model, Cmd.none )
+        OnKeyUp k ->
+            ( { model | keyUps = Set.insert k model.keyUps }, Cmd.none )
 
 
-resetKeys : Model -> Model
-resetKeys m =
-    { m | keyDowns = Set.empty }
+resetKeyEvents : Model -> Model
+resetKeyEvents m =
+    { m | keyDowns = Set.empty, keyUps = Set.empty }
 
 
 subscriptions : Model -> Sub Msg

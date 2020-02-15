@@ -556,9 +556,11 @@ view m =
             30
     in
     div [ class "df-row w-100 h-100 centerX centerY p10" ]
-        [ viewGrid cellWidth m.state m.width m.height (gridWithActiveMask m)
-            |> wrapSvg
-        , viewNext cellWidth m.nextTetronName
+        [ div [ class "df-row sp10" ]
+            [ viewGrid cellWidth m.state m.width m.height (gridWithActiveMask m)
+                |> wrapSvg
+            , viewNext cellWidth m.nextTetronName
+            ]
         , viewShapesDemo cellWidth
             |> remove
         ]

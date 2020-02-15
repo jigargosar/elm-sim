@@ -386,10 +386,20 @@ update message model =
             )
 
         OnKeyDown k _ ->
-            ( { model | keyDowns = Set.insert k model.keyDowns }, Cmd.none )
+            ( { model
+                | keyDowns = Set.insert k model.keyDowns
+                , keys = Set.insert k model.keys
+              }
+            , Cmd.none
+            )
 
         OnKeyUp k ->
-            ( { model | keyUps = Set.insert k model.keyUps }, Cmd.none )
+            ( { model
+                | keyUps = Set.insert k model.keyUps
+                , keys = Set.remove k model.keys
+              }
+            , Cmd.none
+            )
 
 
 resetKeyEvents : Model -> Model

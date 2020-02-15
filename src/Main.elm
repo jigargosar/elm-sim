@@ -37,6 +37,124 @@ type alias Board a =
     }
 
 
+activateNext : Board a -> Board a
+activateNext model =
+    let
+        nextTetron =
+            tetronFromName model.nextTetronName
+
+        randomNext =
+            Random.uniform Line [ S, Z ]
+
+        ( next, seed ) =
+            Random.step randomNext model.seed
+    in
+    { model
+        | x = 3
+        , y = -2
+        , color = nextTetron.color
+        , activeMask = nextTetron.mask
+        , nextTetronName = next
+        , seed = seed
+    }
+
+
+tryRotate : Board a -> Board a
+tryRotate m =
+    let
+        newMask =
+            rotateMask m.activeMask
+
+        newMaskPoints =
+            newMask
+                |> translateMask m.x m.y
+                |> maskToList
+    in
+    if List.all (isValidMaskPosition m) newMaskPoints then
+        { m | activeMask = newMask }
+
+    else
+        m
+
+
+tryShiftX : Int -> Board a -> Board a
+tryShiftX dx m =
+    let
+        newMaskPoints =
+            m.activeMask
+                |> translateMask (m.x + dx) m.y
+                |> maskToList
+    in
+    if List.all (isValidMaskPosition m) newMaskPoints then
+        { m | x = m.x + dx }
+
+    else
+        m
+
+
+moveActiveDown : Board a -> Board a
+moveActiveDown m =
+    let
+        nextMaskPoints =
+            translateMask m.x (m.y + 1) m.activeMask
+                |> maskToList
+
+        currentMaskPoints =
+            translateMask m.x m.y m.activeMask
+                |> maskToList
+    in
+    if List.all (isValidMaskPosition m) nextMaskPoints then
+        { m | y = m.y + 1 }
+
+    else if List.all (isValidInsertPosition m) currentMaskPoints then
+        { m | grid = gridWithActiveMask m }
+            |> activateNext
+
+    else
+        { m | state = GameOver }
+
+
+isValidMaskPosition : Board a -> Int2 -> Bool
+isValidMaskPosition m p =
+    let
+        gridMember =
+            Dict.member p m.grid
+
+        withingBoundsIgnoringMinY ( x, y ) =
+            x >= 0 && x < m.width && y < m.height
+    in
+    not gridMember && withingBoundsIgnoringMinY p
+
+
+isValidInsertPosition : Board a -> Int2 -> Bool
+isValidInsertPosition m p =
+    let
+        gridMember =
+            Dict.member p m.grid
+
+        withingBounds ( x, y ) =
+            x >= 0 && x < m.width && y < m.height && y >= 0
+    in
+    not gridMember && withingBounds p
+
+
+gridWithActiveMask : Board a -> Dict Int2 String
+gridWithActiveMask m =
+    let
+        isValid w h ( x, y ) =
+            x >= 0 && x <= w && y >= 0 && y < h
+
+        pairTo b a =
+            ( a, b )
+    in
+    translateMask m.x m.y m.activeMask
+        |> maskToList
+        |> List.filter (isValid m.width m.height)
+        |> List.map (pairTo m.color)
+        |> Dict.fromList
+        |> Dict.union m.grid
+
+
 
 -- Model
 
@@ -198,28 +316,6 @@ init _ =
     )
 
 
-activateNext : Board a -> Board a
-activateNext model =
-    let
-        nextTetron =
-            tetronFromName model.nextTetronName
-
-        randomNext =
-            Random.uniform Line [ S, Z ]
-
-        ( next, seed ) =
-            Random.step randomNext model.seed
-    in
-    { model
-        | x = 3
-        , y = -2
-        , color = nextTetron.color
-        , activeMask = nextTetron.mask
-        , nextTetronName = next
-        , seed = seed
-    }
-
-
 updateRunning : Model -> Model
 updateRunning m =
     let
@@ -275,39 +371,6 @@ whenTrue bool func arg =
         arg
 
 
-tryRotate : Board a -> Board a
-tryRotate m =
-    let
-        newMask =
-            rotateMask m.activeMask
-
-        newMaskPoints =
-            newMask
-                |> translateMask m.x m.y
-                |> maskToList
-    in
-    if List.all (isValidMaskPosition m) newMaskPoints then
-        { m | activeMask = newMask }
-
-    else
-        m
-
-
-tryShiftX : Int -> Board a -> Board a
-tryShiftX dx m =
-    let
-        newMaskPoints =
-            m.activeMask
-                |> translateMask (m.x + dx) m.y
-                |> maskToList
-    in
-    if List.all (isValidMaskPosition m) newMaskPoints then
-        { m | x = m.x + dx }
-
-    else
-        m
-
-
 stepFallTrigger : FallTrigger -> ( Bool, FallTrigger )
 stepFallTrigger fall =
     let
@@ -318,69 +381,6 @@ stepFallTrigger fall =
             fall.delay <= 0 || modBy fall.delay fall.ticks == 0
     in
     ( isTriggered, newFall )
-
-
-moveActiveDown : Board a -> Board a
-moveActiveDown m =
-    let
-        nextMaskPoints =
-            translateMask m.x (m.y + 1) m.activeMask
-                |> maskToList
-
-        currentMaskPoints =
-            translateMask m.x m.y m.activeMask
-                |> maskToList
-    in
-    if List.all (isValidMaskPosition m) nextMaskPoints then
-        { m | y = m.y + 1 }
-
-    else if List.all (isValidInsertPosition m) currentMaskPoints then
-        { m | grid = gridWithActiveMask m }
-            |> activateNext
-
-    else
-        { m | state = GameOver }
-
-
-isValidMaskPosition : Board a -> Int2 -> Bool
-isValidMaskPosition m p =
-    let
-        gridMember =
-            Dict.member p m.grid
-
-        withingBoundsIgnoringMinY ( x, y ) =
-            x >= 0 && x < m.width && y < m.height
-    in
-    not gridMember && withingBoundsIgnoringMinY p
-
-
-isValidInsertPosition : Board a -> Int2 -> Bool
-isValidInsertPosition m p =
-    let
-        gridMember =
-            Dict.member p m.grid
-
-        withingBounds ( x, y ) =
-            x >= 0 && x < m.width && y < m.height && y >= 0
-    in
-    not gridMember && withingBounds p
-
-
-gridWithActiveMask : Board a -> Dict Int2 String
-gridWithActiveMask m =
-    let
-        isValid w h ( x, y ) =
-            x >= 0 && x <= w && y >= 0 && y < h
-
-        pairTo b a =
-            ( a, b )
-    in
-    translateMask m.x m.y m.activeMask
-        |> maskToList
-        |> List.filter (isValid m.width m.height)
-        |> List.map (pairTo m.color)
-        |> Dict.fromList
-        |> Dict.union m.grid
 
 
 

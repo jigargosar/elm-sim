@@ -556,10 +556,8 @@ view m =
             30
     in
     div [ class "df-row w-100 h-100 centerX centerY p10" ]
-        [ div [ class "df-col sp10" ]
-            [ viewGrid cellWidth m.state m.width m.height (gridWithActiveMask m)
-                |> wrapSvg
-            ]
+        [ viewGrid cellWidth m.state m.width m.height (gridWithActiveMask m)
+            |> wrapSvg
         , viewShapesDemo cellWidth
             |> remove
         ]

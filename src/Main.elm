@@ -140,6 +140,11 @@ type alias Keyboard a =
     }
 
 
+onKeyDown : String -> Model -> Bool
+onKeyDown string m =
+    Set.member string m.keyDowns
+
+
 handleKeyUp : String -> Keyboard a -> Keyboard a
 handleKeyUp k m =
     { m
@@ -280,11 +285,6 @@ whenTrue bool func arg =
 
     else
         arg
-
-
-onKeyDown : String -> Model -> Bool
-onKeyDown string m =
-    Set.member string m.keyDowns
 
 
 tryRotate : Board a -> Board a

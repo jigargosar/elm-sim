@@ -366,6 +366,15 @@ type alias Flags =
     ()
 
 
+fillRows _ =
+    let
+        fillR y =
+            List.range 0 8 |> List.map (Tuple.pair >> (|>) y >> Tuple.pair >> (|>) "black")
+    in
+    Dict.fromList
+        (fillR 19 ++ fillR 18 ++ fillR 17 ++ fillR 16 ++ fillR 15 ++ fillR 14)
+
+
 init : Flags -> ( Model, Cmd Msg )
 init _ =
     let
@@ -378,7 +387,9 @@ init _ =
             , prevKeys = Set.empty
 
             -- BOARD
-            , grid = Dict.empty
+            , grid =
+                Dict.empty
+                    |> fillRows
             , width = 10
             , height = 20
             , x = 4

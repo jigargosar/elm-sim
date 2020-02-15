@@ -376,8 +376,8 @@ update message model =
         OnKeyDown k _ ->
             ( { model | keyDowns = Set.insert k model.keyDowns }, Cmd.none )
 
-        OnKeyUp k ->
-            ( { model | keyDowns = Set.remove k model.keyDowns }, Cmd.none )
+        OnKeyUp _ ->
+            ( model, Cmd.none )
 
 
 resetKeys : Model -> Model

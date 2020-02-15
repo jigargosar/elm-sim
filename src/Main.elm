@@ -199,7 +199,6 @@ type alias Model =
     , shiftXTrigger : RepeatTrigger
     , speedUpTrigger : RepeatTrigger
     , keys : Set String
-    , keyPresses : Set String
     , state : State
     , seed : Seed
     }
@@ -236,7 +235,6 @@ init _ =
       , shiftXTrigger = defaultRepeatTrigger
       , speedUpTrigger = initRepeatTrigger 10 1
       , keys = Set.empty
-      , keyPresses = Set.empty
       }
         |> activateNext
     , Cmd.none
@@ -308,50 +306,6 @@ updateRunning m =
         |> whenTrue (shouldFall || shouldSpeedUp) moveActiveDown
         |> whenTrue shouldRotate tryRotate
         |> whenTrue shouldShiftX (tryShiftX dx)
-        |> when (.grid >> (/=) m.grid) resetSpeedUpTrigger
-
-
-updateRunning2 : Model -> Model
-updateRunning2 m =
-    let
-        check k =
-            Set.member k m.keyPresses
-
-        upPressed =
-            check "ArrowUp"
-
-        leftPressed =
-            check "ArrowLeft"
-
-        rightPressed =
-            check "ArrowRight"
-
-        dx =
-            case ( leftPressed, rightPressed ) of
-                ( True, True ) ->
-                    0
-
-                ( False, False ) ->
-                    0
-
-                ( True, False ) ->
-                    -1
-
-                ( False, True ) ->
-                    1
-
-        shouldSpeedUp =
-            check "ArrowDown"
-
-        ( shouldFall, fallTrigger ) =
-            stepFallTrigger m.fallTrigger
-    in
-    { m
-        | fallTrigger = fallTrigger
-    }
-        |> whenTrue (shouldFall || shouldSpeedUp) moveActiveDown
-        |> whenTrue upPressed tryRotate
-        |> whenTrue (dx /= 0) (tryShiftX dx)
         |> when (.grid >> (/=) m.grid) resetSpeedUpTrigger
 
 
@@ -510,7 +464,6 @@ type Msg
     = Tick
     | OnKeyDown String
     | OnKeyUp String
-    | OnKeyPress String
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -518,7 +471,6 @@ update message model =
     case message of
         Tick ->
             ( tick model
-                |> resetKeyPresses
             , Cmd.none
             )
 
@@ -528,14 +480,6 @@ update message model =
         OnKeyUp k ->
             ( { model | keys = Set.remove k model.keys }, Cmd.none )
 
-        OnKeyPress k ->
-            ( { model | keyPresses = Set.insert k model.keyPresses }, Cmd.none )
-
-
-resetKeyPresses : Model -> Model
-resetKeyPresses m =
-    { m | keyPresses = Set.empty }
-
 
 subscriptions : Model -> Sub Msg
 subscriptions _ =
@@ -543,7 +487,6 @@ subscriptions _ =
         [ Browser.Events.onAnimationFrame (always Tick)
         , Browser.Events.onKeyDown (JD.map OnKeyDown (JD.field "key" JD.string))
         , Browser.Events.onKeyUp (JD.map OnKeyUp (JD.field "key" JD.string))
-        , Browser.Events.onKeyPress (JD.map OnKeyPress (JD.field "key" JD.string))
         ]
 
 

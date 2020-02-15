@@ -311,6 +311,50 @@ updateRunning m =
         |> when (.grid >> (/=) m.grid) resetSpeedUpTrigger
 
 
+updateRunning2 : Model -> Model
+updateRunning2 m =
+    let
+        check k =
+            Set.member k m.keyPresses
+
+        upPressed =
+            check "ArrowUp"
+
+        leftPressed =
+            check "ArrowLeft"
+
+        rightPressed =
+            check "ArrowRight"
+
+        dx =
+            case ( leftPressed, rightPressed ) of
+                ( True, True ) ->
+                    0
+
+                ( False, False ) ->
+                    0
+
+                ( True, False ) ->
+                    -1
+
+                ( False, True ) ->
+                    1
+
+        shouldSpeedUp =
+            check "ArrowDown"
+
+        ( shouldFall, fallTrigger ) =
+            stepFallTrigger m.fallTrigger
+    in
+    { m
+        | fallTrigger = fallTrigger
+    }
+        |> whenTrue (shouldFall || shouldSpeedUp) moveActiveDown
+        |> whenTrue upPressed tryRotate
+        |> whenTrue (dx /= 0) (tryShiftX dx)
+        |> when (.grid >> (/=) m.grid) resetSpeedUpTrigger
+
+
 when pred true val =
     if pred val then
         true val

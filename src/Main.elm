@@ -272,7 +272,12 @@ tickKeyboard m =
 
 
 type alias Model =
-    Keyboard (Board { fallTrigger : FallTrigger })
+    Keyboard
+        (Board
+            { fallTrigger : FallTrigger
+            , allowRepeat : Bool
+            }
+        )
 
 
 type alias FallTrigger =
@@ -314,6 +319,7 @@ init _ =
 
             -- OTHER
             , fallTrigger = { ticks = 0, delay = 20 }
+            , allowRepeat = True
             }
     in
     ( model |> activateNext

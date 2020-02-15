@@ -585,7 +585,7 @@ viewShapesDemo cw =
     , T
     ]
         |> List.map (tetronFromName >> viewShapeRotations)
-        |> div [ class "df-row sp10 items-center" ]
+        |> div [ class "df-row sp10 items-center f-wrap" ]
 
 
 applyN : Int -> (c -> c) -> c -> c

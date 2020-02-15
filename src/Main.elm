@@ -294,7 +294,14 @@ init _ =
     let
         model : Keyboard (Board Model)
         model =
-            { grid = Dict.empty
+            { -- KEYBOARD
+              keyDowns = Set.empty
+            , keyUps = Set.empty
+            , keys = Set.empty
+            , prevKeys = Set.empty
+
+            -- BOARD
+            , grid = Dict.empty
             , width = 10
             , height = 20
             , x = 4
@@ -304,11 +311,9 @@ init _ =
             , nextTetronName = Line
             , state = Running
             , seed = Random.initialSeed 0
+
+            -- OTHER
             , fallTrigger = { ticks = 0, delay = 20 }
-            , keyDowns = Set.empty
-            , keyUps = Set.empty
-            , keys = Set.empty
-            , prevKeys = Set.empty
             }
     in
     ( model |> activateNext

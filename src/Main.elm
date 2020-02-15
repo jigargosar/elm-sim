@@ -34,7 +34,6 @@ type alias Board a =
         , nextTetronName : TetronName
         , state : State
         , seed : Seed
-        , speedUpTrigger : RepeatTrigger
     }
 
 
@@ -229,13 +228,13 @@ init _ =
       , color = ""
       , activeMask = emptyMask
       , nextTetronName = Line
+      , state = Running
+      , seed = Random.initialSeed 0
       , fallTrigger = { ticks = 0, delay = 20 }
       , rotateTrigger = defaultRepeatTrigger
       , shiftXTrigger = defaultRepeatTrigger
       , speedUpTrigger = initRepeatTrigger 10 1
       , keys = Set.empty
-      , state = Running
-      , seed = Random.initialSeed 0
       }
         |> activateNext
     , Cmd.none
@@ -260,7 +259,6 @@ activateNext model =
         , activeMask = nextTetron.mask
         , nextTetronName = next
         , seed = seed
-        , speedUpTrigger = resetRepeatTrigger model.speedUpTrigger
     }
 
 
@@ -308,6 +306,20 @@ updateRunning m =
         |> whenTrue (shouldFall || shouldSpeedUp) moveActiveDown
         |> whenTrue shouldRotate tryRotate
         |> whenTrue shouldShiftX (tryShiftX dx)
+        |> when (.grid >> (/=) m.grid) resetSpeedUpTrigger
+
+
+when pred true val =
+    if pred val then
+        true val
+
+    else
+        val
+
+
+resetSpeedUpTrigger : Model -> Model
+resetSpeedUpTrigger m =
+    { m | speedUpTrigger = resetRepeatTrigger m.speedUpTrigger }
 
 
 tick : Model -> Model

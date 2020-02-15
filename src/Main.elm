@@ -123,6 +123,7 @@ type alias Keyboard a =
         | keyDowns : Set String
         , keyUps : Set String
         , keys : Set String
+        , prevKeys : Set String
     }
 
 
@@ -189,6 +190,7 @@ init _ =
             , keyDowns = Set.empty
             , keyUps = Set.empty
             , keys = Set.empty
+            , prevKeys = Set.empty
             }
     in
     ( model |> activateNext

@@ -199,6 +199,7 @@ type alias Model =
     , shiftXTrigger : RepeatTrigger
     , speedUpTrigger : RepeatTrigger
     , keys : Set String
+    , keyPresses : Set String
     , state : State
     , seed : Seed
     }
@@ -235,6 +236,7 @@ init _ =
       , shiftXTrigger = defaultRepeatTrigger
       , speedUpTrigger = initRepeatTrigger 10 1
       , keys = Set.empty
+      , keyPresses = Set.empty
       }
         |> activateNext
     , Cmd.none
@@ -464,19 +466,31 @@ type Msg
     = Tick
     | OnKeyDown String
     | OnKeyUp String
+    | OnKeyPress String
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update message model =
     case message of
         Tick ->
-            ( tick model, Cmd.none )
+            ( tick model
+                |> resetKeyPresses
+            , Cmd.none
+            )
 
         OnKeyDown k ->
             ( { model | keys = Set.insert k model.keys }, Cmd.none )
 
         OnKeyUp k ->
             ( { model | keys = Set.remove k model.keys }, Cmd.none )
+
+        OnKeyPress k ->
+            ( { model | keyPresses = Set.insert k model.keyPresses }, Cmd.none )
+
+
+resetKeyPresses : Model -> Model
+resetKeyPresses m =
+    { m | keyPresses = Set.empty }
 
 
 subscriptions : Model -> Sub Msg
@@ -485,6 +499,7 @@ subscriptions _ =
         [ Browser.Events.onAnimationFrame (always Tick)
         , Browser.Events.onKeyDown (JD.map OnKeyDown (JD.field "key" JD.string))
         , Browser.Events.onKeyUp (JD.map OnKeyUp (JD.field "key" JD.string))
+        , Browser.Events.onKeyPress (JD.map OnKeyPress (JD.field "key" JD.string))
         ]
 
 

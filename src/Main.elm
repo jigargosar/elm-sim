@@ -111,21 +111,19 @@ tetronFromName shape =
 
 
 type alias Model =
-    { grid : Dict Int2 String
-    , width : Int
-    , height : Int
-    , x : Int
-    , y : Int
-    , color : String
-    , activeMask : Mask
-    , nextTetronName : TetronName
-    , fallTrigger : FallTrigger
-    , keyDowns : Set String
-    , keyUps : Set String
-    , keys : Set String
-    , state : State
-    , seed : Seed
-    }
+    Keyboard
+        { grid : Dict Int2 String
+        , width : Int
+        , height : Int
+        , x : Int
+        , y : Int
+        , color : String
+        , activeMask : Mask
+        , nextTetronName : TetronName
+        , fallTrigger : FallTrigger
+        , state : State
+        , seed : Seed
+        }
 
 
 
@@ -187,7 +185,7 @@ type alias Flags =
 init : Flags -> ( Model, Cmd Msg )
 init _ =
     let
-        model : Model
+        model : Keyboard Model
         model =
             { grid = Dict.empty
             , width = 10

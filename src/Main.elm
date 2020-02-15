@@ -32,6 +32,7 @@ type alias Board a =
         , color : String
         , activeMask : Mask
         , nextTetronName : TetronName
+        , state : State
     }
 
 
@@ -377,28 +378,6 @@ stepFallTrigger fall =
             fall.delay <= 0 || modBy fall.delay fall.ticks == 0
     in
     ( isTriggered, newFall )
-
-
-tickFall : Model -> Model
-tickFall model =
-    let
-        fall =
-            model.fallTrigger
-
-        newFall =
-            { fall | ticks = fall.ticks + 1 }
-
-        isTriggered =
-            fall.delay <= 0 || modBy fall.delay fall.ticks == 0
-
-        newModel =
-            { model | fallTrigger = newFall }
-    in
-    if isTriggered then
-        newModel |> moveActiveDown
-
-    else
-        newModel
 
 
 moveActiveDown : Model -> Model

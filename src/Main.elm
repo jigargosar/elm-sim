@@ -366,7 +366,7 @@ type alias Flags =
     ()
 
 
-fillRows _ =
+fillMockRows _ =
     let
         fillR y =
             List.range 0 8 |> List.map (Tuple.pair >> (|>) y >> Tuple.pair >> (|>) "black")
@@ -389,7 +389,7 @@ init _ =
             -- BOARD
             , grid =
                 Dict.empty
-                    |> fillRows
+                    |> fillMockRows
             , width = 10
             , height = 20
             , x = 4

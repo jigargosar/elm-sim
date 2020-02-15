@@ -33,6 +33,7 @@ type alias Board a =
         , activeMask : Mask
         , nextTetronName : TetronName
         , state : State
+        , seed : Seed
     }
 
 
@@ -240,7 +241,6 @@ init _ =
     )
 
 
-activateNext : Model -> Model
 activateNext model =
     let
         nextTetron =
@@ -380,7 +380,7 @@ stepFallTrigger fall =
     ( isTriggered, newFall )
 
 
-moveActiveDown : Model -> Model
+moveActiveDown : Board a -> Board a
 moveActiveDown m =
     let
         nextMaskPoints =
@@ -402,7 +402,6 @@ moveActiveDown m =
         { m | state = GameOver }
 
 
-isValidMaskPosition : Model -> Int2 -> Bool
 isValidMaskPosition m p =
     let
         gridMember =
@@ -414,7 +413,6 @@ isValidMaskPosition m p =
     not gridMember && withingBoundsIgnoringMinY p
 
 
-isValidInsertPosition : Model -> Int2 -> Bool
 isValidInsertPosition m p =
     let
         gridMember =
@@ -426,7 +424,6 @@ isValidInsertPosition m p =
     not gridMember && withingBounds p
 
 
-gridWithActiveMask : Model -> Dict ( Int, Int ) String
 gridWithActiveMask m =
     let
         isValid w h ( x, y ) =

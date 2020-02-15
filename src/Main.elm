@@ -46,7 +46,7 @@ activateNext model =
             tetronFromName model.nextTetronName
 
         randomNext =
-            Random.uniform Line [ S, Z ]
+            Random.uniform Line [ S, Z, L, J, T ]
 
         ( next, seed ) =
             Random.step randomNext model.seed
@@ -271,15 +271,15 @@ zMask =
 
 
 jMask =
-    Mask 3 [ ( 0, 2 ), ( 1, 2 ), ( 2, 2 ), ( 2, 1 ) ]
+    Mask 3 [ ( 2, 0 ), ( 2, 1 ), ( 2, 2 ), ( 1, 2 ) ]
 
 
 lMask =
-    Mask 3 [ ( 0, 0 ), ( 1, 0 ), ( 2, 0 ), ( 2, 1 ) ]
+    Mask 3 [ ( 0, 0 ), ( 0, 1 ), ( 0, 2 ), ( 1, 2 ) ]
 
 
 tMask =
-    Mask 3 [ ( 0, 0 ), ( 0, 1 ), ( 0, 2 ), ( 1, 1 ) ]
+    Mask 3 [ ( 0, 0 ), ( 1, 0 ), ( 2, 0 ), ( 1, 1 ) ]
 
 
 emptyMask =
@@ -580,6 +580,9 @@ viewShapesDemo cw =
     [ Line
     , S
     , Z
+    , L
+    , J
+    , T
     ]
         |> List.map (tetronFromName >> viewShapeRotations)
         |> div [ class "df-row sp10 items-center" ]

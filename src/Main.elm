@@ -567,17 +567,13 @@ view m =
 
 
 viewNext : Float -> TetronName -> Html msg
-viewNext cw tn =
+viewNext cw tetronName =
     let
         { mask, color } =
-            tetronFromName tn
+            tetronFromName tetronName
     in
-    viewMask cw color mask
-        |> wrapSvg2
-            [ class "alignTop"
-            , style "min-width" (fromFloat (cw * 4) ++ "px")
-            , style "min-height" (fromFloat (cw * 4) ++ "px")
-            ]
+    viewMask2 cw 4 color mask
+        |> wrapSvg2 [ class "alignTop" ]
 
 
 remove _ =
@@ -632,6 +628,29 @@ wrapSvg s =
 
 
 viewMask cw color (Mask maskWidth list) =
+    let
+        w =
+            toFloat maskWidth * cw
+
+        square ( x, y ) =
+            rect
+                [ width cw
+                , height cw
+                , fill color
+                , strokeWidth 1
+                , stroke "white"
+                , transform [ Translate (toFloat x * cw) (toFloat y * cw) ]
+                ]
+                []
+    in
+    svg [ viewBox 0 0 w w, width w, height w ]
+        [ list
+            |> List.map square
+            |> g []
+        ]
+
+
+viewMask2 cw maskWidth color (Mask _ list) =
     let
         w =
             toFloat maskWidth * cw

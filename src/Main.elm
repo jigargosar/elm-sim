@@ -359,6 +359,24 @@ updateRunning m =
         |> whenTrue (shouldFall || keyWentDown "ArrowDown" m) moveActiveDown
         |> whenTrue (keyWentDown "ArrowUp" m) tryRotate
         |> whenTrue (dx /= 0) (tryShiftX dx)
+        |> when (notEqBy .grid m) disableRepeatKeys
+
+
+notEqBy func a b =
+    func a /= func b
+
+
+when pred true val =
+    if pred val then
+        true val
+
+    else
+        val
+
+
+disableRepeatKeys : Model -> Model
+disableRepeatKeys m =
+    { m | allowRepeat = False }
 
 
 tick : Model -> Model

@@ -19,6 +19,23 @@ import TypedSvg.Types exposing (Transform(..))
 
 
 
+-- Tetrons Board Model
+
+
+type alias Board a =
+    { a
+        | grid : Dict Int2 String
+        , width : Int
+        , height : Int
+        , x : Int
+        , y : Int
+        , color : String
+        , activeMask : Mask
+        , nextTetronName : TetronName
+    }
+
+
+
 -- track how long key is held down, and trigger event at *delayed* rate.
 -- also trigger first time key is pressed
 -- KeyTrigger

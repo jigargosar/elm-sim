@@ -122,8 +122,17 @@ type alias Model =
     , fallTrigger : FallTrigger
     , keyDowns : Set String
     , keyUps : Set String
+    , keys : Set String
     , state : State
     , seed : Seed
+    }
+
+
+type alias Keyboard a =
+    { a
+        | keyDowns : Set String
+        , keyUps : Set String
+        , keys : Set String
     }
 
 
@@ -159,6 +168,7 @@ init _ =
             , fallTrigger = { ticks = 0, delay = 20 }
             , keyDowns = Set.empty
             , keyUps = Set.empty
+            , keys = Set.empty
             }
     in
     ( model |> activateNext

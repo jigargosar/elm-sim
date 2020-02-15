@@ -142,20 +142,24 @@ type alias Flags =
 
 init : Flags -> ( Model, Cmd Msg )
 init _ =
-    ( { grid = Dict.empty
-      , width = 10
-      , height = 20
-      , x = 4
-      , y = -2
-      , color = ""
-      , activeMask = emptyMask
-      , nextTetronName = Line
-      , state = Running
-      , seed = Random.initialSeed 0
-      , fallTrigger = { ticks = 0, delay = 20 }
-      , keys = Set.empty
-      }
-        |> activateNext
+    let
+        model : Model
+        model =
+            { grid = Dict.empty
+            , width = 10
+            , height = 20
+            , x = 4
+            , y = -2
+            , color = ""
+            , activeMask = emptyMask
+            , nextTetronName = Line
+            , state = Running
+            , seed = Random.initialSeed 0
+            , fallTrigger = { ticks = 0, delay = 20 }
+            , keys = Set.empty
+            }
+    in
+    ( model |> activateNext
     , Cmd.none
     )
 

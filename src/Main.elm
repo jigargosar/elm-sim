@@ -386,20 +386,30 @@ update message model =
             )
 
         OnKeyDown k _ ->
-            ( { model
-                | keyDowns = Set.insert k model.keyDowns
-                , keys = Set.insert k model.keys
-              }
+            ( handleKeyDown k model
             , Cmd.none
             )
 
         OnKeyUp k ->
-            ( { model
-                | keyUps = Set.insert k model.keyUps
-                , keys = Set.remove k model.keys
-              }
+            ( handleKeyUp k model
             , Cmd.none
             )
+
+
+handleKeyUp : String -> Keyboard a -> Keyboard a
+handleKeyUp k m =
+    { m
+        | keyUps = Set.insert k m.keyUps
+        , keys = Set.remove k m.keys
+    }
+
+
+handleKeyDown : String -> Keyboard a -> Keyboard a
+handleKeyDown k m =
+    { m
+        | keyDowns = Set.insert k m.keyDowns
+        , keys = Set.insert k m.keys
+    }
 
 
 clearKeyEvents : Keyboard a -> Keyboard a

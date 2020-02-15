@@ -354,7 +354,7 @@ tryRotate m =
         m
 
 
-tryShiftX : Int -> Model -> Model
+tryShiftX : Int -> Board a -> Board a
 tryShiftX dx m =
     let
         newMaskPoints =

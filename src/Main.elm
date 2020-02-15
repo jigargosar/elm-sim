@@ -56,7 +56,7 @@ activateNext model =
         , y = -2
         , color = nextTetron.color
         , activeMask = nextTetron.mask
-        , nextTetronName = Line
+        , nextTetronName = next
         , seed = seed
     }
 

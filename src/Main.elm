@@ -140,8 +140,8 @@ type alias Keyboard a =
     }
 
 
-onKeyDown : String -> Model -> Bool
-onKeyDown string m =
+keyWentDown : String -> Model -> Bool
+keyWentDown string m =
     Set.member string m.keyDowns
 
 
@@ -236,10 +236,10 @@ updateRunning : Model -> Model
 updateRunning m =
     let
         leftPressed =
-            onKeyDown "ArrowLeft" m
+            keyWentDown "ArrowLeft" m
 
         rightPressed =
-            onKeyDown "ArrowRight" m
+            keyWentDown "ArrowRight" m
 
         dx =
             case ( leftPressed, rightPressed ) of
@@ -261,8 +261,8 @@ updateRunning m =
     { m
         | fallTrigger = fallTrigger
     }
-        |> whenTrue (shouldFall || onKeyDown "ArrowDown" m) moveActiveDown
-        |> whenTrue (onKeyDown "ArrowUp" m) tryRotate
+        |> whenTrue (shouldFall || keyWentDown "ArrowDown" m) moveActiveDown
+        |> whenTrue (keyWentDown "ArrowUp" m) tryRotate
         |> whenTrue (dx /= 0) (tryShiftX dx)
 
 

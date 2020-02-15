@@ -136,7 +136,7 @@ rowIs rn ( _, y ) =
     rn == y
 
 
-clearRowAndShiftDown : Int -> List ( Int2, a ) -> List ( Int2, a )
+clearRowAndShiftDown : Int -> Dict Int2 a -> Dict Int2 a
 clearRowAndShiftDown rn =
     let
         fm ( ( x, y ), v ) =
@@ -148,8 +148,13 @@ clearRowAndShiftDown rn =
 
             else
                 Just ( ( x, y ), v )
+
+        _ =
+            Dict.Extra.mapKeys
     in
-    List.filterMap fm
+    Dict.toList
+        >> List.filterMap fm
+        >> Dict.fromList
 
 
 propEq func expected val =
@@ -167,9 +172,6 @@ clearAndShiftRows m =
             Dict.keys m.grid
                 |> List.Extra.count (propEq Tuple.second y)
                 |> is m.width
-
-        setGridFromList list =
-            { m | grid = Dict.fromList list }
     in
     case
         List.range 0 (m.height - 1)
@@ -177,8 +179,8 @@ clearAndShiftRows m =
     of
         Just rn ->
             clearAndShiftRows
-                (clearRowAndShiftDown rn (Dict.toList m.grid)
-                    |> setGridFromList
+                (clearRowAndShiftDown rn m.grid
+                    |> (\grid -> { m | grid = grid })
                 )
 
         Nothing ->

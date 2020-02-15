@@ -160,6 +160,7 @@ init _ =
     )
 
 
+activateNext : Board a -> Board a
 activateNext model =
     let
         nextTetron =

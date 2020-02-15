@@ -246,11 +246,6 @@ keyWentDown string m =
     Dict.member string m.keyDowns
 
 
-keyWentDownNoRepeat : String -> Model -> Bool
-keyWentDownNoRepeat string m =
-    Dict.get string m.keyDowns == Just False
-
-
 updateKeyboardOnKeyUp : String -> Keyboard a -> Keyboard a
 updateKeyboardOnKeyUp k m =
     { m
@@ -280,7 +275,6 @@ type alias Model =
     Keyboard
         (Board
             { fallTrigger : FallTrigger
-            , allowRepeat : Bool
             }
         )
 
@@ -324,7 +318,6 @@ init _ =
 
             -- OTHER
             , fallTrigger = { ticks = 0, delay = 20 }
-            , allowRepeat = True
             }
     in
     ( model |> activateNext
@@ -336,12 +329,7 @@ updateRunning : Model -> Model
 updateRunning m =
     let
         checkKey k =
-            if m.allowRepeat then
-                keyWentDown k m
-
-            else
-                --keyWentDownNoRepeat k m
-                keyWentDown k m
+            keyWentDown k m
 
         leftPressed =
             checkKey "ArrowLeft"
@@ -368,34 +356,10 @@ updateRunning m =
     in
     { m
         | fallTrigger = fallTrigger
-        , allowRepeat =
-            m.allowRepeat
-                || leftPressed
-                || rightPressed
-                || checkKey "ArrowDown"
-                || checkKey "ArrowUp"
     }
         |> whenTrue (shouldFall || checkKey "ArrowDown") moveActiveDown
         |> whenTrue (checkKey "ArrowUp") tryRotate
         |> whenTrue (dx /= 0) (tryShiftX dx)
-        |> when (notEqBy .grid m) disableRepeatKeys
-
-
-notEqBy func a b =
-    func a /= func b
-
-
-when pred true val =
-    if pred val then
-        true val
-
-    else
-        val
-
-
-disableRepeatKeys : Model -> Model
-disableRepeatKeys m =
-    { m | allowRepeat = False }
 
 
 tick : Model -> Model

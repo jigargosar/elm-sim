@@ -367,6 +367,12 @@ updateRunning m =
     in
     { m
         | fallTrigger = fallTrigger
+        , allowRepeat =
+            m.allowRepeat
+                || leftPressed
+                || rightPressed
+                || checkKey "ArrowDown"
+                || checkKey "ArrowUp"
     }
         |> whenTrue (shouldFall || checkKey "ArrowDown") moveActiveDown
         |> whenTrue (checkKey "ArrowUp") tryRotate

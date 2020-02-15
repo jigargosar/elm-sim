@@ -559,7 +559,14 @@ view m =
         [ div [ class "df-row sp10" ]
             [ viewGrid cellWidth m.state m.width m.height (gridWithActiveMask m)
                 |> wrapSvg
-            , div [ class "df-col" ] [ viewNext cellWidth m.nextTetronName ]
+            , div
+                [ class "df-col"
+                , style "justify-content" "space-around"
+                , style "justify-content" "space-evenly"
+                ]
+                [ viewNext cellWidth m.nextTetronName
+                , div [ class "" ] [ text "text" ]
+                ]
             ]
         , viewShapesDemo cellWidth
             |> remove
@@ -573,7 +580,7 @@ viewNext cw tetronName =
             tetronFromName tetronName
     in
     viewMask2 cw 4 color mask
-        |> wrapSvg2 [ class "alignTop" ]
+        |> wrapSvg
 
 
 remove _ =

@@ -414,6 +414,7 @@ isValidMaskPosition m p =
     not gridMember && withingBoundsIgnoringMinY p
 
 
+isValidInsertPosition : Board a -> Int2 -> Bool
 isValidInsertPosition m p =
     let
         gridMember =
@@ -425,6 +426,7 @@ isValidInsertPosition m p =
     not gridMember && withingBounds p
 
 
+gridWithActiveMask : Board a -> Dict Int2 String
 gridWithActiveMask m =
     let
         isValid w h ( x, y ) =

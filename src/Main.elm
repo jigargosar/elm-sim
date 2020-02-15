@@ -381,7 +381,7 @@ update message model =
     case message of
         Tick ->
             ( tick model
-                |> resetKeyEvents
+                |> clearKeyEvents
             , Cmd.none
             )
 
@@ -402,8 +402,8 @@ update message model =
             )
 
 
-resetKeyEvents : Model -> Model
-resetKeyEvents m =
+clearKeyEvents : Model -> Model
+clearKeyEvents m =
     { m | keyDowns = Set.empty, keyUps = Set.empty }
 
 

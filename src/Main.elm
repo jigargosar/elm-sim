@@ -558,9 +558,20 @@ view m =
     div [ class "df-row w-100 h-100 centerX centerY p10" ]
         [ viewGrid cellWidth m.state m.width m.height (gridWithActiveMask m)
             |> wrapSvg
+        , viewNext cellWidth m.nextTetronName
         , viewShapesDemo cellWidth
             |> remove
         ]
+
+
+viewNext : Float -> TetronName -> Html msg
+viewNext cw tn =
+    let
+        { mask, color } =
+            tetronFromName tn
+    in
+    viewMask cw color mask
+        |> wrapSvg
 
 
 remove _ =

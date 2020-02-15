@@ -145,16 +145,16 @@ onKeyDown string m =
     Set.member string m.keyDowns
 
 
-handleKeyUp : String -> Keyboard a -> Keyboard a
-handleKeyUp k m =
+updateKeyboardOnKeyUp : String -> Keyboard a -> Keyboard a
+updateKeyboardOnKeyUp k m =
     { m
         | keyUps = Set.insert k m.keyUps
         , keys = Set.remove k m.keys
     }
 
 
-handleKeyDown : String -> Keyboard a -> Keyboard a
-handleKeyDown k m =
+updateKeyboardOnKeyDown : String -> Keyboard a -> Keyboard a
+updateKeyboardOnKeyDown k m =
     { m
         | keyDowns = Set.insert k m.keyDowns
         , keys = Set.insert k m.keys
@@ -415,12 +415,12 @@ update message model =
             )
 
         OnKeyDown k _ ->
-            ( handleKeyDown k model
+            ( updateKeyboardOnKeyDown k model
             , Cmd.none
             )
 
         OnKeyUp k ->
-            ( handleKeyUp k model
+            ( updateKeyboardOnKeyUp k model
             , Cmd.none
             )
 

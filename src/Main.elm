@@ -394,7 +394,7 @@ fillMockRows : Board a -> Board a
 fillMockRows m =
     let
         fillR y =
-            List.range 0 (m.width - 2) |> List.map (Tuple.pair >> (|>) y >> Tuple.pair >> (|>) "black")
+            List.range 0 (m.width - 2) |> List.map (Tuple.pair >> (|>) y >> Tuple.pair >> (|>) "gray")
 
         grid =
             List.range 15 (m.height - 1)
@@ -555,18 +555,18 @@ view m =
         cellWidth =
             30
     in
-    div [ class "df-row sp10 items-center" ]
+    div [ class "df-row w-100 centerX p10" ]
         [ div [ class "df-col sp10" ]
             [ viewGrid cellWidth m.state m.width m.height (gridWithActiveMask m)
                 |> wrapSvg
             ]
         , viewShapesDemo cellWidth
-            |> el [ class "dn" ]
+            |> remove
         ]
 
 
-el attr child =
-    div attr [ child ]
+remove _ =
+    text ""
 
 
 viewShapesDemo : Float -> Html msg

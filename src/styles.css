@@ -39,8 +39,12 @@ body{
 }
 
 .df-row {
-  display: flex;
+  display: inline-flex;
   flex-direction: row;
+}
+
+.df-row.centerX {
+  justify-content: center;
 }
 
 .df-col {

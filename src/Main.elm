@@ -366,13 +366,18 @@ type alias Flags =
     ()
 
 
-fillMockRows _ =
+fillMockRows : Board a -> Board a
+fillMockRows m =
     let
         fillR y =
-            List.range 0 8 |> List.map (Tuple.pair >> (|>) y >> Tuple.pair >> (|>) "black")
+            List.range 0 (m.width - 2) |> List.map (Tuple.pair >> (|>) y >> Tuple.pair >> (|>) "black")
+
+        grid =
+            List.range 15 (m.height - 1)
+                |> List.concatMap fillR
+                |> Dict.fromList
     in
-    Dict.fromList
-        (fillR 19 ++ fillR 18 ++ fillR 17 ++ fillR 16 ++ fillR 15 ++ fillR 14)
+    { m | grid = grid }
 
 
 init : Flags -> ( Model, Cmd Msg )
@@ -387,9 +392,7 @@ init _ =
             , prevKeys = Set.empty
 
             -- BOARD
-            , grid =
-                Dict.empty
-                    |> fillMockRows
+            , grid = Dict.empty
             , width = 10
             , height = 20
             , x = 4
@@ -404,7 +407,7 @@ init _ =
             , fallTrigger = { ticks = 0, delay = 20 }
             }
     in
-    ( model |> activateNext
+    ( model |> fillMockRows |> activateNext
     , Cmd.none
     )
 

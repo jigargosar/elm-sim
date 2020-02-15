@@ -336,7 +336,7 @@ keyDown string m =
     Set.member string m.keys
 
 
-tryRotate : Model -> Model
+tryRotate : Board a -> Board a
 tryRotate m =
     let
         newMask =

@@ -128,12 +128,41 @@ type alias Model =
     }
 
 
+
+-- Keyboard
+
+
 type alias Keyboard a =
     { a
         | keyDowns : Set String
         , keyUps : Set String
         , keys : Set String
     }
+
+
+handleKeyUp : String -> Keyboard a -> Keyboard a
+handleKeyUp k m =
+    { m
+        | keyUps = Set.insert k m.keyUps
+        , keys = Set.remove k m.keys
+    }
+
+
+handleKeyDown : String -> Keyboard a -> Keyboard a
+handleKeyDown k m =
+    { m
+        | keyDowns = Set.insert k m.keyDowns
+        , keys = Set.insert k m.keys
+    }
+
+
+clearKeyEvents : Keyboard a -> Keyboard a
+clearKeyEvents m =
+    { m | keyDowns = Set.empty, keyUps = Set.empty }
+
+
+
+-- END KEYBOARD
 
 
 type alias FallTrigger =
@@ -394,27 +423,6 @@ update message model =
             ( handleKeyUp k model
             , Cmd.none
             )
-
-
-handleKeyUp : String -> Keyboard a -> Keyboard a
-handleKeyUp k m =
-    { m
-        | keyUps = Set.insert k m.keyUps
-        , keys = Set.remove k m.keys
-    }
-
-
-handleKeyDown : String -> Keyboard a -> Keyboard a
-handleKeyDown k m =
-    { m
-        | keyDowns = Set.insert k m.keyDowns
-        , keys = Set.insert k m.keys
-    }
-
-
-clearKeyEvents : Keyboard a -> Keyboard a
-clearKeyEvents m =
-    { m | keyDowns = Set.empty, keyUps = Set.empty }
 
 
 subscriptions : Model -> Sub Msg

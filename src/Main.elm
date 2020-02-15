@@ -462,7 +462,7 @@ gridWithActiveMask m =
 
 type Msg
     = Tick
-    | OnKeyDown String
+    | OnKeyDown String Bool
     | OnKeyUp String
 
 
@@ -474,7 +474,7 @@ update message model =
             , Cmd.none
             )
 
-        OnKeyDown k ->
+        OnKeyDown k repeat ->
             ( { model | keys = Set.insert k model.keys }, Cmd.none )
 
         OnKeyUp k ->
@@ -485,7 +485,7 @@ subscriptions : Model -> Sub Msg
 subscriptions _ =
     Sub.batch
         [ Browser.Events.onAnimationFrame (always Tick)
-        , Browser.Events.onKeyDown (JD.map OnKeyDown (JD.field "key" JD.string))
+        , Browser.Events.onKeyDown (JD.map2 OnKeyDown (JD.field "key" JD.string) (JD.field "repeat" JD.bool))
         , Browser.Events.onKeyUp (JD.map OnKeyUp (JD.field "key" JD.string))
         ]
 

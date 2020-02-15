@@ -270,6 +270,18 @@ zMask =
     Mask 3 [ ( 0, 1 ), ( 1, 1 ), ( 1, 2 ), ( 2, 2 ) ]
 
 
+jMask =
+    Mask 3 [ ( 0, 2 ), ( 1, 2 ), ( 2, 2 ), ( 2, 1 ) ]
+
+
+lMask =
+    Mask 3 [ ( 0, 0 ), ( 1, 0 ), ( 2, 0 ), ( 2, 1 ) ]
+
+
+tMask =
+    Mask 3 [ ( 0, 0 ), ( 0, 1 ), ( 0, 2 ), ( 1, 1 ) ]
+
+
 emptyMask =
     Mask 0 []
 
@@ -278,6 +290,9 @@ type TetronName
     = Line
     | S
     | Z
+    | L
+    | J
+    | T
 
 
 type alias Tetron =
@@ -299,6 +314,15 @@ tetronFromName shape =
 
         Z ->
             create zMask "green"
+
+        L ->
+            create lMask "orange"
+
+        J ->
+            create jMask "cyan"
+
+        T ->
+            create tMask "purple"
 
 
 

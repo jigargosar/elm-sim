@@ -340,7 +340,8 @@ updateRunning m =
                 keyWentDown k m
 
             else
-                keyWentDownNoRepeat k m
+                --keyWentDownNoRepeat k m
+                keyWentDown k m
 
         leftPressed =
             checkKey "ArrowLeft"

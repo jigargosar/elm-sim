@@ -306,7 +306,6 @@ updateRunning m =
         |> whenTrue (shouldFall || shouldSpeedUp) moveActiveDown
         |> whenTrue shouldRotate tryRotate
         |> whenTrue shouldShiftX (tryShiftX dx)
-        |> whenTrue shouldSpeedUp moveActiveDown
 
 
 tick : Model -> Model

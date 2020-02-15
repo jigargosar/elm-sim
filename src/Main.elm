@@ -402,7 +402,7 @@ update message model =
             )
 
 
-clearKeyEvents : Model -> Model
+clearKeyEvents : Keyboard a -> Keyboard a
 clearKeyEvents m =
     { m | keyDowns = Set.empty, keyUps = Set.empty }
 

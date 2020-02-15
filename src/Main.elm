@@ -403,6 +403,7 @@ moveActiveDown m =
         { m | state = GameOver }
 
 
+isValidMaskPosition : Board a -> Int2 -> Bool
 isValidMaskPosition m p =
     let
         gridMember =

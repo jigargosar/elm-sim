@@ -52,7 +52,7 @@ body {
 }
 
 .df-col {
-  display: flex;
+  display: inline-flex;
   flex-direction: column;
 }
 

@@ -12,7 +12,7 @@ import Json.Decode as JD
 import List.Extra
 import Random exposing (Seed)
 import Set exposing (Set)
-import String
+import String exposing (fromFloat)
 import Svg exposing (g, rect, svg, text_)
 import Svg.Attributes exposing (class, fill, stroke)
 import TypedSvg.Attributes exposing (transform, viewBox)
@@ -559,7 +559,7 @@ view m =
         [ div [ class "df-row sp10" ]
             [ viewGrid cellWidth m.state m.width m.height (gridWithActiveMask m)
                 |> wrapSvg
-            , viewNext cellWidth m.nextTetronName
+            , div [ class "df-col" ] [ viewNext cellWidth m.nextTetronName ]
             ]
         , viewShapesDemo cellWidth
             |> remove
@@ -573,7 +573,11 @@ viewNext cw tn =
             tetronFromName tn
     in
     viewMask cw color mask
-        |> wrapSvg2 [ class "alignTop" ]
+        |> wrapSvg2
+            [ class "alignTop"
+            , style "min-width" (fromFloat (cw * 4) ++ "px")
+            , style "min-height" (fromFloat (cw * 4) ++ "px")
+            ]
 
 
 remove _ =

@@ -65,6 +65,15 @@ html {
   flex-direction: column;
 }
 
+.df-col.centerX {
+  align-items: center;
+}
+
+.df-col.centerY {
+  justify-content: center;
+}
+
+
 .f-wrap {
   flex-wrap: wrap;
 }

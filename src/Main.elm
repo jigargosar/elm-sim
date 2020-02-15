@@ -178,10 +178,6 @@ type alias Model =
     , nextTetronName : TetronName
     , ticks : Int
     , fallSpeed : { ticks : Int, delay : Int }
-    , rotateClicked : Bool
-    , leftClicked : Bool
-    , rightClicked : Bool
-    , speedUpClicked : Bool
     , rotateTrigger : RepeatTrigger
     , shiftXTrigger : RepeatTrigger
     , speedUpTrigger : RepeatTrigger
@@ -223,10 +219,6 @@ init _ =
       , ticks = 0
       , fallSpeed = { ticks = 0, delay = 20 }
       , rotateTrigger = defaultRepeatTrigger
-      , rotateClicked = False
-      , leftClicked = False
-      , rightClicked = False
-      , speedUpClicked = False
       , shiftXTrigger = defaultRepeatTrigger
       , speedUpTrigger = initRepeatTrigger 10 1
       , keys = Set.empty
@@ -463,10 +455,6 @@ type Msg
     | OnKeyUp String
     | OnBtnDown Btn
     | OnBtnUp Btn
-    | RotateClicked
-    | LeftClicked
-    | RightClicked
-    | SpeedUpClicked
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -484,18 +472,6 @@ update message model =
 
         OnKeyUp k ->
             ( { model | keys = Set.remove k model.keys }, Cmd.none )
-
-        RotateClicked ->
-            ( { model | rotateClicked = True }, Cmd.none )
-
-        LeftClicked ->
-            ( { model | leftClicked = True }, Cmd.none )
-
-        RightClicked ->
-            ( { model | rightClicked = True }, Cmd.none )
-
-        SpeedUpClicked ->
-            ( { model | speedUpClicked = True }, Cmd.none )
 
         OnBtnDown btn ->
             ( { model | btns = btn :: List.filter ((/=) btn) model.btns }, Cmd.none )

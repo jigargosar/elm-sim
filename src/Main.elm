@@ -364,13 +364,18 @@ tickFall model =
 
         newFall =
             { fall | ticks = fall.ticks + 1 }
+
+        isTriggered =
+            fall.delay <= 0 || modBy fall.delay fall.ticks == 0
+
+        newModel =
+            { model | fallSpeed = newFall }
     in
-    if fall.delay <= 0 || modBy fall.delay fall.ticks == 0 then
-        { model | fallSpeed = newFall }
-            |> moveActiveDown
+    if isTriggered then
+        newModel |> moveActiveDown
 
     else
-        { model | fallSpeed = newFall }
+        newModel
 
 
 moveActiveDown : Model -> Model

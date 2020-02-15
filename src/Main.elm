@@ -192,7 +192,7 @@ type alias Model =
     , color : String
     , activeMask : Mask
     , nextTetronName : TetronName
-    , fallSpeed : FallTrigger
+    , fallTrigger : FallTrigger
     , rotateTrigger : RepeatTrigger
     , shiftXTrigger : RepeatTrigger
     , speedUpTrigger : RepeatTrigger
@@ -226,7 +226,7 @@ init _ =
       , color = ""
       , activeMask = emptyMask
       , nextTetronName = Line
-      , fallSpeed = { ticks = 0, delay = 20 }
+      , fallTrigger = { ticks = 0, delay = 20 }
       , rotateTrigger = defaultRepeatTrigger
       , shiftXTrigger = defaultRepeatTrigger
       , speedUpTrigger = initRepeatTrigger 10 1
@@ -293,9 +293,17 @@ updateRunning m =
 
         ( shouldSpeedUp, speedUpTrigger ) =
             stepRepeatTrigger (keyDown "ArrowDown" m) m.speedUpTrigger
+
+        ( shouldFall, fallTrigger ) =
+            stepFallTrigger m.fallTrigger
     in
-    { m | rotateTrigger = rotateTrigger, shiftXTrigger = shiftXTrigger, speedUpTrigger = speedUpTrigger }
-        |> tickFall
+    { m
+        | fallTrigger = fallTrigger
+        , rotateTrigger = rotateTrigger
+        , shiftXTrigger = shiftXTrigger
+        , speedUpTrigger = speedUpTrigger
+    }
+        |> whenTrue (shouldFall || shouldSpeedUp) moveActiveDown
         |> whenTrue shouldRotate tryRotate
         |> whenTrue shouldShiftX (tryShiftX dx)
         |> whenTrue shouldSpeedUp moveActiveDown
@@ -376,7 +384,7 @@ tickFall : Model -> Model
 tickFall model =
     let
         fall =
-            model.fallSpeed
+            model.fallTrigger
 
         newFall =
             { fall | ticks = fall.ticks + 1 }
@@ -385,7 +393,7 @@ tickFall model =
             fall.delay <= 0 || modBy fall.delay fall.ticks == 0
 
         newModel =
-            { model | fallSpeed = newFall }
+            { model | fallTrigger = newFall }
     in
     if isTriggered then
         newModel |> moveActiveDown

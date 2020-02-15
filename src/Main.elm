@@ -561,7 +561,12 @@ view m =
                 |> wrapSvg
             ]
         , viewShapesDemo cellWidth
+            |> el [ class "dn" ]
         ]
+
+
+el attr child =
+    div attr [ child ]
 
 
 viewShapesDemo : Float -> Html msg

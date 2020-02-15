@@ -234,7 +234,7 @@ tetronFromName shape =
 
 type alias Keyboard a =
     { a
-        | keyDowns : Set String
+        | keyDowns : Dict String Bool
         , keyUps : Set String
         , keys : Set String
         , prevKeys : Set String
@@ -243,7 +243,7 @@ type alias Keyboard a =
 
 keyWentDown : String -> Model -> Bool
 keyWentDown string m =
-    Set.member string m.keyDowns
+    Dict.member string m.keyDowns
 
 
 updateKeyboardOnKeyUp : String -> Keyboard a -> Keyboard a
@@ -254,17 +254,17 @@ updateKeyboardOnKeyUp k m =
     }
 
 
-updateKeyboardOnKeyDown : String -> Keyboard a -> Keyboard a
-updateKeyboardOnKeyDown k m =
+updateKeyboardOnKeyDown : String -> Bool -> Keyboard a -> Keyboard a
+updateKeyboardOnKeyDown key repeat m =
     { m
-        | keyDowns = Set.insert k m.keyDowns
-        , keys = Set.insert k m.keys
+        | keyDowns = Dict.insert key repeat m.keyDowns
+        , keys = Set.insert key m.keys
     }
 
 
 tickKeyboard : Keyboard a -> Keyboard a
 tickKeyboard m =
-    { m | keyDowns = Set.empty, keyUps = Set.empty, prevKeys = m.keys }
+    { m | keyDowns = Dict.empty, keyUps = Set.empty, prevKeys = m.keys }
 
 
 
@@ -295,7 +295,7 @@ init _ =
         model : Keyboard (Board Model)
         model =
             { -- KEYBOARD
-              keyDowns = Set.empty
+              keyDowns = Dict.empty
             , keyUps = Set.empty
             , keys = Set.empty
             , prevKeys = Set.empty
@@ -407,8 +407,8 @@ update message model =
             , Cmd.none
             )
 
-        OnKeyDown k _ ->
-            ( updateKeyboardOnKeyDown k model
+        OnKeyDown key repeat ->
+            ( updateKeyboardOnKeyDown key repeat model
             , Cmd.none
             )
 

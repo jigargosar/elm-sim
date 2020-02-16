@@ -622,7 +622,12 @@ view (Model _ m) =
         ]
         [ div [ class "df-row sp10" ]
             [ viewGrid cellWidth m.state m.width m.height (gridWithActiveMask m)
-                |> wrapSvg
+                |> wrap
+                    (noa
+                        :: tabindex 0
+                        :: autofocus True
+                        :: svgWrapperStyles
+                    )
             , div
                 [ class "df-col sp10"
 
@@ -639,6 +644,10 @@ view (Model _ m) =
         , viewShapesDemo cellWidth
             |> remove
         ]
+
+
+noa =
+    class ""
 
 
 viewNext : Float -> TetronName -> Html msg
@@ -691,8 +700,12 @@ svgWrapperStyles =
     ]
 
 
-wrapSvg s =
-    div svgWrapperStyles [ s ]
+wrap a c =
+    div a [ c ]
+
+
+wrapSvg =
+    wrap svgWrapperStyles
 
 
 viewMask cw color (Mask maskWidth list) =

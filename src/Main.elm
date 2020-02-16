@@ -10,7 +10,7 @@ import Html.Attributes exposing (autofocus, style, tabindex)
 import Html.Events exposing (onBlur)
 import Json.Decode as JD
 import List exposing (map)
-import List.Extra exposing (initialize, iterate)
+import List.Extra exposing (initialize)
 import Random exposing (Seed)
 import Set exposing (Set)
 import String exposing (fromInt)
@@ -150,11 +150,11 @@ pairTo =
 fillMockRows : Board a -> Board a
 fillMockRows m =
     let
-        fill y =
-            pairTo y >> pairTo "gray"
+        fromYX y x =
+            ( ( x, y ), "gray" )
 
         fillR y =
-            initialize (m.width - 1) (fill y)
+            initialize (m.width - 1) (fromYX y)
 
         grid =
             List.range 15 (m.height - 1)

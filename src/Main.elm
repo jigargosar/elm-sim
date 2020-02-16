@@ -6,7 +6,7 @@ import Browser
 import Browser.Events
 import Dict exposing (Dict)
 import Html exposing (Html, div, span, text)
-import Html.Attributes exposing (style)
+import Html.Attributes exposing (autofocus, style, tabindex)
 import Json.Decode as JD
 import List.Extra
 import Random exposing (Seed)
@@ -617,7 +617,7 @@ view (Model _ m) =
         cellWidth =
             30
     in
-    div [ class "df-row w-100 h-100 centerX centerY p10" ]
+    div [ class "df-row w-100 h-100 centerX centerY p10", tabindex 0, autofocus True ]
         [ div [ class "df-row sp10" ]
             [ viewGrid cellWidth m.state m.width m.height (gridWithActiveMask m)
                 |> wrapSvg

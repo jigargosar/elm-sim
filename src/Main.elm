@@ -617,7 +617,9 @@ view (Model _ m) =
         cellWidth =
             30
     in
-    div [ class "df-row w-100 h-100 centerX centerY p10", tabindex 0, autofocus True ]
+    div
+        [ class "df-row w-100 h-100 centerX centerY p10"
+        ]
         [ div [ class "df-row sp10" ]
             [ viewGrid cellWidth m.state m.width m.height (gridWithActiveMask m)
                 |> wrapSvg
@@ -683,12 +685,14 @@ applyN n func val =
         |> List.foldl (always func) val
 
 
+svgWrapperStyles =
+    [ style "border" "1px dotted gray"
+    , class "lh0"
+    ]
+
+
 wrapSvg s =
-    div
-        [ style "border" "1px dotted gray"
-        , class "lh0"
-        ]
-        [ s ]
+    div svgWrapperStyles [ s ]
 
 
 viewMask cw color (Mask maskWidth list) =

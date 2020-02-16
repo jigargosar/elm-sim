@@ -16,6 +16,7 @@ import Set exposing (Set)
 import String exposing (fromInt)
 import Svg exposing (g, rect, svg, text_)
 import Svg.Attributes exposing (class, fill, stroke)
+import Tuple exposing (pair)
 import TypedSvg.Attributes exposing (transform, viewBox)
 import TypedSvg.Attributes.InPx exposing (height, strokeWidth, width)
 import TypedSvg.Types exposing (Transform(..))
@@ -138,11 +139,22 @@ type alias Board a =
     }
 
 
+flip func a b =
+    func b a
+
+
+pairTo =
+    flip pair
+
+
 fillMockRows : Board a -> Board a
 fillMockRows m =
     let
+        fill y =
+            pairTo y >> pairTo "gray"
+
         fillR y =
-            initialize (m.width - 1) (Tuple.pair >> (|>) y >> Tuple.pair >> (|>) "gray")
+            initialize (m.width - 1) (fill y)
 
         grid =
             List.range 15 (m.height - 1)
@@ -324,9 +336,6 @@ gridWithActiveMask m =
     let
         isValid w h ( x, y ) =
             x >= 0 && x <= w && y >= 0 && y < h
-
-        pairTo b a =
-            ( a, b )
     in
     translateMask m.x m.y m.activeMask
         |> maskToList

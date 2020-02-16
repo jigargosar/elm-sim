@@ -457,9 +457,7 @@ updateRunning m =
         ( shouldFall, fallTrigger ) =
             stepFallTrigger m.fallTrigger
     in
-    { m
-        | fallTrigger = fallTrigger
-    }
+    { m | fallTrigger = fallTrigger }
         |> whenTrue (shouldFall || checkKey "ArrowDown") moveActiveDown
         |> whenTrue (checkKey "ArrowUp") tryRotate
         |> whenTrue (dx /= 0) (tryShiftX dx)

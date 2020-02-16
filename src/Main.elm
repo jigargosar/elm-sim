@@ -172,12 +172,15 @@ isRowFilled m y =
         |> is m.width
 
 
+findFirstFilledRow : Board a -> Maybe Int
+findFirstFilledRow m =
+    rangeN m.height
+        |> List.Extra.find (isRowFilled m)
+
+
 clearAndShiftRows : Board a -> Board a
 clearAndShiftRows m =
-    case
-        rangeN m.height
-            |> List.Extra.find (isRowFilled m)
-    of
+    case findFirstFilledRow m of
         Just rn ->
             clearAndShiftRows
                 (clearRowAndShiftDown rn m.grid

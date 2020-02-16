@@ -174,7 +174,7 @@ clearAndShiftRows m =
                 |> is m.width
     in
     case
-        List.range 0 (m.height - 1)
+        rangeN m.height
             |> List.Extra.find isRowFilled
     of
         Just rn ->

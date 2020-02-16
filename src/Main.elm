@@ -420,6 +420,26 @@ fillMockRows m =
     { m | grid = grid }
 
 
+initialMem : Mem
+initialMem =
+    { -- BOARD
+      grid = Dict.empty
+    , width = 10
+    , height = 20
+    , x = 4
+    , y = -2
+    , color = ""
+    , activeMask = emptyMask
+    , nextTetronName = Line
+    , state = Running
+    , score = 0
+    , seed = Random.initialSeed 0
+
+    -- OTHER
+    , fallTrigger = { ticks = 0, delay = 20 }
+    }
+
+
 init : Flags -> ( Model, Cmd Msg )
 init _ =
     let
@@ -436,22 +456,7 @@ init _ =
 
         mem : Mem
         mem =
-            { -- BOARD
-              grid = Dict.empty
-            , width = 10
-            , height = 20
-            , x = 4
-            , y = -2
-            , color = ""
-            , activeMask = emptyMask
-            , nextTetronName = Line
-            , state = Running
-            , score = 0
-            , seed = Random.initialSeed 0
-
-            -- OTHER
-            , fallTrigger = { ticks = 0, delay = 20 }
-            }
+            initialMem
     in
     ( mapMem (fillMockRows >> activateNext) model
     , Cmd.none
@@ -545,8 +550,11 @@ updateMem kb state =
         ( False, Paused ) ->
             nop
 
-        ( _, GameOver ) ->
+        ( False, GameOver ) ->
             nop
+
+        ( True, GameOver ) ->
+            always initialMem
 
 
 whenTrue bool func arg =

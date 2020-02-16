@@ -359,10 +359,10 @@ tickKeyboard m =
 
 
 type Model
-    = Model Keyboard (GameModel {})
+    = Model Keyboard (Mem {})
 
 
-type alias GameModel a =
+type alias Mem a =
     Board
         { a
             | fallTrigger : FallTrigger
@@ -479,7 +479,7 @@ toInput kb =
     }
 
 
-tick : Keyboard -> GameModel b -> GameModel b
+tick : Keyboard -> Mem b -> Mem b
 tick kb model =
     case model.state of
         Running ->

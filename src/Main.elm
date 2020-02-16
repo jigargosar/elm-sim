@@ -203,18 +203,18 @@ tryRotate m =
 
 
 tryShiftX : Int -> Board a -> Board a
-tryShiftX dx m =
+tryShiftX dx =
     let
-        newMaskPoints =
+        shiftedMaskValid m =
             m.activeMask
                 |> translateMask (m.x + dx) m.y
                 |> maskToList
-    in
-    if List.all (isValidMaskPosition m) newMaskPoints then
-        { m | x = m.x + dx }
+                |> List.all (isValidMaskPosition m)
 
-    else
-        m
+        shiftX m =
+            { m | x = m.x + dx }
+    in
+    when shiftedMaskValid shiftX
 
 
 moveActiveDown : Board a -> Board a

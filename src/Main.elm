@@ -479,26 +479,26 @@ toInput kb =
 
 
 updateMem : Keyboard -> Mem -> Mem
-updateMem kb model =
-    case model.state of
+updateMem kb mem =
+    case mem.state of
         Running ->
             let
                 ( shouldFall, fallTrigger ) =
-                    stepFallTrigger model.fallTrigger
+                    stepFallTrigger mem.fallTrigger
 
                 input =
                     toInput kb
             in
-            { model | fallTrigger = fallTrigger }
+            { mem | fallTrigger = fallTrigger }
                 |> whenTrue (shouldFall || input.speedUp) moveActiveDown
                 |> whenTrue input.rotate tryRotate
                 |> whenTrue (input.dx /= 0) (tryShiftX input.dx)
 
         GameOver ->
-            model
+            mem
 
         Paused ->
-            model
+            mem
 
 
 whenTrue bool func arg =

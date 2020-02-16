@@ -21,6 +21,103 @@ import TypedSvg.Types exposing (Transform(..))
 
 
 
+-- MASKS AND TETRONS MODEL
+
+
+type alias Int2 =
+    ( Int, Int )
+
+
+type Mask
+    = Mask Int (List Int2)
+
+
+maskToList (Mask _ list) =
+    list
+
+
+shiftNum2 dx dy ( x, y ) =
+    ( x + dx, y + dy )
+
+
+translateMask dx dy (Mask w list) =
+    List.map (shiftNum2 dx dy) list
+        |> Mask w
+
+
+rotateMask (Mask w list) =
+    List.map (\( x, y ) -> ( y, w - 1 - x )) list
+        |> Mask w
+
+
+lineMask =
+    Mask 4 [ ( 0, 1 ), ( 1, 1 ), ( 2, 1 ), ( 3, 1 ) ]
+
+
+sMask =
+    Mask 3 [ ( 1, 1 ), ( 2, 1 ), ( 0, 2 ), ( 1, 2 ) ]
+
+
+zMask =
+    Mask 3 [ ( 0, 1 ), ( 1, 1 ), ( 1, 2 ), ( 2, 2 ) ]
+
+
+jMask =
+    Mask 3 [ ( 2, 0 ), ( 2, 1 ), ( 2, 2 ), ( 1, 2 ) ]
+
+
+lMask =
+    Mask 3 [ ( 0, 0 ), ( 0, 1 ), ( 0, 2 ), ( 1, 2 ) ]
+
+
+tMask =
+    Mask 3 [ ( 0, 0 ), ( 1, 0 ), ( 2, 0 ), ( 1, 1 ) ]
+
+
+emptyMask =
+    Mask 0 []
+
+
+type TetronName
+    = Line
+    | S
+    | Z
+    | L
+    | J
+    | T
+
+
+type alias Tetron =
+    { mask : Mask, color : String }
+
+
+tetronFromName : TetronName -> Tetron
+tetronFromName shape =
+    let
+        create =
+            Tetron
+    in
+    case shape of
+        Line ->
+            create lineMask "red"
+
+        S ->
+            create sMask "blue"
+
+        Z ->
+            create zMask "green"
+
+        L ->
+            create lMask "orange"
+
+        J ->
+            create jMask "cyan"
+
+        T ->
+            create tMask "purple"
+
+
+
 -- Tetrons Board Model
 
 
@@ -222,102 +319,6 @@ gridWithActiveMask m =
 
 
 -- Model
-
-
-type alias Int2 =
-    ( Int, Int )
-
-
-type Mask
-    = Mask Int (List Int2)
-
-
-maskToList (Mask _ list) =
-    list
-
-
-shiftNum2 dx dy ( x, y ) =
-    ( x + dx, y + dy )
-
-
-translateMask dx dy (Mask w list) =
-    List.map (shiftNum2 dx dy) list
-        |> Mask w
-
-
-rotateMask (Mask w list) =
-    List.map (\( x, y ) -> ( y, w - 1 - x )) list
-        |> Mask w
-
-
-lineMask =
-    Mask 4 [ ( 0, 1 ), ( 1, 1 ), ( 2, 1 ), ( 3, 1 ) ]
-
-
-sMask =
-    Mask 3 [ ( 1, 1 ), ( 2, 1 ), ( 0, 2 ), ( 1, 2 ) ]
-
-
-zMask =
-    Mask 3 [ ( 0, 1 ), ( 1, 1 ), ( 1, 2 ), ( 2, 2 ) ]
-
-
-jMask =
-    Mask 3 [ ( 2, 0 ), ( 2, 1 ), ( 2, 2 ), ( 1, 2 ) ]
-
-
-lMask =
-    Mask 3 [ ( 0, 0 ), ( 0, 1 ), ( 0, 2 ), ( 1, 2 ) ]
-
-
-tMask =
-    Mask 3 [ ( 0, 0 ), ( 1, 0 ), ( 2, 0 ), ( 1, 1 ) ]
-
-
-emptyMask =
-    Mask 0 []
-
-
-type TetronName
-    = Line
-    | S
-    | Z
-    | L
-    | J
-    | T
-
-
-type alias Tetron =
-    { mask : Mask, color : String }
-
-
-tetronFromName : TetronName -> Tetron
-tetronFromName shape =
-    let
-        create =
-            Tetron
-    in
-    case shape of
-        Line ->
-            create lineMask "red"
-
-        S ->
-            create sMask "blue"
-
-        Z ->
-            create zMask "green"
-
-        L ->
-            create lMask "orange"
-
-        J ->
-            create jMask "cyan"
-
-        T ->
-            create tMask "purple"
-
-
-
 -- Keyboard
 
 

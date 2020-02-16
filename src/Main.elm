@@ -352,8 +352,8 @@ inPrevKeys string m =
     Set.member string m.prevKeys
 
 
-keyJustDown : String -> Keyboard -> Bool
-keyJustDown k m =
+inJustDown : String -> Keyboard -> Bool
+inJustDown k m =
     inKeys k m && not (inPrevKeys k m)
 
 
@@ -467,20 +467,21 @@ type alias Input =
     , dx : Int
     , speedUp : Bool
     , rotate : Bool
+    , pause : Bool
     }
 
 
 toInput : Keyboard -> Input
 toInput kb =
     let
-        checkKey k =
+        inKeyDowns_ k =
             inKeyDowns k kb
 
         left =
-            checkKey "ArrowLeft"
+            inKeyDowns_ "ArrowLeft"
 
         right =
-            checkKey "ArrowRight"
+            inKeyDowns_ "ArrowRight"
     in
     { left = left
     , right = right
@@ -497,24 +498,22 @@ toInput kb =
 
             ( False, True ) ->
                 1
-    , speedUp = checkKey "ArrowDown"
-    , rotate = checkKey "ArrowUp"
+    , speedUp = inKeyDowns_ "ArrowDown"
+    , rotate = inKeyDowns_ "ArrowUp"
+    , pause = inJustDown " " kb
     }
 
 
 updateMem : Keyboard -> State -> Mem -> Mem
 updateMem kb state =
     let
-        pausePressed =
-            keyJustDown " " kb
+        input =
+            toInput kb
 
         updateRunning mem =
             let
                 ( shouldFall, fallTrigger ) =
                     stepFallTrigger mem.fallTrigger
-
-                input =
-                    toInput kb
             in
             { mem | fallTrigger = fallTrigger }
                 |> whenTrue (shouldFall || input.speedUp) moveActiveDown
@@ -530,7 +529,7 @@ updateMem kb state =
         nop =
             identity
     in
-    case ( pausePressed, state ) of
+    case ( input.pause, state ) of
         ( True, Running ) ->
             setPaused
 

@@ -137,14 +137,8 @@ isRowFilled m y =
         |> is m.width
 
 
-findFirstFilledRow : Board a -> Maybe Int
-findFirstFilledRow m =
-    rangeN m.height
-        |> List.Extra.find (isRowFilled m)
-
-
 clearAndShiftRows : Board a -> Board a
-clearAndShiftRows m =
+clearAndShiftRows =
     let
         clearRowAndShiftDown : Int -> Dict Int2 String -> Dict Int2 String
         clearRowAndShiftDown rn =
@@ -162,16 +156,28 @@ clearAndShiftRows m =
             Dict.toList
                 >> List.filterMap fm
                 >> Dict.fromList
-    in
-    case findFirstFilledRow m of
-        Just rn ->
-            clearAndShiftRows
-                (clearRowAndShiftDown rn m.grid
-                    |> (\grid -> { m | grid = grid })
-                )
 
-        Nothing ->
-            m
+        findFirstFilledRow : Board a -> Maybe Int
+        findFirstFilledRow m =
+            rangeN m.height
+                |> List.Extra.find (isRowFilled m)
+
+        setGridIn : Board a -> Dict Int2 String -> Board a
+        setGridIn m grid =
+            { m | grid = grid }
+
+        do m =
+            case findFirstFilledRow m of
+                Just rn ->
+                    do
+                        (clearRowAndShiftDown rn m.grid
+                            |> setGridIn m
+                        )
+
+                Nothing ->
+                    m
+    in
+    do
 
 
 isValidMaskPosition : Board a -> Int2 -> Bool

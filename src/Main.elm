@@ -5,7 +5,6 @@ module Main exposing (main)
 import Browser
 import Browser.Events
 import Dict exposing (Dict)
-import Dict.Extra
 import Html exposing (Html, div, text)
 import Html.Attributes exposing (style)
 import Json.Decode as JD
@@ -431,11 +430,11 @@ init _ =
     )
 
 
-updateRunning : MainModel -> MainModel
-updateRunning m =
+updateRunning : Bool -> Keyboard b -> Board a -> Board a
+updateRunning shouldFall kb m =
     let
         checkKey k =
-            keyWentDown k m
+            keyWentDown k kb
 
         leftPressed =
             checkKey "ArrowLeft"
@@ -456,11 +455,8 @@ updateRunning m =
 
                 ( False, True ) ->
                     1
-
-        ( shouldFall, fallTrigger ) =
-            stepFallTrigger m.fallTrigger
     in
-    { m | fallTrigger = fallTrigger }
+    m
         |> whenTrue (shouldFall || checkKey "ArrowDown") moveActiveDown
         |> whenTrue (checkKey "ArrowUp") tryRotate
         |> whenTrue (dx /= 0) (tryShiftX dx)
@@ -470,7 +466,12 @@ tick : MainModel -> MainModel
 tick model =
     case model.state of
         Running ->
-            updateRunning model
+            let
+                ( shouldFall, fallTrigger ) =
+                    stepFallTrigger model.fallTrigger
+            in
+            { model | fallTrigger = fallTrigger }
+                |> updateRunning shouldFall model
 
         GameOver ->
             model

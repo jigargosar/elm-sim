@@ -117,24 +117,6 @@ moveActiveDown m =
         { m | state = GameOver }
 
 
-clearRowAndShiftDown : Int -> Dict Int2 a -> Dict Int2 a
-clearRowAndShiftDown rn =
-    let
-        fm ( ( x, y ), v ) =
-            if y == rn then
-                Nothing
-
-            else if y < rn then
-                Just ( ( x, y + 1 ), v )
-
-            else
-                Just ( ( x, y ), v )
-    in
-    Dict.toList
-        >> List.filterMap fm
-        >> Dict.fromList
-
-
 propEq func expected val =
     func val == expected
 
@@ -163,6 +145,24 @@ findFirstFilledRow m =
 
 clearAndShiftRows : Board a -> Board a
 clearAndShiftRows m =
+    let
+        clearRowAndShiftDown : Int -> Dict Int2 String -> Dict Int2 String
+        clearRowAndShiftDown rn =
+            let
+                fm ( ( x, y ), v ) =
+                    if y == rn then
+                        Nothing
+
+                    else if y < rn then
+                        Just ( ( x, y + 1 ), v )
+
+                    else
+                        Just ( ( x, y ), v )
+            in
+            Dict.toList
+                >> List.filterMap fm
+                >> Dict.fromList
+    in
     case findFirstFilledRow m of
         Just rn ->
             clearAndShiftRows

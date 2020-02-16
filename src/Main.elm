@@ -330,7 +330,7 @@ type alias Keyboard a =
     }
 
 
-keyWentDown : String -> Model -> Bool
+keyWentDown : String -> Keyboard a -> Bool
 keyWentDown string m =
     Dict.member string m.keyDowns
 
@@ -360,12 +360,15 @@ tickKeyboard m =
 -- MODEL
 
 
-type alias Model =
+type alias MainModel =
+    Model (Board {})
+
+
+type alias Model a =
     Keyboard
-        (Board
-            { fallTrigger : FallTrigger
-            }
-        )
+        { a
+            | fallTrigger : FallTrigger
+        }
 
 
 type alias FallTrigger =
@@ -396,10 +399,10 @@ fillMockRows m =
     { m | grid = grid }
 
 
-init : Flags -> ( Model, Cmd Msg )
+init : Flags -> ( MainModel, Cmd Msg )
 init _ =
     let
-        model : Keyboard (Board Model)
+        model : MainModel
         model =
             { -- KEYBOARD
               keyDowns = Dict.empty
@@ -428,7 +431,7 @@ init _ =
     )
 
 
-updateRunning : Model -> Model
+updateRunning : MainModel -> MainModel
 updateRunning m =
     let
         checkKey k =
@@ -463,7 +466,7 @@ updateRunning m =
         |> whenTrue (dx /= 0) (tryShiftX dx)
 
 
-tick : Model -> Model
+tick : MainModel -> MainModel
 tick model =
     case model.state of
         Running ->
@@ -506,7 +509,7 @@ type Msg
     | OnKeyUp String
 
 
-update : Msg -> Model -> ( Model, Cmd Msg )
+update : Msg -> MainModel -> ( MainModel, Cmd Msg )
 update message model =
     case message of
         Tick ->
@@ -526,7 +529,7 @@ update message model =
             )
 
 
-subscriptions : Model -> Sub Msg
+subscriptions : MainModel -> Sub Msg
 subscriptions _ =
     Sub.batch
         [ Browser.Events.onAnimationFrame (always Tick)
@@ -539,7 +542,7 @@ subscriptions _ =
 -- View
 
 
-view : Model -> Html Msg
+view : MainModel -> Html Msg
 view m =
     let
         cellWidth =
@@ -742,7 +745,7 @@ viewBoxCentered width_ height_ =
 -- Main
 
 
-main : Program Flags Model Msg
+main : Program Flags MainModel Msg
 main =
     Browser.element
         { init = init

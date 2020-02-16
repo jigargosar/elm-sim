@@ -587,11 +587,12 @@ view (Model _ m) =
             [ viewGrid cellWidth m.state m.width m.height (gridWithActiveMask m)
                 |> wrapSvg
             , div
-                [ class "df-col"
-                , style "justify-content" "space-around"
-                , style "justify-content" "space-evenly"
+                [ class "df-col sp10"
+
+                --, style "justify-content" "space-around"
+                --, style "justify-content" "space-evenly"
                 ]
-                [ div [ class "" ]
+                [ div [ class "fw-bold" ]
                     [ span [] [ text "Score: " ]
                     , text (fromInt m.score)
                     ]

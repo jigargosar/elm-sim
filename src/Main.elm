@@ -5,13 +5,13 @@ module Main exposing (main)
 import Browser
 import Browser.Events
 import Dict exposing (Dict)
-import Html exposing (Html, div, text)
+import Html exposing (Html, div, span, text)
 import Html.Attributes exposing (style)
 import Json.Decode as JD
 import List.Extra
 import Random exposing (Seed)
 import Set exposing (Set)
-import String
+import String exposing (fromInt)
 import Svg exposing (g, rect, svg, text_)
 import Svg.Attributes exposing (class, fill, stroke)
 import TypedSvg.Attributes exposing (transform, viewBox)
@@ -577,22 +577,25 @@ subscriptions _ =
 
 
 view : Model -> Html Msg
-view (Model _ gm) =
+view (Model _ m) =
     let
         cellWidth =
             30
     in
     div [ class "df-row w-100 h-100 centerX centerY p10" ]
         [ div [ class "df-row sp10" ]
-            [ viewGrid cellWidth gm.state gm.width gm.height (gridWithActiveMask gm)
+            [ viewGrid cellWidth m.state m.width m.height (gridWithActiveMask m)
                 |> wrapSvg
             , div
                 [ class "df-col"
                 , style "justify-content" "space-around"
                 , style "justify-content" "space-evenly"
                 ]
-                [ viewNext cellWidth gm.nextTetronName
-                , div [ class "" ] [ text "text" ]
+                [ div [ class "" ]
+                    [ span [] [ text "Score: " ]
+                    , text (fromInt m.score)
+                    ]
+                , viewNext cellWidth m.nextTetronName
                 ]
             ]
         , viewShapesDemo cellWidth

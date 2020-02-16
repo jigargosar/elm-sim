@@ -430,36 +430,53 @@ init _ =
     )
 
 
-updateRunning : Bool -> Keyboard b -> Board a -> Board a
-updateRunning shouldFall kb m =
+type alias Input =
+    { left : Bool
+    , right : Bool
+    , dx : Int
+    , speedUp : Bool
+    , rotate : Bool
+    }
+
+
+toInput : Keyboard a -> Input
+toInput kb =
     let
         checkKey k =
             keyWentDown k kb
 
-        leftPressed =
+        left =
             checkKey "ArrowLeft"
 
-        rightPressed =
+        right =
             checkKey "ArrowRight"
-
-        dx =
-            case ( leftPressed, rightPressed ) of
-                ( True, True ) ->
-                    0
-
-                ( False, False ) ->
-                    0
-
-                ( True, False ) ->
-                    -1
-
-                ( False, True ) ->
-                    1
     in
+    { left = left
+    , right = right
+    , dx =
+        case ( left, right ) of
+            ( True, True ) ->
+                0
+
+            ( False, False ) ->
+                0
+
+            ( True, False ) ->
+                -1
+
+            ( False, True ) ->
+                1
+    , speedUp = checkKey "ArrowDown"
+    , rotate = checkKey "ArrowUp"
+    }
+
+
+updateRunning : Bool -> Input -> Board a -> Board a
+updateRunning shouldFall input m =
     m
-        |> whenTrue (shouldFall || checkKey "ArrowDown") moveActiveDown
-        |> whenTrue (checkKey "ArrowUp") tryRotate
-        |> whenTrue (dx /= 0) (tryShiftX dx)
+        |> whenTrue (shouldFall || input.speedUp) moveActiveDown
+        |> whenTrue input.rotate tryRotate
+        |> whenTrue (input.dx /= 0) (tryShiftX input.dx)
 
 
 tick : Keyboard a -> GameModel b -> GameModel b
@@ -471,7 +488,7 @@ tick kb model =
                     stepFallTrigger model.fallTrigger
             in
             { model | fallTrigger = fallTrigger }
-                |> updateRunning shouldFall kb
+                |> updateRunning shouldFall (toInput kb)
 
         GameOver ->
             model

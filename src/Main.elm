@@ -376,6 +376,7 @@ type Model
 type alias Mem =
     Board
         { fallTrigger : FallTrigger
+        , scoreView : ScoreView
         }
 
 
@@ -383,12 +384,13 @@ type alias FallTrigger =
     { ticks : Int, delay : Int }
 
 
-type alias ScoreView =
-    { start : Float
-    , end : Float
-    , duration : Int
-    , elapsed : Int
-    }
+type ScoreView
+    = ScoreView Int { start : Float, end : Float, duration : Int }
+
+
+zeroScoreView : ScoreView
+zeroScoreView =
+    ScoreView 0 { start = 0, end = 0, duration = 1000 }
 
 
 type State
@@ -446,6 +448,7 @@ init _ =
 
             -- OTHER
             , fallTrigger = { ticks = 0, delay = 20 }
+            , scoreView = zeroScoreView
             }
     in
     ( mapMem (fillMockRows >> activateNext) model

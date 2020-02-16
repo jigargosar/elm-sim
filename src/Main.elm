@@ -117,14 +117,6 @@ moveActiveDown m =
         { m | state = GameOver }
 
 
-propEq func expected val =
-    func val == expected
-
-
-is =
-    (==)
-
-
 rangeN : Int -> List Int
 rangeN n =
     List.range 0 (n - 1)
@@ -132,6 +124,13 @@ rangeN n =
 
 isRowFilled : Board a -> Int -> Bool
 isRowFilled m y =
+    let
+        propEq func expected val =
+            func val == expected
+
+        is =
+            (==)
+    in
     Dict.keys m.grid
         |> List.Extra.count (propEq Tuple.second y)
         |> is m.width

@@ -504,13 +504,13 @@ toInput kb =
     }
 
 
-updateMem : Keyboard -> Mem -> Mem
-updateMem kb mem =
+updateMem : Keyboard -> State -> Mem -> Mem
+updateMem kb state =
     let
         pausePressed =
             keyJustDown " " kb
 
-        updateRunning =
+        updateRunning mem =
             let
                 ( shouldFall, fallTrigger ) =
                     stepFallTrigger mem.fallTrigger
@@ -522,24 +522,31 @@ updateMem kb mem =
                 |> whenTrue (shouldFall || input.speedUp) moveActiveDown
                 |> whenTrue input.rotate tryRotate
                 |> whenTrue (input.dx /= 0) (tryShiftX input.dx)
+
+        setPaused mem =
+            { mem | state = Paused }
+
+        setRunning mem =
+            { mem | state = Running }
+
+        nop =
+            identity
     in
-    case mem.state of
-        Running ->
-            if pausePressed then
-                { mem | state = Paused }
+    case ( pausePressed, state ) of
+        ( True, Running ) ->
+            setPaused
 
-            else
-                updateRunning
+        ( False, Running ) ->
+            updateRunning
 
-        GameOver ->
-            mem
+        ( True, Paused ) ->
+            setRunning
 
-        Paused ->
-            if pausePressed then
-                { mem | state = Running }
+        ( False, Paused ) ->
+            nop
 
-            else
-                mem
+        ( _, GameOver ) ->
+            nop
 
 
 whenTrue bool func arg =
@@ -573,20 +580,20 @@ type Msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
-update message (Model kb gm) =
+update message (Model kb mem) =
     case message of
         Tick ->
-            ( Model (tickKeyboard kb) (updateMem kb gm)
+            ( Model (tickKeyboard kb) (updateMem kb mem.state mem)
             , Cmd.none
             )
 
         OnKeyDown key repeat ->
-            ( Model (updateKeyboardOnKeyDown key repeat kb) gm
+            ( Model (updateKeyboardOnKeyDown key repeat kb) mem
             , Cmd.none
             )
 
         OnKeyUp k ->
-            ( Model (updateKeyboardOnKeyUp k kb) gm
+            ( Model (updateKeyboardOnKeyUp k kb) mem
             , Cmd.none
             )
 

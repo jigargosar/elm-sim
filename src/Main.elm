@@ -177,7 +177,7 @@ activateNext model =
             tetronFromName model.nextTetronName
 
         randomNext =
-            Random.uniform Line [ S, Z, L, J, T ]
+            Random.uniform Line [ Square, S, Z, L, J, T ]
 
         ( next, seed ) =
             Random.step randomNext model.seed
@@ -720,6 +720,7 @@ viewShapesDemo cw =
                 |> div [ class "df-col sp10" ]
     in
     [ Line
+    , Square
     , S
     , Z
     , L

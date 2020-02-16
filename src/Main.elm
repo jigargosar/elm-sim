@@ -140,8 +140,8 @@ isRowFilled m y =
 clearAndShiftRows : Board a -> Board a
 clearAndShiftRows =
     let
-        clearRowAndShiftDown : Int -> Dict Int2 String -> Dict Int2 String
-        clearRowAndShiftDown rn =
+        clearAndShift : Int -> Dict Int2 String -> Dict Int2 String
+        clearAndShift rn =
             let
                 fm ( ( x, y ), v ) =
                     if y == rn then
@@ -170,7 +170,7 @@ clearAndShiftRows =
             case findFirstFilledRow m of
                 Just rn ->
                     do
-                        (clearRowAndShiftDown rn m.grid
+                        (clearAndShift rn m.grid
                             |> setGridIn m
                         )
 

@@ -56,6 +56,10 @@ lineMask =
     Mask 4 [ ( 0, 1 ), ( 1, 1 ), ( 2, 1 ), ( 3, 1 ) ]
 
 
+squareMask =
+    Mask 2 [ ( 0, 0 ), ( 1, 0 ), ( 0, 1 ), ( 1, 1 ) ]
+
+
 sMask =
     Mask 3 [ ( 1, 1 ), ( 2, 1 ), ( 0, 2 ), ( 1, 2 ) ]
 
@@ -82,6 +86,7 @@ emptyMask =
 
 type TetronName
     = Line
+    | Square
     | S
     | Z
     | L
@@ -102,6 +107,9 @@ tetronFromName shape =
     case shape of
         Line ->
             create lineMask "red"
+
+        Square ->
+            create squareMask "dodgerblue"
 
         S ->
             create sMask "blue"

@@ -205,16 +205,16 @@ tryRotate m =
 tryShiftX : Int -> Board a -> Board a
 tryShiftX dx =
     let
-        shiftedMaskValid m =
+        shiftValid m =
             m.activeMask
                 |> translateMask (m.x + dx) m.y
                 |> maskToList
                 |> List.all (isValidMaskPosition m)
 
-        shiftX m =
+        shift m =
             { m | x = m.x + dx }
     in
-    when shiftedMaskValid shiftX
+    when shiftValid shift
 
 
 moveActiveDown : Board a -> Board a
@@ -253,13 +253,18 @@ isRowFilled m y =
         |> is m.width
 
 
+countFilledRows m =
+    rangeN m.height |> List.Extra.count (isRowFilled m)
+
+
+scoreForFillingNRows : Int -> Int
+scoreForFillingNRows n =
+    n ^ 2 * 100
+
+
 updateScore : Board a -> Board a
 updateScore m =
-    let
-        clearedLines =
-            rangeN m.height |> List.Extra.count (isRowFilled m)
-    in
-    { m | score = m.score + (clearedLines ^ 2 * 100) }
+    { m | score = m.score + scoreForFillingNRows (countFilledRows m) }
 
 
 clearAndShiftRows : Board a -> Board a

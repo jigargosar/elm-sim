@@ -320,21 +320,20 @@ gridWithActiveMask m =
 -- Keyboard
 
 
-type alias Keyboard a =
-    { a
-        | keyDowns : Dict String Bool
-        , keyUps : Set String
-        , keys : Set String
-        , prevKeys : Set String
+type alias Keyboard =
+    { keyDowns : Dict String Bool
+    , keyUps : Set String
+    , keys : Set String
+    , prevKeys : Set String
     }
 
 
-keyWentDown : String -> Keyboard a -> Bool
+keyWentDown : String -> Keyboard -> Bool
 keyWentDown string m =
     Dict.member string m.keyDowns
 
 
-updateKeyboardOnKeyUp : String -> Keyboard a -> Keyboard a
+updateKeyboardOnKeyUp : String -> Keyboard -> Keyboard
 updateKeyboardOnKeyUp k m =
     { m
         | keyUps = Set.insert k m.keyUps
@@ -342,7 +341,7 @@ updateKeyboardOnKeyUp k m =
     }
 
 
-updateKeyboardOnKeyDown : String -> Bool -> Keyboard a -> Keyboard a
+updateKeyboardOnKeyDown : String -> Bool -> Keyboard -> Keyboard
 updateKeyboardOnKeyDown key repeat m =
     { m
         | keyDowns = Dict.insert key repeat m.keyDowns
@@ -350,7 +349,7 @@ updateKeyboardOnKeyDown key repeat m =
     }
 
 
-tickKeyboard : Keyboard a -> Keyboard a
+tickKeyboard : Keyboard -> Keyboard
 tickKeyboard m =
     { m | keyDowns = Dict.empty, keyUps = Set.empty, prevKeys = m.keys }
 
@@ -360,7 +359,7 @@ tickKeyboard m =
 
 
 type Model
-    = Model (Keyboard {}) (GameModel {})
+    = Model Keyboard (GameModel {})
 
 
 type alias GameModel a =
@@ -448,7 +447,7 @@ type alias Input =
     }
 
 
-toInput : Keyboard a -> Input
+toInput : Keyboard -> Input
 toInput kb =
     let
         checkKey k =
@@ -480,7 +479,7 @@ toInput kb =
     }
 
 
-tick : Keyboard a -> GameModel b -> GameModel b
+tick : Keyboard -> GameModel b -> GameModel b
 tick kb model =
     case model.state of
         Running ->

@@ -240,7 +240,7 @@ updateScore m =
         clearedLines =
             rangeN m.height |> List.Extra.count (isRowFilled m)
     in
-    { m | score = m.score + (clearedLines * 100) }
+    { m | score = m.score + (clearedLines ^ 2 * 100) }
 
 
 clearAndShiftRows : Board a -> Board a

@@ -12,7 +12,7 @@ import Json.Decode as JD
 import List.Extra
 import Random exposing (Seed)
 import Set exposing (Set)
-import String exposing (fromFloat)
+import String
 import Svg exposing (g, rect, svg, text_)
 import Svg.Attributes exposing (class, fill, stroke)
 import TypedSvg.Attributes exposing (transform, viewBox)
@@ -605,15 +605,6 @@ applyN : Int -> (c -> c) -> c -> c
 applyN n func val =
     List.range 0 (n - 1)
         |> List.foldl (always func) val
-
-
-wrapSvg2 attrs s =
-    div
-        (style "border" "1px dotted gray"
-            :: class "lh0"
-            :: attrs
-        )
-        [ s ]
 
 
 wrapSvg s =

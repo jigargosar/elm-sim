@@ -207,6 +207,7 @@ moveActiveDown m =
 
     else if List.all (isValidInsertPosition m) currentMaskPoints then
         { m | grid = gridWithActiveMask m }
+            |> updateScore
             |> clearAndShiftRows
             |> activateNext
 
@@ -231,6 +232,15 @@ isRowFilled m y =
     Dict.keys m.grid
         |> List.Extra.count (propEq Tuple.second y)
         |> is m.width
+
+
+updateScore : Board a -> Board a
+updateScore m =
+    let
+        clearedLines =
+            rangeN m.height |> List.Extra.count (isRowFilled m)
+    in
+    { m | score = m.score + (clearedLines * 100) }
 
 
 clearAndShiftRows : Board a -> Board a

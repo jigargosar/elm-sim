@@ -187,6 +187,12 @@ clearAndShiftRows m =
             m
 
 
+rangeN : Int -> List Int
+
+ n =
+    List.range 0 (n - 1)
+
+
 isValidMaskPosition : Board a -> Int2 -> Bool
 isValidMaskPosition m p =
     let

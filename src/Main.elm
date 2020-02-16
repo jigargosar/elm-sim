@@ -131,6 +131,7 @@ type alias Board a =
         , activeMask : Mask
         , nextTetronName : TetronName
         , state : State
+        , score : Int
         , seed : Seed
     }
 
@@ -408,9 +409,10 @@ init _ =
                 , keys = Set.empty
                 , prevKeys = Set.empty
                 }
-                gameModel
+                mem
 
-        gameModel =
+        mem : Mem
+        mem =
             { -- BOARD
               grid = Dict.empty
             , width = 10
@@ -427,12 +429,12 @@ init _ =
             , fallTrigger = { ticks = 0, delay = 20 }
             }
     in
-    ( mapGameModel (fillMockRows >> activateNext) model
+    ( mapMem (fillMockRows >> activateNext) model
     , Cmd.none
     )
 
 
-mapGameModel func (Model kb gm) =
+mapMem func (Model kb gm) =
     Model kb <|
         func gm
 

@@ -7,6 +7,7 @@ import Browser.Events
 import Dict exposing (Dict)
 import Html exposing (Html, div, span, text)
 import Html.Attributes exposing (autofocus, style, tabindex)
+import Html.Events exposing (onBlur)
 import Json.Decode as JD
 import List.Extra
 import Random exposing (Seed)
@@ -222,15 +223,8 @@ rangeN n =
 
 isRowFilled : Board a -> Int -> Bool
 isRowFilled m y =
-    let
-        propEq func expected val =
-            func val == expected
-
-        is =
-            (==)
-    in
     Dict.keys m.grid
-        |> List.Extra.count (propEq Tuple.second y)
+        |> List.Extra.count (propIs Tuple.second y)
         |> is m.width
 
 
@@ -504,6 +498,14 @@ toInput kb =
     }
 
 
+setPaused mem =
+    { mem | state = Paused }
+
+
+setRunning mem =
+    { mem | state = Running }
+
+
 updateMem : Keyboard -> State -> Mem -> Mem
 updateMem kb state =
     let
@@ -519,12 +521,6 @@ updateMem kb state =
                 |> whenTrue (shouldFall || input.speedUp) moveActiveDown
                 |> whenTrue input.rotate tryRotate
                 |> whenTrue (input.dx /= 0) (tryShiftX input.dx)
-
-        setPaused mem =
-            { mem | state = Paused }
-
-        setRunning mem =
-            { mem | state = Running }
 
         nop =
             identity
@@ -577,6 +573,7 @@ type Msg
     = Tick
     | OnKeyDown String Bool
     | OnKeyUp String
+    | PauseOnBlur
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -596,6 +593,29 @@ update message (Model kb mem) =
             ( Model (updateKeyboardOnKeyUp k kb) mem
             , Cmd.none
             )
+
+        PauseOnBlur ->
+            ( Model kb (when isRunning setPaused mem), Cmd.none )
+
+
+when pred true val =
+    if pred val then
+        true val
+
+    else
+        val
+
+
+propIs func expected val =
+    func val == expected
+
+
+is =
+    (==)
+
+
+isRunning =
+    propIs .state Running
 
 
 subscriptions : Model -> Sub Msg
@@ -624,6 +644,7 @@ view (Model _ m) =
             [ viewGrid cellWidth m.state m.width m.height (gridWithActiveMask m)
                 |> wrap
                     (noa
+                        :: onBlur PauseOnBlur
                         :: tabindex 0
                         :: autofocus True
                         :: svgWrapperStyles

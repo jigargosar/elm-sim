@@ -359,12 +359,12 @@ tickKeyboard m =
 -- MODEL
 
 
-type alias MainModel =
-    Model (Board {})
+type alias Model =
+    GameModel (Keyboard {})
 
 
-type alias Model a =
-    Keyboard
+type alias GameModel a =
+    Board
         { a
             | fallTrigger : FallTrigger
         }
@@ -398,10 +398,10 @@ fillMockRows m =
     { m | grid = grid }
 
 
-init : Flags -> ( MainModel, Cmd Msg )
+init : Flags -> ( Model, Cmd Msg )
 init _ =
     let
-        model : MainModel
+        model : Model
         model =
             { -- KEYBOARD
               keyDowns = Dict.empty
@@ -462,8 +462,8 @@ updateRunning shouldFall kb m =
         |> whenTrue (dx /= 0) (tryShiftX dx)
 
 
-tick : MainModel -> MainModel
-tick model =
+tick : Keyboard a -> GameModel b -> GameModel b
+tick kb model =
     case model.state of
         Running ->
             let
@@ -471,7 +471,7 @@ tick model =
                     stepFallTrigger model.fallTrigger
             in
             { model | fallTrigger = fallTrigger }
-                |> updateRunning shouldFall model
+                |> updateRunning shouldFall kb
 
         GameOver ->
             model
@@ -510,11 +510,11 @@ type Msg
     | OnKeyUp String
 
 
-update : Msg -> MainModel -> ( MainModel, Cmd Msg )
+update : Msg -> Model -> ( Model, Cmd Msg )
 update message model =
     case message of
         Tick ->
-            ( tick model
+            ( tick model model
                 |> tickKeyboard
             , Cmd.none
             )
@@ -530,7 +530,7 @@ update message model =
             )
 
 
-subscriptions : MainModel -> Sub Msg
+subscriptions : Model -> Sub Msg
 subscriptions _ =
     Sub.batch
         [ Browser.Events.onAnimationFrame (always Tick)
@@ -543,7 +543,7 @@ subscriptions _ =
 -- View
 
 
-view : MainModel -> Html Msg
+view : Model -> Html Msg
 view m =
     let
         cellWidth =
@@ -746,7 +746,7 @@ viewBoxCentered width_ height_ =
 -- Main
 
 
-main : Program Flags MainModel Msg
+main : Program Flags Model Msg
 main =
     Browser.element
         { init = init

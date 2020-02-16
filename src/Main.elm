@@ -393,6 +393,11 @@ zeroScoreView =
     ScoreView 0 { start = 0, end = 0, duration = 1000 }
 
 
+tickScoreView : Int -> ScoreView -> ScoreView
+tickScoreView score (ScoreView elapsed c) =
+    ScoreView (elapsed + 1) { c | end = toFloat score }
+
+
 type State
     = Running
     | Paused
@@ -502,6 +507,11 @@ toInput kb =
     }
 
 
+updateScoreView : Mem -> Mem
+updateScoreView mem =
+    { mem | scoreView = tickScoreView mem.score mem.scoreView }
+
+
 updateMem : Keyboard -> Mem -> Mem
 updateMem kb mem =
     case mem.state of
@@ -517,6 +527,7 @@ updateMem kb mem =
                 |> whenTrue (shouldFall || input.speedUp) moveActiveDown
                 |> whenTrue input.rotate tryRotate
                 |> whenTrue (input.dx /= 0) (tryShiftX input.dx)
+                |> updateScoreView
 
         GameOver ->
             mem

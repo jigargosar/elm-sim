@@ -129,9 +129,6 @@ clearRowAndShiftDown rn =
 
             else
                 Just ( ( x, y ), v )
-
-        _ =
-            Dict.Extra.mapKeys
     in
     Dict.toList
         >> List.filterMap fm

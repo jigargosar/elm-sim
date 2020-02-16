@@ -423,6 +423,7 @@ init _ =
             , activeMask = emptyMask
             , nextTetronName = Line
             , state = Running
+            , score = 0
             , seed = Random.initialSeed 0
 
             -- OTHER

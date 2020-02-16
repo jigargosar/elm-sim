@@ -188,8 +188,7 @@ clearAndShiftRows m =
 
 
 rangeN : Int -> List Int
-
- n =
+rangeN n =
     List.range 0 (n - 1)
 
 

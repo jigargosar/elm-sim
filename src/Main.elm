@@ -359,13 +359,12 @@ tickKeyboard m =
 
 
 type Model
-    = Model Keyboard (Mem {})
+    = Model Keyboard Mem
 
 
-type alias Mem a =
+type alias Mem =
     Board
-        { a
-            | fallTrigger : FallTrigger
+        { fallTrigger : FallTrigger
         }
 
 
@@ -479,8 +478,8 @@ toInput kb =
     }
 
 
-tick : Keyboard -> Mem b -> Mem b
-tick kb model =
+updateMem : Keyboard -> Mem -> Mem
+updateMem kb model =
     case model.state of
         Running ->
             let
@@ -536,7 +535,7 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update message (Model kb gm) =
     case message of
         Tick ->
-            ( Model (tickKeyboard kb) (tick kb gm)
+            ( Model (tickKeyboard kb) (updateMem kb gm)
             , Cmd.none
             )
 

@@ -150,14 +150,12 @@ pairTo =
 fillMockRows : Board a -> Board a
 fillMockRows m =
     let
-        fromYX y x =
-            ( ( x, y ), "gray" )
-
         fillR y =
-            initialize (m.width - 1) (fromYX y)
+            initialize (m.width - 1) (pairTo y >> pairTo "gray")
 
         grid =
-            List.range 15 (m.height - 1)
+            rangeN m.height
+                |> List.drop 15
                 |> List.concatMap fillR
                 |> Dict.fromList
     in

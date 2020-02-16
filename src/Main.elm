@@ -438,6 +438,8 @@ initialMem =
     -- OTHER
     , fallTrigger = { ticks = 0, delay = 20 }
     }
+        |> fillMockRows
+        |> activateNext
 
 
 init : Flags -> ( Model, Cmd Msg )
@@ -452,20 +454,11 @@ init _ =
                 , keys = Set.empty
                 , prevKeys = Set.empty
                 }
-                mem
-
-        mem : Mem
-        mem =
-            initialMem
+                initialMem
     in
-    ( mapMem (fillMockRows >> activateNext) model
+    ( model
     , Cmd.none
     )
-
-
-mapMem func (Model kb gm) =
-    Model kb <|
-        func gm
 
 
 type alias Input =

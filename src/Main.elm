@@ -9,6 +9,7 @@ import Html exposing (Html, div, span, text)
 import Html.Attributes exposing (autofocus, style, tabindex)
 import Html.Events exposing (onBlur)
 import Json.Decode as JD
+import List exposing (map)
 import List.Extra
 import Random exposing (Seed)
 import Set exposing (Set)
@@ -41,12 +42,12 @@ shiftNum2 dx dy ( x, y ) =
 
 
 translateMask dx dy (Mask w list) =
-    List.map (shiftNum2 dx dy) list
+    map (shiftNum2 dx dy) list
         |> Mask w
 
 
 rotateMask (Mask w list) =
-    List.map (\( x, y ) -> ( y, w - 1 - x )) list
+    map (\( x, y ) -> ( y, w - 1 - x )) list
         |> Mask w
 
 
@@ -141,7 +142,7 @@ fillMockRows : Board a -> Board a
 fillMockRows m =
     let
         fillR y =
-            List.range 0 (m.width - 2) |> List.map (Tuple.pair >> (|>) y >> Tuple.pair >> (|>) "gray")
+            List.range 0 (m.width - 2) |> map (Tuple.pair >> (|>) y >> Tuple.pair >> (|>) "gray")
 
         grid =
             List.range 15 (m.height - 1)
@@ -330,7 +331,7 @@ gridWithActiveMask m =
     translateMask m.x m.y m.activeMask
         |> maskToList
         |> List.filter (isValid m.width m.height)
-        |> List.map (pairTo m.color)
+        |> map (pairTo m.color)
         |> Dict.fromList
         |> Dict.union m.grid
 
@@ -690,7 +691,7 @@ viewShapesDemo cw =
     let
         viewShapeRotations { color, mask } =
             List.range 0 3
-                |> List.map
+                |> map
                     (\n ->
                         applyN n rotateMask mask
                             |> viewMask cw color
@@ -705,7 +706,7 @@ viewShapesDemo cw =
     , J
     , T
     ]
-        |> List.map (tetronFromName >> viewShapeRotations)
+        |> map (tetronFromName >> viewShapeRotations)
         |> div [ class "df-row sp10 items-center f-wrap" ]
 
 
@@ -747,7 +748,7 @@ viewMask cw color (Mask maskWidth list) =
     in
     svg [ viewBox 0 0 w w, width w, height w ]
         [ list
-            |> List.map square
+            |> map square
             |> g []
         ]
 
@@ -770,7 +771,7 @@ viewMask2 cw maskWidth color (Mask _ list) =
     in
     svg [ viewBox 0 0 w w, width w, height w ]
         [ list
-            |> List.map square
+            |> map square
             |> g []
         ]
 

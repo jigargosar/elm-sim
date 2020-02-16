@@ -383,6 +383,14 @@ type alias FallTrigger =
     { ticks : Int, delay : Int }
 
 
+type alias ScoreView =
+    { start : Float
+    , end : Float
+    , duration : Int
+    , elapsed : Int
+    }
+
+
 type State
     = Running
     | Paused

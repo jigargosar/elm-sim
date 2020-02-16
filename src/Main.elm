@@ -161,21 +161,22 @@ propEq func expected val =
     func val == expected
 
 
+is =
+    (==)
+
+
+isRowFilled : Board a -> Int -> Bool
+isRowFilled m y =
+    Dict.keys m.grid
+        |> List.Extra.count (propEq Tuple.second y)
+        |> is m.width
+
+
 clearAndShiftRows : Board a -> Board a
 clearAndShiftRows m =
-    let
-        is =
-            (==)
-
-        isRowFilled : Int -> Bool
-        isRowFilled y =
-            Dict.keys m.grid
-                |> List.Extra.count (propEq Tuple.second y)
-                |> is m.width
-    in
     case
         rangeN m.height
-            |> List.Extra.find isRowFilled
+            |> List.Extra.find (isRowFilled m)
     of
         Just rn ->
             clearAndShiftRows

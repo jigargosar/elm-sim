@@ -117,25 +117,6 @@ moveActiveDown m =
         { m | state = GameOver }
 
 
-justWhen : (a -> Bool) -> a -> Maybe a
-justWhen pred val =
-    if pred val then
-        Just val
-
-    else
-        Nothing
-
-
-clearRow : Int -> List ( Int2, a ) -> List ( Int2, a )
-clearRow rn =
-    List.filter (Tuple.first >> rowIs rn)
-
-
-rowIs : Int -> Int2 -> Bool
-rowIs rn ( _, y ) =
-    rn == y
-
-
 clearRowAndShiftDown : Int -> Dict Int2 a -> Dict Int2 a
 clearRowAndShiftDown rn =
     let
@@ -165,6 +146,11 @@ is =
     (==)
 
 
+rangeN : Int -> List Int
+rangeN n =
+    List.range 0 (n - 1)
+
+
 isRowFilled : Board a -> Int -> Bool
 isRowFilled m y =
     Dict.keys m.grid
@@ -189,11 +175,6 @@ clearAndShiftRows m =
 
         Nothing ->
             m
-
-
-rangeN : Int -> List Int
-rangeN n =
-    List.range 0 (n - 1)
 
 
 isValidMaskPosition : Board a -> Int2 -> Bool

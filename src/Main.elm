@@ -471,14 +471,6 @@ toInput kb =
     }
 
 
-updateRunning : Bool -> Input -> Board a -> Board a
-updateRunning shouldFall input m =
-    m
-        |> whenTrue (shouldFall || input.speedUp) moveActiveDown
-        |> whenTrue input.rotate tryRotate
-        |> whenTrue (input.dx /= 0) (tryShiftX input.dx)
-
-
 tick : Keyboard a -> GameModel b -> GameModel b
 tick kb model =
     case model.state of
@@ -486,9 +478,14 @@ tick kb model =
             let
                 ( shouldFall, fallTrigger ) =
                     stepFallTrigger model.fallTrigger
+
+                input =
+                    toInput kb
             in
             { model | fallTrigger = fallTrigger }
-                |> updateRunning shouldFall (toInput kb)
+                |> whenTrue (shouldFall || input.speedUp) moveActiveDown
+                |> whenTrue input.rotate tryRotate
+                |> whenTrue (input.dx /= 0) (tryShiftX input.dx)
 
         GameOver ->
             model

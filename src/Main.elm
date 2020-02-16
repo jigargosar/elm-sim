@@ -339,8 +339,8 @@ type alias Keyboard =
     }
 
 
-keyWentDown : String -> Keyboard -> Bool
-keyWentDown string m =
+keyDownTriggerd : String -> Keyboard -> Bool
+keyDownTriggerd string m =
     Dict.member string m.keyDowns
 
 
@@ -463,7 +463,7 @@ toInput : Keyboard -> Input
 toInput kb =
     let
         checkKey k =
-            keyWentDown k kb
+            keyDownTriggerd k kb
 
         left =
             checkKey "ArrowLeft"

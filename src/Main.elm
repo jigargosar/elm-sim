@@ -137,6 +137,20 @@ type alias Board a =
     }
 
 
+fillMockRows : Board a -> Board a
+fillMockRows m =
+    let
+        fillR y =
+            List.range 0 (m.width - 2) |> List.map (Tuple.pair >> (|>) y >> Tuple.pair >> (|>) "gray")
+
+        grid =
+            List.range 15 (m.height - 1)
+                |> List.concatMap fillR
+                |> Dict.fromList
+    in
+    { m | grid = grid }
+
+
 activateNext : Board a -> Board a
 activateNext model =
     let
@@ -398,20 +412,6 @@ type State
 
 type alias Flags =
     ()
-
-
-fillMockRows : Board a -> Board a
-fillMockRows m =
-    let
-        fillR y =
-            List.range 0 (m.width - 2) |> List.map (Tuple.pair >> (|>) y >> Tuple.pair >> (|>) "gray")
-
-        grid =
-            List.range 15 (m.height - 1)
-                |> List.concatMap fillR
-                |> Dict.fromList
-    in
-    { m | grid = grid }
 
 
 initialMem : Mem

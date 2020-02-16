@@ -359,8 +359,8 @@ tickKeyboard m =
 -- MODEL
 
 
-type alias Model =
-    GameModel (Keyboard {})
+type Model
+    = Model (Keyboard {}) (GameModel {})
 
 
 type alias GameModel a =
@@ -403,14 +403,18 @@ init _ =
     let
         model : Model
         model =
-            { -- KEYBOARD
-              keyDowns = Dict.empty
-            , keyUps = Set.empty
-            , keys = Set.empty
-            , prevKeys = Set.empty
+            Model
+                { -- KEYBOARD
+                  keyDowns = Dict.empty
+                , keyUps = Set.empty
+                , keys = Set.empty
+                , prevKeys = Set.empty
+                }
+                gameModel
 
-            -- BOARD
-            , grid = Dict.empty
+        gameModel =
+            { -- BOARD
+              grid = Dict.empty
             , width = 10
             , height = 20
             , x = 4
@@ -425,9 +429,14 @@ init _ =
             , fallTrigger = { ticks = 0, delay = 20 }
             }
     in
-    ( model |> fillMockRows |> activateNext
+    ( mapGameModel (fillMockRows >> activateNext) model
     , Cmd.none
     )
+
+
+mapGameModel func (Model kb gm) =
+    Model kb <|
+        func gm
 
 
 type alias Input =
@@ -525,21 +534,20 @@ type Msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
-update message model =
+update message (Model kb gm) =
     case message of
         Tick ->
-            ( tick model model
-                |> tickKeyboard
+            ( Model (tickKeyboard kb) (tick kb gm)
             , Cmd.none
             )
 
         OnKeyDown key repeat ->
-            ( updateKeyboardOnKeyDown key repeat model
+            ( Model (updateKeyboardOnKeyDown key repeat kb) gm
             , Cmd.none
             )
 
         OnKeyUp k ->
-            ( updateKeyboardOnKeyUp k model
+            ( Model (updateKeyboardOnKeyUp k kb) gm
             , Cmd.none
             )
 
@@ -558,21 +566,21 @@ subscriptions _ =
 
 
 view : Model -> Html Msg
-view m =
+view (Model _ gm) =
     let
         cellWidth =
             30
     in
     div [ class "df-row w-100 h-100 centerX centerY p10" ]
         [ div [ class "df-row sp10" ]
-            [ viewGrid cellWidth m.state m.width m.height (gridWithActiveMask m)
+            [ viewGrid cellWidth gm.state gm.width gm.height (gridWithActiveMask gm)
                 |> wrapSvg
             , div
                 [ class "df-col"
                 , style "justify-content" "space-around"
                 , style "justify-content" "space-evenly"
                 ]
-                [ viewNext cellWidth m.nextTetronName
+                [ viewNext cellWidth gm.nextTetronName
                 , div [ class "" ] [ text "text" ]
                 ]
             ]

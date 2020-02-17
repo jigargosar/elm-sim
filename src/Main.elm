@@ -882,9 +882,6 @@ viewMask2 cw maskWidth color (Mask _ list) =
                 [ width cw
                 , height cw
                 , fill color
-
-                --, strokeWidth 1
-                --, stroke "white"
                 , transform [ Translate (toFloat x * cw) (toFloat y * cw) ]
                 ]
                 []

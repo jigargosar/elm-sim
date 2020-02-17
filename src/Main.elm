@@ -11,6 +11,7 @@ import Html.Events exposing (onBlur)
 import Json.Decode as JD
 import List exposing (map)
 import List.Extra exposing (initialize)
+import Maybe.Extra
 import Random exposing (Seed)
 import Set exposing (Set)
 import String exposing (fromInt)
@@ -240,12 +241,9 @@ tryRotate m =
                     Nothing ->
                         shiftXRotate (dx + 1) maxDx dxSign
     in
-    case rotate m m.x m.y m.activeMask of
-        Just newMask ->
-            { m | activeMask = newMask }
-
-        Nothing ->
-            m
+    shiftXRotate 0 3 1
+        |> Maybe.Extra.orElseLazy (\_ -> shiftXRotate 0 3 -1)
+        |> Maybe.withDefault m
 
 
 tryShiftX : Int -> Board a -> Board a

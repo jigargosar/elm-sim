@@ -1,6 +1,6 @@
 const Module = require('./Main.elm')
 require('./styles.css')
-require('ramda')
+// require('ramda')
 
 {
   initElmApp()

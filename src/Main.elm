@@ -917,20 +917,21 @@ viewGrid cellW state gridWidth gridHeight cellList =
             |> groupGrid
         , case state of
             GameOver ->
-                [ filledRect w h "rgba(255, 255, 255, .7)" [] []
-                , filledText "GAME OVER" "" []
-                ]
-                    |> group [] []
+                overlayText w h "GAME OVER"
 
             Running ->
                 text ""
 
             Paused ->
-                [ filledRect w h "rgba(255, 255, 255, .7)" [] []
-                , filledText "PAUSED" "" []
-                ]
-                    |> group [] []
+                overlayText w h "PAUSED"
         ]
+
+
+overlayText w h string =
+    [ filledRect w h "rgba(255, 255, 255, .7)" [] []
+    , filledText string primaryColor [ style "font-size" "2rem" ]
+    ]
+        |> group [] []
 
 
 canvas w h =

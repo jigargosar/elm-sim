@@ -19,8 +19,21 @@ import Svg exposing (g, rect, svg, text_)
 import Svg.Attributes exposing (class, fill)
 import Tuple exposing (pair)
 import TypedSvg.Attributes exposing (transform, viewBox)
-import TypedSvg.Attributes.InPx exposing (height, width)
 import TypedSvg.Types exposing (Transform(..))
+
+
+floatAttr : (String.String -> a) -> Float -> a
+floatAttr attr float =
+    attr (fromFloat float)
+
+
+width : Float -> Svg.Attribute msg
+width =
+    floatAttr Svg.Attributes.width
+
+
+height =
+    floatAttr Svg.Attributes.height
 
 
 

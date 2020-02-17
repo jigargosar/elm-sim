@@ -106,25 +106,25 @@ tetronFromName shape =
     in
     case shape of
         Line ->
-            create lineMask "red"
+            create lineMask "rgb(60, 199, 214)"
 
         Square ->
-            create squareMask "dodgerblue"
+            create squareMask "rgb(251, 180, 20)"
 
         S ->
-            create sMask "blue"
+            create sMask "rgb(149, 196, 61)"
 
         Z ->
-            create zMask "green"
+            create zMask "rgb(232, 65, 56)"
 
         L ->
-            create lMask "orange"
+            create lMask "rgb(237, 101, 47)"
 
         J ->
-            create jMask "cyan"
+            create jMask "rgb(57, 147, 208)"
 
         T ->
-            create tMask "purple"
+            create tMask "rgb(176, 68, 151)"
 
 
 
@@ -671,7 +671,7 @@ view (Model _ m) =
             , style "margin" "auto"
             ]
             [ viewGrid cellWidth m.state m.width m.height (gridWithActiveMask m)
-                |> wrapSvg
+                |> wrap [ class "lh-0", style "background-color" "rgb(236, 240, 241)" ]
             , viewPanel cellWidth m
             ]
         , viewShapesDemo cellWidth
@@ -745,8 +745,8 @@ viewNext cw tetronName =
         { mask, color } =
             tetronFromName tetronName
     in
-    viewMask2 cw 4 color mask
-        |> wrapSvg
+    viewMask2 cw 4 "rgb(192, 192, 192)" mask
+        |> wrap [ class "lh-0" ]
 
 
 remove _ =
@@ -831,8 +831,9 @@ viewMask2 cw maskWidth color (Mask _ list) =
                 [ width cw
                 , height cw
                 , fill color
-                , strokeWidth 1
-                , stroke "white"
+
+                --, strokeWidth 1
+                --, stroke "white"
                 , transform [ Translate (toFloat x * cw) (toFloat y * cw) ]
                 ]
                 []

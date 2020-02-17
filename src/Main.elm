@@ -678,14 +678,22 @@ view (Model _ m) =
 
 viewPanel cw m =
     div
-        [ class "df-col sp10"
+        [ class "df-col sp15"
         ]
         [ viewTitle "Elm Flatris"
         , div [ class "df-col" ]
             [ viewLabel "Score"
             , viewInt m.score
             ]
-        , div [ style "align-self" "start" ] [ viewNext cw m.nextTetronName ]
+        , div [ class "df-col" ]
+            [ viewLabel "Lines Cleared"
+            , viewInt m.score
+            ]
+        , div [ class "df-col sp10" ]
+            [ viewLabel "Next"
+            , div [ style "align-self" "start" ]
+                [ viewNext cw m.nextTetronName ]
+            ]
         ]
 
 
@@ -700,7 +708,7 @@ accentColor =
 viewTitle txt =
     div
         [ style "font-size" "3rem"
-        , style "line-height" "2"
+        , style "line-height" "1"
         , style "color" primaryColor
         ]
         [ text txt ]

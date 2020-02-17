@@ -73,7 +73,7 @@ html {
   justify-content: center;
 }
 
-.alignTop{
+.alignTop {
   align-self: flex-start;
 }
 
@@ -174,18 +174,30 @@ html {
 .df-row.sp5 > :last-child {
   margin-right: 0;
 }
+
 .df-col.sp10 > * {
   margin-bottom: 10px;
 }
 .df-col.sp10 > :last-child {
   margin-bottom: 0;
 }
-
 .df-row.sp10 > * {
   margin-right: 10px;
 }
-
 .df-row.sp10 > :last-child {
+  margin-right: 0;
+}
+
+.df-col.sp15 > * {
+  margin-bottom: 15px;
+}
+.df-col.sp15 > :last-child {
+  margin-bottom: 0;
+}
+.df-row.sp15 > * {
+  margin-right: 15px;
+}
+.df-row.sp15 > :last-child {
   margin-right: 0;
 }
 

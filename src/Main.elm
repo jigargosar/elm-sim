@@ -219,6 +219,23 @@ rotate m x y mask =
 
 tryRotate : Board a -> Board a
 tryRotate m =
+    let
+        shiftXRotate dx =
+            let
+                x =
+                    m.x + dx
+            in
+            case rotate m x m.y m.activeMask of
+                Just newMask ->
+                    Just
+                        { m
+                            | activeMask = newMask
+                            , x = x
+                        }
+
+                Nothing ->
+                    Nothing
+    in
     case rotate m m.x m.y m.activeMask of
         Just newMask ->
             { m | activeMask = newMask }

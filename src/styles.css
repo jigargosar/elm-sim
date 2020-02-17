@@ -83,7 +83,6 @@ html {
 .p15 {
   padding: 15px;
 }
-
 .p20 {
   padding: 20px;
 }
@@ -100,7 +99,6 @@ html {
   padding-left: 15px;
   padding-right: 15px;
 }
-
 .ph20 {
   padding-left: 20px;
   padding-right: 20px;
@@ -118,7 +116,6 @@ html {
   padding-top: 15px;
   padding-bottom: 15px;
 }
-
 .pv20 {
   padding-top: 20px;
   padding-bottom: 20px;
@@ -134,11 +131,9 @@ html {
 .df-col.sp5 > :last-child {
   margin-bottom: 0;
 }
-
 .df-row.sp5 > * {
   margin-right: 5px;
 }
-
 .df-row.sp5 > :last-child {
   margin-right: 0;
 }
@@ -194,4 +189,3 @@ html {
 .df-row.sp25 > :last-child {
   margin-right: 0;
 }
-

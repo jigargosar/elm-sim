@@ -14,7 +14,7 @@ import List.Extra exposing (initialize)
 import Maybe.Extra
 import Random exposing (Seed)
 import Set exposing (Set)
-import String exposing (fromInt)
+import String exposing (fromFloat, fromInt)
 import Svg exposing (g, rect, svg, text_)
 import Svg.Attributes exposing (class, fill, stroke)
 import Tuple exposing (pair)
@@ -917,19 +917,23 @@ viewGrid cellW state gridWidth gridHeight cellList =
             |> groupGrid
         , case state of
             GameOver ->
-                overlayText w h "GAME OVER"
+                overlayText cellW w h "GAME OVER"
 
             Running ->
                 text ""
 
             Paused ->
-                overlayText w h "PAUSED"
+                overlayText cellW w h "PAUSED"
         ]
 
 
-overlayText w h string =
+overlayText cellW w h string =
     [ filledRect w h "rgba(255, 255, 255, .7)" [] []
-    , filledText string primaryColor [ style "font-size" "2rem" ]
+    , filledText string
+        primaryColor
+        [ style "font-size" (fromFloat cellW ++ "px")
+        , style "font-weight" "bold"
+        ]
     ]
         |> group [] []
 

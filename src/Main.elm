@@ -45,6 +45,16 @@ viewBox minX minY vWidth vHeight =
         |> Svg.Attributes.viewBox
 
 
+dominantBaselineCentral : Svg.Attribute msg
+dominantBaselineCentral =
+    Svg.Attributes.dominantBaseline "central"
+
+
+textAnchorMiddle : Svg.Attribute msg
+textAnchorMiddle =
+    Svg.Attributes.textAnchor "middle"
+
+
 
 -- MASKS AND TETRONS MODEL
 
@@ -915,8 +925,8 @@ filledRect w h color transforms attrs =
 
 filledText string color attrs =
     text_
-        (TypedSvg.Attributes.dominantBaseline TypedSvg.Types.DominantBaselineCentral
-            :: TypedSvg.Attributes.textAnchor TypedSvg.Types.AnchorMiddle
+        (dominantBaselineCentral
+            :: textAnchorMiddle
             :: fill color
             :: attrs
         )

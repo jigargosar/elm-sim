@@ -659,14 +659,17 @@ view (Model _ m) =
             30
     in
     div
-        (class "df-row w-100 h-100 centerX centerY p10"
+        (class "df-row w-100 h-100"
             :: onBlur PauseOnBlur
             :: tabindex 0
             :: autofocus True
             :: style "outline" "none"
             :: []
         )
-        [ div [ class "df-row sp10" ]
+        [ div
+            [ class "df-row sp20 p10"
+            , style "margin" "auto"
+            ]
             [ viewGrid cellWidth m.state m.width m.height (gridWithActiveMask m)
                 |> wrapSvg
             , viewPanel cellWidth m
@@ -678,7 +681,7 @@ view (Model _ m) =
 
 viewPanel cw m =
     div
-        [ class "df-col sp15"
+        [ class "df-col sp25"
         ]
         [ viewTitle "Elm Flatris"
         , div [ class "df-col" ]
@@ -707,7 +710,7 @@ accentColor =
 
 viewTitle txt =
     div
-        [ style "font-size" "3rem"
+        [ style "font-size" "2.5rem"
         , style "line-height" "1"
         , style "color" primaryColor
         ]

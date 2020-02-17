@@ -201,6 +201,32 @@ html {
   margin-right: 0;
 }
 
+.df-col.sp20 > * {
+  margin-bottom: 20px;
+}
+.df-col.sp20 > :last-child {
+  margin-bottom: 0;
+}
+.df-row.sp20 > * {
+  margin-right: 20px;
+}
+.df-row.sp20 > :last-child {
+  margin-right: 0;
+}
+
+.df-col.sp25 > * {
+  margin-bottom: 25px;
+}
+.df-col.sp25 > :last-child {
+  margin-bottom: 0;
+}
+.df-row.sp25 > * {
+  margin-right: 25px;
+}
+.df-row.sp25 > :last-child {
+  margin-right: 0;
+}
+
 .mono-board {
   font-family: monospace;
   white-space: pre;

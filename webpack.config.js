@@ -4,7 +4,7 @@ module.exports = (_, config) => {
   const isProd = config.mode === 'production'
   return {
     output: {
-      publicPath: './',
+      publicPath: '/',
     },
     resolve: {
       extensions: ['.js', '.elm'],

@@ -21,68 +21,6 @@ import Tuple exposing (pair)
 
 
 
--- SVG ATTRIBUTES
-
-
-floatAttr : (String.String -> a) -> Float -> a
-floatAttr attr float =
-    attr (fromFloat float)
-
-
-width : Float -> Svg.Attribute msg
-width =
-    floatAttr Svg.Attributes.width
-
-
-height : Float -> Svg.Attribute msg
-height =
-    floatAttr Svg.Attributes.height
-
-
-viewBox : Float -> Float -> Float -> Float -> Svg.Attribute msg
-viewBox minX minY vWidth vHeight =
-    [ minX, minY, vWidth, vHeight ]
-        |> List.map fromFloat
-        |> String.join " "
-        |> Svg.Attributes.viewBox
-
-
-dominantBaselineCentral : Svg.Attribute msg
-dominantBaselineCentral =
-    Svg.Attributes.dominantBaseline "central"
-
-
-textAnchorMiddle : Svg.Attribute msg
-textAnchorMiddle =
-    Svg.Attributes.textAnchor "middle"
-
-
-
--- TRANSFORMS
-
-
-tx : List String -> Svg.Attribute msg
-tx list =
-    Svg.Attributes.transform <|
-        join " " list
-
-
-tx_ : String -> List Float -> String
-tx_ name args =
-    String.concat
-        [ name
-        , "("
-        , String.join " " (List.map String.fromFloat args)
-        , ")"
-        ]
-
-
-move : Float -> Float -> String
-move x y =
-    tx_ "translate" [ x, y ]
-
-
-
 -- MASKS AND TETRONS MODEL
 
 
@@ -962,6 +900,68 @@ filledText string color attrs =
 
 group transforms attrs =
     g (tx transforms :: attrs)
+
+
+
+-- SVG ATTRIBUTES
+
+
+floatAttr : (String.String -> a) -> Float -> a
+floatAttr attr float =
+    attr (fromFloat float)
+
+
+width : Float -> Svg.Attribute msg
+width =
+    floatAttr Svg.Attributes.width
+
+
+height : Float -> Svg.Attribute msg
+height =
+    floatAttr Svg.Attributes.height
+
+
+viewBox : Float -> Float -> Float -> Float -> Svg.Attribute msg
+viewBox minX minY vWidth vHeight =
+    [ minX, minY, vWidth, vHeight ]
+        |> List.map fromFloat
+        |> String.join " "
+        |> Svg.Attributes.viewBox
+
+
+dominantBaselineCentral : Svg.Attribute msg
+dominantBaselineCentral =
+    Svg.Attributes.dominantBaseline "central"
+
+
+textAnchorMiddle : Svg.Attribute msg
+textAnchorMiddle =
+    Svg.Attributes.textAnchor "middle"
+
+
+
+-- TRANSFORMS
+
+
+tx : List String -> Svg.Attribute msg
+tx list =
+    Svg.Attributes.transform <|
+        join " " list
+
+
+tx_ : String -> List Float -> String
+tx_ name args =
+    String.concat
+        [ name
+        , "("
+        , String.join " " (List.map String.fromFloat args)
+        , ")"
+        ]
+
+
+move : Float -> Float -> String
+move x y =
+    tx_ "translate" [ x, y ]
 
 
 

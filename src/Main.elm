@@ -717,6 +717,15 @@ viewTitle txt =
         [ text txt ]
 
 
+viewInt int =
+    div
+        [ style "font-size" "2.5rem"
+        , style "line-height" "1"
+        , style "color" accentColor
+        ]
+        [ text (fromInt int) ]
+
+
 viewLabel txt =
     div
         [ style "font-size" "1rem"
@@ -724,15 +733,6 @@ viewLabel txt =
         , style "color" "gray"
         ]
         [ text txt ]
-
-
-viewInt int =
-    div
-        [ style "font-size" "3rem"
-        , style "line-height" "1"
-        , style "color" accentColor
-        ]
-        [ text (fromInt int) ]
 
 
 noa =

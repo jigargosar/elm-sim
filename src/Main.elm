@@ -9,17 +9,15 @@ import Html exposing (Html, div, text)
 import Html.Attributes exposing (autofocus, style, tabindex)
 import Html.Events exposing (onBlur)
 import Json.Decode as JD
-import List exposing (map)
+import List exposing (List, map)
 import List.Extra exposing (initialize)
 import Maybe.Extra
 import Random exposing (Seed)
 import Set exposing (Set)
-import String exposing (fromFloat, fromInt)
+import String exposing (String, fromFloat, fromInt, join)
 import Svg exposing (g, rect, svg, text_)
 import Svg.Attributes exposing (class, fill)
 import Tuple exposing (pair)
-import TypedSvg.Attributes exposing (transform)
-import TypedSvg.Types exposing (Transform(..))
 
 
 floatAttr : (String.String -> a) -> Float -> a
@@ -53,6 +51,27 @@ dominantBaselineCentral =
 textAnchorMiddle : Svg.Attribute msg
 textAnchorMiddle =
     Svg.Attributes.textAnchor "middle"
+
+
+tx : List String -> Svg.Attribute msg
+tx list =
+    Svg.Attributes.transform <|
+        join " " list
+
+
+tx_ : String -> List Float -> String
+tx_ name args =
+    String.concat
+        [ name
+        , "("
+        , String.join " " (List.map String.fromFloat args)
+        , ")"
+        ]
+
+
+move : Float -> Float -> String
+move x y =
+    tx_ "translate" [ x, y ]
 
 
 
@@ -840,7 +859,7 @@ viewMask cw maskWidth color (Mask _ list) =
                 [ width cw
                 , height cw
                 , fill color
-                , transform [ Translate (toFloat x * cw) (toFloat y * cw) ]
+                , tx [ move (toFloat x * cw) (toFloat y * cw) ]
                 ]
                 []
     in
@@ -857,14 +876,14 @@ viewGrid cellW state gridWidth gridHeight cellList =
             filledSquare
                 cellW
                 color
-                [ Translate (toFloat x * cellW) (toFloat y * cellW) ]
+                [ move (toFloat x * cellW) (toFloat y * cellW) ]
                 []
 
         ( w, h ) =
             ( toFloat gridWidth * cellW, toFloat gridHeight * cellW )
 
         groupGridCells =
-            group [ Translate ((cellW - w) * 0.5) ((cellW - h) * 0.5) ] []
+            group [ move ((cellW - w) * 0.5) ((cellW - h) * 0.5) ] []
     in
     canvas w h <|
         [ cellList
@@ -906,7 +925,7 @@ filledSquare sideWidth color transforms attrs =
         (width sideWidth
             :: height sideWidth
             :: fill color
-            :: transform (transforms ++ [ Translate (sideWidth * -0.5) (sideWidth * -0.5) ])
+            :: tx (transforms ++ [ move (sideWidth * -0.5) (sideWidth * -0.5) ])
             :: attrs
         )
         []
@@ -917,7 +936,7 @@ filledRect w h color transforms attrs =
         (width w
             :: height h
             :: fill color
-            :: transform (transforms ++ [ Translate (w * -0.5) (h * -0.5) ])
+            :: tx (transforms ++ [ move (w * -0.5) (h * -0.5) ])
             :: attrs
         )
         []
@@ -934,7 +953,7 @@ filledText string color attrs =
 
 
 group transforms attrs =
-    g (transform transforms :: attrs)
+    g (tx transforms :: attrs)
 
 
 

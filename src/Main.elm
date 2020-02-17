@@ -699,7 +699,7 @@ viewPanel cw m =
             ]
         , div [ class "df-col" ]
             [ viewLabel "Lines Cleared"
-            , viewInt m.score
+            , viewInt m.linesCleared
             ]
         , div [ class "df-col sp10" ]
             [ viewLabel "Next"

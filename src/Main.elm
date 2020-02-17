@@ -219,20 +219,12 @@ rotate m x y mask =
 
 tryRotate : Board a -> Board a
 tryRotate m =
-    let
-        newMask =
-            rotateMask m.activeMask
+    case rotate m m.x m.y m.activeMask of
+        Just newMask ->
+            { m | activeMask = newMask }
 
-        newMaskPoints =
-            newMask
-                |> translateMask m.x m.y
-                |> maskToList
-    in
-    if List.all (isValidMaskPosition m) newMaskPoints then
-        { m | activeMask = newMask }
-
-    else
-        m
+        Nothing ->
+            m
 
 
 tryShiftX : Int -> Board a -> Board a

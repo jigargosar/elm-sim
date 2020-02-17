@@ -704,6 +704,10 @@ view (Model _ m) =
     let
         cellWidth =
             30
+
+        gridCells =
+            gridWithActiveMask m
+                |> Dict.toList
     in
     div
         (class "df-row w-100 h-100"
@@ -717,7 +721,7 @@ view (Model _ m) =
             [ class "df-row sp20 p10"
             , style "margin" "auto"
             ]
-            [ viewGrid cellWidth m.state m.width m.height (gridWithActiveMask m)
+            [ viewGrid cellWidth m.state m.width m.height gridCells
                 |> wrap [ class "lh-0", style "background-color" "rgb(236, 240, 241)" ]
             , viewPanel cellWidth m
             ]
@@ -892,23 +896,24 @@ viewMask2 cw maskWidth color (Mask _ list) =
         ]
 
 
-viewGrid cw state gridWidth gridHeight grid =
+viewGrid cellW state gridWidth gridHeight cellList =
     let
-        gridSquare ( x, y ) color =
-            filledSquare cw
+        gridSquare ( ( x, y ), color ) =
+            filledSquare
+                cellW
                 color
-                [ Translate (toFloat x * cw) (toFloat y * cw) ]
+                [ Translate (toFloat x * cellW) (toFloat y * cellW) ]
                 []
 
         ( w, h ) =
-            ( toFloat gridWidth * cw, toFloat gridHeight * cw )
+            ( toFloat gridWidth * cellW, toFloat gridHeight * cellW )
 
         groupGrid =
-            group [ Translate ((cw - w) * 0.5) ((cw - h) * 0.5) ] []
+            group [ Translate ((cellW - w) * 0.5) ((cellW - h) * 0.5) ] []
     in
     canvas w h <|
-        [ Dict.map gridSquare grid
-            |> Dict.values
+        [ cellList
+            |> List.map gridSquare
             |> groupGrid
         , case state of
             GameOver ->

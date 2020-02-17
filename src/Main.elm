@@ -722,7 +722,7 @@ view (Model _ m) =
             , style "margin" "auto"
             ]
             [ viewGrid cellWidth m.state m.width m.height gridCells
-                |> wrap [ class "lh-0", style "background-color" "rgb(236, 240, 241)" ]
+                |> wrap [ class "lh0", style "background-color" "rgb(236, 240, 241)" ]
             , viewPanel cellWidth m
             ]
         ]
@@ -791,7 +791,7 @@ viewNext cw tetronName =
             tetronFromName tetronName
     in
     viewMask cw 4 "rgb(192, 192, 192)" mask
-        |> wrap [ class "lh-0" ]
+        |> wrap [ class "lh0" ]
 
 
 wrap a c =

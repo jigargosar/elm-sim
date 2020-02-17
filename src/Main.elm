@@ -131,21 +131,27 @@ tetronFromName shape =
 -- Tetrons Board Model
 
 
-type alias Board a =
+type alias Grid a =
     { a
         | grid : Dict Int2 String
         , width : Int
         , height : Int
-        , x : Int
-        , y : Int
-        , color : String
-        , activeMask : Mask
-        , nextTetronName : TetronName
-        , state : State
-        , score : Int
-        , linesCleared : Int
-        , seed : Seed
     }
+
+
+type alias Board a =
+    Grid
+        { a
+            | x : Int
+            , y : Int
+            , color : String
+            , activeMask : Mask
+            , nextTetronName : TetronName
+            , state : State
+            , score : Int
+            , linesCleared : Int
+            , seed : Seed
+        }
 
 
 flip func a b =
@@ -191,6 +197,24 @@ activateNext model =
         , nextTetronName = next
         , seed = seed
     }
+
+
+rotate : Grid a -> Int -> Int -> Mask -> Maybe Mask
+rotate m x y mask =
+    let
+        newMask =
+            rotateMask mask
+
+        newMaskPoints =
+            newMask
+                |> translateMask x y
+                |> maskToList
+    in
+    if List.all (isValidMaskPosition m) newMaskPoints then
+        Just newMask
+
+    else
+        Nothing
 
 
 tryRotate : Board a -> Board a
@@ -326,7 +350,7 @@ clearAndShiftRows =
     do
 
 
-isValidMaskPosition : Board a -> Int2 -> Bool
+isValidMaskPosition : Grid a -> Int2 -> Bool
 isValidMaskPosition m p =
     let
         gridMember =
@@ -338,7 +362,7 @@ isValidMaskPosition m p =
     not gridMember && withingBoundsIgnoringMinY p
 
 
-isValidInsertPosition : Board a -> Int2 -> Bool
+isValidInsertPosition : Grid a -> Int2 -> Bool
 isValidInsertPosition m p =
     let
         gridMember =

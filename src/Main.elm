@@ -659,17 +659,16 @@ view (Model _ m) =
             30
     in
     div
-        [ class "df-row w-100 h-100 centerX centerY p10"
-        ]
+        (class "df-row w-100 h-100 centerX centerY p10"
+            :: onBlur PauseOnBlur
+            :: tabindex 0
+            :: autofocus True
+            :: style "outline" "none"
+            :: []
+        )
         [ div [ class "df-row sp10" ]
             [ viewGrid cellWidth m.state m.width m.height (gridWithActiveMask m)
-                |> wrap
-                    (noa
-                        :: onBlur PauseOnBlur
-                        :: tabindex 0
-                        :: autofocus True
-                        :: svgWrapperStyles
-                    )
+                |> wrapSvg
             , div
                 [ class "df-col sp10"
 

@@ -52,29 +52,9 @@ html {
   flex-direction: row;
 }
 
-.df-row.centerX {
-  justify-content: center;
-}
-
-.df-row.centerY {
-  align-items: center;
-}
-
 .df-col {
   display: inline-flex;
   flex-direction: column;
-}
-
-.df-col.centerX {
-  align-items: center;
-}
-
-.df-col.centerY {
-  justify-content: center;
-}
-
-.alignTop {
-  align-self: flex-start;
 }
 
 .f-wrap {

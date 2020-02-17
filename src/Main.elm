@@ -9,7 +9,7 @@ import Html exposing (Html, div, text)
 import Html.Attributes exposing (autofocus, style, tabindex)
 import Html.Events exposing (onBlur)
 import Json.Decode as JD
-import List exposing (List, map)
+import List exposing (map)
 import List.Extra exposing (initialize)
 import Maybe.Extra
 import Random exposing (Seed)

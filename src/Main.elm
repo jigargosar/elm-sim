@@ -927,7 +927,7 @@ viewGrid cellW state gridWidth gridHeight cellList =
 
             Paused ->
                 [ filledRect w h "rgba(255, 255, 255, .7)" [] []
-                , filledText "Paused" "" []
+                , filledText "PAUSED" "" []
                 ]
                     |> group [] []
         ]

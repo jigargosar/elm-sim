@@ -669,22 +669,59 @@ view (Model _ m) =
         [ div [ class "df-row sp10" ]
             [ viewGrid cellWidth m.state m.width m.height (gridWithActiveMask m)
                 |> wrapSvg
-            , div
-                [ class "df-col sp10"
-
-                --, style "justify-content" "space-around"
-                --, style "justify-content" "space-evenly"
-                ]
-                [ div [ class "fw-bold" ]
-                    [ span [] [ text "Score: " ]
-                    , text (fromInt m.score)
-                    ]
-                , viewNext cellWidth m.nextTetronName
-                ]
+            , viewPanel cellWidth m
             ]
         , viewShapesDemo cellWidth
             |> remove
         ]
+
+
+viewPanel cw m =
+    div
+        [ class "df-col sp10"
+        ]
+        [ viewTitle "Elm Flatris"
+        , div [ class "df-col" ]
+            [ viewLabel "Score"
+            , viewInt m.score
+            ]
+        , div [ style "align-self" "start" ] [ viewNext cw m.nextTetronName ]
+        ]
+
+
+primaryColor =
+    "rgb(52,73,95)"
+
+
+accentColor =
+    "dodgerblue"
+
+
+viewTitle txt =
+    div
+        [ style "font-size" "3rem"
+        , style "line-height" "2"
+        , style "color" primaryColor
+        ]
+        [ text txt ]
+
+
+viewLabel txt =
+    div
+        [ style "font-size" "1rem"
+        , style "line-height" "1"
+        , style "color" "gray"
+        ]
+        [ text txt ]
+
+
+viewInt int =
+    div
+        [ style "font-size" "3rem"
+        , style "line-height" "1"
+        , style "color" accentColor
+        ]
+        [ text (fromInt int) ]
 
 
 noa =

@@ -831,13 +831,13 @@ viewGrid cellW state gridWidth gridHeight cellList =
         ( w, h ) =
             ( toFloat gridWidth * cellW, toFloat gridHeight * cellW )
 
-        groupGrid =
+        groupGridCells =
             group [ Translate ((cellW - w) * 0.5) ((cellW - h) * 0.5) ] []
     in
     canvas w h <|
         [ cellList
             |> List.map gridSquare
-            |> groupGrid
+            |> groupGridCells
         , case state of
             GameOver ->
                 overlayText cellW w h "GAME OVER"

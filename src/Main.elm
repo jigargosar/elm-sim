@@ -143,6 +143,7 @@ type alias Board a =
         , nextTetronName : TetronName
         , state : State
         , score : Int
+        , linesCleared : Int
         , seed : Seed
     }
 
@@ -272,7 +273,14 @@ scoreForFillingNRows n =
 
 updateScore : Board a -> Board a
 updateScore m =
-    { m | score = m.score + scoreForFillingNRows (countFilledRows m) }
+    let
+        newCleared =
+            countFilledRows m
+    in
+    { m
+        | score = m.score + scoreForFillingNRows (countFilledRows m)
+        , linesCleared = m.linesCleared + newCleared
+    }
 
 
 clearAndShiftRows : Board a -> Board a
@@ -448,6 +456,7 @@ initialMem =
     , nextTetronName = Line
     , state = Running
     , score = 0
+    , linesCleared = 0
     , seed = Random.initialSeed 0
 
     -- OTHER

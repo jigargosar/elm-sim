@@ -221,7 +221,10 @@ rotate m x y mask =
 tryRotate : Board a -> Board a
 tryRotate m =
     let
-        shiftXRotate dx maxDx dxSign =
+        maxDx =
+            3
+
+        shiftXRotate dx dxSign =
             if dx >= maxDx then
                 Nothing
 
@@ -239,10 +242,10 @@ tryRotate m =
                             }
 
                     Nothing ->
-                        shiftXRotate (dx + 1) maxDx dxSign
+                        shiftXRotate (dx + 1) dxSign
     in
-    shiftXRotate 0 3 1
-        |> Maybe.Extra.orElseLazy (\_ -> shiftXRotate 0 3 -1)
+    shiftXRotate 0 1
+        |> Maybe.Extra.orElseLazy (\_ -> shiftXRotate 0 -1)
         |> Maybe.withDefault m
 
 

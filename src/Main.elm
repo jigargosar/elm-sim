@@ -965,8 +965,8 @@ canvas w h =
     svg [ viewBoxCentered w h, width w, height h ]
 
 
-viewBoxCentered width_ height_ =
-    viewBox (width_ * -0.5) (height_ * -0.5) width_ height_
+viewBoxCentered w h =
+    viewBox (w * -0.5) (h * -0.5) w h
 
 
 

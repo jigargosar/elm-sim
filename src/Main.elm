@@ -5,7 +5,7 @@ module Main exposing (main)
 import Browser
 import Browser.Events
 import Dict exposing (Dict)
-import Html exposing (Html, div, span, text)
+import Html exposing (Html, div, text)
 import Html.Attributes exposing (autofocus, style, tabindex)
 import Html.Events exposing (onBlur)
 import Json.Decode as JD
@@ -16,10 +16,10 @@ import Random exposing (Seed)
 import Set exposing (Set)
 import String exposing (fromFloat, fromInt)
 import Svg exposing (g, rect, svg, text_)
-import Svg.Attributes exposing (class, fill, stroke)
+import Svg.Attributes exposing (class, fill)
 import Tuple exposing (pair)
 import TypedSvg.Attributes exposing (transform, viewBox)
-import TypedSvg.Attributes.InPx exposing (height, strokeWidth, width)
+import TypedSvg.Attributes.InPx exposing (height, width)
 import TypedSvg.Types exposing (Transform(..))
 
 
@@ -725,8 +725,6 @@ view (Model _ m) =
                 |> wrap [ class "lh-0", style "background-color" "rgb(236, 240, 241)" ]
             , viewPanel cellWidth m
             ]
-        , viewShapesDemo cellWidth
-            |> remove
         ]
 
 
@@ -786,93 +784,21 @@ viewLabel txt =
         [ text txt ]
 
 
-noa =
-    class ""
-
-
 viewNext : Float -> TetronName -> Html msg
 viewNext cw tetronName =
     let
         { mask, color } =
             tetronFromName tetronName
     in
-    viewMask2 cw 4 "rgb(192, 192, 192)" mask
+    viewMask cw 4 "rgb(192, 192, 192)" mask
         |> wrap [ class "lh-0" ]
-
-
-remove _ =
-    text ""
-
-
-viewShapesDemo : Float -> Html msg
-viewShapesDemo cw =
-    let
-        viewShapeRotations { color, mask } =
-            List.range 0 3
-                |> map
-                    (\n ->
-                        applyN n rotateMask mask
-                            |> viewMask cw color
-                            |> wrapSvg
-                    )
-                |> div [ class "df-col sp10" ]
-    in
-    [ Line
-    , Square
-    , S
-    , Z
-    , L
-    , J
-    , T
-    ]
-        |> map (tetronFromName >> viewShapeRotations)
-        |> div [ class "df-row sp10 items-center f-wrap" ]
-
-
-applyN : Int -> (c -> c) -> c -> c
-applyN n func val =
-    List.range 0 (n - 1)
-        |> List.foldl (always func) val
-
-
-svgWrapperStyles =
-    [ style "border" "1px dotted gray"
-    , class "lh0"
-    ]
 
 
 wrap a c =
     div a [ c ]
 
 
-wrapSvg =
-    wrap svgWrapperStyles
-
-
-viewMask cw color (Mask maskWidth list) =
-    let
-        w =
-            toFloat maskWidth * cw
-
-        square ( x, y ) =
-            rect
-                [ width cw
-                , height cw
-                , fill color
-                , strokeWidth 1
-                , stroke "white"
-                , transform [ Translate (toFloat x * cw) (toFloat y * cw) ]
-                ]
-                []
-    in
-    svg [ viewBox 0 0 w w, width w, height w ]
-        [ list
-            |> map square
-            |> g []
-        ]
-
-
-viewMask2 cw maskWidth color (Mask _ list) =
+viewMask cw maskWidth color (Mask _ list) =
     let
         w =
             toFloat maskWidth * cw

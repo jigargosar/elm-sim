@@ -18,7 +18,7 @@ import String exposing (fromFloat, fromInt)
 import Svg exposing (g, rect, svg, text_)
 import Svg.Attributes exposing (class, fill)
 import Tuple exposing (pair)
-import TypedSvg.Attributes exposing (transform, viewBox)
+import TypedSvg.Attributes exposing (transform)
 import TypedSvg.Types exposing (Transform(..))
 
 
@@ -32,8 +32,17 @@ width =
     floatAttr Svg.Attributes.width
 
 
+height : Float -> Svg.Attribute msg
 height =
     floatAttr Svg.Attributes.height
+
+
+viewBox : Float -> Float -> Float -> Float -> Svg.Attribute msg
+viewBox minX minY vWidth vHeight =
+    [ minX, minY, vWidth, vHeight ]
+        |> List.map fromFloat
+        |> String.join " "
+        |> Svg.Attributes.viewBox
 
 
 

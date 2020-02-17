@@ -20,6 +20,10 @@ import Svg.Attributes exposing (class, fill)
 import Tuple exposing (pair)
 
 
+
+-- SVG ATTRIBUTES
+
+
 floatAttr : (String.String -> a) -> Float -> a
 floatAttr attr float =
     attr (fromFloat float)
@@ -51,6 +55,10 @@ dominantBaselineCentral =
 textAnchorMiddle : Svg.Attribute msg
 textAnchorMiddle =
     Svg.Attributes.textAnchor "middle"
+
+
+
+-- TRANSFORMS
 
 
 tx : List String -> Svg.Attribute msg

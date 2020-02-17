@@ -894,26 +894,6 @@ viewMask2 cw maskWidth color (Mask _ list) =
 
 viewGrid cw state gridWidth gridHeight grid =
     let
-        filledSquare sideWidth color transforms attrs =
-            rect
-                (width sideWidth
-                    :: height sideWidth
-                    :: fill color
-                    :: transform (transforms ++ [ Translate (sideWidth * -0.5) (sideWidth * -0.5) ])
-                    :: attrs
-                )
-                []
-
-        filledRect width_ height_ color transforms attrs =
-            rect
-                (width width_
-                    :: height height_
-                    :: fill color
-                    :: transform (transforms ++ [ Translate (width_ * -0.5) (height_ * -0.5) ])
-                    :: attrs
-                )
-                []
-
         gridSquare ( x, y ) color =
             filledSquare cw
                 color
@@ -923,23 +903,10 @@ viewGrid cw state gridWidth gridHeight grid =
         ( w, h ) =
             ( toFloat gridWidth * cw, toFloat gridHeight * cw )
 
-        filledText string color attrs =
-            text_
-                (TypedSvg.Attributes.dominantBaseline TypedSvg.Types.DominantBaselineCentral
-                    :: TypedSvg.Attributes.textAnchor TypedSvg.Types.AnchorMiddle
-                    :: fill color
-                    :: attrs
-                )
-                [ text string ]
-
-        group transforms attrs =
-            g (transform transforms :: attrs)
-
         groupGrid =
             group [ Translate ((cw - w) * 0.5) ((cw - h) * 0.5) ] []
     in
-    canvas w
-        h
+    canvas w h <|
         [ Dict.map gridSquare grid
             |> Dict.values
             |> groupGrid
@@ -967,6 +934,42 @@ canvas w h =
 
 viewBoxCentered w h =
     viewBox (w * -0.5) (h * -0.5) w h
+
+
+filledSquare sideWidth color transforms attrs =
+    rect
+        (width sideWidth
+            :: height sideWidth
+            :: fill color
+            :: transform (transforms ++ [ Translate (sideWidth * -0.5) (sideWidth * -0.5) ])
+            :: attrs
+        )
+        []
+
+
+filledRect w h color transforms attrs =
+    rect
+        (width w
+            :: height h
+            :: fill color
+            :: transform (transforms ++ [ Translate (w * -0.5) (h * -0.5) ])
+            :: attrs
+        )
+        []
+
+
+filledText string color attrs =
+    text_
+        (TypedSvg.Attributes.dominantBaseline TypedSvg.Types.DominantBaselineCentral
+            :: TypedSvg.Attributes.textAnchor TypedSvg.Types.AnchorMiddle
+            :: fill color
+            :: attrs
+        )
+        [ text string ]
+
+
+group transforms attrs =
+    g (transform transforms :: attrs)
 
 
 

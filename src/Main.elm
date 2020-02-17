@@ -917,7 +917,7 @@ viewGrid cellW state gridWidth gridHeight cellList =
             |> groupGrid
         , case state of
             GameOver ->
-                [ filledRect (w * 0.75) (w / 10) "rgba(166, 166, 166, .902)" [] []
+                [ filledRect w h "rgba(255, 255, 255, .7)" [] []
                 , filledText "GAME OVER" "" []
                 ]
                     |> group [] []
@@ -926,7 +926,7 @@ viewGrid cellW state gridWidth gridHeight cellList =
                 text ""
 
             Paused ->
-                [ filledRect (w * 0.75) (w / 10) "rgba(166, 166, 166, .902)" [] []
+                [ filledRect w h "rgba(255, 255, 255, .7)" [] []
                 , filledText "Paused" "" []
                 ]
                     |> group [] []

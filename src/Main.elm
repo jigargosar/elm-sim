@@ -144,6 +144,39 @@ focusAfter nid ov =
     { ov | focused = focused }
 
 
+focusLast : OutlineView -> OutlineView
+focusLast ov =
+    let
+        nvl =
+            ovToNvList ov
+
+        focused =
+            Pivot.fromList nvl
+                |> Maybe.andThen (\p -> Pivot.lastWith (.ancestorCollapsed >> not) p)
+                |> Maybe.map (Pivot.getC >> .id >> NodeId)
+    in
+    { ov | focused = focused }
+
+
+focusBefore : NodeId -> OutlineView -> OutlineView
+focusBefore nid ov =
+    let
+        nvl =
+            ovToNvList ov
+
+        focused =
+            Pivot.fromList nvl
+                |> Maybe.andThen
+                    (\p ->
+                        Pivot.firstWith (.id >> NodeId >> (==) nid) p
+                            |> Maybe.andThen (Pivot.findL (.ancestorCollapsed >> not))
+                            |> Maybe.Extra.orElseLazy (\_ -> Pivot.firstWith (.ancestorCollapsed >> not) p)
+                    )
+                |> Maybe.map (Pivot.getC >> .id >> NodeId)
+    in
+    { ov | focused = focused }
+
+
 moveFocusDown : OutlineView -> OutlineView
 moveFocusDown ov =
     case ov.focused of
@@ -154,14 +187,14 @@ moveFocusDown ov =
             focusAfter nid ov
 
 
-expandFocused : OutlineView -> OutlineView
-expandFocused ov =
+moveFocusUp : OutlineView -> OutlineView
+moveFocusUp ov =
     case ov.focused of
-        Just nid ->
-            updateNode nid (\nd -> { nd | collapsed = False }) ov
-
         Nothing ->
-            ov
+            focusLast ov
+
+        Just nid ->
+            focusBefore nid ov
 
 
 hasExpandedChildren : NodeId -> OutlineView -> Bool
@@ -195,6 +228,20 @@ expandFocusedOrFocusNext ov =
 
             else
                 moveFocusDown ov
+
+        Nothing ->
+            ov
+
+
+collapseFocusedOrFocusPrev : OutlineView -> OutlineView
+collapseFocusedOrFocusPrev ov =
+    case ov.focused of
+        Just nid ->
+            if hasExpandedChildren nid ov then
+                updateNode nid (\nd -> { nd | collapsed = True }) ov
+
+            else
+                moveFocusUp ov
 
         Nothing ->
             ov
@@ -256,6 +303,8 @@ view _ =
                 |> expandFocusedOrFocusNext
                 |> expandFocusedOrFocusNext
                 |> expandFocusedOrFocusNext
+                |> expandFocusedOrFocusNext
+                |> collapseFocusedOrFocusPrev
                 |> ovToNvList
     in
     div []

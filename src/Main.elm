@@ -123,6 +123,7 @@ type alias NodeView =
     { id : String
     , dataText : String
     , collapseState : CollapseState
+    , ancestorCollapsed : Bool
     , level : Int
     , focused : Bool
     }
@@ -143,7 +144,13 @@ ovToNv ov =
                     CS_Expanded
 
         toNV level (Node (NodeId id) data children) =
-            NodeView id data.text (toCS data children) level (NodeId id == ov.focused)
+            { id = id
+            , dataText = data.text
+            , collapseState = toCS data children
+            , ancestorCollapsed = False
+            , level = level
+            , focused = NodeId id == ov.focused
+            }
                 :: List.concatMap (toNV (level + 1)) children
     in
     List.concatMap (toNV 0) ov.list

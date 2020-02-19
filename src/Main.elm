@@ -124,7 +124,19 @@ initialOV =
             (dataText "Third Node " |> collapseND)
             [ Node (NodeId "30-10") (dataText "C1 Node ") []
             , Node (NodeId "30-20") (dataText "C2 Node ") []
+            , Node (NodeId "30-25")
+                (dataText "C2.5 ")
+                [ Node (NodeId "30-25-10") (dataText "C1 Node ") []
+                , Node (NodeId "30-25-20") (dataText "C2 Node ") []
+                , Node (NodeId "30-25-30") (dataText "C3 Node ") []
+                ]
             , Node (NodeId "30-30") (dataText "C3 Node ") []
+            ]
+        , Node (NodeId "40")
+            (dataText "Fourth Node " |> collapseND)
+            [ Node (NodeId "40-10") (dataText "C1 Node ") []
+            , Node (NodeId "40-20") (dataText "C2 Node ") []
+            , Node (NodeId "40-30") (dataText "C3 Node ") []
             ]
         ]
     , focused = Nothing

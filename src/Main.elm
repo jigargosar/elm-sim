@@ -103,7 +103,7 @@ moveFocusDown ov =
 
         nextFocused =
             List.Extra.findIndex (\{ id } -> NodeId id == ov.focused) nv
-                |> Maybe.andThen ((+) 3 >> List.Extra.getAt >> (|>) nv)
+                |> Maybe.andThen ((+) 1 >> List.Extra.getAt >> (|>) nv)
     in
     case nextFocused of
         Just { id } ->

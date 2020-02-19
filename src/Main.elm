@@ -143,17 +143,21 @@ ovToNv ov =
                 ( False, _ ) ->
                     CS_Expanded
 
-        toNV level (Node (NodeId id) data children) =
+        toNV level ancestorCollapsed (Node (NodeId id) data children) =
+            let
+                collapseState =
+                    toCS data children
+            in
             { id = id
             , dataText = data.text
-            , collapseState = toCS data children
-            , ancestorCollapsed = False
+            , collapseState = collapseState
+            , ancestorCollapsed = ancestorCollapsed
             , level = level
             , focused = NodeId id == ov.focused
             }
-                :: List.concatMap (toNV (level + 1)) children
+                :: List.concatMap (toNV (level + 1) (collapseState == CS_Collapsed)) children
     in
-    List.concatMap (toNV 0) ov.list
+    List.concatMap (toNV 0 False) ov.list
 
 
 view : Model -> Html Msg

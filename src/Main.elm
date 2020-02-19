@@ -175,10 +175,19 @@ view _ =
 
 
 viewNodeListItem : NodeView -> Html msg
-viewNodeListItem { level, id, dataText, focused, collapseState } =
+viewNodeListItem nv =
+    let
+        { level, id, dataText, focused, collapseState } =
+            nv
+    in
     div
         ((style "padding-left" <| fromInt (level * 30) ++ "px")
-            :: class "df-row sp10"
+            :: (if nv.ancestorCollapsed then
+                    style "display" "none"
+
+                else
+                    class "df-row sp10"
+               )
             :: (if focused then
                     [ style "outline-width" "1px"
                     , style "outline-color" "blue"

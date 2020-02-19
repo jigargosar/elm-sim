@@ -115,7 +115,7 @@ focusFirst : OutlineView -> OutlineView
 focusFirst ov =
     let
         nvl =
-            ovToNv ov
+            ovToNvList ov
 
         focused =
             Pivot.fromList nvl
@@ -129,7 +129,7 @@ focusAfter : NodeId -> OutlineView -> OutlineView
 focusAfter nid ov =
     let
         nvl =
-            ovToNv ov
+            ovToNvList ov
 
         focused =
             Pivot.fromList nvl
@@ -164,6 +164,42 @@ expandFocused ov =
             ov
 
 
+hasExpandedChildren : NodeId -> OutlineView -> Bool
+hasExpandedChildren nid ov =
+    let
+        nvl =
+            ovToNvList ov
+    in
+    List.Extra.find (.id >> NodeId >> (==) nid) nvl
+        |> Maybe.map (.collapseState >> (==) CS_Expanded)
+        |> Maybe.withDefault False
+
+
+hasCollapsedChildren : NodeId -> OutlineView -> Bool
+hasCollapsedChildren nid ov =
+    let
+        nvl =
+            ovToNvList ov
+    in
+    List.Extra.find (.id >> NodeId >> (==) nid) nvl
+        |> Maybe.map (.collapseState >> (==) CS_Collapsed)
+        |> Maybe.withDefault False
+
+
+expandFocusedOrFocusNext : OutlineView -> OutlineView
+expandFocusedOrFocusNext ov =
+    case ov.focused of
+        Just nid ->
+            if hasCollapsedChildren nid ov then
+                updateNode nid (\nd -> { nd | collapsed = False }) ov
+
+            else
+                moveFocusDown ov
+
+        Nothing ->
+            ov
+
+
 type CollapseState
     = CS_NoChildren
     | CS_Expanded
@@ -180,8 +216,8 @@ type alias NodeView =
     }
 
 
-ovToNv : OutlineView -> List NodeView
-ovToNv ov =
+ovToNvList : OutlineView -> List NodeView
+ovToNvList ov =
     let
         toCS data children =
             case ( data.collapsed, children ) of
@@ -216,17 +252,11 @@ view _ =
     let
         ov =
             initialOV
-                |> moveFocusDown
-                |> moveFocusDown
-                |> moveFocusDown
-                |> moveFocusDown
-                |> moveFocusDown
-                |> expandFocused
-                |> moveFocusDown
-                |> moveFocusDown
-                |> moveFocusDown
-                |> moveFocusDown
-                |> ovToNv
+                |> expandFocusedOrFocusNext
+                |> expandFocusedOrFocusNext
+                |> expandFocusedOrFocusNext
+                |> expandFocusedOrFocusNext
+                |> ovToNvList
     in
     div []
         [ div [ class "pv20" ] [ text "Outline View" ]

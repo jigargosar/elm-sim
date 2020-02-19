@@ -4,6 +4,7 @@ import Browser
 import Html exposing (Html, div, text)
 import Html.Attributes exposing (class, style)
 import List.Extra
+import Maybe.Extra
 import Pivot
 import String exposing (fromInt)
 
@@ -71,6 +72,19 @@ type Node
     = Node NodeId NodeData (List Node)
 
 
+updateNode : NodeId -> (NodeData -> NodeData) -> OutlineView -> OutlineView
+updateNode nodeId func ov =
+    let
+        updateNodeHelp (Node nid nd children) =
+            if nid == nodeId then
+                Node nid (func nd) children
+
+            else
+                Node nid nd (List.map updateNodeHelp children)
+    in
+    { ov | list = List.map updateNodeHelp ov.list }
+
+
 initialOV : OutlineView
 initialOV =
     let
@@ -113,7 +127,21 @@ focusFirst ov =
 
 focusAfter : NodeId -> OutlineView -> OutlineView
 focusAfter nid ov =
-    ov
+    let
+        nvl =
+            ovToNv ov
+
+        focused =
+            Pivot.fromList nvl
+                |> Maybe.andThen
+                    (\p ->
+                        Pivot.firstWith (.id >> NodeId >> (==) nid) p
+                            |> Maybe.andThen (Pivot.findR (.ancestorCollapsed >> not))
+                            |> Maybe.Extra.orElseLazy (\_ -> Pivot.lastWith (.ancestorCollapsed >> not) p)
+                    )
+                |> Maybe.map (Pivot.getC >> .id >> NodeId)
+    in
+    { ov | focused = focused }
 
 
 moveFocusDown : OutlineView -> OutlineView
@@ -124,6 +152,16 @@ moveFocusDown ov =
 
         Just nid ->
             focusAfter nid ov
+
+
+expandFocused : OutlineView -> OutlineView
+expandFocused ov =
+    case ov.focused of
+        Just nid ->
+            updateNode nid (\nd -> { nd | collapsed = False }) ov
+
+        Nothing ->
+            ov
 
 
 type CollapseState
@@ -178,6 +216,14 @@ view _ =
     let
         ov =
             initialOV
+                |> moveFocusDown
+                |> moveFocusDown
+                |> moveFocusDown
+                |> moveFocusDown
+                |> moveFocusDown
+                |> expandFocused
+                |> moveFocusDown
+                |> moveFocusDown
                 |> moveFocusDown
                 |> moveFocusDown
                 |> ovToNv

@@ -52,7 +52,7 @@ subscriptions _ =
 
 type alias OutlineView =
     { list : List Node
-    , focused : NodeId
+    , focused : Int
     }
 
 
@@ -91,26 +91,30 @@ initialOV =
             , Node (NodeId "30-30") (dataText "C3 Node ") []
             ]
         ]
-    , focused = NodeId "30"
+    , focused = 0
     }
 
 
 moveFocusDown : OutlineView -> OutlineView
 moveFocusDown ov =
     let
-        nv =
+        nvList =
             ovToNv ov
 
-        nextFocused =
-            List.Extra.findIndex (\{ id } -> NodeId id == ov.focused) nv
-                |> Maybe.andThen ((+) 1 >> List.Extra.getAt >> (|>) nv)
-    in
-    case nextFocused of
-        Just { id } ->
-            { ov | focused = NodeId id }
+        clampFocusIndex fi =
+            if List.isEmpty nvList then
+                0
 
-        Nothing ->
-            ov
+            else
+                clamp 0 (List.length nvList) fi
+
+        nextFocused =
+            List.drop (ov.focused + 1) nvList
+                |> List.Extra.findIndex (.ancestorCollapsed >> not)
+                |> Maybe.map ((+) (ov.focused + 1) >> clampFocusIndex)
+                |> Maybe.withDefault 0
+    in
+    { ov | focused = nextFocused }
 
 
 type CollapseState
@@ -153,11 +157,12 @@ ovToNv ov =
             , collapseState = collapseState
             , ancestorCollapsed = ancestorCollapsed
             , level = level
-            , focused = NodeId id == ov.focused
+            , focused = False
             }
                 :: List.concatMap (toNV (level + 1) (collapseState == CS_Collapsed)) children
     in
     List.concatMap (toNV 0 False) ov.list
+        |> List.Extra.updateAt ov.focused (\nv -> { nv | focused = True })
 
 
 view : Model -> Html Msg

@@ -16,10 +16,26 @@ module.exports = (_, config) => {
           include: /\.elm/,
           use: [
             //'elm-hot-webpack-loader',
-            { loader: 'elm-webpack-loader', options: { optimize: isProd , debug: !isProd} },
+            {
+              loader: 'elm-webpack-loader',
+              options: { optimize: isProd, debug: !isProd },
+            },
           ],
         },
-        { include: /\.css/, use: ['style-loader', 'css-loader'] },
+        {
+          include: /\.css/,
+          use: [
+            'style-loader',
+            { loader: 'css-loader', options: { importLoaders: 1 } },
+            {
+              loader: 'postcss-loader',
+              options: {
+                ident: 'postcss',
+                plugins: [require('tailwindcss')],
+              },
+            },
+          ],
+        },
       ],
     },
     devServer: {

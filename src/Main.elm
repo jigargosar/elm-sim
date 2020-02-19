@@ -121,7 +121,7 @@ initialOV =
         [ Node (NodeId "10") (dataText "First Node") []
         , Node (NodeId "20") (dataText "Second Node") []
         , Node (NodeId "30")
-            (dataText "Third Node " |> collapseND)
+            (dataText "Third Node ")
             [ Node (NodeId "30-10") (dataText "C1 Node ") []
             , Node (NodeId "30-20") (dataText "C2 Node ") []
             , Node (NodeId "30-25")
@@ -342,6 +342,10 @@ view _ =
                 |> expandFocusedOrFocusNext
                 |> expandFocusedOrFocusNext
                 |> expandFocusedOrFocusNext
+                |> expandFocusedOrFocusNext
+                |> expandFocusedOrFocusNext
+                |> collapseFocusedOrFocusParentOrPrev
+                |> collapseFocusedOrFocusParentOrPrev
                 |> collapseFocusedOrFocusParentOrPrev
                 |> collapseFocusedOrFocusParentOrPrev
                 |> collapseFocusedOrFocusParentOrPrev

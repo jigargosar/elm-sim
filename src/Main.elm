@@ -164,9 +164,10 @@ view _ =
 
 
 viewNodeListItem : NodeView -> Html msg
-viewNodeListItem { level, id, dataText, focused } =
+viewNodeListItem { level, id, dataText, focused, collapseState } =
     div
         ((style "padding-left" <| fromInt (level * 30) ++ "px")
+            :: class "df-row sp10"
             :: (if focused then
                     [ style "outline-width" "1px"
                     , style "outline-color" "blue"
@@ -177,7 +178,18 @@ viewNodeListItem { level, id, dataText, focused } =
                     []
                )
         )
-        [ text <| "id: " ++ id ++ ". data: " ++ dataText
+        [ div [ class "" ]
+            [ case collapseState of
+                CS_NoChildren ->
+                    text "_"
+
+                CS_Expanded ->
+                    text "-"
+
+                CS_Collapsed ->
+                    text "+"
+            ]
+        , text <| "id: " ++ id ++ ". data: " ++ dataText
         ]
 
 

@@ -44,12 +44,12 @@ html {
 }
 
 .df-row {
-  display: inline-flex;
+  display: flex;
   flex-direction: row;
 }
 
 .df-col {
-  display: inline-flex;
+  display: flex;
   flex-direction: column;
 }
 

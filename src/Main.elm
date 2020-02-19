@@ -107,14 +107,11 @@ moveFocusDown ov =
 
             else
                 clamp 0 (List.length nvList) fi
-
-        nextFocused =
-            List.drop (ov.focused + 1) nvList
-                |> List.Extra.findIndex (.ancestorCollapsed >> not)
-                |> Maybe.map ((+) (ov.focused + 1) >> clampFocusIndex)
-                |> Maybe.withDefault 0
     in
-    { ov | focused = nextFocused }
+    List.drop (ov.focused + 1) nvList
+        |> List.Extra.findIndex (.ancestorCollapsed >> not)
+        |> Maybe.map ((+) (ov.focused + 1) >> clampFocusIndex >> (\focused -> { ov | focused = focused }))
+        |> Maybe.withDefault ov
 
 
 type CollapseState
@@ -170,6 +167,7 @@ view _ =
     let
         ov =
             initialOV
+                |> moveFocusDown
                 |> moveFocusDown
                 |> ovToNv
     in

@@ -85,6 +85,27 @@ updateNode nodeId func ov =
     { ov | list = List.map updateNodeHelp ov.list }
 
 
+nodeIdEq : NodeId -> Node -> Bool
+nodeIdEq nodeId (Node nid _ _) =
+    nodeId == nid
+
+
+parentNodeId : NodeId -> OutlineView -> Maybe NodeId
+parentNodeId nodeId ov =
+    let
+        parentNodeIdHelp (Node nid _ children) found =
+            case found of
+                Just _ ->
+                    found
+
+                Nothing ->
+                    List.Extra.find (nodeIdEq nodeId) children
+                        |> Maybe.map (\_ -> nid)
+                        |> Maybe.Extra.orElseLazy (\_ -> List.foldl parentNodeIdHelp Nothing children)
+    in
+    List.foldl parentNodeIdHelp Nothing ov.list
+
+
 initialOV : OutlineView
 initialOV =
     let
@@ -247,6 +268,25 @@ collapseFocusedOrFocusPrev ov =
             ov
 
 
+collapseFocusedOrFocusParentOrPrev : OutlineView -> OutlineView
+collapseFocusedOrFocusParentOrPrev ov =
+    case ov.focused of
+        Just nid ->
+            if hasExpandedChildren nid ov then
+                updateNode nid (\nd -> { nd | collapsed = True }) ov
+
+            else
+                case parentNodeId nid ov of
+                    Just pid ->
+                        { ov | focused = Just pid }
+
+                    Nothing ->
+                        moveFocusUp ov
+
+        Nothing ->
+            ov
+
+
 type CollapseState
     = CS_NoChildren
     | CS_Expanded
@@ -304,7 +344,9 @@ view _ =
                 |> expandFocusedOrFocusNext
                 |> expandFocusedOrFocusNext
                 |> expandFocusedOrFocusNext
-                |> collapseFocusedOrFocusPrev
+                |> collapseFocusedOrFocusParentOrPrev
+                |> collapseFocusedOrFocusParentOrPrev
+                |> collapseFocusedOrFocusParentOrPrev
                 |> ovToNvList
     in
     div []

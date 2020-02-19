@@ -337,18 +337,15 @@ view _ =
     let
         ov =
             initialOV
-                |> expandFocusedOrFocusNext
-                |> expandFocusedOrFocusNext
-                |> expandFocusedOrFocusNext
-                |> expandFocusedOrFocusNext
-                |> expandFocusedOrFocusNext
-                |> expandFocusedOrFocusNext
-                |> expandFocusedOrFocusNext
+                |> focusNext
+                |> focusNext
+                |> focusNext
+                |> focusNext
+                |> focusNext
                 |> collapseFocusedOrFocusParentOrPrev
-                |> collapseFocusedOrFocusParentOrPrev
-                |> collapseFocusedOrFocusParentOrPrev
-                |> collapseFocusedOrFocusParentOrPrev
-                |> collapseFocusedOrFocusParentOrPrev
+                |> focusNext
+                |> focusPrev
+                |> expandFocusedOrFocusNext
                 |> ovToNvList
     in
     div []

@@ -2,7 +2,7 @@ module Main exposing (main)
 
 import Browser
 import Html exposing (Html, div, text)
-import Html.Attributes exposing (style)
+import Html.Attributes exposing (class, style)
 import String exposing (fromInt)
 
 
@@ -81,21 +81,49 @@ ov =
     }
 
 
+type alias NodeView =
+    { id : String
+    , dataText : String
+    , level : Int
+    }
+
+
+nvList : List NodeView
+nvList =
+    let
+        toNV level (Node (NodeId id) (NodeData data) children) =
+            NodeView id data level
+                :: List.concatMap (toNV (level + 1)) children
+    in
+    List.concatMap (toNV 0) ov.list
+
+
 view : Model -> Html Msg
 view _ =
     div []
         [ div [] [ text "Outline View" ]
-        , div [] (List.concatMap (viewNode 0) ov.list)
+        , div [] (List.concatMap (viewOutlineNode 0) ov.list)
+        , div [ class "pv20" ] [ text "Outline View 2" ]
+        , div [] (List.map viewNodeListItem nvList)
         ]
 
 
-viewNode level (Node (NodeId id) (NodeData data) children) =
+viewNodeListItem : NodeView -> Html msg
+viewNodeListItem { level, id, dataText } =
+    div
+        [ style "padding-left" <| fromInt (level * 30) ++ "px"
+        ]
+        [ text <| "id: " ++ id ++ ". data: " ++ dataText
+        ]
+
+
+viewOutlineNode level (Node (NodeId id) (NodeData data) children) =
     div
         [ style "padding-left" <| fromInt (level * 30) ++ "px"
         ]
         [ text <| "id: " ++ id ++ ". data: " ++ data
         ]
-        :: List.concatMap (viewNode (level + 1)) children
+        :: List.concatMap (viewOutlineNode (level + 1)) children
 
 
 empty : Html msg

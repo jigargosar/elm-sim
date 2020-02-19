@@ -254,20 +254,6 @@ expandFocusedOrFocusNext ov =
             ov
 
 
-collapseFocusedOrFocusPrev : OutlineView -> OutlineView
-collapseFocusedOrFocusPrev ov =
-    case ov.focused of
-        Just nid ->
-            if hasExpandedChildren nid ov then
-                updateNode nid (\nd -> { nd | collapsed = True }) ov
-
-            else
-                moveFocusUp ov
-
-        Nothing ->
-            ov
-
-
 collapseFocusedOrFocusParentOrPrev : OutlineView -> OutlineView
 collapseFocusedOrFocusParentOrPrev ov =
     case ov.focused of

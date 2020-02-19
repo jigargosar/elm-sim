@@ -51,6 +51,7 @@ subscriptions _ =
 
 type alias OutlineView =
     { list : List Node
+    , focused : NodeId
     }
 
 
@@ -78,6 +79,7 @@ ov =
             , Node (NodeId "30-30") (NodeData "C3 Node ") []
             ]
         ]
+    , focused = NodeId "30"
     }
 
 
@@ -85,6 +87,7 @@ type alias NodeView =
     { id : String
     , dataText : String
     , level : Int
+    , focused : Bool
     }
 
 
@@ -92,7 +95,7 @@ nvList : List NodeView
 nvList =
     let
         toNV level (Node (NodeId id) (NodeData data) children) =
-            NodeView id data level
+            NodeView id data level (NodeId id == ov.focused)
                 :: List.concatMap (toNV (level + 1)) children
     in
     List.concatMap (toNV 0) ov.list
@@ -101,29 +104,27 @@ nvList =
 view : Model -> Html Msg
 view _ =
     div []
-        [ div [] [ text "Outline View" ]
-        , div [] (List.concatMap (viewOutlineNode 0) ov.list)
-        , div [ class "pv20" ] [ text "Outline View 2" ]
+        [ div [ class "pv20" ] [ text "Outline View" ]
         , div [] (List.map viewNodeListItem nvList)
         ]
 
 
 viewNodeListItem : NodeView -> Html msg
-viewNodeListItem { level, id, dataText } =
+viewNodeListItem { level, id, dataText, focused } =
     div
-        [ style "padding-left" <| fromInt (level * 30) ++ "px"
-        ]
+        ((style "padding-left" <| fromInt (level * 30) ++ "px")
+            :: (if focused then
+                    [ style "outline-width" "1px"
+                    , style "outline-color" "blue"
+                    , style "outline-style" "auto"
+                    ]
+
+                else
+                    []
+               )
+        )
         [ text <| "id: " ++ id ++ ". data: " ++ dataText
         ]
-
-
-viewOutlineNode level (Node (NodeId id) (NodeData data) children) =
-    div
-        [ style "padding-left" <| fromInt (level * 30) ++ "px"
-        ]
-        [ text <| "id: " ++ id ++ ". data: " ++ data
-        ]
-        :: List.concatMap (viewOutlineNode (level + 1)) children
 
 
 empty : Html msg

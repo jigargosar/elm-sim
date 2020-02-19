@@ -4,6 +4,7 @@ import Browser
 import Html exposing (Html, div, text)
 import Html.Attributes exposing (class, style)
 import List.Extra
+import Pivot
 import String exposing (fromInt)
 
 
@@ -52,7 +53,7 @@ subscriptions _ =
 
 type alias OutlineView =
     { list : List Node
-    , focused : Int
+    , focused : Maybe NodeId
     }
 
 
@@ -91,27 +92,38 @@ initialOV =
             , Node (NodeId "30-30") (dataText "C3 Node ") []
             ]
         ]
-    , focused = 0
+    , focused = Nothing
     }
+        |> focusFirst
+
+
+focusFirst : OutlineView -> OutlineView
+focusFirst ov =
+    let
+        nvl =
+            ovToNv ov
+
+        focused =
+            Pivot.fromList nvl
+                |> Maybe.andThen (\p -> Pivot.firstWith (.ancestorCollapsed >> not) p)
+                |> Maybe.map (Pivot.getC >> .id >> NodeId)
+    in
+    { ov | focused = focused }
+
+
+focusAfter : NodeId -> OutlineView -> OutlineView
+focusAfter nid ov =
+    ov
 
 
 moveFocusDown : OutlineView -> OutlineView
 moveFocusDown ov =
-    let
-        nvList =
-            ovToNv ov
+    case ov.focused of
+        Nothing ->
+            focusFirst ov
 
-        clampFocusIndex fi =
-            if List.isEmpty nvList then
-                0
-
-            else
-                clamp 0 (List.length nvList) fi
-    in
-    List.drop (ov.focused + 1) nvList
-        |> List.Extra.findIndex (.ancestorCollapsed >> not)
-        |> Maybe.map ((+) (ov.focused + 1) >> clampFocusIndex >> (\focused -> { ov | focused = focused }))
-        |> Maybe.withDefault ov
+        Just nid ->
+            focusAfter nid ov
 
 
 type CollapseState
@@ -154,12 +166,11 @@ ovToNv ov =
             , collapseState = collapseState
             , ancestorCollapsed = ancestorCollapsed
             , level = level
-            , focused = False
+            , focused = ov.focused == Just (NodeId id)
             }
                 :: List.concatMap (toNV (level + 1) (collapseState == CS_Collapsed)) children
     in
     List.concatMap (toNV 0 False) ov.list
-        |> List.Extra.updateAt ov.focused (\nv -> { nv | focused = True })
 
 
 view : Model -> Html Msg

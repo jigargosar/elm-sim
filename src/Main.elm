@@ -210,8 +210,8 @@ focusBefore nid ov =
     { ov | focused = focused }
 
 
-moveFocusDown : OutlineView -> OutlineView
-moveFocusDown ov =
+focusNext : OutlineView -> OutlineView
+focusNext ov =
     case ov.focused of
         Nothing ->
             focusFirst ov
@@ -220,8 +220,8 @@ moveFocusDown ov =
             focusAfter nid ov
 
 
-moveFocusUp : OutlineView -> OutlineView
-moveFocusUp ov =
+focusPrev : OutlineView -> OutlineView
+focusPrev ov =
     case ov.focused of
         Nothing ->
             focusLast ov
@@ -260,7 +260,7 @@ expandFocusedOrFocusNext ov =
                 updateNode nid (\nd -> { nd | collapsed = False }) ov
 
             else
-                moveFocusDown ov
+                focusNext ov
 
         Nothing ->
             ov
@@ -279,7 +279,7 @@ collapseFocusedOrFocusParentOrPrev ov =
                         { ov | focused = Just pid }
 
                     Nothing ->
-                        moveFocusUp ov
+                        focusPrev ov
 
         Nothing ->
             ov

@@ -47,6 +47,24 @@ subscriptions _ =
 -- View
 
 
+type alias OutlineView =
+    { list : List Node
+    }
+
+
+type NodeId
+    = NodeId
+
+
+type NodeData
+    = NodeData
+
+
+type Node
+    = LeafNode NodeId NodeData
+    | Node NodeId NodeData (List Node)
+
+
 view : Model -> Html Msg
 view _ =
     empty

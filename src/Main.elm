@@ -3,6 +3,7 @@ module Main exposing (main)
 import Browser
 import Html exposing (Html, div, text)
 import Html.Attributes exposing (class, style)
+import List.Extra
 import String exposing (fromInt)
 
 
@@ -59,8 +60,10 @@ type NodeId
     = NodeId String
 
 
-type NodeData
-    = NodeData String
+type alias NodeData =
+    { text : String
+    , collapsed : Bool
+    }
 
 
 type Node
@@ -69,23 +72,57 @@ type Node
 
 initialOV : OutlineView
 initialOV =
+    let
+        dataText : String -> NodeData
+        dataText t =
+            { text = t, collapsed = False }
+
+        collapseND : NodeData -> NodeData
+        collapseND nd =
+            { nd | collapsed = True }
+    in
     { list =
-        [ Node (NodeId "10") (NodeData "First Node") []
-        , Node (NodeId "20") (NodeData "Second Node") []
+        [ Node (NodeId "10") (dataText "First Node") []
+        , Node (NodeId "20") (dataText "Second Node") []
         , Node (NodeId "30")
-            (NodeData "Third Node ")
-            [ Node (NodeId "30-10") (NodeData "C1 Node ") []
-            , Node (NodeId "30-20") (NodeData "C2 Node ") []
-            , Node (NodeId "30-30") (NodeData "C3 Node ") []
+            (dataText "Third Node " |> collapseND)
+            [ Node (NodeId "30-10") (dataText "C1 Node ") []
+            , Node (NodeId "30-20") (dataText "C2 Node ") []
+            , Node (NodeId "30-30") (dataText "C3 Node ") []
             ]
         ]
     , focused = NodeId "30"
     }
 
 
+moveFocusDown : OutlineView -> OutlineView
+moveFocusDown ov =
+    let
+        nv =
+            ovToNv ov
+
+        nextFocused =
+            List.Extra.findIndex (\{ id } -> NodeId id == ov.focused) nv
+                |> Maybe.andThen ((+) 3 >> List.Extra.getAt >> (|>) nv)
+    in
+    case nextFocused of
+        Just { id } ->
+            { ov | focused = NodeId id }
+
+        Nothing ->
+            ov
+
+
+type CollapseState
+    = CS_NoChildren
+    | CS_Expanded
+    | CS_Collapsed
+
+
 type alias NodeView =
     { id : String
     , dataText : String
+    , collapseState : CollapseState
     , level : Int
     , focused : Bool
     }
@@ -94,8 +131,19 @@ type alias NodeView =
 ovToNv : OutlineView -> List NodeView
 ovToNv ov =
     let
-        toNV level (Node (NodeId id) (NodeData data) children) =
-            NodeView id data level (NodeId id == ov.focused)
+        toCS data children =
+            case ( data.collapsed, children ) of
+                ( _, [] ) ->
+                    CS_NoChildren
+
+                ( True, _ ) ->
+                    CS_Collapsed
+
+                ( False, _ ) ->
+                    CS_Expanded
+
+        toNV level (Node (NodeId id) data children) =
+            NodeView id data.text (toCS data children) level (NodeId id == ov.focused)
                 :: List.concatMap (toNV (level + 1)) children
     in
     List.concatMap (toNV 0) ov.list
@@ -105,7 +153,9 @@ view : Model -> Html Msg
 view _ =
     let
         ov =
-            ovToNv initialOV
+            initialOV
+                |> moveFocusDown
+                |> ovToNv
     in
     div []
         [ div [ class "pv20" ] [ text "Outline View" ]
@@ -129,11 +179,6 @@ viewNodeListItem { level, id, dataText, focused } =
         )
         [ text <| "id: " ++ id ++ ". data: " ++ dataText
         ]
-
-
-empty : Html msg
-empty =
-    Html.text ""
 
 
 

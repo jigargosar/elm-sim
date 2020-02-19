@@ -67,8 +67,8 @@ type Node
     = Node NodeId NodeData (List Node)
 
 
-ov : OutlineView
-ov =
+initialOV : OutlineView
+initialOV =
     { list =
         [ Node (NodeId "10") (NodeData "First Node") []
         , Node (NodeId "20") (NodeData "Second Node") []
@@ -91,8 +91,8 @@ type alias NodeView =
     }
 
 
-nvList : List NodeView
-nvList =
+ovToNv : OutlineView -> List NodeView
+ovToNv ov =
     let
         toNV level (Node (NodeId id) (NodeData data) children) =
             NodeView id data level (NodeId id == ov.focused)
@@ -103,9 +103,13 @@ nvList =
 
 view : Model -> Html Msg
 view _ =
+    let
+        ov =
+            ovToNv initialOV
+    in
     div []
         [ div [ class "pv20" ] [ text "Outline View" ]
-        , div [] (List.map viewNodeListItem nvList)
+        , div [] (List.map viewNodeListItem ov)
         ]
 
 

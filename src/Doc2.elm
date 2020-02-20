@@ -5,26 +5,37 @@ import Html.Attributes exposing (class)
 
 
 type Doc
-    = Doc (List Tree)
+    = Doc LCR
+    | Empty
 
 
-type Tree
-    = Tree String (List Tree)
+type LCR
+    = LCR ( List String, String, List String )
+
+
+initLCR : String -> LCR
+initLCR string =
+    LCR ( [], string, [] )
+
+
+appendAfterC : String -> LCR -> LCR
+appendAfterC string (LCR ( l, c, r )) =
+    LCR ( c :: l, string, r )
 
 
 empty : Doc
 empty =
-    Doc []
-
-
-newTree : String -> Tree
-newTree string =
-    Tree string []
+    Empty
 
 
 appendSibling : String -> Doc -> Doc
-appendSibling string (Doc list) =
-    Doc (list ++ [ newTree string ])
+appendSibling string doc =
+    case doc of
+        Empty ->
+            Doc (initLCR string)
+
+        Doc lcr ->
+            Doc (appendAfterC string lcr)
 
 
 insertChild : String -> Doc -> Doc
@@ -33,17 +44,25 @@ insertChild string doc =
 
 
 viewDoc : Doc -> Html msg
-viewDoc (Doc list) =
+viewDoc doc =
     div [ class "pa3" ]
         [ div [ class "f4 b pv2" ] [ text "Doc" ]
-        , List.map viewTreeData list
-            |> div []
+        , case doc of
+            Empty ->
+                div [] [ text "Doc Empty" ]
+
+            Doc lcr ->
+                div [] (viewLCR lcr)
         ]
 
 
-viewTreeData : Tree -> Html msg
-viewTreeData (Tree string _) =
-    div [] [ text string ]
+viewLCR : LCR -> List (Html msg)
+viewLCR (LCR ( l, c, r )) =
+    let
+        viewS string =
+            div [] [ text string ]
+    in
+    List.map viewS (l |> List.reverse) ++ viewS c :: List.map viewS r
 
 
 viewSampleDoc : Html msg
@@ -53,7 +72,7 @@ viewSampleDoc =
         sampleDoc =
             empty
                 |> appendSibling "First"
-                |> appendSibling "Secomd"
+                |> appendSibling "Second"
                 |> appendSibling "Third"
                 |> insertChild "Third's Child 1"
     in

@@ -7,7 +7,6 @@ import List.Extra
 import Maybe.Extra
 import Pivot exposing (Pivot)
 import String exposing (fromInt)
-import String.Extra
 
 
 sampleStringDoc =

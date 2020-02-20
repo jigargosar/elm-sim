@@ -5,8 +5,34 @@ import Html exposing (Html, div, text)
 import Html.Attributes exposing (class, style)
 import List.Extra
 import Maybe.Extra
-import Pivot
+import Pivot exposing (Pivot)
 import String exposing (fromInt)
+
+
+sampleStringDoc =
+    """
+Chapter 1
+    C1:L1 Line 1
+    C1:L2 Line 2
+    C1:L3:S1 Section1
+        C1:L3:S1 Line 1
+        C1:L3:S1 Line 2
+    C1:L4 Line 4
+Chapter 2
+    C2:L1 Line 1
+    C2:L2 Line 2
+    C2:L3:S1 Section1
+        C2:L3:S1 Line 1
+        C2:L3:S1 Line 2
+    C2:L4 Line 4
+Chapter 3 - Empty
+Chapter 4 - Single Child Deep Nested
+    Foo
+        Bar
+            Bazz
+                Boom
+                    Bang
+    """
 
 
 

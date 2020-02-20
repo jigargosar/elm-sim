@@ -4,9 +4,8 @@ import Html exposing (Html, div, text)
 import Html.Attributes exposing (class)
 
 
-type Doc
-    = Doc LCR
-    | Empty
+
+-- LCR
 
 
 type LCR
@@ -21,6 +20,15 @@ initLCR string =
 appendAfterC : String -> LCR -> LCR
 appendAfterC string (LCR ( l, c, r )) =
     LCR ( c :: l, string, r )
+
+
+
+-- DOC
+
+
+type Doc
+    = Doc LCR
+    | Empty
 
 
 empty : Doc

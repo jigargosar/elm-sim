@@ -38,13 +38,18 @@ newRootLine string =
 
 viewLine : Line -> Html msg
 viewLine (Line l) =
-    div [ style "padding-left" (fromInt l.level ++ "px") ] [ text l.content ]
+    div [ levelPadding l.level ] [ text l.content ]
+
+
+levelPadding : Int -> Html.Attribute msg
+levelPadding level =
+    style "padding-left" (fromInt (level * 20) ++ "px")
 
 
 viewFocusedLine : Line -> Html msg
 viewFocusedLine (Line l) =
     div
-        [ style "padding-left" (fromInt l.level ++ "px")
+        [ levelPadding l.level
         , style "outline" "1px auto blue"
         ]
         [ text l.content ]

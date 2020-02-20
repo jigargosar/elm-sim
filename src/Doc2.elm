@@ -26,6 +26,11 @@ newSibling string (Line { level }) =
     Line (LineRecord string level)
 
 
+newChild : String -> Line -> Line
+newChild string (Line { level }) =
+    Line (LineRecord string (level + 1))
+
+
 newRootLine : String -> Line
 newRootLine string =
     Line (LineRecord string 0)
@@ -49,21 +54,60 @@ viewFocusedLine (Line l) =
 -- LCR
 
 
-type alias LCR =
+type alias LineZipper =
     Pivot Line
 
 
-initLCR : String -> LCR
+initLCR : String -> LineZipper
 initLCR string =
     Pivot.singleton (newRootLine string)
 
 
-appendAfterC : String -> LCR -> LCR
+appendAfterC : String -> LineZipper -> LineZipper
 appendAfterC string p =
     Pivot.appendGoR (newSibling string (Pivot.getC p)) p
 
 
-viewLCR : LCR -> List (Html msg)
+levelC : LineZipper -> Int
+levelC =
+    Pivot.getC >> (\(Line { level }) -> level)
+
+
+gotoFirstChild : LineZipper -> Maybe LineZipper
+gotoFirstChild parent =
+    let
+        isChild child =
+            levelC parent + 1 == levelC child
+    in
+    Pivot.goR parent
+        |> Maybe.Extra.filter isChild
+
+
+gotoLastChild : LineZipper -> Maybe LineZipper
+gotoLastChild p =
+    gotoFirstChild p
+        |> Maybe.map gotoLastSibling
+
+
+gotoLastSibling : LineZipper -> LineZipper
+gotoLastSibling p =
+    case Pivot.goR p of
+        Just p2 ->
+            if levelC p2 == levelC p then
+                gotoLastSibling p2
+
+            else
+                p
+
+        Nothing ->
+            p
+
+
+
+--|> gotoLastSibling (Pivot.getC p)
+
+
+viewLCR : LineZipper -> List (Html msg)
 viewLCR p =
     Pivot.mapCS viewFocusedLine viewLine p |> Pivot.toList
 
@@ -73,7 +117,7 @@ viewLCR p =
 
 
 type Doc
-    = Doc LCR
+    = Doc LineZipper
     | Empty
 
 
@@ -82,11 +126,16 @@ empty =
     Empty
 
 
+init : String -> Doc
+init string =
+    Doc (initLCR string)
+
+
 appendSibling : String -> Doc -> Doc
 appendSibling string doc =
     case doc of
         Empty ->
-            Doc (initLCR string)
+            init string
 
         Doc lcr ->
             Doc (appendAfterC string lcr)
@@ -94,7 +143,27 @@ appendSibling string doc =
 
 appendChild : String -> Doc -> Doc
 appendChild string doc =
-    appendSibling string doc
+    case doc of
+        Empty ->
+            init string
+
+        Doc p ->
+            case
+                p
+                    |> gotoLastChild
+                    |> Maybe.map (appendAfterC string)
+            of
+                Just p2 ->
+                    Doc p2
+
+                Nothing ->
+                    insertChild_ string p
+                        |> Doc
+
+
+insertChild_ : String -> LineZipper -> LineZipper
+insertChild_ string p =
+    Pivot.appendGoR (newChild string (Pivot.getC p)) p
 
 
 viewDoc : Doc -> Html msg

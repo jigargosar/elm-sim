@@ -78,7 +78,7 @@ viewLine (Line lr) =
 viewDoc : Doc -> Html msg
 viewDoc (Doc lines) =
     (div [ style "font-size" "2rem", class "pv10" ]
-        [ text "Doc View" ]
+        [ text "Doc1 View" ]
         :: List.map viewLine lines
     )
         |> div [ class "df-col p20" ]

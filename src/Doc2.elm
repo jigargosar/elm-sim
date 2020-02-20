@@ -2,6 +2,8 @@ module Doc2 exposing (viewSampleDoc)
 
 import Html exposing (Html, div, text)
 import Html.Attributes exposing (class, style)
+import Maybe.Extra
+import Pivot exposing (Pivot)
 import String exposing (fromInt)
 
 
@@ -34,32 +36,36 @@ viewLine (Line l) =
     div [ style "padding-left" (fromInt l.level ++ "px") ] [ text l.content ]
 
 
+viewFocusedLine : Line -> Html msg
+viewFocusedLine (Line l) =
+    div
+        [ style "padding-left" (fromInt l.level ++ "px")
+        , style "outline" "1px auto blue"
+        ]
+        [ text l.content ]
+
+
 
 -- LCR
 
 
-type LCR
-    = LCR ( List Line, Line, List Line )
+type alias LCR =
+    Pivot Line
 
 
 initLCR : String -> LCR
 initLCR string =
-    LCR ( [], newRootLine string, [] )
+    Pivot.singleton (newRootLine string)
 
 
 appendAfterC : String -> LCR -> LCR
-appendAfterC string (LCR ( l, c, r )) =
-    LCR ( c :: l, newSibling string c, r )
-
-
-toList : LCR -> List Line
-toList (LCR ( l, c, r )) =
-    List.reverse l ++ c :: r
+appendAfterC string p =
+    Pivot.appendGoR (newSibling string (Pivot.getC p)) p
 
 
 viewLCR : LCR -> List (Html msg)
-viewLCR lcr =
-    toList lcr |> List.map viewLine
+viewLCR p =
+    Pivot.mapCS viewFocusedLine viewLine p |> Pivot.toList
 
 
 
@@ -86,8 +92,8 @@ appendSibling string doc =
             Doc (appendAfterC string lcr)
 
 
-insertChild : String -> Doc -> Doc
-insertChild string doc =
+appendChild : String -> Doc -> Doc
+appendChild string doc =
     appendSibling string doc
 
 
@@ -113,6 +119,6 @@ viewSampleDoc =
                 |> appendSibling "First"
                 |> appendSibling "Second"
                 |> appendSibling "Third"
-                |> insertChild "Third's Child 1"
+                |> appendChild "Third's Child 1"
     in
     viewDoc sampleDoc

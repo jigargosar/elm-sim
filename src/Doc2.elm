@@ -63,9 +63,14 @@ initLCR string =
     Pivot.singleton (newRootLine string)
 
 
-appendAfterC : String -> LineZipper -> LineZipper
-appendAfterC string p =
+appendSibling_ : String -> LineZipper -> LineZipper
+appendSibling_ string p =
     Pivot.appendGoR (newSibling string (Pivot.getC p)) p
+
+
+insertChild_ : String -> LineZipper -> LineZipper
+insertChild_ string p =
+    Pivot.appendGoR (newChild string (Pivot.getC p)) p
 
 
 levelC : LineZipper -> Int
@@ -138,7 +143,7 @@ appendSibling string doc =
             init string
 
         Doc lcr ->
-            Doc (appendAfterC string lcr)
+            Doc (appendSibling_ string lcr)
 
 
 appendChild : String -> Doc -> Doc
@@ -151,7 +156,7 @@ appendChild string doc =
             case
                 p
                     |> gotoLastChild
-                    |> Maybe.map (appendAfterC string)
+                    |> Maybe.map (appendSibling_ string)
             of
                 Just p2 ->
                     Doc p2
@@ -159,11 +164,6 @@ appendChild string doc =
                 Nothing ->
                     insertChild_ string p
                         |> Doc
-
-
-insertChild_ : String -> LineZipper -> LineZipper
-insertChild_ string p =
-    Pivot.appendGoR (newChild string (Pivot.getC p)) p
 
 
 viewDoc : Doc -> Html msg

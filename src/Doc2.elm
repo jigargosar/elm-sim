@@ -22,13 +22,18 @@ appendAfterC string (LCR ( l, c, r )) =
     LCR ( c :: l, string, r )
 
 
+toList : LCR -> List String
+toList (LCR ( l, c, r )) =
+    List.reverse l ++ c :: r
+
+
 viewLCR : LCR -> List (Html msg)
-viewLCR (LCR ( l, c, r )) =
+viewLCR lcr =
     let
         viewS string =
             div [] [ text string ]
     in
-    List.map viewS (l |> List.reverse) ++ viewS c :: List.map viewS r
+    toList lcr |> List.map viewS
 
 
 

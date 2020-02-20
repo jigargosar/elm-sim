@@ -1,26 +1,34 @@
 module Doc2 exposing (viewSampleDoc)
 
 import Html exposing (Html, div, text)
+import Html.Attributes exposing (class)
 
 
 type Doc
-    = Doc String
-    | EmptyDoc
+    = Doc (List String)
 
 
 empty : Doc
 empty =
-    EmptyDoc
+    Doc []
 
 
 appendSibling : String -> Doc -> Doc
-appendSibling string doc =
-    Doc string
+appendSibling string (Doc list) =
+    Doc (string :: list)
 
 
 viewDoc : Doc -> Html msg
-viewDoc doc =
-    div [] [ text "Doc" ]
+viewDoc (Doc list) =
+    div [ class "pa3" ]
+        [ div [ class "f4 b pv2" ] [ text "Doc" ]
+        , List.map viewNode list
+            |> div []
+        ]
+
+
+viewNode string =
+    div [] [ text string ]
 
 
 viewSampleDoc : Html msg

@@ -7,6 +7,7 @@ import List.Extra
 import Maybe.Extra
 import Pivot exposing (Pivot)
 import String exposing (fromInt)
+import String.Extra
 
 
 sampleStringDoc =
@@ -33,6 +34,53 @@ Chapter 4 - Single Child Deep Nested
                 Boom
                     Bang
     """
+
+
+type Doc
+    = Doc (List Line)
+
+
+type Line
+    = Line LineRecord
+
+
+type alias LineRecord =
+    { content : String, level : Int, isCollapsed : Bool }
+
+
+parseDocString : String -> Doc
+parseDocString string =
+    let
+        countWS s =
+            String.split "    " s
+                |> List.Extra.takeWhile String.isEmpty
+                |> List.length
+                |> Debug.log "l"
+
+        toLine content =
+            Line (LineRecord (String.trim content) (countWS content) False)
+
+        lines =
+            String.trim string
+                |> String.lines
+                |> List.map toLine
+                |> Debug.log "all"
+    in
+    Doc lines
+
+
+viewLine : Line -> Html msg
+viewLine (Line lr) =
+    div [ style "padding-left" (fromInt (lr.level * 20) ++ "px") ] [ text lr.content ]
+
+
+viewDoc : Doc -> Html msg
+viewDoc (Doc lines) =
+    (div [ style "font-size" "2rem", class "pv10" ]
+        [ text "Doc View" ]
+        :: List.map viewLine lines
+    )
+        |> div [ class "df-col p20" ]
 
 
 
@@ -375,7 +423,8 @@ view _ =
                 |> ovToNvList
     in
     div []
-        [ div [ class "pv20" ] [ text "Outline View" ]
+        [ viewDoc (parseDocString sampleStringDoc)
+        , div [ class "pv20" ] [ text "Outline View" ]
         , div [] (List.map viewNodeListItem ov)
         ]
 

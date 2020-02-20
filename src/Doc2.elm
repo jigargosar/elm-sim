@@ -1,7 +1,37 @@
 module Doc2 exposing (viewSampleDoc)
 
 import Html exposing (Html, div, text)
-import Html.Attributes exposing (class)
+import Html.Attributes exposing (class, style)
+import String exposing (fromInt)
+
+
+
+-- Line
+
+
+type Line
+    = Line LineRecord
+
+
+type alias LineRecord =
+    { content : String
+    , level : Int
+    }
+
+
+newSibling : String -> Line -> Line
+newSibling string (Line { level }) =
+    Line (LineRecord string level)
+
+
+newRootLine : String -> Line
+newRootLine string =
+    Line (LineRecord string 0)
+
+
+viewLine : Line -> Html msg
+viewLine (Line l) =
+    div [ style "padding-left" (fromInt l.level ++ "px") ] [ text l.content ]
 
 
 
@@ -9,31 +39,27 @@ import Html.Attributes exposing (class)
 
 
 type LCR
-    = LCR ( List String, String, List String )
+    = LCR ( List Line, Line, List Line )
 
 
 initLCR : String -> LCR
 initLCR string =
-    LCR ( [], string, [] )
+    LCR ( [], newRootLine string, [] )
 
 
 appendAfterC : String -> LCR -> LCR
 appendAfterC string (LCR ( l, c, r )) =
-    LCR ( c :: l, string, r )
+    LCR ( c :: l, newSibling string c, r )
 
 
-toList : LCR -> List String
+toList : LCR -> List Line
 toList (LCR ( l, c, r )) =
     List.reverse l ++ c :: r
 
 
 viewLCR : LCR -> List (Html msg)
 viewLCR lcr =
-    let
-        viewS string =
-            div [] [ text string ]
-    in
-    toList lcr |> List.map viewS
+    toList lcr |> List.map viewLine
 
 
 

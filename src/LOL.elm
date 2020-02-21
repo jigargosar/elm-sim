@@ -152,7 +152,7 @@ viewGroupItems : Maybe ( Group, List Item ) -> Html msg
 viewGroupItems mb =
     case mb of
         Nothing ->
-            div [] []
+            div [] [ text "INTERNAL ERROR" ]
 
         Just ( Group g, il ) ->
             let

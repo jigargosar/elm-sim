@@ -198,11 +198,8 @@ view model =
         PGroups _ ->
             viewGroupList (allGroups model.db)
 
-        PItems { groupId } ->
-            viewGroupItems
-                (findGroup groupId model.db
-                    |> Maybe.map (\g -> ( g, findItemsInGroup groupId model.db ))
-                )
+        PItems pr ->
+            viewGroupItems model pr
 
 
 viewGroupList : List Group -> Html Msg
@@ -215,8 +212,13 @@ viewGroupList =
         >> div []
 
 
-viewGroupItems : Maybe ( Group, List Item ) -> Html Msg
-viewGroupItems mb =
+viewGroupItems : Model -> PItemsRecord -> Html Msg
+viewGroupItems model { groupId } =
+    let
+        mb =
+            findGroup groupId model.db
+                |> Maybe.map (\g -> ( g, findItemsInGroup groupId model.db ))
+    in
     case mb of
         Nothing ->
             div [] [ text "INTERNAL ERROR" ]

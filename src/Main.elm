@@ -1,16 +1,8 @@
 module Main exposing (main)
 
 import Browser
-import Doc1
-import Doc2
-import Html exposing (Html, div, text)
-import Html.Attributes exposing (class, style)
+import Html exposing (Html, div)
 import LOL
-import List.Extra
-import Maybe.Extra
-import OutlineView
-import Pivot exposing (Pivot)
-import String exposing (fromInt)
 
 
 
@@ -59,9 +51,6 @@ subscriptions _ =
 view _ =
     div []
         [ LOL.viewSample
-        , Doc2.viewSampleDoc
-        , Doc1.viewSampleDoc
-        , OutlineView.viewSample
         ]
 
 

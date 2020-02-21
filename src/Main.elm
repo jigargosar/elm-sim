@@ -113,16 +113,29 @@ type Route
     | RItems GroupId
 
 
+type Page
+    = PGroups PGroupsRecord
+    | PItems PItemsRecord
+
+
+type alias PGroupsRecord =
+    {}
+
+
+type alias PItemsRecord =
+    { groupId : GroupId }
+
+
 type alias Model =
     { db : Db
-    , route : Route
+    , page : Page
     }
 
 
 initialModel : Model
 initialModel =
     { db = emptyDb
-    , route = RGroups
+    , page = PGroups {}
     }
 
 
@@ -155,7 +168,16 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         RouteTo route ->
-            pure { model | route = route }
+            let
+                newPage =
+                    case route of
+                        RGroups ->
+                            PGroups {}
+
+                        RItems groupId ->
+                            PItems { groupId = groupId }
+            in
+            pure { model | page = newPage }
 
         GotDB db ->
             pure { model | db = db }
@@ -172,11 +194,11 @@ subscriptions _ =
 
 view : Model -> Html Msg
 view model =
-    case model.route of
-        RGroups ->
+    case model.page of
+        PGroups _ ->
             viewGroupList (allGroups model.db)
 
-        RItems groupId ->
+        PItems { groupId } ->
             viewGroupItems
                 (findGroup groupId model.db
                     |> Maybe.map (\g -> ( g, findItemsInGroup groupId model.db ))
@@ -246,15 +268,15 @@ viewSample =
         [ div [ class "pv2 f4 b" ] [ text "Db Demo" ]
         , div [ class "pv2" ]
             [ div [ class "pv2 f4" ] [ text "Group Items List Page" ]
-            , view { modelWithDb | route = RItems (GroupId 0) }
+            , view { modelWithDb | page = PItems { groupId = GroupId 0 } }
             ]
         , div [ class "pv2" ]
             [ div [ class "pv2 f4" ] [ text "Group Not Found Page" ]
-            , view { initialModel | route = RItems (GroupId 0) }
+            , view { modelWithDb | page = PItems { groupId = GroupId -1 } }
             ]
         , div [ class "pv2" ]
             [ div [ class "pv2 f4" ] [ text "Group List Page" ]
-            , view { modelWithDb | db = db, route = RGroups }
+            , view { modelWithDb | page = PGroups {} }
             ]
         ]
 

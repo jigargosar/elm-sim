@@ -105,7 +105,7 @@ viewSample =
     div [ class "pv2 ph4" ]
         [ div [ class "pv2 f4 b" ] [ text "LOL Demo" ]
         , div [ class "pv2" ]
-            [ div [ class "pv2 f4" ] [ text "Group titles" ]
+            [ div [ class "pv2 f4" ] [ text "Group List Page" ]
             , viewGroupList groupList
             ]
         ]

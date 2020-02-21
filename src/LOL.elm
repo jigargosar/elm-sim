@@ -62,11 +62,11 @@ viewSample =
     div [ class "pv2 ph4" ]
         [ div [ class "pv2 f4 b" ] [ text "LOL Demo" ]
         , div [ class "pv2" ]
-            [ div [ class "pv2 f4" ] [ text "Group With Items" ]
+            [ div [ class "pv2 f4" ] [ text "Group with items" ]
             , viewGroupsWithItems sampleLOL
             ]
         , div [ class "pv2" ]
-            [ div [ class "pv2 f4" ] [ text "Group Titles" ]
+            [ div [ class "pv2 f4" ] [ text "Group titles" ]
             , viewGroupTitleList sampleLOL
             ]
         ]

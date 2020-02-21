@@ -143,6 +143,7 @@ viewSample =
         ]
 
 
+viewGroupList : List Group -> Html msg
 viewGroupList =
     let
         viewGT (Group { title }) =

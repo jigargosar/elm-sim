@@ -59,6 +59,7 @@ viewSample =
                 , ni "x: perhaps not, we can have group-pivot, and for that group, item pivot. humm.."
                 , ni "x: I think we should keep things simple. one view for master list, then sub view for its list items"
                 , ni "how do we model group list view, group items view?"
+                , ni "perhaps we should use list & index? or have item store group id?"
                 ]
             , ng "Projects"
                 [ ni "LOL Demo"

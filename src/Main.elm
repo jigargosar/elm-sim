@@ -265,17 +265,17 @@ viewSample =
             { initialModel | db = db }
     in
     div [ class "pv2 ph4" ]
-        [ div [ class "pv2 f4 b" ] [ text "Db Demo" ]
+        [ div [ class "pv2 f4 b" ] [ text "LOL Demo" ]
         , div [ class "pv2" ]
-            [ div [ class "pv2 f4" ] [ text "Items Page" ]
+            [ div [ class "pv2 f4 ttu " ] [ text "Items Page" ]
             , view { modelWithDb | page = PItems { groupId = GroupId 0 } }
             ]
         , div [ class "pv2" ]
-            [ div [ class "pv2 f4" ] [ text "Items Page: Group Not Found" ]
+            [ div [ class "pv2 f4 ttu " ] [ text "Items Page: Group Not Found" ]
             , view { modelWithDb | page = PItems { groupId = GroupId -1 } }
             ]
         , div [ class "pv2" ]
-            [ div [ class "pv2 f4" ] [ text "Groups Page" ]
+            [ div [ class "pv2 f4 ttu" ] [ text "Groups Page" ]
             , view { modelWithDb | page = PGroups {} }
             ]
         ]

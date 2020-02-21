@@ -267,15 +267,15 @@ viewSample =
     div [ class "pv2 ph4" ]
         [ div [ class "pv2 f4 b" ] [ text "Db Demo" ]
         , div [ class "pv2" ]
-            [ div [ class "pv2 f4" ] [ text "Group Items List Page" ]
+            [ div [ class "pv2 f4" ] [ text "Items Page" ]
             , view { modelWithDb | page = PItems { groupId = GroupId 0 } }
             ]
         , div [ class "pv2" ]
-            [ div [ class "pv2 f4" ] [ text "Group Not Found Page" ]
+            [ div [ class "pv2 f4" ] [ text "Items Page: Group Not Found" ]
             , view { modelWithDb | page = PItems { groupId = GroupId -1 } }
             ]
         , div [ class "pv2" ]
-            [ div [ class "pv2 f4" ] [ text "Group List Page" ]
+            [ div [ class "pv2 f4" ] [ text "Groups Page" ]
             , view { modelWithDb | page = PGroups {} }
             ]
         ]

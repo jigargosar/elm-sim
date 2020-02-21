@@ -1,56 +1,85 @@
 module LOL exposing (viewSample)
 
+import Dict exposing (Dict)
 import Html exposing (Html, div, text)
 import Html.Attributes exposing (class)
+import List.Extra
+
+
+type ItemId
+    = ItemId Int
+
+
+type GroupId
+    = GroupId Int
 
 
 type Group
-    = Group String (List Item)
+    = Group GroupRecord
+
+
+type alias GroupRecord =
+    { id : GroupId
+    , title : String
+    }
 
 
 type Item
-    = Item String
+    = Item ItemRecord
 
 
-type alias Model =
-    { groups : List Group }
+type alias ItemRecord =
+    { id : ItemId
+    , groupId : GroupId
+    , title : String
+    }
 
 
-viewGroupTitleList : List Group -> Html msg
-viewGroupTitleList groups =
+type alias Db =
+    { groupDict : Dict Int Group
+    , itemDict : Dict Int Item
+    }
+
+
+empty : Db
+empty =
+    { groupDict = Dict.empty
+    , itemDict = Dict.empty
+    }
+
+
+toDb list =
     let
-        viewGroupTitle (Group title _) =
-            div [] [ text title ]
+        insertGroupAndItems gidx ( groupTitle, itemTitles ) m =
+            let
+                gid =
+                    GroupId gidx
+
+                group : Group
+                group =
+                    Group { id = gid, title = groupTitle }
+
+                insertItem idx title =
+                    Dict.insert idx (Item { id = ItemId idx, groupId = gid, title = title })
+            in
+            { m
+                | groupDict = Dict.insert gidx group m.groupDict
+                , itemDict = List.Extra.indexedFoldl insertItem m.itemDict itemTitles
+            }
     in
-    List.map viewGroupTitle groups
-        |> div []
-
-
-viewGroupsWithItems : List Group -> Html msg
-viewGroupsWithItems groups =
-    let
-        viewItem (Item title) =
-            div [ class "pl3" ] [ text title ]
-
-        viewGroupTitleAndItems (Group title items) =
-            div [ class "pv2 b" ] [ text title ]
-                :: List.map viewItem items
-                |> div [ class "pv2" ]
-    in
-    List.map viewGroupTitleAndItems groups
-        |> div []
+    List.Extra.indexedFoldl insertGroupAndItems empty list
 
 
 viewSample : Html msg
 viewSample =
     let
         ng =
-            Group
+            Tuple.pair
 
         ni =
-            Item
+            identity
 
-        sampleLOL =
+        sampleData =
             [ ng "Inbox"
                 [ ni "x: Show Group title with items"
                 , ni "x: should we show group list separately? and on nav show children? Or show entire tree?"
@@ -66,15 +95,26 @@ viewSample =
                 , ni "LOL: Focus Item/Group"
                 ]
             ]
+
+        db =
+            toDb sampleData
+
+        groupList =
+            db.groupDict |> Dict.values
     in
     div [ class "pv2 ph4" ]
         [ div [ class "pv2 f4 b" ] [ text "LOL Demo" ]
         , div [ class "pv2" ]
-            [ div [ class "pv2 f4" ] [ text "Group with items" ]
-            , viewGroupsWithItems sampleLOL
-            ]
-        , div [ class "pv2" ]
             [ div [ class "pv2 f4" ] [ text "Group titles" ]
-            , viewGroupTitleList sampleLOL
+            , viewGroupList groupList
             ]
         ]
+
+
+viewGroupList =
+    let
+        viewGT (Group { title }) =
+            div [] [ text title ]
+    in
+    List.map viewGT
+        >> div []

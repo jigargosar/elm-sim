@@ -70,6 +70,22 @@ toDb list =
     List.Extra.indexedFoldl insertGroupAndItems empty list
 
 
+findGroup : GroupId -> Db -> Maybe Group
+findGroup (GroupId gidx) db =
+    Dict.get gidx db.groupDict
+
+
+itemGroupIdEq : GroupId -> Item -> Bool
+itemGroupIdEq groupId (Item i) =
+    groupId == i.groupId
+
+
+findItemsInGroup : GroupId -> Db -> List Item
+findItemsInGroup gid db =
+    Dict.values db.itemDict
+        |> List.filter (itemGroupIdEq gid)
+
+
 viewSample : Html msg
 viewSample =
     let
@@ -101,9 +117,21 @@ viewSample =
 
         groupList =
             db.groupDict |> Dict.values
+
+        gid =
+            GroupId 0
+
+        groupWithItems : Maybe ( Group, List Item )
+        groupWithItems =
+            findGroup gid db
+                |> Maybe.map (\g -> ( g, findItemsInGroup gid db ))
     in
     div [ class "pv2 ph4" ]
         [ div [ class "pv2 f4 b" ] [ text "LOL Demo" ]
+        , div [ class "pv2" ]
+            [ div [ class "pv2 f4" ] [ text "Group Items List Page" ]
+            , viewGroupItems groupWithItems
+            ]
         , div [ class "pv2" ]
             [ div [ class "pv2 f4" ] [ text "Group List Page" ]
             , viewGroupList groupList
@@ -118,3 +146,19 @@ viewGroupList =
     in
     List.map viewGT
         >> div []
+
+
+viewGroupItems mb =
+    case mb of
+        Nothing ->
+            div [] []
+
+        Just ( Group g, il ) ->
+            let
+                viewItem (Item i) =
+                    div [ class "pv1 pl3" ] [ text i.title ]
+            in
+            div []
+                (div [ class "b f5 pv2" ] [ text g.title ]
+                    :: List.map viewItem il
+                )

@@ -219,7 +219,7 @@ viewGroupItems db { groupId } =
             |> Maybe.map (\g -> ( g, findItemsInGroup groupId db ))
     of
         Nothing ->
-            div [] [ text "INTERNAL ERROR" ]
+            div [ class "f2 red" ] [ text ("Group Not Found: " ++ Debug.toString groupId) ]
 
         Just ( Group g, il ) ->
             let

@@ -125,8 +125,8 @@ initialModel =
     }
 
 
-viewModel : Model -> Html msg
-viewModel model =
+view : Model -> Html msg
+view model =
     case model.route of
         GroupList ->
             viewGroupList (allGroups model.db)
@@ -135,6 +135,33 @@ viewModel model =
             viewGroupItems
                 (findGroup groupId model.db
                     |> Maybe.map (\g -> ( g, findItemsInGroup groupId model.db ))
+                )
+
+
+viewGroupList : List Group -> Html msg
+viewGroupList =
+    let
+        viewGT (Group { title }) =
+            div [] [ text title ]
+    in
+    List.map viewGT
+        >> div []
+
+
+viewGroupItems : Maybe ( Group, List Item ) -> Html msg
+viewGroupItems mb =
+    case mb of
+        Nothing ->
+            div [] [ text "INTERNAL ERROR" ]
+
+        Just ( Group g, il ) ->
+            let
+                viewItem (Item i) =
+                    div [ class "pv1 pl3" ] [ text i.title ]
+            in
+            div []
+                (div [ class "b f5 pv2" ] [ text g.title ]
+                    :: List.map viewItem il
                 )
 
 
@@ -179,41 +206,14 @@ viewSample =
         [ div [ class "pv2 f4 b" ] [ text "Db Demo" ]
         , div [ class "pv2" ]
             [ div [ class "pv2 f4" ] [ text "Group Items List Page" ]
-            , viewGroupItems groupWithItems
+            , view { initialModel | db = db, route = GroupItems (GroupId 0) }
             ]
         , div [ class "pv2" ]
             [ div [ class "pv2 f4" ] [ text "Group Not Found Page" ]
-            , viewGroupItems Nothing
+            , view { initialModel | db = db, route = GroupItems (GroupId -1) }
             ]
         , div [ class "pv2" ]
             [ div [ class "pv2 f4" ] [ text "Group List Page" ]
-            , viewModel { initialModel | db = db, route = GroupList }
+            , view { initialModel | db = db, route = GroupList }
             ]
         ]
-
-
-viewGroupList : List Group -> Html msg
-viewGroupList =
-    let
-        viewGT (Group { title }) =
-            div [] [ text title ]
-    in
-    List.map viewGT
-        >> div []
-
-
-viewGroupItems : Maybe ( Group, List Item ) -> Html msg
-viewGroupItems mb =
-    case mb of
-        Nothing ->
-            div [] [ text "INTERNAL ERROR" ]
-
-        Just ( Group g, il ) ->
-            let
-                viewItem (Item i) =
-                    div [ class "pv1 pl3" ] [ text i.title ]
-            in
-            div []
-                (div [ class "b f5 pv2" ] [ text g.title ]
-                    :: List.map viewItem il
-                )

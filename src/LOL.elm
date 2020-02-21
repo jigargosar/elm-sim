@@ -16,13 +16,28 @@ type alias Model =
     { groups : List Group }
 
 
-viewGroupList : List Group -> Html msg
-viewGroupList groups =
+viewGroupTitleList : List Group -> Html msg
+viewGroupTitleList groups =
     let
         viewGroupTitle (Group title _) =
             div [] [ text title ]
     in
     List.map viewGroupTitle groups
+        |> div []
+
+
+viewGroupsWithItems : List Group -> Html msg
+viewGroupsWithItems groups =
+    let
+        viewItem (Item title) =
+            div [ class "pl3" ] [ text title ]
+
+        viewGroupTitleAndItems (Group title items) =
+            div [ class "pv2 b" ] [ text title ]
+                :: List.map viewItem items
+                |> div [ class "pv2" ]
+    in
+    List.map viewGroupTitleAndItems groups
         |> div []
 
 
@@ -46,5 +61,12 @@ viewSample =
     in
     div [ class "pv2 ph4" ]
         [ div [ class "pv2 f4 b" ] [ text "LOL Demo" ]
-        , viewGroupList sampleLOL
+        , div [ class "pv2" ]
+            [ div [ class "pv2 f4" ] [ text "Group With Items" ]
+            , viewGroupsWithItems sampleLOL
+            ]
+        , div [ class "pv2" ]
+            [ div [ class "pv2 f4" ] [ text "Group Titles" ]
+            , viewGroupTitleList sampleLOL
+            ]
         ]

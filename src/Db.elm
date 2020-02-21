@@ -1,4 +1,4 @@
-module LOL exposing (viewSample)
+module Db exposing (viewSample)
 
 import Dict exposing (Dict)
 import Html exposing (Html, div, text)
@@ -120,8 +120,8 @@ viewSample =
                 , ni "perhaps we should use list & index? or have item store group id?"
                 ]
             , ng "Projects"
-                [ ni "LOL Demo"
-                , ni "LOL: Focus Item/Group"
+                [ ni "Db Demo"
+                , ni "Db: Focus Item/Group"
                 ]
             ]
 
@@ -137,7 +137,7 @@ viewSample =
                 |> Maybe.map (\g -> ( g, findItemsInGroup gid db ))
     in
     div [ class "pv2 ph4" ]
-        [ div [ class "pv2 f4 b" ] [ text "LOL Demo" ]
+        [ div [ class "pv2 f4 b" ] [ text "Db Demo" ]
         , div [ class "pv2" ]
             [ div [ class "pv2 f4" ] [ text "Group Items List Page" ]
             , viewGroupItems groupWithItems

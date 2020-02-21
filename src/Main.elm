@@ -1,8 +1,8 @@
 module Main exposing (main)
 
 import Browser
+import Db
 import Html exposing (Html, div)
-import LOL
 
 
 
@@ -50,7 +50,7 @@ subscriptions _ =
 
 view _ =
     div []
-        [ LOL.viewSample
+        [ Db.viewSample
         ]
 
 

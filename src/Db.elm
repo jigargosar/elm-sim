@@ -107,6 +107,37 @@ findItemsInGroup gid (Db db) =
 -- Model
 
 
+type Route
+    = GroupList
+    | GroupItems GroupId
+
+
+type alias Model =
+    { db : Db
+    , route : Route
+    }
+
+
+initialModel : Model
+initialModel =
+    { db = empty
+    , route = GroupList
+    }
+
+
+viewModel : Model -> Html msg
+viewModel model =
+    case model.route of
+        GroupList ->
+            viewGroupList (allGroups model.db)
+
+        GroupItems groupId ->
+            viewGroupItems
+                (findGroup groupId model.db
+                    |> Maybe.map (\g -> ( g, findItemsInGroup groupId model.db ))
+                )
+
+
 viewSample : Html msg
 viewSample =
     let
@@ -156,7 +187,7 @@ viewSample =
             ]
         , div [ class "pv2" ]
             [ div [ class "pv2 f4" ] [ text "Group List Page" ]
-            , viewGroupList (allGroups db)
+            , viewModel { initialModel | db = db, route = GroupList }
             ]
         ]
 

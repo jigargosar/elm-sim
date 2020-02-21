@@ -52,10 +52,15 @@ viewSample =
 
         sampleLOL =
             [ ng "Inbox"
-                [ ni "Show Group Items"
+                [ ni "x: Show Group title with items"
+                , ni "x: should we show group list separately? and on nav show children? Or show entire tree?"
+                , ni "x: For now it seems easier to show everything"
+                , ni "now showing focus is complicated, since we are showing both, group &  it's items"
+                , ni "perhaps not, we can have group-pivot, and for that group, item pivot. humm.."
                 ]
             , ng "Projects"
                 [ ni "LOL Demo"
+                , ni "LOL: Focus Item/Group"
                 ]
             ]
     in

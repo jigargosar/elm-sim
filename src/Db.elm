@@ -125,6 +125,21 @@ initialModel =
     }
 
 
+type Msg
+    = RouteTo Route
+    | GotDB Db
+
+
+update : Msg -> Model -> Model
+update msg model =
+    case msg of
+        RouteTo route ->
+            { model | route = route }
+
+        GotDB db ->
+            { model | db = db }
+
+
 view : Model -> Html msg
 view model =
     case model.route of
@@ -194,26 +209,21 @@ viewSample =
         db =
             toDb sampleData
 
-        gid =
-            GroupId 0
-
-        groupWithItems : Maybe ( Group, List Item )
-        groupWithItems =
-            findGroup gid db
-                |> Maybe.map (\g -> ( g, findItemsInGroup gid db ))
+        modelWithDb =
+            initialModel |> update (GotDB db)
     in
     div [ class "pv2 ph4" ]
         [ div [ class "pv2 f4 b" ] [ text "Db Demo" ]
         , div [ class "pv2" ]
             [ div [ class "pv2 f4" ] [ text "Group Items List Page" ]
-            , view { initialModel | db = db, route = GroupItems (GroupId 0) }
+            , view (modelWithDb |> update (RouteTo (GroupItems (GroupId 0))))
             ]
         , div [ class "pv2" ]
             [ div [ class "pv2 f4" ] [ text "Group Not Found Page" ]
-            , view { initialModel | db = db, route = GroupItems (GroupId -1) }
+            , view (initialModel |> update (RouteTo (GroupItems (GroupId 0))))
             ]
         , div [ class "pv2" ]
             [ div [ class "pv2 f4" ] [ text "Group List Page" ]
-            , view { initialModel | db = db, route = GroupList }
+            , view { modelWithDb | db = db, route = GroupList }
             ]
         ]

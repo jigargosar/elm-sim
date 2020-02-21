@@ -148,6 +148,7 @@ viewGroupList =
         >> div []
 
 
+viewGroupItems : Maybe ( Group, List Item ) -> Html msg
 viewGroupItems mb =
     case mb of
         Nothing ->

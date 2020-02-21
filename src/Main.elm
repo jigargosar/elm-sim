@@ -5,6 +5,7 @@ import Doc1
 import Doc2
 import Html exposing (Html, div, text)
 import Html.Attributes exposing (class, style)
+import LOL
 import List.Extra
 import Maybe.Extra
 import OutlineView
@@ -57,7 +58,8 @@ subscriptions _ =
 
 view _ =
     div []
-        [ Doc2.viewSampleDoc
+        [ LOL.viewSample
+        , Doc2.viewSampleDoc
         , Doc1.viewSampleDoc
         , OutlineView.viewSample
         ]

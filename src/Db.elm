@@ -6,6 +6,10 @@ import Html.Attributes exposing (class)
 import List.Extra
 
 
+
+-- DB
+
+
 type ItemId
     = ItemId Int
 
@@ -97,6 +101,10 @@ findItemsInGroup : GroupId -> Db -> List Item
 findItemsInGroup gid (Db db) =
     Dict.values db.itemDict
         |> List.filter (itemGroupIdEq gid)
+
+
+
+-- Model
 
 
 viewSample : Html msg

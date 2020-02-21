@@ -109,8 +109,8 @@ findItemsInGroup gid (Db db) =
 
 
 type Route
-    = GroupList
-    | GroupItems GroupId
+    = RGroups
+    | RItems GroupId
 
 
 type alias Model =
@@ -122,7 +122,7 @@ type alias Model =
 initialModel : Model
 initialModel =
     { db = emptyDb
-    , route = GroupList
+    , route = RGroups
     }
 
 
@@ -173,10 +173,10 @@ subscriptions _ =
 view : Model -> Html Msg
 view model =
     case model.route of
-        GroupList ->
+        RGroups ->
             viewGroupList (allGroups model.db)
 
-        GroupItems groupId ->
+        RItems groupId ->
             viewGroupItems
                 (findGroup groupId model.db
                     |> Maybe.map (\g -> ( g, findItemsInGroup groupId model.db ))
@@ -246,15 +246,15 @@ viewSample =
         [ div [ class "pv2 f4 b" ] [ text "Db Demo" ]
         , div [ class "pv2" ]
             [ div [ class "pv2 f4" ] [ text "Group Items List Page" ]
-            , view { modelWithDb | route = GroupItems (GroupId 0) }
+            , view { modelWithDb | route = RItems (GroupId 0) }
             ]
         , div [ class "pv2" ]
             [ div [ class "pv2 f4" ] [ text "Group Not Found Page" ]
-            , view { initialModel | route = GroupItems (GroupId 0) }
+            , view { initialModel | route = RItems (GroupId 0) }
             ]
         , div [ class "pv2" ]
             [ div [ class "pv2 f4" ] [ text "Group List Page" ]
-            , view { modelWithDb | db = db, route = GroupList }
+            , view { modelWithDb | db = db, route = RGroups }
             ]
         ]
 

@@ -183,17 +183,17 @@ view model =
                 )
 
 
-viewGroupList : List Group -> Html msg
+viewGroupList : List Group -> Html Msg
 viewGroupList =
     let
         viewGT (Group { title }) =
-            div [] [ text title ]
+            div [ class "pointer b pa2 underline hover-bg-blue hover-white br2" ] [ text title ]
     in
     List.map viewGT
         >> div []
 
 
-viewGroupItems : Maybe ( Group, List Item ) -> Html msg
+viewGroupItems : Maybe ( Group, List Item ) -> Html Msg
 viewGroupItems mb =
     case mb of
         Nothing ->

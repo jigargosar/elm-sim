@@ -133,6 +133,10 @@ viewSample =
             , viewGroupItems groupWithItems
             ]
         , div [ class "pv2" ]
+            [ div [ class "pv2 f4" ] [ text "Group Not Found Page" ]
+            , viewGroupItems Nothing
+            ]
+        , div [ class "pv2" ]
             [ div [ class "pv2 f4" ] [ text "Group List Page" ]
             , viewGroupList groupList
             ]

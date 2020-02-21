@@ -35,7 +35,11 @@ type alias ItemRecord =
     }
 
 
-type alias Db =
+type Db
+    = Db DbRecord
+
+
+type alias DbRecord =
     { groupDict : Dict Int Group
     , itemDict : Dict Int Item
     }
@@ -43,14 +47,17 @@ type alias Db =
 
 empty : Db
 empty =
-    { groupDict = Dict.empty
-    , itemDict = Dict.empty
-    }
+    Db
+        { groupDict = Dict.empty
+        , itemDict = Dict.empty
+        }
 
 
+toDb : List ( String, List String ) -> Db
 toDb list =
     let
-        insertGroupAndItems gidx ( groupTitle, itemTitles ) m =
+        insertGroupAndItems : Int -> ( String, List String ) -> Db -> Db
+        insertGroupAndItems gidx ( groupTitle, itemTitles ) (Db m) =
             let
                 gid =
                     GroupId gidx
@@ -62,17 +69,23 @@ toDb list =
                 insertItem idx title =
                     Dict.insert idx (Item { id = ItemId idx, groupId = gid, title = title })
             in
-            { m
-                | groupDict = Dict.insert gidx group m.groupDict
-                , itemDict = List.Extra.indexedFoldl insertItem m.itemDict itemTitles
-            }
+            Db
+                { m
+                    | groupDict = Dict.insert gidx group m.groupDict
+                    , itemDict = List.Extra.indexedFoldl insertItem m.itemDict itemTitles
+                }
     in
     List.Extra.indexedFoldl insertGroupAndItems empty list
 
 
 findGroup : GroupId -> Db -> Maybe Group
-findGroup (GroupId gidx) db =
+findGroup (GroupId gidx) (Db db) =
     Dict.get gidx db.groupDict
+
+
+allGroups : Db -> List Group
+allGroups (Db db) =
+    db.groupDict |> Dict.values
 
 
 itemGroupIdEq : GroupId -> Item -> Bool
@@ -81,7 +94,7 @@ itemGroupIdEq groupId (Item i) =
 
 
 findItemsInGroup : GroupId -> Db -> List Item
-findItemsInGroup gid db =
+findItemsInGroup gid (Db db) =
     Dict.values db.itemDict
         |> List.filter (itemGroupIdEq gid)
 
@@ -115,9 +128,6 @@ viewSample =
         db =
             toDb sampleData
 
-        groupList =
-            db.groupDict |> Dict.values
-
         gid =
             GroupId 0
 
@@ -138,7 +148,7 @@ viewSample =
             ]
         , div [ class "pv2" ]
             [ div [ class "pv2 f4" ] [ text "Group List Page" ]
-            , viewGroupList groupList
+            , viewGroupList (allGroups db)
             ]
         ]
 

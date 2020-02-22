@@ -203,13 +203,16 @@ view model =
 
 
 viewGroupList : List Group -> Html Msg
-viewGroupList =
+viewGroupList groups =
     let
         viewGT (Group { title }) =
-            div [ class "pointer f4 pv1 ph2 hover-bg-blue hover-white br2" ] [ text title ]
+            div [ class "pointer pv1 ph2 hover-bg-blue hover-white br2" ] [ text title ]
+
+        viewPT =
+            div [ class "pv2 ttu tracked" ] [ text "Lists" ]
     in
-    List.map viewGT
-        >> div []
+    (viewPT :: List.map viewGT groups)
+        |> div [ class "measure-wide center" ]
 
 
 viewGroupItems : Db -> PageItemsRecord -> Html Msg

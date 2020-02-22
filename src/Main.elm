@@ -4,7 +4,7 @@ import Browser
 import Dict exposing (Dict)
 import Html exposing (Html, button, div, input, text)
 import Html.Attributes exposing (autofocus, class, value)
-import Html.Events exposing (onClick)
+import Html.Events exposing (onClick, onInput)
 import List.Extra
 import Maybe.Extra
 import Pivot exposing (Pivot)
@@ -369,6 +369,7 @@ viewGroupsPage db page =
                     [ input
                         [ class "ph1 flex-grow-1"
                         , value content
+                        , onInput InputChanged
                         , autofocus True
                         ]
                         []

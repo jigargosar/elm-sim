@@ -217,7 +217,7 @@ viewGroupsPage db =
                 viewSGT (Group { title }) =
                     div
                         [ class "pointer pv1 ph2 br2"
-                        , class "bg-blue white hover-bg-blue hover-white"
+                        , class "bg-blue white"
                         ]
                         [ text title ]
             in

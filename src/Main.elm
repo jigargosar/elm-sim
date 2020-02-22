@@ -563,6 +563,13 @@ sampleDb =
                 [ ni "Db Demo"
                 , ni "Db: Focus Item/Group"
                 ]
+            , ng "NA" []
+            , ng "@Work" []
+            , ng "@WF" []
+            , ng "@SDMB" []
+            , ng "@Mobile" []
+            , ng "Trash" []
+            , ng "#Prj1" []
             ]
     in
     dbFromList sampleData
@@ -584,6 +591,7 @@ main =
                                         Just
                                             { content = "Next Actions"
                                             }
+                                            |> always Nothing
                                     , selectedGroupId = Nothing
                                     }
                         }

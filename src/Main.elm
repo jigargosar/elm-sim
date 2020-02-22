@@ -369,7 +369,7 @@ viewGroupsPage db page =
             div [ class "" ]
                 [ div [ class "ph2 pv1 flex relative outline" ]
                     [ input
-                        [ class "pa0 flex-grow-1 lh-solid bn outline-0"
+                        [ class "flex-grow-1 lh-title pa0 bn outline-0"
                         , value content
                         , onInput InputChanged
                         , onEnter SubmitClicked

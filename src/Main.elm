@@ -3,6 +3,7 @@ module Main exposing (main)
 import Browser
 import Browser.Events
 import Dict exposing (Dict)
+import GroupId exposing (GroupId)
 import Html exposing (Html, button, div, input, text)
 import Html.Attributes exposing (autofocus, class, value)
 import Html.Events exposing (onClick, onInput)
@@ -10,6 +11,7 @@ import Json.Decode as JD
 import List.Extra
 import Maybe.Extra
 import Pivot exposing (Pivot)
+import Random exposing (Generator, Seed)
 import String.Extra
 
 
@@ -19,10 +21,6 @@ import String.Extra
 
 type ItemId
     = ItemId Int
-
-
-type GroupId
-    = GroupId Int
 
 
 type Group
@@ -55,7 +53,7 @@ type Db
 
 
 type alias DbRecord =
-    { groupDict : Dict Int Group
+    { groupDict : Dict String Group
     , itemDict : Dict Int Item
     }
 
@@ -68,34 +66,38 @@ emptyDb =
         }
 
 
-dbFromList : List ( String, List String ) -> Db
+dbFromList : List ( String, List String ) -> Generator Db
 dbFromList list =
     let
-        insertGroupAndItems : Int -> ( String, List String ) -> Db -> Db
-        insertGroupAndItems gidx ( groupTitle, itemTitles ) (Db m) =
-            let
-                gid =
-                    GroupId gidx
+        insertGroupAndItems : Int -> ( String, List String ) -> Generator Db -> Generator Db
+        insertGroupAndItems _ ( groupTitle, itemTitles ) =
+            Random.andThen
+                (\(Db m) ->
+                    let
+                        func gid =
+                            let
+                                group : Group
+                                group =
+                                    Group { id = gid, title = groupTitle }
 
-                group : Group
-                group =
-                    Group { id = gid, title = groupTitle }
-
-                insertItem idx title =
-                    Dict.insert idx (Item { id = ItemId idx, groupId = gid, title = title })
-            in
-            Db
-                { m
-                    | groupDict = Dict.insert gidx group m.groupDict
-                    , itemDict = List.Extra.indexedFoldl insertItem m.itemDict itemTitles
-                }
+                                insertItem idx title =
+                                    Dict.insert idx (Item { id = ItemId idx, groupId = gid, title = title })
+                            in
+                            Db
+                                { m
+                                    | groupDict = Dict.insert (GroupId.toString gid) group m.groupDict
+                                    , itemDict = List.Extra.indexedFoldl insertItem m.itemDict itemTitles
+                                }
+                    in
+                    Random.map func GroupId.random
+                )
     in
-    List.Extra.indexedFoldl insertGroupAndItems emptyDb list
+    List.Extra.indexedFoldl insertGroupAndItems (Random.constant emptyDb) list
 
 
 findGroup : GroupId -> Db -> Maybe Group
-findGroup (GroupId gidx) (Db db) =
-    Dict.get gidx db.groupDict
+findGroup gid (Db db) =
+    Dict.get (GroupId.toString gid) db.groupDict
 
 
 allGroups : Db -> List Group
@@ -124,31 +126,18 @@ findItemsInGroup gid (Db db) =
         |> List.filter (itemGroupIdEq gid)
 
 
-dbAddNewGroup : String -> Db -> Db
+dbAddNewGroup : String -> Db -> Generator Db
 dbAddNewGroup groupTitle (Db db) =
-    let
-        gidx =
-            allGroups (Db db)
-                |> List.map
-                    (\(Group { id }) ->
-                        let
-                            (GroupId idx) =
-                                id
-                        in
-                        idx
-                    )
-                |> List.maximum
-                |> Maybe.withDefault 0
-                |> (+) 1
-
-        gid =
-            GroupId gidx
-
-        group : Group
-        group =
-            Group { id = gid, title = groupTitle }
-    in
-    Db { db | groupDict = Dict.insert gidx group db.groupDict }
+    GroupId.random
+        |> Random.map
+            (\gid ->
+                let
+                    group : Group
+                    group =
+                        Group { id = gid, title = groupTitle }
+                in
+                Db { db | groupDict = Dict.insert (GroupId.toString gid) group db.groupDict }
+            )
 
 
 
@@ -190,6 +179,7 @@ type alias PageItemsRecord =
 type alias Model =
     { db : Db
     , page : Page
+    , seed : Seed
     }
 
 
@@ -197,6 +187,7 @@ initialModel : Model
 initialModel =
     { db = emptyDb
     , page = PageGroups { add = Nothing, selectedGroupId = Nothing }
+    , seed = Random.initialSeed 0
     }
 
 
@@ -299,6 +290,18 @@ update msg model =
         SubmitClicked ->
             case model.page of
                 PageGroups page ->
+                    let
+                        randomDb =
+                            case page.add |> Maybe.andThen (.content >> String.trim >> String.Extra.nonBlank) of
+                                Just string ->
+                                    dbAddNewGroup string model.db
+
+                                Nothing ->
+                                    Random.constant model.db
+
+                        ( newDb, newSeed ) =
+                            Random.step randomDb model.seed
+                    in
                     ( { model
                         | page =
                             let
@@ -306,17 +309,8 @@ update msg model =
                                     { page | add = Nothing }
                             in
                             PageGroups newPage
-                        , db =
-                            let
-                                newDb =
-                                    case page.add |> Maybe.andThen (.content >> String.trim >> String.Extra.nonBlank) of
-                                        Just string ->
-                                            dbAddNewGroup string model.db
-
-                                        Nothing ->
-                                            model.db
-                            in
-                            newDb
+                        , db = newDb
+                        , seed = newSeed
                       }
                     , Cmd.none
                     )
@@ -643,30 +637,11 @@ viewItemsPage db page =
         ]
 
 
-viewGroupItems : Db -> PageItemsRecord -> Html Msg
-viewGroupItems db { groupId } =
-    case
-        findGroup groupId db
-            |> Maybe.map (\g -> ( g, findItemsInGroup groupId db ))
-    of
-        Nothing ->
-            div [ class "f2 red" ] [ text ("Group Not Found: " ++ Debug.toString groupId) ]
-
-        Just ( Group g, il ) ->
-            let
-                viewItem (Item i) =
-                    div [ class "pv1 pl3" ] [ text i.title ]
-            in
-            div []
-                (div [ class "b f5 pv2" ] [ text g.title ]
-                    :: List.map viewItem il
-                )
-
-
 
 -- Main
 
 
+sampleDb : Db
 sampleDb =
     let
         ng =
@@ -700,6 +675,9 @@ sampleDb =
             ]
     in
     dbFromList sampleData
+        |> Random.step
+        |> (|>) (Random.initialSeed 0)
+        |> Tuple.first
 
 
 main : Program Flags Model Msg

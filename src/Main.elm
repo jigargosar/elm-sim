@@ -376,8 +376,6 @@ viewGroupsPage db page =
                         , autofocus True
                         ]
                         []
-
-                    --, div [ class "absolute w-100 min-h-100 outline" ] []
                     ]
                 , div []
                     [ button [ btnStyle1, onClick SubmitClicked ] [ text "Add" ]

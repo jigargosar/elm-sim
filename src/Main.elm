@@ -202,7 +202,7 @@ type Msg
     | InputFocused Bool
     | SubmitClicked
     | CancelClicked
-    | OnKeyDown String
+    | OnKeyDown String String
 
 
 pure : a -> ( a, Cmd msg )
@@ -338,11 +338,14 @@ update msg model =
                 PageItems _ ->
                     ( model, Cmd.none )
 
-        OnKeyDown string ->
+        OnKeyDown keyName tagName ->
             case model.page of
                 PageGroups page ->
-                    case string of
-                        "j" ->
+                    case ( keyName, tagName ) of
+                        ( _, "INPUT" ) ->
+                            ( model, Cmd.none )
+
+                        ( "j", _ ) ->
                             ( { model
                                 | page =
                                     let
@@ -363,7 +366,7 @@ update msg model =
 
 subscriptions : Model -> Sub Msg
 subscriptions _ =
-    Sub.batch [ Browser.Events.onKeyDown (JD.map OnKeyDown (JD.field "key" JD.string)) ]
+    Sub.batch [ Browser.Events.onKeyDown (JD.map2 OnKeyDown (JD.field "key" JD.string) (JD.at [ "target", "tag" ] JD.string)) ]
 
 
 

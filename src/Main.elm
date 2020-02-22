@@ -5,7 +5,7 @@ import Browser.Events
 import Dict exposing (Dict)
 import Html exposing (Html, button, div, input, text)
 import Html.Attributes exposing (autofocus, class, value)
-import Html.Events exposing (onClick, onInput)
+import Html.Events exposing (onBlur, onClick, onFocus, onInput)
 import Json.Decode as JD
 import List.Extra
 import Maybe.Extra
@@ -151,8 +151,14 @@ type Page
     | PageItems PageItemsRecord
 
 
+type alias Add =
+    { content : String
+    , keyboardFocused : Bool
+    }
+
+
 type alias PageGroupsRecord =
-    { add : Maybe String
+    { add : Maybe Add
     }
 
 
@@ -193,6 +199,7 @@ type Msg
     | GotDB Db
     | AddGroupClicked
     | InputChanged String
+    | InputFocused Bool
     | SubmitClicked
     | CancelClicked
     | OnKeyDown String
@@ -228,12 +235,38 @@ update msg model =
                         | page =
                             let
                                 newPage =
-                                    { page | add = page.add |> Maybe.Extra.orElse (Just "") }
+                                    { page
+                                        | add =
+                                            page.add
+                                                |> Maybe.Extra.orElse (Just { content = "", keyboardFocused = False })
+                                    }
                             in
                             PageGroups newPage
                       }
                     , Cmd.none
                     )
+
+                PageItems _ ->
+                    ( model, Cmd.none )
+
+        InputFocused bool ->
+            case model.page of
+                PageGroups page ->
+                    case page.add of
+                        Nothing ->
+                            ( model, Cmd.none )
+
+                        Just add ->
+                            ( { model
+                                | page =
+                                    let
+                                        newPage =
+                                            { page | add = Just { add | keyboardFocused = bool } }
+                                    in
+                                    PageGroups newPage
+                              }
+                            , Cmd.none
+                            )
 
                 PageItems _ ->
                     ( model, Cmd.none )
@@ -245,12 +278,12 @@ update msg model =
                         Nothing ->
                             ( model, Cmd.none )
 
-                        Just _ ->
+                        Just add ->
                             ( { model
                                 | page =
                                     let
                                         newPage =
-                                            { page | add = Just string }
+                                            { page | add = Just { add | content = string, keyboardFocused = True } }
                                     in
                                     PageGroups newPage
                               }
@@ -273,7 +306,7 @@ update msg model =
                         , db =
                             let
                                 newDb =
-                                    case page.add |> Maybe.andThen (String.trim >> String.Extra.nonBlank) of
+                                    case page.add |> Maybe.andThen (.content >> String.trim >> String.Extra.nonBlank) of
                                         Just string ->
                                             dbAddNewGroup string model.db
 
@@ -388,14 +421,20 @@ viewGroupsPage db page =
                 ]
                 [ text "Add List" ]
 
-        viewAddGroupInlineForm : String -> Html Msg
-        viewAddGroupInlineForm content =
+        viewAddGroupInlineForm : Add -> Html Msg
+        viewAddGroupInlineForm add =
             div [ class "" ]
                 [ input
                     [ class "w-100 ph2 pv0 lh-solid"
-                    , value content
+                    , value add.content
                     , onInput InputChanged
                     , onEnter SubmitClicked
+                    , case add.keyboardFocused of
+                        True ->
+                            onBlur (InputFocused False)
+
+                        False ->
+                            onFocus (InputFocused True)
                     , autofocus True
                     ]
                     []
@@ -420,8 +459,8 @@ viewGroupsPage db page =
             Nothing ->
                 viewAddGroupButton
 
-            Just string ->
-                viewAddGroupInlineForm string
+            Just add ->
+                viewAddGroupInlineForm add
         ]
 
 
@@ -499,7 +538,7 @@ main =
             init
                 >> Tuple.mapFirst
                     (\m ->
-                        { m | db = sampleDb, page = PageGroups { add = Just "Next Actions" } }
+                        { m | db = sampleDb, page = PageGroups { add = Just { content = "Next Actions", keyboardFocused = False } } }
                     )
         , view = view
 

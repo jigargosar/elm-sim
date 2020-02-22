@@ -218,20 +218,25 @@ pure m =
     ( m, Cmd.none )
 
 
+switchRoute : Route -> Model -> ( Model, Cmd Msg )
+switchRoute route model =
+    let
+        newPage =
+            case route of
+                RouteGroups ->
+                    PageGroups { add = Nothing, selectedGroupId = Nothing }
+
+                RouteItems groupId ->
+                    PageItems { groupId = groupId }
+    in
+    pure { model | page = newPage }
+
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         RouteTo route ->
-            let
-                newPage =
-                    case route of
-                        RouteGroups ->
-                            PageGroups { add = Nothing, selectedGroupId = Nothing }
-
-                        RouteItems groupId ->
-                            PageItems { groupId = groupId }
-            in
-            pure { model | page = newPage }
+            switchRoute route model
 
         GotDB db ->
             pure { model | db = db }
@@ -382,6 +387,28 @@ update msg model =
                               }
                             , Cmd.none
                             )
+
+                        ( "l", _ ) ->
+                            let
+                                maybeRoute =
+                                    Pivot.fromList (allGroups model.db)
+                                        |> Maybe.map
+                                            (\p ->
+                                                case page.selectedGroupId of
+                                                    Just gid ->
+                                                        Pivot.withRollback (Pivot.firstWith (groupIdEq gid)) p
+
+                                                    Nothing ->
+                                                        p
+                                            )
+                                        |> Maybe.map (Pivot.getC >> groupGroupId >> RouteItems)
+                            in
+                            case maybeRoute of
+                                Nothing ->
+                                    ( model, Cmd.none )
+
+                                Just route ->
+                                    switchRoute route model
 
                         _ ->
                             ( model, Cmd.none )

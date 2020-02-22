@@ -29,6 +29,10 @@ type Group
     = Group GroupRecord
 
 
+groupGroupId (Group g) =
+    g.id
+
+
 type alias GroupRecord =
     { id : GroupId
     , title : String
@@ -358,8 +362,22 @@ update msg model =
                             ( { model
                                 | page =
                                     let
+                                        selectedGroupId =
+                                            Pivot.fromList (allGroups model.db)
+                                                |> Maybe.map
+                                                    (\p ->
+                                                        case page.selectedGroupId of
+                                                            Just gid ->
+                                                                Pivot.withRollback (Pivot.firstWith (groupIdEq gid)) p
+
+                                                            Nothing ->
+                                                                p
+                                                    )
+                                                |> Maybe.map (Pivot.withRollback Pivot.goR)
+                                                |> Maybe.map (Pivot.getC >> groupGroupId)
+
                                         newPage =
-                                            page
+                                            { page | selectedGroupId = selectedGroupId }
                                     in
                                     PageGroups newPage
                               }
@@ -379,7 +397,7 @@ subscriptions _ =
         [ Browser.Events.onKeyDown
             (JD.map2 OnKeyDown
                 (JD.field "key" JD.string)
-                (JD.at [ "target", "tag" ] JD.string)
+                (JD.at [ "target", "tagName" ] JD.string)
             )
         ]
 
@@ -462,7 +480,7 @@ viewGroupsPage db page =
                     ]
                 ]
 
-        maybePivot =
+        maybeSelectedGroupPivot =
             Pivot.fromList (allGroups db)
                 |> Maybe.map
                     (\p ->
@@ -476,7 +494,7 @@ viewGroupsPage db page =
     in
     div [ class "measure-wide center" ]
         [ viewPT
-        , case maybePivot of
+        , case maybeSelectedGroupPivot of
             Just pivot ->
                 viewGroupPivot pivot
 

@@ -358,7 +358,12 @@ main : Program Flags Model Msg
 main =
     Browser.element
         { -- init = init
-          init = init >> Tuple.mapFirst (\m -> { m | db = sampleDb, page = PageGroups { add = Just "" } })
+          init =
+            init
+                >> Tuple.mapFirst
+                    (\m ->
+                        { m | db = sampleDb, page = PageGroups { add = Just "Next Actions" } }
+                    )
         , view = view
 
         --, view = always viewSample

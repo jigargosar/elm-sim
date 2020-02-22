@@ -1,4 +1,4 @@
-module Item exposing (Item, id, idEq, random, title)
+module Item exposing (Item, groupId, groupIdEq, id, idEq, random, title)
 
 import GroupId exposing (GroupId)
 import ItemId exposing (ItemId)
@@ -24,6 +24,20 @@ id (Item i) =
 idEq : ItemId -> Item -> Bool
 idEq itemId (Item i) =
     itemId == i.id
+
+
+groupIdEq : GroupId -> Item -> Bool
+groupIdEq gid =
+    groupId >> eq gid
+
+
+eq =
+    (==)
+
+
+groupId : Item -> GroupId
+groupId (Item i) =
+    i.groupId
 
 
 title : Item -> String

@@ -15,26 +15,13 @@ import List.Extra
 import Maybe.Extra
 import Pivot exposing (Pivot)
 import Random exposing (Generator, Seed)
+import Random.Extra
 import String.Extra
+import Tuple exposing (mapBoth)
 
 
 
 -- DB
-
-
-type ItemId
-    = ItemId Int
-
-
-type Item
-    = Item ItemRecord
-
-
-type alias ItemRecord =
-    { id : ItemId
-    , groupId : GroupId
-    , title : String
-    }
 
 
 type Db
@@ -43,7 +30,7 @@ type Db
 
 type alias DbRecord =
     { groupDict : Dict String Group
-    , itemDict : Dict Int Item
+    , itemDict : Dict String Item
     }
 
 
@@ -58,29 +45,43 @@ emptyDb =
 dbFromList : List ( String, List String ) -> Generator Db
 dbFromList list =
     let
-        insertGroupAndItems : Int -> ( String, List String ) -> Generator Db -> Generator Db
-        insertGroupAndItems _ ( groupTitle, itemTitles ) =
-            Random.andThen
-                (\(Db m) ->
-                    let
-                        func group =
-                            let
-                                gid =
-                                    G.id group
+        foo : GroupId -> List String -> Generator (List Item)
+        foo groupId =
+            List.map (I.random groupId)
+                >> Random.Extra.combine
 
-                                insertItem idx title =
-                                    Dict.insert idx (Item { id = ItemId idx, groupId = gid, title = title })
-                            in
-                            Db
-                                { m
-                                    | groupDict = Dict.insert (GI.toString gid) group m.groupDict
-                                    , itemDict = List.Extra.indexedFoldl insertItem m.itemDict itemTitles
-                                }
-                    in
-                    Random.map func (G.random groupTitle)
+        fooo : List ( String, List String ) -> Generator ( Dict String Group, Dict String Item )
+        fooo =
+            List.map
+                (\( gt, itl ) ->
+                    G.random gt
+                        |> Random.andThen
+                            (\g ->
+                                foo (G.id g) itl
+                                    |> Random.map (Tuple.pair g)
+                            )
                 )
+                >> Random.Extra.combine
+                >> Random.map
+                    (List.unzip
+                        >> Tuple.mapSecond List.concat
+                        >> mapBoth (dictFromModelList (G.id >> GI.toString)) (dictFromModelList (I.id >> II.toString))
+                    )
+
+        dictFromModelList : (a -> comparable) -> List a -> Dict comparable a
+        dictFromModelList func =
+            List.foldl (dictInsert1 func) Dict.empty
+
+        dictInsert1 : (b -> comparable) -> b -> Dict comparable b -> Dict comparable b
+        dictInsert1 func v =
+            Dict.insert (func v) v
+
+        bar : Generator Db
+        bar =
+            fooo list
+                |> Random.map (\( g, i ) -> Db { groupDict = g, itemDict = i })
     in
-    List.Extra.indexedFoldl insertGroupAndItems (Random.constant emptyDb) list
+    bar
 
 
 
@@ -97,20 +98,10 @@ allGroups (Db db) =
     db.groupDict |> Dict.values
 
 
-itemGroupIdEq : GroupId -> Item -> Bool
-itemGroupIdEq groupId (Item i) =
-    groupId == i.groupId
-
-
-itemIdEq : ItemId -> Item -> Bool
-itemIdEq itemId (Item g) =
-    itemId == g.id
-
-
 findItemsInGroup : GroupId -> Db -> List Item
 findItemsInGroup gid (Db db) =
     Dict.values db.itemDict
-        |> List.filter (itemGroupIdEq gid)
+        |> List.filter (I.groupIdEq gid)
 
 
 dbAddNewGroup : String -> Db -> Generator Db
@@ -543,16 +534,16 @@ viewItemsPage db page =
         viewItemPivot items =
             let
                 viewGT : Item -> Html msg
-                viewGT (Item { title }) =
-                    div [ class "pointer pv1 ph2 br2" ] [ text title ]
+                viewGT i =
+                    div [ class "pointer pv1 ph2 br2" ] [ text (I.title i) ]
 
                 viewSGT : Item -> Html msg
-                viewSGT (Item { title }) =
+                viewSGT i =
                     div
                         [ class "pointer pv1 ph2 br2"
                         , class "bg-blue white"
                         ]
-                        [ text title ]
+                        [ text (I.title i) ]
             in
             div []
                 (Pivot.mapCS viewSGT viewGT items
@@ -599,8 +590,8 @@ viewItemsPage db page =
                 |> Maybe.map
                     (\p ->
                         case page.selectedItemId of
-                            Just gid ->
-                                Pivot.withRollback (Pivot.firstWith (itemIdEq gid)) p
+                            Just iid ->
+                                Pivot.withRollback (Pivot.firstWith (I.idEq iid)) p
 
                             Nothing ->
                                 p

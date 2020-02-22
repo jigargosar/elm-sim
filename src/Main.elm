@@ -64,23 +64,18 @@ dbFromList list =
                 >> Random.map
                     (List.unzip
                         >> Tuple.mapSecond List.concat
-                        >> mapBoth (dictFromModelList (G.id >> GI.toString)) (dictFromModelList (I.id >> II.toString))
+                        >> mapBoth
+                            (dictFromListByKey (G.id >> GI.toString))
+                            (dictFromListByKey (I.id >> II.toString))
                     )
-
-        dictFromModelList : (a -> comparable) -> List a -> Dict comparable a
-        dictFromModelList func =
-            List.foldl (dictInsert1 func) Dict.empty
-
-        dictInsert1 : (b -> comparable) -> b -> Dict comparable b -> Dict comparable b
-        dictInsert1 func v =
-            Dict.insert (func v) v
-
-        bar : Generator Db
-        bar =
-            fooo list
-                |> Random.map (\( g, i ) -> Db { groupDict = g, itemDict = i })
     in
-    bar
+    fooo list
+        |> Random.map (\( g, i ) -> Db { groupDict = g, itemDict = i })
+
+
+dictFromListByKey : (v -> comparable) -> List v -> Dict comparable v
+dictFromListByKey func =
+    List.map (\v -> ( func v, v )) >> Dict.fromList
 
 
 

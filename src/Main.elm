@@ -189,6 +189,7 @@ type Msg
     = RouteTo Route
     | GotDB Db
     | AddGroupClicked
+    | InputChanged String
     | SubmitClicked
     | CancelClicked
 
@@ -229,6 +230,28 @@ update msg model =
                       }
                     , Cmd.none
                     )
+
+                PageItems _ ->
+                    ( model, Cmd.none )
+
+        InputChanged string ->
+            case model.page of
+                PageGroups page ->
+                    case page.add of
+                        Nothing ->
+                            ( model, Cmd.none )
+
+                        Just _ ->
+                            ( { model
+                                | page =
+                                    let
+                                        newPage =
+                                            { page | add = Just string }
+                                    in
+                                    PageGroups newPage
+                              }
+                            , Cmd.none
+                            )
 
                 PageItems _ ->
                     ( model, Cmd.none )

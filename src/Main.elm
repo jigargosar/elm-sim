@@ -109,20 +109,20 @@ findItemsInGroup gid (Db db) =
 
 
 type Route
-    = RGroups
-    | RItems GroupId
+    = RouteGroups
+    | RouteItems GroupId
 
 
 type Page
-    = PGroups PGroupsRecord
-    | PItems PItemsRecord
+    = PageGroups PageGroupsRecord
+    | PageItems PageItemsRecord
 
 
-type alias PGroupsRecord =
+type alias PageGroupsRecord =
     {}
 
 
-type alias PItemsRecord =
+type alias PageItemsRecord =
     { groupId : GroupId }
 
 
@@ -135,7 +135,7 @@ type alias Model =
 initialModel : Model
 initialModel =
     { db = emptyDb
-    , page = PGroups {}
+    , page = PageGroups {}
     }
 
 
@@ -171,11 +171,11 @@ update msg model =
             let
                 newPage =
                     case route of
-                        RGroups ->
-                            PGroups {}
+                        RouteGroups ->
+                            PageGroups {}
 
-                        RItems groupId ->
-                            PItems { groupId = groupId }
+                        RouteItems groupId ->
+                            PageItems { groupId = groupId }
             in
             pure { model | page = newPage }
 
@@ -195,10 +195,10 @@ subscriptions _ =
 view : Model -> Html Msg
 view model =
     case model.page of
-        PGroups _ ->
+        PageGroups _ ->
             viewGroupList (allGroups model.db)
 
-        PItems pr ->
+        PageItems pr ->
             viewGroupItems model.db pr
 
 
@@ -212,7 +212,7 @@ viewGroupList =
         >> div []
 
 
-viewGroupItems : Db -> PItemsRecord -> Html Msg
+viewGroupItems : Db -> PageItemsRecord -> Html Msg
 viewGroupItems db { groupId } =
     case
         findGroup groupId db
@@ -268,15 +268,15 @@ viewSample =
         [ div [ class "pv2 f4 b" ] [ text "LOL Demo" ]
         , div [ class "pv2" ]
             [ div [ class "pv2 f4 ttu " ] [ text "Items Page" ]
-            , view { modelWithDb | page = PItems { groupId = GroupId 0 } }
+            , view { modelWithDb | page = PageItems { groupId = GroupId 0 } }
             ]
         , div [ class "pv2" ]
             [ div [ class "pv2 f4 ttu " ] [ text "Items Page: Group Not Found" ]
-            , view { modelWithDb | page = PItems { groupId = GroupId -1 } }
+            , view { modelWithDb | page = PageItems { groupId = GroupId -1 } }
             ]
         , div [ class "pv2" ]
             [ div [ class "pv2 f4 ttu" ] [ text "Groups Page" ]
-            , view { modelWithDb | page = PGroups {} }
+            , view { modelWithDb | page = PageGroups {} }
             ]
         ]
 

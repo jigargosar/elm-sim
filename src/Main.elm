@@ -69,6 +69,7 @@ dbFromList list =
         |> Random.map (\( g, i ) -> Db { groupDict = g, itemDict = i })
 
 
+dictFromListByKey : (v -> comparable) -> List v -> Dict comparable v
 dictFromListByKey func =
     List.map (\v -> ( func v, v )) >> Dict.fromList
 

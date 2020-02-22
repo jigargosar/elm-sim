@@ -4,10 +4,12 @@ import Browser
 import Browser.Events
 import Dict exposing (Dict)
 import Group as G exposing (Group)
-import GroupId exposing (GroupId)
+import GroupId as GI exposing (GroupId)
 import Html exposing (Html, button, div, input, text)
 import Html.Attributes exposing (autofocus, class, value)
 import Html.Events exposing (onClick, onInput)
+import Item as I exposing (Item)
+import ItemId as II exposing (ItemId)
 import Json.Decode as JD
 import List.Extra
 import Maybe.Extra
@@ -71,7 +73,7 @@ dbFromList list =
                             in
                             Db
                                 { m
-                                    | groupDict = Dict.insert (GroupId.toString gid) group m.groupDict
+                                    | groupDict = Dict.insert (GI.toString gid) group m.groupDict
                                     , itemDict = List.Extra.indexedFoldl insertItem m.itemDict itemTitles
                                 }
                     in
@@ -87,7 +89,7 @@ dbFromList list =
 
 findGroup : GroupId -> Db -> Maybe Group
 findGroup gid (Db db) =
-    Dict.get (GroupId.toString gid) db.groupDict
+    Dict.get (GI.toString gid) db.groupDict
 
 
 allGroups : Db -> List Group
@@ -120,7 +122,7 @@ dbAddNewGroup groupTitle (Db db) =
                     gid =
                         G.id group
                 in
-                Db { db | groupDict = Dict.insert (GroupId.toString gid) group db.groupDict }
+                Db { db | groupDict = Dict.insert (GI.toString gid) group db.groupDict }
             )
 
 

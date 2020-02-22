@@ -277,20 +277,6 @@ viewGroupsPage db =
         ]
 
 
-viewGroupList : List Group -> Html Msg
-viewGroupList groups =
-    let
-        viewGT : Group -> Html msg
-        viewGT (Group { title }) =
-            div [ class "pointer pv1 ph2 hover-bg-blue hover-white br2" ] [ text title ]
-
-        viewPT =
-            div [ class "pv2 ttu tracked" ] [ text "Lists" ]
-    in
-    (viewPT :: List.map viewGT groups)
-        |> div [ class "measure-wide center" ]
-
-
 viewGroupItems : Db -> PageItemsRecord -> Html Msg
 viewGroupItems db { groupId } =
     case

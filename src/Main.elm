@@ -367,9 +367,9 @@ viewGroupsPage db page =
         viewAddGroupInlineForm : String -> Html Msg
         viewAddGroupInlineForm content =
             div [ class "" ]
-                [ div [ class "ph2 pv1 flex relative br2 ba" ]
+                [ div [ class "flex" ]
                     [ input
-                        [ class "flex-grow-1 input-reset bn lh-title outline-0 pa0 ma0"
+                        [ class "flex-grow-1 ph2 pv0 lh-title"
                         , value content
                         , onInput InputChanged
                         , onEnter SubmitClicked

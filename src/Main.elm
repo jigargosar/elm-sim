@@ -206,7 +206,7 @@ viewGroupList : List Group -> Html Msg
 viewGroupList =
     let
         viewGT (Group { title }) =
-            div [ class "pointer b pa2 underline hover-bg-blue hover-white br2" ] [ text title ]
+            div [ class "pointer f4 pv1 ph2 hover-bg-blue hover-white br2" ] [ text title ]
     in
     List.map viewGT
         >> div []

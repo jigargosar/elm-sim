@@ -5,6 +5,7 @@ import Dict exposing (Dict)
 import Html exposing (Html, button, div, input, text)
 import Html.Attributes exposing (autofocus, class, value)
 import Html.Events exposing (onClick, onInput)
+import Json.Decode as JD
 import List.Extra
 import Maybe.Extra
 import Pivot exposing (Pivot)
@@ -365,12 +366,13 @@ viewGroupsPage db page =
 
         viewAddGroupInlineForm : String -> Html Msg
         viewAddGroupInlineForm content =
-            div [ class "pv2" ]
-                [ div [ class "flex" ]
+            div [ class "" ]
+                [ div [ class "flex outline" ]
                     [ input
-                        [ class "ph1 flex-grow-1"
+                        [ class "ph2 pv1 flex-grow-1 lh-title bn outline-0"
                         , value content
                         , onInput InputChanged
+                        , onEnter SubmitClicked
                         , autofocus True
                         ]
                         []
@@ -399,6 +401,20 @@ viewGroupsPage db page =
             Just string ->
                 viewAddGroupInlineForm string
         ]
+
+
+onEnter msg =
+    Html.Events.on "keydown"
+        (JD.field "key" JD.string
+            |> JD.andThen
+                (\actual ->
+                    if actual == "Enter" then
+                        JD.succeed msg
+
+                    else
+                        JD.fail "not enter"
+                )
+        )
 
 
 viewGroupItems : Db -> PageItemsRecord -> Html Msg

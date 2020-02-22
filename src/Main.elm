@@ -254,17 +254,26 @@ viewGroupsPage db page =
         viewEmptyGroups =
             div [] [ text "empty" ]
 
+        btnStyle1 =
+            class "pointer bn ph2 pv1 f5 ttu bg-inherit blue"
+
         viewAddGroupButton : Html Msg
         viewAddGroupButton =
             button
-                [ class "pointer bn ph2 pv1 f5 ttu bg-inherit blue"
+                [ btnStyle1
                 , onClick AddGroupClicked
                 ]
                 [ text "Add List" ]
 
         viewAddGroupInlineForm : String -> Html Msg
         viewAddGroupInlineForm content =
-            div [] [ input [ value content ] [] ]
+            div []
+                [ div [ class "flex" ] [ input [ class "flex-grow-1", value content ] [] ]
+                , div []
+                    [ button [ btnStyle1 ] [ text "Add" ]
+                    , button [ btnStyle1 ] [ text "Cancel" ]
+                    ]
+                ]
 
         maybePivot =
             Pivot.fromList (allGroups db)

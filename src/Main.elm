@@ -3,7 +3,7 @@ module Main exposing (main)
 import Browser
 import Dict exposing (Dict)
 import Html exposing (Html, button, div, input, text)
-import Html.Attributes exposing (class, value)
+import Html.Attributes exposing (autofocus, class, value)
 import Html.Events exposing (onClick)
 import List.Extra
 import Maybe.Extra
@@ -267,8 +267,15 @@ viewGroupsPage db page =
 
         viewAddGroupInlineForm : String -> Html Msg
         viewAddGroupInlineForm content =
-            div []
-                [ div [ class "flex" ] [ input [ class "flex-grow-1", value content ] [] ]
+            div [ class "pv2" ]
+                [ div [ class "flex" ]
+                    [ input
+                        [ class "ph1 flex-grow-1"
+                        , value content
+                        , autofocus True
+                        ]
+                        []
+                    ]
                 , div []
                     [ button [ btnStyle1 ] [ text "Add" ]
                     , button [ btnStyle1 ] [ text "Cancel" ]
@@ -351,7 +358,7 @@ main : Program Flags Model Msg
 main =
     Browser.element
         { -- init = init
-          init = init >> Tuple.mapFirst (\m -> { m | db = sampleDb })
+          init = init >> Tuple.mapFirst (\m -> { m | db = sampleDb, page = PageGroups { add = Just "" } })
         , view = view
 
         --, view = always viewSample

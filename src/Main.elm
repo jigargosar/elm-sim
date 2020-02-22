@@ -232,8 +232,11 @@ viewGroupItems db { groupId } =
                 )
 
 
-viewSample : Html Msg
-viewSample =
+
+-- Main
+
+
+sampleDb =
     let
         ng =
             Tuple.pair
@@ -257,12 +260,15 @@ viewSample =
                 , ni "Db: Focus Item/Group"
                 ]
             ]
+    in
+    dbFromList sampleData
 
-        db =
-            dbFromList sampleData
 
+viewSample : Html Msg
+viewSample =
+    let
         modelWithDb =
-            { initialModel | db = db }
+            { initialModel | db = sampleDb }
     in
     div [ class "pv2 ph4" ]
         [ div [ class "pv2 f4 b" ] [ text "LOL Demo" ]
@@ -279,10 +285,6 @@ viewSample =
             , view { modelWithDb | page = PageGroups {} }
             ]
         ]
-
-
-
--- Main
 
 
 main : Program Flags Model Msg

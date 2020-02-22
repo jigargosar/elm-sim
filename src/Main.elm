@@ -8,6 +8,7 @@ import Html.Events exposing (onClick)
 import List.Extra
 import Maybe.Extra
 import Pivot exposing (Pivot)
+import String.Extra
 
 
 
@@ -107,6 +108,32 @@ findItemsInGroup gid (Db db) =
         |> List.filter (itemGroupIdEq gid)
 
 
+dbAddNewGroup : String -> Db -> Db
+dbAddNewGroup groupTitle (Db db) =
+    let
+        gidx =
+            allGroups (Db db)
+                |> List.map
+                    (\(Group { id }) ->
+                        let
+                            (GroupId idx) =
+                                id
+                        in
+                        idx
+                    )
+                |> List.maximum
+                |> Maybe.withDefault 0
+
+        gid =
+            GroupId gidx
+
+        group : Group
+        group =
+            Group { id = gid, title = groupTitle }
+    in
+    Db { db | groupDict = Dict.insert gidx group db.groupDict }
+
+
 
 -- Model
 
@@ -162,6 +189,8 @@ type Msg
     = RouteTo Route
     | GotDB Db
     | AddGroupClicked
+    | SubmitClicked
+    | CancelClicked
 
 
 pure : a -> ( a, Cmd msg )
@@ -188,6 +217,49 @@ update msg model =
             pure { model | db = db }
 
         AddGroupClicked ->
+            case model.page of
+                PageGroups page ->
+                    ( { model
+                        | page =
+                            let
+                                newPage =
+                                    { page | add = page.add |> Maybe.Extra.orElse (Just "") }
+                            in
+                            PageGroups newPage
+                      }
+                    , Cmd.none
+                    )
+
+                PageItems _ ->
+                    ( model, Cmd.none )
+
+        SubmitClicked ->
+            case model.page of
+                PageGroups page ->
+                    let
+                        _ =
+                            case page.add |> Maybe.andThen (String.trim >> String.Extra.nonBlank) of
+                                Just string ->
+                                    dbAddNewGroup string model.db
+
+                                Nothing ->
+                                    model.db
+                    in
+                    ( { model
+                        | page =
+                            let
+                                newPage =
+                                    { page | add = Nothing }
+                            in
+                            PageGroups newPage
+                      }
+                    , Cmd.none
+                    )
+
+                PageItems _ ->
+                    ( model, Cmd.none )
+
+        CancelClicked ->
             case model.page of
                 PageGroups page ->
                     ( { model
@@ -277,8 +349,8 @@ viewGroupsPage db page =
                         []
                     ]
                 , div []
-                    [ button [ btnStyle1 ] [ text "Add" ]
-                    , button [ btnStyle1 ] [ text "Cancel" ]
+                    [ button [ btnStyle1, onClick SubmitClicked ] [ text "Add" ]
+                    , button [ btnStyle1, onClick CancelClicked ] [ text "Cancel" ]
                     ]
                 ]
 

@@ -104,6 +104,11 @@ itemGroupIdEq groupId (Item i) =
     groupId == i.groupId
 
 
+groupIdEq : GroupId -> Group -> Bool
+groupIdEq groupId (Group g) =
+    groupId == g.id
+
+
 findItemsInGroup : GroupId -> Db -> List Item
 findItemsInGroup gid (Db db) =
     Dict.values db.itemDict
@@ -364,13 +369,19 @@ update msg model =
                         _ ->
                             ( model, Cmd.none )
 
-                PageItems pageItemsRecord ->
+                PageItems _ ->
                     ( model, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg
 subscriptions _ =
-    Sub.batch [ Browser.Events.onKeyDown (JD.map2 OnKeyDown (JD.field "key" JD.string) (JD.at [ "target", "tag" ] JD.string)) ]
+    Sub.batch
+        [ Browser.Events.onKeyDown
+            (JD.map2 OnKeyDown
+                (JD.field "key" JD.string)
+                (JD.at [ "target", "tag" ] JD.string)
+            )
+        ]
 
 
 
@@ -453,6 +464,15 @@ viewGroupsPage db page =
 
         maybePivot =
             Pivot.fromList (allGroups db)
+                |> Maybe.map
+                    (\p ->
+                        case page.selectedGroupId of
+                            Just gid ->
+                                Pivot.withRollback (Pivot.firstWith (groupIdEq gid)) p
+
+                            Nothing ->
+                                p
+                    )
     in
     div [ class "measure-wide center" ]
         [ viewPT

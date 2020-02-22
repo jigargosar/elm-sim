@@ -44,19 +44,15 @@ emptyDb =
 dbFromList : List ( String, List String ) -> Generator Db
 dbFromList list =
     let
-        foo : GroupId -> List String -> Generator (List Item)
-        foo groupId =
-            List.map (I.random groupId)
-                >> Random.Extra.combine
-
-        fooo : List ( String, List String ) -> Generator ( Dict String Group, Dict String Item )
-        fooo =
+        randomDbDicts : List ( String, List String ) -> Generator ( Dict String Group, Dict String Item )
+        randomDbDicts =
             List.map
                 (\( gt, itl ) ->
                     G.random gt
                         |> Random.andThen
                             (\g ->
-                                foo (G.id g) itl
+                                List.map (I.random (G.id g)) itl
+                                    |> Random.Extra.combine
                                     |> Random.map (Tuple.pair g)
                             )
                 )
@@ -69,7 +65,7 @@ dbFromList list =
                             (dictFromListByKey (I.id >> II.toString))
                     )
     in
-    fooo list
+    randomDbDicts list
         |> Random.map (\( g, i ) -> Db { groupDict = g, itemDict = i })
 
 

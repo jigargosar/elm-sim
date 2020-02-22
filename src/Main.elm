@@ -2,8 +2,8 @@ module Main exposing (main)
 
 import Browser
 import Dict exposing (Dict)
-import Html exposing (Html, button, div, text)
-import Html.Attributes exposing (class)
+import Html exposing (Html, button, div, input, text)
+import Html.Attributes exposing (class, value)
 import Html.Events exposing (onClick)
 import List.Extra
 import Maybe.Extra
@@ -201,7 +201,7 @@ update msg model =
                     , Cmd.none
                     )
 
-                PageItems page ->
+                PageItems _ ->
                     ( model, Cmd.none )
 
 
@@ -217,15 +217,15 @@ subscriptions _ =
 view : Model -> Html Msg
 view model =
     case model.page of
-        PageGroups _ ->
-            viewGroupsPage model.db
+        PageGroups page ->
+            viewGroupsPage model.db page
 
         PageItems pr ->
             viewGroupItems model.db pr
 
 
-viewGroupsPage : Db -> Html Msg
-viewGroupsPage db =
+viewGroupsPage : Db -> PageGroupsRecord -> Html Msg
+viewGroupsPage db page =
     let
         viewGroupPivot : Pivot Group -> Html Msg
         viewGroupPivot groups =
@@ -254,13 +254,17 @@ viewGroupsPage db =
         viewEmptyGroups =
             div [] [ text "empty" ]
 
-        viewAddGroup : Html Msg
-        viewAddGroup =
+        viewAddGroupButton : Html Msg
+        viewAddGroupButton =
             button
                 [ class "pointer bn ph2 pv1 f5 ttu bg-inherit blue"
                 , onClick AddGroupClicked
                 ]
                 [ text "Add List" ]
+
+        viewAddGroupInlineForm : String -> Html Msg
+        viewAddGroupInlineForm content =
+            div [] [ input [ value content ] [] ]
 
         maybePivot =
             Pivot.fromList (allGroups db)
@@ -273,7 +277,12 @@ viewGroupsPage db =
 
             Nothing ->
                 viewEmptyGroups
-        , viewAddGroup
+        , case page.add of
+            Nothing ->
+                viewAddGroupButton
+
+            Just string ->
+                viewAddGroupInlineForm string
         ]
 
 

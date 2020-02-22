@@ -236,15 +236,6 @@ update msg model =
         SubmitClicked ->
             case model.page of
                 PageGroups page ->
-                    let
-                        _ =
-                            case page.add |> Maybe.andThen (String.trim >> String.Extra.nonBlank) of
-                                Just string ->
-                                    dbAddNewGroup string model.db
-
-                                Nothing ->
-                                    model.db
-                    in
                     ( { model
                         | page =
                             let
@@ -252,6 +243,17 @@ update msg model =
                                     { page | add = Nothing }
                             in
                             PageGroups newPage
+                        , db =
+                            let
+                                newDb =
+                                    case page.add |> Maybe.andThen (String.trim >> String.Extra.nonBlank) of
+                                        Just string ->
+                                            dbAddNewGroup string model.db
+
+                                        Nothing ->
+                                            model.db
+                            in
+                            newDb
                       }
                     , Cmd.none
                     )

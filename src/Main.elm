@@ -264,12 +264,12 @@ sampleDb =
     dbFromList sampleData
 
 
-sampleModel =
-    { initialModel | db = sampleDb }
-
-
 viewSample : Html Msg
 viewSample =
+    let
+        sampleModel =
+            { initialModel | db = sampleDb }
+    in
     div [ class "pv2 ph4" ]
         [ div [ class "pv2 f4 b" ] [ text "LOL Demo" ]
         , div [ class "pv2" ]
@@ -290,10 +290,11 @@ viewSample =
 main : Program Flags Model Msg
 main =
     Browser.element
-        { init = init
+        { -- init = init
+          init = init >> Tuple.mapFirst (\m -> { m | db = sampleDb })
+        , view = view
 
-        --, view = view
-        , view = always viewSample
+        --, view = always viewSample
         , update = update
         , subscriptions = subscriptions
         }

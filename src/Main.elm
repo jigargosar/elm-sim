@@ -293,7 +293,7 @@ update msg model =
                         | page =
                             let
                                 newPage =
-                                    { page | add = page.add |> Maybe.Extra.orElse (Just "") }
+                                    { page | add = Nothing }
                             in
                             PageGroups newPage
                       }

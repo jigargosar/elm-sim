@@ -1,6 +1,6 @@
-module Group exposing (Group, id, idEq, random, title)
+module Group exposing (Group, id, idEq, idString, random, title)
 
-import GroupId exposing (GroupId)
+import GroupId as GI exposing (GroupId)
 import Random exposing (Generator)
 
 
@@ -19,6 +19,11 @@ id (Group g) =
     g.id
 
 
+idString : Group -> String
+idString =
+    id >> GI.toString
+
+
 idEq : GroupId -> Group -> Bool
 idEq groupId (Group g) =
     groupId == g.id
@@ -31,5 +36,5 @@ title (Group g) =
 
 random : String -> Generator Group
 random gTitle =
-    GroupId.random
+    GI.random
         |> Random.map (\gid -> Group { id = gid, title = gTitle })

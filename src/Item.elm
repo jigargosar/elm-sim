@@ -1,7 +1,7 @@
-module Item exposing (Item, groupId, groupIdEq, id, idEq, random, title)
+module Item exposing (Item, groupId, groupIdEq, id, idEq, idString, random, title)
 
-import GroupId exposing (GroupId)
-import ItemId exposing (ItemId)
+import GroupId as GI exposing (GroupId)
+import ItemId as II exposing (ItemId)
 import Random exposing (Generator)
 
 
@@ -31,6 +31,11 @@ groupIdEq gid =
     groupId >> eq gid
 
 
+idString : Item -> String
+idString =
+    id >> II.toString
+
+
 eq =
     (==)
 
@@ -47,5 +52,5 @@ title (Item i) =
 
 random : GroupId -> String -> Generator Item
 random gid iTitle =
-    ItemId.random
+    II.random
         |> Random.map (\iid -> Item { id = iid, groupId = gid, title = iTitle })

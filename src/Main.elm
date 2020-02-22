@@ -65,7 +65,7 @@ dbFromList list =
                     (List.unzip
                         >> Tuple.mapSecond List.concat
                         >> mapBoth
-                            (dictFromListByKey (G.id >> GI.toString))
+                            (dictFromListByKey G.idString)
                             (dictFromListByKey (I.id >> II.toString))
                     )
     in

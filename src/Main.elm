@@ -5,6 +5,7 @@ import Dict exposing (Dict)
 import Html exposing (Html, div, text)
 import Html.Attributes exposing (class)
 import List.Extra
+import Pivot exposing (Pivot)
 
 
 
@@ -196,10 +197,54 @@ view : Model -> Html Msg
 view model =
     case model.page of
         PageGroups _ ->
-            viewGroupList (allGroups model.db)
+            viewGroupsPage model.db
 
         PageItems pr ->
             viewGroupItems model.db pr
+
+
+viewGroupsPage : Db -> Html Msg
+viewGroupsPage db =
+    let
+        viewGroupPivot : Pivot Group -> Html Msg
+        viewGroupPivot groups =
+            let
+                viewGT : Group -> Html msg
+                viewGT (Group { title }) =
+                    div [ class "pointer pv1 ph2 hover-bg-blue hover-white br2" ] [ text title ]
+
+                viewSGT : Group -> Html msg
+                viewSGT (Group { title }) =
+                    div
+                        [ class "pointer pv1 ph2 br2"
+                        , class "bg-blue white hover-bg-blue hover-white"
+                        ]
+                        [ text title ]
+            in
+            div []
+                (Pivot.mapCS viewSGT viewGT groups
+                    |> Pivot.toList
+                )
+
+        viewPT =
+            div [ class "pv2 ttu tracked" ] [ text "Lists" ]
+
+        viewEmptyGroups : Html Msg
+        viewEmptyGroups =
+            div [] [ text "empty" ]
+
+        maybePivot =
+            Pivot.fromList (allGroups db)
+    in
+    div [ class "measure-wide center" ]
+        [ viewPT
+        , case maybePivot of
+            Just pivot ->
+                viewGroupPivot pivot
+
+            Nothing ->
+                viewEmptyGroups
+        ]
 
 
 viewGroupList : List Group -> Html Msg

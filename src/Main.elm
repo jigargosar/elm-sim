@@ -3,6 +3,7 @@ module Main exposing (main)
 import Browser
 import Browser.Events
 import Dict exposing (Dict)
+import Group as G exposing (Group)
 import GroupId exposing (GroupId)
 import Html exposing (Html, button, div, input, text)
 import Html.Attributes exposing (autofocus, class, value)
@@ -21,20 +22,6 @@ import String.Extra
 
 type ItemId
     = ItemId Int
-
-
-type Group
-    = Group GroupRecord
-
-
-groupGroupId (Group g) =
-    g.id
-
-
-type alias GroupRecord =
-    { id : GroupId
-    , title : String
-    }
 
 
 type Item
@@ -74,11 +61,10 @@ dbFromList list =
             Random.andThen
                 (\(Db m) ->
                     let
-                        func gid =
+                        func group =
                             let
-                                group : Group
-                                group =
-                                    Group { id = gid, title = groupTitle }
+                                gid =
+                                    G.id group
 
                                 insertItem idx title =
                                     Dict.insert idx (Item { id = ItemId idx, groupId = gid, title = title })
@@ -89,10 +75,14 @@ dbFromList list =
                                     , itemDict = List.Extra.indexedFoldl insertItem m.itemDict itemTitles
                                 }
                     in
-                    Random.map func GroupId.random
+                    Random.map func (G.random groupTitle)
                 )
     in
     List.Extra.indexedFoldl insertGroupAndItems (Random.constant emptyDb) list
+
+
+
+--noinspection ElmUnusedSymbol
 
 
 findGroup : GroupId -> Db -> Maybe Group
@@ -110,11 +100,6 @@ itemGroupIdEq groupId (Item i) =
     groupId == i.groupId
 
 
-groupIdEq : GroupId -> Group -> Bool
-groupIdEq groupId (Group g) =
-    groupId == g.id
-
-
 itemIdEq : ItemId -> Item -> Bool
 itemIdEq itemId (Item g) =
     itemId == g.id
@@ -128,13 +113,12 @@ findItemsInGroup gid (Db db) =
 
 dbAddNewGroup : String -> Db -> Generator Db
 dbAddNewGroup groupTitle (Db db) =
-    GroupId.random
+    G.random groupTitle
         |> Random.map
-            (\gid ->
+            (\group ->
                 let
-                    group : Group
-                    group =
-                        Group { id = gid, title = groupTitle }
+                    gid =
+                        G.id group
                 in
                 Db { db | groupDict = Dict.insert (GroupId.toString gid) group db.groupDict }
             )
@@ -352,13 +336,13 @@ update msg model =
                                                     (\p ->
                                                         case page.selectedGroupId of
                                                             Just gid ->
-                                                                Pivot.withRollback (Pivot.firstWith (groupIdEq gid)) p
+                                                                Pivot.withRollback (Pivot.firstWith (G.idEq gid)) p
 
                                                             Nothing ->
                                                                 p
                                                     )
                                                 |> Maybe.map (Pivot.withRollback Pivot.goR)
-                                                |> Maybe.map (Pivot.getC >> groupGroupId)
+                                                |> Maybe.map (Pivot.getC >> G.id)
 
                                         newPage =
                                             { page | selectedGroupId = selectedGroupId }
@@ -378,13 +362,13 @@ update msg model =
                                                     (\p ->
                                                         case page.selectedGroupId of
                                                             Just gid ->
-                                                                Pivot.withRollback (Pivot.firstWith (groupIdEq gid)) p
+                                                                Pivot.withRollback (Pivot.firstWith (G.idEq gid)) p
 
                                                             Nothing ->
                                                                 p
                                                     )
                                                 |> Maybe.map (Pivot.withRollback Pivot.goL)
-                                                |> Maybe.map (Pivot.getC >> groupGroupId)
+                                                |> Maybe.map (Pivot.getC >> G.id)
 
                                         newPage =
                                             { page | selectedGroupId = selectedGroupId }
@@ -402,12 +386,12 @@ update msg model =
                                             (\p ->
                                                 case page.selectedGroupId of
                                                     Just gid ->
-                                                        Pivot.withRollback (Pivot.firstWith (groupIdEq gid)) p
+                                                        Pivot.withRollback (Pivot.firstWith (G.idEq gid)) p
 
                                                     Nothing ->
                                                         p
                                             )
-                                        |> Maybe.map (Pivot.getC >> groupGroupId >> RouteItems)
+                                        |> Maybe.map (Pivot.getC >> G.id >> RouteItems)
                             in
                             case maybeRoute of
                                 Nothing ->
@@ -456,16 +440,16 @@ viewGroupsPage db page =
         viewGroupPivot groups =
             let
                 viewGT : Group -> Html msg
-                viewGT (Group { title }) =
-                    div [ class "pointer pv1 ph2 br2" ] [ text title ]
+                viewGT g =
+                    div [ class "pointer pv1 ph2 br2" ] [ text (G.title g) ]
 
                 viewSGT : Group -> Html msg
-                viewSGT (Group { title }) =
+                viewSGT g =
                     div
                         [ class "pointer pv1 ph2 br2"
                         , class "bg-blue white"
                         ]
-                        [ text title ]
+                        [ text (G.title g) ]
             in
             div []
                 (Pivot.mapCS viewSGT viewGT groups
@@ -513,7 +497,7 @@ viewGroupsPage db page =
                     (\p ->
                         case page.selectedGroupId of
                             Just gid ->
-                                Pivot.withRollback (Pivot.firstWith (groupIdEq gid)) p
+                                Pivot.withRollback (Pivot.firstWith (G.idEq gid)) p
 
                             Nothing ->
                                 p

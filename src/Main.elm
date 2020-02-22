@@ -357,6 +357,32 @@ update msg model =
                             , Cmd.none
                             )
 
+                        ( "k", _ ) ->
+                            ( { model
+                                | page =
+                                    let
+                                        selectedGroupId =
+                                            Pivot.fromList (allGroups model.db)
+                                                |> Maybe.map
+                                                    (\p ->
+                                                        case page.selectedGroupId of
+                                                            Just gid ->
+                                                                Pivot.withRollback (Pivot.firstWith (groupIdEq gid)) p
+
+                                                            Nothing ->
+                                                                p
+                                                    )
+                                                |> Maybe.map (Pivot.withRollback Pivot.goL)
+                                                |> Maybe.map (Pivot.getC >> groupGroupId)
+
+                                        newPage =
+                                            { page | selectedGroupId = selectedGroupId }
+                                    in
+                                    PageGroups newPage
+                              }
+                            , Cmd.none
+                            )
+
                         _ ->
                             ( model, Cmd.none )
 

@@ -2,7 +2,7 @@ module Main exposing (main)
 
 import Browser
 import Dict exposing (Dict)
-import Html exposing (Html, div, text)
+import Html exposing (Html, button, div, text)
 import Html.Attributes exposing (class)
 import List.Extra
 import Pivot exposing (Pivot)
@@ -233,6 +233,10 @@ viewGroupsPage db =
         viewEmptyGroups =
             div [] [ text "empty" ]
 
+        viewAddGroup : Html Msg
+        viewAddGroup =
+            button [ class "pointer bn ph2 pv1 f5 ttu bg-inherit blue" ] [ text "Add List" ]
+
         maybePivot =
             Pivot.fromList (allGroups db)
     in
@@ -244,6 +248,7 @@ viewGroupsPage db =
 
             Nothing ->
                 viewEmptyGroups
+        , viewAddGroup
         ]
 
 

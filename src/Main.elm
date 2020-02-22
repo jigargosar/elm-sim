@@ -5,7 +5,7 @@ import Browser.Events
 import Dict exposing (Dict)
 import Html exposing (Html, button, div, input, text)
 import Html.Attributes exposing (autofocus, class, value)
-import Html.Events exposing (onBlur, onClick, onFocus, onInput)
+import Html.Events exposing (onClick, onInput)
 import Json.Decode as JD
 import List.Extra
 import Maybe.Extra
@@ -162,7 +162,6 @@ type Page
 
 type alias Add =
     { content : String
-    , keyboardFocused : Bool
     }
 
 
@@ -209,7 +208,6 @@ type Msg
     | GotDB Db
     | AddGroupClicked
     | InputChanged String
-    | InputFocused Bool
     | SubmitClicked
     | CancelClicked
     | OnKeyDown String String
@@ -248,35 +246,13 @@ update msg model =
                                     { page
                                         | add =
                                             page.add
-                                                |> Maybe.Extra.orElse (Just { content = "", keyboardFocused = False })
+                                                |> Maybe.Extra.orElse (Just { content = "" })
                                     }
                             in
                             PageGroups newPage
                       }
                     , Cmd.none
                     )
-
-                PageItems _ ->
-                    ( model, Cmd.none )
-
-        InputFocused bool ->
-            case model.page of
-                PageGroups page ->
-                    case page.add of
-                        Nothing ->
-                            ( model, Cmd.none )
-
-                        Just add ->
-                            ( { model
-                                | page =
-                                    let
-                                        newPage =
-                                            { page | add = Just { add | keyboardFocused = bool } }
-                                    in
-                                    PageGroups newPage
-                              }
-                            , Cmd.none
-                            )
 
                 PageItems _ ->
                     ( model, Cmd.none )
@@ -293,7 +269,7 @@ update msg model =
                                 | page =
                                     let
                                         newPage =
-                                            { page | add = Just { add | content = string, keyboardFocused = True } }
+                                            { page | add = Just { add | content = string } }
                                     in
                                     PageGroups newPage
                               }
@@ -465,12 +441,6 @@ viewGroupsPage db page =
                     , value add.content
                     , onInput InputChanged
                     , onEnter SubmitClicked
-                    , case add.keyboardFocused of
-                        True ->
-                            onBlur (InputFocused False)
-
-                        False ->
-                            onFocus (InputFocused True)
                     , autofocus True
                     ]
                     []
@@ -590,7 +560,6 @@ main =
                                     { add =
                                         Just
                                             { content = "Next Actions"
-                                            , keyboardFocused = False
                                             }
                                     , selectedGroupId = Nothing
                                     }

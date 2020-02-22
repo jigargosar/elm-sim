@@ -172,7 +172,7 @@ type alias PageGroupsRecord =
 
 
 type alias PageItemsRecord =
-    { groupId : GroupId }
+    { groupId : GroupId, selectedItemId : Maybe ItemId }
 
 
 type alias Model =
@@ -227,7 +227,7 @@ switchRoute route model =
                     PageGroups { add = Nothing, selectedGroupId = Nothing }
 
                 RouteItems groupId ->
-                    PageItems { groupId = groupId }
+                    PageItems { groupId = groupId, selectedItemId = Nothing }
     in
     pure { model | page = newPage }
 

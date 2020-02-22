@@ -264,25 +264,25 @@ sampleDb =
     dbFromList sampleData
 
 
+sampleModel =
+    { initialModel | db = sampleDb }
+
+
 viewSample : Html Msg
 viewSample =
-    let
-        modelWithDb =
-            { initialModel | db = sampleDb }
-    in
     div [ class "pv2 ph4" ]
         [ div [ class "pv2 f4 b" ] [ text "LOL Demo" ]
         , div [ class "pv2" ]
             [ div [ class "pv2 f4 ttu " ] [ text "Items Page" ]
-            , view { modelWithDb | page = PageItems { groupId = GroupId 0 } }
+            , view { sampleModel | page = PageItems { groupId = GroupId 0 } }
             ]
         , div [ class "pv2" ]
             [ div [ class "pv2 f4 ttu " ] [ text "Items Page: Group Not Found" ]
-            , view { modelWithDb | page = PageItems { groupId = GroupId -1 } }
+            , view { sampleModel | page = PageItems { groupId = GroupId -1 } }
             ]
         , div [ class "pv2" ]
             [ div [ class "pv2 f4 ttu" ] [ text "Groups Page" ]
-            , view { modelWithDb | page = PageGroups {} }
+            , view { sampleModel | page = PageGroups {} }
             ]
         ]
 

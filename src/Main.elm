@@ -327,14 +327,11 @@ update msg model =
         OnKeyDown keyName tagName ->
             case model.page of
                 PageGroups page ->
-                    case ( keyName, tagName, page.add ) of
-                        ( _, "INPUT", _ ) ->
+                    case ( keyName, tagName ) of
+                        ( _, "INPUT" ) ->
                             ( model, Cmd.none )
 
-                        ( _, _, Just _ ) ->
-                            ( model, Cmd.none )
-
-                        ( "j", _, _ ) ->
+                        ( "j", _ ) ->
                             ( { model
                                 | page =
                                     let

@@ -113,6 +113,11 @@ groupIdEq groupId (Group g) =
     groupId == g.id
 
 
+itemIdEq : ItemId -> Item -> Bool
+itemIdEq itemId (Item g) =
+    itemId == g.id
+
+
 findItemsInGroup : GroupId -> Db -> List Item
 findItemsInGroup gid (Db db) =
     Dict.values db.itemDict
@@ -160,19 +165,26 @@ type Page
     | PageItems PageItemsRecord
 
 
-type alias Add =
+type alias GAdd =
     { content : String
     }
 
 
 type alias PageGroupsRecord =
-    { add : Maybe Add
+    { add : Maybe GAdd
     , selectedGroupId : Maybe GroupId
     }
 
 
+type alias IAdd =
+    { content : String }
+
+
 type alias PageItemsRecord =
-    { groupId : GroupId, selectedItemId : Maybe ItemId }
+    { groupId : GroupId
+    , add : Maybe IAdd
+    , selectedItemId : Maybe ItemId
+    }
 
 
 type alias Model =
@@ -206,7 +218,7 @@ init _ =
 type Msg
     = RouteTo Route
     | GotDB Db
-    | AddGroupClicked
+    | AddFormClicked
     | InputChanged String
     | SubmitClicked
     | CancelClicked
@@ -227,7 +239,7 @@ switchRoute route model =
                     PageGroups { add = Nothing, selectedGroupId = Nothing }
 
                 RouteItems groupId ->
-                    PageItems { groupId = groupId, selectedItemId = Nothing }
+                    PageItems { groupId = groupId, add = Nothing, selectedItemId = Nothing }
     in
     pure { model | page = newPage }
 
@@ -241,7 +253,7 @@ update msg model =
         GotDB db ->
             pure { model | db = db }
 
-        AddGroupClicked ->
+        AddFormClicked ->
             case model.page of
                 PageGroups page ->
                     ( { model
@@ -438,8 +450,9 @@ view model =
         PageGroups page ->
             viewGroupsPage model.db page
 
-        PageItems pr ->
-            viewGroupItems model.db pr
+        PageItems page ->
+            --viewGroupItems model.db pr
+            viewItemsPage model.db page
 
 
 viewGroupsPage : Db -> PageGroupsRecord -> Html Msg
@@ -479,11 +492,11 @@ viewGroupsPage db page =
         viewAddGroupButton =
             button
                 [ btnStyle1
-                , onClick AddGroupClicked
+                , onClick AddFormClicked
                 ]
                 [ text "Add List" ]
 
-        viewAddGroupInlineForm : Add -> Html Msg
+        viewAddGroupInlineForm : GAdd -> Html Msg
         viewAddGroupInlineForm add =
             div [ class "" ]
                 [ input
@@ -541,6 +554,93 @@ onEnter msg =
                         JD.fail "not enter"
                 )
         )
+
+
+viewItemsPage : Db -> PageItemsRecord -> Html Msg
+viewItemsPage db page =
+    let
+        viewItemPivot : Pivot Item -> Html Msg
+        viewItemPivot items =
+            let
+                viewGT : Item -> Html msg
+                viewGT (Item { title }) =
+                    div [ class "pointer pv1 ph2 br2" ] [ text title ]
+
+                viewSGT : Item -> Html msg
+                viewSGT (Item { title }) =
+                    div
+                        [ class "pointer pv1 ph2 br2"
+                        , class "bg-blue white"
+                        ]
+                        [ text title ]
+            in
+            div []
+                (Pivot.mapCS viewSGT viewGT items
+                    |> Pivot.toList
+                )
+
+        viewPT =
+            div [ class "pv2 ttu tracked" ] [ text "Lists" ]
+
+        viewEmptyItems : Html Msg
+        viewEmptyItems =
+            div [] [ text "empty" ]
+
+        btnStyle1 =
+            class "pointer bn ph2 pv1 f5 ttu bg-inherit blue"
+
+        viewAddItemButton : Html Msg
+        viewAddItemButton =
+            button
+                [ btnStyle1
+                , onClick AddFormClicked
+                ]
+                [ text "Add List" ]
+
+        viewAddItemInlineForm : GAdd -> Html Msg
+        viewAddItemInlineForm add =
+            div [ class "" ]
+                [ input
+                    [ class "w-100 ph2 pv0 lh-solid"
+                    , value add.content
+                    , onInput InputChanged
+                    , onEnter SubmitClicked
+                    , autofocus True
+                    ]
+                    []
+                , div []
+                    [ button [ btnStyle1, onClick SubmitClicked ] [ text "Add" ]
+                    , button [ btnStyle1, onClick CancelClicked ] [ text "Cancel" ]
+                    ]
+                ]
+
+        maybeSelectedItemPivot =
+            Pivot.fromList (findItemsInGroup page.groupId db)
+                |> Maybe.map
+                    (\p ->
+                        case page.selectedItemId of
+                            Just gid ->
+                                Pivot.withRollback (Pivot.firstWith (itemIdEq gid)) p
+
+                            Nothing ->
+                                p
+                    )
+    in
+    div [ class "measure-wide center" ]
+        [ viewPT
+        , case maybeSelectedItemPivot of
+            Just pivot ->
+                viewItemPivot pivot
+
+            Nothing ->
+                viewEmptyItems
+        , case page.add of
+            Nothing ->
+                viewAddItemButton
+
+            Just add ->
+                viewAddItemInlineForm add
+        ]
 
 
 viewGroupItems : Db -> PageItemsRecord -> Html Msg

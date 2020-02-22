@@ -211,7 +211,7 @@ viewGroupsPage db =
             let
                 viewGT : Group -> Html msg
                 viewGT (Group { title }) =
-                    div [ class "pointer pv1 ph2 hover-bg-blue hover-white br2" ] [ text title ]
+                    div [ class "pointer pv1 ph2 br2" ] [ text title ]
 
                 viewSGT : Group -> Html msg
                 viewSGT (Group { title }) =

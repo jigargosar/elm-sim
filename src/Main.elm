@@ -580,7 +580,7 @@ viewItemsPage db page =
                 )
 
         viewPT =
-            div [ class "pv2 ttu tracked" ] [ text "Lists" ]
+            div [ class "pv2 ttu tracked" ] [ text "Items" ]
 
         viewEmptyItems : Html Msg
         viewEmptyItems =
@@ -595,7 +595,7 @@ viewItemsPage db page =
                 [ btnStyle1
                 , onClick AddFormClicked
                 ]
-                [ text "Add List" ]
+                [ text "Add Item" ]
 
         viewAddItemInlineForm : GAdd -> Html Msg
         viewAddItemInlineForm add =

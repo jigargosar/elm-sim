@@ -264,6 +264,10 @@ sampleDb =
     dbFromList sampleData
 
 
+
+--noinspection ElmUnusedSymbol
+
+
 viewSample : Html Msg
 viewSample =
     let

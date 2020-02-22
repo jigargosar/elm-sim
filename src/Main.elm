@@ -11,7 +11,6 @@ import Html.Events exposing (onClick, onInput)
 import Item as I exposing (Item)
 import ItemId as II exposing (ItemId)
 import Json.Decode as JD
-import List.Extra
 import Maybe.Extra
 import Pivot exposing (Pivot)
 import Random exposing (Generator, Seed)

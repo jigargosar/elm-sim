@@ -123,6 +123,7 @@ dbAddNewGroup groupTitle (Db db) =
                     )
                 |> List.maximum
                 |> Maybe.withDefault 0
+                |> (+) 1
 
         gid =
             GroupId gidx

@@ -1,6 +1,7 @@
 module Main exposing (main)
 
 import Browser
+import Browser.Events
 import Dict exposing (Dict)
 import Html exposing (Html, button, div, input, text)
 import Html.Attributes exposing (autofocus, class, value)
@@ -194,6 +195,7 @@ type Msg
     | InputChanged String
     | SubmitClicked
     | CancelClicked
+    | OnKeyDown String
 
 
 pure : a -> ( a, Cmd msg )
@@ -303,10 +305,32 @@ update msg model =
                 PageItems _ ->
                     ( model, Cmd.none )
 
+        OnKeyDown string ->
+            case model.page of
+                PageGroups page ->
+                    case string of
+                        "j" ->
+                            ( { model
+                                | page =
+                                    let
+                                        newPage =
+                                            page
+                                    in
+                                    PageGroups newPage
+                              }
+                            , Cmd.none
+                            )
+
+                        _ ->
+                            ( model, Cmd.none )
+
+                PageItems pageItemsRecord ->
+                    ( model, Cmd.none )
+
 
 subscriptions : Model -> Sub Msg
 subscriptions _ =
-    Sub.batch []
+    Sub.batch [ Browser.Events.onKeyDown (JD.map OnKeyDown (JD.field "key" JD.string)) ]
 
 
 

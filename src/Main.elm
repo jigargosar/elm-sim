@@ -4,6 +4,7 @@ import Browser
 import Dict exposing (Dict)
 import Html exposing (Html, button, div, text)
 import Html.Attributes exposing (class)
+import Html.Events exposing (onClick)
 import List.Extra
 import Pivot exposing (Pivot)
 
@@ -120,7 +121,8 @@ type Page
 
 
 type alias PageGroupsRecord =
-    {}
+    { add : Maybe String
+    }
 
 
 type alias PageItemsRecord =
@@ -136,7 +138,7 @@ type alias Model =
 initialModel : Model
 initialModel =
     { db = emptyDb
-    , page = PageGroups {}
+    , page = PageGroups { add = Nothing }
     }
 
 
@@ -158,6 +160,7 @@ init _ =
 type Msg
     = RouteTo Route
     | GotDB Db
+    | AddGroupClicked
 
 
 pure : a -> ( a, Cmd msg )
@@ -173,7 +176,7 @@ update msg model =
                 newPage =
                     case route of
                         RouteGroups ->
-                            PageGroups {}
+                            PageGroups { add = Nothing }
 
                         RouteItems groupId ->
                             PageItems { groupId = groupId }
@@ -182,6 +185,14 @@ update msg model =
 
         GotDB db ->
             pure { model | db = db }
+
+        AddGroupClicked ->
+            case model.page of
+                PageGroups page ->
+                    ( model, Cmd.none )
+
+                PageItems page ->
+                    ( model, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg
@@ -235,7 +246,11 @@ viewGroupsPage db =
 
         viewAddGroup : Html Msg
         viewAddGroup =
-            button [ class "pointer bn ph2 pv1 f5 ttu bg-inherit blue" ] [ text "Add List" ]
+            button
+                [ class "pointer bn ph2 pv1 f5 ttu bg-inherit blue"
+                , onClick AddGroupClicked
+                ]
+                [ text "Add List" ]
 
         maybePivot =
             Pivot.fromList (allGroups db)
@@ -316,33 +331,6 @@ sampleDb =
             ]
     in
     dbFromList sampleData
-
-
-
---noinspection ElmUnusedSymbol
-
-
-viewSample : Html Msg
-viewSample =
-    let
-        sampleModel =
-            { initialModel | db = sampleDb }
-    in
-    div [ class "pv2 ph4" ]
-        [ div [ class "pv2 f4 b" ] [ text "LOL Demo" ]
-        , div [ class "pv2" ]
-            [ div [ class "pv2 f4 ttu " ] [ text "Items Page" ]
-            , view { sampleModel | page = PageItems { groupId = GroupId 0 } }
-            ]
-        , div [ class "pv2" ]
-            [ div [ class "pv2 f4 ttu " ] [ text "Items Page: Group Not Found" ]
-            , view { sampleModel | page = PageItems { groupId = GroupId -1 } }
-            ]
-        , div [ class "pv2" ]
-            [ div [ class "pv2 f4 ttu" ] [ text "Groups Page" ]
-            , view { sampleModel | page = PageGroups {} }
-            ]
-        ]
 
 
 main : Program Flags Model Msg

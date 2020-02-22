@@ -6,6 +6,7 @@ import Html exposing (Html, button, div, text)
 import Html.Attributes exposing (class)
 import Html.Events exposing (onClick)
 import List.Extra
+import Maybe.Extra
 import Pivot exposing (Pivot)
 
 
@@ -189,7 +190,16 @@ update msg model =
         AddGroupClicked ->
             case model.page of
                 PageGroups page ->
-                    ( model, Cmd.none )
+                    ( { model
+                        | page =
+                            let
+                                newPage =
+                                    { page | add = page.add |> Maybe.Extra.orElse (Just "") }
+                            in
+                            PageGroups newPage
+                      }
+                    , Cmd.none
+                    )
 
                 PageItems page ->
                     ( model, Cmd.none )

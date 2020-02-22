@@ -159,6 +159,7 @@ type alias Add =
 
 type alias PageGroupsRecord =
     { add : Maybe Add
+    , selectedGroupId : Maybe GroupId
     }
 
 
@@ -175,7 +176,7 @@ type alias Model =
 initialModel : Model
 initialModel =
     { db = emptyDb
-    , page = PageGroups { add = Nothing }
+    , page = PageGroups { add = Nothing, selectedGroupId = Nothing }
     }
 
 
@@ -218,7 +219,7 @@ update msg model =
                 newPage =
                     case route of
                         RouteGroups ->
-                            PageGroups { add = Nothing }
+                            PageGroups { add = Nothing, selectedGroupId = Nothing }
 
                         RouteItems groupId ->
                             PageItems { groupId = groupId }
@@ -544,7 +545,18 @@ main =
             init
                 >> Tuple.mapFirst
                     (\m ->
-                        { m | db = sampleDb, page = PageGroups { add = Just { content = "Next Actions", keyboardFocused = False } } }
+                        { m
+                            | db = sampleDb
+                            , page =
+                                PageGroups
+                                    { add =
+                                        Just
+                                            { content = "Next Actions"
+                                            , keyboardFocused = False
+                                            }
+                                    , selectedGroupId = Nothing
+                                    }
+                        }
                     )
         , view = view
 
